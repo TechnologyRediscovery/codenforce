@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Core concepts</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="docHomeView">
+                    
+                    <div class="mainContainer">
+
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1>Core concepts in CodeConneect</h1>
+                        
+                        <p:accordionPanel>
+                            <p:tab title="Municipal code terms">
+                                <h:outputText value="Code element, code sets (code books), code sources, and code violations"/>
+                            </p:tab>
+                            <p:tab title="What key code enforcement actions does the system track?">
+                                <h:outputText value=""/>
+                            </p:tab>
+                            <p:tab title="Municipal code terms">
+                                <h:outputText value="Code element, code sets (code books), code sources, and code violations"/>
+                            </p:tab>
+                        </p:accordionPanel>
+                        
+                       
+                        <h:graphicImage id="testIMG" value="/resources/diagrams/occInspDiagram.jpg"/>
+
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+     <h:head>
+        
+        <title>Inspectable Code Element (test)</title>
+            <h:outputStylesheet name="style.css" library="css"/>
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'/>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                    <h1>Inspectable Code Element (test)</h1>
+                    <f:view>
+                                                <h:form>
+                            <p:dataTable
+                                id="inspectableCodeElements"
+                                var="i"
+                                selectionMode="single"
+                                selection="#{inspectableCodeElementBB.selectedICE}"
+                                rowKey="#{i.inspectableCodeElementId}"
+                                value="#{inspectableCodeElementBB.inspectableCodeElementList}"
+                                tableStyleClass="primeDataTable"
+                                tabindex="1">
+                                <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="ID:" />
+                                        </f:facet>
+                                    <h:outputText value="#{i.inspectableCodeElementId}"/>
+                                </p:column>
+                                
+                                 <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Code Element ID:" />
+                                        </f:facet>
+                                     <h:outputText value="#{i.codeElementID}"/>
+                                </p:column>
+                                
+                                
+                                <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Inspection Tips:" />
+                                        </f:facet>
+                                    <h:outputText value="#{i.inspectionTips}"/>
+                                </p:column>
+                                <!--<p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Non-compliance Notes" />
+                                        </f:facet>
+                                        <h:outputText value="#"/>
+                                </p:column>-->
+                                <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Inspection Priority:" />
+                                        </f:facet>
+                                    <h:outputText value="#{i.inspectionPriority}"/>
+                                </p:column>
+                                <!--<p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Date" />
+                                        </f:facet>
+                                    <h:outputText value="#"/>
+                                </p:column>-->
+                            </p:dataTable>
+                                                    
+                            <p:spacer height="10px"/>                        
+                            
+                            <p:commandButton id="newIceCommand" ajax="false" value="Update Selected Code Element:" actionListener="#{inspectableCodeElementBB.editInspectableCodeElement}" styleClass="iceButton"/>
+                            <p:commandButton id="deleteIceCommand" ajax="false" value="Nuke Selected Category:" actionListener="#{inspectableCodeElementBB.deleteSelectedInspectableCodeElement}" styleClass="iceButton"/>
+                            
+                        </h:form>
+                        
+                        <h:form>
+                            <h2>Add New Inspectable Code Element</h2>
+                            <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
+                             <h:panelGrid cellpadding="5" border="0" footerClass="gridFooter"
+                                         columnClasses="gridTd, gridTd, gridTd,">
+                                
+                                <h:outputLabel value="Code Element ID:"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="formCodeElementID" value="#{inspectableCodeElementBB.formCodeElementID}"
+                                                     styleClass="inputText"/>
+                                        <h:message for="formCodeElementID" showDetail="false" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                
+                                <h:outputLabel value="Inspection Tips:"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="formInspectionTips" value="#{inspectableCodeElementBB.formInspectionTips}"
+                                                     styleClass="inputText"/>
+                                        <h:message for="formInspectionTips" showDetail="false" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup> 
+                                
+                                <h:outputLabel value="Inspection Priority:"/>
+                                    <h:panelGroup>    
+                                        <p:inputSwitch id="formInspectionPriority" value="#{inspectableCodeElementBB.formInspectionPriority}" 
+                                                   tabindex="10" onLabel="Yes" offLabel="No"/>
+                                        <h:message for="formInspectionPriority" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                
+                                <f:facet name="footer">
+                                </f:facet>   
+                                
+                                <p:spacer height="15"/>
+                                <!--
+                                <h:panelGroup>
+                                    <h:outputLabel>
+                                    <h:outputText value="Add date: " />
+                                    </h:outputLabel>
+                                    <p:calendar value="date"
+                                                    mode="popup" tabindex="13"
+                                                    id="iceDate"
+                                                    showOn="button"
+                                                    pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true"
+                                                    showButtonPanel="true"
+                                                    showTodayButton="false"
+                                                    required="true"/>
+
+                                            <h:message for="iceDate" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+                                -->
+                             </h:panelGrid>
+                            <p:commandButton ajax="false" value="Add Code Element" action="#{inspectableCodeElementBB.addInspectableCodeElement}" />
+                        </h:form>
+                       <!--Add "#" tags to expression lang. 
+                       <h:form>
+                            <p:dataTable
+                                id="inspectableCodeElements"
+                                var="i"
+                                selectionMode="single"
+                                selection="{inspectableCodeElementBB.selectedIce}"
+                                rowKey="{i.codeElement}"
+                                value="{inspectableCodeElementBB.inspectableCodeElementList}"
+                                tableStyleClass="primeDataTable"
+                                tabindex="1">
+                                <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Inspection Guideline" />
+                                        </f:facet>
+                                        <h:outputText value="{i.inspectionGuidelines}"/>
+                                </p:column>
+                                <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Non-compliance Notes" />
+                                        </f:facet>
+                                        <h:outputText value="{i.noncomplianceNotes}"/>
+                                </p:column>
+                                <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="High Importance" />
+                                        </f:facet>
+                                        <h:outputText value="{i.highImportance}"/>
+                                </p:column>
+                            </p:dataTable>
+                            
+                        </h:form>
+                       -->
+                    </f:view>
+                        
+                </div>        
+            </ui:define>
+
+        </ui:composition>
+    </h:body>
+    
+</html>
+

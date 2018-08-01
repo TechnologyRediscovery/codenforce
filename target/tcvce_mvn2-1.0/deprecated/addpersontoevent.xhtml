@@ -1,0 +1,67 @@
+    <p:fieldset legend="Attach persons to event"
+                                    toggleable="true">
+                                    <h:outputLabel>
+                                        <h:outputText value="Choose one or more Persons from the list below, then click \'Attach selected people\'"/>
+                                    </h:outputLabel>
+                                      
+                                    <p:selectOneListbox id="personEventAddSelectOneMenu" value="#{eventAddBB.selectedCadidatePerson}" >
+                                        <!--<p:ajax update="personTable" immediate="true"/>-->
+                                        <f:converter converterId="personConverter"/>
+                                        <f:selectItems id="personDisplayItems" value="#{eventAddBB.candidatePersonList}" var="p" 
+                                                       itemValue="#{p}" itemLabel="#{p.lastName}, #{p.firstName}"/>
+                                    </p:selectOneListbox>
+                                    
+                                    <p:commandButton update="personTable" id="addPersons" value="Attach selected persons" >
+                                        <p:ajax update="personTable" listener="#{eventAddBB.attachSelectedPerson}" immediate="true"/>
+                                    </p:commandButton>
+                                    
+                                    <p:spacer height="15px"/>
+                                    
+                                
+                                 <p:dataTable
+                                    id="personTable"
+                                    var="p"
+                                    value="#{eventAddBB.formSelectedPersons}"
+                                    rowKey="#{p.personID}"
+                                    tableStyleClass="primeDataTable">
+                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Person Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.personType.label}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.muni.muniName}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="First" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.firstName}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Last" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.lastName}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Cell Num" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.phoneCell}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.address_street}"/>
+                                    </p:column>
+                                </p:dataTable>
+
+                            </p:fieldset>

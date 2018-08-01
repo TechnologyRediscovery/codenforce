@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <h:outputStylesheet name="public_style.css" library="css"/>
+
+        <title>Public Access Portal</title>
+
+    </h:head>
+
+
+    <h:body>
+        <ui:composition template="./tempPublicPortal.xhtml">
+
+            <ui:define name="content">
+
+                <div class="container text-center">
+                    <div class="jumbotron" id="jumbo-override">
+                        <h1>Code Enforcement Public Access Portal</h1>      
+                    </div>
+                </div>
+
+                <!--v. cool!  if we nest well classes inside row classes, we can stack
+                columns of buttons!  The grid is split into three columns (col-sm-4)-->
+                <f:view>
+                    <h:form>
+                        <div class="container text-center">    
+                            <h3>Select an Option</h3>
+                            <div class="row">
+
+                                <div class="col-sm-4">
+                                    <div class="well">
+                                        <p:outputLabel value="Apply for an occupancy permit"/>
+                                        <p:commandLink ajax="false" action="scheduleOccIns" >
+                                            <h:graphicImage value="/images/bees.jpeg"/>
+                                        </p:commandLink> 
+                                    </div>
+                                    <div class="well">
+                                        <p:outputLabel value="Request a code enforcement investigation"/>
+                                        <p:commandLink ajax="false" action="codeEnforce">
+                                            <h:graphicImage value="/images/alligator.jpeg"/>
+                                        </p:commandLink>  
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4"> 
+                                    <div class="well">
+                                        <p:outputLabel value="Check Code Enforcement Request Status"/>
+                                        <p:commandLink ajax="false" action="checkRequestStatus">
+                                            <h:graphicImage value="/images/triceratops.jpeg"/>
+                                        </p:commandLink> 
+                                    </div>
+                                    <div class="well">
+                                        <p:outputLabel value="Register Your LandLord"/>
+                                        <p:commandLink ajax="false" action="registerLandlord">
+                                            <h:graphicImage value="/images/oldHouseEdit.jpg"/>
+                                        </p:commandLink> 
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="well">
+                                        <p:outputLabel value="Look-up Existing Code Enforcement Case"/>
+                                        <p:commandLink ajax="false" action="ceCaseLookup">
+                                            <h:graphicImage value="/images/bees.jpeg"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <div class="well">
+                                        <p:outputLabel value="Return to COG Home Page"/>
+                                        <h:outputLink value="http://tcvcog.com/">
+                                            <h:graphicImage value="/images/tcvcoglogo.png"/>
+                                        </h:outputLink>
+                                    </div>  
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
+                </f:view> 
+
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>

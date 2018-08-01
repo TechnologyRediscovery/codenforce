@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Add Payment Type</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                    <h1>Payment Type Configuration Tool</h1>
+                    <p>View, create, and manage  payment types</p>
+                    <f:view>
+                        <h:form id="paymentTypeDisplay">
+                            <h2>Payment Type Details</h2>
+                            <p:dataTable
+                                    id="paymentTypes"
+                                    var="p"
+                                    selectionMode="single"
+                                    selection="#{paymentTypeBB.selectedPaymentType}"
+                                    rowKey="#{p.paymentTypeId}"
+                                    value="#{paymentTypeBB.paymentTypeList}"
+                                    tableStyleClass="primeDataTable"
+                                    tabindex="1">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.paymentTypeId}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Payment Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.paymentTypeTitle}"/>
+                                    </p:column>
+     
+                                </p:dataTable>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{paymentTypeBB.editPaymentType}"
+                                             value="Update Selected Payment Type" tabindex="2"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{paymentTypeBB.deleteSelectedPaymentType}"
+                                            value="Nuke Selected Category Forever" tabindex="3"/>
+                            
+                         </h:form>    
+                             
+                             
+                            <!--<p:fieldset legend="Update occupancy inspection "
+                                toggleable="true" collapsed="false" tabindex="4">
+                                    <h:form id="updateCategoryForm">
+                                        <p:spacer height="10px"/>
+                                        <p:outputLabel for="occInsFeeName">
+                                           <h:outputText value="Name:"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                                 style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
+                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:spacer height="20px"/>
+                                        
+                                       
+                                    </h:form>  
+                                </p:fieldset>-->
+                            
+                           
+                        <h:form id="paymentTypeAddForm">
+                            <h2>Add New Payment Type</h2>
+                            <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
+                            <h:panelGrid columns="4" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                         footerClass="gridFooter">
+
+                                <h:outputLabel value="Payment Type:" for="newOccInsFeeName"/>
+                                <h:panelGroup>
+                                    <p:inputText id="newPaymentType" value="#{paymentTypeBB.formPaymentTypeTitle}" 
+                                                 style="width: 250px;" tabindex="6" required="false" styleClass="inputText" maxlength="100"/>
+                                    <h:message for="newPaymentType" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <f:facet name="footer">
+                                </f:facet>   
+                                
+                                <p:spacer height="15"/>
+                                
+                            </h:panelGrid>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="false" value="Add Payment Type" action="#{paymentTypeBB.addPaymentType}" />
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{paymentTypeBB.commitPaymentTypeUpdates}"
+                                                  value="Commit Updates" tabindex="7"/>
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

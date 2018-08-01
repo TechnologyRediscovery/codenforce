@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Login error</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="navContainer_public.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view id="erroPageView">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1>Incorrect username and/or password</h1>
+                        <h2>Please click your browser's BACK button and try again.</h2>
+                        <p><span class="bold">Remember:</span> Both usernames and passswords ARE cAse SenSiTIve.</p>
+                        <p>If you have tried a bunch of times and checked your records, etc., and believe 
+                                this is non-user, system error please contact system administrator Eric Darsow at 412.923.9907 (c).</p>
+                        <p>Automated password reset services are not yet setup for this system.</p>
+
+
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

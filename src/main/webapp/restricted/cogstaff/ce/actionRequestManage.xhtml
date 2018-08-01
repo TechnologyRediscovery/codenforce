@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Manage Code Enforcement Action Requests</title>
+        <h:outputStylesheet name="style.css" library="css"/>
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'/>
+
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view>
+                    <div class="mainContainer">
+                        
+                        <h1>Process code enforcement action request </h1>
+                        
+                        
+                        <h:outputText value="Request: #{sessionBean.actionRequest.requestID}"/>
+                        
+                        
+                        <h:form>
+                            
+                            
+                            <p:fieldset id="newCaseConnectFS" legend="Open new case and connect"
+                                 toggleable="true" collapsed="false">
+                                             
+                                 
+                                 
+                             </p:fieldset>
+                            
+                             
+                            <p:fieldset id="openCaseConnectFS" legend="Connect to existing case"
+                                 toggleable="true" collapsed="false">
+                                             
+                                 
+                                 
+                             </p:fieldset>
+                            
+                        
+                        
+                        
+                        </h:form>
+                        
+                        
+                        
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

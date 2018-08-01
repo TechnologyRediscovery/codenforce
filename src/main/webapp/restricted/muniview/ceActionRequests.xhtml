@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Manage Code Enforcement Action Request</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'/>
+
+    </h:head>
+    <body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="actionRequestManagement">
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h:form id="manageSingleActionRequest">
+                            <h1>Manage Code Enforcement Action Requests</h1>
+
+                            <h2>Un-Tethered Code Enforcement Action Requests:</h2>
+                            <p>Code Enforcement requests which have not yet been connected to 
+                                an open case. Select each request to view its details and attach to an existing case.
+                                OR you may select a request and click "open a new case and tether action request" to
+                                complete the connection in one fell swoop.</p>
+
+                            <p:dataTable
+                                id="actionRequestTable"
+                                selectionMode="single"
+                                var="r"
+                                selection="#{ceActionRequestsBB.selectedRequest}"
+                                rowKey="#{r.requestID}"
+                                value="#{ceActionRequestsBB.requestList}"
+                                tableStyleClass="primeDataTable"
+                                scrollable="true"
+                                resizableColumns="true"
+                                scrollHeight="200"
+                                rowExpandMode="multiple"
+                                reflow="true"
+                                expandedRow="false"
+                                >
+
+                                
+                                <p:column width="10%">
+                                    <f:facet name="header">
+                                        <h:outputText value="View request" />
+                                    </f:facet>
+                                    
+                                    <p:rowToggler />
+                                </p:column>
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID#" />
+                                    </f:facet>
+                                    <h:outputText value="#{r.requestID}"/>
+                                </p:column>
+                                <p:column width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Issue Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{r.issueTypeString}"/>
+                                </p:column>
+                                <p:column width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Attached Address" />
+                                    </f:facet>
+                                    <h:outputText value="#{r.requestProperty.address}"/>
+                                </p:column>
+                                <p:column width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Submitted" />
+                                    </f:facet>
+                                    <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
+                                </p:column>
+
+                                <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Days old" />
+                                    </f:facet>
+                                    <h:outputText value="#{r.daysSinceDateOfRecord}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Urgent?" />
+                                    </f:facet>
+                                    <h:outputText value="#{r.isUrgent}"/>
+                                </p:column>
+                                <p:column>
+                                    <p:commandButton value="Manage" action="#{ceActionRequestsBB.viewSelectedActionRequest}">
+                                        <f:setPropertyActionListener value="#{r}" target="#{ceActionRequestsBB.selectedRequest}"/>
+                                    </p:commandButton>
+                                </p:column>
+                                <p:rowExpansion>
+                                    
+                                    <div class="outlinedBox">
+                                        <h2>Code Enforcement Action Request</h2>
+                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd">
+                                            <h:outputLabel value="Description of code enforcement Concern: "/>
+                                            <h:outputLabel value="#{r.requestDescription}"/>
+                                            <h:outputLabel value="Requestor: "/>
+                                            <h:outputText value="#{r.actionRequestorPerson.firstName}"/> 
+                                            <h:outputText value="#{r.actionRequestorPerson.lastName}"/> 
+                                            <h:outputText value=" Living at: "/>
+                                            <h:outputText value="#{r.actionRequestorPerson.address_street}"/> 
+                                            <h:outputText value="#{r.actionRequestorPerson.address_city}"/> 
+                                            <h:outputText value=" Phone (cell): "/>
+                                            <h:outputText value="#{r.actionRequestorPerson.phoneCell}"/> 
+                                        </h:panelGrid>
+                                    </div>
+                                    
+                                </p:rowExpansion>
+                            </p:dataTable>
+
+                            <p:spacer height="10px"/>
+
+                            <p:commandButton ajax="false" value="Manage Selected Action Request" 
+                                             action="#{ceActionRequestsBB.viewSelectedActionRequest}"/>
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

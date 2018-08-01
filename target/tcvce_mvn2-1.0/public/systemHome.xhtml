@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>TCVCOG Code Enforcement Home</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./navContainer_public.xhtml">
+           
+            <ui:define name="content">
+                <f:view id="sysHomeView">
+                    
+                    <div class="mainContainer">
+                        <h1>Code enforcement system home</h1>
+                        
+
+                        
+                        <h:form id="sysHomeForm">
+                            
+                            <h2>Public services</h2>
+                                <p>Request a code enforcement investigation, apply for an occupancy permit, 
+                                    check request status, and more through our public services portal</p>
+
+                                <p:commandButton ajax="false" value="Jump to public services portal" 
+                                                 action="#{missionControlBB.jumpToPublicPortal()}"/>
+
+                                
+                            <h2>Restricted content access</h2>
+                            <p>TCVCOG staff, code enforcement officials, and other authorized users access tools
+                                via mission control</p>
+                                <p:commandButton ajax="false" value="Log in to mission control" 
+                                                 action="#{missionControlBB.loginToMissionControl}"/>
+
+                        </h:form>
+                        
+                    </div>
+                </f:view>
+                
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

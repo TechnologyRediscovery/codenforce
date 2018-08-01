@@ -1,0 +1,376 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Notice of Violation Builder</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+           
+            <ui:define name="content">
+                <div class="mainContainer">
+                    
+                    <h:messages globalOnly="true"
+                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+
+                    
+                    <h:form id="noticeBuilderForm">
+
+                        <h1>Notice of Violation Builder</h1>
+
+                            <p>Select a pre-entered text block by name from the drop-down 
+                            menu under each of the following sub-headers. 
+                            Blank menus will not render any content in the generated letter.</p>
+
+                        
+                        <h2>Recipient</h2>
+                        
+                            <h3>Add recipient from property persons</h3>
+                            
+                            <p>Select the notice recipient from the list below of persons connected to <h:outputText value="#{sessionBean.activeProp.address}"/></p>
+                            
+                            <p:dataTable
+                                    id="selectPersonTable"
+                                    var="p"
+                                    selectionMode="single"
+                                    selection="#{noticeOfViolationBB.selectedRecipient}"
+                                    rowKey="#{p.personID}"
+                                    value="#{noticeOfViolationBB.personCandidateAL}"
+                                    tableStyleClass="primeDataTable"
+                                    expandedRow="false"
+                                    rowExpandMode="single">
+                              
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Person Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.personType.label}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Person ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.personID}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.muni.muniName}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="First" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.firstName}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Last" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.lastName}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.address_street}"/>
+                                    </p:column>
+                                </p:dataTable>
+                        
+                           
+                        <h3>Add recipient by Person ID</h3>
+                        
+                            <p>If you wish to send the letter to a person not on the list above, 
+                                enter the Person's ID number in the box below and toggle option switch to "Add from ID". 
+                                You can open the Persons's search page by "right-clicking" the link to "Persons" 
+                                on the left sidebar and opening that page in its own browser tab.</p>
+                                
+                        
+                            <p:inputSwitch id="addPersonByIdIS" value="#{noticeOfViolationBB.addPersonByID}" 
+                                           onLabel="Add by ID" offLabel="Add from data table" />
+                            
+                            <p:spacer height="5px"/>
+                            <h:commandLink  target="_blank" action="personSearch" value="Open person search in new tab"/>
+                            <p:spacer height="5px"/>
+                            
+                            <h:outputLabel for="personIDIT" value="Person ID Number: "/>
+                            
+                            <p:inputText id="personIDIT" value="#{noticeOfViolationBB.recipientPersonID}"/>
+                                           
+                        <h2>Greeting</h2>
+
+                            <p:selectOneMenu 
+                                id="greeting"
+                                tabindex="1"
+                                value="#{noticeOfViolationBB.greetingBlock}">
+                                <f:converter converterId="textBlockConverter"/>
+                                <p:ajax update="greetingOT" immediate="true"/>
+                                <f:selectItems
+                                    value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                    var="block" 
+                                    itemValue="#{block}"
+                                    itemLabel="#{block.textBlockName}"/>
+
+                            </p:selectOneMenu>
+
+                            <h4>Text preview:</h4>
+                                <p><h:outputText id="greetingOT" value="#{noticeOfViolationBB.greetingBlock.textBlockText}" /> </p>
+
+                        <h2>Introductory paragraph</h2>
+                            <p:selectOneMenu 
+                                id="intro"
+                                tabindex="s"
+                                value="#{noticeOfViolationBB.introBlock}">
+                                <f:converter converterId="textBlockConverter"/>
+                                <p:ajax update="introOT" immediate="true"/>
+                                <f:selectItems
+                                    value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                    var="block" 
+                                    itemValue="#{block}"
+                                    itemLabel="#{block.textBlockName}"/>
+
+                            </p:selectOneMenu>
+
+                            <h4>Text preview:</h4>
+                            <p><h:outputText id="introOT" value="#{noticeOfViolationBB.introBlock.textBlockText}" /> </p>
+
+                                
+                        <p:fieldset legend="Add more paragraphs"
+                            toggleable="true"
+                            collapsed="true">
+                            
+                            <h2>Optional text block 1</h2>
+                                <p:inputSwitch id="useOptional1" value="#{noticeOfViolationBB.useTb1}" 
+                                           onLabel="Use Block" offLabel="Don't use" />
+                                <p:spacer height="5px"/>
+                                <p:selectOneMenu 
+                                    id="optional1"
+                                    tabindex="7"
+                                    value="#{noticeOfViolationBB.tb1}">
+                                    <f:converter converterId="textBlockConverter"/>
+                                    <p:ajax update="optional1OT" immediate="true"/>
+                                    <f:selectItems
+                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                        var="block" 
+                                        itemValue="#{block}"
+                                        itemLabel="#{block.textBlockName}"/>
+
+                                </p:selectOneMenu>
+
+                                <h4>Text preview:</h4>
+                                <p><h:outputText id="optional1OT" value="#{noticeOfViolationBB.tb1.textBlockText}" /> </p>
+
+                                
+
+                            <h2>Optional text block 2</h2>
+                                        
+                                <p:inputSwitch id="useOptional2" value="#{noticeOfViolationBB.useTb2}" 
+                                           onLabel="Use Block" offLabel="Don't use" />
+                                <p:spacer height="5px"/>
+                                <p:selectOneMenu 
+                                    id="optional2"
+                                    tabindex="7"
+                                    value="#{noticeOfViolationBB.tb2}">
+                                    <f:converter converterId="textBlockConverter"/>
+                                    <p:ajax update="optional2OT" immediate="true"/>
+                                    <f:selectItems
+                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                        var="block" 
+                                        itemValue="#{block}"
+                                        itemLabel="#{block.textBlockName}"/>
+
+                                </p:selectOneMenu>
+
+                                <h4>Text preview:</h4>
+                                <p><h:outputText id="optional2OT" value="#{noticeOfViolationBB.tb2.textBlockText}" /> </p>
+                            
+                        </p:fieldset>
+
+                        <h2>Violation List</h2>
+
+                            <p>This is a fixed list of violations based on your choice on the previous page. 
+                                If this list is incorrect, click cancel and return to the violations page</p>
+
+                            <p:dataTable
+                                id="violationTable"
+                                value="#{noticeOfViolationBB.activeVList}"
+                                tableStyleClass="primeDataTable"
+                                draggableColumns="true"
+                                reflow="true"
+                                var="v"
+                                rowExpandMode="single"
+                                expandedRow="false">
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Code Element" />
+                                    </f:facet>
+                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Stipulated Comp. Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{v.stipulatedComplianceDate}"/>
+                                </p:column>
+
+                                <p:rowExpansion>
+                                    <h:outputLabel value="Violated Element Details: "/>
+                                    <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                   #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                   #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                   #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                   #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel value="Penalty:"/>
+                                    <h:outputText value="#{v.penalty}"/>
+
+                                    <h:outputLabel value="Description: "/>
+                                    <h:outputText value="#{v.description}"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel value="Violation Notes: "/>
+                                    <h:outputText value="#{v.notes}"/>
+
+                                </p:rowExpansion>
+
+                            </p:dataTable> 
+
+                            <p:spacer height="15px"/>
+
+
+                        <h2>Compliance instructions</h2>
+                        
+                                <p:selectOneMenu 
+                                    id="compliance"
+                                    tabindex="7"
+                                    value="#{noticeOfViolationBB.complianceBlock}">
+                                    <f:converter converterId="textBlockConverter"/>
+                                    <p:ajax update="complianceOT" immediate="true"/>
+                                    <f:selectItems
+                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                        var="block" 
+                                        itemValue="#{block}"
+                                        itemLabel="#{block.textBlockName}"/>
+
+                                </p:selectOneMenu>
+
+                                <h4>Text preview:</h4>
+                                <p><h:outputText id="complianceOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
+
+                        <h2>Penalty notice</h2>
+                        
+                                <p:selectOneMenu 
+                                    id="penalty"
+                                    tabindex="7"
+                                    value="#{noticeOfViolationBB.penaltyBlock}">
+                                    <f:converter converterId="textBlockConverter"/>
+                                    <p:ajax update="penaltyOT" immediate="true"/>
+                                    <f:selectItems
+                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                        var="block" 
+                                        itemValue="#{block}"
+                                        itemLabel="#{block.textBlockName}"/>
+
+                                </p:selectOneMenu>
+
+                                <h4>Text preview:</h4>
+                                <p><h:outputText id="penaltyOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
+
+                                
+                        <p:fieldset legend="Add more paragraphs" toggleable="true" collapsed="true">
+                              
+                                  
+                            <h2>Optional text block 3</h2>
+                            
+                                <p:inputSwitch id="useOptional3" value="#{noticeOfViolationBB.useTb3}" 
+                                           onLabel="Use Block" offLabel="Don't use" />
+                                <p:spacer height="5px"/>
+                                
+                                <p:selectOneMenu 
+                                    id="optional3"
+                                    tabindex="7"
+                                    value="#{noticeOfViolationBB.tb3}">
+                                    <f:converter converterId="textBlockConverter"/>
+                                    <p:ajax update="optional3OT" immediate="true"/>
+                                    <f:selectItems
+                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                        var="block" 
+                                        itemValue="#{block}"
+                                        itemLabel="#{block.textBlockName}"/>
+
+                                </p:selectOneMenu>
+
+                                <h4>Text preview:</h4>
+                                <p><h:outputText id="optional3OT" value="#{noticeOfViolationBB.tb3.textBlockText}" /> </p>
+                            
+
+                            <h2>Optional text block 4</h2>
+                            
+                            
+                                <p:inputSwitch id="useOptional4" value="#{noticeOfViolationBB.useTb4}" 
+                                           onLabel="Use Block" offLabel="Don't use" />
+                                <p:spacer height="5px"/>
+                                
+                                <p:selectOneMenu 
+                                    id="optional4"
+                                    tabindex="7"
+                                    value="#{noticeOfViolationBB.tb4}">
+                                    <f:converter converterId="textBlockConverter"/>
+                                    <p:ajax update="optional4OT" immediate="true"/>
+                                    <f:selectItems
+                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                        var="block" 
+                                        itemValue="#{block}"
+                                        itemLabel="#{block.textBlockName}"/>
+
+                                </p:selectOneMenu>
+
+                                <h4>Text preview:</h4>
+                                <p><h:outputText id="optional4OT" value="#{noticeOfViolationBB.tb4.textBlockText}" /> </p>
+                            
+                        </p:fieldset>
+
+                        <h2>Signature</h2>
+                        
+                        <p>
+                            <h:outputText id="sig1" value="#{facesUser.FName} #{facesUser.LName}"/><br/>
+                            <h:outputText id="sig2" value="#{facesUser.workTitle}"/><br/>
+                            <h:outputText id="sig3" value="#{facesUser.muni.muniName}"/><br/>
+                            <h:outputText id="sig4" value="#{facesUser.phoneCell}"/><br/>
+                            <h:outputText id="sig5" value="#{facesUser.email}"/>
+                        </p>
+
+                        <p:spacer height="15px"/>
+
+                        <p:commandButton ajax="false" value="Assemble and edit draft notice" 
+                                         action="#{noticeOfViolationBB.assembleNotice}"
+                                         icon="fa fa-tasks"/>
+
+
+                    </h:form>
+                </div>
+                
+                
+                
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

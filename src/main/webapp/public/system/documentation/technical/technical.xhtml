@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Technical reference</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="docHomeView">
+                    
+                    <div class="mainContainer">
+
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1>Technical reference</h1>
+                        
+                        <p>Intended for system admins and developers working with the Java or postgreSQL.
+                        All of the computer code for CodeConnecet is published under the GNU Public License (GPL)
+                        version 3.0 (or later). Using this framework of peer-to-peer collaboration. 
+                        in the CodeeConnect project sharing is encouraged. Vendor lock-in is also impossible
+                        since no exno license agreements .</p>
+
+
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

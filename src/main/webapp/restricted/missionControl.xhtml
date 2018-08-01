@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Code Enforcement Mission Control</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="missionControlView">
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h:form id="missionControlForm">
+
+                            <h1>Mission Control</h1>
+                            
+
+
+                            <h2>Municipality control</h2>
+                            <h3>Current municipality</h3>
+                            <h:outputText value="#{missionControlBB.currentMuni.muniName}"/>
+                            <h3>Change current municipality</h3>
+                            <p>Select the system-wide municipality. (Your selected muni's default code set will be automatically activated.)</p>
+                            
+                            <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
+                                <f:converter converterId="muniConverter"/>
+                                <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                            </p:selectOneMenu>
+                            
+                            <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            <p:spacer height="15px;"/>
+                            <p:commandButton value="Switch to selected municiplaity" action="#{missionControlBB.switchMuni}" icon="fa fa-gears" />
+
+                            <h2>User info verification:</h2>
+
+
+                            <h:outputText value="Authenticated Faces user: 
+                                          #{missionControlBB.user.FName} #{missionControlBB.user.LName}"/>
+
+                            <p:spacer height="15px"/>
+                            <p:dialog header="About page: Mission Control" 
+                                      widgetVar="helpdlg" 
+                                      responsive="true" 
+                                      width="400"
+                                      modal="false"
+                                      height="600">
+                                <h2>Help Topic: Mission Control</h2>
+                                
+                                <p>Mission control is both a set of links to various system tools and a display of key data metrics of the system.</p>
+                                
+                                <h3>You current municipality</h3>
+                                
+                                <p>You are always navigating the system from the standpoint of a certain municipality, which is 
+                                        always listed in the dark blue top banner bar. You cannot be in an "all municipalities" view mode. </p>
+                                
+                                <p>CodeConnects looks up your current municipality to decide which case lists to show you when 
+                                viewing code enforcement data. On pages for searching or creating muni-specific data, your current
+                                municipality is used to set the default values.</p>
+                                
+                                 <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+                                
+                                <h4>Switching municipalities</h4>
+                                
+                                <p>If you are authorized to change your municipality, you can do so with this drop down box and command button. After issuing
+                                    the command to switch to a new municipality, the page will reload and both the listing on this page
+                                    and in the header bar will reflect these changes.</p>
+                                
+                                <h4>What is COG Land?</h4>
+                                
+                                <p>COG Land is a dream world where all mistakes are allowed and nothing bad ever happens. 
+                                    If you make a mistake, nobody cares so you can tinker and explore and experiment with freedom and ease. All
+                                data stored in COG Land behaves just like a non-dreamland municipality but impacts no actual humans.</p>
+                                
+                                <h3>User info verification</h3>
+                                
+                                <p>CodeConnect is built on a system called Java ServerFaces(JSF) and the PrimeFaces library that works with JSF.
+                                The entire system runs inside a web server called Glassfish. Page control is managed by Glassfish but all other
+                                data in the system is linked to your user that's managed by JSF, hence the heading: 
+                                <span class="italic">Authenticated Faces User</span>.</p>
+                                
+                                <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+                                
+                                
+                            </p:dialog>
+                            <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                            <p:spacer height="10px"/>
+
+
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

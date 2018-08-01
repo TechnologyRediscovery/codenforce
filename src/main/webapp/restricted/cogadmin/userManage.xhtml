@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>User Manager</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                    <h1>System User Manager</h1>
+                    <f:view>
+                        <h:form id="userManageForm">
+                            
+                            <p:commandButton ajax="false" value="Add New User" icon="fa fa-plus" action="#{userBB.addUser}"/>
+                            <p:spacer height="15px"/>
+                            
+                             <p:dataTable
+                                id="userTable"
+                                var="user"
+                                value="#{userBB.userList}"
+                                selectionMode="single"
+                                selection="#{userBB.selectedUser}"
+                                rowKey="#{user.userID}"
+                                tableStyleClass="primeDataTable">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.userID}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="First Name" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.FName}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Last Name" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.LName}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Work Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.workTitle}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Municipality" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.muni.muniName}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Expiry Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.activityStopDate}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Active?" />
+                                    </f:facet>
+                                    <h:outputText value="#{user.accessPermitted}"/>
+                                </p:column>
+                            </p:dataTable>
+                            
+                            <p:spacer height="15px"/>
+                            
+                            <p:commandButton ajax="false"
+                                id="updateUser" value="Edit Selected User"
+                                styleClass="multiButtonLineButton" icon="fa fa-edit"
+                                action="#{userBB.updateUser}"/>
+
+                        
+                        <p:spacer height="15px"/>
+                        <hr/>
+                        <p:spacer height="15px"/>
+                        
+
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

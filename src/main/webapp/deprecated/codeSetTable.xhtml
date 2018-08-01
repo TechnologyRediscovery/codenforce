@@ -1,0 +1,53 @@
+
+                        <h:outputLabel for="muni" >
+                            <h:outputText styleClass="uiLabel" value="Select a municipality" />
+                        </h:outputLabel>
+                        <p:selectOneMenu 
+                                id="muni" 
+                                value="#{codeSetBB.selectedMuniCode}">
+
+                            <f:selectItems value="#{codeSetBB.muniMap}"/>
+
+                        </p:selectOneMenu>
+                        
+                        <p:commandButton
+                            id="loadCodeSets" 
+                            value="Retrieve all Code Sets" 
+                            ajax="false"
+                            styleClass="buttonOwnLine"
+                            actionListener="#{codeSetBB.retrieveCodeSetsByMuni}"/>
+                        
+                        <p:dataTable
+                            id="codeSourceTable"
+                            var="set"
+                            value="#{codeSetBB.codeSetList}"
+                            selectionMode="single"
+                            selection="#{codeSetBB.selectedCodeSet}"
+                            rowKey="#{set.codeSetID}"
+                            tableStyleClass="primeDataTable">
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Municipality" />
+                                </f:facet>
+                                <h:outputText value="#{set.muni.muniName}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Set ID" />
+                                </f:facet>
+                                <h:outputText value="#{set.codeSetID}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Name" />
+                                </f:facet>
+                                <h:outputText value="#{set.codeSetName}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Description" />
+                                </f:facet>
+                                <h:outputText value="#{set.codeSetDescription}"/>
+                            </p:column>
+                        </p:dataTable>
+                        

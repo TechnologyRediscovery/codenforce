@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Improvement suggestion listing</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./navContainer_public.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view>
+                    <h:messages globalOnly="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                    <h:form id="navForm1">
+                        <p:commandButton icon="fa fa-arrow-left" id="navButton" action="missionControl" value="Return to mission control" ajax="false"/>
+                    </h:form>
+                    
+                    <h1>Suggestion and bug reporting listing</h1>
+                    <p>All submitted improvement suggestions are logged and displayed in the table below. Each new suggestion 
+                        is stamped with a default status of "Received". Eric reviews these regularly and adjusts the status and posts replies to each. 
+                        If you are dissatisfied with the time frame of the fix or the reply offered, please submit another ticket with your concerns explained. </p>
+                        <h2>Submit a new improvement suggestion</h2>
+                        <h:form id="newImpSugForm">
+                            <p:commandButton id="impSugButton" action="bugReporting" value="Add new improvement suggestion" ajax="false" icon="fa fa-plus"/>
+                            
+                        </h:form>
+                        <h:form id="ticketTableForm">
+                            <h2>Review submitted improvement suggestions</h2>
+                            <p>Click the right-facing arrow in the left-most column to see the any replies or updates from the administrator.</p>
+                           
+                            <p:dataTable    
+                            id="ticketTable"
+                            var="ticket"
+                            value="#{systemServicesBB.impList}"
+                            selectionMode="single"
+                            rowKey="#{ticket.suggestionID}"
+                            tableStyleClass="primeDataTable"
+                            scrollable="true"
+                            scrollHeight="300"
+                            rowExpandMode="single"
+                            resizableColumns="true"
+                            draggableColumns="true"
+                            expandedRow="false"
+                            filteredValue="#{systemServicesBB.filteredImpList}"
+                            widgetVar="personSelectListTable">
+                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+                                
+                                <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Exp"/>
+                                        </f:facet>
+                                        <p:rowToggler/>
+                                    </p:column>
+                                
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                        <h:outputText value="#{ticket.suggestionID}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{ticket.submitter.LName}"
+                                          filterBy="#{ticket.submitter.LName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Submitter" />
+                                    </f:facet>
+                                    <h:outputText value="#{ticket.submitter.LName}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{ticket.prettySubmissionTimeStamp}"
+                                          filterBy="#{ticket.prettySubmissionTimeStamp}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub. Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{ticket.prettySubmissionTimeStamp}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{ticket.improvementTypeStr}"
+                                          filterBy="#{ticket.improvementTypeStr}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{ticket.improvementTypeStr}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" filterBy="#{ticket.statusStr}"
+                                          sortBy="#{ticket.statusStr}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Status" />
+                                    </f:facet>
+                                    <h:outputText value="#{ticket.statusStr}"/>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Suggestion" />
+                                    </f:facet>
+                                    <h:outputText escape="false" value="#{ticket.suggestionText}"/>
+                                </p:column>
+                                
+                                
+                                <p:rowExpansion>
+                                        <h:outputLabel styleClass="bold" value="Sys Admin reply"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{ticket.reply}"/>
+                                        </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2018 techred3
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Space Type manage (test)</title>
+        <h:outputStylesheet name="style.css" library="css"/>
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'/>
+    </h:head>
+    <body>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                        <h1>Space Type Manage (test)</h1>
+                        <f:view>
+                            <h:form>
+                                <p:dataTable
+                                id="spaceTypes"
+                                var="s"
+                                selectionMode="single"
+                                selection="#{spaceTypeBB.selectedSpaceType}"
+                                rowKey="#{s.spaceTypeID}"
+                                value="#{spaceTypeBB.spaceTypeList}"
+                                tableStyleClass="primeDataTable"
+                                tabindex="1">
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Space Type ID: "/>
+                                        </f:facet>
+                                        <h:outputText value="#{s.spaceTypeID}"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Space Type Title: " />
+                                        </f:facet>
+                                        <h:outputText value="#{s.spaceTypeTitle}"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Space Type Title:"/>
+                                        </f:facet>
+                                        <h:outputText value="#{s.spaceTypeDescription}"/>
+                                    </p:column> 
+                                </p:dataTable>
+                            </h:form>
+                        </f:view>    
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>    
+    </body>
+</html>

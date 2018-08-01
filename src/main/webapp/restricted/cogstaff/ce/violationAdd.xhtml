@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Add a violation</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                    
+                    <h1>Add new code violation to current case</h1>
+                    
+                    <f:view>
+                        <h:form id="violationAddForm">
+                            <h2>Code Element Details:</h2>
+                            
+                            <h:outputText value="#{violationAddBB.currentViolation.codeViolated.codeElement.ordchapterTitle}: 
+                                #{violationAddBB.currentViolation.codeViolated.codeElement.ordSecNum} 
+                                #{violationAddBB.currentViolation.codeViolated.codeElement.ordSecTitle}:
+                                #{violationAddBB.currentViolation.codeViolated.codeElement.ordSubSecNum} 
+                                #{violationAddBB.currentViolation.codeViolated.codeElement.ordSubSecTitle}"/>
+                            <p:spacer height="5px"/>
+                            
+                            <h:outputText value="Current case Name: 
+                                          #{violationAddBB.currentViolation.attachedCase.caseName}"/>
+                            <p:spacer height="5px"/>
+
+                            <h:outputText style="font-family: monospace; text-align: center; font-size: 1.4em;" value="#{violationAddBB.currentViolation.codeViolated.codeElement.ordTechnicalText}"/>
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel value="Default Penalty:"/>
+                            <h:outputText value="#{violationAddBB.currentViolation.codeViolated.normPenalty}"/>
+
+                            <p:spacer height="5px"/>
+                            
+                            <h:outputLabel value="Default days to comply: "/>
+                            <h:outputText value="#{violationAddBB.currentViolation.codeViolated.normDaysToComply}"/>
+                            
+                            <p:separator />
+                            
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                         footerClass="gridFooter">
+                                <f:facet name="header" >
+                                    <h:panelGroup >
+                                        <h:outputText style="text-align: left;" 
+                                                      value="Code Violation Input Form:"/>
+                                    </h:panelGroup>    
+                                </f:facet>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="stipCompDate">
+                                        <h:outputText value="Stipulated Compliance Date"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="0px"/>
+                                    <p:calendar value="#{violationAddBB.stipulatedComplianceDate}" 
+                                                mode="popup"  id="stipCompDate"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                navigator="true" tabindex="1"
+                                                showButtonPanel="true" showTodayButton="true"
+                                                required="true"/>
+                                    <p:spacer height="0px"/>
+                                    <h:outputText value="(Generated based on default days to comply of 
+                                                  #{violationAddBB.currentViolation.codeViolated.normDaysToComply})"
+                                                  style="font-style: italic"/>
+                                    <h:message for="stipCompDate" showDetail="false" showSummary="true" 
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" 
+                                            errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="dateOfRecord">
+                                        <h:outputText value="Date of Record"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="0px"/>
+                                    <p:calendar value="#{violationAddBB.dateOfRecord}" 
+                                                mode="popup"  id="dateOfRecord"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                navigator="true" tabindex="2"
+                                                showButtonPanel="true" showTodayButton="true"
+                                                required="true"/>
+                                    <h:message for="dateOfRecord" showDetail="false" showSummary="true" 
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="penalty">
+                                        <h:outputText value="Penalty (exclude $)"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="penalty" value="#{violationAddBB.penalty}"
+                                                 style="width: 20%;" tabindex="3" required="true" styleClass="inputText" type="currency"/>
+                                    <h:message for="penalty" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="notes">
+                                        <h:outputText value="Penalty Notes"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="notes" value="#{violationAddBB.notes}"
+                                                 style="width: 100%;" tabindex="4" required="false" styleClass="inputText" type="text"/>
+                                    <h:message for="notes" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <f:facet name="footer">
+                                    <h:panelGroup>
+                                        <p:outputLabel for="desc">
+                                            <h:outputText value="Description of code violation"/>
+                                        </p:outputLabel>
+                                        <p:inputTextarea id="desc" value="#{violationAddBB.description}"
+                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <h:message for="desc" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                </f:facet>
+                            </h:panelGrid>
+                            <p:spacer height="10px"/>
+                            
+                            <p:commandButton    ajax="false" action="#{violationAddBB.addViolation}" icon="fa fa-plus"
+                                                value="Add code violation to case and return to case home" tabindex="6"/>
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

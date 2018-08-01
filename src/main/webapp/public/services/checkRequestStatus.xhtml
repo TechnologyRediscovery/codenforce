@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+ 
+    <h:head>
+        <title>Check Request Status</title>
+         <h:outputStylesheet name="style.css" library="css"/>
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'/>
+    </h:head>
+    <h:body>
+         <h:graphicImage name="cedbHeader.jpg" width="1030" styleClass="header"/>
+        <div class="mainContainer">
+        
+        <h1>Code enforcement action request monitoring portal</h1>
+            
+        <p clasbs="pageInstructions">Enter your request control code into the input box below:</p>
+        <p class="userNote">The request's control code was displayed on the submission confirmatoin page.
+        If you do not have your control code, please contact your municipal office.</p>
+        <f:view>
+            <h:messages/>
+            <h:form id="checkRequestStatusForm">
+                
+                
+                
+                <h:outputLabel for="controlCode" >
+                    <h:outputText value="Enter the address of the property of concern or describe its location " styleClass="uiLabel" />
+                </h:outputLabel>
+                <p:inputText id="controlCode" value="#{checkRequestStatusBean.lookupControlCode}" 
+                             style="width: 100%;" tabindex="1" required="false" styleClass="inputText"/>
+                <h:message for="controlCode" showDetail="false" showSummary="true" 
+                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                <h:commandButton 
+                    id="submitCheckRequest"  tabindex="2"
+                        value="Check Request Status" 
+                        styleClass="buttonOwnLine"
+                        action="#{checkRequestStatusBean.lookupRequest}"/>
+            </h:form>
+        </f:view>
+        </div>
+    </h:body>
+</html>
+

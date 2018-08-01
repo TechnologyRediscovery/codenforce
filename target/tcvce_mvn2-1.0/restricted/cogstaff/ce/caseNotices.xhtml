@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Notices of Violation</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+           
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view id="noticeOfViolationView">
+                        
+                        <h:messages globalOnly="true" showDetail="false" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>               
+                        <h1>Notices of Violation</h1>
+                        
+                        <h:form id="noticeOfViolationForm">
+
+                            <p:separator/>
+
+                            <h2>Notices of Violation</h2>
+                            <h:outputText value="Current Case: #{caseProfileBB.currentCase.caseName}"/>
+
+                            <p:spacer height="15px"/>
+
+
+                            <p:dataTable
+                                id="noticeOfViolationTab"
+                                var="notice"
+                                selectionMode="single"
+                                selection="#{caseProfileBB.selectedNotice}"
+                                rowKey="#{notice.noticeID}"
+                                value="#{caseProfileBB.noticeList}"
+                                tableStyleClass="primeDataTable"
+                                expandedRow="false"
+                                rowExpandMode="multiple"
+                                draggableColumns="true"
+                                reflow="true">
+
+
+                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                <p:column width="4%">
+                                    <p:rowToggler />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Notice No." />
+                                    </f:facet>
+                                    <h:outputText value="#{notice.noticeID}"/>
+                                </p:column>
+                                
+                                 <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Date of Record" />
+                                    </f:facet>
+                                     <h:outputText value="#{notice.dateOfRecordPretty}"/>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Queued for Mailing" />
+                                    </f:facet>
+                                    <h:outputText value="#{notice.requestToSend}"/>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Sent Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{notice.letterSentDatePretty}"/>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Returned?" />
+                                    </f:facet>
+                                    <h:outputText value="#{notice.letterReturnedDatePretty}"/>
+                                </p:column>
+                                
+                                <p:rowExpansion>
+                                    <h:outputLabel value="Letter Text: "/>
+                                    <h:outputText value="#{notice.noticeText}" id="letterTextBox" escape="false"/>
+                                    
+                                </p:rowExpansion>
+                                
+
+                            </p:dataTable>
+
+                            <p:spacer height="15px"/>
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.editNoticeOfViolation()}"
+                                             value="Edit notice or queue for mailing"
+                                             icon="fa fa-edit "/>
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.markNoticeOfViolationAsSent}"
+                                             value="Mark selected notice as sent"
+                                             icon="fa fa-send"/>
+                            
+                            <p:commandButton ajax="false" action="#{caseProfileBB.markNoticeOfViolationAsReturned}"
+                                             value="Mark selected notice as returned"
+                                             icon="fa fa-mail-reply"/>
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.deleteNoticeOfViolation}"
+                                             value="Nuke selected notice"
+                                             icon="fa fa-bomb"/>
+
+                        </h:form>
+
+                    </f:view>
+                </div>
+                
+                
+                
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Activate internal user</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../public/navContainer_public.xhtml">
+
+            <ui:define name="content">
+                <f:view id="initiateSessionView">
+                    <div class="mainContainer">
+                        <h:form id="initiateSessionForm">
+                            <h1>Initiate internal session</h1>
+                            <h2>Authentication Results</h2>
+
+                                <h:outputText value="HTTP Session id: "/>
+                                <h:outputText value="#{sessionInitializer.sessionID}" /> <br/>
+                                <h:outputText value="Session user: "/>
+                                <h:outputText value="#{sessionInitializer.glassfishUser}" /> 
+                            <h2>Open session</h2>
+
+                                <p>If the above info is correct, please click the following button to proceed to the internal landing page</p>
+                                <p:commandButton ajax="false" value="Initiate Session" action="#{sessionInitializer.initiateInternalSession}"/>
+                        </h:form>
+                    </div>
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Link code guide to code elements</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+
+            <ui:define name="content">
+                <f:view id="guideEntryBuilder">
+                    <div class="mainContainer">
+                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        
+                        <h1>Link code guide entries to code elements</h1>
+                        
+                        <p>Each row in this table contains data about a single code element in 
+                            <h:outputText value="#{codeElementGuideBB.currentSource.sourceName} 
+                                          (#{codeElementGuideBB.currentSource.sourceYear})"/>
+                            Click the little pencil icon in the rightmost column to edit that 
+                            particular element's code guide ID, which must correspond to the 
+                            ID number of a guide entry in our Code Guide. Best to open that page in
+                            its own browser window and split your screen so you can see both at the same time.</p>
+                        
+                        <h:form id="guideBuilderForm">
+                            
+                             <p:dataTable
+                                id="codeElementTable"
+                                var="element"
+                                value="#{codeElementGuideBB.elementList}"
+                                selectionMode="single"
+                                selection="#{codeElementGuideBB.selectedElement}"
+                                rowKey="#{element.elementID}"
+                                tableStyleClass="primeDataTable"
+                                scrollable="true"
+                                scrollHeight="300"
+                                resizableColumns="true"
+                                rowExpandMode="multiple"
+                                expandedRow="false"
+                                filteredValue="#{codeElementGuideBB.filteredElementList}"
+                                widgetVar="codeElementListTable"
+                                editable="true">
+                                
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Expand"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+                                
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID#" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.elementID}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{element.guideEntry.category}"
+                                          filterBy="#{element.guideEntry.category}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.guideEntry.category}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{element.guideEntry.subCategory}"
+                                          filterBy="#{element.guideEntry.subCategory}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.guideEntry.subCategory}"/>
+                                </p:column>
+                                
+                                <p:column width="5%" sortBy="#{element.ordchapterNo}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chap"/>
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordchapterNo}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{element.ordchapterTitle}"
+                                          filterBy="#{element.ordchapterTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chapter"/>
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordchapterTitle}"/>
+                                </p:column>
+                                
+                                <p:column width="5%" sortBy="#{element.ordSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sec" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordSecNum}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{element.ordSecTitle}"
+                                          filterBy="#{element.ordSecTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sec. Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordSecTitle}"/>
+                                </p:column>
+                                
+                                <p:column width="5%" sortBy="#{element.ordSubSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="SubSec" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordSubSecNum}"/>
+                                </p:column>
+                                
+                                <p:column sortBy="#{element.ordSubSecTitle}" 
+                                          filterBy="#{element.ordSubSecTitle}"
+                                          width="10%">
+                                    <f:facet name="header">
+                                        <h:outputText value="SubSec. Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{element.ordSubSecTitle}"/>
+                                </p:column>
+                                 
+                                 <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="GuideID" />
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{element.guideEntryID}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <h:inputText value="#{element.guideEntryID}"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                 <p:column>
+                                     <p:rowEditor />
+                                 </p:column>
+                                
+                                <p:rowExpansion>
+                                    <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                    <p:spacer height="15px"/>
+                                    <div class="rowExpansion">
+                                        <h:outputText escape="false" value="#{element.ordTechnicalText}"/>
+                                    </div>
+                                    <p:spacer height="15px"/>
+                                    <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                    <div class="rowExpansion">
+                                        <h:outputText escape="false" value="#{element.ordHumanFriendlyText}"/>
+                                    </div>
+                                    <p:spacer height="15px"/>
+                                    <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                    <div class="rowExpansion">
+                                        <h:outputText escape="false" value="#{element.guideEntry.enforcementGuidelines}"/>
+                                    </div>
+                                    <p:spacer height="15px"/>
+                                    <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                    <div class="rowExpansion">
+                                        <h:outputText escape="false" value="#{element.guideEntry.inspectionGuidelines}"/>
+                                    </div>
+                                </p:rowExpansion>
+                                
+                            </p:dataTable>
+                            
+                            <p:spacer height="15px"/>
+                           
+                            <p:commandButton ajax="false" value="Update all code element - guide links" icon="fa fa-plus" tabindex="5"
+                                             action="#{codeElementGuideBB.updateCodeGuideLinks}"/>
+                            <p class="note">To view the updated element list with their linked code guide entries, reload the element list through the "Manage Source" list at left.</p>
+
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

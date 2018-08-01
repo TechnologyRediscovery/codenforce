@@ -1,0 +1,329 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Case Event Configuration Tool</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                    <h1>Case Event Configuration Tool</h1>
+                    <p>View, Create, and manage event categories inside event types</p>
+                    <p>It's perfectly safe to edit category descriptions on this page. All other changes, 
+                        such as major changes to event category titles, should 
+                    only be edited after consulting the sys admin to avoid making messes.</p>
+                    <f:view>
+                        <h:form id="caseEventConfigForm">
+                            
+                                <p:dataTable
+                                    id="eventCategories"
+                                    var="c"
+                                    selectionMode="single"
+                                    selection="#{eventConfigurationBB.selectedEventCategory}"
+                                    rowKey="#{c.categoryID}"
+                                    value="#{eventConfigurationBB.eventCategoryList}"
+                                    tableStyleClass="primeDataTable"
+                                    tabindex="1">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.categoryID}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Event Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.eventType.label}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Category" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.eventCategoryTitle}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="UD" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.userdeployable}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="MD" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.munideployable}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="PD" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.publicdeployable}"/>
+                                    </p:column>
+                                    
+                                    
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="PD" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.publicdeployable}"/>
+                                    </p:column>
+                                    
+                                    
+                                    
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="RVC" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.requiresviewconfirmation}"/>
+                                    </p:column>
+                                    
+                                    
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="NCM" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.notifycasemonitors}"/>
+                                    </p:column>
+                                    
+                                    
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="HIDE" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.hidable}"/>
+                                    </p:column>
+                                    
+                                    <p:column >
+                                        <f:facet name="header">
+                                            <h:outputText value="Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.eventCategoryDesc}"/>
+                                    </p:column>
+                                    
+                                </p:dataTable>
+                            <p:spacer height="10px"/>
+                            
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{eventConfigurationBB.editSelectedEventCategory}"
+                                             value="Update Selected EventCateogory" tabindex="2"/>
+                              <p:commandButton ajax="false" 
+                                             actionListener="#{eventConfigurationBB.deleteSelectedEventCategory}"
+                                            value="Nuke Selected Category Forever" tabindex="3"/>
+               
+                            </h:form>
+                            <p:spacer height="20px"/>
+                            
+                             <p:fieldset legend="Update event category"
+                                         toggleable="true" collapsed="false" tabindex="4">
+                                 
+                                 <h:form id="updateCategoryForm">
+                                     
+                                 
+                                <h:outputLabel for="eventTypeMenu">
+                                    <h:outputText value="Event Type: "/>
+                                </h:outputLabel>
+                                 <p:selectOneMenu id="eventTypeMenu" required="true" value="#{eventConfigurationBB.formEventType}" tabindex="5">
+                                     <f:selectItems value="#{eventConfigurationBB.eventTypeList}"/>
+                                </p:selectOneMenu>
+                                <h:message for="eventTypeMenu" showDetail="false" showSummary="true" 
+                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 
+                                <p:spacer height="10px"/>
+                                <p:outputLabel for="catTitleIT">
+                                    <h:outputText value="Category Title"/>
+                                </p:outputLabel>
+                                 <p:inputText id="catTitleIT" value="#{eventConfigurationBB.formEventCategoryTitle}" 
+                                          style="width: 40%;" tabindex="6" required="true" styleClass="inputText"/>
+                                <h:message for="catTitleIT" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                             
+                                <p:spacer height="10px"/>
+                                 
+                                <p:outputLabel for="catDescIT">
+                                    <h:outputText value="Category Description"/>
+                                </p:outputLabel>
+                                <p:inputText id="catDescIT" value="#{eventConfigurationBB.formEventCategoryDescr}" 
+                                          style="width: 100%;" tabindex="7" required="true" styleClass="inputText"/>
+                                <h:message for="catDescIT" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                <p:spacer height="20px"/>
+                                
+                                   <h:panelGrid columns="3" cellpadding="5" border="0" frame="false" columnClasses="gridTd, gridTd, gridTd">
+                                
+                                    <h:panelGroup>
+                                        <p:outputLabel for="userdeploy">
+                                            <h:outputText value="User deployable"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="userdeploy" value="#{eventConfigurationBB.formUserdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="munideploy">
+                                            <h:outputText value="Municipality deployable"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="munideploy" value="#{eventConfigurationBB.formMunideployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="publicDeploy">
+                                            <h:outputText value="Public deployable"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="publicDeploy" value="#{eventConfigurationBB.formPublicdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="requireViewConf">
+                                            <h:outputText value="Require case manager view confirmation"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="requireViewConf" value="#{eventConfigurationBB.formRequiresviewconfirmation}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="notifyCaseMonitors">
+                                            <h:outputText value="Notify Case Monitors"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="notifyCaseMonitors" value="#{eventConfigurationBB.formNotifycasemonitors}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="hidable">
+                                            <h:outputText value="Hidable"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="hidable" value="#{eventConfigurationBB.formHidable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                       
+                                   </h:panelGrid>
+                                
+                                <p:commandButton ajax="false" icon="fa fa-edit"
+                                           actionListener="#{eventConfigurationBB.commitUpdates}"
+                                           value="Commit Updates" tabindex="8"/>
+                                 </h:form>
+                                             
+                            </p:fieldset>
+                            <p:spacer height="20px"/>
+                            
+                            <p:fieldset legend="Add new event category"
+                                        toggleable="true" collapsed="false" tabindex="9">
+                                <h:form id="newCategoryForm">
+                                    
+                                
+                                <h:outputLabel for="newEventTypeMenu">
+                                    <h:outputText value="Event Type: "/>
+                                </h:outputLabel>
+                                 <p:selectOneMenu id="newEventTypeMenu" required="true" value="#{eventConfigurationBB.newFormSelectedEventType}" tabindex="10">
+                                     <f:selectItems value="#{eventConfigurationBB.eventTypeList}"/>
+                                </p:selectOneMenu>
+                                <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
+                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 
+                                <p:spacer height="10px"/>
+                                <p:outputLabel for="newCatTitleIT">
+                                    <h:outputText value="Category Title"/>
+                                </p:outputLabel>
+                                 <p:inputText id="newCatTitleIT" value="#{eventConfigurationBB.newFormEventCategoryTitle}" 
+                                          style="width: 40%;" tabindex="11" required="true" styleClass="inputText"/>
+                                <h:message for="newCatTitleIT" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                             
+                                 
+                                <p:spacer height="10px"/>
+                                <p:outputLabel for="newCatDescIT">
+                                    <h:outputText value="Category Description"/>
+                                </p:outputLabel>
+                                <p:inputText id="newCatDescIT" value="#{eventConfigurationBB.newFormEventCategoryDescr}" 
+                                          style="width: 100%;" tabindex="12" required="true" styleClass="inputText"/>
+                                <h:message for="newCatDescIT" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                <p:spacer height="20px"/>
+                                
+                                 <h:panelGrid columns="3" cellpadding="5" border="0" frame="false" columnClasses="gridTd, gridTd, gridTd">
+                                
+                                    <h:panelGroup>
+                                        <p:outputLabel for="userdeploy">
+                                            <h:outputText value="User deployable"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="userdeploy" value="#{eventConfigurationBB.newFormUserdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="munideploy">
+                                            <h:outputText value="Municipality deployable"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="munideploy" value="#{eventConfigurationBB.newFormMunideployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="publicDeploy">
+                                            <h:outputText value="Public deployable"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="publicDeploy" value="#{eventConfigurationBB.newFormPublicdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="requireViewConf">
+                                            <h:outputText value="Require case manager view confirmation"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="requireViewConf" value="#{eventConfigurationBB.newFormRequiresviewconfirmation}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="notifyCaseMonitors">
+                                            <h:outputText value="Notify Case Monitors"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="notifyCaseMonitors" value="#{eventConfigurationBB.newFormNotifycasemonitors}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel for="hidable">
+                                            <h:outputText value="Hidable"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch id="hidable" value="#{eventConfigurationBB.newFormHidable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        
+                                    </h:panelGroup>
+                                       
+                                   </h:panelGrid>
+                                            
+                                <p:commandButton ajax="false" icon="fa fa-plus"
+                                    actionListener="#{eventConfigurationBB.addNewEventCategory}"
+                                    value="Add Event Category" tabindex="13"/>
+                                </h:form>
+                            </p:fieldset>
+                            
+
+                      
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

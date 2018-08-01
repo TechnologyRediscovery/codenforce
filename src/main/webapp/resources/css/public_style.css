@@ -1,0 +1,150 @@
+/*
+Copyright (C) 2018 Adam Gutonski
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* 
+    Created on : May 8, 2018, 9:12:27 PM
+    Author     : Adam Gutonski
+
+    With love and help from www.w3schools.com, specifically
+    https://www.w3schools.com/css/css_navbar.asp
+    &
+    https://www.w3schools.com/css/tryit.asp?filename=trycss_template2_float
+
+*/
+
+
+/*
+removes bullets and browser default settings for padding/margins
+
+.mainContainer {
+
+}
+ For previous non-bootstrap navigation styling
+.navMenu ul {
+    font-family: 'roboto', sans-serif;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color:   #8ea4a4 ;
+    
+}
+
+
+makes vertical nav bar
+
+.navMenu li {
+    float: left;
+}
+
+.navMenu a {
+    display: block;
+    padding: 8px;
+}
+
+
+block elements make makes whole link area clickable, setting width at 60px leaves
+60px of link clickable
+
+.navMenu li a {
+    display: block;
+    width: 60px;
+    text-decoration: none;
+}
+
+.navMenu li a:hover {
+    background-color: black;
+}
+*/
+
+.header {
+    font-family: 'roboto', sans-serif;
+    background-color: #abb;
+    padding: 30px;
+    text-align: center;
+    font-size: 35px;
+    /*border-radius: 5px;*/
+
+}
+
+
+.userInput {
+    font-family: 'roboto', sans-serif;
+    padding: 10px;
+    height: 100px;
+    text-align: center;
+}
+/*this class exists on occupancyPermitAccessPortal page*/
+.userSchedule {
+    font-family: 'roboto', sans-serif;
+    padding: 10px;
+    height: 100px;
+    text-align: center;
+}
+
+/* Style the footer */
+.cogInfo {
+    font-family: 'roboto', sans-serif;
+    background-color: #abb;
+    padding: 10px;
+    text-align: center;
+    /*border-radius: 5px;*/
+
+}
+
+.controlCodeInput {
+    margin-left: 10px;
+}
+
+.permitInput {
+    margin-left: 10px;
+}
+
+.contextBackgrounds {
+    background-color: #abb;
+
+}
+
+/*
+.navbar-custom {
+    color: #FFFFFF;
+    background-color: #abb;
+    only way i have found to remove the custom-navbar default rounded borders
+    border-radius: 5px !important;
+}
+/*
+
+/*styles the title jumbotron element of publicDashboard.xhtml*/
+#jumbo-override {
+    background-color: #abb;
+}
+
+#navbar-override {
+    color: #FFFFFF;
+    background-color: #abb;
+}
+
+#navbar-override .navbar-brand {
+    color: #0040ff;
+}
+
+#navbar-override .navbar-nav > li > a {
+    color: #0040ff;
+}
+
+#navbar-override .navbar-nav > li :hover{
+    color: whitesmoke;
+}

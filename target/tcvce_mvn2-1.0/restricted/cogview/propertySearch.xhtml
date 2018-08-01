@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Property Search</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+
+                    <f:view>
+                        <h1>Locate a property</h1>
+                        <p>Search for and select a property to set as your 'active property' to which you can attach cases, events, and more.</p>
+
+                        <h:form id="propertySearchForm">
+
+                            <p:fieldset legend="Search in all municipalities"
+                                        toggleable="true" collapsed="true" tabindex="1">
+
+                                <p:outputLabel for="propSearchIT">
+                                    <h:outputText value="House number and street name"/>
+                                </p:outputLabel>
+                                <p:inputText id="propSearchIT" value="#{propertySearchBB.addrPartAllMunis}" 
+                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                <h:message for="propSearchIT" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                <p:spacer height="5px"/>
+                                <p:commandButton
+                                    value="Search All Municipalities" tabindex="2" ajax="false"
+                                    icon="fa fa-search" actionListener="#{propertySearchBB.searchForPropertiesAllMunis}" />
+                            </p:fieldset>
+                            
+                            <p:spacer height="15px"/>
+                            
+
+                            <p:fieldset legend="Search in a selected municipality"
+                                        toggleable="true" collapsed="false" tabindex="2">
+
+                                <p:outputLabel for="propSearchITwMuni">
+                                    <h:outputText value="House number and street name"/>
+                                </p:outputLabel>
+                                
+                                <p:inputText id="propSearchITwMuni" value="#{propertySearchBB.addrPart}" 
+                                             style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
+                                
+                                <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                <p:spacer height="5px"/>
+
+                                <p:selectOneMenu id="personMuniSelectMenu" tabindex="4" required="false" value="#{propertySearchBB.selectedMuniCode}">
+                                    <f:selectItems value="#{muniBB.muniMap}"/>
+                                </p:selectOneMenu>
+
+                                <h:message for="personMuniSelectMenu" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                <p:spacer height="5px"/>
+
+
+                                <p:commandButton
+                                    value="Search only in Selected Municipality" tabindex="5" ajax="false"
+                                    icon="fa fa-indent"  actionListener="#{propertySearchBB.searchForPropertiesSingleMuni}" />
+
+                            </p:fieldset>
+                            
+
+
+                            <p>Search note: You may enter all or only part of an address for searching: 
+                                "398 HOMER DR" can be found with "398 H" but NOT "3 HOM" 
+                                since you cannot "chop" characters from the middle of an address, 
+                                only from the front and back.</p>
+
+                            <p:spacer height="10"></p:spacer>
+                            <hr/>
+                            <p:spacer height="10"></p:spacer>
+
+
+                            <h2>Search Results:</h2>
+
+                            <p:commandButton ajax="false" value="View Profile for Selected Property &rarr;" 
+                                             icon="fa fa-home" tabindex="8" action="#{propertySearchBB.viewProperty}"/>
+                            <p:spacer height="10px"/>
+
+                            <h4>There should be a data table right HERE!</h4>
+                            
+                            <p:dataTable
+                                id="propSearchTable"
+                                var="prop"
+                                value="#{propertySearchBB.propList}"
+                                selectionMode="single"
+                                selection="#{propertySearchBB.selectedProperty}"
+                                rowKey="#{prop.propertyID}"
+                                tableStyleClass="primeDataTable"
+                                scrollable="true" scrollHeight="200" 
+                                draggableRows="false" tabindex="6"
+                                >
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Address"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prop.address}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Municipality" />
+                                    </f:facet>
+                                    <h:outputText value="#{prop.muni.muniName}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Parcel ID"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prop.parID}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Lot and Block"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prop.lotAndBlock}" />
+                                </p:column>
+
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Use Type"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prop.propertyUseType}" />
+                                </p:column>
+
+
+                            </p:dataTable>
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

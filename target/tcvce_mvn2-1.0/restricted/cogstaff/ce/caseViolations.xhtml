@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Case Violations</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view id="violationView">
+
+                        <h:messages globalOnly="true" showDetail="false" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h1>Municipal Code Violations</h1>
+
+                        <h:form id="form_codeViolations">
+
+                            <h2>Assigned Code Violations</h2>
+
+                            <h:outputText value="Current Case: #{caseProfileBB.currentCase.caseName}"/>
+
+                            <p:spacer height="10px"/>
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
+                                             value="Add new code violation to case"
+                                             icon="fa fa-plus"/>
+                            <p:spacer height="15px"/>
+
+                            <p:dataTable
+                                id="violationTable"
+                                var="v"
+                                selectionMode="mulitiple"
+                                selection="#{caseProfileBB.selectedViolations}"
+                                rowKey="#{v.violationID}"
+                                value="#{caseProfileBB.fullCaseViolationList}"
+                                tableStyleClass="primeDataTable"
+                                expandedRow="false"
+                                rowExpandMode="multiple"
+                                draggableColumns="true"
+                                reflow="true">
+
+
+                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                <p:column width="4%">
+                                    <p:rowToggler />
+                                </p:column>
+                                <p:column width="4%">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{v.violationID}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Code Element" />
+                                    </f:facet>
+                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Stipulated Compliance Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{v.stipulatedComplianceDate}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Actual Compliance Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{v.actualComplianceDate}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Citation Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{v.dateOfCitation}"/>
+                                </p:column>
+
+                                <p:rowExpansion>
+                                    <h:outputLabel value="Violated Element Details: "/>
+                                    <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                   #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                   #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                   #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                   #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel value="Penalty:"/>
+                                    <h:outputText value="#{v.penalty}"/>
+
+                                    <h:outputLabel value="Description: "/>
+                                    <h:outputText value="#{v.description}"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel value="Violation Notes: "/>
+                                    <h:outputText value="#{v.notes}"/>
+
+                                </p:rowExpansion>
+
+                            </p:dataTable> 
+
+                            <p:spacer height="15px"/>
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.recordCompliance}"
+                                             value="Record Compliance "
+                                             icon="fa fa-check" />
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
+                                             value="Edit violation details"
+                                             icon="fa fa-edit"/>
+                            <p style="font-style: italic; font-size: 0.8em; margin-bottom: 0px;">(To clear selections, re-access this "Violations" page from the left sidebar.)</p>
+
+                            
+                            <p:spacer height="5px"/>
+
+                            <h3>Notice of violation actions</h3>
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.createNewNoticeForAllViolations}"
+                                             value="Generate Notice Letter for all Violations"
+                                             icon="fa fa-envelope"/>
+
+                            <p:commandButton disabled="false" ajax="false" 
+                                             action="#{caseProfileBB.createNewNoticeForSelectedViolations()}"
+                                             value="Generate Notice Letter for selected violations"
+                                             icon="fa fa-list"/>
+                            <p:spacer height="5px"/>
+
+                            <h3>Citation actions</h3>
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.createCitationForAllViolations}"
+                                             value="Generate citation for all Violations"
+                                             icon="fa fa-warning"/>
+
+                            <p:commandButton ajax="false" action="#{caseProfileBB.createCitationFromSelected}"
+                                             value="Generate citation for selected violations"
+                                             icon="fa fa-warning"/>
+
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

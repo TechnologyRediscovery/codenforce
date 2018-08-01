@@ -1,0 +1,1 @@
+﻿select * from ceevent where eventdescription ILIKE '%grass%' OR eventdescription ILIKE '%weeds%';

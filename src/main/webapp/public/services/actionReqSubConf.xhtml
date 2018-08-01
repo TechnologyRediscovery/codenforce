@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" >
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Action Request submission confirmation</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_public.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                    <h1>Code Enforcement action request submission confirmation</h1>
+                    <f:view>
+                        <h:form id="actionRequestSubConfForm">
+                             
+                            <p>Thanks for submitting a code enforcement request using our online system. You may check on the status of
+                            your request at any time through this website using the following control code. </p>
+                            
+                            <div class="ccBox">
+                                <h:outputText value="#{actionRequestConfirmation.actionRequest.requestPublicCC}"/>
+                            </div>
+                            
+                            <p>Please save this number for your records (snap a pic, write it down, etc.). To maintain privacy, there is no 
+                            search-by-address feature. If you lose track of this number, you will need to call your municipal office
+                            to retrieve your control code again. </p>
+
+                             <p> 
+                                Requests submitted here are immediately sent to the code enforcement official 
+                                handling cases in the selected municipality. Once the form has been submitted
+                                you will be issued a tracking number which can be used to monitor the status
+                                of your request at any time and to send notes to the code enforcement officials regarding
+                                your request.
+                             </p>
+                            <p>
+                                Please allow at least 1-2 business days for the team to 
+                                conduct an initial case investigation before following up with the 
+                                code enforcement team directly. Code enforcement officials will
+                                contact you and concerned parties directly during the investigation process.
+                                With your tracking number, you may login at anytime to view the status of your request.
+                            </p>
+                            <hr/>
+                            
+                            <h3>Copy of submitted request</h3>
+                
+                                <h4>Violation Type:</h4>
+                                    <p>
+                                       <h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.issueTypeString}" />
+                                    </p>
+                                <h4>Municipality: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.muni.muniName}" /></p>
+
+                                <h4>Address of Concern: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.requestProperty.address}" /></p>
+
+                                <h4>Request Description: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.requestDescription}" /></p>
+
+                                <h4>Requestor Type: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.issueTypeString}" /></p>
+
+                                <h4>Notes on case made for public viewing: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.publicExternalNotes}" /></p>
+
+
+              
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

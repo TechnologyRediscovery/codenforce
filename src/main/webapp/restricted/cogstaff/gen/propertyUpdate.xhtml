@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Update Property</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                    <f:view>
+                        <h:form id="propertyUpdateForm">
+                            <h2>Update property information for <h:outputText value="#{propertyUpdateBB.property.address}"/>
+                                in <h:outputText value="#{propertyUpdateBB.property.muni.muniName}"/></h2>
+                                
+                            <p>Edit property information carefully: the entire system is rooted in this data
+                                and errors here can cause strange problems elsewhere. When done, click "commit" to save changes.</p>
+                            
+                             
+                             <h:panelGrid columns="4" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd"
+                                        footerClass="gridFooter">
+                                 
+                                 <h:panelGroup>
+                                    <h:outputLabel for="propAddForm" >
+                                        <h:outputText styleClass="uiLabel" value="Address:" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 
+                                 <h:panelGroup>
+                                 <p:inputText id="propAddForm" value="#{propertyUpdateBB.formAddress}" 
+                                          style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                    <h:message for="propAddForm" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 </h:panelGroup>
+                                             
+                                 <h:panelGroup>
+                                    <h:outputLabel for="parcelIdForm" >
+                                        <h:outputText styleClass="uiLabel" value="Parcel ID:" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 
+                                 <h:panelGroup>
+                                     <p:inputText id="parcelIdForm" value="#{propertyUpdateBB.formParID}" 
+                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                       <h:message for="parcelIdForm" showDetail="false" showSummary="true" 
+                                          warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 </h:panelGroup>
+                                             
+                                 <h:panelGroup>
+                                    <h:outputLabel for="proplotandblockForm" >
+                                        <h:outputText styleClass="uiLabel" value="Lot and Block:" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 <h:panelGroup>
+                                     <p:inputText id="proplotandblockForm" value="#{propertyUpdateBB.formLotAndBlock}" 
+                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                       <h:message for="proplotandblockForm" showDetail="false" showSummary="true" 
+                                          warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 </h:panelGroup>
+                                             
+                                 <h:panelGroup>
+                                    <h:outputLabel for="propUseTypeFormMenu" >
+                                        <h:outputText styleClass="uiLabel" value="Property Use Type:" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 <h:panelGroup>
+                                     <p>Current type: <h:outputText value="#{propertyUpdateBB.currentPropUseTypeName}"/></p>
+                                     <p:selectOneMenu id="propUseTypeFormMenu" required="true" value="#{propertyUpdateBB.formPropertyUseTypeID}">
+                                         <f:selectItems value="#{propertyUpdateBB.propertyUseTypeMap}"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="propUseTypeFormMenu" showDetail="false" showSummary="true" 
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 </h:panelGroup>
+                                             
+                                 <h:panelGroup>
+                                    <h:outputLabel for="propRentalForm" >
+                                        <h:outputText styleClass="uiLabel" value="Rental?" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 <h:panelGroup>
+                                    
+                                     <p:inputSwitch id="propRentalForm" value="#{propertyUpdateBB.formRental}" onLabel="Yes" offLabel="No" tabindex="14"/>
+                                     
+                                 </h:panelGroup>
+                                             
+                                 <h:panelGroup>
+                                    <h:outputLabel for="propMultiForm" >
+                                        <h:outputText styleClass="uiLabel" value="Multi-Unit?" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 <h:panelGroup>
+                                     <p:inputSwitch id="propMultiForm" value="#{propertyUpdateBB.formMultiUnit}" onLabel="Yes" offLabel="No" tabindex="14"/>
+                                 </h:panelGroup>
+                                             
+                                 <h:panelGroup>
+                                    <h:outputLabel for="propUseGroupForm" >
+                                        <h:outputText styleClass="uiLabel" value="Use Group:" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 <h:panelGroup>
+                                     <p:inputText id="propUseGroupForm" value="#{propertyUpdateBB.formUseGroup}" 
+                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                       <h:message for="propUseGroupForm" showDetail="false" showSummary="true" 
+                                          warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 </h:panelGroup>
+                                             
+                                 <h:panelGroup>
+                                    <h:outputLabel for="propConstTypeForm" >
+                                        <h:outputText styleClass="uiLabel" value="Construction Type:" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 <h:panelGroup>
+                                     <p:inputText id="propConstTypeForm" value="#{propertyUpdateBB.formConstructionType}" 
+                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                       <h:message for="propConstTypeForm" showDetail="false" showSummary="true" 
+                                          warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 </h:panelGroup>
+                                             
+                                 <h:panelGroup>
+                                    <h:outputLabel for="propCountyCodeForm" >
+                                        <h:outputText styleClass="uiLabel" value="County Code:" />
+                                    </h:outputLabel>
+                                 </h:panelGroup>
+                                 <h:panelGroup>
+                                     <p:inputText id="propCountyCodeForm" value="#{propertyUpdateBB.formCountyCode}" 
+                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                       <h:message for="propCountyCodeForm" showDetail="false" showSummary="true" 
+                                          warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                 </h:panelGroup>
+                                 
+                                 
+                                 <f:facet name="footer">
+                                     <h:panelGroup>
+                                         
+                                       <h:outputLabel for="propNotesForm" value="Notes:"/>
+                                        <p:inputTextarea id="propNotesForm" value="#{propertyUpdateBB.formNotes}" 
+                                                style="width: 100%;" tabindex="1" required="false" styleClass="inputText"/>
+                                          <h:message for="propNotesForm" showDetail="false" showSummary="true" 
+                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                     </h:panelGroup>
+                                 </f:facet>
+                             </h:panelGrid>
+                            <p:spacer height="10px"/>
+                            
+
+                             <h:commandButton id="updatePropertyFormCB" value="Commit Updated Property Information" 
+                                             action="#{propertyUpdateBB.updateProperty}"/>
+                          
+
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

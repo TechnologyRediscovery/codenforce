@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2018 Adam Gutonski
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Occupancy Permit Type Configuration Tool</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                    <h1>Occupancy Permit Type Configuration Tool</h1>
+                    <p>View, Create, and manage occupancy permit types</p>
+                    <p>It's perfectly safe make edits on this page. <!--All other changes, 
+                        such as major changes to event category titles, should 
+                        only be edited after consulting the sys admin to avoid making messes.--></p>
+                    <f:view>
+                        <h:form id="occPermitTypeConfigForm">
+                            
+                                <p:dataTable
+                                    id="occPermitTypes"
+                                    var="o"
+                                    selectionMode="single"
+                                    selection="#{occupancyPermitTypeBB.selectedOccupancyPermitType}"
+                                    rowKey="#{o.occupancyPermitTypeID}"
+                                    value="#{occupancyPermitTypeBB.occupancyPermitTypeList}"
+                                    tableStyleClass="primeDataTable"
+                                    tabindex="1">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyPermitTypeID}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality Code" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.muni.muniName}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyPermitTypeName}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyPermitTypeDescription}"/>
+                                    </p:column>
+     
+                                </p:dataTable>
+                            
+                                <p:spacer height="10px"/>
+                            
+                                <p:commandButton ajax="false" 
+                                                 actionListener="#{occupancyPermitTypeBB.editOccupancyPermitType}"
+                                                 value="Update Selected Occupancy Permit Type" tabindex="2"/>
+                                <p:commandButton ajax="false" 
+                                                 actionListener="#{occupancyPermitTypeBB.deleteSelectedOccupancyPermitType}"
+                                                value="Nuke Selected Category Forever" tabindex="3"/>
+               
+                        </h:form>
+                        
+                                <p:spacer height="20px"/>
+                            
+                                <p:fieldset legend="Update occupancy permit type"
+                                toggleable="true" collapsed="false" tabindex="4">
+                                    <h:form id="updateCategoryForm">    
+                                        <p:spacer height="10px"/>
+                                        <p:outputLabel for="occPermitTypeName">
+                                           <h:outputText value="Name:"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="occPermitTypeName" value="#{occupancyPermitTypeBB.formOccupancyPermitTypeName}" 
+                                                 style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <h:message for="occPermitTypeName" showDetail="false" showSummary="true" 
+                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:spacer height="10px"/>
+
+                                        <p:outputLabel for="occPermitTypeDesc">
+                                           <h:outputText value="Description"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="occPermitTypeDesc" value="#{occupancyPermitTypeBB.formOccupancyPermitTypeDescription}" 
+                                                 style="width: 100%;" tabindex="6" required="true" styleClass="inputText"/>
+                                        <h:message for="occPermitTypeDesc" showDetail="false" showSummary="true" 
+                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:spacer height="20px"/>
+
+                                        <p:commandButton ajax="false" 
+                                                  actionListener="#{occupancyPermitTypeBB.commitUpdates}"
+                                                  value="Commit Updates" tabindex="7"/>
+                                    </h:form>  
+                                </p:fieldset>
+                                
+                            <p:spacer height="20px"/>
+                            
+                            <p:fieldset legend="Add new occupancy permit type"
+                                        toggleable="true" collapsed="false" tabindex="8">
+                                <h:form id="newOccPermitTypeForm">
+                                    
+                                    <p:outputLabel for="newOccPermitTypeMuni">
+                                    <h:outputText value="Municipality:" styleClass="occPermitTypeMuniSelect"/> 
+                                    </p:outputLabel>
+                                    
+                                    <p:selectOneMenu id="newOccPermitTypeMuni" tabindex="11" required="false" value="#{occupancyPermitTypeBB.formMuni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="newOccPermitTypeMuni" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                     
+                                    <p:spacer height="15px"/>
+                                    <!--<p:selectOneListbox style="width: 300px;" id="categoryList" value="{eventAddBB.selectedEventCategory}" tabindex="10">
+                                        <p:ajax update="selectedEventCategoryDescription, selectedEventCategoryDescription, selectedEventCateogryRequiresViewConfirm, selectedEventCateogryNotifiesCaseMonitors" immediate="true"/>
+                                       <f:converter converterId="eventCategoryConverter"/>
+                                       <f:selectItems  id="catItemsList" value="{eventAddBB.eventCategoryList}" var="ec" itemValue="{ec}" itemLabel="{ec.eventCategoryTitle}"/>
+                                            </p:selectOneListbox>-->               
+                                    
+                                    <p:outputLabel for="newOccPermitTypeFormName">
+                                    <h:outputText value="Name:"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="newOccPermitTypeFormName" value="#{occupancyPermitTypeBB.newFormOccupancyPermitTypeName}" 
+                                          style="width: 50%;" tabindex="9" required="true" styleClass="inputText"/>
+                                    <h:message for="newOccPermitTypeFormName" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:spacer height="10px"/>
+
+                                    <p:outputLabel for="occPermitTypeDesc">
+                                        <h:outputText value="Description"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="occPermitTypeDesc" value="#{occupancyPermitTypeBB.newFormOccupancyPermitTypeDescription}" 
+                                              style="width: 100%;" tabindex="10" required="true" styleClass="inputText"/>
+                                    <h:message for="occPermitTypeDesc" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    
+                                    
+                                    <p:commandButton ajax="false" 
+                                        actionListener="#{occupancyPermitTypeBB.addNewOccupancyPermitType}"
+                                        value="Add Occ Permit Type" tabindex="11"/>
+                                </h:form>
+                            </p:fieldset>
+                            
+
+                      
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
