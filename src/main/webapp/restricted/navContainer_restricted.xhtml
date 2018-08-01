@@ -85,7 +85,10 @@
 
                                     <h:panelGroup>
                                         <div class="under-icon-link-container">
-                                            <h:commandLink  action="#{missionControlBB.logout}" value="Logout" styleClass="headerLink"/>
+                                            <h:commandLink  action="#{missionControlBB.logout}" styleClass="headerLink">
+                                                <h:outputText value=" "/>   
+                                                <h:outputText value="Logout #{facesUser.FName} #{facesUser.LName}"/>
+                                            </h:commandLink>
                                         </div>
                                     </h:panelGroup>
 
@@ -96,7 +99,7 @@
 
 
                         <div class="logoBox">
-                            <h2 id="logoHeader" style="font-weight: bold;">TCVCOG<br/>Code Enforcement<br />Data Hub</h2>
+                            <h2 id="logoHeader" style="font-weight: bold;">CodeConnect<br />Municipal Data Hub<br />Turtle Creek Valley COG</h2>
                         </div>
                     </f:view>
                 </div>
@@ -198,28 +201,54 @@
                     <f:view id="sessionInfoView">
                         <div class="flexing-box-sessioninfo">
                             <h:form id="sessionInfoForm">
-                                <h:outputText value="User: "/>
-                                <h:outputText value="#{facesUser.FName} "/>   
-                                <h:outputText value="#{facesUser.LName}  | "/>
-                                <h:outputText value="Permissions: "/>
-                                <h:outputText value="#{facesUser.roleType.label}  | "/>   
-                                <h:outputText value="Municipality: "/>
-                                <h:outputText value="#{sessionBean.activeMuni.muniName} "/><br/> 
-                                <h:outputText value="Active Property: "/>
-                                <h:outputText value="#{sessionBean.activeProp.address} "/> 
-                                <h:outputText value="(#{sessionBean.activeProp.muni.muniName}  ) | "/>
-                                <h:outputText value="Active Case:"/>
-                                <h:outputText value="#{sessionBean.activeCase.caseName}  | "/> 
-                                <h:outputText value="Code Set: "/>
-                                <h:outputText value="#{sessionBean.activeCodeSet.codeSetName}  | " /> 
+            
+                                <div class="activeObjectBox">
+                                    <h:outputText styleClass="infoBarDataLabel" value="muni: "/>
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.activeMuni.muniName} "/> 
+                                    <p:commandButton value="switch" styleClass="sessionInfoButton" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
+                                    <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    </p:selectOneMenu>
+                                    <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+                                <div class="activeObjectBox">
+                                    <h:outputText styleClass="infoBarDataLabel" value="property: "/>
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.activeProp.address} "/> 
+                                    <h:outputText styleClass="infoBarData" value="(#{sessionBean.activeProp.muni.muniName})  "/>
+                                    <p:commandButton styleClass="sessionInfoButton" action="propertySearch" value="change prop" ajax="false" icon="fa fa-search"/>
+                                </div>
                             </h:form>
                         </div>
+                        <div class="flexing-box-sessioninfo">
+                            <h:form id="sessionInfoFormRow2">
+                                <div class="activeObjectBox">
+                                    <h:outputText styleClass="infoBarDataLabel" value="case: " />
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.activeCase.caseName}  "/> 
+                                    <p:commandButton styleClass="sessionInfoButton" 
+                                                     action="caseEvents" 
+                                                     value="log new event" 
+                                                     ajax="false"
+                                                     disabled="#{navigationBB.noActiveCase}"/>
+                                    <p:commandButton styleClass="sessionInfoButton" 
+                                                     action="caseProfile" 
+                                                     value="view case profile" 
+                                                     ajax="false"
+                                                     disabled="#{navigationBB.noActiveCase}"/>
+                                    <p:commandButton styleClass="sessionInfoButton" 
+                                                     action="ceCases" 
+                                                     value="list open cases" 
+                                                     ajax="false"/>
+                                </div>
+                            </h:form>
+                        </div>
+                    </f:view>
                         <div class="flexing-box-pagecontent">
                             <ui:insert name="content">
                                 <p>I am content in the template content</p>
                             </ui:insert>
                         </div>
-                    </f:view>
                 </div>
             </div>
         </div>
