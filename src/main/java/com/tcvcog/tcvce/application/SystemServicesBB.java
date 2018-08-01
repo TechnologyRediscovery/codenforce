@@ -21,7 +21,6 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -30,24 +29,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
-import javax.servlet.http.HttpSession;
 
 /**
- * A hodgepodge class of backing bean code for improvement suggestion stuff
- * and related data
+ *
  * @author Eric C. Darsow
  */
 public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 
     private String listItemChangeRequestRText;
-    
-    private UserAuthorized sessionAuthUser;
     
     private String systemImprovementTicketRText;
     private int selectedImprovementType;
@@ -58,20 +48,11 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     private ResultSet impSugs;
     
-    private String logSub;
-    
     
     /**
      * Creates a new instance of SystemServicesBB
      */
     public SystemServicesBB() {
-    }
-    
-    @PostConstruct
-    public void initBean(){
-        
-        sessionAuthUser = getSessionBean().getSessionUser();
-        
     }
     
     public String closeRS(){
@@ -84,47 +65,6 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         }
         return "missionControl";
     }
-    
-     
-    public String logout(){
-        FacesContext context = getFacesContext();
-        HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
-        
-        if (session != null) {
-
-//            session.removeAttribute("dBConnection");
-//            session.removeAttribute("codeCoordinator");
-//            session.removeAttribute("codeIntegrator");
-//            session.removeAttribute("municipalitygrator");
-//            session.removeAttribute("personIntegrator");
-//            session.removeAttribute("propertyIntegrator");
-//            session.removeAttribute("cEActionRequestIntegrator");
-//            session.removeAttribute("userIntegrator");
-            session.invalidate();
-
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Logout Successful", ""));
-            System.out.println("MissionControlBB.logout | Session invalidated");
-
-        } else {
-            FacesContext facesContext = getFacesContext();
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                "ERROR: Unable to invalidate session.", "Your system administrator has been notified."));
-        }
-        return "logoutSequenceComplete";
-    }
-
-    
-    public void logErrorPageLoad(){
-//        try {
-//            getLogIntegrator().makeLogEntry(getSessionBean().getSessionUser().getUserID(),
-//                    getSessionID(), 2, "error page hit", true, false);
-//        } catch (IntegrationException ex) {
-//            getFacesContext().addMessage(null,
-//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-//                   "Could not load error page",""));
-//        }
-    }
 
     public String submitImprovementSuggestion(){
         
@@ -132,7 +72,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 
         ImprovementSuggestion is = new ImprovementSuggestion();
         
-        is.setSubmitter(getSessionBean().getSessionUser());
+        is.setSubmitter(getFacesUser());
         is.setImprovementTypeID(selectedImprovementType);
         is.setSuggestionText(systemImprovementTicketRText);
         // back to the hard-coded since I couldn't get the resource bundle lookup
@@ -316,36 +256,6 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setImpSugs(ResultSet impSugs) {
         this.impSugs = impSugs;
-    }
-
-    /**
-     * @return the logSub
-     */
-    public String getLogSub() {
-        logErrorPageLoad();
-        logSub = "logged";
-        return logSub;
-    }
-
-    /**
-     * @param logSub the logSub to set
-     */
-    public void setLogSub(String logSub) {
-        this.logSub = logSub;
-    }
-
-    /**
-     * @return the sessionAuthUser
-     */
-    public UserAuthorized getSessionAuthUser() {
-        return sessionAuthUser;
-    }
-
-    /**
-     * @param sessionAuthUser the sessionAuthUser to set
-     */
-    public void setSessionAuthUser(UserAuthorized sessionAuthUser) {
-        this.sessionAuthUser = sessionAuthUser;
     }
     
     

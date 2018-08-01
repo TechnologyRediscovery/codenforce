@@ -18,17 +18,10 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.domain.ObjectNotFoundException;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorizationPeriod;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,7 +29,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -48,464 +40,117 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * Creates a new instance of UserIntegrator
      */
     public UserIntegrator() {
-        
     }
     
-   
     /**
-     *
-     * @param userID
+     * Deprecated as of the revision to use the glassfish container security
+     * instead of our own internal code
+     * @param loginName
+     * @param loginPassword
      * @return
+     * @throws ObjectNotFoundException
      * @throws IntegrationException 
      */
-    public User getUser(int userID) throws IntegrationException{
+    public User getAuthenticatedUser(String loginName, String loginPassword) throws ObjectNotFoundException, IntegrationException{
+        System.out.println("UserIntegrator.getAuthenticatedUser | attempting to get user for " + loginName);
         
-        if(userID == 0){
-            return null;
-        }
+        String query = "SELECT username, password, userid FROM login"
+                + " WHERE username= ? AND password = ?;";
         
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        User newUser = null;
-        // broken query
-        String query =  "   SELECT userid, username, notes, personlink \n" +
-                        "   FROM public.login WHERE userid = ?;";
+        ResultSet rs;
+        Connection con;
+        User newlyAuthenticatedUser = null;
         
-        PreparedStatement stmt = null;
-        
+        // login is successful if the result set has any rows in it
+        // TODO: create value comparison check as a backup to avoid SQL injection risks
         try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, userID);
+            con = getPostgresCon();
+            PreparedStatement stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, loginName);
+            stmt.setString(2, loginPassword);
+            
             rs = stmt.executeQuery();
-            while(rs.next()){
-                newUser = generateUser(rs);
-            }
             
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting user", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return newUser;
-    }
-    
-    /**
-     * Legacy auth organelle
-     * 
-     * @deprecated 
-     * @param userID
-     * @param m
-     * @return
-     * @throws IntegrationException
-     * @throws AuthorizationException 
-     */
-    public UserAuthorized getUserAuthorized(int userID, Municipality m) throws IntegrationException, AuthorizationException{
-        if(userID == 0){
-            throw new AuthorizationException("UserIntegrator.getUserWithAccessData | incoming userID = 0");
-        }
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        UserAuthorized newUser = null;
-        // broken query
-        String query =  "   SELECT userid, username, notes, personlink \n" +
-                        "   FROM public.login WHERE userid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, userID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                // this method deprecated
-//                newUser = generateUserWithAccessData(rs, m);
-            }
+            String retrievedUsername;
+            String retrievedPassword;
+            int authenticatedUserid;
             
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting user", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return newUser;
-        
-        
-    }
-    
-     /**
-     * Note that the client method is responsible for moving the cursor on the 
-     * result set object before passing it into this method     * 
-     * @param rs
-     * @return
-     * @throws IntegrationException 
-     */
-    private User generateUser(ResultSet rs) throws IntegrationException{
-        User user = new User();
-        PersonIntegrator pi = getPersonIntegrator();
-        try {
-            user.setUserID(rs.getInt("userid"));
-            user.setUsername(rs.getString("username"));
-            user.setNotes(rs.getString("notes"));
-            user.setPerson(pi.getPerson(rs.getInt("personlink")));
-        } catch (SQLException ex) {
-            throw new IntegrationException("Cannot create user", ex);
-        }
-        
-        return user;
-    }
-    
-   
-    
-    
-    public List<UserAuthorizationPeriod> getUserAuthorizationPeriods(User u) throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        List<UserAuthorizationPeriod> perList = new ArrayList<>();
-        // broken query
-        String query = "SELECT muniauthperiodid FROM public.loginmuniauthperiod WHERE authuser_userid=?;";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                perList.add(getUserAuthorizationPeriod(rs.getInt("muniauthperiodid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting user access record", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return perList;
-        
-    }
-    
-    private UserAuthorizationPeriod getUserAuthorizationPeriod(int periodID) throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        UserAuthorizationPeriod per = null;
-        // broken query
-        String query = "SELECT muniauthperiodid, muni_municode, authuser_userid, defaultmuni, \n" +
-                        "       accessgranteddatestart, accessgranteddatestop, recorddeactivatedts, \n" +
-                        "       authorizedrole, createdts, createdby_userid, notes\n" +
-                        "  FROM public.loginmuniauthperiod WHERE muniauthperiodid=?;";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, periodID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                per = generateUserAuthPeriod(rs);
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting user access record", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return per;
-        
-        
-    }
-    
-    
-    private UserAuthorizationPeriod getUserAccessRecord(User u, Municipality muni) throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        UserAuthorizationPeriod rec = null;
-        // broken query
-                String query = "SELECT muniauthperiodid, muni_municode, authuser_userid, defaultmuni, \n" +
-        "       accessgranteddatestart, accessgranteddatestop, recorddeactivatedts, \n" +
-        "       authorizedrole, createdts, createdby_userid, notes\n" +
-        "  FROM public.loginmuniauthperiod;";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, muni.getMuniCode());
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                rec = generateUserAuthPeriod(rs);
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting user access record", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return rec;
-    }
-    
-    private UserAuthorizationPeriod generateUserAuthPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        UserIntegrator ui = getUserIntegrator();
-        UserAuthorizationPeriod rec = new UserAuthorizationPeriod();
-        
-        rec.setMuniloginrecordid(rs.getInt("muniauthperiodid"));
-        
-        rec.setMuni(mi.getMuni(rs.getInt("muni_municode")));
-        rec.setUserID(rs.getInt("authuser_userid"));
-        rec.setDefaultmuni(rs.getBoolean("defaultmuni"));
-        
-        if(rs.getTimestamp("accessgranteddatestart") != null){
-            rec.setAccessgranteddatestart(rs.getTimestamp("accessgranteddatestart").toLocalDateTime());
-        }
-        if(rs.getTimestamp("accessgranteddatestop") != null){
-            rec.setAccessgranteddatestop(rs.getTimestamp("accessgranteddatestop").toLocalDateTime());
-        }
-        if(rs.getTimestamp("recorddeactivatedts") != null){
-            rec.setRecorddeactivatedTS(rs.getTimestamp("recorddeactivatedts").toLocalDateTime());
-        }
-        if(rs.getTimestamp("createdts") != null){
-            rec.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
-        }
-
-        rec.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
-        rec.setAuthorizedRole(RoleType.valueOf(rs.getString("authorizedrole")));
-        
-        rec.setNotes(rs.getString("notes"));
-        
-        return rec;
-    }
-    
-//    SELECT muniauthperiodid, muni_municode, authuser_userid, defaultmuni, 
-//       accessgranteddatestart, accessgranteddatestop, recorddeactivatedts, 
-//       authorizedrole, createdts, createdby_userid, notes
-//  FROM public.loginmuniauthperiod;
-
-    
-    
-    
-    public int insertUser(User userToInsert) throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query =  "INSERT INTO    public.login(\n" +
-                        "               userid, username, password, notes, "
-                    +   "               personlink)\n" +
-                        "    VALUES     (DEFAULT, ?, ?, ?, "
-                + "                     ?, ?, ?);";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, userToInsert.getUsername());
-            StringBuilder sb = new StringBuilder();
-            sb.append(generateControlCodeFromTime());
-            sb.append(generateControlCodeFromTime());
-            stmt.setString(2, sb.toString());
-            stmt.setString(3, userToInsert.getNotes());
-            if(userToInsert.getPerson() == null){
-                stmt.setInt(10, userToInsert.getPersonID());
-            } else {
-                stmt.setInt(10, userToInsert.getPerson().getPersonID());
-            }
-            
-            stmt.execute();
-            
-            String idNumQuery = "SELECT currval('login_userid_seq');";
-            Statement s = con.createStatement();
-            rs = s.executeQuery(idNumQuery);
-            rs.next();
-            int newID = rs.getInt("currval");
-            return newID;
-            
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting new user", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-    }
-    
-    
-    
-    
-    
-    
-    /**
-     * Yikes! The embedding of access logic in the SQL statement inside this here
-     * integration method is death.
-     * 
-     * @deprecated 
-     * @param userID
-     * @return
-     * @throws IntegrationException
-     * @throws AuthorizationException 
-     */
-    public Municipality getUserDefaultMunicipality(int userID) throws IntegrationException, AuthorizationException{
-        Connection con = getPostgresCon();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        ResultSet rs = null;
-        String query = "SELECT muni_municode FROM public.munilogin "
-                + "WHERE userid=? AND defaultmuni=? AND recorddeactivatedts IS NULL "
-                + "             AND accessgranteddatestart < now() "
-                + "             AND accessgranteddatestop > now() "
-                + "             ORDER BY recordcreatedts DESC;";
-        Municipality m = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query, 
-                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setInt(1, userID);
-            stmt.setBoolean(2, true);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                m = mi.getMuni(rs.getInt("muni_municode"));
-            }
-//            if(!rs.first()){
-//                stmt = con.prepareStatement(query);
-//                stmt.setInt(1, userID);
-//                stmt.setBoolean(2, true);
-//                rs = stmt.executeQuery();
-//                while(rs.next()){
-//                    m = mi.getMuni(rs.getInt("muni_municode"));
-//                }
-//                
-//            }
+            // ACCESS CONTROL: ONLY CREATE USER IF THE USER EXISTS IN THE SYSTEM
+            if(rs.next()){
                 
+                retrievedUsername = rs.getString("username");
+                retrievedPassword = rs.getString("password");
+                
+                // check again that there is a direct match between what was entered by
+                // user and what was retrieved from the DB
+                if(retrievedUsername.equals(loginName) && retrievedPassword.equals(loginPassword)){
+                    authenticatedUserid = rs.getInt("userid");
+                    newlyAuthenticatedUser = getUser(authenticatedUserid);
+                    return newlyAuthenticatedUser;
+                    
+                }
             
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error getting default muni", ex);
-        } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        if(m == null){
-            throw new AuthorizationException("Could not load a default muni");
-        }
-        return m;
-    }
-    
-    /**
-     * @deprecated 
-     * @param u
-     * @param m
-     * @return
-     * @throws IntegrationException 
-     */
-    public boolean setDefaultMunicipality(User u, Municipality m) throws IntegrationException, AuthorizationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        boolean defaultSet = false;
-        String queryTurnOffDefaults = "UPDATE munilogin SET defaultmuni = FALSE "
-                + "WHERE USERID = ?;";
-        String query = "UPDATE munilogin SET defaultmuni = TRUE "
-                + "WHERE USERID = ? AND MUNI_MUNICODE = ?;";
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(queryTurnOffDefaults);
-            stmt.setInt(1, u.getUserID());
-            stmt.executeUpdate();
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, m.getMuniCode());
-            stmt.executeUpdate();
-            
-            if(getUserDefaultMunicipality(u.getUserID()).equals(m)){
-                defaultSet = true;
+            } else {
+                throw new ObjectNotFoundException("No User found with those credentials. Try again, please.");
             }
             
+   
             
         } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error setting default muni for user " + u.getUserID(), ex);
-        } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return defaultSet;
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to authenticate a user due to a SQL error", ex);
+        } 
+        
+        
+        return null;
+        
     }
     
-    
-    /**
-     * As of September 2019, this method will hash incoming passwords with MD5 before writing to the 
-     * table. Wildfly's config file specifies that it will digest any submitted password with MD5
-     * and then compare. I wanted to use the crypto() library in posgres but that fucntion returns 
-     * a true/false and knows how to do its own comparison--but that doesn't work with the current postgres setup
-     * 
-     * @param user
-     * @param psswd
-     * @throws IntegrationException 
-     */
-    public void setUserPassword(User user, String psswd) throws IntegrationException{
-         Connection con = getPostgresCon();
-        
-         String query = "UPDATE login SET password = encode(digest(?, 'md5'), 'base64') WHERE userid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, psswd);
-            stmt.setInt(2, user.getUserID());
-            
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error updating password", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    public void updateUser(User userToUpdate) throws IntegrationException{
+    public void insertUser(User userToInsert) throws IntegrationException{
         Connection con = getPostgresCon();
         
-        String query =  "UPDATE public.login\n" +
-                        "   SET username=?, notes=?, personlink=?\n" +
-                        " WHERE userid=?;";
+        String query = "INSERT INTO public.login(\n" +
+"            userrole, username, password, muni_municode, fname, lname, \n" +
+"            worktitle, phonecell, phonehome, phonework, email, address_street, \n" +
+"            address_city, address_zip, address_state, notes, activitystartdate, \n" +
+"            activitystopdate, accesspermitted, userid)\n" +
+"    VALUES (CAST (? AS role) , ?, ?, ?, ?, ?, \n" +
+"            ?, ?, ?, ?, ?, ?, \n" +
+"            ?, ?, ?, ?, ?, \n" +
+"            ?, ?, ?);";
         
         PreparedStatement stmt = null;
-        	
+        
         try {
-            
             stmt = con.prepareStatement(query);
-            stmt.setString(1, userToUpdate.getUsername());
-            stmt.setString(2, userToUpdate.getNotes());
+            stmt.setString(1, userToInsert.getRoleType().toString());
+            stmt.setString(2, userToInsert.getUsername());
+            stmt.setString(3, userToInsert.getPassword());
+            stmt.setInt(4, userToInsert.getMuniCode());
+            stmt.setString(5, userToInsert.getFName());
+            stmt.setString(6, userToInsert.getLName());
             
-            stmt.setInt(3, userToUpdate.getPerson().getPersonID());
+            stmt.setString(7,userToInsert.getWorkTitle());
+            stmt.setString(8, userToInsert.getPhoneCell());
+            stmt.setString(9, userToInsert.getPhoneHome());
+            stmt.setString(10, userToInsert.getPhoneWork());
+            stmt.setString(11, userToInsert.getEmail());
+            stmt.setString(12, userToInsert.getAddress_street());
             
-            stmt.setInt(4, userToUpdate.getUserID());
+            stmt.setString(13, userToInsert.getAddress_city());
+            stmt.setString(14, userToInsert.getAddress_zip());
+            stmt.setString(15, userToInsert.getAddress_state());
+            stmt.setString(16, userToInsert.getNotes());
+            stmt.setTimestamp(17, java.sql.Timestamp
+                    .valueOf(userToInsert.getActivityStartDate()));
             
+            stmt.setTimestamp(18, java.sql.Timestamp
+                    .valueOf(userToInsert.getActivityStopDate()));
+            stmt.setBoolean(19, userToInsert.isAccessPermitted());
+            stmt.setInt(20, userToInsert.getUserID());
+            
+            System.out.println("UserIntegrator.insertUser | sql: " + stmt.toString());
             stmt.execute();
             
         } catch (SQLException ex) {
@@ -515,9 +160,117 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
+        
+        
     }
     
-   
+    public void updateUser(User userToUpdate) throws IntegrationException{
+        Connection con = getPostgresCon();
+        
+        String query = "UPDATE public.login\n" +
+            "   SET userrole= CAST (? as role), username=?, password=?, muni_municode=?, \n" +
+            "       fname=?, lname=?, worktitle=?, phonecell=?, phonehome=?, phonework=?, \n" +
+            "       email=?, address_street=?, address_city=?, address_zip=?, address_state=?, \n" +
+            "       notes=?, activitystartdate=?, activitystopdate=?, accesspermitted=?\n" +
+            " WHERE userid = ?";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, userToUpdate.getRoleType().toString());
+            stmt.setString(2, userToUpdate.getUsername());
+            stmt.setString(3, userToUpdate.getPassword());
+            stmt.setInt(4, userToUpdate.getMuniCode());
+            
+            stmt.setString(5, userToUpdate.getFName());
+            stmt.setString(6, userToUpdate.getLName());
+            stmt.setString(7,userToUpdate.getWorkTitle());
+            stmt.setString(8, userToUpdate.getPhoneCell());
+            stmt.setString(9, userToUpdate.getPhoneHome());
+            stmt.setString(10, userToUpdate.getPhoneWork());
+            
+            stmt.setString(11, userToUpdate.getEmail());
+            stmt.setString(12, userToUpdate.getAddress_street());
+            stmt.setString(13, userToUpdate.getAddress_city());
+            stmt.setString(14, userToUpdate.getAddress_zip());
+            stmt.setString(15, userToUpdate.getAddress_state());
+            
+            stmt.setString(16, userToUpdate.getNotes());
+            stmt.setTimestamp(17, java.sql.Timestamp
+                    .valueOf(userToUpdate.getActivityStartDate()));
+            stmt.setTimestamp(18, java.sql.Timestamp
+                    .valueOf(userToUpdate.getActivityStopDate()));
+            stmt.setBoolean(19, userToUpdate.isAccessPermitted());
+            
+            stmt.setInt(20, userToUpdate.getUserID());
+            System.out.println("UserIntegrator.updateUser | sql: " + stmt.toString());
+            
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting new person", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * Note that the client method is responsible for moving the cursor on the 
+     * result set object before passing it into this method
+     * @param rs
+     * @return
+     * @throws IntegrationException 
+     */
+    private User generateUser(ResultSet rs) throws IntegrationException{
+        User user = new User();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        CodeIntegrator ci = getCodeIntegrator();
+        try {
+            
+            user.setUserID(rs.getInt("userid"));
+            user.setRoleType(RoleType.valueOf(rs.getString("userrole")));
+            user.setUsername(rs.getString("username"));
+            user.setPassword(rs.getString("password"));
+            user.setMuniCode(rs.getInt("muni_municode"));
+            user.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_muniCode")));
+            
+            user.setFName(rs.getString("fname"));
+            user.setLName(rs.getString("lname"));
+            user.setWorkTitle(rs.getString("worktitle"));
+            user.setPhoneCell(rs.getString("phonecell"));
+            user.setPhoneHome(rs.getString("phonehome"));
+            user.setPhoneWork(rs.getString("phonework"));
+            
+            user.setEmail(rs.getString("email"));
+            user.setAddress_street(rs.getString("address_street"));
+            user.setAddress_city(rs.getString("address_city"));
+            user.setAddress_zip(rs.getString("address_zip"));
+            user.setAddress_state(rs.getString("address_state"));
+            
+            user.setNotes(rs.getString("notes"));
+            
+            if(rs.getTimestamp("activitystartdate") != null){
+                user.setActivityStartDate(rs.getTimestamp("activitystartdate").toLocalDateTime());
+            }
+            
+            if(rs.getTimestamp("activitystopdate") != null ){
+                user.setActivityStopDate(rs.getTimestamp("activitystopdate").toLocalDateTime());
+                
+            }
+            user.setAccessPermitted(rs.getBoolean("accesspermitted"));
+            
+        } catch (SQLException ex) {
+            throw new IntegrationException("Cannot create user", ex);
+        }
+        
+        return user;
+    }
+    
     // program later--we generally dont want to allow folks to delete
     // users from the web client since they'll be integrated into tables
     // etc. They should mark the user as inactive and with an expiry date that
@@ -528,23 +281,42 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     } 
     
-    
-    /**
-     * Primary access point for retrieving the numeric ID for a 
-     * logged in User. Jboss only knows about user-entered names
-     * : Called during SessionInitializer actions
-     * to create a new session
-     * @param userName
-     * @return the Fully-baked user object ready to be passed to and fro
-     * @throws IntegrationException 
-     */   
-    public int getUserID(String userName) throws IntegrationException{
-        
-        System.out.println("UserIntegrator.getUser");
+    public User getUser(int userID) throws IntegrationException{
+        System.out.println("UserIntegrator.getUserByID");
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        int userID = 0;
-        String query = "SELECT userid FROM login WHERE username = ?;";
+        User newUser = new User();
+        String query = "SELECT * from login where userid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, userID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                newUser = generateUser(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting new person", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return newUser;
+    }
+    
+    public User getUser(String userName) throws IntegrationException{
+        System.out.println("UserIntegrator.getUserByID");
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        User newUser = new User();
+        String query = "SELECT * from login where username = ?;";
         
         PreparedStatement stmt = null;
         
@@ -554,99 +326,27 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, userName);
             rs = stmt.executeQuery();
             while(rs.next()){
-                userID = rs.getInt("userid");
+                newUser = generateUser(rs);
             }
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("userint.getuser", ex);
+            throw new IntegrationException("Error inserting new person", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return userID;
+        return newUser;
     }
     
-    
-    /** 
-     * Inserts user-municipality mappings into the loginmuni table. This effectively gives the user
-     * "permissions" to view the data for the municipalities that are linked to their userid.     * 
-     * @param u - A User
-     * @param munilist - A list of municipalities to be mapped to User u
-     * @throws IntegrationException 
-     */
-    public void setUserAuthMunis(User u, List<Municipality> munilist) throws IntegrationException{       
-        Connection con = getPostgresCon();
-        String query = "INSERT INTO loginmuni (\n" + 
-                "userid, muni_municode)\n" +  "VALUES (?,?)";        
-        int userId = u.getUserID();
-        PreparedStatement stmt = null;
-        
-        try {                   
-                stmt = con.prepareStatement(query);
-                stmt.setInt(1,userId);
-                for(Municipality muni: munilist){
-                    System.out.println("UserIntegrator.setUserAuthMunis: " + muni.getMuniCode());
-                    int municode = muni.getMuniCode();
-                    stmt.setInt(2,municode);
-                    stmt.execute();
-                }
-                
-        } catch (SQLException ex) {
-            System.out.println("UserIntegrator.setUserAuthMunis exception encountered." + ex);
-            throw new IntegrationException("Error in mapping authorized municipality to user", ex);
-        } finally {
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        }
-        
-    }
-    
-    /**
-     * Removes a user-municipality mapping from the loginmuni table.     * 
-     * @param u - A User
-     * @param muni - A Municipality
-     * @throws IntegrationException 
-     */
-    public void deleteUserAuthMuni(User u, Municipality muni) throws IntegrationException{
-        Connection con = getPostgresCon();
-        String query = "DELETE FROM loginmuni WHERE (userid, muni_municode) = (?,?)";
-        
-        int userId = u.getUserID();
-        int municode = muni.getMuniCode();
-        PreparedStatement stmt = null;
-        
-        try { 
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, userId);
-            stmt.setInt(2,municode);
-            stmt.execute();
-        }
-        catch (SQLException ex) {
-            System.out.println("UserIntegrator.deleteUserAuthMuni: Error deleting row from loginmuni");
-            throw new IntegrationException();
-        } finally {
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        }
-    }        
-    
-    /**
-     * For use by system administrators to manage user data
-     * @return
-     * @throws IntegrationException 
-     */
-    public List getCompleteActiveUserList() throws IntegrationException{
+    public ArrayList getCompleteUserList() throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         ArrayList<User> userList = new ArrayList();
         
-       String query =  "SELECT muniauthperiodid, authuser_userid\n" +
-                        "FROM public.loginmuniauthperiod WHERE recorddeactivatedts IS NULL \n" +
-                        "	AND accessgranteddatestart < now() \n" +
-                        "	AND accessgranteddatestop > now();";
+        String query = "SELECT * from login;";
         
         PreparedStatement stmt = null;
         
@@ -655,7 +355,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             while(rs.next()){
-                userList.add(getUser(rs.getInt("authuser_userid")));
+                userList.add(generateUser(rs));
             }
             
         } catch (SQLException ex) {
@@ -670,215 +370,5 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return userList;
         
     }
-    
-    /**
-     * For use by system administrators to manage user data
-     * @param muniCode
-     * @return
-     * @throws IntegrationException 
-     */
-    public List getCompleteActiveUserList(int muniCode) throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        ArrayList<User> userList = new ArrayList();
-        
-       String query =  "SELECT userid "
-                + "FROM munilogin "
-                + "WHERE muni_municode=? "
-                + "AND recorddeactivatedts IS NULL "
-                + "AND accessgranteddatestart < now() "
-                + "AND accessgranteddatestop > now();";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                userList.add(getUser(rs.getInt("userid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error fetching user list", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return userList;
-        
-    }
-    
-     
-    /**
-     * For attaching event requests to default code officers by muni
-     * @param muniCode
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<User> getActiveCodeOfficerList(int muniCode) throws IntegrationException{
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        List<User> userList = new ArrayList<>();
-        
-        String query =  "SELECT userid "
-                + "FROM munilogin "
-                + "WHERE muni_municode=? "
-                + "AND recorddeactivatedts IS NULL "
-                + "AND accessgranteddatestart < now() "
-                + "AND accessgranteddatestop > now() "
-                + "AND codeofficerstartdate < now() "
-                + "AND codeofficerstopdate > now();";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            
-            rs = stmt.executeQuery();
-            
-            while(rs.next()){
-                userList.add(getUser(rs.getInt("userid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error fetching user list", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return userList;
-        
-    }
-    
-    
-    /**
-     * Writes in a history record when a User accesses that object.
-     * The Object's type will be checked against existing history 
-     * recording opportunities and create an appropriate entry in the
-     * loginobjecthistory table.
-     * 
-     * Checks for duplicates in the table before inserting. 
-     * If duplicate object ID exists, update existing entry with the current
-     * time stamp only.
-     *  
-     * @param u the User who viewed the object
-     * @param ob any Object that's displayed in a data table or list in the system
-     * @throws IntegrationException 
-     */
-    public void logObjectView(User u, Object ob) throws IntegrationException{
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        
-        StringBuilder selectSB = new StringBuilder();
-        selectSB.append("SELECT historyentryid FROM loginobjecthistory "
-                + "WHERE login_userid = ? ");
-        
-        StringBuilder insertSB = new StringBuilder();
-        insertSB.append("INSERT INTO loginobjecthistory ");
-        
-        StringBuilder updateSB = new StringBuilder();
-        updateSB.append("UPDATE loginobjecthistory SET entrytimestamp = now() "
-                + "WHERE login_userid = ? ");
-        
-        try {
-            if(ob instanceof Person){
-                Person p = (Person) ob;
-                
-                // prepare SELECT statement
-                selectSB.append("AND person_personid = ? ");
-                stmt = con.prepareStatement(selectSB.toString(),
-                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPersonID());
-                rs = stmt.executeQuery();
-                
-                if(rs.first()){ // history entry with this user and person already exists
-                    updateSB.append("AND person_personid = ? ");
-                    stmt = con.prepareStatement(updateSB.toString());
-                    
-                } else { // pair not in history, do fresh insert
-                    insertSB.append("(login_userid, person_personid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
-                    stmt = con.prepareStatement(insertSB.toString());
-                }
-
-                // each UPDATE and INSERT SQL structures take the params in this order
-                stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPersonID());
-                stmt.execute();
-                System.out.println("UserIntegrator.logObjectView: Person view logged id = " + p.getPersonID());
-                
-            } else if(ob instanceof Property){
-                Property p = (Property) ob;
-                // prepare SELECT statement
-                selectSB.append("AND property_propertyid = ? ");
-                stmt = con.prepareStatement(selectSB.toString(),
-                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPropertyID());
-                rs = stmt.executeQuery();
-                
-                if(rs.first()){ // history entry with this user and person already exists
-                    updateSB.append("AND property_propertyid = ? ");
-                    stmt = con.prepareStatement(updateSB.toString());
-                    
-                } else { // pair not in history, do fresh insert
-                    insertSB.append("(login_userid, property_propertyid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
-                    stmt = con.prepareStatement(insertSB.toString());
-                }
-
-                // each UPDATE and INSERT SQL structures take the params in this order
-                stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPropertyID());
-                stmt.execute();
-                System.out.println("UserIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
-            
-            } else if(ob instanceof CECase){
-                CECase c = (CECase) ob;
-                // prepare SELECT statement
-                selectSB.append("AND cecase_caseid = ? ");
-                stmt = con.prepareStatement(selectSB.toString(),
-                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, c.getCaseID());
-                rs = stmt.executeQuery();
-                
-                if(rs.first()){ // history entry with this user and person already exists
-                    updateSB.append("AND cecase_caseid = ? ");
-                    stmt = con.prepareStatement(updateSB.toString());
-                    
-                } else { // pair not in history, do fresh insert
-                    insertSB.append("(login_userid, cecase_caseid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
-                    stmt = con.prepareStatement(insertSB.toString());
-                }
-
-                // each UPDATE and INSERT SQL structures take the params in this order
-                stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, c.getCaseID());
-                stmt.execute();
-                System.out.println("UserIntegrator.logObjectView: Case view logged id = " + c.getCaseID());
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error writign object history: persons, properties, or cecases", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-
     
 }

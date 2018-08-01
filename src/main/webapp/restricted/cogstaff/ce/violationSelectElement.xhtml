@@ -24,20 +24,17 @@
                             <h:outputText value="#{sessionBean.activeCodeSet.codeSetName}"/></p>
 
                         <h:form id="selectViolatedElementForm">
-                            
-                            
-                            <p:commandButton ajax="false" 
-                                             action="#{violationSelectElementBB.useSelectedElement}"
-                                             value="Add selected violation to current case" icon="fa fa-edit"/>
-                            <p:spacer height="5px"/>
 
                              <p:dataTable
                                 id="enforcableCodeSetElementTable"
                                 var="cse"
                                 value="#{violationSelectElementBB.enfElementList}"
+                                selectionMode="single"
+                                selection="#{violationSelectElementBB.selectedViolatedEnfElement}"
                                 rowKey="#{cse.codeSetElementID}"
                                 tableStyleClass="primeDataTable"
                                 scrollable="true"
+                                scrollHeight="300"
                                 resizableColumns="true"
                                 draggableColumns="false"
                                 rowExpandMode="single"
@@ -50,17 +47,6 @@
                                         <h:outputText value="Exp"/>
                                     </f:facet>
                                     <p:rowToggler/>
-                                </p:column>
-                                
-                                <p:column width="6%" >
-                                    <f:facet name="header">
-                                        <h:outputText value="Select" />
-                                    </f:facet>
-                                    <p:commandButton id="selectviolation-cb" 
-                                                     ajax="false" value="select"
-                                                     icon="fa fa-hand-o-right"
-                                                     action="#{violationSelectElementBB.useSelectedElement(cse)}" />
-                                    
                                 </p:column>
                                 
                                 <p:column width="4%" >
@@ -76,6 +62,22 @@
                                         <h:outputText value="Source" />
                                     </f:facet>
                                     <h:outputText value="#{cse.codeElement.source.sourceName}(#{cse.codeElement.source.sourceYear})"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.category}"
+                                          filterBy="#{cse.codeElement.guideEntry.category}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
+                                          filterBy="#{cse.codeElement.guideEntry.subCategory}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.guideEntry.subCategory}"/>
                                 </p:column>
                                 
                                 <p:column width="5%" sortBy="#{cse.codeElement.ordchapterNo}">
@@ -122,22 +124,6 @@
                                         <h:outputText value="SubSec. Title" />
                                     </f:facet>
                                     <h:outputText value="#{cse.codeElement.ordSubSecTitle}"/>
-                                </p:column>
-                                
-                                 <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.category}"
-                                          filterBy="#{cse.codeElement.guideEntry.category}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
-                                </p:column>
-                                
-                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
-                                          filterBy="#{cse.codeElement.guideEntry.subCategory}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Sub Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{cse.codeElement.guideEntry.subCategory}"/>
                                 </p:column>
                                 
                                 
@@ -236,6 +222,9 @@
                                 </p:rowExpansion>
                             </p:dataTable>
 
+                            <p:commandButton ajax="false" 
+                                             action="#{violationSelectElementBB.useSelectedElement}"
+                                             value="Add selected violation to current case" icon="fa fa-edit"/>
                         </h:form>
                     </div>
                 </f:view>

@@ -17,38 +17,35 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class CodeElement implements Serializable {
+public class CodeElement {
     
-    protected int elementID;
+    private int elementID;
     
-    protected CodeElementGuideEntry guideEntry;
-    protected int guideEntryID;
-    protected CodeSource source;
+    private CodeElementGuideEntry guideEntry;
+    private int guideEntryID;
+    private CodeSource source;
     
-    protected int ordchapterNo;
+    private int ordchapterNo;
     
-    protected String ordchapterTitle;
-    protected String ordSecNum;
-    protected String ordSecTitle;
+    private String ordchapterTitle;
+    private String ordSecNum;
+    private String ordSecTitle;
     
-    protected String ordSubSecNum;
-    protected String ordSubSecTitle;
-    protected String ordTechnicalText;
+    private String ordSubSecNum;
+    private String ordSubSecTitle;
+    private String ordTechnicalText;
     
-    protected String ordHumanFriendlyText;
-    protected boolean isActive;
+    private String ordHumanFriendlyText;
+    private boolean isActive;
     
-    protected String resourceURL;
-    protected LocalDateTime dateCreated;
-    
-    protected String headerString;
+    private String resourceURL;
+    private LocalDateTime dateCreated;
 
     
     /**
@@ -267,30 +264,6 @@ public class CodeElement implements Serializable {
      */
     public void setGuideEntryID(int guideEntryID) {
         this.guideEntryID = guideEntryID;
-    }
-
-    /**
-     * @return the headerString
-     */
-    public String getHeaderString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(ordchapterTitle);
-        sb.append(":");
-        sb.append(ordSecTitle);
-        sb.append("-");
-        sb.append(ordSubSecNum);
-        sb.append(":");
-        sb.append(ordSubSecTitle);
-        headerString = sb.toString();
-        
-        return headerString;
-    }
-
-    /**
-     * @param headerString the headerString to set
-     */
-    public void setHeaderString(String headerString) {
-        this.headerString = headerString;
     }
 
 

@@ -17,41 +17,27 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class Citation extends EntityUtils implements Serializable {
+public class Citation {
     private int citationID;
     private String citationNo;
     private CitationStatus status;
     private CourtEntity origin_courtentity;
-    
-    private List<CECaseEvent> eventList;
-    
-    private CECaseBase ceCaseNoLists;
+    private CECase ceCase;
     private User userOwner;
-    
     private LocalDateTime dateOfRecord;
-    private java.util.Date dateOfRecordUtilDate;
-    private String dateOfRecordPretty;
-    
     private LocalDateTime timeStamp;
-    private String timeStampPretty;
-    
     private boolean isActive;
     private String notes;
-    
-    // notice that to avoid cycles, the Citation is allowed to have actual CodeViolation
-    // objects in its LinkedList but CodeViolation only gets the citation IDs which
-    // it can use to look up a Citation if needs be
-    private List<CodeViolation> violationList;
+    private ArrayList<CodeViolation> violationList;
 
     /**
      * @return the citationID
@@ -68,7 +54,13 @@ public class Citation extends EntityUtils implements Serializable {
     }
 
    
-    
+    /**
+     * @return the ceCase
+     */
+    public CECase getCeCase() {
+        return ceCase;
+    }
+
     /**
      * @return the userOwner
      */
@@ -119,7 +111,12 @@ public class Citation extends EntityUtils implements Serializable {
     }
 
 
-    
+    /**
+     * @param ceCase the ceCase to set
+     */
+    public void setCeCase(CECase ceCase) {
+        this.ceCase = ceCase;
+    }
 
     /**
      * @param userOwner the userOwner to set
@@ -159,14 +156,14 @@ public class Citation extends EntityUtils implements Serializable {
     /**
      * @return the violationList
      */
-    public List<CodeViolation> getViolationList() {
+    public ArrayList<CodeViolation> getViolationList() {
         return violationList;
     }
 
     /**
      * @param violationList the violationList to set
      */
-    public void setViolationList(List<CodeViolation> violationList) {
+    public void setViolationList(ArrayList<CodeViolation> violationList) {
         this.violationList = violationList;
     }
 
@@ -175,7 +172,7 @@ public class Citation extends EntityUtils implements Serializable {
         int hash = 7;
         hash = 71 * hash + this.citationID;
         hash = 71 * hash + Objects.hashCode(this.citationNo);
-        hash = 71 * hash + Objects.hashCode(this.ceCaseNoLists);
+        hash = 71 * hash + Objects.hashCode(this.ceCase);
         hash = 71 * hash + Objects.hashCode(this.userOwner);
         hash = 71 * hash + Objects.hashCode(this.dateOfRecord);
         hash = 71 * hash + Objects.hashCode(this.timeStamp);
@@ -212,7 +209,7 @@ public class Citation extends EntityUtils implements Serializable {
         if (!Objects.equals(this.notes, other.notes)) {
             return false;
         }
-        if (!Objects.equals(this.ceCaseNoLists, other.ceCaseNoLists)) {
+        if (!Objects.equals(this.ceCase, other.ceCase)) {
             return false;
         }
         if (!Objects.equals(this.userOwner, other.userOwner)) {
@@ -256,70 +253,6 @@ public class Citation extends EntityUtils implements Serializable {
      */
     public void setOrigin_courtentity(CourtEntity origin_courtentity) {
         this.origin_courtentity = origin_courtentity;
-    }
-
-    /**
-     * @return the ceCaseNoLists
-     */
-    public CECaseBase getCeCaseNoLists() {
-        return ceCaseNoLists;
-    }
-
-    /**
-     * @param ceCaseNoLists the ceCaseNoLists to set
-     */
-    public void setCeCaseNoLists(CECaseBase ceCaseNoLists) {
-        this.ceCaseNoLists = ceCaseNoLists;
-    }
-
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        if(dateOfRecord != null){
-            dateOfRecordUtilDate = java.util.Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return dateOfRecordUtilDate;
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        if(dateOfRecordUtilDate != null){
-            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
-
-    /**
-     * @return the dateOfRecordPretty
-     */
-    public String getDateOfRecordPretty() {
-        dateOfRecordPretty = getPrettyDate(dateOfRecord);
-        return dateOfRecordPretty;
-    }
-
-    /**
-     * @return the timeStampPretty
-     */
-    public String getTimeStampPretty() {
-        timeStampPretty = getPrettyDate(timeStamp);
-        return timeStampPretty;
-    }
-
-    /**
-     * @return the eventList
-     */
-    public List<CECaseEvent> getEventList() {
-        return eventList;
-    }
-
-    /**
-     * @param eventList the eventList to set
-     */
-    public void setEventList(List<CECaseEvent> eventList) {
-        this.eventList = eventList;
     }
     
     

@@ -290,8 +290,8 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
              throw new IntegrationException("Exception in CodeSetIntegrator", ex);
         } finally{
             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) {System.out.println("getCodeSetById | " + e.toString());} }
         } // close finally
         return cs;
         
@@ -335,7 +335,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         // the key call: grab a list of all enforcable code elements in this set (large)
         set.setEnfCodeElementList(getEnforcableCodeElementList(rs.getInt("codesetid")));
         
-        set.setMuni(muniInt.getMuni(rs.getInt("municipality_municode")));
+        set.setMuni(muniInt.getMuniFromMuniCode(rs.getInt("municipality_municode")));
 
         return set;
         
@@ -588,7 +588,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { System.out.println("getEnforcableCodeElementList | " + e.toString());} }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
         return eceList;
@@ -666,7 +666,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         //System.out.println("CodeIntegrator.getCodeElement | fetching code element by ID");
         CodeElement newCodeElement = new CodeElement();
         PreparedStatement stmt = null;
-        Connection con = getPostgresCon();
+        Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
         String query = "SELECT elementid, guideentryid, codesource_sourceid, ordchapterno, \n" +
             "ordchaptertitle, ordsecnum, ordsectitle, ordsubsecnum, ordsubsectitle, \n" +
@@ -676,6 +676,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
  
         try {
+            con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, elementID);
             rs = stmt.executeQuery();
@@ -691,7 +692,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) {System.out.println(e.toString());} }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         return newCodeElement;
         
@@ -991,6 +992,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             while(rs.next()){
                 cege = generateCodeElementGuideEntry(rs);
+                System.out.println("CodeIntegrator.getCodeElementGuideEntry | retrievd " + cege.getGuideEntryID());
             }
              
         } catch (SQLException ex) { 

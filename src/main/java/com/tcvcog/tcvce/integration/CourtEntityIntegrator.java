@@ -25,7 +25,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,10 +39,10 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
     }
     
     public void updateCourtEntity(CourtEntity courtEntity) throws IntegrationException {
-        String query =  "UPDATE public.courtentity\n" +
-                        "   SET entityofficialnum=?, jurisdictionlevel=?, name=?, \n" +
-                        "       address_street=?, address_city=?, address_zip=?, address_state=?, \n" +
-                        "       county=?, phone=?, url=?, notes=?, judgename=?\n" +
+        String query = "UPDATE public.courtentity\n" +
+                        "   SET entityofficialnum=?, jurisdictionlevel=?, muni_municode=?, \n" +
+                        "       name=?, address_street=?, address_city=?, address_zip=?, address_state=?, \n" +
+                        "       county=?, phone=?, url=?, notes=?\n" +
                         " WHERE entityid=?;";
         
         Connection con = getPostgresCon();
@@ -54,20 +53,17 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             stmt = con.prepareStatement(query);
             stmt.setString(1, courtEntity.getCourtEntityOfficialNum());
             stmt.setString(2, courtEntity.getJurisdictionLevel());
+            stmt.setInt(3, courtEntity.getMunicipality().getMuniCode());
             stmt.setString(4, courtEntity.getCourtEntityName());
-            
             stmt.setString(5, courtEntity.getAddressStreet());
             stmt.setString(6, courtEntity.getAddressCity());
             stmt.setString(7, courtEntity.getAddressZip());
             stmt.setString(8, courtEntity.getAddressState());
-            
             stmt.setString(9, courtEntity.getAddressCounty());
             stmt.setString(10, courtEntity.getPhone());
             stmt.setString(11, courtEntity.getUrl());
             stmt.setString(12, courtEntity.getNotes());
-            stmt.setString(13, courtEntity.getJudgeName());
-            
-            stmt.setInt(14, courtEntity.getCourtEntityID());
+            stmt.setInt(13, courtEntity.getCourtEntityID());
             System.out.println("CourtEntityIntegrator.updateCourtEntity | sql: " + stmt.toString());
             stmt.executeUpdate();
         } catch (SQLException ex){
@@ -80,8 +76,11 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
         
     }
     
-    public List<CourtEntity> getCourtEntityList() throws IntegrationException {
-            String query = "SELECT entityid FROM public.courtentity;";
+    public ArrayList<CourtEntity> getCourtEntityList() throws IntegrationException {
+            String query = "SELECT entityid, entityofficialnum, jurisdictionlevel, muni_municode, \n" +
+                            "       name, address_street, address_city, address_zip, address_state, \n" +
+                            "       county, phone, url, notes\n" +
+                            "  FROM public.courtentity;";
             Connection con = getPostgresCon();
             ResultSet rs = null;
             PreparedStatement stmt = null;
@@ -92,12 +91,12 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             System.out.println("");
             rs = stmt.executeQuery();
             while(rs.next()){
-                ceList.add(getCourtEntity(rs.getInt("entityid")));
+                ceList.add(generateCourtEntity(rs));
             }
             
             } catch (SQLException ex) {
                 System.out.println(ex.toString());
-                throw new IntegrationException("cannot generate court entity list", ex);
+                throw new IntegrationException("Cannot get Occupancy Inspection Fee List", ex);
             } finally {
                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -105,43 +104,15 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             }
             return ceList;   
     }
-    
-       public List<CourtEntity> getCourtEntityList(int muniCode) throws IntegrationException {
-            String query = "SELECT courtentity_entityid FROM municourtentity WHERE muni_municode=?;";
-            Connection con = getPostgresCon();
-            ResultSet rs = null;
-            PreparedStatement stmt = null;
-            List<CourtEntity> ceList = new ArrayList();
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                ceList.add(getCourtEntity(rs.getInt("courtentity_entityid")));
-            }
-            
-            } catch (SQLException ex) {
-                System.out.println(ex.toString());
-                throw new IntegrationException("Cannot generate court entity list", ex);
-            } finally {
-                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-                if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-            }
-            return ceList;   
-    }
-    
-    
     
     public void insertCourtEntity(CourtEntity courtEntity) throws IntegrationException {
-        String query =  "INSERT INTO public.courtentity(\n" +
-                        "            entityid, entityofficialnum, jurisdictionlevel, name, address_street, \n" +
-                        "            address_city, address_zip, address_state, county, phone, url, \n" +
-                        "            notes, judgename)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?);";
+        String query = "INSERT INTO public.courtentity(\n" +
+                        "            entityid, entityofficialnum, jurisdictionlevel, muni_municode, \n" +
+                        "            name, address_street, address_city, address_zip, address_state, \n" +
+                        "            county, phone, url, notes)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         
@@ -149,20 +120,17 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             stmt = con.prepareStatement(query);
             stmt.setString(1, courtEntity.getCourtEntityOfficialNum());
             stmt.setString(2, courtEntity.getJurisdictionLevel());
+            stmt.setInt(3, courtEntity.getMunicipality().getMuniCode());
             stmt.setString(4, courtEntity.getCourtEntityName());
             stmt.setString(5, courtEntity.getAddressStreet());
             stmt.setString(6, courtEntity.getAddressCity());
-            
             stmt.setString(7, courtEntity.getAddressZip());
             stmt.setString(8, courtEntity.getAddressState());
             stmt.setString(9, courtEntity.getAddressCounty());
             stmt.setString(10, courtEntity.getPhone());
             stmt.setString(11, courtEntity.getUrl());
-            
             stmt.setString(12, courtEntity.getNotes());
-            stmt.setString(13, courtEntity.getJudgeName());
-            
-            System.out.println("CourtEntityIntegrator.courtEntityIntegrator | sql: ");
+            System.out.println("CourtEntityIntegrator.courtEntityIntegrator | sql: " + stmt.toString());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -177,10 +145,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
     
     public CourtEntity getCourtEntity(int entityID) throws IntegrationException{
         
-         String query = "SELECT entityid, entityofficialnum, jurisdictionlevel, name, address_street, \n" +
-                        "       address_city, address_zip, address_state, county, phone, url, \n" +
-                        "       notes, judgename\n" +
-                        "  FROM public.courtentity WHERE entityID=?;";
+         String query = "SELECT * FROM public.courtentity where entityID=?;";
             Connection con = getPostgresCon();
             ResultSet rs = null;
             PreparedStatement stmt = null;
@@ -192,6 +157,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             rs = stmt.executeQuery();
             while(rs.next()){
                 ce = generateCourtEntity(rs);
+                
             }
             
             } catch (SQLException ex) {
@@ -233,23 +199,22 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
     
     private CourtEntity generateCourtEntity(ResultSet rs) throws IntegrationException {
         CourtEntity newCourtEntity = new CourtEntity();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
     
         try {
             newCourtEntity.setCourtEntityID(rs.getInt("entityid"));
             newCourtEntity.setCourtEntityOfficialNum(rs.getString("entityofficialnum"));
             newCourtEntity.setJurisdictionLevel(rs.getString("jurisdictionlevel"));
+            newCourtEntity.setMunicipality(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
             newCourtEntity.setCourtEntityName(rs.getString("name"));
             newCourtEntity.setAddressStreet(rs.getString("address_street"));
-            
             newCourtEntity.setAddressCity(rs.getString("address_city"));
             newCourtEntity.setAddressZip(rs.getString("address_zip"));
             newCourtEntity.setAddressState(rs.getString("address_state"));
             newCourtEntity.setAddressCounty(rs.getString("county"));
             newCourtEntity.setPhone(rs.getString("phone"));
             newCourtEntity.setUrl(rs.getString("url"));
-            
             newCourtEntity.setNotes(rs.getString("notes"));
-            newCourtEntity.setJudgeName(rs.getString("judgename"));
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());

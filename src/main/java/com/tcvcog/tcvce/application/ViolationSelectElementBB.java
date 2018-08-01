@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -34,6 +34,7 @@ import javax.faces.application.FacesMessage;
  */
 public class ViolationSelectElementBB extends BackingBeanUtils implements Serializable {
 
+    private EnforcableCodeElement selectedViolatedEnfElement;
     private ArrayList<EnforcableCodeElement> enfElementList;
     private ArrayList<EnforcableCodeElement> filteredElementList;
     private CodeSet currentCodeSet;
@@ -44,15 +45,33 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
     public ViolationSelectElementBB() {
     }
 
-    public String useSelectedElement(EnforcableCodeElement ece) {
-        CaseCoordinator cc = getCaseCoordinator();
-        CodeViolation cv = cc.generateNewCodeViolation(getSessionBean().getSessionCECase(), ece);
-        getSessionBean().setSessionCodeViolation(cv);
-        return "violationAdd";
+    public String useSelectedElement() {
+        
+        ViolationCoordinator vc = getViolationCoordinator();
+        CodeViolation cv;
+        if (selectedViolatedEnfElement != null && getSessionBean() != null) {
+             cv = vc.generateNewCodeViolation(getSessionBean().getActiveCase(), 
+                    selectedViolatedEnfElement);
+            getSessionBean().setActiveCodeViolation(cv);
+//            System.out.println("ViolationSelectElementBB.useSelectedElement | Selected Enf Element: "
+//                    + selectedViolatedEnfElement.getCodeElement().getOrdchapterTitle());
+            return "violationAdd";
 
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Ooops: Can't continue -- Please select an element from the list.", ""));
+            return "";
+        }
 
     }
 
+    /**
+     * @return the selectedViolatedEnfElement
+     */
+    public EnforcableCodeElement getSelectedViolatedEnfElement() {
+        return selectedViolatedEnfElement;
+    }
 
     /**
      * @return the enfElementList
@@ -82,6 +101,12 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
         return enfElementList;
     }
 
+    /**
+     * @param selectedViolatedEnfElement the selectedViolatedEnfElement to set
+     */
+    public void setSelectedViolatedEnfElement(EnforcableCodeElement selectedViolatedEnfElement) {
+        this.selectedViolatedEnfElement = selectedViolatedEnfElement;
+    }
 
     /**
      * @param enfElementList the enfElementList to set

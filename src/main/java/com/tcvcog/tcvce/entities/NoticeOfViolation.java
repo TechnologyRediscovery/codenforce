@@ -17,72 +17,44 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class NoticeOfViolation extends EntityUtils implements Serializable, Comparable<NoticeOfViolation> {
+public class NoticeOfViolation {
     
     private int noticeID;
     private Person recipient;
     
-    private String noticeTextBeforeViolations;
-    private List<CodeViolationDisplayable> violationList;
-    private String noticeTextAfterViolations;
+    private String noticeText;
+    private LocalDateTime insertionTimeStamp;
+    private String insertionTimeStampPretty;
     
     private LocalDateTime dateOfRecord;
-    private java.util.Date dateOfRecordUtilDate;
     private String dateOfRecordPretty;
     
-    private LocalDateTime creationTS;
-    private String creationTSPretty;
-    private User creationBy;
+    private boolean requestToSend;
     
-    private int headerImageID;
-   
-    private LocalDateTime lockedAndqueuedTS;
-    private String lockedAndQueuedTSPretty;
-    private User lockedAndQueuedBy;
+    private LocalDateTime letterSentDate;
+    private String letterSentDatePretty;
     
-    private LocalDateTime sentTS;
-    private String sentTSPretty;
-    private User sentBy;
-    
-    private LocalDateTime returnedTS;
-    private String returnedTSPretty;
-    private User returnedBy;
-    
-    private String notes;
-   
-    private PrintStyle style;
-    private boolean useSignatureImage;
-    private boolean includeViolationPhotoAttachment;
-
-    @Override
-    public int compareTo(NoticeOfViolation nv) {
-        return dateOfRecord.compareTo(nv.getDateOfRecord());
-    }
-    
-    
+    private LocalDateTime letterReturnedDate;
+    private String letterReturnedDatePretty;
 
     /**
-     * @return the noticeTextBeforeViolations
+     * @return the noticeText
      */
-    public String getNoticeTextBeforeViolations() {
-        return noticeTextBeforeViolations;
+    public String getNoticeText() {
+        return noticeText;
     }
 
     /**
-     * @param noticeTextBeforeViolations the noticeTextBeforeViolations to set
+     * @param noticeText the noticeText to set
      */
-    public void setNoticeTextBeforeViolations(String noticeTextBeforeViolations) {
-        this.noticeTextBeforeViolations = noticeTextBeforeViolations;
+    public void setNoticeText(String noticeText) {
+        this.noticeText = noticeText;
     }
 
     /**
@@ -93,10 +65,10 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
     }
 
     /**
-     * @return the creationTS
+     * @return the insertionTimeStamp
      */
-    public LocalDateTime getCreationTS() {
-        return creationTS;
+    public LocalDateTime getInsertionTimeStamp() {
+        return insertionTimeStamp;
     }
 
     /**
@@ -107,10 +79,17 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
     }
 
     /**
-     * @return the sentTS
+     * @return the requestToSend
      */
-    public LocalDateTime getSentTS() {
-        return sentTS;
+    public boolean isRequestToSend() {
+        return requestToSend;
+    }
+
+    /**
+     * @return the letterSentDate
+     */
+    public LocalDateTime getLetterSentDate() {
+        return letterSentDate;
     }
 
     /**
@@ -121,10 +100,10 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
     }
 
     /**
-     * @param creationTS the creationTS to set
+     * @param insertionTimeStamp the insertionTimeStamp to set
      */
-    public void setCreationTS(LocalDateTime creationTS) {
-        this.creationTS = creationTS;
+    public void setInsertionTimeStamp(LocalDateTime insertionTimeStamp) {
+        this.insertionTimeStamp = insertionTimeStamp;
     }
 
     /**
@@ -134,49 +113,46 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
         this.dateOfRecord = dateOfRecord;
     }
 
-
     /**
-     * @param sentTS the sentTS to set
+     * @param requestToSend the requestToSend to set
      */
-    public void setSentTS(LocalDateTime sentTS) {
-        this.sentTS = sentTS;
+    public void setRequestToSend(boolean requestToSend) {
+        this.requestToSend = requestToSend;
     }
 
     /**
-     * @return the creationTSPretty
+     * @param letterSentDate the letterSentDate to set
      */
-    public String getCreationTSPretty() {
-        if(creationTS != null){
-            creationTSPretty = getPrettyDate(creationTS);
-        }
-        return creationTSPretty;
+    public void setLetterSentDate(LocalDateTime letterSentDate) {
+        this.letterSentDate = letterSentDate;
+    }
+
+    /**
+     * @return the insertionTimeStampPretty
+     */
+    public String getInsertionTimeStampPretty() {
+        return insertionTimeStampPretty;
     }
 
     /**
      * @return the dateOfRecordPretty
      */
     public String getDateOfRecordPretty() {
-        if(dateOfRecord != null){
-            dateOfRecordPretty = getPrettyDate(dateOfRecord);
-        }
         return dateOfRecordPretty;
     }
 
     /**
-     * @return the sentTSPretty
+     * @return the letterSentDatePretty
      */
-    public String getSentTSPretty() {
-        if(sentTS != null){
-            sentTSPretty = getPrettyDate(sentTS);
-        }
-        return sentTSPretty;
+    public String getLetterSentDatePretty() {
+        return letterSentDatePretty;
     }
 
     /**
-     * @param creationTSPretty the creationTSPretty to set
+     * @param insertionTimeStampPretty the insertionTimeStampPretty to set
      */
-    public void setCreationTSPretty(String creationTSPretty) {
-        this.creationTSPretty = creationTSPretty;
+    public void setInsertionTimeStampPretty(String insertionTimeStampPretty) {
+        this.insertionTimeStampPretty = insertionTimeStampPretty;
     }
 
     /**
@@ -187,42 +163,38 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
     }
 
     /**
-     * @param sentTSPretty the sentTSPretty to set
+     * @param letterSentDatePretty the letterSentDatePretty to set
      */
-    public void setSentTSPretty(String sentTSPretty) {
-        this.sentTSPretty = sentTSPretty;
+    public void setLetterSentDatePretty(String letterSentDatePretty) {
+        this.letterSentDatePretty = letterSentDatePretty;
     }
 
     /**
-     * @return the returnedTS
+     * @return the letterReturnedDate
      */
-    public LocalDateTime getReturnedTS() {
-        return returnedTS;
+    public LocalDateTime getLetterReturnedDate() {
+        return letterReturnedDate;
     }
 
     /**
-     * @param returnedTS the returnedTS to set
+     * @param letterReturnedDate the letterReturnedDate to set
      */
-    public void setReturnedTS(LocalDateTime returnedTS) {
-        this.returnedTS = returnedTS;
+    public void setLetterReturnedDate(LocalDateTime letterReturnedDate) {
+        this.letterReturnedDate = letterReturnedDate;
     }
 
     /**
-     * @return the returnedTSPretty
+     * @return the letterReturnedDatePretty
      */
-    public String getReturnedTSPretty() {
-        if(returnedTS != null){
-            returnedTSPretty = getPrettyDate(returnedTS);
-            
-        }
-        return returnedTSPretty;
+    public String getLetterReturnedDatePretty() {
+        return letterReturnedDatePretty;
     }
 
     /**
-     * @param returnedTSPretty the returnedTSPretty to set
+     * @param letterReturnedDatePretty the letterReturnedDatePretty to set
      */
-    public void setReturnedTSPretty(String returnedTSPretty) {
-        this.returnedTSPretty = returnedTSPretty;
+    public void setLetterReturnedDatePretty(String letterReturnedDatePretty) {
+        this.letterReturnedDatePretty = letterReturnedDatePretty;
     }
 
     /**
@@ -237,222 +209,6 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
      */
     public void setRecipient(Person recipient) {
         this.recipient = recipient;
-    }
-
-    /**
-     * @return the noticeTextAfterViolations
-     */
-    public String getNoticeTextAfterViolations() {
-        return noticeTextAfterViolations;
-    }
-
-    /**
-     * @param noticeTextAfterViolations the noticeTextAfterViolations to set
-     */
-    public void setNoticeTextAfterViolations(String noticeTextAfterViolations) {
-        this.noticeTextAfterViolations = noticeTextAfterViolations;
-    }
-
-    /**
-     * @return the violationList
-     */
-    public List<CodeViolationDisplayable> getViolationList() {
-        return violationList;
-    }
-
-    /**
-     * @param violationList the violationList to set
-     */
-    public void setViolationList(List<CodeViolationDisplayable> violationList) {
-        this.violationList = violationList;
-    }
-
-    /**
-     * @return the lockedAndqueuedTS
-     */
-    public LocalDateTime getLockedAndqueuedTS() {
-        return lockedAndqueuedTS;
-    }
-
-    /**
-     * @return the lockedAndQueuedTSPretty
-     */
-    public String getLockedAndQueuedTSPretty() {
-        if(lockedAndqueuedTS != null){
-            lockedAndQueuedTSPretty = getPrettyDate(lockedAndqueuedTS);
-        }
-        return lockedAndQueuedTSPretty;
-    }
-
-    /**
-     * @return the lockedAndQueuedBy
-     */
-    public User getLockedAndQueuedBy() {
-        return lockedAndQueuedBy;
-    }
-
-    /**
-     * @return the sentBy
-     */
-    public User getSentBy() {
-        return sentBy;
-    }
-
-    /**
-     * @return the returnedBy
-     */
-    public User getReturnedBy() {
-        return returnedBy;
-    }
-
-    /**
-     * @param lockedAndqueuedTS the lockedAndqueuedTS to set
-     */
-    public void setLockedAndqueuedTS(LocalDateTime lockedAndqueuedTS) {
-        this.lockedAndqueuedTS = lockedAndqueuedTS;
-    }
-
-    /**
-     * @param lockedAndQueuedTSPretty the lockedAndQueuedTSPretty to set
-     */
-    public void setLockedAndQueuedTSPretty(String lockedAndQueuedTSPretty) {
-        this.lockedAndQueuedTSPretty = lockedAndQueuedTSPretty;
-    }
-
-    /**
-     * @param lockedAndQueuedBy the lockedAndQueuedBy to set
-     */
-    public void setLockedAndQueuedBy(User lockedAndQueuedBy) {
-        this.lockedAndQueuedBy = lockedAndQueuedBy;
-    }
-
-    /**
-     * @param sentBy the sentBy to set
-     */
-    public void setSentBy(User sentBy) {
-        this.sentBy = sentBy;
-    }
-
-    /**
-     * @param returnedBy the returnedBy to set
-     */
-    public void setReturnedBy(User returnedBy) {
-        this.returnedBy = returnedBy;
-    }
-
-    /**
-     * @return the notes
-     */
-    public String getNotes() {
-        return notes;
-    }
-
-    /**
-     * @param notes the notes to set
-     */
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    /**
-     * @return the creationBy
-     */
-    public User getCreationBy() {
-        return creationBy;
-    }
-
-    /**
-     * @param creationBy the creationBy to set
-     */
-    public void setCreationBy(User creationBy) {
-        this.creationBy = creationBy;
-    }
-
-    
-    /**
-     * @return the useSignatureImage
-     */
-    public boolean isUseSignatureImage() {
-        return useSignatureImage;
-    }
-
-   
-    /**
-     * @param useSignatureImage the useSignatureImage to set
-     */
-    public void setUseSignatureImage(boolean useSignatureImage) {
-        this.useSignatureImage = useSignatureImage;
-    }
-
-    /**
-     * @return the includeViolationPhotoAttachment
-     */
-    public boolean isIncludeViolationPhotoAttachment() {
-        includeViolationPhotoAttachment = false;
-        if(!violationList.isEmpty()){
-            Iterator<CodeViolationDisplayable> iter = violationList.iterator();
-            while(iter.hasNext()){
-                CodeViolationDisplayable cvd = iter.next();
-                if(cvd.isIncludeViolationPhotos()){
-                    includeViolationPhotoAttachment = true;
-                }
-            }
-        }
-        return includeViolationPhotoAttachment;
-    }
-
-    /**
-     * @param includeViolationPhotoAttachment the includeViolationPhotoAttachment to set
-     */
-    public void setIncludeViolationPhotoAttachment(boolean includeViolationPhotoAttachment) {
-        this.includeViolationPhotoAttachment = includeViolationPhotoAttachment;
-    }
-
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        dateOfRecordUtilDate = java.util.Date.from(getDateOfRecord().atZone(ZoneId.systemDefault()).toInstant());
-        return dateOfRecordUtilDate;
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        if(dateOfRecordUtilDate != null){
-            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-    }
-
-  
-    /**
-     * @return the headerImageID
-     */
-    public int getHeaderImageID() {
-        return headerImageID;
-    }
-
-    /**
-     * @param headerImageID the headerImageID to set
-     */
-    public void setHeaderImageID(int headerImageID) {
-        this.headerImageID = headerImageID;
-    }
-
-    /**
-     * @return the style
-     */
-    public PrintStyle getStyle() {
-        return style;
-    }
-
-    /**
-     * @param style the style to set
-     */
-    public void setStyle(PrintStyle style) {
-        this.style = style;
     }
     
 }

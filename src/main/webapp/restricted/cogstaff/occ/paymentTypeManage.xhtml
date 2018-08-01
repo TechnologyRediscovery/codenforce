@@ -10,10 +10,10 @@
         <title>Add Payment Type</title>
     </h:head>
     <h:body>
-        <ui:composition template="../../navContainer_restricted.xhtml">
+        <ui:composition template="./navContainer_restricted.xhtml">
             <ui:define name="content">
                 <div class="mainContainer">
-                    <h:messages id="messages" globalOnly="true" showDetail="true" showSummary="true"
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                     </h:messages>
                             
@@ -26,9 +26,9 @@
                                     id="paymentTypes"
                                     var="p"
                                     selectionMode="single"
-                                    selection="#{paymentBB.selectedPaymentType}"
+                                    selection="#{paymentTypeBB.selectedPaymentType}"
                                     rowKey="#{p.paymentTypeId}"
-                                    value="#{paymentBB.paymentTypeList}"
+                                    value="#{paymentTypeBB.paymentTypeList}"
                                     tableStyleClass="primeDataTable"
                                     tabindex="1">
                                     <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
@@ -49,21 +49,12 @@
      
                                 </p:dataTable>
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="true" update="paymentTypeAddForm messages"
-                                             actionListener="#{paymentBB.editPaymentType}"
-                                             oncomplete="PF('typeAddDialogVar').show()"
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{paymentTypeBB.editPaymentType}"
                                              value="Update Selected Payment Type" tabindex="2"/>
                             <p:commandButton ajax="false" 
-                                             actionListener="#{paymentBB.deleteSelectedPaymentType}"
+                                             actionListener="#{paymentTypeBB.deleteSelectedPaymentType}"
                                             value="Nuke Selected Category Forever" tabindex="3"/>
-                            <p:commandButton    id="newTypeDialogButton"
-                                                actionListener="#{paymentBB.initializeNewType}"
-                                                oncomplete="PF('typeAddDialogVar').show()"
-                                                ajax="true"
-                                                update="paymentTypeAddForm"
-                                                value="Create new Payment Type"
-                                                icon="fa fa-plus"
-                                                />
                             
                          </h:form>    
                              
@@ -75,7 +66,7 @@
                                         <p:outputLabel for="occInsFeeName">
                                            <h:outputText value="Name:"/>
                                         </p:outputLabel>
-                                        <p:inputText id="occInsFeeName" value="{feeManagementBB.formOccupancyInspectionFeeName}" 
+                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
                                                  style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
                                         <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -86,10 +77,7 @@
                                     </h:form>  
                                 </p:fieldset>-->
                             
-                           <p:dialog id="typeAddDialog"
-                                  height="450" width="1000"
-                                  widgetVar="typeAddDialogVar"
-                                  closable="true">
+                           
                         <h:form id="paymentTypeAddForm">
                             <h2>Add New Payment Type</h2>
                             <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
@@ -99,7 +87,7 @@
 
                                 <h:outputLabel value="Payment Type:" for="newOccInsFeeName"/>
                                 <h:panelGroup>
-                                    <p:inputText id="newPaymentType" value="#{paymentBB.formPaymentType.paymentTypeTitle}" 
+                                    <p:inputText id="newPaymentType" value="#{paymentTypeBB.formPaymentTypeTitle}" 
                                                  style="width: 250px;" tabindex="6" required="false" styleClass="inputText" maxlength="100"/>
                                     <h:message for="newPaymentType" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -112,20 +100,11 @@
                                 
                             </h:panelGrid>
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" rendered="#{!paymentBB.editing}"
-                                             value="Add Payment Type" action="#{paymentBB.addPaymentType}" />
-                            <p:commandButton ajax="false" rendered="#{paymentBB.editing}"
-                                             actionListener="#{paymentBB.commitPaymentTypeUpdates}"
+                            <p:commandButton ajax="false" value="Add Payment Type" action="#{paymentTypeBB.addPaymentType}" />
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{paymentTypeBB.commitPaymentTypeUpdates}"
                                                   value="Commit Updates" tabindex="7"/>
-                            <p:commandButton    id="cancel-cb"
-                                                    ajax="true"  tabindex="27"
-                                                    value="Cancel" 
-                                                    icon="fa fa-stop" 
-                                                    immediate="true"
-                                                    onclick="PF('typeAddDialogVar').hide()"
-                                                    />
                         </h:form>
-                           </p:dialog>
                     </f:view>
                 </div>
             </ui:define>

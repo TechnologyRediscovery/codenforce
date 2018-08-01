@@ -137,7 +137,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     
                                     <p:selectOneMenu id="newOccPermitTypeMuni" tabindex="11" required="false" value="#{occupancyPermitTypeBB.formMuni}">
                                         <f:converter converterId="muniConverter"/>
-                                        <f:selectItems id="muniNameList" value="#{sessionBean.sessionUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+                                        <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
                                     </p:selectOneMenu>
                                     <h:message for="newOccPermitTypeMuni" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />

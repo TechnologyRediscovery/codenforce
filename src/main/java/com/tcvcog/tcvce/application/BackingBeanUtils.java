@@ -16,32 +16,22 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
-import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
 import java.sql.Connection;
+import com.tcvcog.tcvce.integration.PostgresConnectionFactory;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.entities.Event;
-import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
+import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -50,40 +40,30 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 
 // occupancy integrators
-import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-
+import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyPermitIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 
 // system integrators
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
-import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
-import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
-import java.sql.SQLException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ResourceBundle;
 import javax.el.ValueExpression;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 
 /**
- * Collection of convenience methods for accessing application-level objects
- * that beans of various scopes use, most notably Coordinators and Integrators
- * 
- * @author Xander Darsow
+ *
+ * @author cedba
  */
 
 public class BackingBeanUtils implements Serializable{
@@ -102,36 +82,24 @@ public class BackingBeanUtils implements Serializable{
     private EventCoordinator eventCoordinator;
     private EventIntegrator eventIntegrator;
     
-    private ViolationIntegrator codeViolationIntegrator;
+    private CodeViolationIntegrator codeViolationIntegrator;
+    private ViolationCoordinator violationCoordinator;
     private CitationIntegrator citationIntegrator;
     private CourtEntityIntegrator courtEntityIntegrator;
     
     private PropertyIntegrator propertyIntegrator;
     private CEActionRequestIntegrator cEActionRequestIntegrator;
-    private PublicInfoCoordinator publicInfoCoordinator;
-    private PersonCoordinator personCoordinator;
-    private PropertyCoordinator propertyCoordinator;
     
-    private OccInspectionIntegrator occInspectionIntegrator;
-    private OccupancyIntegrator occupancyIntegrator;
+    private ChecklistIntegrator checklistIntegrator;
+    private OccupancyInspectionIntegrator occupancyInspectionIntegrator;
+    private OccupancyPermitIntegrator occupancyPermitIntegrator;
     private PaymentIntegrator paymentIntegrator;
-    private OccupancyCoordinator occupancyCoordinator;
-    private DataCoordinator dataCoordinator;
     
-    private BlobCoordinator blobCoordinator;
-    private BlobIntegrator blobIntegrator;
-    
-    // system 
+    // system integrators
     private SystemIntegrator systemIntegrator;
-    private SystemCoordinator systemCoordinator;
     private LogIntegrator logIntegrator;
     
-    private SearchCoordinator searchCoordinator;
-    
     private User facesUser;
-    
-    private DataSource dataSource;
-    private Connection connx;
     
     /**
      * Creates a new instance of BackingBeanUtils
@@ -144,6 +112,8 @@ public class BackingBeanUtils implements Serializable{
         // it should be made by the MBCF
         //System.out.println("Constructing BackingBean Utils");
         //userCoordinator = new UserCoordinator();
+        
+       
         
     }
     
@@ -168,19 +138,6 @@ public class BackingBeanUtils implements Serializable{
         return bundle;
     }
     
-        
-    public boolean isMunicodeInMuniList(int muniCode, List<Municipality> muniList){
-        Municipality m;
-        boolean isInList = false;
-        Iterator<Municipality> iter = muniList.iterator();
-        while(iter.hasNext()){
-            m = iter.next();
-            if(m.getMuniCode() == muniCode){
-                isInList = true;
-            }
-        }
-        return isInList;
-    }
     
     
     public void setUserCoordinator(UserCoordinator userCoordinator){
@@ -189,63 +146,32 @@ public class BackingBeanUtils implements Serializable{
 
     /**
      * creates a PostgresConnectionFactory factory and calls getCon to get a handle on the
-     * database connection
+ database connection
      * @return the postgresCon
      */
     public Connection getPostgresCon() {
-        String jndi_name = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("jndi_name");
-        
-        Context initContext = null;
-        try {
-            initContext = new InitialContext();
-            Context envCtx = (Context) initContext.lookup("java:comp/env");
-            dataSource = (DataSource) envCtx.lookup(jndi_name);
-            connx = dataSource.getConnection();
-        } catch (NamingException | SQLException ex) {
-            System.out.println(ex);
-        }
-        finally {
-//             removed to avoid a "connection closed error" when migrating to glassfish managed connection pool
-//            if (connx != null) { try { connx.close();} catch (SQLException e) { /* ignored */}}
-        } 
-        return connx;
-      
-    }
-    
-    public String appendNoteBlock(MessageBuilderParams mcc){
-        StringBuilder sb = new StringBuilder();
-        sb.append(mcc.existingContent);
-        sb.append("<br />******************** NOTE ********************<br />");
-        sb.append(mcc.header);
-        sb.append("<br />");
-        if(mcc.explanation != null){
-            sb.append(mcc.explanation);
-            sb.append("<br />");
-        }
-        sb.append("creatd by: ");
-        sb.append(mcc.user.getPerson().getFirstName());
-        sb.append(" ");
-        sb.append(mcc.user.getPerson().getLastName());
-        sb.append(" (username:  ");
-        sb.append(mcc.user.getUsername());
-        sb.append(", id#: ");
-        sb.append(mcc.user.getUserID());
-        sb.append(")");
-        sb.append("<br />");
-        sb.append(" at ");
-        sb.append(getPrettyDate(LocalDateTime.now()));
-        sb.append("<br />----------------note-text-----------------<br />");
-        sb.append(mcc.newMessageContent);
-        sb.append("<br />**************** END NOTE *****************<br />");
-        return sb.toString();
-    }
-    
 
-    /**
-     * Chops up the current time to get seven random digits
-     * @return 
-     */
-    public int generateControlCodeFromTime(){
+        // We definitely do not want to be creating a connection 
+        // factory in this location-- go get a bean!
+       // PostgresConnectionFactory factory = new PostgresConnectionFactory();
+       // return factory.getCon();
+       
+             
+         //System.out.println("BackingBeanUtils.getPostgresCon- Getting con through backing bean");
+         FacesContext context = getFacesContext();
+         PostgresConnectionFactory dbCon = context.getApplication()
+                 .evaluateExpressionGet(
+                         context, 
+                         "#{dBConnection}", 
+                         PostgresConnectionFactory.class);
+         return dbCon.getCon();
+         
+
+    }
+
+    // deleted setter
+    
+    public int getControlCodeFromTime(){
          long dateInMs = new Date().getTime();
          
          String numAsString = String.valueOf(dateInMs);
@@ -339,9 +265,6 @@ public class BackingBeanUtils implements Serializable{
    
         return propertyIntegrator;
     }
-    
-   
-    
 
     /**
      * @param propertyIntegrator the propertyIntegrator to set
@@ -484,35 +407,18 @@ public class BackingBeanUtils implements Serializable{
     
     public String getPrettyDate(LocalDateTime d){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-        if(d != null){
-            String formattedDateTime = d.format(formatter); 
-            return formattedDateTime;
-        } else {
-            return "";
-        }
+        String formattedDateTime = d.format(formatter); 
+        return formattedDateTime;
     }
-    
-    
-    public String getPrettyDateNoTime(LocalDateTime d){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy");
-        if(d != null){
-            String formattedDateTime = d.format(formatter); 
-            return formattedDateTime;
-        } else {
-            return "";
-        }
-    }
-    
-    
 
     /**
      * @return the codeViolationIntegrator
      */
-    public ViolationIntegrator getCodeViolationIntegrator() {
+    public CodeViolationIntegrator getCodeViolationIntegrator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{codeViolationIntegrator}", ViolationIntegrator.class);
-        codeViolationIntegrator = (ViolationIntegrator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{codeViolationIntegrator}", CodeViolationIntegrator.class);
+        codeViolationIntegrator = (CodeViolationIntegrator) ve.getValue(context.getELContext());
         
         return codeViolationIntegrator;
     }
@@ -520,11 +426,49 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @param codeViolationIntegrator the codeViolationIntegrator to set
      */
-    public void setCodeViolationIntegrator(ViolationIntegrator codeViolationIntegrator) {
+    public void setCodeViolationIntegrator(CodeViolationIntegrator codeViolationIntegrator) {
         this.codeViolationIntegrator = codeViolationIntegrator;
     }
 
+    /**
+     * @return the violationCoordinator
+     */
+    public ViolationCoordinator getViolationCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{violationCoordinator}", ViolationCoordinator.class);
+        violationCoordinator = (ViolationCoordinator) ve.getValue(context.getELContext());
+        return violationCoordinator;
+    }
+
+    /**
+     * @param violationCoordinator the violationCoordinator to set
+     */
+    public void setViolationCoordinator(ViolationCoordinator violationCoordinator) {
+        this.violationCoordinator = violationCoordinator;
+    }
+    
    
+   
+    /**
+     * @return the occupancyInspectionIntegrator
+     */
+    public OccupancyInspectionIntegrator getOccupancyInspectionIntegrator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{occupancyInspectionIntegrator}", OccupancyInspectionIntegrator.class);
+        occupancyInspectionIntegrator = (OccupancyInspectionIntegrator) ve.getValue(context.getELContext());
+        return occupancyInspectionIntegrator;
+    }
+
+    /**
+     * @param occupancyInspectionIntegrator the occupancyInspectionIntegrator to set
+     */
+    public void setOccupancyInspectionIntegrator(OccupancyInspectionIntegrator occupancyInspectionIntegrator) {
+        this.occupancyInspectionIntegrator = occupancyInspectionIntegrator;
+    }
+
+    
    
     /**
      * @return the courtEntityIntegrator
@@ -588,41 +532,41 @@ public class BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the occInspectionIntegrator
+     * @return the checklistIntegrator
      */
-    public OccInspectionIntegrator getOccInspectionIntegrator() {
+    public ChecklistIntegrator getChecklistIntegrator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{occInspectionIntegrator}", OccInspectionIntegrator.class);
-        occInspectionIntegrator = (OccInspectionIntegrator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{checklistIntegrator}", ChecklistIntegrator.class);
+        checklistIntegrator = (ChecklistIntegrator) ve.getValue(context.getELContext());
         
-        return occInspectionIntegrator;
+        return checklistIntegrator;
     }
 
     /**
-     * @param occInspectionIntegrator the occInspectionIntegrator to set
+     * @param checklistIntegrator the checklistIntegrator to set
      */
-    public void setOccInspectionIntegrator(OccInspectionIntegrator occInspectionIntegrator) {
-        this.occInspectionIntegrator = occInspectionIntegrator;
+    public void setChecklistIntegrator(ChecklistIntegrator checklistIntegrator) {
+        this.checklistIntegrator = checklistIntegrator;
     }
 
     /**
-     * @return the occupancyIntegrator
+     * @return the occupancyPermitIntegrator
      */
-    public OccupancyIntegrator getOccupancyIntegrator() {
+    public OccupancyPermitIntegrator getOccupancyPermitIntegrator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{occupancyIntegrator}", OccupancyIntegrator.class);
-        occupancyIntegrator = (OccupancyIntegrator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{occupancyPermitIntegrator}", OccupancyPermitIntegrator.class);
+        occupancyPermitIntegrator = (OccupancyPermitIntegrator) ve.getValue(context.getELContext());
         
-        return occupancyIntegrator;
+        return occupancyPermitIntegrator;
     }
 
     /**
-     * @param occupancyIntegrator the occupancyIntegrator to set
+     * @param occupancyPermitIntegrator the occupancyPermitIntegrator to set
      */
-    public void setOccupancyIntegrator(OccupancyIntegrator occupancyIntegrator) {
-        this.occupancyIntegrator = occupancyIntegrator;
+    public void setOccupancyPermitIntegrator(OccupancyPermitIntegrator occupancyPermitIntegrator) {
+        this.occupancyPermitIntegrator = occupancyPermitIntegrator;
     }
 
     /**
@@ -648,17 +592,6 @@ public class BackingBeanUtils implements Serializable{
         
         return logIntegrator;
     }
-    
-     /**
-     * @return the sessionBean
-     */
-    public SearchCoordinator getSearchCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{searchCoordinator}", SearchCoordinator.class);
-        searchCoordinator = (SearchCoordinator) ve.getValue(context.getELContext());
-        return searchCoordinator;
-    }
 
     /**
      * @return the sessionBean
@@ -681,7 +614,7 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @return the facesUser
      */
-    public User getJBOSSUser() {
+    public User getFacesUser() {
         ExternalContext ec = getFacesContext().getExternalContext();
         facesUser = (User) ec.getSessionMap().get("facesUser");
         return facesUser;
@@ -690,200 +623,8 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @param facesUser the facesUser to set
      */
-    public void setSessionUser(User facesUser) {
+    public void setFacesUser(User facesUser) {
         this.facesUser = facesUser;
     }
-    
-    public String getSessionID(){
-        
-        FacesContext fc = getFacesContext();
-        HttpSession session = (HttpSession) fc.getExternalContext().getSession(false);
-        // prints out the current session attributes to standard out
-//        Enumeration e = session.getAttributeNames();
-//        System.out.println("SessionInitailzier.getSessionID | Dumping lots of attrs");
-//        while (e.hasMoreElements())
-//        {
-//          String attr = (String)e.nextElement();
-//          System.out.println("      attr  = "+ attr);
-//          Object value = session.getValue(attr);
-//          System.out.println("      value = "+ value);
-//        }
-        String sessionID = session.getId();
-        return sessionID;
-    }
-
-    /**
-     * @return the publicInfoCoordinator
-     */
-    public PublicInfoCoordinator getPublicInfoCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{publicInfoCoordinator}", PublicInfoCoordinator.class);
-        publicInfoCoordinator = (PublicInfoCoordinator) ve.getValue(context.getELContext());
-        
-        return publicInfoCoordinator;
-    }
-
-    /**
-     * @param publicInfoCoordinator the publicInfoCoordinator to set
-     */
-    public void setPublicInfoCoordinator(PublicInfoCoordinator publicInfoCoordinator) {
-        this.publicInfoCoordinator = publicInfoCoordinator;
-    }
-
-    /**
-     * @return the dataSource
-     */
-    public DataSource getDataSource() {
-        
-        return dataSource;
-    }
-
-    /**
-     * @param dataSource the dataSource to set
-     */
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    /**
-     * @return the personCoordinator
-     */
-    public PersonCoordinator getPersonCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{personCoordinator}", PersonCoordinator.class);
-        personCoordinator = (PersonCoordinator) ve.getValue(context.getELContext());
-        
-        return personCoordinator;
-    }
-
-    /**
-     * @param personCoordinator the personCoordinator to set
-     */
-    public void setPersonCoordinator(PersonCoordinator personCoordinator) {
-        this.personCoordinator = personCoordinator;
-    }
-
-    /**
-     * @return the propertyCoordinator
-     */
-    public PropertyCoordinator getPropertyCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{propertyCoordinator}", PropertyCoordinator.class);
-        propertyCoordinator = (PropertyCoordinator) ve.getValue(context.getELContext());
-        
-        return propertyCoordinator;
-    }
-
-    /**
-     * @param propertyCoordinator the propertyCoordinator to set
-     */
-    public void setPropertyCoordinator(PropertyCoordinator propertyCoordinator) {
-        this.propertyCoordinator = propertyCoordinator;
-    }
-
-    /**
-     * @return the occupancyCoordiator
-     */
-    public OccupancyCoordinator getOccupancyCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{occupancyCoordinator}", OccupancyCoordinator.class);
-        occupancyCoordinator = (OccupancyCoordinator) ve.getValue(context.getELContext());
-        return occupancyCoordinator;
-    }
-
-    /**
-     * @param occupancyCoordiator the occupancyCoordiator to set
-     */
-    public void setOccupancyCoordinator(OccupancyCoordinator occupancyCoordiator) {
-        this.occupancyCoordinator = occupancyCoordiator;
-    }
-/**
-     * @return the systemCoordinator
-     */
-    public SystemCoordinator getSystemCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{systemCoordinator}", SystemCoordinator.class);
-        systemCoordinator = (SystemCoordinator) ve.getValue(context.getELContext());
-        return systemCoordinator;
-    }
-/**
-     * @return the systemCoordinator
-     */
-    public DataCoordinator getDataCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{dataCoordinator}", DataCoordinator.class);
-        dataCoordinator = (DataCoordinator) ve.getValue(context.getELContext());
-        return dataCoordinator;
-    }
-
-    /**
-     * @param systemCoordinator the systemCoordinator to set
-     */
-    public void setSystemCoordinator(SystemCoordinator systemCoordinator) {
-        this.systemCoordinator = systemCoordinator;
-    }
-
-    
-    public ChoiceCoordinator getChoiceCoordinator(){
-        ChoiceCoordinator cc;
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{choiceCoordinator}", ChoiceCoordinator.class);
-        cc = (ChoiceCoordinator) ve.getValue(context.getELContext());
-        return cc;
-    }
-    
-    public ChoiceIntegrator getChoiceIntegrator(){
-        ChoiceIntegrator ci;
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{choiceIntegrator}", ChoiceIntegrator.class);
-        ci = (ChoiceIntegrator) ve.getValue(context.getELContext());
-        return ci;
-    }
-    /**
-     * @return the blobCoordinator
-     */
-    public BlobCoordinator getBlobCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{blobCoordinator}", BlobCoordinator.class);
-        blobCoordinator = (BlobCoordinator) ve.getValue(context.getELContext());
-        return blobCoordinator;
-    }
-
-    /**
-     * @param blobCoordinator the blobCoordinator to set
-     */
-    public void setBlobCoordinator(BlobCoordinator blobCoordinator) {
-        this.blobCoordinator = blobCoordinator;
-    }
-
-    /**
-     * @return the blobIntegrator
-     */
-    public BlobIntegrator getBlobIntegrator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{blobIntegrator}", BlobIntegrator.class);
-        blobIntegrator = (BlobIntegrator) ve.getValue(context.getELContext());
-        return blobIntegrator;
-    }
-
-    /**
-     * @param blobIntegrator the blobIntegrator to set
-     */
-    public void setBlobIntegrator(BlobIntegrator blobIntegrator) {
-        this.blobIntegrator = blobIntegrator;
-    }
-
-       
-
 
 }

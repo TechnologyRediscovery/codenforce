@@ -12,27 +12,23 @@
     <h:body>
         <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view>
-                    <div class="mainContainer">
-
-                        <h:form id="messages-global-form">
-
-
-                            <h:messages globalOnly="true" showDetail="false" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                        </h:form>
-
-                        <h1>Edit code violation details</h1>
-
-                        <p>Use this page for updating any non-compliance or citation-related violation details
-                            such as penalty notes, descriptions, and which groups can see the events in their logs.</p>
-
+                <div class="mainContainer">
+                    
+                    <h:messages globalOnly="true" showDetail="false" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                    <h1>Edit code violation details</h1>
+                    
+                    <p>Use this page for updating any non-compliance or citation-related violation details
+                    such as penalty notes, descriptions, and which groups can see the events in their logs.</p>
+                    <f:view>
+                        
                         <h:outputText value="You are editing the violation of code subsection: 
                                       #{violationEditBB.currentViolation.codeViolated.codeElement.ordSubSecTitle} "/>
-                        <h:form id="editViolationEventForm">
-
-                            <h:panelGrid columns="2" border="0" 
+                          <h:form id="editViolationEventForm">
+                              
+                             <h:panelGrid columns="2" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
                                          footerClass="gridFooter">
                                 <f:facet name="header" >
@@ -42,31 +38,15 @@
                                     </h:panelGroup>    
                                 </f:facet>
 
-
-                                <h:panelGroup>
-                                    <h:outputLabel for="dateOfRecord">
-                                        <h:outputText value="Date of Record"/>
-                                    </h:outputLabel>
-                                    <p:spacer height="0px"/>
-                                    <p:calendar value="#{violationEditBB.currentViolation.dateOfRecordUtilDate}" 
-                                                mode="popup"  id="dateOfRecord"
-                                                showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                navigator="true" tabindex="2"
-                                                showButtonPanel="true" showTodayButton="true"
-                                                required="true"/>
-                                    <h:message for="dateOfRecord" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
                                 <h:panelGroup>
                                     <h:outputLabel for="stipCompDate">
                                         <h:outputText value="Stipulated Compliance Date"/>
                                     </h:outputLabel>
                                     <p:spacer height="0px"/>
-                                    <p:calendar value="#{violationEditBB.currentViolation.stipulatedComplianceDateUtilDate}" 
+                                    <p:calendar value="#{violationEditBB.stipulatedComplianceDate}" 
                                                 mode="popup"  id="stipCompDate"
-                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                navigator="true" tabindex="1" timeInput="true" showHour="true" showMinute="true"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                navigator="true" tabindex="1"
                                                 showButtonPanel="true" showTodayButton="true"
                                                 required="true"/>
                                     <p:spacer height="0px"/>
@@ -74,58 +54,76 @@
                                                   #{violationEditBB.currentViolation.codeViolated.normDaysToComply})"
                                                   style="font-style: italic"/>
                                     <h:message for="stipCompDate" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" 
-                                               errorClass="msgError" />
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" 
+                                            errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="dateOfRecord">
+                                        <h:outputText value="Date of Record"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="0px"/>
+                                    <p:calendar value="#{violationEditBB.dateOfRecord}" 
+                                                mode="popup"  id="dateOfRecord"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                navigator="true" tabindex="2"
+                                                showButtonPanel="true" showTodayButton="true"
+                                                required="true"/>
+                                    <h:message for="dateOfRecord" showDetail="false" showSummary="true" 
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
 
                                 <h:panelGroup>
                                     <p:outputLabel for="penalty">
-                                        <h:outputText value="Penalty (exclude $ sign)"/>
+                                        <h:outputText value="Penalty (exclude $)"/>
                                     </p:outputLabel>
-                                    <p:inputText id="penalty" value="#{violationEditBB.currentViolation.penalty}"
+                                    <p:inputText id="penalty" value="#{violationEditBB.penalty}"
                                                  style="width: 20%;" tabindex="3" required="true" styleClass="inputText" type="currency"/>
                                     <h:message for="penalty" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
-                                <h:panelGroup>
-                                    <p:outputLabel for="notes-ot">
-                                        <h:outputText value="Internal Notes: "/>
+                                 <h:panelGroup>
+                                    <p:outputLabel for="notes">
+                                        <h:outputText value="Penalty Notes"/>
                                     </p:outputLabel>
-                                    <h:outputText id="notes-ot" escape="false" value="#{violationEditBB.currentViolation.notes}"/>
+                                    <p:inputText id="notes" value="#{violationEditBB.notes}"
+                                                 style="width: 100%;" tabindex="4" required="false" styleClass="inputText" type="text"/>
+                                    <h:message for="notes" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
-
+                                
 
                                 <f:facet name="footer">
                                     <h:panelGroup>
                                         <p:outputLabel for="desc">
                                             <h:outputText value="Description of code violation"/>
                                         </p:outputLabel>
-                                        <p:inputTextarea id="desc" value="#{violationEditBB.currentViolation.description}"
-                                                         style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <p:inputTextarea id="desc" value="#{violationEditBB.description}"
+                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
                                         <h:message for="desc" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
                                 </f:facet>
                             </h:panelGrid>
-
+                              
                             <p:spacer height="10px"/>
-
+                            
                             <p:separator />
-
+                            
                             <p:spacer height="10px"/>
-                            <p>This record change will generate a notice event for the case log and for this violation. Please populate the following event information fields. 
+                            <p>This record change will generate a notice event for the case log. Please populate the following event information fields. 
                                 For example: Describe in a sentence or two why these changes are necessary in the notes section</p>
-
-                            <p:fieldset legend="Record change event"
-                                        toggleable="true" collapsed="false">
-
+                            
+                             <p:fieldset legend="Record change event"
+                                         toggleable="true" collapsed="false">
+                                 
                                 <p:spacer height="10px"/>
-
+                                
                                 <h:panelGrid columns="2" border="0" 
-                                             cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
-                                             footerClass="gridFooter">
-
-
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                         footerClass="gridFooter">
+                                    
+                                   
                                     <h:panelGroup>
                                         <h:outputLabel for="discloseToMuniIS">
                                             <h:outputText value="Disclose to Municipalities"/>
@@ -133,7 +131,7 @@
                                         <p:spacer height="0px"/>
                                         <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{violationEditBB.formDiscloseToMuni}" onLabel="Yes" offLabel="No" />
                                     </h:panelGroup>
-
+                                    
                                     <h:panelGroup>
                                         <h:outputLabel for="discloseToPublic">
                                             <h:outputText value="Disclose to Public"/>
@@ -141,33 +139,34 @@
                                         <p:spacer height="0px"/>
                                         <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{violationEditBB.formDiscloseToPublic}" onLabel="Yes" offLabel="No" />
                                     </h:panelGroup>
-
+                                       
                                     <f:facet name="footer">
                                         <h:outputLabel for="eventNotes">
                                             <h:outputText value="Event Notes:"/>
                                         </h:outputLabel>
                                         <h:panelGroup>
                                             <p:inputTextarea id="eventNotes" value="#{violationEditBB.formEventNotes}" 
-                                                             style="width: 100%;" tabindex="19" required="false" styleClass="inputText"/>
+                                                   style="width: 100%;" tabindex="19" required="false" styleClass="inputText"/>
                                             <h:message for="eventNotes" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                         </h:panelGroup>
                                     </f:facet>
-
+                                 
                                 </h:panelGrid>
-                            </p:fieldset>
-
+                             </p:fieldset>
+                            
                             <p:spacer height="10px"/>
-
+                            
                             <p:commandButton    ajax="false" action="#{violationEditBB.editViolation}"
                                                 value="Update violation record and return to case home" icon="fa fa-edit" tabindex="6"/>
-
+                            
                             <p:commandButton    ajax="false" action="caseProfile"
                                                 value="Cancel" tabindex="7" icon="fa fa-stop"/>
-
+                            
+                            
                         </h:form>
-                    </div>
-                </f:view>
+                    </f:view>
+                </div>
             </ui:define>
         </ui:composition>
     </h:body>

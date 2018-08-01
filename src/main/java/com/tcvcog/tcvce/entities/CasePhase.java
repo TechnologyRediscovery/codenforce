@@ -23,45 +23,28 @@ package com.tcvcog.tcvce.entities;
  */
 public enum CasePhase {
 
-    PrelimInvestigationPending("Preliminary Investigation Pending", 1, CaseStage.Investigation, true),
-    NoticeDelivery("Notice of Violation Delivery", 2, CaseStage.Investigation, true ),
-    InitialComplianceTimeframe("Initial Compliance Timeframe", 3, CaseStage.Enforcement, true),
-    SecondaryComplianceTimeframe("Secondary Compliance Timeframe",4, CaseStage.Enforcement, true ),
-    AwaitingHearingDate("Awaiting Hearing", 5, CaseStage.Citation, true),
-    HearingPreparation("Hearing Preparation", 6, CaseStage.Citation, true),
-    InitialPostHearingComplianceTimeframe("Initial Post-Hearing Compliance Timeframe", 7, CaseStage.Citation, true),
-    SecondaryPostHearingComplianceTimeframe("Secondary Post-Hearing Compliance Timeframe", 8, CaseStage.Citation, true),
-    InactiveHolding("Inactive Holding", 9, CaseStage.Unknown, false),
-    Closed("Closed", 10, CaseStage.Closed, false),
-    LegacyImported("Legacy data container case", 11, CaseStage.Unknown, false);
+    PrelimInvestigationPending("Preliminary Investigation Pending"),
+    NoticeDelivery("Notice of Violation Delivery"),
+    InitialComplianceTimeframe("Intitial Compliance Timeframe"),
+    SecondaryComplianceTimeframe("Secondary Compliance Timeframe"),
+    AwaitingHearingDate("Awaiting Hearing"),
+    HearingPreparation("Hearing Preparation"),
+    InitialPostHearingComplianceTimeframe("Initial Post-Hearing Compliance Timeframe"),
+    SecondaryPostHearingComplianceTimeframe("Secondary Post-Hearing Compliance Timeframe"),
+    InactiveHolding("Inactive Holding"),
+    Closed("Closed"),
+    LegacyImported("Legacy data container case");
     
     private final String label;
-    private final int phaseOrder;
-    private final CaseStage stage;
-    private final Boolean caseOpen;
     
-    private CasePhase(String label, int ord, CaseStage s, Boolean oc){
+    private CasePhase(String label){
         this.label = label;
-        this.phaseOrder = ord;
-        this.stage = s;
-        this.caseOpen = oc;
     }
     
     public String getLabel(){
         return label;
     }
-    
-    public int getOrder(){
-        return phaseOrder;
-    }
-    
-    public CaseStage getCaseStage(){
-        return stage;
-    }
-    
-    public boolean isCaseOpen(){
-        return caseOpen;
-    }
+
     
 }
 

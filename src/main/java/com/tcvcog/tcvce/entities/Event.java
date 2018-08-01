@@ -17,49 +17,27 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Objects;
 
 /**
- * Superclass of the entire Event family! The father of all Events.
- * @author Ellen Baskem
+ *
+ * @author Eric C. Darsow
  */
-public class Event 
-        extends EntityUtils 
-        implements  Serializable, 
-                    Comparable<Event>{
+public class Event {
     
-    protected int eventID;
-    
-    protected int muniCode;
-    protected String muniName;
-    protected int propertyID;
-    protected EventCategory category;
-    
-    protected LocalDateTime dateOfRecord;
-    protected String dateOfRecordPretty;
-    protected java.util.Date dateOfRecordUtilDate;
-    protected LocalDateTime timestamp;
-    protected String timestampPretty;
-    
-    protected String description;
-    protected User owner;
-    protected boolean discloseToMunicipality; 
-    protected boolean discloseToPublic;
-    protected boolean active;
-    protected boolean hidden;
-    protected String notes;
-    
-    protected List<Person> personList;
-    
-    protected long daysUntilDue;
-    
-    
-    
+    private int eventID;
+    private EventCategory category;
+    private LocalDateTime dateOfRecord;
+    private String prettyDateOfRecord;
+    private LocalDateTime eventTimeStamp;
+    private String eventDescription;
+    private User eventOwnerUser;
+    private boolean discloseToMunicipality;
+    private boolean discloseToPublic;
+    private boolean activeEvent;
+    private boolean hidden;
+    private String notes;
+
     /**
      * @return the eventID
      */
@@ -82,33 +60,31 @@ public class Event
     }
 
     /**
-     * @return the dateOfRecordPretty
+     * @return the prettyDateOfRecord
      */
-    public String getDateOfRecordPretty() {
-        String pretty = getPrettyDate(dateOfRecord);
-        dateOfRecordPretty = pretty;
-        return dateOfRecordPretty;
+    public String getPrettyDateOfRecord() {
+        return prettyDateOfRecord;
     }
 
     /**
-     * @return the timestamp
+     * @return the eventTimeStamp
      */
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public LocalDateTime getEventTimeStamp() {
+        return eventTimeStamp;
     }
 
     /**
-     * @return the description
+     * @return the eventDescription
      */
-    public String getDescription() {
-        return description;
+    public String getEventDescription() {
+        return eventDescription;
     }
 
     /**
-     * @return the owner
+     * @return the eventOwnerUser
      */
-    public User getOwner() {
-        return owner;
+    public User getEventOwnerUser() {
+        return eventOwnerUser;
     }
 
     /**
@@ -126,10 +102,10 @@ public class Event
     }
 
     /**
-     * @return the active
+     * @return the activeEvent
      */
-    public boolean isActive() {
-        return active;
+    public boolean isActiveEvent() {
+        return activeEvent;
     }
 
     /**
@@ -167,26 +143,32 @@ public class Event
         this.dateOfRecord = dateOfRecord;
     }
 
-    
     /**
-     * @param timestamp the timestamp to set
+     * @param prettyDateOfRecord the prettyDateOfRecord to set
      */
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setPrettyDateOfRecord(String prettyDateOfRecord) {
+        this.prettyDateOfRecord = prettyDateOfRecord;
     }
 
     /**
-     * @param description the description to set
+     * @param eventTimeStamp the eventTimeStamp to set
      */
-    public void setDescription(String description) {
-        this.description = description;
+    public void setEventTimeStamp(LocalDateTime eventTimeStamp) {
+        this.eventTimeStamp = eventTimeStamp;
     }
 
     /**
-     * @param owner the owner to set
+     * @param eventDescription the eventDescription to set
      */
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setEventDescription(String eventDescription) {
+        this.eventDescription = eventDescription;
+    }
+
+    /**
+     * @param eventOwnerUser the eventOwnerUser to set
+     */
+    public void setEventOwnerUser(User eventOwnerUser) {
+        this.eventOwnerUser = eventOwnerUser;
     }
 
     /**
@@ -204,10 +186,10 @@ public class Event
     }
 
     /**
-     * @param active the active to set
+     * @param activeEvent the activeEvent to set
      */
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setActiveEvent(boolean activeEvent) {
+        this.activeEvent = activeEvent;
     }
 
     /**
@@ -224,173 +206,5 @@ public class Event
         this.notes = notes;
     }
 
-   
-
-
-
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        if(dateOfRecord != null){
-            dateOfRecordUtilDate = java.util.Date.from(
-                    this.dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return dateOfRecordUtilDate;
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        if(dateOfRecordUtilDate != null){
-            dateOfRecord = this.dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
-
-   
-
-
-    /**
-     * @return the timestampPretty
-     */
-    public String getTimestampPretty() {
-        String s = getPrettyDate(timestamp);
-        timestampPretty = s;
-        return timestampPretty;
-    }
-
-    /**
-     * @param timestampPretty the timestampPretty to set
-     */
-    public void setTimestampPretty(String timestampPretty) {
-        this.timestampPretty = timestampPretty;
-    }
-
-
-    /**
-     * @return the personList
-     */
-    public List<Person> getPersonList() {
-        return personList;
-    }
-
-    /**
-     * @param personList the personList to set
-     */
-    public void setPersonList(List<Person> personList) {
-        this.personList = personList;
-    }
-
     
-    /**
-     * @return the daysUntilDue
-     */
-    public long getDaysUntilDue() {
-        long d = getTimePeriodAsDays(LocalDateTime.now(), dateOfRecord);
-        daysUntilDue = d;
-        return daysUntilDue;
-    }
-
-    /**
-     * @param daysUntilDue the daysUntilDue to set
-     */
-    public void setDaysUntilDue(long daysUntilDue) {
-        this.daysUntilDue = daysUntilDue;
-    }
-
-    /**
-     * @return the muniCode
-     */
-    public int getMuniCode() {
-        return muniCode;
-    }
-
-    /**
-     * @param muniCode the muniCode to set
-     */
-    public void setMuniCode(int muniCode) {
-        this.muniCode = muniCode;
-    }
-
-    /**
-     * @return the propertyID
-     */
-    public int getPropertyID() {
-        return propertyID;
-    }
-
-    /**
-     * @param propertyID the propertyID to set
-     */
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
-    }
-
-    /**
-     * @return the muniName
-     */
-    public String getMuniName() {
-        return muniName;
-    }
-
-    /**
-     * @param muniName the muniName to set
-     */
-    public void setMuniName(String muniName) {
-        this.muniName = muniName;
-    }
-
-    @Override
-    public int compareTo(Event e) {
-        int c = this.dateOfRecord.compareTo(e.getDateOfRecord());
-        return c;
-        
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 97 * hash + this.eventID;
-        hash = 97 * hash + this.muniCode;
-        hash = 97 * hash + Objects.hashCode(this.muniName);
-        hash = 97 * hash + this.propertyID;
-        hash = 97 * hash + Objects.hashCode(this.category);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecord);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecordPretty);
-        hash = 97 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
-        hash = 97 * hash + Objects.hashCode(this.timestamp);
-        hash = 97 * hash + Objects.hashCode(this.timestampPretty);
-        hash = 97 * hash + Objects.hashCode(this.description);
-        hash = 97 * hash + Objects.hashCode(this.owner);
-        hash = 97 * hash + (this.discloseToMunicipality ? 1 : 0);
-        hash = 97 * hash + (this.discloseToPublic ? 1 : 0);
-        hash = 97 * hash + (this.active ? 1 : 0);
-        hash = 97 * hash + (this.hidden ? 1 : 0);
-        hash = 97 * hash + Objects.hashCode(this.notes);
-        hash = 97 * hash + Objects.hashCode(this.personList);
-        hash = 97 * hash + (int) (this.daysUntilDue ^ (this.daysUntilDue >>> 32));
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Event other = (Event) obj;
-        if (this.eventID != other.eventID) {
-            return false;
-        }
-        return true;
-    }
-
-   
 }

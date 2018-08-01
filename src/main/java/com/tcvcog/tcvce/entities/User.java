@@ -18,10 +18,6 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  *
@@ -29,39 +25,35 @@ import java.util.Objects;
  */
 public class User implements Serializable{
 
-    protected int userID;
-    protected String username;
-    
-    protected Person person;
-    protected int personID;
-
-    protected String notes;
-    
-    protected String badgeNumber;
-    protected String oriNumber;
-    
+    private int userID;
+    private RoleType roleType;
+    private String username;
+    // note password is not stored in the business object!
+    private String password;
+    private int muniCode;
+    private Municipality muni;
+    private String fName;
+    private String lName;
+    private String workTitle;
+    private String phoneCell;
+    private String phoneHome;
+    private String phoneWork;
+    private String email;
+    private String address_street;
+    private String address_city;
+    private String address_zip;
+    private String address_state;
+    private String notes;
+    private LocalDateTime activityStartDate;
+    private LocalDateTime activityStopDate;
+    private boolean accessPermitted;
     
     /**
      * Creates a new instance of User
      */
     public User() {
     }
-    
-    /**
-     * Creates a new instance of User
-     * @param id
-     */
-    public User(int id) {
-        userID = id;
-    }
-    
-    public void setUserID(int uid){
-        userID = uid;
-    }
-    
-    
-    
-    
+
 
     /**
      * @return the userID
@@ -70,7 +62,27 @@ public class User implements Serializable{
         return userID;
     }
 
-  
+    /**
+     * @param userID the userID to set
+     */
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
+
+    /**
+     * @return the roleType
+     */
+    public RoleType getRoleType() {
+        return roleType;
+    }
+
+    /**
+     * @param roleType the roleType to set
+     */
+    public void setRoleType(RoleType roleType) {
+        this.roleType = roleType;
+    }
+
     /**
      * @return the username
      */
@@ -85,8 +97,160 @@ public class User implements Serializable{
         this.username = username;
     }
 
-    
-   
+    /**
+     * @return the muni
+     */
+    public Municipality getMuni() {
+        return muni;
+    }
+
+    /**
+     * @param muni the muni to set
+     */
+    public void setMuni(Municipality muni) {
+        this.muni = muni;
+    }
+
+    /**
+     * @return the fName
+     */
+    public String getFName() {
+        return fName;
+    }
+
+    /**
+     * @param fName the fName to set
+     */
+    public void setFName(String fName) {
+        this.fName = fName;
+    }
+
+    /**
+     * @return the lName
+     */
+    public String getLName() {
+        return lName;
+    }
+
+    /**
+     * @param lName the lName to set
+     */
+    public void setLName(String lName) {
+        this.lName = lName;
+    }
+
+    /**
+     * @return the workTitle
+     */
+    public String getWorkTitle() {
+        return workTitle;
+    }
+
+    /**
+     * @param workTitle the workTitle to set
+     */
+    public void setWorkTitle(String workTitle) {
+        this.workTitle = workTitle;
+    }
+
+    /**
+     * @return the phoneCell
+     */
+    public String getPhoneCell() {
+        return phoneCell;
+    }
+
+    /**
+     * @param phoneCell the phoneCell to set
+     */
+    public void setPhoneCell(String phoneCell) {
+        this.phoneCell = phoneCell;
+    }
+
+    /**
+     * @return the phoneHome
+     */
+    public String getPhoneHome() {
+        return phoneHome;
+    }
+
+    /**
+     * @param phoneHome the phoneHome to set
+     */
+    public void setPhoneHome(String phoneHome) {
+        this.phoneHome = phoneHome;
+    }
+
+    /**
+     * @return the phoneWork
+     */
+    public String getPhoneWork() {
+        return phoneWork;
+    }
+
+    /**
+     * @param phoneWork the phoneWork to set
+     */
+    public void setPhoneWork(String phoneWork) {
+        this.phoneWork = phoneWork;
+    }
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * @return the address_street
+     */
+    public String getAddress_street() {
+        return address_street;
+    }
+
+    /**
+     * @param address_street the address_street to set
+     */
+    public void setAddress_street(String address_street) {
+        this.address_street = address_street;
+    }
+
+    /**
+     * @return the address_city
+     */
+    public String getAddress_city() {
+        return address_city;
+    }
+
+    /**
+     * @param address_city the address_city to set
+     */
+    public void setAddress_city(String address_city) {
+        this.address_city = address_city;
+    }
+
+    /**
+     * @return the address_zip
+     */
+    public String getAddress_zip() {
+        return address_zip;
+    }
+
+    /**
+     * @param address_zip the address_zip to set
+     */
+    public void setAddress_zip(String address_zip) {
+        this.address_zip = address_zip;
+    }
+
     /**
      * @return the notes
      */
@@ -100,115 +264,92 @@ public class User implements Serializable{
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    // no setters for access permissions private variables!!
+
     /**
-     * @return the keyCard
+     * @return the activityStartDate
      */
+    public LocalDateTime getActivityStartDate() {
+        return activityStartDate;
+    }
+
     /**
-     * @param keyCard the keyCard to set
-     */   
+     * @param activityStartDate the activityStartDate to set
+     */
+    public void setActivityStartDate(LocalDateTime activityStartDate) {
+        this.activityStartDate = activityStartDate;
+    }
+
+    /**
+     * @return the activityStopDate
+     */
+    public LocalDateTime getActivityStopDate() {
+        return activityStopDate;
+    }
+
+    /**
+     * @param activityStopDate the activityStopDate to set
+     */
+    public void setActivityStopDate(LocalDateTime activityStopDate) {
+        this.activityStopDate = activityStopDate;
+    }
+
+    /**
+     * @return the accessPermitted
+     */
+    public boolean isAccessPermitted() {
+        return accessPermitted;
+    }
+
+    /**
+     * @param accessPermitted the accessPermitted to set
+     */
+    public void setAccessPermitted(boolean accessPermitted) {
+        this.accessPermitted = accessPermitted;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * @return the muniCode
+     */
+    public int getMuniCode() {
+        return muniCode;
+    }
+
+    /**
+     * @param muniCode the muniCode to set
+     */
+    public void setMuniCode(int muniCode) {
+        this.muniCode = muniCode;
+    }
+
+    /**
+     * @return the address_state
+     */
+    public String getAddress_state() {
+        return address_state;
+    }
+
+    /**
+     * @param address_state the address_state to set
+     */
+    public void setAddress_state(String address_state) {
+        this.address_state = address_state;
+    }
+
     
     
-
-   
-    /**
-     * @return the person
-     */
-    public Person getPerson() {
-        return person;
-    }
-
-    /**
-     * @param person the person to set
-     */
-    public void setPerson(Person person) {
-        this.person = person;
-    }
-
-
-    /**
-     * @return the badgeNumber
-     */
-    public String getBadgeNumber() {
-        return badgeNumber;
-    }
-
-    /**
-     * @return the oriNumber
-     */
-    public String getOriNumber() {
-        return oriNumber;
-    }
-
-    /**
-     * @param badgeNumber the badgeNumber to set
-     */
-    public void setBadgeNumber(String badgeNumber) {
-        this.badgeNumber = badgeNumber;
-    }
-
-    /**
-     * @param oriNumber the oriNumber to set
-     */
-    public void setOriNumber(String oriNumber) {
-        this.oriNumber = oriNumber;
-    }
-
-    /**
-     * @return the personID
-     */
-    public int getPersonID() {
-        if(person != null){
-            personID = person.getPersonID();
-        }
-        return personID;
-    }
-
-    /**
-     * @param personID the personID to set
-     */
-    public void setPersonID(int personID) {
-        this.personID = personID;
-    }
-
-  
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 43 * hash + this.userID;
-        hash = 43 * hash + Objects.hashCode(this.username);
-        hash = 43 * hash + Objects.hashCode(this.person);
-        hash = 43 * hash + this.personID;
-        hash = 43 * hash + Objects.hashCode(this.notes);
-        hash = 43 * hash + Objects.hashCode(this.badgeNumber);
-        hash = 43 * hash + Objects.hashCode(this.oriNumber);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final User other = (User) obj;
-        if (this.userID != other.userID) {
-            return false;
-        }
-       
-        return true;
-    }
-    /**
-     * @return the accessRecord
-     */
-    /**
-     * @param accessRecord the accessRecord to set
-     */
-
+    
 }

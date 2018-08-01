@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Add Occupancy Inspection Fee</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                    <h1>Occupancy Inspection Fee Configuration Tool</h1>
+                    <p>View, create, and manage  occupancy inspection fees</p>
+                    <f:view>
+                        <h:form id="occInsFeeDisplay">
+                            <h2>Occupancy Inspection Fee Details</h2>
+                            <p:dataTable
+                                    id="occInsFees"
+                                    var="o"
+                                    selectionMode="single"
+                                    selection="#{occupancyInspectionFeeBB.selectedOccupancyInspectionFee}"
+                                    rowKey="#{o.occupancyInspectionFeeID}"
+                                    value="#{occupancyInspectionFeeBB.occupancyInspectionFeeList}"
+                                    tableStyleClass="primeDataTable"
+                                    tabindex="1">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyInspectionFeeID}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.muni.muniName}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyInspectionFeeName}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Amount" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyInspectionFeeAmount}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Effective Date" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyInspectionFeeEffDate}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Expire Date" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyInspectionFeeExpDate}"/>
+                                    </p:column>
+     
+                                </p:dataTable>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{occupancyInspectionFeeBB.editOccupancyInspectionFee}"
+                                             value="Update Selected Occupancy Permit Type" tabindex="2"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{occupancyInspectionFeeBB.deleteSelectedOccupancyInspectionFee}"
+                                            value="Nuke Selected Category Forever" tabindex="3"/>
+                            
+                         </h:form>    
+                             
+                             
+                            <!--<p:fieldset legend="Update occupancy inspection "
+                                toggleable="true" collapsed="false" tabindex="4">
+                                    <h:form id="updateCategoryForm">
+                                        <p:spacer height="10px"/>
+                                        <p:outputLabel for="occInsFeeName">
+                                           <h:outputText value="Name:"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                                 style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
+                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:spacer height="20px"/>
+                                        
+                                       
+                                    </h:form>  
+                                </p:fieldset>-->
+                            
+                           
+                        <h:form id="poccInsFeeAddForm">
+                            <h2>Add New Occupancy Inspection Fee</h2>
+                            <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
+                            <h:panelGrid columns="4" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                         footerClass="gridFooter">
+
+                                <h:outputLabel value="Fee name:" for="newOccInsFeeName"/>
+                                <h:panelGroup>
+                                    <p:inputText id="newOccInsFeeName" value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                                 style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
+                                    <h:message for="newOccInsFeeName" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                
+                                <p:outputLabel for="muniSelectMenu">
+                                    <h:outputText value="Municipality:"/>
+                                </p:outputLabel>
+                                <h:panelGroup>
+                                    <p:selectOneMenu id="muniSelectMenu" tabindex="5" required="false" value="#{occupancyInspectionFeeBB.formMuni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+                                    </p:selectOneMenu>
+                                    
+                                    <!--<h:message for="muniSelectMenu" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />-->
+                                </h:panelGroup>
+
+                                <h:outputLabel value="Amount:" for="newOccInspectionFeeAmount"/>
+                                <h:panelGroup>
+                                    <p:inputText id="newOccInspectionFeeAmount" value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeAmount}" 
+                                           style="width: 250px;" tabindex="6" required="true" styleClass="inputText"/>
+                                    <h:message for="newOccInspectionFeeAmount" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:outputLabel value="Effective Date:" for="newOccInsFeeEffDate"/>
+                                <h:panelGroup>
+                                    <p:calendar 
+                                        value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeEffDate}" 
+                                            styleClass="occInsFeeDateCal"
+                                            mode="popup" tabindex="7"
+                                            id="newOccInsFeeEffDate"
+                                            showOn="button"
+                                            pattern="EEE, dd MMM, yyyy"
+                                            navigator="true"
+                                            showButtonPanel="true"
+                                            showTodayButton="false"
+                                            required="true"/>
+                                    <h:message for="newOccInsFeeEffDate" showDetail="true" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:outputLabel value="Notes:" for="newOccInsFeeNotes"/>
+                                <h:panelGroup>
+                                    <p:inputText id="newOccInsFeeNotes" value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeNotes}" 
+                                           style="width: 250px;" tabindex="8" required="true" styleClass="inputText"/>
+                                    <h:message for="newOccInsFeeNotes" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                
+                                <h:outputLabel value="Expiry Date:" for="newOccInsFeeExpDate"/>
+                                <h:panelGroup>
+                                    <p:calendar 
+                                        value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeExpDate}" 
+                                            styleClass="occInsFeeDateCal"
+                                            mode="popup" tabindex="9"
+                                            id="newOccInsFeeExpDate"
+                                            showOn="button"
+                                            pattern="EEE, dd MMM, yyyy"
+                                            navigator="true"
+                                            showButtonPanel="true"
+                                            showTodayButton="false"
+                                            required="true"/>
+                                            
+
+                                    <h:message for="newOccInsFeeExpDate" showDetail="true" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                        
+                                </h:panelGroup> 
+       
+                                <f:facet name="footer">
+                                </f:facet>   
+                                
+                                <p:spacer height="15"/>
+                                
+                            </h:panelGrid>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="false" value="Add Occupancy Inspection Fee" action="#{occupancyInspectionFeeBB.addOccupancyInspectionFee}" />
+                            <p:commandButton ajax="false" 
+                                                         actionListener="#{occupancyInspectionFeeBB.commitOccupancyInspectionFeeUpdates}"
+                                                  value="Commit Updates" tabindex="10"/>
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

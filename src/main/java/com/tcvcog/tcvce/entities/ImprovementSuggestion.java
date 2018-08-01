@@ -17,7 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -25,7 +24,7 @@ import java.time.format.DateTimeFormatter;
  *
  * @author Eric C. Darsow
  */
-public class ImprovementSuggestion implements Serializable {
+public class ImprovementSuggestion {
     private int suggestionID;
     private User submitter;
     private int improvementTypeID;

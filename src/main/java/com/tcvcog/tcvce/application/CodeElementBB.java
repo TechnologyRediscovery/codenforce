@@ -69,7 +69,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
         currentElement.setOrdSecNum(formOrdSecNum);
         currentElement.setOrdSecTitle(formOrdSecTitle);
         
-        currentElement.setOrdSubSecNum(formOrdSubSecNum);
+        currentElement.setOrdSecNum(formOrdSecNum);
         currentElement.setOrdSubSecTitle(formOrdSubSecTitle);
         currentElement.setOrdTechnicalText(formOrdTechnicalText);
         

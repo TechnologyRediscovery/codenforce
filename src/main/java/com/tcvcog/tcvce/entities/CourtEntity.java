@@ -16,32 +16,27 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author Adam Gutonski
  */
-public class CourtEntity implements Serializable {
+public class CourtEntity {
     
     private int courtEntityID;
     private String courtEntityOfficialNum;
     private String jurisdictionLevel;
+    private Municipality municipality;
     private String courtEntityName;
-    
     private String addressStreet;
     private String addressCity;
     private String addressZip;
     private String addressState;
     private String addressCounty;
-    
     private String phone;
     private String url;
     private String notes;
-    
-    private String judgeName;
-    private int relativeOrder;
 
     @Override
     public int hashCode() {
@@ -49,6 +44,7 @@ public class CourtEntity implements Serializable {
         hash = 37 * hash + this.courtEntityID;
         hash = 37 * hash + Objects.hashCode(this.courtEntityOfficialNum);
         hash = 37 * hash + Objects.hashCode(this.jurisdictionLevel);
+        hash = 37 * hash + Objects.hashCode(this.municipality);
         hash = 37 * hash + Objects.hashCode(this.courtEntityName);
         hash = 37 * hash + Objects.hashCode(this.addressStreet);
         hash = 37 * hash + Objects.hashCode(this.addressCity);
@@ -76,7 +72,42 @@ public class CourtEntity implements Serializable {
         if (this.courtEntityID != other.courtEntityID) {
             return false;
         }
-        
+        if (!Objects.equals(this.courtEntityOfficialNum, other.courtEntityOfficialNum)) {
+            return false;
+        }
+        if (!Objects.equals(this.jurisdictionLevel, other.jurisdictionLevel)) {
+            return false;
+        }
+        if (!Objects.equals(this.courtEntityName, other.courtEntityName)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressStreet, other.addressStreet)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressCity, other.addressCity)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressZip, other.addressZip)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressState, other.addressState)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressCounty, other.addressCounty)) {
+            return false;
+        }
+        if (!Objects.equals(this.phone, other.phone)) {
+            return false;
+        }
+        if (!Objects.equals(this.url, other.url)) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.municipality, other.municipality)) {
+            return false;
+        }
         return true;
     }
 
@@ -122,7 +153,19 @@ public class CourtEntity implements Serializable {
         this.jurisdictionLevel = jurisdictionLevel;
     }
 
-   
+    /**
+     * @return the municipality
+     */
+    public Municipality getMunicipality() {
+        return municipality;
+    }
+
+    /**
+     * @param municipality the municipality to set
+     */
+    public void setMunicipality(Municipality municipality) {
+        this.municipality = municipality;
+    }
 
     /**
      * @return the courtEntityName
@@ -248,34 +291,6 @@ public class CourtEntity implements Serializable {
      */
     public void setAddressCity(String addressCity) {
         this.addressCity = addressCity;
-    }
-
-    /**
-     * @return the judgeName
-     */
-    public String getJudgeName() {
-        return judgeName;
-    }
-
-    /**
-     * @return the relativeOrder
-     */
-    public int getRelativeOrder() {
-        return relativeOrder;
-    }
-
-    /**
-     * @param judgeName the judgeName to set
-     */
-    public void setJudgeName(String judgeName) {
-        this.judgeName = judgeName;
-    }
-
-    /**
-     * @param relativeOrder the relativeOrder to set
-     */
-    public void setRelativeOrder(int relativeOrder) {
-        this.relativeOrder = relativeOrder;
     }
     
     

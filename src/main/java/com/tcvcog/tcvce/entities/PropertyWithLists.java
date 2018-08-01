@@ -17,167 +17,61 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class PropertyWithLists extends Property implements Serializable{
+public class PropertyWithLists extends Property{
     
     // cases store code enforcement data
-    private List<CECase> ceCaseList;
+    private ArrayList<CECase> propertyCaseList;
     // property units store occupancy data
-    private List<PropertyUnitWithLists> unitWithListsList;
+    private ArrayList<PropertyUnit> propertyUnitList;
     // both are connected to Person objects all over the place
-    private List<Person> personList;
-    private List<CECase> infoCaseList;
-    private List<PropertyUnitChange> changeList;
-    private List<Integer> blobList;
-    
-    public PropertyWithLists(){
-        
-    }
-
-    public PropertyWithLists(Property prop){
-        this.propertyID = prop.getPropertyID();
-        this.muni = prop.getMuni();
-        this.muniCode = prop.getMuniCode();
-        this.parID = prop.getParID();
-        this.lotAndBlock = prop.getLotAndBlock();
-        this.address = prop.getAddress();
-
-        this.useTypeString = prop.getUseTypeString();
-        this.useGroup = prop.getUseGroup();
-        this.constructionType = prop.getConstructionType();
-        this.countyCode = prop.getCountyCode();
-
-        this.notes = prop.getNotes();
-        this.address_city = prop.getAddress_city();
-        this.address_state = prop.getAddress_state();
-        this.address_zip = prop.address_zip;
-
-        this.ownerCode = prop.getOwnerCode();
-        this.propclass = prop.getPropclass();
-
-        this.lastUpdatedTS = prop.getLastUpdatedTS();
-        this.lastUpdatedBy = prop.getLastUpdatedBy();
-        this.locationDescriptor = prop.getLocationDescriptor();
-
-        this.bobSource = prop.getBobSource();
-        this.unfitDateStart = prop.getUnfitDateStart();
-        this.unfitDateStop = prop.getUnfitDateStop();
-        this.unfitBy = prop.getUnfitBy();
-
-        this.abandonedDateStart = prop.getAbandonedDateStart();
-        this.abandonedDateStop = prop.getAbandonedDateStop();
-        this.abandonedBy = prop.getAbandonedBy();
-        this.vacantDateStart = prop.getVacantDateStart();
-
-        this.vacantDateStop = prop.getVacantDateStop();
-        this.vacantBy = prop.getVacantBy();
-        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
-
-        this.landBankProspectIntensityClassID = prop.getLandBankProspectIntensityClassID();
-        this.LandBankHeld = prop.isLandBankHeld();
-        this.active = prop.isActive();
-        this.nonAddressable = prop.isNonAddressable();
-        
-        this.useTypeID = prop.getUseTypeID();
-        this.useTypeString = prop.getUseTypeString();
-        this.unitList = prop.getUnitList();
-        
-        
-    }
-    
-    
-    /**
-     * @return the ceCaseList
-     */
-    public List<CECase> getCeCaseList() {
-        return ceCaseList;
-    }
-
+    private ArrayList<Person> propertyPersonList;
 
     /**
-     * @return the personList
+     * @return the propertyCaseList
      */
-    public List<Person> getPersonList() {
-        return personList;
+    public ArrayList<CECase> getPropertyCaseList() {
+        return propertyCaseList;
     }
 
     /**
-     * @param ceCaseList the ceCaseList to set
+     * @return the propertyUnitList
      */
-    public void setCeCaseList(List<CECase> ceCaseList) {
-        this.ceCaseList = ceCaseList;
-    }
-
-
-    /**
-     * @param personList the personList to set
-     */
-    public void setPersonList(List<Person> personList) {
-        this.personList = personList;
+    public ArrayList<PropertyUnit> getPropertyUnitList() {
+        return propertyUnitList;
     }
 
     /**
-     * @return the infoCaseList
+     * @return the propertyPersonList
      */
-    public List getInfoCaseList() {
-        return infoCaseList;
+    public ArrayList<Person> getPropertyPersonList() {
+        return propertyPersonList;
     }
 
     /**
-     * @param infoCaseList the infoCaseList to set
+     * @param propertyCaseList the propertyCaseList to set
      */
-    public void setInfoCaseList(List<CECase> infoCaseList) {
-        this.infoCaseList = infoCaseList;
+    public void setPropertyCaseList(ArrayList<CECase> propertyCaseList) {
+        this.propertyCaseList = propertyCaseList;
     }
 
     /**
-     * @return the changeList
+     * @param propertyUnitList the propertyUnitList to set
      */
-    public List getChangeList() {
-        return changeList;
+    public void setPropertyUnitList(ArrayList<PropertyUnit> propertyUnitList) {
+        this.propertyUnitList = propertyUnitList;
     }
 
     /**
-     * @param changeList the changeList to set
+     * @param propertyPersonList the propertyPersonList to set
      */
-    public void setChangeList(List<PropertyUnitChange> changeList) {
-        this.changeList = changeList;
-    }
-
-    /**
-     * @return the blobList
-     */
-    public List getBlobList() {
-        return blobList;
-    }
-
-    /**
-     * @param blobList the blobList to set
-     */
-    public void setBlobList(List<Integer> blobList) {
-        this.blobList = blobList;
-    }
-
-    /**
-     * @return the unitWithListsList
-     */
-    public List<PropertyUnitWithLists> getUnitWithListsList() {
-        return unitWithListsList;
-    }
-
-    /**
-     * @param unitWithListsList the unitWithListsList to set
-     */
-    public void setUnitWithListsList(List<PropertyUnitWithLists> unitWithListsList) {
-        this.unitWithListsList = unitWithListsList;
+    public void setPropertyPersonList(ArrayList<Person> propertyPersonList) {
+        this.propertyPersonList = propertyPersonList;
     }
     
 }

@@ -8,109 +8,91 @@
 
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <h:outputStylesheet name="css/style.css"/>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
-
-        <title>codeNforce</title>
+          <h:outputStylesheet name="style.css" library="css"/>
+          
+        <title>Code Enforcement</title>
         <script>
-            function setSideBarHeight() {
+            function setSideBarHeight(){
                 var height = $('.contentContainer').height();
                 $('.flexing-box-sidebar').height(height);
             }
             window.onload = setSideBarHeight;
         </script>
-        <script>
-            $(document).on("keydown", ".ui-row-editor .ui-helper-clearfix", function (event) {
-                if (event.keyCode === 13) {
-                    $(this).closest("tr").find(".ui-row-editor-check .ui-icon-check .ui-c").click();
-                }
-            }
-            );
-
-        </script>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-        <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" />
-
+        
 
     </h:head>
 
     <h:body>
-
+        
         <div class="flex-box-container">
-
-
-
+            
+            
+        
             <ui:insert name="top">
                 <f:view id="navview">
                     <div class="flexing-box-topbar">
+                        <div class="userToolBar">
+                            <h:form id="navForm">
+                                <h:panelGrid columns="3" border="0" 
+                                           cellpadding="2" columnClasses="userBarTd,  userBarTd, userBarTd"
+                                           footerClass="gridFooter" >
+                                </h:panelGrid>
+                            </h:form>
+                        </div>
                         <div class="logoBox">
-                            <div class="logo-image-wrapper">
-                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
-                            </div>
-                            <div class="logo-title-wrapper">
-                                <div class="report-title">
-                                    <div class="sys-title" style="font-weight: bold;">codeNforce</div>
-                                </div>
-                                <div class="report-title-sub">
-
-                                    <div class="sys-title-sub">municipal code enforcement workflow management system</div>
-                                </div>
-                            </div>
+                            <h2 id="logoHeader" style="font-weight: bold">TCVCOG<br/>Code Enforcement<br />Data Hub</h2>
                         </div>
                     </div>
                 </f:view>
             </ui:insert>
-
-
+                
+            
         </div>
-
-
+         
+        
         <div class="flex-box-container">
-            <div class="flexing-box-sidebar">
-
-                <f:view id="sideBarView">
-
-                    <h:form id="panelMenu">
+                <div class="flexing-box-sidebar">
+                    
+                    <f:view id="sideBarView">
+                        
+                       <h:form id="panelMenu">
                         <p:menu>
 
-                            <p:menuitem value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
-                            <p:menuitem value="Request code&lt;br /&gt; enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
-                            <p:menuitem value="Check on your case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
-                            <p:menuitem value="Apply for an &lt;br /&gt;occupancy permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false"/>
-                            <p:menuitem value="About" action="about" ajax="false" icon="fa fa-info" />
-                            <p:menuitem value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
+                                <p:menuitem value="Login" action="#{missionControlBB.loginToMissionControl}" ajax="false" icon="ui-icon-disk" />
+                                <p:menuitem value="About Code Connect" action="missionControl" ajax="false" icon="ui-icon-disk" />
+                                <p:menuitem value="Contact" action="help" ajax="false" icon="ui-icon-disk" />
 
                             <p:submenu label="Help" expanded="true">
-
+                                
                                 <p:menuitem value="How-To Guides" action="howtos" ajax="false" 
-                                            icon="fa fa-question-circle" />
-
-                                <p:menuitem value="Learn core concepts" action="coreConcepts" ajax="false" 
-                                            icon="fa fa-pencil"/>
-
-                                <p:menuitem value="For developers" action="technical"  ajax="false" 
-                                            icon="fa fa-database" />
+                                            icon="ui-icon-disk" />
+                                
+                                <p:menuitem value="Core concepts" action="coreConcepts" ajax="false" 
+                                            icon="ui-icon-disk"/>
+                                
+                                <p:menuitem value="technical" action="technical"  ajax="false" 
+                                            icon="ui-icon-arrowrefresh-1-w" />
                             </p:submenu>
                         </p:menu>
                     </h:form>
-                </f:view>
-            </div>
-
-
-
+                    </f:view>
+                </div>
+                    
+                
+            
             <div class="flexing-box-interior">
-
+                
                 <div class="flex-box-container-interior">
                     <f:view id="sessionInfoView">
-
+                        
 
                         <div class="flexing-box-sessioninfo">
-
-
+                           
+                                
 
                         </div>
 
-                        <!--<div class="flexing-box-pagecontent narrow-content-container">-->
                         <div class="flexing-box-pagecontent">
                             <ui:insert name="content">
                                 <p>I am content in the template content</p>
@@ -124,19 +106,19 @@
         </div>
         <div class="flex-box-container">
 
-            <div class="flexing-box-footer">
-                <ui:insert name="bottom">
-                    <div class="footer">
-                        <f:view id="footerView">
-                            <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
-                        </f:view>
-                    </div>
-
-                </ui:insert>
-            </div>
-
+        <div class="flexing-box-footer">
+            <ui:insert name="bottom">
+                <div class="footer">
+                    <f:view id="footerView">
+                        <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
+                    </f:view>
+                </div>
+                
+            </ui:insert>
         </div>
-
+            
+    </div>
+        
         <!--<div class="clearFix"></div>-->
 
 

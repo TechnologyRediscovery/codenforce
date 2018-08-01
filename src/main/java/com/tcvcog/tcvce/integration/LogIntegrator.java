@@ -17,14 +17,7 @@
  */
 package com.tcvcog.tcvce.integration;
 
-import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.LogEntry;
-import com.tcvcog.tcvce.entities.User;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -32,7 +25,7 @@ import java.util.ArrayList;
  *
  * @author Eric Darsow
  */
-public class LogIntegrator extends BackingBeanUtils {
+public class LogIntegrator {
 
     /**
      * Creates a new instance of LogIntegrator
@@ -40,36 +33,8 @@ public class LogIntegrator extends BackingBeanUtils {
     public LogIntegrator() {
     }
     
-    public void makeLogEntry(int uid, String sid, int cat, String notes, 
-            boolean error, boolean reqview) throws IntegrationException{
-        Connection con = getPostgresCon();
-        String query = "INSERT INTO public.log(\n" +
-            "            logentryid, timeofentry, user_userid, sessionid, category, notes, \n" +
-            "            error, reqview, viewed)\n" +
-            "    VALUES (DEFAULT, now(), ?, ?, ?, ?, \n" +
-            "            ?, ?, FALSE);";
-
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, uid);
-            stmt.setString(2, sid);
-            stmt.setInt(3, cat);
-            stmt.setString(4, notes);
-            stmt.setBoolean(5, error);
-            stmt.setBoolean(6, reqview);
-            stmt.execute();
-            
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error creating log ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
+    public int insertLogEvent(LogEntry entry){
+        return 0;
         
     }
     

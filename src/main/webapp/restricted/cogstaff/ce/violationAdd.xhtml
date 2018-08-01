@@ -31,10 +31,11 @@
                                 #{violationAddBB.currentViolation.codeViolated.codeElement.ordSubSecTitle}"/>
                             <p:spacer height="5px"/>
                             
+                            <h:outputText value="Current case Name: 
+                                          #{violationAddBB.currentViolation.attachedCase.caseName}"/>
+                            <p:spacer height="5px"/>
 
-                            <h:outputText style="font-family: monospace; text-align: center; font-size: 1.4em;" 
-                                          escape="false"
-                                          value="#{violationAddBB.currentViolation.codeViolated.codeElement.ordTechnicalText}"/>
+                            <h:outputText style="font-family: monospace; text-align: center; font-size: 1.4em;" value="#{violationAddBB.currentViolation.codeViolated.codeElement.ordTechnicalText}"/>
 
                             <p:spacer height="5px"/>
 
@@ -63,11 +64,10 @@
                                         <h:outputText value="Stipulated Compliance Date"/>
                                     </h:outputLabel>
                                     <p:spacer height="0px"/>
-                                    <p:calendar value="#{violationAddBB.currentViolation.stipulatedComplianceDateUtilDate}" 
+                                    <p:calendar value="#{violationAddBB.stipulatedComplianceDate}" 
                                                 mode="popup"  id="stipCompDate"
-                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy"
                                                 navigator="true" tabindex="1"
-                                                timeInput="true" showHour="true" showMinute="true"
                                                 showButtonPanel="true" showTodayButton="true"
                                                 required="true"/>
                                     <p:spacer height="0px"/>
@@ -84,10 +84,10 @@
                                         <h:outputText value="Date of Record"/>
                                     </h:outputLabel>
                                     <p:spacer height="0px"/>
-                                    <p:calendar value="#{violationAddBB.currentViolation.dateOfRecordUtilDate}" 
+                                    <p:calendar value="#{violationAddBB.dateOfRecord}" 
                                                 mode="popup"  id="dateOfRecord"
-                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                navigator="true" tabindex="2" timeInput="true" showHour="true" showMinute="true"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                navigator="true" tabindex="2"
                                                 showButtonPanel="true" showTodayButton="true"
                                                 required="true"/>
                                     <h:message for="dateOfRecord" showDetail="false" showSummary="true" 
@@ -98,7 +98,7 @@
                                     <p:outputLabel for="penalty">
                                         <h:outputText value="Penalty (exclude $)"/>
                                     </p:outputLabel>
-                                    <p:inputText id="penalty" value="#{violationAddBB.currentViolation.penalty}"
+                                    <p:inputText id="penalty" value="#{violationAddBB.penalty}"
                                                  style="width: 20%;" tabindex="3" required="true" styleClass="inputText" type="currency"/>
                                     <h:message for="penalty" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -108,18 +108,18 @@
                                     <p:outputLabel for="notes">
                                         <h:outputText value="Penalty Notes"/>
                                     </p:outputLabel>
-                                    <p:inputText id="notes" value="#{violationAddBB.currentViolation.notes}"
+                                    <p:inputText id="notes" value="#{violationAddBB.notes}"
                                                  style="width: 100%;" tabindex="4" required="false" styleClass="inputText" type="text"/>
                                     <h:message for="notes" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
-                                
+
                                 <f:facet name="footer">
                                     <h:panelGroup>
                                         <p:outputLabel for="desc">
                                             <h:outputText value="Description of code violation"/>
                                         </p:outputLabel>
-                                        <p:inputTextarea id="desc" value="#{violationAddBB.currentViolation.description}"
+                                        <p:inputTextarea id="desc" value="#{violationAddBB.description}"
                                                      style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
                                         <h:message for="desc" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -128,9 +128,6 @@
                             </h:panelGrid>
                             <p:spacer height="10px"/>
                             
-                            <p:commandButton    ajax="false" action="#{violationAddBB.addViolationWithPhotos}" icon="fa fa-image"
-                                                value="Add code violation to case and upload photos of the violation" tabindex="6"/>
-                            <p:spacer height="10px"/>
                             <p:commandButton    ajax="false" action="#{violationAddBB.addViolation}" icon="fa fa-plus"
                                                 value="Add code violation to case and return to case home" tabindex="6"/>
                         </h:form>

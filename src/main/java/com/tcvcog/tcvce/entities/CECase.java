@@ -5,418 +5,255 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.integration.EventIntegrator;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.application.interfaces.IFace_ProposalDriven;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
+import java.util.ArrayList;
 
 /**
  *
- * @author Ellen Baskem
+ * @author cedba
  */
-public class CECase 
-        extends CECaseBase 
-        implements Cloneable,
-                   IFace_ProposalDriven, 
-                   IFace_EventRuleGoverned{
+public class CECase {
     
-    private List<CodeViolation> violationList;
+    private int caseID;
+    private int publicControlCode;
     
-    private boolean showHiddenEvents;
-    private boolean showInactiveEvents;
-    private List<CECaseEvent> completeEventList;
-    
-    // accessed through methods specified in the interfaces
-    private List<Proposal> proposalList;
-    private List<Event> eventList;
-    private List<EventRuleImplementation> eventRuleList;
-    
-    private List<Citation> citationList;
-    private List<NoticeOfViolation> noticeList;
-    private List<CEActionRequest> ceActionRequestList;
-    
-    public CECase(){
-    }
+    private Property property;
+    private PropertyUnit propertyUnit;
+    private User user;
 
-    /**
-     * Constructor used to create an instance of this object with a
-     * CECase without any lists. Transfers the member variables
-     * from the incoming object to this sublcass
-     * 
-     * ** CONSTRUCTORS ARE NOT INHERITED!
-     * ** but member variables and methods sure are!
-     * 
-     * @param cse 
-     */
-    public CECase(CECaseBase cse){
-        this.caseID = cse.caseID;
-        this.publicControlCode = cse.publicControlCode;
-        this.paccEnabled = cse.paccEnabled;
-        this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
-        this.property = cse.property;
-        this.propertyUnit = cse.propertyUnit;
-        this.caseManager = cse.caseManager;
-        this.caseName = cse.caseName;
-        this.casePhase = cse.casePhase;
-        this.casePhaseIcon = cse.casePhaseIcon;
-        this.originationDate = cse.originationDate;
-        this.closingDate = cse.closingDate;
-        this.creationTimestamp = cse.creationTimestamp;
-        this.notes = cse.notes;
+    private ArrayList<CodeViolation> violationList;
+    private ArrayList<EventCase> eventList;
+    
+    private String caseName;
+    private CasePhase casePhase;
+    
+    private LocalDateTime originationDate;
+    private String originiationDatePretty;
+
+    private LocalDateTime closingDate;
+    private String closingDatePretty;
+    
+    private LocalDateTime creationTimestamp;
+    
+    private String notes;
+    
+    
+    @Override
+    public String toString(){
+        return caseName;
     }
     
     /**
-     *
-     * @return
-     * @throws CloneNotSupportedException
+     * @return the caseID
      */
-    @Override
-    public CECase clone() throws CloneNotSupportedException{
-        super.clone();
-        return null;
-    }
-    
-     @Override
-    public List<Event> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-         List<Event> visEventList = new ArrayList<>();
-        if(eventList != null){
-            for (Event ev : eventList) {
-                switch(voahle){
-                    case VIEW_ACTIVE_HIDDEN:
-                        if (ev.isActive()
-                                && ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if (ev.isActive()
-                                && !ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        visEventList.add(ev);
-                        break;
-                    case VIEW_INACTIVE:
-                        if (!ev.isActive()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    default:
-                        visEventList.add(ev);
-                } // close switch
-            } // close for   
-        } // close null check
-        return visEventList;
+    public int getCaseID() {
+        return caseID;
     }
 
-    @Override
-    public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
-         List<EventRuleImplementation> evRuleList = new ArrayList<>();
-        if(eventRuleList != null){
-            for(EventRuleImplementation eri: eventRuleList){
-                switch(voere){
-                    case VIEW_ACTIVE_NOT_PASSED:
-                        if(eri.isActiveRuleImp()
-                                && eri.getPassedRuleTS() == null){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    case VIEW_ACTIVE_PASSED:
-                        if(eri.isActiveRuleImp()
-                                && eri.getPassedRuleTS() != null){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        evRuleList.add(eri);
-                        break;
-                    case VIEW_INACTIVE:
-                        if(!eri.isActiveRuleImp()){
-                            evRuleList.add(eri);
-                        }
-                        break;
-                    default:
-                        evRuleList.add(eri);
-                } // close switch
-            } // close loop
-        } // close null check
-        return evRuleList;
-    }
-
-    @Override
-    public boolean isAllRulesPassed() {
-        boolean allPassed = true;
-        for(EventRuleImplementation er: eventRuleList){
-            if(er.getPassedRuleTS() == null){
-                allPassed = false;
-                break;
-            }
-        }
-        return allPassed;
-    }
-
-    @Override
-    public List<Proposal> assembleProposalList(ViewOptionsProposalsEnum vope) {
-        List<Proposal> proposalListVisible = new ArrayList<>();
-        if(proposalList != null && !proposalList.isEmpty()){
-            for(Proposal p: proposalList){
-                switch(vope){
-                    case VIEW_ALL:
-                        proposalListVisible.add(p);
-                        break;
-                    case VIEW_ACTIVE_HIDDEN:
-                        if(p.isActive() 
-                                && p.isHidden()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if(p.isActive() 
-                                && !p.isHidden()
-                                && !p.getDirective().isRefuseToBeHidden()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_EVALUATED:
-                        if(p.getResponseTS() != null){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_INACTIVE:
-                        if(!p.isActive()){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    case VIEW_NOT_EVALUATED:
-                        if(p.getResponseTS() == null){
-                            proposalListVisible.add(p);
-                        }
-                        break;
-                    default:
-                        proposalListVisible.add(p);
-                } // switch
-            } // for
-        } // if
-        return proposalListVisible;
-    }
-    
     /**
-     * @param eventRuleList the eventRuleList to set
+     * @param caseID the caseID to set
      */
-    public void setEventRuleList(List<EventRuleImplementation> eventRuleList) {
-        this.eventRuleList = eventRuleList;
+    public void setCaseID(int caseID) {
+        this.caseID = caseID;
     }
-    
+
+    /**
+     * @return the property
+     */
+    public Property getProperty() {
+        return property;
+    }
+
+    /**
+     * @param property the property to set
+     */
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    /**
+     * @return the propertyUnit
+     */
+    public PropertyUnit getPropertyUnit() {
+        return propertyUnit;
+    }
+
+    /**
+     * @param propertyUnit the propertyUnit to set
+     */
+    public void setPropertyUnit(PropertyUnit propertyUnit) {
+        this.propertyUnit = propertyUnit;
+    }
+
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the caseName
+     */
+    public String getCaseName() {
+        return caseName;
+    }
+
+    /**
+     * @param caseName the caseName to set
+     */
+    public void setCaseName(String caseName) {
+        this.caseName = caseName;
+    }
+
+    /**
+     * @return the casePhase
+     */
+    public CasePhase getCasePhase() {
+        return casePhase;
+    }
+
+    /**
+     * @param casePhase the casePhase to set
+     */
+    public void setCasePhase(CasePhase casePhase) {
+        this.casePhase = casePhase;
+    }
+
+    /**
+     * @return the originationDate
+     */
+    public LocalDateTime getOriginationDate() {
+        return originationDate;
+    }
+
+    /**
+     * @param originationDate the originationDate to set
+     */
+    public void setOriginationDate(LocalDateTime originationDate) {
+        this.originationDate = originationDate;
+    }
+
+    /**
+     * @return the closingDate
+     */
+    public LocalDateTime getClosingDate() {
+        return closingDate;
+    }
+
+    /**
+     * @param closingDate the closingDate to set
+     */
+    public void setClosingDate(LocalDateTime closingDate) {
+        this.closingDate = closingDate;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
     /**
      * @return the violationList
      */
-    public List<CodeViolation> getViolationList() {
+    public ArrayList<CodeViolation> getViolationList() {
         return violationList;
     }
 
     /**
      * @param violationList the violationList to set
      */
-    public void setViolationList(List<CodeViolation> violationList) {
+    public void setViolationList(ArrayList<CodeViolation> violationList) {
         this.violationList = violationList;
-    }
-
-    /**
-     * Implements logic to check each event for hidden status and inactive 
-     * status and based on the value of the showHiddenEvents and showInactiveEvents
-     * flags, add the event from the complete list to the visible list
-     * @return the visibleEventList
-     */
-    public List<CECaseEvent> getVisibleEventList() {
-        List<CECaseEvent> visEventList = new ArrayList<>();
-        for (CECaseEvent ev : completeEventList) {
-            if (!ev.isActive() && !showInactiveEvents) {
-                continue;
-            }
-            if (ev.isHidden() && !showHiddenEvents) {
-                continue;
-            }
-            visEventList.add(ev);
-        } // close for   
-        return visEventList;
-    }
-
-
-    /**
-     * @return the citationList
-     */
-    public List<Citation> getCitationList() {
-        return citationList;
-    }
-
-    /**
-     * @param citationList the citationList to set
-     */
-    public void setCitationList(List<Citation> citationList) {
-        this.citationList = citationList;
-    }
-
-    /**
-     * @return the noticeList
-     */
-    public List<NoticeOfViolation> getNoticeList() {
-        return noticeList;
-    }
-
-    /**
-     * @param noticeList the noticeList to set
-     */
-    public void setNoticeList(List<NoticeOfViolation> noticeList) {
-        this.noticeList = noticeList;
-    }
-
-    /**
-     * @return the ceActionRequestList
-     */
-    public List<CEActionRequest> getCeActionRequestList() {
-        return ceActionRequestList;
-    }
-
-    /**
-     * @param ceActionRequestList the ceActionRequestList to set
-     */
-    public void setCeActionRequestList(List<CEActionRequest> ceActionRequestList) {
-        this.ceActionRequestList = ceActionRequestList;
-    }
-
-    
-
-    /**
-     * @return the violationListUnresolved
-     */
-    public List<CodeViolation> getViolationListUnresolved() {
-        
-        List<CodeViolation> violationListUnresolved = new ArrayList<>();
-        if(violationList != null && violationList.size() > 0){
-            for(CodeViolation v: violationList){
-                if(v.getActualComplianceDate() == null){
-                    violationListUnresolved.add(v);
-                }
-            }
-        }
-        
-
-        return violationListUnresolved;
-    }
-
-
-    /**
-     * @return the violationListResolved
-     */
-    public List<CodeViolation> getViolationListResolved() {
-        List<CodeViolation>violationListResolved = new ArrayList<>();
-        if(violationList != null && violationList.size() > 0){
-            for(CodeViolation v: violationList){
-                if(v.getActualComplianceDate() != null){
-                    violationListResolved.add(v);
-                }
-            }
-        }
-        
-        return violationListResolved;
-    }
-
-
-    /**
-     * @return the completeEventList
-     */
-    public List<CECaseEvent> getCompleteEventList() {
-        return completeEventList;
-    }
-
-    /**
-     * @param completeEventList the completeEventList to set
-     */
-    public void setCompleteEventList(List<CECaseEvent> completeEventList) {
-        this.completeEventList = completeEventList;
-    }
-
-    /**
-     * @return the showInactiveEvents
-     */
-    public boolean isShowInactiveEvents() {
-        return showInactiveEvents;
-    }
-
-    /**
-     * @param showInactiveEvents the showInactiveEvents to set
-     */
-    public void setShowInactiveEvents(boolean showInactiveEvents) {
-        this.showInactiveEvents = showInactiveEvents;
-    }
-
-    /**
-     * @return the showHiddenEvents
-     */
-    public boolean isShowHiddenEvents() {
-        return showHiddenEvents;
-    }
-
-    /**
-     * @param showHiddenEvents the showHiddenEvents to set
-     */
-    public void setShowHiddenEvents(boolean showHiddenEvents) {
-        this.showHiddenEvents = showHiddenEvents;
-    }
-
-    /**
-     * @return the activeEventList
-     */
-    public List<CECaseEvent> getActiveEventList() {
-        List<CECaseEvent> actEvList = new ArrayList<>();
-            Iterator<CECaseEvent> iter = completeEventList.iterator();
-                while(iter.hasNext()){
-                    CECaseEvent ev = iter.next();
-                    if(ev.isActive()){
-                        actEvList.add(ev);
-                    }
-                }
-        return actEvList;
-    }
-
-
-    /**
-     * @return the proposalList
-     */
-    public List<Proposal> getProposalList() {
-        return proposalList;
-    }
-
-    /**
-     * @param proposalList the proposalList to set
-     */
-    public void setProposalList(List<Proposal> proposalList) {
-        this.proposalList = proposalList;
     }
 
     /**
      * @return the eventList
      */
-    public List<Event> getEventList() {
+    public ArrayList<EventCase> getEventList() {
         return eventList;
     }
 
     /**
      * @param eventList the eventList to set
      */
-    @Override
-    public void setEventList(List<Event> eventList) {
+    public void setEventList(ArrayList<EventCase> eventList) {
         this.eventList = eventList;
     }
 
-        
-  
+
+    /**
+     * @return the publicControlCode
+     */
+    public int getPublicControlCode() {
+        return publicControlCode;
+    }
+
+    /**
+     * @param publicControlCode the publicControlCode to set
+     */
+    public void setPublicControlCode(int publicControlCode) {
+        this.publicControlCode = publicControlCode;
+    }
+
+    /**
+     * @return the creationTimestamp
+     */
+    public LocalDateTime getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    /**
+     * @param creationTimestamp the creationTimestamp to set
+     */
+    public void setCreationTimestamp(LocalDateTime creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
+    }
+
+    /**
+     * @return the originiationDatePretty
+     */
+    public String getOriginiationDatePretty() {
+        return originiationDatePretty;
+    }
+
+    /**
+     * @return the closingDatePretty
+     */
+    public String getClosingDatePretty() {
+        return closingDatePretty;
+    }
+
+    /**
+     * @param originiationDatePretty the originiationDatePretty to set
+     */
+    public void setOriginiationDatePretty(String originiationDatePretty) {
+        this.originiationDatePretty = originiationDatePretty;
+    }
+
+    /**
+     * @param closingDatePretty the closingDatePretty to set
+     */
+    public void setClosingDatePretty(String closingDatePretty) {
+        this.closingDatePretty = closingDatePretty;
+    }
     
     
     

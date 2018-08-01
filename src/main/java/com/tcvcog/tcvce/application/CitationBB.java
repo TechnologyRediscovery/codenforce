@@ -25,15 +25,16 @@ import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CourtEntity;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -42,20 +43,6 @@ import javax.faces.application.FacesMessage;
  */
 public class CitationBB extends BackingBeanUtils implements Serializable{
 
-    
-    private Citation currentCitation;
-    private CECase currentCase;
-    
-    private List<CitationStatus> citationStatusList;
-    private List<CourtEntity> courtEntityList;
-    
-    private boolean issueCitationDisabled;
-    private boolean updateCitationDisabled;
-    
-    private List<CodeViolation> removedViolationList;
-    private String citationEditEventDescription;
-    
-    
     /**
      * Creates a new instance of CitationBB
      */
@@ -63,78 +50,62 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    @PostConstruct
-    public void initBean(){
-        CitationIntegrator citInt = getCitationIntegrator();
-        CourtEntityIntegrator cei = getCourtEntityIntegrator();
-        
-        try {
-            citationStatusList = citInt.getCitationStatusList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        try {
-            courtEntityList = cei.getCourtEntityList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        
-        Citation c = getSessionBean().getSessionCitation();
-        if(c != null){
-            currentCitation = c;
-        } else {
-            CECase ceCase = getSessionBean().getSessionCECaseList().get(0);
-            currentCitation = new Citation();
-            currentCitation.setCeCaseNoLists(ceCase);
-            currentCitation.setDateOfRecord(LocalDateTime.now());
-            currentCitation.setUserOwner(getSessionBean().getSessionUser());
-            currentCitation.setIsActive(true);
-            currentCitation.setOrigin_courtentity(getSessionBean().getSessionMuni().getCourtEntities().get(0));
-            List<CodeViolation> l = new ArrayList<>();
-            for(CodeViolation v: ceCase.getViolationList()){
-                if(v.getActualComplianceDate() == null){
-                    l.add(v);
-                }
-            }
-            currentCitation.setViolationList(l);
-            removedViolationList = new ArrayList<>();
-        }
-    }
     
-    public void removeViolationFromCitation(CodeViolation v){
-        currentCitation.getViolationList().remove(v);
-        removedViolationList.add(v);
-    }
+    private Citation currentCitation;
     
-    public void returnViolation(CodeViolation v){
-        currentCitation.getViolationList().add(v);
-        removedViolationList.remove(v);
-    }
+    private String citationIdLabel;
+    
+    private ArrayList<CitationStatus> citationStatusList;
+    private CitationStatus formCitationStatus;
+    private String formCitationNumber;
+    private CourtEntity formCourtEntity;
+    private ArrayList<CourtEntity> courtEntityList;
+    
+    private java.util.Date formDateOfRecord;
+    private boolean formIsActive;
+    private String formNotes;
+    
+    private ArrayList<CodeViolation> violationList;
     
     public String updateCitation(){
         System.out.println("CitationBB.updateCitation");
         CaseCoordinator cc = getCaseCoordinator();
         
-        
+        Citation c= getSessionBean().getActiveCitation();
+        c.setStatus(formCitationStatus);
+        c.setCitationNo(formCitationNumber);
+        c.setOrigin_courtentity(formCourtEntity);
+        c.setUserOwner(getFacesUser());
+        c.setDateOfRecord(formDateOfRecord.toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDateTime());
+        c.setIsActive(formIsActive);
+        c.setNotes(formNotes);
         try {
-            cc.updateCitation(currentCitation);
+            cc.updateCitation(c);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     "Unable to issue citation due to a database integration error", ""));
             System.out.println(ex);
         }
-        return "ceCases";
+        
+        
+        return "";
     }
     
-    public String insertCitation(){
+    public String issueCitation(){
         System.out.println("CitationBB.IssueCitation");
         CaseCoordinator cc = getCaseCoordinator();
         
         Citation c = currentCitation;
-        c.setUserOwner(getSessionBean().getSessionUser());
+        c.setStatus(formCitationStatus);
+        c.setCitationNo(formCitationNumber);
+        c.setOrigin_courtentity(formCourtEntity);
+        c.setUserOwner(getFacesUser());
+        c.setDateOfRecord(formDateOfRecord.toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDateTime());
+        c.setIsActive(formIsActive);
+        c.setNotes(formNotes);
         try {
             cc.issueCitation(c);
               
@@ -150,23 +121,87 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         }
         return "caseProfile";
     }
-   
-   
+    
+    public String saveButDoNotIssueCitation(){
+        // if requested feature
+        return "";
+    }
+    
+    public String deleteCitation(){
+        return "";
+    }
+
     /**
      * @return the currentCitation
      */
     public Citation getCurrentCitation() {
+        
+        currentCitation = getSessionBean().getActiveCitation();
+        
+        
+        
+        
         return currentCitation;
     }
 
-    
+    /**
+     * @return the formCitationNumber
+     */
+    public String getFormCitationNumber() {
+        formCitationNumber = currentCitation.getCitationNo();
+        return formCitationNumber;
+    }
 
     /**
-     * @return the removedViolationList
+     * @return the formCourtEntity
      */
-    public List<CodeViolation> getRemovedViolationList() {
-        
-        return removedViolationList;
+    public CourtEntity getFormCourtEntity() {
+        formCourtEntity = currentCitation.getOrigin_courtentity();
+        return formCourtEntity;
+    }
+
+    /**
+     * @return the formDateOfRecord
+     */
+    public java.util.Date getFormDateOfRecord() {
+        if(currentCitation.getDateOfRecord() != null){
+            formDateOfRecord = java.util.Date.from(currentCitation.getDateOfRecord()
+                .atZone(ZoneId.systemDefault()).toInstant());
+            
+            return formDateOfRecord;
+            
+        } else {
+            LocalDateTime ldtNow = LocalDateTime.now();
+            formDateOfRecord = java.util.Date.from(ldtNow
+                    .atZone(ZoneId.systemDefault()).toInstant());
+            
+        }
+        return formDateOfRecord;
+    }
+
+    /**
+     * @return the formIsActive
+     */
+    public boolean isFormIsActive() {
+        formIsActive = currentCitation.isIsActive();
+        return formIsActive;
+    }
+
+    /**
+     * @return the formNotes
+     */
+    public String getFormNotes() {
+        formNotes = currentCitation.getNotes();
+                
+        return formNotes;
+    }
+
+    /**
+     * @return the violationList
+     */
+    public ArrayList<CodeViolation> getViolationList() {
+        violationList = currentCitation.getViolationList();
+        return violationList;
     }
 
     /**
@@ -176,37 +211,115 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         this.currentCitation = currentCitation;
     }
 
-   
-
     /**
-     * @param violationList the removedViolationList to set
+     * @param formCitationNumber the formCitationNumber to set
      */
-    public void setViolationList(ArrayList<CodeViolation> violationList) {
-        this.removedViolationList = violationList;
+    public void setFormCitationNumber(String formCitationNumber) {
+        this.formCitationNumber = formCitationNumber;
     }
 
-   
+    /**
+     * @param formCourtEntity the formCourtEntity to set
+     */
+    public void setFormCourtEntity(CourtEntity formCourtEntity) {
+        this.formCourtEntity = formCourtEntity;
+    }
+
+    /**
+     * @param formDateOfRecord the formDateOfRecord to set
+     */
+    public void setFormDateOfRecord(java.util.Date formDateOfRecord) {
+        this.formDateOfRecord = formDateOfRecord;
+    }
+
+    /**
+     * @param formIsActive the formIsActive to set
+     */
+    public void setFormIsActive(boolean formIsActive) {
+        this.formIsActive = formIsActive;
+    }
+
+    /**
+     * @param formNotes the formNotes to set
+     */
+    public void setFormNotes(String formNotes) {
+        this.formNotes = formNotes;
+    }
+
+    /**
+     * @param violationList the violationList to set
+     */
+    public void setViolationList(ArrayList<CodeViolation> violationList) {
+        this.violationList = violationList;
+    }
+
+    /**
+     * @return the formCitationStatus
+     */
+    public CitationStatus getFormCitationStatus() {
+        return formCitationStatus;
+    }
+
+    /**
+     * @param formCitationStatus the formCitationStatus to set
+     */
+    public void setFormCitationStatus(CitationStatus formCitationStatus) {
+        this.formCitationStatus = formCitationStatus;
+    }
 
     /**
      * @return the CitationStatusList
      */
-    public List<CitationStatus> getCitationStatusList() {
-        
+    public ArrayList<CitationStatus> getCitationStatusList() {
+        CitationIntegrator citInt = getCitationIntegrator();
+        try {
+            citationStatusList = citInt.getFullCitationStatusList();
+        } catch (IntegrationException ex) {
+            // do nothing
+            System.out.println(ex);
+        }
         return citationStatusList;
     }
 
     /**
-     * @param citationStatusList
+     * @param CitationStatusList the CitationStatusList to set
      */
-    public void setCitationStatusList(List<CitationStatus> citationStatusList) {
+    public void setCitationStatusList(ArrayList<CitationStatus> citationStatusList) {
         this.citationStatusList = citationStatusList;
     }
 
-    
+    /**
+     * @return the citationIdLabel
+     */
+    public String getCitationIdLabel() {
+        
+        if(currentCitation.getCitationNo() != null){
+            citationIdLabel = String.valueOf(currentCitation.getCitationID());
+        } else {
+            citationIdLabel = "[citation not yet issued]";
+        }
+        
+        return citationIdLabel;
+    }
+
+    /**
+     * @param citationIdLabel the citationIdLabel to set
+     */
+    public void setCitationIdLabel(String citationIdLabel) {
+        this.citationIdLabel = citationIdLabel;
+    }
+
     /**
      * @return the courtEntityList
      */
-    public List<CourtEntity> getCourtEntityList() {
+    public ArrayList<CourtEntity> getCourtEntityList() {
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        try {
+            courtEntityList = cei.getCourtEntityList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            // no notice to user
+        }
         return courtEntityList;
     }
 
@@ -215,64 +328,6 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
      */
     public void setCourtEntityList(ArrayList<CourtEntity> courtEntityList) {
         this.courtEntityList = courtEntityList;
-    }
-
-    /**
-     * @return the issueCitationDisabled
-     */
-    public boolean isIssueCitationDisabled() {
-        issueCitationDisabled = currentCitation.getCitationNo() != null;
-        return issueCitationDisabled;
-    }
-
-    /**
-     * @return the updateCitationDisabled
-     */
-    public boolean isUpdateCitationDisabled() {
-        updateCitationDisabled = currentCitation.getCitationNo() == null;
-        return updateCitationDisabled;
-    }
-
-    /**
-     * @param issueCitationDisabled the issueCitationDisabled to set
-     */
-    public void setIssueCitationDisabled(boolean issueCitationDisabled) {
-        this.issueCitationDisabled = issueCitationDisabled;
-    }
-
-    /**
-     * @param updateCitationDisabled the updateCitationDisabled to set
-     */
-    public void setUpdateCitationDisabled(boolean updateCitationDisabled) {
-        this.updateCitationDisabled = updateCitationDisabled;
-    }
-
-    /**
-     * @return the currentCase
-     */
-    public CECase getCurrentCase() {
-        return currentCase;
-    }
-
-    /**
-     * @param currentCase the currentCase to set
-     */
-    public void setCurrentCase(CECase currentCase) {
-        this.currentCase = currentCase;
-    }
-
-    /**
-     * @return the citationEditEventDescription
-     */
-    public String getCitationEditEventDescription() {
-        return citationEditEventDescription;
-    }
-
-    /**
-     * @param citationEditEventDescription the citationEditEventDescription to set
-     */
-    public void setCitationEditEventDescription(String citationEditEventDescription) {
-        this.citationEditEventDescription = citationEditEventDescription;
     }
 
     

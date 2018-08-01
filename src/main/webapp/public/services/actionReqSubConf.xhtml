@@ -24,7 +24,7 @@
                             your request at any time through this website using the following control code. </p>
                             
                             <div class="ccBox">
-                                <h:outputText value="#{sessionBean.sessionCEAR.requestPublicCC}"/>
+                                <h:outputText value="#{actionRequestConfirmation.actionRequest.requestPublicCC}"/>
                             </div>
                             
                             <p>Please save this number for your records (snap a pic, write it down, etc.). To maintain privacy, there is no 
@@ -46,7 +46,41 @@
                                 With your tracking number, you may login at anytime to view the status of your request.
                             </p>
                             <hr/>
-                           
+                            
+                            <h3>Copy of submitted request</h3>
+                
+                                <h4>Violation Type:</h4>
+                                    <p>
+                                       <h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.issueTypeString}" />
+                                    </p>
+                                <h4>Municipality: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.muni.muniName}" /></p>
+
+                                <h4>Address of Concern: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.requestProperty.address}" /></p>
+
+                                <h4>Request Description: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.requestDescription}" /></p>
+
+                                <h4>Requestor Type: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.issueTypeString}" /></p>
+
+                                <h4>Notes on case made for public viewing: </h4>
+                                    <p><h:outputText
+                                       styleClass="plainText" 
+                                       value="#{actionRequestConfirmation.actionRequest.publicExternalNotes}" /></p>
+
+
               
                         </h:form>
                     </f:view>

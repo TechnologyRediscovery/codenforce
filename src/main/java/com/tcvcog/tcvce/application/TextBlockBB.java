@@ -20,12 +20,11 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.TextBlock;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
+import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -36,13 +35,14 @@ import javax.faces.application.FacesMessage;
  */
 public class TextBlockBB extends BackingBeanUtils implements Serializable{
 
-    private List<TextBlock> blockList;
-    private List<TextBlock> filteredBlockList;
+    private ArrayList<TextBlock> blockList;
+    private ArrayList<TextBlock> filteredBlockList;
     
     private TextBlock selectedBlock;
     
     private HashMap<String, Integer> categoryList;
     
+    private ArrayList<Municipality> muniListObj;
     private Municipality formMuni;
     
     private String formBlockName;
@@ -57,7 +57,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String updateTextBlock(){
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         if(selectedBlock != null){
             try {
                 cvi.updateTextBlock(selectedBlock);
@@ -81,7 +81,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String addNewTextBlock(){
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         TextBlock newBlock = new TextBlock();
         newBlock.setMuni(formMuni);
         newBlock.setTextBlockCategoryID(formCategoryID);
@@ -103,7 +103,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String nukeTextBlock(){
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         if(selectedBlock != null){
             try {
                 cvi.deleteTextBlock(selectedBlock);
@@ -126,8 +126,8 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the blockList
      */
-    public List<TextBlock> getBlockList() {
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+    public ArrayList<TextBlock> getBlockList() {
+        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         if(blockList == null){
             try {
                 blockList = cvi.getAllTextBlocks();
@@ -141,7 +141,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the filteredBlockList
      */
-    public List<TextBlock> getFilteredBlockList() {
+    public ArrayList<TextBlock> getFilteredBlockList() {
         return filteredBlockList;
     }
 
@@ -159,7 +159,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
      * @return the categoryList
      */
     public HashMap<String, Integer> getCategoryList() {
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         try {
             categoryList = cvi.getTextBlockCategoryMap();
             System.out.println("TextBlockBB.getCategoryMap | isempty: " + categoryList.isEmpty());
@@ -257,6 +257,25 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
         this.formMuni = formMuni;
     }
 
- 
+    /**
+     * @return the muniListObj
+     */
+    public ArrayList<Municipality> getMuniListObj() {
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        try {
+            muniListObj = mi.getCompleteMuniList();
+            System.out.println("TextBlockBB.getMuniListObj | list size: " + muniListObj.size());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return muniListObj;
+    }
+
+    /**
+     * @param muniListObj the muniListObj to set
+     */
+    public void setMuniListObj(ArrayList<Municipality> muniListObj) {
+        this.muniListObj = muniListObj;
+    }
     
 }

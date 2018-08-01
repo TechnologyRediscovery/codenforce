@@ -16,12 +16,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Model object representing a person in the system. A Person has a type
@@ -30,103 +26,34 @@ import java.util.Objects;
  * 
  * @author Eric Darsow
  */
-public class Person extends EntityUtils implements Serializable{
+public class Person {
     
-    protected int personID;
-    
-    protected PersonType personType;
-    /**
-     * Used this to avoid cycles in Municipality creation
-     * but now with a super and subclass of muni, we don't need them
-     * @deprecated 
-     */
-    protected int muniCode;
-    /**
-     * Used this to avoid cycles in Municipality creation
-     * but now with a super and subclass of muni, we don't need them
-     * @deprecated 
-     */
-    protected String muniName;
-    
+    private int personID;
+    private PersonType personType;
     private Municipality muni;
+    private int muniCode;
     
-    protected int sourceID;
+    private String firstName;
+    private String lastName;
+    private String jobTitle;
     
-    protected BOBSource source;
+    private String phoneCell;
+    private String phoneHome;
+    private String phoneWork;
     
-    /**
-     * We don't use a User object here due to cycling
-     */
-    protected int creatorUserID;
-    protected LocalDateTime creationTimeStamp;
+    private String email;
+    private String address_street;
+    private String address_city;
     
-    // for backwards compatability
+    private String address_zip;
+    private String address_state;
+    private String notes;
     
-    protected String firstName;
-    protected String lastName;
+    private LocalDateTime lastUpdated;
+    private LocalDateTime expiryDate;
+    private boolean isActive;
     
-    // frist, middle initial, and last all in lastName
-    protected boolean compositeLastName;
-    protected boolean businessEntity;
-    
-    protected String jobTitle;
-    
-    protected String phoneCell;
-    protected String phoneHome;
-    protected String phoneWork;
-    
-    protected String email;
-    protected String addressStreet;
-    protected String addressCity;
-    
-    protected String addressZip;
-    protected String addressState;
-    
-    protected boolean useSeparateMailingAddress;
-    protected String mailingAddressStreet;
-    protected String mailingAddressThirdLine;
-    protected String mailingAddressCity;
-    protected String mailingAddressZip;
-    
-    protected String mailingAddressState;
-    
-    protected String notes;
-    
-    protected LocalDateTime lastUpdated;
-    protected String lastUpdatedPretty;
-    
-    protected boolean canExpire;
-    protected LocalDateTime expiryDate;
-    protected String expireString;
-    protected java.util.Date expiryDateUtilDate;
-    protected String expiryNotes;
-    protected boolean active;
-    protected int linkedUserID;
-    
-    /**
-     * Tenancy tracking
-     */
-    protected boolean under18;
-    protected int verifiedByUserID;
-    
-    protected boolean referencePerson;
-    
-    protected LocalDateTime ghostCreatedDate;
-    protected String ghostCreatedDatePretty;
-    protected int ghostOf;
-    protected int ghostCreatedByUserID;
-    
-    protected LocalDateTime cloneCreatedDate;
-    protected String cloneCreatedDatePretty;
-    protected int cloneOf;
-    protected int cloneCreatedByUserID;
-    
-    protected ArrayList<Integer> ghostsList;
-    protected ArrayList<Integer> cloneList;
-    protected ArrayList<Integer> mergedList;
-    //used in applying for occupancy.
-    
-    
+    private boolean isUnder18;
 
     /**
      * @return the personID
@@ -200,45 +127,45 @@ public class Person extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the addressStreet
+     * @return the address_street
      */
-    public String getAddressStreet() {
-        return addressStreet;
+    public String getAddress_street() {
+        return address_street;
     }
 
     /**
-     * @param addressStreet the addressStreet to set
+     * @param address_street the address_street to set
      */
-    public void setAddressStreet(String addressStreet) {
-        this.addressStreet = addressStreet;
+    public void setAddress_street(String address_street) {
+        this.address_street = address_street;
     }
 
     /**
-     * @return the addressCity
+     * @return the address_city
      */
-    public String getAddressCity() {
-        return addressCity;
+    public String getAddress_city() {
+        return address_city;
     }
 
     /**
-     * @param addressCity the addressCity to set
+     * @param address_city the address_city to set
      */
-    public void setAddressCity(String addressCity) {
-        this.addressCity = addressCity;
+    public void setAddress_city(String address_city) {
+        this.address_city = address_city;
     }
 
     /**
-     * @return the addressZip
+     * @return the address_zip
      */
-    public String getAddressZip() {
-        return addressZip;
+    public String getAddress_zip() {
+        return address_zip;
     }
 
     /**
-     * @param addressZip the addressZip to set
+     * @param address_zip the address_zip to set
      */
-    public void setAddressZip(String addressZip) {
-        this.addressZip = addressZip;
+    public void setAddress_zip(String address_zip) {
+        this.address_zip = address_zip;
     }
 
     /**
@@ -284,17 +211,17 @@ public class Person extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the addressState
+     * @return the address_state
      */
-    public String getAddressState() {
-        return addressState;
+    public String getAddress_state() {
+        return address_state;
     }
 
     /**
-     * @param addressState the addressState to set
+     * @param address_state the address_state to set
      */
-    public void setAddressState(String addressState) {
-        this.addressState = addressState;
+    public void setAddress_state(String address_state) {
+        this.address_state = address_state;
     }
 
     /**
@@ -326,34 +253,46 @@ public class Person extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the active
+     * @return the isActive
      */
-    public boolean isActive() {
-        return active;
+    public boolean isIsActive() {
+        return isActive;
     }
 
     /**
-     * @param active the active to set
+     * @param isActive the isActive to set
      */
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     /**
-     * @return the under18
+     * @return the isUnder18
      */
-    public boolean isUnder18() {
-        return under18;
+    public boolean isIsUnder18() {
+        return isUnder18;
     }
 
     /**
-     * @param under18 the under18 to set
+     * @param isUnder18 the isUnder18 to set
      */
-    public void setUnder18(boolean under18) {
-        this.under18 = under18;
+    public void setIsUnder18(boolean isUnder18) {
+        this.isUnder18 = isUnder18;
     }
 
-  
+    /**
+     * @return the muni
+     */
+    public Municipality getMuni() {
+        return muni;
+    }
+
+    /**
+     * @param muni the muni to set
+     */
+    public void setMuni(Municipality muni) {
+        this.muni = muni;
+    }
 
     /**
      * @return the firstName
@@ -383,344 +322,6 @@ public class Person extends EntityUtils implements Serializable{
         this.lastName = lastName;
     }
 
-   
-    
-    @Override
-    public String toString(){
-        return this.firstName + this.lastName;
-    }
-
-    /**
-     * @return the sourceID
-     */
-    public int getSourceID() {
-        return sourceID;
-    }
-
-   
-    /**
-     * @return the businessEntity
-     */
-    public boolean isBusinessEntity() {
-        return businessEntity;
-    }
-
-    /**
-     * @return the useSeparateMailingAddress
-     */
-    public boolean isUseSeparateMailingAddress() {
-        return useSeparateMailingAddress;
-    }
-
-    /**
-     * @return the mailingAddressStreet
-     */
-    public String getMailingAddressStreet() {
-        return mailingAddressStreet;
-    }
-
-    /**
-     * @return the mailingAddressCity
-     */
-    public String getMailingAddressCity() {
-        return mailingAddressCity;
-    }
-
-    /**
-     * @return the mailingAddressZip
-     */
-    public String getMailingAddressZip() {
-        return mailingAddressZip;
-    }
-
-    /**
-     * @return the mailingAddressState
-     */
-    public String getMailingAddressState() {
-        return mailingAddressState;
-    }
-
-   
-
-    /**
-     * @return the expiryNotes
-     */
-    public String getExpiryNotes() {
-        return expiryNotes;
-    }
-
-    
-
-    /**
-     * @param sourceID the sourceID to set
-     */
-    public void setSourceID(int sourceID) {
-        this.sourceID = sourceID;
-    }
-
-
-    /**
-     * @param businessEntity the businessEntity to set
-     */
-    public void setBusinessEntity(boolean businessEntity) {
-        this.businessEntity = businessEntity;
-    }
-
-    /**
-     * @param useSeparateMailingAddress the useSeparateMailingAddress to set
-     */
-    public void setUseSeparateMailingAddress(boolean useSeparateMailingAddress) {
-        this.useSeparateMailingAddress = useSeparateMailingAddress;
-    }
-
-    /**
-     * @param mailingAddressStreet the mailingAddressStreet to set
-     */
-    public void setMailingAddressStreet(String mailingAddressStreet) {
-        this.mailingAddressStreet = mailingAddressStreet;
-    }
-
-    /**
-     * @param mailingAddressCity the mailingAddressCity to set
-     */
-    public void setMailingAddressCity(String mailingAddressCity) {
-        this.mailingAddressCity = mailingAddressCity;
-    }
-
-    /**
-     * @param mailingAddressZip the mailingAddressZip to set
-     */
-    public void setMailingAddressZip(String mailingAddressZip) {
-        this.mailingAddressZip = mailingAddressZip;
-    }
-
-    /**
-     * @param mailingAddressState the mailingAddressState to set
-     */
-    public void setMailingAddressState(String mailingAddressState) {
-        this.mailingAddressState = mailingAddressState;
-    }
-
-    
-
-    /**
-     * @param expiryNotes the expiryNotes to set
-     */
-    public void setExpiryNotes(String expiryNotes) {
-        this.expiryNotes = expiryNotes;
-    }
-
-    /**
-     * @return the compositeLastName
-     */
-    public boolean isCompositeLastName() {
-        return compositeLastName;
-    }
-
-    /**
-     * @param compositeLastName the compositeLastName to set
-     */
-    public void setCompositeLastName(boolean compositeLastName) {
-        this.compositeLastName = compositeLastName;
-    }
-
-   
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 79 * hash + this.personID;
-        hash = 79 * hash + Objects.hashCode(this.personType);
-        hash = 79 * hash + this.sourceID;
-        hash = 79 * hash + Objects.hashCode(this.firstName);
-        hash = 79 * hash + Objects.hashCode(this.lastName);
-        hash = 79 * hash + (this.compositeLastName ? 1 : 0);
-        hash = 79 * hash + (this.businessEntity ? 1 : 0);
-        hash = 79 * hash + Objects.hashCode(this.jobTitle);
-        hash = 79 * hash + Objects.hashCode(this.phoneCell);
-        hash = 79 * hash + Objects.hashCode(this.phoneHome);
-        hash = 79 * hash + Objects.hashCode(this.phoneWork);
-        hash = 79 * hash + Objects.hashCode(this.email);
-        hash = 79 * hash + Objects.hashCode(this.addressStreet);
-        hash = 79 * hash + Objects.hashCode(this.addressCity);
-        hash = 79 * hash + Objects.hashCode(this.addressZip);
-        hash = 79 * hash + Objects.hashCode(this.addressState);
-        hash = 79 * hash + (this.useSeparateMailingAddress ? 1 : 0);
-        hash = 79 * hash + Objects.hashCode(this.mailingAddressStreet);
-        hash = 79 * hash + Objects.hashCode(this.mailingAddressCity);
-        hash = 79 * hash + Objects.hashCode(this.mailingAddressZip);
-        hash = 79 * hash + Objects.hashCode(this.mailingAddressState);
-        hash = 79 * hash + Objects.hashCode(this.notes);
-        hash = 79 * hash + Objects.hashCode(this.lastUpdated);
-        hash = 79 * hash + Objects.hashCode(this.expiryDate);
-        hash = 79 * hash + Objects.hashCode(this.expiryNotes);
-        hash = 79 * hash + (this.active ? 1 : 0);
-        hash = 79 * hash + (this.under18 ? 1 : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Person other = (Person) obj;
-        if (this.personID != other.personID) {
-            return false;
-        }
-       
-        return true;
-    }
-
-
-    /**
-     * @return the canExpire
-     */
-    public boolean isCanExpire() {
-        return canExpire;
-    }
-
-    /**
-     * @param canExpire the canExpire to set
-     */
-    public void setCanExpire(boolean canExpire) {
-        this.canExpire = canExpire;
-    }
-
-    
-
-    /**
-     * @return the creationTimeStamp
-     */
-    public LocalDateTime getCreationTimeStamp() {
-        return creationTimeStamp;
-    }
-
-    /**
-     * @param creationTimeStamp the creationTimeStamp to set
-     */
-    public void setCreationTimeStamp(LocalDateTime creationTimeStamp) {
-        this.creationTimeStamp = creationTimeStamp;
-    }
-
-    /**
-     * @return the expiryDateUtilDate
-     */
-    public java.util.Date getExpiryDateUtilDate() {
-        if(expiryDate != null){
-            expiryDateUtilDate = java.util.Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return expiryDateUtilDate;
-    }
-
-    /**
-     * @param edut
-     */
-    public void setExpiryDateUtilDate(java.util.Date edut) {
-        expiryDateUtilDate = edut;
-        if(edut != null){
-            expiryDate = edut.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            
-        }
-        
-    }
-
-    /**
-     * @return the expireString
-     */
-    public String getExpireString() {
-        expireString = getPrettyDate(expiryDate);
-        return expireString;
-        
-    }
-
-    /**
-     * @param expireString the expireString to set
-     */
-    public void setExpireString(String expireString) {
-        this.expireString = expireString;
-    }
-
-    /**
-     * @return the lastUpdatedPretty
-     */
-    public String getLastUpdatedPretty() {
-        lastUpdatedPretty = getPrettyDate(lastUpdated);
-        return lastUpdatedPretty;
-    }
-
-    /**
-     * @param lastUpdatedPretty the lastUpdatedPretty to set
-     */
-    public void setLastUpdatedPretty(String lastUpdatedPretty) {
-        this.lastUpdatedPretty = lastUpdatedPretty;
-    }
-
-  
-   
-
-    /**
-     * @return the verifiedByUserID
-     */
-    public int getVerifiedByUserID() {
-        return verifiedByUserID;
-    }
-
-    /**
-     * @param verifiedByUserID the verifiedByUserID to set
-     */
-    public void setVerifiedByUserID(int verifiedByUserID) {
-        this.verifiedByUserID = verifiedByUserID;
-    }
-
-    /**
-     * @return the linkedUserID
-     */
-    public int getLinkedUserID() {
-        return linkedUserID;
-    }
-
-    /**
-     * @param linkedUserID the linkedUserID to set
-     */
-    public void setLinkedUserID(int linkedUserID) {
-        this.linkedUserID = linkedUserID;
-    }
-
-    /**
-     * @return the creatorUserID
-     */
-    public int getCreatorUserID() {
-        return creatorUserID;
-    }
-
-    /**
-     * @param creatorUserID the creatorUserID to set
-     */
-    public void setCreatorUserID(int creatorUserID) {
-        this.creatorUserID = creatorUserID;
-    }
-
-    /**
-     * @return the muniName
-     */
-    public String getMuniName() {
-        return muniName;
-    }
-
-    /**
-     * @param muniName the muniName to set
-     */
-    public void setMuniName(String muniName) {
-        this.muniName = muniName;
-    }
-
     /**
      * @return the muniCode
      */
@@ -734,216 +335,10 @@ public class Person extends EntityUtils implements Serializable{
     public void setMuniCode(int muniCode) {
         this.muniCode = muniCode;
     }
-
-    /**
-     * @return the ghostCreatedDate
-     */
-    public LocalDateTime getGhostCreatedDate() {
-        return ghostCreatedDate;
-    }
-
-    /**
-     * @return the ghostCreatedDatePretty
-     */
-    public String getGhostCreatedDatePretty() {
-        return ghostCreatedDatePretty;
-    }
-
-    /**
-     * @return the ghostOf
-     */
-    public int getGhostOf() {
-        return ghostOf;
-    }
-
-    /**
-     * @return the ghostCreatedByUserID
-     */
-    public int getGhostCreatedByUserID() {
-        return ghostCreatedByUserID;
-    }
-
-    /**
-     * @return the cloneCreatedDate
-     */
-    public LocalDateTime getCloneCreatedDate() {
-        return cloneCreatedDate;
-    }
-
-    /**
-     * @return the cloneCreatedDatePretty
-     */
-    public String getCloneCreatedDatePretty() {
-        return cloneCreatedDatePretty;
-    }
-
-    /**
-     * @return the cloneOf
-     */
-    public int getCloneOf() {
-        return cloneOf;
-    }
-
-    /**
-     * @return the cloneCreatedByUserID
-     */
-    public int getCloneCreatedByUserID() {
-        return cloneCreatedByUserID;
-    }
-
-    /**
-     * @param ghostCreatedDate the ghostCreatedDate to set
-     */
-    public void setGhostCreatedDate(LocalDateTime ghostCreatedDate) {
-        this.ghostCreatedDate = ghostCreatedDate;
-    }
-
-    /**
-     * @param ghostCreatedDatePretty the ghostCreatedDatePretty to set
-     */
-    public void setGhostCreatedDatePretty(String ghostCreatedDatePretty) {
-        this.ghostCreatedDatePretty = ghostCreatedDatePretty;
-    }
-
-    /**
-     * @param ghostOf the ghostOf to set
-     */
-    public void setGhostOf(int ghostOf) {
-        this.ghostOf = ghostOf;
-    }
-
-    /**
-     * @param ghostCreatedByUserID the ghostCreatedByUserID to set
-     */
-    public void setGhostCreatedByUserID(int ghostCreatedByUserID) {
-        this.ghostCreatedByUserID = ghostCreatedByUserID;
-    }
-
-    /**
-     * @param cloneCreatedDate the cloneCreatedDate to set
-     */
-    public void setCloneCreatedDate(LocalDateTime cloneCreatedDate) {
-        this.cloneCreatedDate = cloneCreatedDate;
-    }
-
-    /**
-     * @param cloneCreatedDatePretty the cloneCreatedDatePretty to set
-     */
-    public void setCloneCreatedDatePretty(String cloneCreatedDatePretty) {
-        this.cloneCreatedDatePretty = cloneCreatedDatePretty;
-    }
-
-    /**
-     * @param cloneOf the cloneOf to set
-     */
-    public void setCloneOf(int cloneOf) {
-        this.cloneOf = cloneOf;
-    }
-
-    /**
-     * @param cloneCreatedByUserID the cloneCreatedByUserID to set
-     */
-    public void setCloneCreatedByUserID(int cloneCreatedByUserID) {
-        this.cloneCreatedByUserID = cloneCreatedByUserID;
-    }
-
-    /**
-     * @return the mailingAddressThirdLine
-     */
-    public String getMailingAddressThirdLine() {
-        return mailingAddressThirdLine;
-    }
-
-    /**
-     * @param mailingAddressThirdLine the mailingAddressThirdLine to set
-     */
-    public void setMailingAddressThirdLine(String mailingAddressThirdLine) {
-        this.mailingAddressThirdLine = mailingAddressThirdLine;
-    }
-
-    /**
-     * @return the referencePerson
-     */
-    public boolean isReferencePerson() {
-        return referencePerson;
-    }
-
-    /**
-     * @param referencePerson the referencePerson to set
-     */
-    public void setReferencePerson(boolean referencePerson) {
-        this.referencePerson = referencePerson;
-    }
-
-    /**
-     * @return the ghostsList
-     */
-    public ArrayList<Integer> getGhostsList() {
-        return ghostsList;
-    }
-
-    /**
-     * @return the cloneList
-     */
-    public ArrayList<Integer> getCloneList() {
-        return cloneList;
-    }
-
-    /**
-     * @return the mergedList
-     */
-    public ArrayList<Integer> getMergedList() {
-        return mergedList;
-    }
-
-    /**
-     * @param ghostsList the ghostsList to set
-     */
-    public void setGhostsList(ArrayList<Integer> ghostsList) {
-        this.ghostsList = ghostsList;
-    }
-
-    /**
-     * @param cloneList the cloneList to set
-     */
-    public void setCloneList(ArrayList<Integer> cloneList) {
-        this.cloneList = cloneList;
-    }
-
-    /**
-     * @param mergedList the mergedList to set
-     */
-    public void setMergedList(ArrayList<Integer> mergedList) {
-        this.mergedList = mergedList;
-    }
-
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
-    }
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
-
-    /**
-     * @return the source
-     */
-    public BOBSource getSource() {
-        return source;
-    }
-
-    /**
-     * @param source the source to set
-     */
-    public void setSource(BOBSource source) {
-        this.source = source;
-    }
     
+    @Override
+    public String toString(){
+        return this.firstName + this.lastName;
+    }
 
 }

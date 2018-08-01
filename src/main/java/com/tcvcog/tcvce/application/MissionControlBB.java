@@ -18,43 +18,19 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
-
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.tcvcog.tcvce.entities.MunicipalityListified;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.ProposalCECase;
-import com.tcvcog.tcvce.entities.ProposalOccPeriod;
-import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.integration.UserIntegrator;
- 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import javax.annotation.PostConstruct;
-
-import org.primefaces.model.DashboardModel;
-import org.primefaces.component.dashboard.Dashboard;
-import org.primefaces.model.DashboardColumn;
-import org.primefaces.model.DefaultDashboardColumn;
-import org.primefaces.model.DefaultDashboardModel;
 
 /**
  *
@@ -62,25 +38,10 @@ import org.primefaces.model.DefaultDashboardModel;
  */
 public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
-    private UserAuthorized currentUser;
+    private User user;
     private Municipality currentMuni;
+    private ArrayList<Municipality> muniList;
     private Municipality selectedMuni;
-    
-    private List<User> userList;
-    private User selectedUser;
-    
-    private DashboardModel mainDash;
-    
-    private List<EventCECaseCasePropBundle> timelineEventList;
-    private List<EventCECaseCasePropBundle> filteredEventWithCasePropList;
-    private int timelineEventViewDateRange;
-    
-    private List<ProposalCECase> ceProposalList;
-    private List<ProposalOccPeriod> occProposalList;
-    
- 
-    
-    
     
     /**
      * Creates a new instance of InitiateSessionBB
@@ -88,80 +49,11 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public MissionControlBB() {
     }
     
-    @PostConstruct
-    public void initBean() throws IntegrationException{
-        UserIntegrator ui = getUserIntegrator();
-        currentUser = getSessionBean().getSessionUser();
-        generateMainDash();
-        userList = ui.getCompleteActiveUserList();
-        
-        
-        
-    }
-    
-    private void generateMainDash(){
-        setMainDash(new DefaultDashboardModel());
-        DashboardColumn column1 = new DefaultDashboardColumn();
-        DashboardColumn column2 = new DefaultDashboardColumn();
-        DashboardColumn column3 = new DefaultDashboardColumn();
-        column1.addWidget("dashpanel-ce-cears");
-        column1.addWidget("dashpanel-ce-cecases");
-        column1.addWidget("dashpanel-ce-todo");
-        
-        column2.addWidget("dashpanel-occ-periods");
-        column2.addWidget("dashpanel-occ-inspections");
-        column2.addWidget("dashpanel-persons");
-        column2.addWidget("dashpanel-properties");
-        
-        column3.addWidget("dashpanel-sys-events");
-        column3.addWidget("dashpanel-sys-switchmuni");
-        column3.addWidget("dashpanel-sys-switchuser");
-
-        mainDash.addColumn(column1);
-        mainDash.addColumn(column2);
-        mainDash.addColumn(column3);
-        
-    }
-    
-    public void testPDF(ActionEvent ev){
-        String DEST = "/home/sylvia/GlassFish_Server/glassfish/domains/domain1/applications/helloPDF.pdf";
-        File file = new File(DEST);
-        System.out.println("MissionControlBB.testPDF | can write to loc: " + file.canWrite());
-        file.getParentFile().mkdirs();
-        //Initialize PDF writer
-        Document document;
-        PdfWriter writer;
-        try {
-            writer = new PdfWriter(file);
-        //Initialize PDF document
-        PdfDocument pdf = new PdfDocument(writer);
- 
-        // Initialize document
-        document = new Document(pdf);
- 
-        //Add paragraph to the document
-        document.add(new Paragraph("Hello World!"));
- 
-        //Close document
-        document.close();
-            System.out.println("wrote pdf!");
-        
-        } catch (FileNotFoundException ex) {
-            System.out.println("MissionControlBB.testPDF");
-            System.out.println(ex);
-        }
- 
-        
-    }
-    
-    
-    public String switchMuni() throws IntegrationException, SQLException{
+    public String switchMuni(){
         CodeIntegrator ci = getCodeIntegrator();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        MunicipalityListified muniComp = mi.getMuniComplete(selectedMuni.getMuniCode());
-        getSessionBean().setSessionMuni(muniComp);
+        getSessionBean().setActiveMuni(selectedMuni);
         try {
-            getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
+            getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(selectedMuni.getDefaultCodeSetID()));
         } catch (IntegrationException ex) {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -180,34 +72,64 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
     public String loginToMissionControl(){
-        System.out.println("MissionControlBB.loginToMissionControl");
         
         return "startInitiationProcess";
     }
-   
+    
+    public String logout(){
+        FacesContext context = getFacesContext();
+        HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
+        
+        if (session != null) {
+
+//            session.removeAttribute("dBConnection");
+//            session.removeAttribute("codeCoordinator");
+//            session.removeAttribute("codeIntegrator");
+//            session.removeAttribute("municipalitygrator");
+//            session.removeAttribute("personIntegrator");
+//            session.removeAttribute("propertyIntegrator");
+//            session.removeAttribute("cEActionRequestIntegrator");
+//            session.removeAttribute("userIntegrator");
+            session.invalidate();
+
+            FacesContext facesContext = getFacesContext();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Logout Successful", ""));
+            System.out.println("MissionControlBB.logout | Session invalidated");
+
+        } else {
+            FacesContext facesContext = getFacesContext();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "ERROR: Unable to invalidate session.", "Your system administrator has been notified."));
+        }
+            return "logoutSequenceComplete";
+    }
+
     
 
     /**
-     * @return the currentUser
+     * @return the user
      */
-    public UserAuthorized getCurrentUser() {
-        
-        currentUser = getSessionBean().getSessionUser();
-        return currentUser;
+    public User getUser() {
+        user = getFacesUser();
+        if(user != null){
+            System.out.println("MissionControlBB.getUser | facesUser: " + user.getFName());
+        }
+        return user;
     }
 
     /**
-     * @param currentUser the currentUser to set
+     * @param user the user to set
      */
-    public void setCurrentUser(UserAuthorized currentUser) {
-        this.currentUser = currentUser;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     /**
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getSessionMuni();
+        currentMuni = getSessionBean().getActiveMuni();
         return currentMuni;
     }
 
@@ -218,9 +140,25 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         this.currentMuni = currentMuni;
     }
 
-    
+    /**
+     * @return the muniList
+     */
+    public ArrayList<Municipality> getMuniList() {
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        try {
+            muniList = mi.getCompleteMuniList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return muniList;
+    }
 
-    
+    /**
+     * @param muniList the muniList to set
+     */
+    public void setMuniList(ArrayList<Municipality> muniList) {
+        this.muniList = muniList;
+    }
 
     /**
      * @return the selectedMuni
@@ -235,131 +173,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public void setSelectedMuni(Municipality selectedMuni) {
         this.selectedMuni = selectedMuni;
     }
-
-    /**
-     * @return the timelineEventList
-     */
-    public List<EventCECaseCasePropBundle> getTimelineEventList() {
-        EventIntegrator ei = getEventIntegrator();
-        try {
-            timelineEventList = 
-                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuni(), 
-                            LocalDateTime.now(), LocalDateTime.now().plusDays(365));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return timelineEventList;
-    }
-
-    /**
-     * @param timelineEventList the timelineEventList to set
-     */
-    public void setTimelineEventList(ArrayList<EventCECaseCasePropBundle> timelineEventList) {
-        this.timelineEventList = timelineEventList;
-    }
-
-    /**
-     * @return the filteredEventWithCasePropList
-     */
-    public List<EventCECaseCasePropBundle> getFilteredEventWithCasePropList() {
-        return filteredEventWithCasePropList;
-    }
-
-    /**
-     * @param filteredEventWithCasePropList the filteredEventWithCasePropList to set
-     */
-    public void setFilteredEventWithCasePropList(ArrayList<EventCECaseCasePropBundle> filteredEventWithCasePropList) {
-        this.filteredEventWithCasePropList = filteredEventWithCasePropList;
-    }
-
-    /**
-     * @return the timelineEventViewDateRange
-     */
-    public int getTimelineEventViewDateRange() {
-        return timelineEventViewDateRange;
-    }
-
-    /**
-     * @param timelineEventViewDateRange the timelineEventViewDateRange to set
-     */
-    public void setTimelineEventViewDateRange(int timelineEventViewDateRange) {
-        this.timelineEventViewDateRange = timelineEventViewDateRange;
-    }
-
-    /**
-     * @return the mainDash
-     */
-    public DashboardModel getMainDash() {
-        return mainDash;
-    }
-
-    /**
-     * @param mainDash the mainDash to set
-     */
-    public void setMainDash(DashboardModel mainDash) {
-        this.mainDash = mainDash;
-    }
-
-
-    /**
-     * @return the occProposalList
-     */
-    public List<ProposalOccPeriod> getOccProposalList() {
-        return occProposalList;
-    }
-
-    /**
-     * @param occProposalList the occProposalList to set
-     */
-    public void setOccProposalList(List<ProposalOccPeriod> occProposalList) {
-        this.occProposalList = occProposalList;
-    }
-
-    /**
-     * @return the ceProposalList
-     */
-    public List<ProposalCECase> getCeProposalList() {
-        return ceProposalList;
-    }
-
-    /**
-     * @param ceProposalList the ceProposalList to set
-     */
-    public void setCeProposalList(List<ProposalCECase> ceProposalList) {
-        this.ceProposalList = ceProposalList;
-    }
-
-    /**
-     * @return the userList
-     */
-    public List<User> getUserList() {
-        return userList;
-    }
-
-    /**
-     * @return the selectedUser
-     */
-    public User getSelectedUser() {
-        return selectedUser;
-    }
-
-    /**
-     * @param userList the userList to set
-     */
-    public void setUserList(List<User> userList) {
-        this.userList = userList;
-    }
-
-    /**
-     * @param selectedUser the selectedUser to set
-     */
-    public void setSelectedUser(User selectedUser) {
-        this.selectedUser = selectedUser;
-    }
-
     
-
-   
     
 
    

@@ -17,14 +17,13 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class TextBlock implements Serializable{
+public class TextBlock {
     
     private int blockID;
     private int textBlockCategoryID;

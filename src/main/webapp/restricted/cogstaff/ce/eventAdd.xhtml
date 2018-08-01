@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Add event</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+           
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view id="addEventView">
+                        
+                    <h1>Add Event</h1>
+                    
+                    <h:outputText value="Current Case: #{eventAddBB.ceCase.caseName}"/>
+                    <p:spacer height="5px"/>
+                    <h:outputText value="Event Type: #{eventAddBB.currentEvent.category.eventType.label}"/>
+                    <p:spacer height="5px"/>
+                    <h:outputText value="Event Category: #{eventAddBB.currentEvent.category.eventCategoryTitle}"/>
+                        
+                    <h:form id="addNewEventForm">
+
+                                <p:spacer height="10px"/>
+
+                                <h:panelGrid columns="2" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd"
+                                             footerClass="gridFooter">
+
+                                    <f:facet name="header">
+                                        <h:panelGroup>
+                                            <p:outputLabel for="eventDesc">
+                                                <h:outputText value="Short Description:"/>
+                                            </p:outputLabel>
+                                            <p:inputText id="eventDesc" value="#{eventAddBB.formEventDesc}" 
+                                                         style="width: 100%;" tabindex="3" required="true" styleClass="inputText"/>
+                                            <h:message for="eventDesc" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </f:facet>
+
+                                    <h:panelGroup>
+                                        
+                                         <h:outputLabel for="activeEvent">
+                                            <h:outputText value="Active Event?"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch tabindex="18" id="activeEvent" value="#{eventAddBB.activeEvent}" onLabel="Yes" offLabel="No" />
+                                        
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="eventDateCal">
+                                            <h:outputText value="Date of Record"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:calendar value="#{eventAddBB.formEventDate}" 
+                                                    mode="popup"  id="eventDateCal"
+                                                    showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" showTodayButton="true"
+                                                    required="true"/>
+                                        <h:message for="eventDateCal" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="discloseToMuniIS">
+                                            <h:outputText value="Disclose to Municipalities"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{eventAddBB.formDiscloseToMuni}" onLabel="Yes" offLabel="No" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="discloseToPublic">
+                                            <h:outputText value="Disclose to Public"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{eventAddBB.formDiscloseToPublic}" onLabel="Yes" offLabel="No" />
+                                    </h:panelGroup>
+                                    
+                                    
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="requireViewConfirmationSwitch">
+                                            <h:outputText value="Require view confirmation by case manager"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventAddBB.formRequireViewConfirmation}" onLabel="Yes" offLabel="No" />
+                                    </h:panelGroup>
+
+                                    <f:facet name="footer">
+                                        <h:outputLabel for="eventNotes">
+                                            <h:outputText value="Event Notes:"/>
+                                        </h:outputLabel>
+                                        <h:panelGroup>
+                                            <p:editor value="#{eventAddBB.formEventNotes}" 
+                                                    controls="bold italic underline strikethrough font size style color 
+                                                    bullets numbering center undo redo rule link removeformat outdent 
+                                                    indent link unlink copy cut paste rule alignleft center alignright"
+                                                    width="1000"
+                                                    height="200"/>
+                                            <h:message for="eventNotes" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </f:facet>
+
+                                </h:panelGrid>
+                                
+                            
+                                <p:commandButton ajax="false" action="#{eventAddBB.addEvent}"
+                                                 value="Create new event" icon="fa fa-plus"/>
+                        </h:form>
+                                
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

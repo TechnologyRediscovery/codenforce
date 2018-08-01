@@ -23,28 +23,22 @@ package com.tcvcog.tcvce.entities;
  */
 public enum RoleType {
     
-    Developer("Developer", 7),
-    SysAdmin("System Administrator", 6),
-    EnforcementOfficial("Enforcement Authorized Staff", 5),
-    CogStaff("TCVCOG Staff Member", 4),
-    MuniStaff("Municipal Government Staff", 3),
-    MuniReader("Municipal Government Viewer", 2),
-    Public("Public at Large", 1); 
+    Developer("Developer"),
+    SysAdmin("System Administrator"),
+    CogStaff("TCVCOG Staff Member"),
+    EnforcementOfficial("Enforcement Authorized Staff"),
+    MuniStaff("Municipal Government Staff"),
+    MuniReader("Municipal Government Viewer"),
+    Public("Public at Large");
    
     private final String label;
-    private final int rank;
     
-    private RoleType(String label, int rnk){
+    private RoleType(String label){
         this.label = label;
-        this.rank = rnk;
     }
     
     public String getLabel(){
         return label;
-    }
-    
-    public int getRank(){
-        return rank;
     }
     
 }

@@ -17,13 +17,11 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
-
 /**
  *
  * @author Eric C. Darsow
  */
-public class ListChangeRequest implements Serializable {
+public class ListChangeRequest {
     private String changeRequestText;
 
     /**

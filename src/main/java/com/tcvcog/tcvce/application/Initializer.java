@@ -16,40 +16,32 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
-import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
+import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.ViolationIntegrator;
+import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.integration.PostgresConnectionFactory;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 
-import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyPermitIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
-import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -77,15 +69,15 @@ public class Initializer implements ServletContextListener{
         System.out.println("Intilizer.contextInitialized -- start");
         
         ServletContext servletContext = event.getServletContext();
-//        UserCoordinator userCoordinator = new UserCoordinator();
+        UserCoordinator userCoordinator = new UserCoordinator();
         
-//        System.out.println("Intilizer.contextInitialized -- creating DB Connection");
-//        PostgresConnectionFactory con = new PostgresConnectionFactory();
-//        servletContext.setAttribute("dBConnection", con);
+        System.out.println("Intilizer.contextInitialized -- creating DB Connection");
+        PostgresConnectionFactory con = new PostgresConnectionFactory();
+        servletContext.setAttribute("dBConnection", con);
         // this setAttribute system is not working as planned.
         
         //servletContext.setAttribute(Constants.USER_COORDINATOR_SCOPE, userCoordinator);
-//        servletContext.setAttribute(Constants.USER_COORDINATOR_KEY, userCoordinator);
+        servletContext.setAttribute(Constants.USER_COORDINATOR_KEY, userCoordinator);
         
         
         CodeCoordinator codeCoordinator = new CodeCoordinator();
@@ -100,8 +92,6 @@ public class Initializer implements ServletContextListener{
         EventCoordinator ec = new EventCoordinator();
         servletContext.setAttribute("eventCoordinator", ec);
         
-        PropertyCoordinator pc = new PropertyCoordinator();
-        servletContext.setAttribute("propertyCoordinator", pc);
        
         
         CodeIntegrator codeIntegrator = new CodeIntegrator();
@@ -132,28 +122,28 @@ public class Initializer implements ServletContextListener{
         CEActionRequestIntegrator ari = new CEActionRequestIntegrator();
         servletContext.setAttribute("ceActionRequestIntegrator", ari);
         
-        PublicInfoCoordinator picor = new PublicInfoCoordinator();
-        servletContext.setAttribute("publicInfoCoordinator", picor);
-        
-        ViolationIntegrator cvi = new ViolationIntegrator();
+        CodeViolationIntegrator cvi = new CodeViolationIntegrator();
         servletContext.setAttribute("codeViolationIntegrator", cvi);
         
         CitationIntegrator citint = new CitationIntegrator();
         servletContext.setAttribute("citationIntegrator", citint);
+        
+        ViolationCoordinator vc = new ViolationCoordinator();
+        servletContext.setAttribute("violationCoordinator", vc);
         
         CourtEntityIntegrator cei = new CourtEntityIntegrator();
         servletContext.setAttribute("courtEntityIntegrator", cei);
         
         // occupancy "modules"
         
-        OccInspectionIntegrator inspecInt = new OccInspectionIntegrator();
-        servletContext.setAttribute("occInspectionIntegrator", inspecInt);
+        ChecklistIntegrator chklstInt = new ChecklistIntegrator();
+        servletContext.setAttribute("ChecklistIntegrator", chklstInt);
         
-        OccupancyIntegrator occupancyIntegrator = new OccupancyIntegrator();
-        servletContext.setAttribute("occupancyIntegrator", occupancyIntegrator);
+        OccupancyInspectionIntegrator occupancyInspectionIntegrator = new OccupancyInspectionIntegrator();
+        servletContext.setAttribute("occupancyInspectionIntegrator", occupancyInspectionIntegrator);
         
-        OccupancyCoordinator occupancyCoordinator = new OccupancyCoordinator();
-        servletContext.setAttribute("occupancyCoordinator", occupancyCoordinator);
+        OccupancyPermitIntegrator occupancyPermitIntegrator = new OccupancyPermitIntegrator();
+        servletContext.setAttribute("occupancyPermitIntegrator", occupancyPermitIntegrator);
         
         PaymentIntegrator pmtInt = new PaymentIntegrator();
         servletContext.setAttribute("paymentIntegrator", pmtInt);
@@ -163,34 +153,6 @@ public class Initializer implements ServletContextListener{
         
         LogIntegrator logInt = new LogIntegrator();
         servletContext.setAttribute("logIntegrator", logInt);
-        
-        // this is a session-scoped bean stored in the session map
-        SearchCoordinator sc = new SearchCoordinator();
-        servletContext.setAttribute("searchCoordinator", sc);
-         
-        BlobCoordinator blobCoordinator = new BlobCoordinator();
-        servletContext.setAttribute("blobCoordinator", blobCoordinator);
-        
-        BlobIntegrator blobIntegrator = new BlobIntegrator();
-        servletContext.setAttribute("blobIntegrator", blobIntegrator);
-        
-        PersonCoordinator persCoor = new PersonCoordinator();
-        servletContext.setAttribute("personCoordinator", persCoor);
-         
-        SystemCoordinator ssCoor = new SystemCoordinator();
-        servletContext.setAttribute("sessionSystemCoordinator", ssCoor);
-         
-         
-        DataCoordinator dc = new DataCoordinator();
-        servletContext.setAttribute("dataCoordinator", dc);
-        
-        ChoiceCoordinator choiceCoord = new ChoiceCoordinator();
-        servletContext.setAttribute("choiceCoordinator", choiceCoord);
-        
-        ChoiceIntegrator choiceInt = new ChoiceIntegrator();
-        servletContext.setAttribute("choiceIntegrator", choiceInt);
-        
-         
         
 //        SessionBean sb = new SessionBean();
 //        servletContext.setAttribute("sessionBean", sb);

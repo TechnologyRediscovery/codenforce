@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>codeNforce home</title>
+        <title>TCVCOG Code Enforcement Home</title>
     </h:head>
     <h:body>
         <ui:composition template="./navContainer_public.xhtml">
@@ -16,29 +16,27 @@
                 <f:view id="sysHomeView">
                     
                     <div class="mainContainer">
-                        <h1>codeNforce system access portal</h1>
+                        <h1>Code enforcement system home</h1>
                         
 
                         
                         <h:form id="sysHomeForm">
-                            <h2>Staff access</h2>
+                            
+                            <h2>Public services</h2>
+                                <p>Request a code enforcement investigation, apply for an occupancy permit, 
+                                    check request status, and more through our public services portal</p>
+
+                                <p:commandButton ajax="false" value="Jump to public services portal" 
+                                                 action="#{missionControlBB.jumpToPublicPortal()}"/>
+
+                                
+                            <h2>Restricted content access</h2>
                             <p>TCVCOG staff, code enforcement officials, and other authorized users access tools
                                 via mission control</p>
                                 <p:commandButton ajax="false" value="Log in to mission control" 
                                                  action="#{missionControlBB.loginToMissionControl}"/>
-                                            
-                                <p:spacer height="5px" />
-                                
-                                <h3>Getting help</h3>
-                                
-                                <a href="https://technologyrediscovery.net/docs/cogconnect_user_guide_v.0.90.pdf" target="_blank">
-                                    Download the evolving system user guide v.0.9
-                                </a>
-                               
 
                         </h:form>
-                        
-                       
                         
                     </div>
                 </f:view>

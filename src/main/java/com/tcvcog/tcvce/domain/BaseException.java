@@ -52,7 +52,6 @@ public class BaseException extends java.lang.Exception{
     this.exception = e;
   }
 
-  @Override
   public String getMessage()
   {
     if ( ( (message == null) || (message.length() == 0)) && exception != null)
@@ -70,13 +69,11 @@ public class BaseException extends java.lang.Exception{
     return exception;
   }
 
-  @Override
   public String toString()
   {
     return getMessage();
   }
 
-  @Override
   public void printStackTrace()
   {
     super.printStackTrace();
@@ -88,7 +85,6 @@ public class BaseException extends java.lang.Exception{
     }
   }
 
-  @Override
   public void printStackTrace(java.io.PrintStream s)
   {
     super.printStackTrace(s);
@@ -100,7 +96,6 @@ public class BaseException extends java.lang.Exception{
     }
   }
 
-  @Override
   public void printStackTrace(java.io.PrintWriter s)
   {
     super.printStackTrace(s);

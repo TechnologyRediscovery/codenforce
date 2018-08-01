@@ -17,14 +17,13 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class CodeSet implements Serializable {
+public class CodeSet {
     
     private int codeSetID;
     private int muniCode;

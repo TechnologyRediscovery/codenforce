@@ -17,103 +17,23 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPermit;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
-import java.time.LocalDateTime;
+import com.tcvcog.tcvce.occupancy.entities.OccPermit;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  *
  * @author Eric C. Darsow
  */
 public class PropertyUnit {
-    protected int unitID;
-    protected int propertyID;
-    protected String unitNumber;
     
-    protected String notes;
-    protected String otherKnownAddress;
-    
-    protected LocalDateTime rentalIntentDateStart;
-    protected LocalDateTime rentalIntentDateStop;
-    protected User rentalIntentLastUpdatedBy;
-    protected String rentalNotes;
-    protected boolean active;
-    
-    protected int conditionIntensityClassID;
-    protected LocalDateTime lastUpdatedTS;
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 43 * hash + this.unitID;
-        hash = 43 * hash + this.propertyID;
-        hash = 43 * hash + Objects.hashCode(this.unitNumber);
-        hash = 43 * hash + Objects.hashCode(this.notes);
-        hash = 43 * hash + Objects.hashCode(this.otherKnownAddress);
-        hash = 43 * hash + Objects.hashCode(this.rentalIntentDateStart);
-        hash = 43 * hash + Objects.hashCode(this.rentalIntentDateStop);
-        hash = 43 * hash + Objects.hashCode(this.rentalIntentLastUpdatedBy);
-        hash = 43 * hash + Objects.hashCode(this.rentalNotes);
-        hash = 43 * hash + (this.active ? 1 : 0);
-        hash = 43 * hash + this.conditionIntensityClassID;
-        hash = 43 * hash + Objects.hashCode(this.lastUpdatedTS);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final PropertyUnit other = (PropertyUnit) obj;
-        if (this.unitID != other.unitID) {
-            return false;
-        }
-        if (this.propertyID != other.propertyID) {
-            return false;
-        }
-        if (this.active != other.active) {
-            return false;
-        }
-        if (this.conditionIntensityClassID != other.conditionIntensityClassID) {
-            return false;
-        }
-        if (!Objects.equals(this.unitNumber, other.unitNumber)) {
-            return false;
-        }
-        if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.otherKnownAddress, other.otherKnownAddress)) {
-            return false;
-        }
-        if (!Objects.equals(this.rentalNotes, other.rentalNotes)) {
-            return false;
-        }
-        if (!Objects.equals(this.rentalIntentDateStart, other.rentalIntentDateStart)) {
-            return false;
-        }
-        if (!Objects.equals(this.rentalIntentDateStop, other.rentalIntentDateStop)) {
-            return false;
-        }
-        if (!Objects.equals(this.rentalIntentLastUpdatedBy, other.rentalIntentLastUpdatedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastUpdatedTS, other.lastUpdatedTS)) {
-            return false;
-        }
-        return true;
-    }
+    private int unitID;
+    private String unitNumber;
+    private String notes;
+    private String otherKnownAddress;
+    private boolean rental;
+    private Property thisProperty;
+    private ArrayList<Person> propertyUnitPeople;
+    private ArrayList<OccPermit> occupancyPermitList;
     
 
     /**
@@ -158,6 +78,19 @@ public class PropertyUnit {
         this.notes = notes;
     }
 
+    /**
+     * @return the propertyUnitPeople
+     */
+    public ArrayList<Person> getPropertyUnitPeople() {
+        return propertyUnitPeople;
+    }
+
+    /**
+     * @param propertyUnitPeople the propertyUnitPeople to set
+     */
+    public void setPropertyUnitPeople(ArrayList<Person> propertyUnitPeople) {
+        this.propertyUnitPeople = propertyUnitPeople;
+    }
 
     /**
      * @return the otherKnownAddress
@@ -174,126 +107,45 @@ public class PropertyUnit {
     }
 
     /**
-  
-   
-    /**
-     * @return the rentalIntentDateStart
+     * @return the rental
      */
-    public LocalDateTime getRentalIntentDateStart() {
-        return rentalIntentDateStart;
+    public boolean isRental() {
+        return rental;
     }
 
     /**
-     * @return the rentalIntentDateStop
+     * @param rental the rental to set
      */
-    public LocalDateTime getRentalIntentDateStop() {
-        return rentalIntentDateStop;
+    public void setRental(boolean rental) {
+        this.rental = rental;
     }
 
     /**
-     * @return the rentalIntentLastUpdatedBy
+     * @return the occupancyPermitList
      */
-    public User getRentalIntentLastUpdatedBy() {
-        return rentalIntentLastUpdatedBy;
+    public ArrayList<OccPermit> getOccupancyPermitList() {
+        return occupancyPermitList;
     }
 
     /**
-     * @return the rentalNotes
+     * @param occupancyPermitList the occupancyPermitList to set
      */
-    public String getRentalNotes() {
-        return rentalNotes;
+    public void setOccupancyPermitList(ArrayList<OccPermit> occupancyPermitList) {
+        this.occupancyPermitList = occupancyPermitList;
     }
 
     /**
-     * @return the active
+     * @return the thisProperty
      */
-    public boolean isActive() {
-        return active;
+    public Property getThisProperty() {
+        return thisProperty;
     }
 
     /**
-     * @return the conditionIntensityClassID
+     * @param thisProperty the thisProperty to set
      */
-    public int getConditionIntensityClassID() {
-        return conditionIntensityClassID;
+    public void setThisProperty(Property thisProperty) {
+        this.thisProperty = thisProperty;
     }
-
-    /**
-     * @param rentalIntentDateStart the rentalIntentDateStart to set
-     */
-    public void setRentalIntentDateStart(LocalDateTime rentalIntentDateStart) {
-        this.rentalIntentDateStart = rentalIntentDateStart;
-    }
-
-    /**
-     * @param rentalIntentDateStop the rentalIntentDateStop to set
-     */
-    public void setRentalIntentDateStop(LocalDateTime rentalIntentDateStop) {
-        this.rentalIntentDateStop = rentalIntentDateStop;
-    }
-
-    /**
-     * @param rentalIntentLastUpdatedBy the rentalIntentLastUpdatedBy to set
-     */
-    public void setRentalIntentLastUpdatedBy(User rentalIntentLastUpdatedBy) {
-        this.rentalIntentLastUpdatedBy = rentalIntentLastUpdatedBy;
-    }
-
-    /**
-     * @param rentalNotes the rentalNotes to set
-     */
-    public void setRentalNotes(String rentalNotes) {
-        this.rentalNotes = rentalNotes;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    /**
-     * @param conditionIntensityClassID the conditionIntensityClassID to set
-     */
-    public void setConditionIntensityClassID(int conditionIntensityClassID) {
-        this.conditionIntensityClassID = conditionIntensityClassID;
-    }
-
-    /**
-     * @return the propertyID
-     */
-    public int getPropertyID() {
-        return propertyID;
-    }
-
-    /**
-     * @param propertyID the propertyID to set
-     */
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
-    }
-
-    /**
-     * @return the lastUpdatedTS
-     */
-    public LocalDateTime getLastUpdatedTS() {
-        return lastUpdatedTS;
-    }
-
-    /**
-     * @param lastUpdatedTS the lastUpdatedTS to set
-     */
-    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
-        this.lastUpdatedTS = lastUpdatedTS;
-    }
-    /**
-     * @return the periodList
-     */
-    /**
-     * @param periodList the periodList to set
-     */
- 
-    
     
 }

@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.util;
 
 import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.PaymentType;
+import com.tcvcog.tcvce.occupancy.entities.PaymentType;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;

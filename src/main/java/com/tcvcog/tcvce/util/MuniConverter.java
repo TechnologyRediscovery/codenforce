@@ -29,12 +29,12 @@ import javax.faces.convert.FacesConverter;
  * and object types
  * @author echocharliedelta
  */
-@FacesConverter(value="muniConverter")
+@FacesConverter(forClass=Municipality.class, value="muniConverter")
 public class MuniConverter extends EntityConverter implements Converter {
     
-    @Override
+     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        System.out.println("Muni was gotten" + titleS);
+        System.out.println("MuniConverter.getAsObject | title: " +titleS);
         if(titleS.isEmpty()) {
             return null; 
         }
@@ -51,6 +51,7 @@ public class MuniConverter extends EntityConverter implements Converter {
         
         Municipality m = (Municipality) o;
         String title = m.getMuniName();
+        System.out.println("MuniConverter.getAsString | title: " + title);
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;
@@ -62,7 +63,7 @@ public class MuniConverter extends EntityConverter implements Converter {
         
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-           
+    
     
     
 }

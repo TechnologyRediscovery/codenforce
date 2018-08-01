@@ -17,14 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.*;
-import com.tcvcog.tcvce.entities.reports.Report;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
-import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Citation;
@@ -34,127 +26,43 @@ import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EventCase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PublicInfoBundle;
-import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryEventCECase;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPermit;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
-import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
-import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
-import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.QueryProperty;
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 
 /**
- * Stores member vars of pretty much all our custom types
- * for persistence across an entire session (i.e. across page changes)
- * Many backing beans will grab this SessionBean in their initBean() method
- * and check for the presence of a session object. If not null, the method injects
- * those objects into its own members. If null, beans will decide if they need an object
- * and where to get it.
- * 
- * When many beans facilitate navigation to other pages, they will put their working
- * object on one of these session shelves for others to work with and to maintain
- * user state across page changes.
- * 
+ *
  * @author Eric C. Darsow
  */
+@ManagedBean(name="sessionBean")
+@SessionScoped
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
-    private List<Municipality> userAuthMuniList;
-
-    // BOB individual object session shelves - NOT NULL
-    private MunicipalityListified sessionMuni;
-    private CECase sessionCECase;
-    private UserAuthorized sessionUser;
-    private Property sessionProperty;
-    private Person sessionPerson;
-    private OccPeriod sessionOccPeriod;
-    
-    // BOB individual object session shelves - NOT ALWAYS POPULATED
-    private CEActionRequest sessionCEAR;
-    private PropertyUnit sessionPropertyUnit;
-    private OccInspection sessionOccInspection;
-    private OccPermit sessionOccPermit;
-    
-    // CECase-specific objects
-    private NoticeOfViolation sessionNotice;
-    private Citation sessionCitation;
-    private CodeViolation sessionCodeViolation;
-    
-    // BOB Lists
-    private List<Property> sessionPropertyList;
-    private List<Person> sessionPersonList;
-    private List<CEActionRequest> sessionCEARList;
-    private List<CECase> sessionCECaseList;
-    private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
-    private List<CodeViolation> sessionViolationList;
-    private List<OccPeriod> sessionOccPeriodList;
-    private List<Blob> blobList;
-    
-    // BOB queries
-    private QueryProperty queryProperty;
-    private QueryPerson queryPerson;
-    private QueryCEAR queryCEAR;
-    private QueryCECase queryCECase;
-    private QueryEventCECase queryEventCECase;
-    private QueryOccPeriod queryOccPeriod;
-    
-    /* *** Municipal Code Session Shelves ***  */
-    private CodeSource activeCodeSource;
-    private CodeSet activeCodeSet;
-    private CodeElementGuideEntry activeCodeElementGuideEntry;
-    private EnforcableCodeElement selectedEnfCodeElement;
-    private CodeElement activeCodeElement;
-    
-    /* *** Occupancy Permit Application Session Shelves *** */
-    private OccPermitApplication sessionOccPermitApplication;
-    private Property occPermitAppActiveProp;
-    private Property occPermitAppWorkingProp;
-    private PropertyUnit occPermitAppActivePropUnit;
-    private PersonType occPermitAppActivePersonType;
-    
-    /* *** Code Enf Action Request Session Shelves ***  */
-    private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
-    private CEActionRequest ceactionRequestForSubmission;
-    
-    /* *** Public Data Session Shelves ***  */
-    private List<PublicInfoBundle> infoBundleList;
-    private PublicInfoBundleCECase pibCECase;
-
-    /* *** Reporting *** */
-    private Report sessionReport;
-    
-    private ReportConfigCECase reportConfigCECase;
-    private ReportConfigCECaseList reportConfigCECaseList;
-    private ReportConfigCEEventList reportConfigCEEventList;
-    
-    private ReportConfigOccInspection reportConfigInspection;
-    private ReportConfigOccPermit reportConfigOccPermit;
-    
-    /* *** Public Person Search/Edit Session Shelves *** */
-    private Person activeAnonPerson;
-    private OccPermitApplicationReason occPermitApplicationReason;
-
-    /* *** Blob Upload Session Shelves *** */
-    //linking
-
+    private Municipality activeMuni;
+    private CodeSource activeCodeSource;
+    private Property activeProp;
+    private CECase activeCase;
+    private EventCase activeEvent;
+    private Person activePerson;
+    private User activeUser;
+    private NoticeOfViolation activeNotice;
+    private CEActionRequest actionRequest;
+    private CodeSet activeCodeSet;
+    private Citation activeCitation;
+    private CodeElement activeCodeElement;
+    private EnforcableCodeElement selectedEnfCodeElement;
+    private CodeViolation activeCodeViolation;
+    private ArrayList<CodeViolation> activeViolationList;
+    private CodeElementGuideEntry activeCodeElementGuideEntry;
+ 
 
     /**
      * Creates a new instance of getSessionBean()
@@ -164,44 +72,53 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionProperty
+     * @return the activeProp
      */
-    public Property getSessionProperty() {
-        return sessionProperty;
+    public Property getActiveProp() {
+        return activeProp;
     }
 
     /**
-     * @return the sessionCECase
+     * @return the activeCase
      */
-    public CECase getSessionCECase() {
-        return sessionCECase;
-        
-    }
-    
-    public void refreshActiveCase() throws IntegrationException, CaseLifecycleException{
-        CaseIntegrator ci = getCaseIntegrator();
-        if(sessionCECase != null){
-            CECase c = ci.getCECase(sessionCECase.getCaseID());
-            sessionCECase = c;
-        }
+    public CECase getActiveCase() {
+        return activeCase;
     }
 
     /**
-     * @return the sessionPerson
+     * @return the activeEvent
      */
-    public Person getSessionPerson() {
-        return sessionPerson;
+    public EventCase getActiveEvent() {
+        return activeEvent;
     }
 
-   
     /**
-     * @return the sessionNotice
+     * @return the activePerson
      */
-    public NoticeOfViolation getSessionNotice() {
-        return sessionNotice;
+    public Person getActivePerson() {
+        return activePerson;
     }
 
-    
+    /**
+     * @return the activeUser
+     */
+    public User getActiveUser() {
+        return activeUser;
+    }
+
+    /**
+     * @return the activeNotice
+     */
+    public NoticeOfViolation getActiveNotice() {
+        return activeNotice;
+    }
+
+    /**
+     * @return the actionRequest
+     */
+    public CEActionRequest getActionRequest() {
+        return actionRequest;
+    }
 
     /**
      * @return the activeCodeSet
@@ -211,10 +128,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionCitation
+     * @return the activeCitation
      */
-    public Citation getSessionCitation() {
-        return sessionCitation;
+    public Citation getActiveCitation() {
+        return activeCitation;
     }
 
     /**
@@ -225,17 +142,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionCodeViolation
+     * @return the activeCodeViolation
      */
-    public CodeViolation getSessionCodeViolation() {
-        return sessionCodeViolation;
+    public CodeViolation getActiveCodeViolation() {
+        return activeCodeViolation;
     }
 
     /**
-     * @return the sessionViolationList
+     * @return the activeViolationList
      */
-    public List<CodeViolation> getSessionViolationList() {
-        return sessionViolationList;
+    public ArrayList<CodeViolation> getActiveViolationList() {
+        return activeViolationList;
     }
 
     /**
@@ -246,37 +163,53 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param sessionProperty the sessionProperty to set
+     * @param activeProp the activeProp to set
      */
-    public void setSessionProperty(Property sessionProperty) {
-        this.sessionProperty = sessionProperty;
+    public void setActiveProp(Property activeProp) {
+        this.activeProp = activeProp;
     }
 
     /**
-     * @param sessionCECase the sessionCECase to set
+     * @param activeCase the activeCase to set
      */
-    public void setSessionCECase(CECase sessionCECase) {
-        this.sessionCECase = sessionCECase;
+    public void setActiveCase(CECase activeCase) {
+        this.activeCase = activeCase;
     }
-
-
 
     /**
-     * @param sessionPerson the sessionPerson to set
+     * @param activeEvent the activeEvent to set
      */
-    public void setSessionPerson(Person sessionPerson) {
-        this.sessionPerson = sessionPerson;
+    public void setActiveEvent(EventCase activeEvent) {
+        this.activeEvent = activeEvent;
     }
 
-   
     /**
-     * @param sessionNotice the sessionNotice to set
+     * @param activePerson the activePerson to set
      */
-    public void setSessionNotice(NoticeOfViolation sessionNotice) {
-        this.sessionNotice = sessionNotice;
+    public void setActivePerson(Person activePerson) {
+        this.activePerson = activePerson;
     }
 
- 
+    /**
+     * @param activeUser the activeUser to set
+     */
+    public void setActiveUser(User activeUser) {
+        this.activeUser = activeUser;
+    }
+
+    /**
+     * @param activeNotice the activeNotice to set
+     */
+    public void setActiveNotice(NoticeOfViolation activeNotice) {
+        this.activeNotice = activeNotice;
+    }
+
+    /**
+     * @param actionRequest the actionRequest to set
+     */
+    public void setActionRequest(CEActionRequest actionRequest) {
+        this.actionRequest = actionRequest;
+    }
 
     /**
      * @param activeCodeSet the activeCodeSet to set
@@ -286,10 +219,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param sessionCitation the sessionCitation to set
+     * @param activeCitation the activeCitation to set
      */
-    public void setSessionCitation(Citation sessionCitation) {
-        this.sessionCitation = sessionCitation;
+    public void setActiveCitation(Citation activeCitation) {
+        this.activeCitation = activeCitation;
     }
 
     /**
@@ -300,17 +233,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param sessionCodeViolation the sessionCodeViolation to set
+     * @param activeCodeViolation the activeCodeViolation to set
      */
-    public void setSessionCodeViolation(CodeViolation sessionCodeViolation) {
-        this.sessionCodeViolation = sessionCodeViolation;
+    public void setActiveCodeViolation(CodeViolation activeCodeViolation) {
+        this.activeCodeViolation = activeCodeViolation;
     }
 
     /**
-     * @param sessionViolationList the sessionViolationList to set
+     * @param activeViolationList the activeViolationList to set
      */
-    public void setSessionViolationList(List<CodeViolation> sessionViolationList) {
-        this.sessionViolationList = sessionViolationList;
+    public void setActiveViolationList(ArrayList<CodeViolation> activeViolationList) {
+        this.activeViolationList = activeViolationList;
     }
 
     /**
@@ -349,17 +282,18 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionMuni
+     * @return the activeMuni
      */
-    public MunicipalityListified getSessionMuni() {
-        return sessionMuni;
+    public Municipality getActiveMuni() {
+        return activeMuni;
     }
 
     /**
-     * @param sessionMuni the sessionMuni to set
+     * @param activeMuni the activeMuni to set
      */
-    public void setSessionMuni(MunicipalityListified sessionMuni) {
-        this.sessionMuni = sessionMuni;
+    public void setActiveMuni(Municipality activeMuni) {
+        System.out.println("MissionControlBB.setActiveMuni | set: " + activeMuni.getMuniName());
+        this.activeMuni = activeMuni;
     }
 
     /**
@@ -375,531 +309,5 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public void setActiveCodeElement(CodeElement activeCodeElement) {
         this.activeCodeElement = activeCodeElement;
     }
-
-  
-
-    /**
-     * @return the infoBundleList
-     */
-    public List<PublicInfoBundle> getInfoBundleList() {
-        return infoBundleList;
-    }
-
-    /**
-     * @param infoBundleList the infoBundleList to set
-     */
-    public void setInfoBundleList(List<PublicInfoBundle> infoBundleList) {
-        this.infoBundleList = infoBundleList;
-    }
-
-    /**
-     * @return the pibCECase
-     */
-    public PublicInfoBundleCECase getPibCECase() {
-        return pibCECase;
-    }
-
-    /**
-     * @param pibCECase the pibCECase to set
-     */
-    public void setPibCECase(PublicInfoBundleCECase pibCECase) {
-        this.pibCECase = pibCECase;
-    }
-
-    /**
-     * @return the sessionCEARList
-     */
-    public List<CEActionRequest> getSessionCEARList() {
-        
-        return sessionCEARList;
-    }
-
-    /**
-     * @return the sessionCECaseList
-     */
-    public List<CECase> getSessionCECaseList() {
-        return sessionCECaseList;
-    }
-
-    /**
-     * @param qc
-     */
-    public void setSessionCEARList(List<CEActionRequest> qc) {
-        if(qc != null && qc.size() > 0 ){
-            setQueryCEAR(null);
-    
-            this.sessionCEARList = qc;
-        }
-    }
-    
-
-    /**
-     * @param sessionCECaseList the sessionCECaseList to set
-     */
-    public void setSessionCECaseList(List<CECase> sessionCECaseList) {
-        this.sessionCECaseList = sessionCECaseList;
-    }
-
-    /**
-     * @return the ceactionRequestForSubmission
-     */
-    public CEActionRequest getCeactionRequestForSubmission() {
-        return ceactionRequestForSubmission;
-    }
-
-    /**
-     * @param ceactionRequestForSubmission the ceactionRequestForSubmission to set
-     */
-    public void setCeactionRequestForSubmission(CEActionRequest ceactionRequestForSubmission) {
-        this.ceactionRequestForSubmission = ceactionRequestForSubmission;
-    }
-
-    /**
-     * @return the userAuthMuniList
-     */
-    public List<Municipality> getUserAuthMuniList() {
-        return userAuthMuniList;
-    }
-
-    /**
-     * @param userAuthMuniList the userAuthMuniList to set
-     */
-    public void setUserAuthMuniList(List<Municipality> userAuthMuniList) {
-        this.userAuthMuniList = userAuthMuniList;
-    }
-
-    /**
-     * @return the sessionCEAR
-     */
-    public CEActionRequest getSessionCEAR() {
-        return sessionCEAR;
-    }
-
-    /**
-     * @param sessionCEAR the sessionCEAR to set
-     */
-    public void setSessionCEAR(CEActionRequest sessionCEAR) {
-        this.sessionCEAR = sessionCEAR;
-    }
-
-    /**
-     * @return the sessionUser
-     */
-    
-    public UserAuthorized getSessionUser() {
-        return sessionUser;
-    }
-
-    /**
-     * @param sessionUser the sessionUser to set
-     */
-    
-    public void setSessionUser(UserAuthorized sessionUser) {
-        this.sessionUser = sessionUser;
-    }
-
-    /**
-     * @return the sessionPersonList
-     */
-    public List<Person> getSessionPersonList() {
-        return sessionPersonList;
-    }
-
-    /**
-     * @param sessionPersonList the sessionPersonList to set
-     */
-    public void setSessionPersonList(List<Person> sessionPersonList) {
-        this.sessionPersonList = sessionPersonList;
-    }
-
-   
-    /**
-     * @return the personForCEActionRequestSubmission
-     */
-    public Person getPersonForCEActionRequestSubmission() {
-        return personForCEActionRequestSubmission;
-    }
-
-    /**
-     * @param personForCEActionRequestSubmission the personForCEActionRequestSubmission to set
-     */
-    public void setPersonForCEActionRequestSubmission(Person personForCEActionRequestSubmission) {
-        this.personForCEActionRequestSubmission = personForCEActionRequestSubmission;
-    }
-
-    
-    public OccPermitApplication getSessionOccPermitApplication() {
-        return sessionOccPermitApplication;
-    }
-
-    public void setSessionOccPermitApplication(OccPermitApplication sessionOccPermitApplication) {
-        this.sessionOccPermitApplication = sessionOccPermitApplication;
-    }
-
-    public PropertyUnit getSessionPropertyUnit() {
-        return sessionPropertyUnit;
-    }
-
-    public void setSessionPropertyUnit(PropertyUnit sessionPropertyUnit) {
-        this.sessionPropertyUnit = sessionPropertyUnit;
-    }
-
-  
-    
-    /*
-     * @return the sessionEventWithCasePropList
-     */
-    public List<EventCECaseCasePropBundle> getSessionEventWithCasePropList() {
-        return sessionEventWithCasePropList;
-    }
-
-    /**
-     * @param sessionEventWithCasePropList the sessionEventWithCasePropList to set
-     */
-    public void setSessionEventWithCasePropList(List<EventCECaseCasePropBundle> sessionEventWithCasePropList) {
-        this.sessionEventWithCasePropList = sessionEventWithCasePropList;
-    }
-
-    /**
-     * @return the sessionPropertyList
-     */
-    public List<Property> getSessionPropertyList() {
-        return sessionPropertyList;
-    }
-
-    /**
-     * @param sessionPropertyList the sessionPropertyList to set
-     */
-    public void setSessionPropertyList(List<Property> sessionPropertyList) {
-        this.sessionPropertyList = sessionPropertyList;
-    }
-
-
-    /**
-     * @return the reportConfigCECase
-     */
-    public ReportConfigCECase getReportConfigCECase() {
-        return reportConfigCECase;
-    }
-
-    /**
-     * @param reportConfigCECase the reportConfigCECase to set
-     */
-    public void setReportConfigCECase(ReportConfigCECase reportConfigCECase) {
-        this.reportConfigCECase = reportConfigCECase;
-    }
-
-    /**
-     * @return the sessionReport
-     */
-    public Report getSessionReport() {
-        return sessionReport;
-    }
-
-    /**
-     * @param sessionReport the sessionReport to set
-     */
-    public void setSessionReport(Report sessionReport) {
-        this.sessionReport = sessionReport;
-    }
-
-    /**
-     * @return the reportConfigCECaseList
-     */
-    public ReportConfigCECaseList getReportConfigCECaseList() {
-        return reportConfigCECaseList;
-    }
-
-    /**
-     * @param reportConfigCECaseList the reportConfigCECaseList to set
-     */
-    public void setReportConfigCECaseList(ReportConfigCECaseList reportConfigCECaseList) {
-        this.reportConfigCECaseList = reportConfigCECaseList;
-    }
-
-    /**
-     * @return the blobList
-     */
-    public List<Blob> getBlobList() {
-        return blobList;
-    }
-
-    /**
-     * @param blobList the blobList to set
-     */
-    public void setBlobList(List<Blob> blobList) {
-        this.blobList = blobList;
-    }
-
-    /**   
-     * @return the reportConfigCEEventList
-     */
-    public ReportConfigCEEventList getReportConfigCEEventList() {
-        return reportConfigCEEventList;
-    }
-
-    /**
-     * @param reportConfigCEEventList the reportConfigCEEventList to set
-     */
-    public void setReportConfigCEEventList(ReportConfigCEEventList reportConfigCEEventList) {
-        this.reportConfigCEEventList = reportConfigCEEventList;
-    }
-
-    /**
-     * @return the queryCEAR
-     */
-    public QueryCEAR getQueryCEAR() {
-        return queryCEAR;
-    }
-
-    /**
-     * @param queryCEAR the queryCEAR to set
-     */
-    public void setQueryCEAR(QueryCEAR queryCEAR) {
-        this.queryCEAR = queryCEAR;
-    }
-
-  
-
-   
-
-    /**
-     * @return the queryCECase
-     */
-    public QueryCECase getQueryCECase() {
-        return queryCECase;
-    }
-
-    /**
-     * @param queryCECase the queryCECase to set
-     */
-    public void setQueryCECase(QueryCECase queryCECase) {
-        this.queryCECase = queryCECase;
-    }
-
-    /**
-     * @return the activeAnonPerson
-     */
-    public Person getActiveAnonPerson() {
-        return activeAnonPerson;
-    }
-
-    /**
-     * @param activeAnonPerson the activeAnonPerson to set
-     */
-    public void setActiveAnonPerson(Person activeAnonPerson) {
-        this.activeAnonPerson = activeAnonPerson;
-    }
-
-    /**
-     * @return the occPermitApplicationReason
-     */
-    public OccPermitApplicationReason getOccPermitApplicationReason() {
-        return occPermitApplicationReason;
-    }
-
-    /**
-     * @param occPermitApplicationReason the occPermitApplicationReason to set
-     */
-    public void setOccPermitApplicationReason(OccPermitApplicationReason occPermitApplicationReason) {
-        this.occPermitApplicationReason = occPermitApplicationReason;
-    }
-
-    /**
-     * @return the sessionOccPeriod
-     */
-    public OccPeriod getSessionOccPeriod() {
-        return sessionOccPeriod;
-    }
-
-    /**
-     * @return the queryOccPeriod
-     */
-    public QueryOccPeriod getQueryOccPeriod() {
-        return queryOccPeriod;
-    }
-
-    /**
-     * @return the sessionOccPeriodList
-     */
-    public List<OccPeriod> getSessionOccPeriodList() {
-        return sessionOccPeriodList;
-    }
-
-    /**
-     * @return the sessionOccInspection
-     */
-    public OccInspection getSessionOccInspection() {
-        return sessionOccInspection;
-    }
-
-    /**
-     * @return the sessionOccPermit
-     */
-    public OccPermit getSessionOccPermit() {
-        return sessionOccPermit;
-    }
-
-    /**
-     * @param sessionOccPeriod the sessionOccPeriod to set
-     */
-    public void setSessionOccPeriod(OccPeriod sessionOccPeriod) {
-        this.sessionOccPeriod = sessionOccPeriod;
-    }
-
-    /**
-     * @param queryOccPeriod the queryOccPeriod to set
-     */
-    public void setQueryOccPeriod(QueryOccPeriod queryOccPeriod) {
-        this.queryOccPeriod = queryOccPeriod;
-    }
-
-    /**
-     * @param sessionOccPeriodList the sessionOccPeriodList to set
-     */
-    public void setSessionOccPeriodList(List<OccPeriod> sessionOccPeriodList) {
-        this.sessionOccPeriodList = sessionOccPeriodList;
-    }
-
-    /**
-     * @param sessionOccInspection the sessionOccInspection to set
-     */
-    public void setSessionOccInspection(OccInspection sessionOccInspection) {
-        this.sessionOccInspection = sessionOccInspection;
-    }
-
-    /**
-     * @param sessionOccPermit the sessionOccPermit to set
-     */
-    public void setSessionOccPermit(OccPermit sessionOccPermit) {
-        this.sessionOccPermit = sessionOccPermit;
-    }
-
-    /**
-     * @return the queryProperty
-     */
-    public QueryProperty getQueryProperty() {
-        return queryProperty;
-    }
-
-    /**
-     * @return the queryPerson
-     */
-    public QueryPerson getQueryPerson() {
-        return queryPerson;
-    }
-
-    /**
-     * @return the queryEventCECase
-     */
-    public QueryEventCECase getQueryEventCECase() {
-        return queryEventCECase;
-    }
-
-    /**
-     * @param queryProperty the queryProperty to set
-     */
-    public void setQueryProperty(QueryProperty queryProperty) {
-        this.queryProperty = queryProperty;
-    }
-
-    /**
-     * @param queryPerson the queryPerson to set
-     */
-    public void setQueryPerson(QueryPerson queryPerson) {
-        this.queryPerson = queryPerson;
-    }
-
-    /**
-     * @param queryEventCECase the queryEventCECase to set
-     */
-    public void setQueryEventCECase(QueryEventCECase queryEventCECase) {
-        this.queryEventCECase = queryEventCECase;
-    }
-
-    /**
-     * @return the occPermitAppActiveProp
-     */
-    public Property getOccPermitAppActiveProp() {
-        return occPermitAppActiveProp;
-    }
-
-    /**
-     * @return the occPermitAppWorkingProp
-     */
-    public Property getOccPermitAppWorkingProp() {
-        return occPermitAppWorkingProp;
-    }
-
-    /**
-     * @param activeProp the occPermitAppActiveProp to set
-     */
-    public void setOccPermitAppActiveProp(Property activeProp) {
-        this.occPermitAppActiveProp = activeProp;
-    }
-
-    /**
-     * @param workingProp the occPermitAppWorkingProp to set
-     */
-    public void setOccPermitAppWorkingProp(Property workingProp) {
-        this.occPermitAppWorkingProp = workingProp;
-    }
-
-    /**
-     * @return the occPermitAppActivePropUnit
-     */
-    public PropertyUnit getOccPermitAppActivePropUnit() {
-        return occPermitAppActivePropUnit;
-    }
-
-    /**
-     * @param occPermitAppActivePropUnit the occPermitAppActivePropUnit to set
-     */
-    public void setOccPermitAppActivePropUnit(PropertyUnit occPermitAppActivePropUnit) {
-        this.occPermitAppActivePropUnit = occPermitAppActivePropUnit;
-    }
-
-    /**
-     * @return the occPermitAppActivePersonType
-     */
-    public PersonType getOccPermitAppActivePersonType() {
-        return occPermitAppActivePersonType;
-    }
-
-    /**
-     * @param occPermitAppActivePersonType the occPermitAppActivePersonType to set
-     */
-    public void setOccPermitAppActivePersonType(PersonType occPermitAppActivePersonType) {
-        this.occPermitAppActivePersonType = occPermitAppActivePersonType;
-    }
-
-    /**
-     * @return the reportConfigOccPermit
-     */
-    public ReportConfigOccPermit getReportConfigOccPermit() {
-        return reportConfigOccPermit;
-    }
-
-    /**
-     * @param reportConfigOccPermit the reportConfigOccPermit to set
-     */
-    public void setReportConfigOccPermit(ReportConfigOccPermit reportConfigOccPermit) {
-        this.reportConfigOccPermit = reportConfigOccPermit;
-    }
-
-    /**
-     * @return the reportConfigInspection
-     */
-    public ReportConfigOccInspection getReportConfigInspection() {
-        return reportConfigInspection;
-    }
-
-    /**
-     * @param reportConfigInspection the reportConfigInspection to set
-     */
-    public void setReportConfigInspection(ReportConfigOccInspection reportConfigInspection) {
-        this.reportConfigInspection = reportConfigInspection;
-    }
-    
     
 }

@@ -19,9 +19,9 @@ package com.tcvcog.tcvce.application;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
 
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
+import com.tcvcog.tcvce.occupancy.entities.SpaceType;
 
 import java.io.Serializable;
 //imported when adding  and @ViewScoped
@@ -37,8 +37,8 @@ import javax.faces.application.FacesMessage;
 @ViewScoped
 public class SpaceTypeBB extends BackingBeanUtils implements Serializable {
 
-    private ArrayList<OccSpaceType> spaceTypeList;
-    private OccSpaceType selectedSpaceType;
+    private ArrayList<SpaceType> spaceTypeList;
+    private SpaceType selectedSpaceType;
     private int formSpaceTypeID;
     private String formSpaceTypeTitle;
     private String formSpaceTypeDescription;
@@ -54,46 +54,44 @@ public class SpaceTypeBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the spaceTypeList
      */
-    public List<OccSpaceType> getSpaceTypeList() {
-        OccInspectionIntegrator si = getOccInspectionIntegrator();
+    public ArrayList<SpaceType> getSpaceTypeList() {
         
-//        try {
-////            spaceTypeList = si.getSpa();
-//        } catch (IntegrationException ex) {
-//            getFacesContext().addMessage(null,
-//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-//                        "Unable to load space type list", 
-//                        "This must be corrected by the System Administrator"));
-//        }
-//         if(spaceTypeList != null){
-//            return spaceTypeList;
-//            
-//        } else {
-//            spaceTypeList = new ArrayList();
-//            return spaceTypeList;
-//        }
-
-        return new ArrayList<>();
+        try {
+            ChecklistIntegrator si = getChecklistIntegrator();
+            spaceTypeList = si.getSpaceTypeList();
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to load space type list", 
+                        "This must be corrected by the System Administrator"));
+        }
+         if(spaceTypeList != null){
+            return spaceTypeList;
+            
+        } else {
+            spaceTypeList = new ArrayList();
+            return spaceTypeList;
+        }
     }
 
     /**
      * @param spaceTypeList the spaceTypeList to set
      */
-    public void setSpaceTypeList(ArrayList<OccSpaceType> spaceTypeList) {
+    public void setSpaceTypeList(ArrayList<SpaceType> spaceTypeList) {
         this.spaceTypeList = spaceTypeList;
     }
 
     /**
      * @return the selectedSpaceType
      */
-    public OccSpaceType getSelectedSpaceType() {
+    public SpaceType getSelectedSpaceType() {
         return selectedSpaceType;
     }
 
     /**
      * @param selectedSpaceType the selectedSpaceType to set
      */
-    public void setSelectedSpaceType(OccSpaceType selectedSpaceType) {
+    public void setSelectedSpaceType(SpaceType selectedSpaceType) {
         this.selectedSpaceType = selectedSpaceType;
     }
 

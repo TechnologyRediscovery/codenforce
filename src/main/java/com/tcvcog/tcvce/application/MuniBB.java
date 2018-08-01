@@ -21,7 +21,11 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.application.FacesMessage;
 
 /**
  *
@@ -29,7 +33,9 @@ import java.util.List;
  */
 public class MuniBB extends BackingBeanUtils implements Serializable {
 
-    private List<Municipality> muniList;
+    private ArrayList<Municipality> muniList;
+    private HashMap<String, Integer> muniMap;
+    
     
     /**
      * Creates a new instance of muniBB
@@ -41,16 +47,42 @@ public class MuniBB extends BackingBeanUtils implements Serializable {
      * @return the muniList
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<Municipality> getMuniList() throws IntegrationException {
+    public ArrayList<Municipality> getMuniList() throws IntegrationException {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        muniList = mi.getMuniList();
+        muniList = mi.getCompleteMuniList();
+        
         return muniList;
     }
-    
+
+    /**
+     * @return the muniMap
+     */
+    public HashMap<String, Integer> getMuniMap() {
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        try {
+            muniMap = mi.getMunicipalityMap();
+        } catch (IntegrationException ex) {
+            System.out.println("MuniBB.getMuniMap " + ex.toString());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Cannot delete person." + ex.toString(), "Best not to delete folks anyway..."));
+            
+        }
+        return muniMap;
+    }
+
     /**
      * @param muniList the muniList to set
      */
-    public void setMuniList(List<Municipality> muniList) {
+    public void setMuniList(ArrayList<Municipality> muniList) {
         this.muniList = muniList;
     }
+
+    /**
+     * @param muniMap the muniMap to set
+     */
+    public void setMuniMap(HashMap<String, Integer> muniMap) {
+        this.muniMap = muniMap;
+    }
+    
 }

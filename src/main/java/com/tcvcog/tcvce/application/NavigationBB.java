@@ -45,7 +45,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     public String gotoPropertyProfile(){
-        if(getSessionBean().getSessionProperty() != null){
+        if(getSessionBean().getActiveProp() != null){
             return "propertyProfile";
         } else {
              getFacesContext().addMessage(null, 
@@ -58,7 +58,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     public String gotoCaseProfile(){
-        if(getSessionBean().getSessionCECase() != null ){
+        if(getSessionBean().getActiveCase() != null ){
             return "caseProfile";
         } else{
              getFacesContext().addMessage(null, 
@@ -71,7 +71,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     public String gotoPersonProfile(){
-        if(getSessionBean().getSessionPerson()!= null ){
+        if(getSessionBean().getActivePerson()!= null ){
             return "personProfile";
         } else{
              getFacesContext().addMessage(null, 
@@ -86,7 +86,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveCase
      */
     public boolean isNoActiveCase() {
-        CECase c = getSessionBean().getSessionCECase();
+        CECase c = getSessionBean().getActiveCase();
         noActiveCase = (c == null);
         return noActiveCase; 
     }
@@ -95,7 +95,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveProperty
      */
     public boolean isNoActiveProperty() {
-        Property p = getSessionBean().getSessionProperty();
+        Property p = getSessionBean().getActiveProp();
         noActiveProperty = (p == null);
         return noActiveProperty;
     }
@@ -148,7 +148,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActivePerson
      */
     public boolean isNoActivePerson() {
-        Person p = getSessionBean().getSessionPerson();
+        Person p = getSessionBean().getActivePerson();
         noActivePerson = (p == null);
         return noActivePerson;
     }
@@ -164,7 +164,8 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveUser
      */
     public boolean isNoActiveUser() {
-        noActiveUser = (getSessionBean().getSessionUser() == null); 
+        SessionBean sb = getSessionBean();
+        noActiveUser = (sb.getActiveUser() == null); 
         return noActiveUser;
     }
 
