@@ -94,7 +94,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             "WHERE \n" +
             "  cecase.property_propertyid = property.propertyid AND\n" +
             "  property.municipality_municode = municipality.municode AND\n" +
-            "  municipality.municode = ? AND casephase <> 'Closed'::casephase;";
+            "  municipality.municode = ? AND casephase <> 'Closed'::casephase AND casephase <> 'LegacyImported'::casephase;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -135,7 +135,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             "WHERE \n" +
             "  cecase.property_propertyid = property.propertyid AND\n" +
             "  property.municipality_municode = municipality.municode AND\n" +
-            "  municipality.municode = ? AND casephase = 'Closed'::casephase;";
+            "  municipality.municode = ? AND (casephase = 'Closed'::casephase OR casephase = 'LegacyImported'::casephase);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;

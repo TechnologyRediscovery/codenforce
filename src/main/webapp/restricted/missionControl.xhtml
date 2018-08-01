@@ -19,32 +19,26 @@
                         </h:messages>
                         <h:form id="missionControlForm">
 
-                            <h1>Mission Control</h1>
+                            <h1><h:outputText value="#{sessionBean.activeMuni.muniName}"/> Dashboard</h1>
+
+                            <h:panelGrid columns="2" columnClasses="gridTd, gridTd"
+                                footerClass="gridFooter">
+                                
+                                <h:panelGroup>
+                                    <p:chart type="bar" model="#{dashboardDataBB.model}"/>
+                                    
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
+                                    <p:chart type="bar" model="#{dashboardDataBB.model}"/>
+                                    
+                                </h:panelGroup>
+
+
+                            </h:panelGrid>
                             
-
-
-                            <h2>Municipality control</h2>
-                            <h3>Current municipality</h3>
-                            <h:outputText value="#{missionControlBB.currentMuni.muniName}"/>
-                            <h3>Change current municipality</h3>
-                            <p>Select the system-wide municipality. (Your selected muni's default code set will be automatically activated.)</p>
                             
-                            <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
-                                <f:converter converterId="muniConverter"/>
-                                <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                            </p:selectOneMenu>
                             
-                            <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
-                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            <p:spacer height="15px;"/>
-                            <p:commandButton value="Switch to selected municiplaity" action="#{missionControlBB.switchMuni}" icon="fa fa-gears" />
-
-                            <h2>User info verification:</h2>
-
-
-                            <h:outputText value="Authenticated Faces user: 
-                                          #{missionControlBB.user.FName} #{missionControlBB.user.LName}"/>
-
                             <p:spacer height="15px"/>
                             <p:dialog header="About page: Mission Control" 
                                       widgetVar="helpdlg" 

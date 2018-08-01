@@ -232,9 +232,7 @@ div.headerLink a:before, a:visited{
     flex-direction: column;
     flex-wrap: nowrap;
     
-    
-    
-    justify-content: flex-start;
+     justify-content: flex-start;
     
     font-family: 'roboto', sans-serif;
     margin-left: 0px;
@@ -279,7 +277,7 @@ div.headerLink a:before, a:visited{
     margin-right: 0px;
     margin-top: 0px;
     margin-bottom: 0px;
-    padding: 10px;
+    padding-left: 0px;
     color: white;
     font-weight: normal;
     
@@ -427,6 +425,13 @@ div.headerLinkCont{
     font-style: italic;
 }
 
+.infoBarData{
+    font-size: 1.5em;
+    font-family: mono;
+    font-weight: bold;
+}
+
+
 /***************** CLOSE TEXT AND SPANS ***********************/
 
 
@@ -443,6 +448,24 @@ div.headerLinkCont{
     padding: 10px;
 }
 
+.activeObjectBox{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
+    border: thin solid #4774A0;
+    padding: 5px;
+    font-size:small;
+    display: inline-block;
+    
+    
+}
+
+.activeObjectBox h4{
+    margin-top: 3px;
+    margin-bottom: 8px;
+   
+}
 
 
 
@@ -621,6 +644,14 @@ td.userBarTd{
     background: none;
 }
 
+.sessionInfoButton{
+    background: none;
+    
+}
+
+.sessionInfoButton span{
+    color: white;
+}
 
 /* ****************** CLOSE BUTTON STYLES ********************/
 
