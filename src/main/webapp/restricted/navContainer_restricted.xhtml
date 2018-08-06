@@ -217,6 +217,7 @@
                                     <h:outputText styleClass="infoBarDataLabel" value="property: "/>
                                     <h:outputText styleClass="infoBarData" value="#{sessionBean.activeProp.address} "/> 
                                     <h:outputText styleClass="infoBarData" value="(#{sessionBean.activeProp.muni.muniName})  "/>
+                                    <p:commandButton styleClass="sessionInfoButton" action="#{navigationBB.gotoPropertyProfile}" value="profile" ajax="false" icon="fa fa-home" disabled="#{navigationBB.noActiveProperty}"/>
                                     <p:commandButton styleClass="sessionInfoButton" action="propertySearch" value="change prop" ajax="false" icon="fa fa-search"/>
                                 </div>
                             </h:form>

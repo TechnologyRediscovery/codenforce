@@ -77,8 +77,8 @@ h3{
 }
 
 .ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
-    text-shadow: none;
-    color:white;
+/*    text-shadow: none;
+    color:white;*/
     
 }
 
@@ -533,12 +533,9 @@ div.ccBox{
 table.primeDataTable td{
     font-size: small;
     white-space: normal;
-    overflow-wrap: normal;
+    word-wrap: normal;
 }
 
-.primeDataTable{
-    width: auto;
-}
 
 table.borders{
     

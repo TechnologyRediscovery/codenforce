@@ -6,9 +6,13 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * Copyright (C) 2018 Turtle Creek Valley
@@ -33,13 +37,14 @@ Council of Governments, PA
  * @author Eric C. Darsow
  */
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
-    private Property currentProperty;
+    private PropertyWithLists currentProperty;
     private ArrayList<Person> propertyPersonList;
     private Person selectedPerson;
     private ArrayList<Person> filteredPersonList;
     
-    
     private ArrayList<CECase> ceCaseList;
+    private CECase selectedCECase;
+    
     private ArrayList<CEActionRequest> ceActionRequestList;
 
     /**
@@ -60,21 +65,23 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return "personProfile";
     }
     
-
-    
     /**
      * @return the currentProperty
      */
     public Property getCurrentProperty() {
-        
-        currentProperty = getSessionBean().getActiveProp();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            currentProperty = pi.getPropertyWithLists(getSessionBean().getActiveProp().getPropertyID());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         return currentProperty;
     }
 
     /**
      * @param currentProperty the currentProperty to set
      */
-    public void setCurrentProperty(Property currentProperty) {
+    public void setCurrentProperty(PropertyWithLists currentProperty) {
         this.currentProperty = currentProperty;
     }
     
@@ -88,12 +95,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      * @return the propertyPersonList
      */
     public ArrayList<Person> getPropertyPersonList() {
-        PersonIntegrator pi = getPersonIntegrator();
-        try {
-            propertyPersonList = pi.getPersonList(currentProperty);
-        } catch (IntegrationException ex) {
-            // do nothing
-        }
+        propertyPersonList = currentProperty.getPropertyPersonList();
         return propertyPersonList;
     }
 
@@ -101,6 +103,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      * @return the ceCaseList
      */
     public ArrayList<CECase> getCeCaseList() {
+        ceCaseList = currentProperty.getPropertyCaseList();
         return ceCaseList;
     }
 
@@ -158,6 +161,20 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setFilteredPersonList(ArrayList<Person> filteredPersonList) {
         this.filteredPersonList = filteredPersonList;
+    }
+
+    /**
+     * @return the selectedCECase
+     */
+    public CECase getSelectedCECase() {
+        return selectedCECase;
+    }
+
+    /**
+     * @param selectedCECase the selectedCECase to set
+     */
+    public void setSelectedCECase(CECase selectedCECase) {
+        this.selectedCECase = selectedCECase;
     }
     
     

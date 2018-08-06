@@ -33,6 +33,7 @@ com/tcvcog/tcvce/occupancy/application/PaymentTypeBB.class
 testing/RoomType.class
 com/tcvcog/tcvce/coordinators/ViolationCoordinator.class
 com/tcvcog/tcvce/application/TextBlockBB.class
+com/tcvcog/tcvce/application/DashboardDataBB.class
 com/tcvcog/tcvce/coordinators/CaseCoordinator.class
 com/tcvcog/tcvce/integration/SystemIntegrator.class
 com/tcvcog/tcvce/occupancy/entities/PaymentType.class

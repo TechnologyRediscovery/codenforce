@@ -18,6 +18,7 @@ import org.primefaces.model.chart.ChartSeries;
 public class DashboardDataBB extends BackingBeanUtils implements Serializable{
 
     private BarChartModel model;
+    private BarChartModel caseClosings;
     
     /**
      * Creates a new instance of DashboardDataBB
@@ -42,8 +43,26 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
         yAxis.setLabel("Num of open cases");
         yAxis.setMin(0);
         yAxis.setMax(100);
-                
         
+        caseClosings = new BarChartModel();
+        
+        ChartSeries closings = new ChartSeries();
+        closings.setLabel("Closing");
+        closings.set("No notice required", 2);
+        closings.set("During notice period", 3);
+        closings.set("Through citation", 20);
+        
+        caseClosings.addSeries(cases);
+        caseClosings.setTitle("Case closings");
+        caseClosings.setLegendPosition("ne");
+        
+        Axis xAxis2 = caseClosings.getAxis(AxisType.X);
+        xAxis2.setLabel("Closing pathway");
+        
+        Axis yAxis2 = caseClosings.getAxis(AxisType.Y);
+        yAxis2.setLabel("Num of cases");
+        yAxis2.setMin(0);
+        yAxis2.setMax(30);
     }
 
     /**
@@ -58,6 +77,20 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
      */
     public void setModel(BarChartModel model) {
         this.model = model;
+    }
+
+    /**
+     * @return the caseClosings
+     */
+    public BarChartModel getCaseClosings() {
+        return caseClosings;
+    }
+
+    /**
+     * @param caseClosings the caseClosings to set
+     */
+    public void setCaseClosings(BarChartModel caseClosings) {
+        this.caseClosings = caseClosings;
     }
     
     

@@ -31,6 +31,7 @@
                         <h:outputText value="#{caseProfileBB.currentCase.caseID}"/>
                         <span> ) </span>
                         
+                        <p:spacer height="10px"/>
                          
                         <p:tabView id="ceactionTabView" 
                                    widgetVar="tabview" effect="fade" 
@@ -43,9 +44,6 @@
 
                                     <p:commandButton ajax="false" action="caseEvents" icon="fa fa-plus"
                                                      value="Create new event"/>
-
-                                    <p:spacer height="10px"/>
-
 
                                     <p:commandButton ajax="false" action="#{caseProfileBB.editSelectedEvent}"
                                                      value="Edit Selected Event" icon="fa fa-edit"/>
@@ -104,11 +102,13 @@
                                             </f:facet>
                                             <h:outputText value="#{e.eventOwnerUser.LName}"/>
                                         </p:column>
-                                        <p:column>
+                                        <p:column style="word-wrap: normal;">
                                             <f:facet name="header">
                                                 <h:outputText value="Description" />
                                             </f:facet>
-                                            <h:outputText value="#{e.eventDescription}"/>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.eventDescription}"/>
+                                            </div>
                                         </p:column>
 
                                         <p:rowExpansion>
@@ -117,6 +117,14 @@
                                                 <h2>Event Info</h2>
                                                 <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                              columnClasses="gridTd, gridTd">
+                                                    
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Description" />
+                                                        
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.eventDescription}"/>
+                                                        </div>
+                                                    </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputLabel styleClass="bold" value="Disclose to Municipality Staff?"/>
@@ -166,6 +174,46 @@
                                 <span class="bold">Current phase: </span>
                                 <h:outputText class="mono" value="#{caseProfileBB.currentCase.casePhase.label}"/>
 
+                                
+                                 <h3>Manually change case phase</h3>
+                                <h:form id="casePhaseChangeForm">
+
+
+                                    <p:selectOneMenu value="#{caseProfileBB.selectedCasePhase}"
+                                                     id="casePhaseSOM">
+
+                                        <f:selectItems value="#{caseProfileBB.casePhaseList}"
+                                                       var="cp"
+                                                       itemValue="#{cp}"
+                                                       itemLabel="#{cp.label}"/>
+                                    </p:selectOneMenu>
+                                    <p:spacer/>
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
+                                                         value="Override to selected phase"/>
+
+                                    <p:spacer height="10px"/>
+
+                                    <ui:remove>
+
+                                    <p:commandButton onclick="PF('cd').show()" type="button" icon="fa fa-bullhorn"
+                                                     value="Manually override case phase to selected value"/>
+
+                                    <p:confirmDialog message="Manually override a case's phase can cause a spaghetti-like mess of our
+                                                     case management process. Note: This action will generate a special event which will
+                                                     be analyzed at our next group meeting to discuss changes to our standard protocol to avoid
+                                                     the need for any manual case phase changes. Please add a note event to the case to explain
+                                                     why the case phase is being changed manually." severity="alert" widgetVar="cd">
+
+                                        <p:commandButton value="Abort override" onclick="PF('cd').hide()" type="button" icon="fa fa-stop"/>
+                                        <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
+                                                             value="Yes, override phase" oncomplete="PF('cd').hide()"/>
+                                    </p:confirmDialog>
+
+                                    </ui:remove>
+
+                                </h:form>
+                                 
+                                 
                                 <h2>Next case action</h2>
 
                                 <span class="bold">Next phase: </span>
@@ -200,7 +248,7 @@
                                 <h3>Update case details</h3>
 
                                 <p:fieldset legend="Expand to update case metadata"
-                                            toggleable="true" collapsed="true">
+                                            toggleable="true" collapsed="false">
 
                                     <h:outputText value="You are editing case no. #{caseUpdateBB.currentCase.caseID}"/>
                                     <p:spacer height="10px"/>
@@ -256,72 +304,327 @@
                                     </h:form>
                                 </p:fieldset>
 
-                                <h3>Manually change case phase</h3>
-                                <h:form id="casePhaseChangeForm">
-
-
-                                    <p:selectOneMenu value="#{caseProfileBB.selectedCasePhase}"
-                                                     id="casePhaseSOM">
-
-                                        <f:selectItems value="#{caseProfileBB.casePhaseList}"
-                                                       var="cp"
-                                                       itemValue="#{cp}"
-                                                       itemLabel="#{cp.label}"/>
-                                    </p:selectOneMenu>
-                                    <p:spacer/>
-                                    <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
-                                                         value="Override to selected phase"/>
-
-                                    <p:spacer height="10px"/>
-
-                                    <ui:remove>
-
-                                    <p:commandButton onclick="PF('cd').show()" type="button" icon="fa fa-bullhorn"
-                                                     value="Manually override case phase to selected value"/>
-
-                                    <p:confirmDialog message="Manually override a case's phase can cause a spaghetti-like mess of our
-                                                     case management process. Note: This action will generate a special event which will
-                                                     be analyzed at our next group meeting to discuss changes to our standard protocol to avoid
-                                                     the need for any manual case phase changes. Please add a note event to the case to explain
-                                                     why the case phase is being changed manually." severity="alert" widgetVar="cd">
-
-                                        <p:commandButton value="Abort override" onclick="PF('cd').hide()" type="button" icon="fa fa-stop"/>
-                                        <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
-                                                             value="Yes, override phase" oncomplete="PF('cd').hide()"/>
-                                    </p:confirmDialog>
-
-                                    </ui:remove>
-
-                                </h:form>
+                               
 
                              </p:tab>
                              
                              <p:tab title="Violations" id="t3LViolations">
                                  
-                                 
+                                <h:form id="form_codeViolations">
+
+                                    <h2>Assigned Code Violations</h2>
+
+                                    <h:outputText value="Current Case: #{caseProfileBB.currentCase.caseName}"/>
+
+                                    <p:spacer height="10px"/>
+
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
+                                                     value="Add new code violation to case"
+                                                     icon="fa fa-plus"/>
+                                    <p:spacer height="15px"/>
+
+                                    <p:dataTable
+                                        id="violationTable"
+                                        var="v"
+                                        selectionMode="mulitiple"
+                                        selection="#{caseProfileBB.selectedViolations}"
+                                        rowKey="#{v.violationID}"
+                                        value="#{caseProfileBB.fullCaseViolationList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true">
+
+
+                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                        <p:column width="4%">
+                                            <p:rowToggler />
+                                        </p:column>
+                                        <p:column width="4%">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.violationID}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Code Element" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Stipulated Compliance Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.stipulatedComplianceDate}"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Actual Compliance Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.actualComplianceDate}"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Citation Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.dateOfCitation}"/>
+                                        </p:column>
+
+                                        <p:rowExpansion>
+                                            <h:outputLabel value="Violated Element Details: "/>
+                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel value="Penalty:"/>
+                                            <h:outputText value="#{v.penalty}"/>
+
+                                            <h:outputLabel value="Description: "/>
+                                            <h:outputText value="#{v.description}"/>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel value="Violation Notes: "/>
+                                            <h:outputText value="#{v.notes}" escape="false"/>
+
+                                        </p:rowExpansion>
+
+                                    </p:dataTable> 
+
+                                    <p:spacer height="15px"/>
+
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.recordCompliance}"
+                                                     value="Record Compliance "
+                                                     icon="fa fa-check" />
+
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
+                                                     value="Edit violation details"
+                                                     icon="fa fa-edit"/>
+                                    <p style="font-style: italic; font-size: 0.8em; margin-bottom: 0px;">(To clear selections, re-access this "Violations" page from the left sidebar.)</p>
+
+
+                                    <p:spacer height="5px"/>
+
+                                    <h3>Notice of violation actions</h3>
+
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.createNewNoticeForAllViolations}"
+                                                     value="Generate Notice Letter for all Violations"/>
+                                    
+                                    <p:commandButton disabled="false" ajax="false" 
+                                             action="#{caseProfileBB.createNewNoticeForSelectedViolations()}"
+                                             value="Generate Notice Letter for selected violations"
+                                             icon="fa fa-list"/>
+                                    
+                                    <p:spacer height="5px"/>
+
+                                    <h3>Citation actions</h3>
+
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.createCitationForAllViolations}"
+                                                     value="Generate citation for all Violations"
+                                                     icon="fa fa-warning"/>
+
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.createCitationFromSelected}"
+                                                     value="Generate citation for selected violations"
+                                                     icon="fa fa-warning"/>
+                                </h:form>
+
                              </p:tab>
                              
                              <p:tab title="Notices" id="t4Notices">
-                                 
-                                 
+                                  <h:form id="noticeOfViolationForm">
+
+                                <p:separator/>
+
+                                <h2>Notices of Violation</h2>
+                                <h:outputText value="Current Case: #{caseProfileBB.currentCase.caseName}"/>
+
+                                <p:spacer height="15px"/>
+
+
+                                <p:dataTable
+                                    id="noticeOfViolationTab"
+                                    var="notice"
+                                    selectionMode="single"
+                                    selection="#{caseProfileBB.selectedNotice}"
+                                    rowKey="#{notice.noticeID}"
+                                    value="#{caseProfileBB.noticeList}"
+                                    tableStyleClass="primeDataTable"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    draggableColumns="true"
+                                    reflow="true">
+
+
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="4%">
+                                        <p:rowToggler />
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Notice No." />
+                                        </f:facet>
+                                        <h:outputText value="#{notice.noticeID}"/>
+                                    </p:column>
+
+                                     <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Date of Record" />
+                                        </f:facet>
+                                         <h:outputText value="#{notice.dateOfRecordPretty}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Queued for Mailing" />
+                                        </f:facet>
+                                        <h:outputText value="#{notice.requestToSend}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Sent Date" />
+                                        </f:facet>
+                                        <h:outputText value="#{notice.letterSentDatePretty}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Returned?" />
+                                        </f:facet>
+                                        <h:outputText value="#{notice.letterReturnedDatePretty}"/>
+                                    </p:column>
+
+                                    <p:rowExpansion>
+                                        <h:outputLabel value="Letter Text: "/>
+                                        <h:outputText value="#{notice.noticeText}" id="letterTextBox" escape="false"/>
+
+                                    </p:rowExpansion>
+
+
+                                </p:dataTable>
+
+                                <p:spacer height="15px"/>
+
+                                <p:commandButton ajax="false" action="#{caseProfileBB.editNoticeOfViolation()}"
+                                                 value="Edit notice or queue for mailing"
+                                                 icon="fa fa-edit "/>
+
+                                <p:commandButton ajax="false" action="#{caseProfileBB.markNoticeOfViolationAsSent}"
+                                                 value="Mark selected notice as sent"
+                                                 icon="fa fa-send"/>
+
+                                <p:commandButton ajax="false" action="#{caseProfileBB.markNoticeOfViolationAsReturned}"
+                                                 value="Mark selected notice as returned"
+                                                 icon="fa fa-mail-reply"/>
+
+                                <p:commandButton ajax="false" action="#{caseProfileBB.deleteNoticeOfViolation}"
+                                                 value="Nuke selected notice"
+                                                 icon="fa fa-bomb"/>
+
+                            </h:form>
+
+
                              </p:tab>
                         
                              <p:tab title="Citations" id="t5Citations">
                                  
+                                <h:form id="citationForm">
+                                    <p:dataTable
+                                        id="citationTable"
+                                        var="citation"
+                                        selectionMode="single"
+                                        selection="#{caseProfileBB.selectedCitation}"
+                                        rowKey="#{citation.citationID}"
+                                        value="#{caseProfileBB.citationList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true">
+
+
+                                        <p:column width="4%">
+                                            <p:rowToggler />
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Citation ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.citationID}"/>
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Citation No." />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.citationNo}"/>
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Court Entity ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.origin_courtentity.courtEntityName}"/>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Issuer" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.userOwner.LName}"/>
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Date of record" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.dateOfRecord}"/>
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Status" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.status.statusTitle}"/>
+                                        </p:column>
+
+                                        <p:rowExpansion>
+                                            <h:outputLabel value="Notes: "/>
+                                                <h:outputText value="#{citation.notes}"/>
+                                            <p:spacer height="10px"/>
+                                            <h:outputLabel value="Active: "/>
+                                                <h:outputText value="#{citation.isActive}"/>
+                                            <p:spacer height="10px"/>
+                                            <h:outputLabel value="Entry Timestamp: "/>
+                                                <h:outputText value="#{citation.timeStamp}"/>
+                                            <p:spacer height="10px"/>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable>
+
+                                        <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
+                                                     value="Updated selected citation"/>
+
+                                        <p:commandButton ajax="false" action="#{caseProfileBB.deleteCitation}"
+                                                     value="Nuke selected citation forever"/>
+
+                                    <p:separator/>
+                                </h:form>
                                  
                              </p:tab>
                              
                          </p:tabView>
                         
                        
-                        
-
-                       
-
-
-                        
-
-                    
                          <p:dialog header="Code Enforcement Profile" widgetVar="helpdlg" responsive="true">
                             <h2>Code enforcement case profile</h2>
                             <p>This page is the launchpad for all other case-related actions and displays the entire case event history.</p>

@@ -73,11 +73,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             p.setConstructionType(rs.getString("constructiontype"));
             p.setCountyCode(rs.getString("countycode"));
             p.setNotes(rs.getString("notes"));
-            
-           
-            //p.setNotes(rs.getString("notes"));
-            
-            
         } catch (SQLException ex){
             System.out.println(ex);
             throw new IntegrationException("Error generating Property from ResultSet", ex);
@@ -128,19 +123,25 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     
     public ArrayList<Property> searchForProperties(String addrPart) throws IntegrationException{
     
-        String query = "select * from property WHERE address ILIKE '%" + addrPart + "%';";
+        String query = "select propertyid, municipality_municode, parid, lotandblock, address, \n" +
+"       propertyusetype, usegroup, constructiontype, countycode, apartmentno, \n" +
+"       notes, addr_city, addr_state, addr_zip, ownercode, propclass, \n" +
+"       lastupdated, lastupdatedby, locationdescription, datasource, \n" +
+"       containsrentalunits, vacant FROM property WHERE address ILIKE ?;";
         
         System.out.println("PropertyIntegrator.searchForPropertiesAddOnly - query: " + query);
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
             
         ArrayList<Property> propList = new ArrayList<>();
  
         try {
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(query);
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, "%" + addrPart + "%");
+            System.out.println("PropertyIntegrator.searchForProperties | SQL: " + stmt.toString());
+            rs = stmt.executeQuery();
             while(rs.next()){
                 propList.add(generatePropertyFromRS(rs));
             }
@@ -157,25 +158,24 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
     public ArrayList<Property> searchForProperties(String addrPart, int muniID) throws IntegrationException{
-        
-        
-        
-        String query = "SELECT * from property WHERE address ILIKE '%" + addrPart + "%' AND municipality_muniCode=" 
-                + muniID + ";";
-//        String query = "select * from property LEFT OUTER JOIN propertyusetype ON public.propertyusetype.propertyUseTypeID = public.property.propertyUseType_UseID "
-//                + " WHERE address ILIKE '%" + addrPart + "%' AND municipality_muniCode=" 
-//                + muniID + ";";
-        System.out.println("PropertyIntegrator.searchForProperties - with muni | sql: " + query);
+        String query = "SELECT propertyid, municipality_municode, parid, lotandblock, address, \n" +
+"       propertyusetype, usegroup, constructiontype, countycode, apartmentno, \n" +
+"       notes, addr_city, addr_state, addr_zip, ownercode, propclass, \n" +
+"       lastupdated, lastupdatedby, locationdescription, datasource, \n" +
+"       containsrentalunits, vacant FROM property WHERE address ILIKE ? AND municipality_muniCode=?;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
             
         ArrayList<Property> propList = new ArrayList<>();
  
         try {
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(query);
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, "%" + addrPart + "%");
+            stmt.setInt(2, muniID);
+            rs = stmt.executeQuery();
+            System.out.println("PropertyIntegrator.searchForProperties - with muni | sql: " + stmt.toString());
             while(rs.next()){
                 propList.add(generatePropertyFromRS(rs));
             }
@@ -300,7 +300,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     
     public PropertyWithLists getPropertyWithLists(int propID) throws IntegrationException{
         PropertyWithLists p = new PropertyWithLists();
-         String query = "SELECT * from property WHERE propertyid = ?;";
+        String query = "SELECT * from property WHERE propertyid = ?;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -400,7 +400,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         pu.setNotes(rs.getString("notes"));
         pu.setOtherKnownAddress(rs.getString("otherknownaddress"));
         pu.setRental(rs.getBoolean("rental"));
-        pu.setThisProperty(getProperty(rs.getInt("property_propertyin")));
+        pu.setThisProperty(getProperty(rs.getInt("property_propertyid")));
         pu.setPropertyUnitPeople(persInt.getPersonList(rs.getInt("property_propertyid")));
         
         

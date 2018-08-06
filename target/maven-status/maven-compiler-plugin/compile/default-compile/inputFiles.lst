@@ -114,6 +114,7 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/coordinators/PropertyUnitCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/SessionBean.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/CourtEntityConverter.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/DashboardDataBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/EventCategoryConverter.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CodeElementBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/coordinators/OccupancyCoordinator.java
