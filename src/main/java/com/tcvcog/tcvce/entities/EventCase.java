@@ -31,9 +31,6 @@ public class EventCase extends Event {
     
     
     private int caseID;
-    private boolean requiresViewConfirmation;
-    private boolean viewConfirmed;
-    
     private ArrayList<Person> eventPersons;
     
    
@@ -66,34 +63,7 @@ public class EventCase extends Event {
         this.eventPersons = eventPersons;
     }
 
-    /**
-     * @return the requiresViewConfirmation
-     */
-    public boolean isRequiresViewConfirmation() {
-        return requiresViewConfirmation;
-    }
-
-    /**
-     * @return the viewConfirmed
-     */
-    public boolean isViewConfirmed() {
-        return viewConfirmed;
-    }
-
    
-    /**
-     * @param requiresViewConfirmation the requiresViewConfirmation to set
-     */
-    public void setRequiresViewConfirmation(boolean requiresViewConfirmation) {
-        this.requiresViewConfirmation = requiresViewConfirmation;
-    }
-
-    /**
-     * @param viewConfirmed the viewConfirmed to set
-     */
-    public void setViewConfirmed(boolean viewConfirmed) {
-        this.viewConfirmed = viewConfirmed;
-    }
 
     
     

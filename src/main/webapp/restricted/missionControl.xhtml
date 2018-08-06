@@ -17,28 +17,174 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h:form id="missionControlForm">
+                        <h:form id="upcomingEventsForm">
 
                             <h1><h:outputText value="#{sessionBean.activeMuni.muniName}"/> Dashboard</h1>
 
+                            <h2>Upcoming Events</h2>
+                            
+
+                            <p:dataTable
+                                id="caseEventTable"
+                                var="e"
+                                disabledSelection="true"
+                                rowKey="#{e.eventID}"
+                                value="#{missionControlBB.eventWithCasePropList}"
+                                tableStyleClass="primeDataTable"
+                                resizableColumns="true"
+                                rowExpandMode="multiple"
+                                expandedRow="false"
+                                scrollHeight="400"
+                                filteredValue="#{missionControlBB.filteredEventWithCasePropList}"
+                                widgetVar="caseEventTable"
+                                editable="true"
+                                >
+                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Expand"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{e.prettyDateOfRecord}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.prettyDateOfRecord}"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{e.category.eventType.label}"
+                                          filterBy="#{e.category.eventType.label}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.category.eventType.label}"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
+                                          filterBy="#{e.category.eventCategoryTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                </p:column>
+                                <p:column width="8%" filterBy="#{e.eventOwnerUser.LName}"
+                                          sortBy="#{e.eventOwnerUser.LName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Creator" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.eventOwnerUser.LName}"/>
+                                </p:column>
+                                <p:column width="15%" style="word-wrap: normal;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Description" />
+                                    </f:facet>
+                                    <div class="rowExpansion">
+                                        <h:outputText value="#{e.eventDescription}"/>
+                                    </div>
+                                </p:column>
+
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="View Confirm?" />
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputSwitch value="#{e.viewConfirmed}" onLabel="Yes" offLabel="No" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column width="8%">
+                                    <p:rowEditor />
+                                </p:column>
+
+                                <p:rowExpansion>
+
+                                    <div class="outlinedBox">
+                                        <h2>Event Info</h2>
+                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd">
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Description" />
+
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.eventDescription}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Disclose to Municipality Staff?"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.discloseToMunicipality}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Disclose to public?"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.discloseToPublic}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Active Event?"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.activeEvent}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer" class="leftalign">
+                                                <h:outputLabel styleClass="bold" value="Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText escape="false" value="#{e.notes}"/>
+                                                </div>
+                                            </f:facet>
+
+                                        </h:panelGrid>
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+                            
+                            <p:commandButton ajax="false" value="Update event view changes" icon="fa fa-edit" tabindex="1"
+                                             action="#{missionControlBB.updateEventViewData}"/>                
+                            
+                        </h:form>
+                        <h:form id="dashboardHelpLinksFOrm">
+
+                            <h2>Notices requiring your attention:</h2>
+
+
+                            <h2>Key Indicators</h2>
+
+                            <p>Data charts for testing purposes only: the data in these is arbitrary.</p>
                             <h:panelGrid columns="2" columnClasses="gridTd, gridTd"
-                                footerClass="gridFooter">
-                                
+                                         footerClass="gridFooter">
+
                                 <h:panelGroup>
                                     <p:chart type="bar" model="#{dashboardDataBB.model}"/>
-                                    
+
                                 </h:panelGroup>
-                                
+
                                 <h:panelGroup>
-                                    <p:chart type="bar" model="#{dashboardDataBB.model}"/>
-                                    
+                                    <p:chart type="bar" model="#{dashboardDataBB.caseClosings}"/>
+
                                 </h:panelGroup>
 
 
                             </h:panelGrid>
-                            
-                            
-                            
+
+
+
                             <p:spacer height="15px"/>
                             <p:dialog header="About page: Mission Control" 
                                       widgetVar="helpdlg" 
@@ -47,42 +193,42 @@
                                       modal="false"
                                       height="600">
                                 <h2>Help Topic: Mission Control</h2>
-                                
+
                                 <p>Mission control is both a set of links to various system tools and a display of key data metrics of the system.</p>
-                                
+
                                 <h3>You current municipality</h3>
-                                
+
                                 <p>You are always navigating the system from the standpoint of a certain municipality, which is 
-                                        always listed in the dark blue top banner bar. You cannot be in an "all municipalities" view mode. </p>
-                                
+                                    always listed in the dark blue top banner bar. You cannot be in an "all municipalities" view mode. </p>
+
                                 <p>CodeConnects looks up your current municipality to decide which case lists to show you when 
-                                viewing code enforcement data. On pages for searching or creating muni-specific data, your current
-                                municipality is used to set the default values.</p>
-                                
-                                 <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
-                                
+                                    viewing code enforcement data. On pages for searching or creating muni-specific data, your current
+                                    municipality is used to set the default values.</p>
+
+                                <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+
                                 <h4>Switching municipalities</h4>
-                                
+
                                 <p>If you are authorized to change your municipality, you can do so with this drop down box and command button. After issuing
                                     the command to switch to a new municipality, the page will reload and both the listing on this page
                                     and in the header bar will reflect these changes.</p>
-                                
+
                                 <h4>What is COG Land?</h4>
-                                
+
                                 <p>COG Land is a dream world where all mistakes are allowed and nothing bad ever happens. 
                                     If you make a mistake, nobody cares so you can tinker and explore and experiment with freedom and ease. All
-                                data stored in COG Land behaves just like a non-dreamland municipality but impacts no actual humans.</p>
-                                
+                                    data stored in COG Land behaves just like a non-dreamland municipality but impacts no actual humans.</p>
+
                                 <h3>User info verification</h3>
-                                
+
                                 <p>CodeConnect is built on a system called Java ServerFaces(JSF) and the PrimeFaces library that works with JSF.
-                                The entire system runs inside a web server called Glassfish. Page control is managed by Glassfish but all other
-                                data in the system is linked to your user that's managed by JSF, hence the heading: 
-                                <span class="italic">Authenticated Faces User</span>.</p>
-                                
+                                    The entire system runs inside a web server called Glassfish. Page control is managed by Glassfish but all other
+                                    data in the system is linked to your user that's managed by JSF, hence the heading: 
+                                    <span class="italic">Authenticated Faces User</span>.</p>
+
                                 <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
-                                
-                                
+
+
                             </p:dialog>
                             <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
                             <p:spacer height="10px"/>

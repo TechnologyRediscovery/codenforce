@@ -18,16 +18,20 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
@@ -43,10 +47,39 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private ArrayList<Municipality> muniList;
     private Municipality selectedMuni;
     
+    private ArrayList<EventWithCasePropInfo> eventWithCasePropList;
+    private ArrayList<EventWithCasePropInfo> filteredEventWithCasePropList;
+    
+    
+    
     /**
      * Creates a new instance of InitiateSessionBB
      */
     public MissionControlBB() {
+    }
+    
+    public String updateEventViewData(){
+        EventIntegrator ei = getEventIntegrator();
+        
+        ListIterator<EventWithCasePropInfo> evIterator = eventWithCasePropList.listIterator();
+        EventWithCasePropInfo ewcpl;
+        
+        while(evIterator.hasNext()){
+            ewcpl = evIterator.next();
+            
+            if(ewcpl.isViewConfirmed()){
+                try {
+                    ei.confirmEventView(getFacesUser(), ewcpl);
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Updated view info for event " 
+                                + ewcpl.getEventID(), ""));
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+                }
+            }
+        }
+        return "";
     }
     
     public String switchMuni(){
@@ -172,6 +205,40 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedMuni(Municipality selectedMuni) {
         this.selectedMuni = selectedMuni;
+    }
+
+    /**
+     * @return the eventWithCasePropList
+     */
+    public List<EventWithCasePropInfo> getEventWithCasePropList() {
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            eventWithCasePropList = (ArrayList<EventWithCasePropInfo>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return eventWithCasePropList;
+    }
+
+    /**
+     * @param eventWithCasePropList the eventWithCasePropList to set
+     */
+    public void setEventWithCasePropList(ArrayList<EventWithCasePropInfo> eventWithCasePropList) {
+        this.eventWithCasePropList = eventWithCasePropList;
+    }
+
+    /**
+     * @return the filteredEventWithCasePropList
+     */
+    public List<EventWithCasePropInfo> getFilteredEventWithCasePropList() {
+        return filteredEventWithCasePropList;
+    }
+
+    /**
+     * @param filteredEventWithCasePropList the filteredEventWithCasePropList to set
+     */
+    public void setFilteredEventWithCasePropList(ArrayList<EventWithCasePropInfo> filteredEventWithCasePropList) {
+        this.filteredEventWithCasePropList = filteredEventWithCasePropList;
     }
     
     

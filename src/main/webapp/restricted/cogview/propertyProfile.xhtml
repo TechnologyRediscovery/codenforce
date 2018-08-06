@@ -133,16 +133,78 @@
                             <p:spacer height="10px"/>
 
                             <h2>Active Code enforcement cases</h2>
-                            <p:commandButton ajax="false"  value="Open a new case &rarr;" action="#{propertyProfileBB.createCase}"/>
+                                <p:commandButton ajax="false"  value="Open a new case &rarr;" action="#{propertyProfileBB.createCase}"/>
 
+                                <h:form id="caseViewForm">
+                                <p:dataTable
+                                    id="caseTable"
+                                    var="c"
+                                    selectionMode="single"
+                                    selection="#{ceCasesBB.selectedCase}"
+                                    rowKey="#{c.caseID}"
+                                    rowExpandMode="multiple"
+                                    value="#{propertyProfileBB.ceCaseList}"
+                                    tableStyleClass="primeDataTable">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
+                                    <p:column width="3%">
+                                        <p:rowToggler />
+                                    </p:column>
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Case ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseID}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Property" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.property.address}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseName}"/>
+                                    </p:column>
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Phase" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.casePhase}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Date Opened" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.originiationDatePretty}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Manager" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.user.LName}"/>
+                                    </p:column>
 
-                            <p>Select a case in the table to view its details.</p>
-                            <!--Insert case table here-->
+                                    <p:rowExpansion>
 
+                                        <h:panelGrid
+                                            columns="3" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd"
+                                             footerClass="gridFooter" style="vertical-align: top;">
+                                            <h:panelGroup>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                        <h:outputText value="Public access control Code: #{c.publicControlCode}"/>
+                                    </p:rowExpansion>
+                                </p:dataTable>
 
-                            <p:commandButton ajax="fakse" value="View selected case summary" action="caseSummary" disabled="true"/>
+                                <p:spacer height="10px"/>
 
+                                <p:commandButton ajax="false" value="View Case Profile" 
+                                                 action="#{ceCasesBB.viewCase}"/>
+                            </h:form>
 
                             <p:spacer height="10px"/>
                             <hr/>
