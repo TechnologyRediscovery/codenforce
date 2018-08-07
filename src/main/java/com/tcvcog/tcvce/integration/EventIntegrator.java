@@ -349,13 +349,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     
     
-    public void updateEvent(EventCase event) throws IntegrationException{
+    public void updateEvent(EventCase event, boolean clearViewConfirmation) throws IntegrationException{
         String query = "UPDATE public.ceevent\n" +
             "   SET ceeventcategory_catid=?, cecase_caseid=?, dateofrecord=?, \n" +
             "       eventtimestamp=now(), eventdescription=?, login_userid=?, disclosetomunicipality=?, \n" +
             "       disclosetopublic=?, activeevent=?, \n" +
             "       hidden=?, notes=?\n" +
             " WHERE eventid = ?;";
+        
+        // TO DO: finish clearing view confirmation
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -456,7 +458,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
         ArrayList<EventWithCasePropInfo> eventList = new ArrayList<>();
         
-        String query = "SELECT ceevent.eventid, ceevent.ceeventcategory_catid, ceevent.cecase_caseid, ceevent.dateofrecord, \n" +
+        String query = "SELECT ceevent.eventid, ceevent.ceeventcategory_catid, ceevent.dateofrecord, \n" +
 "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.login_userid, ceevent.disclosetomunicipality, \n" +
 "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requiresviewconfirmation, ceevent.hidden, \n" +
 "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, property.propertyid, cecase.caseid, ceeventcategory.categoryid\n" +
@@ -489,7 +491,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
                 ev.setEventID(rs.getInt("eventid"));
                 ev.setCategory(getEventCategory(rs.getInt("categoryid")));
-                ev.setCaseID(rs.getInt("cecase_caseid"));
+                ev.setCaseID(rs.getInt("caseid"));
                 LocalDateTime dt = rs.getTimestamp("dateofrecord").toInstant()
                         .atZone(ZoneId.systemDefault()).toLocalDateTime();
                 ev.setDateOfRecord(dt);

@@ -28,13 +28,17 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCase;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
+import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -47,7 +51,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     private CECase currentCase;
     private CasePhase nextPhase;
     private CasePhase[] casePhaseList;
-    private CasePhase selectedCasePhase;
+    private CasePhase selectedCasePhase; 
     
     private EventCase eventForTriggeringCasePhaseAdvancement;
     
@@ -57,6 +61,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     private ArrayList<CodeViolation> fullCaseViolationList;
     private ArrayList<CodeViolation> selectedViolations;
+    private CodeViolation selectedViolation;
+    private int newViolationCodeBookEleID;
     
     private ArrayList<NoticeOfViolation> noticeList;
     private NoticeOfViolation selectedNotice;
@@ -68,6 +74,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * Creates a new instance of CaseManageBB
      */
     public CaseProfileBB() {
+    }
+    
+    public String editEvent(EventCase ev){
+        getSessionBean().setActiveEvent(ev);
+        return "eventEdit";
     }
     
     /**
@@ -411,6 +422,37 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         return currentCase;
     }
 
+    /**
+     * Used in the violation table to set the clicked violation row
+     * as the system's current violation. At this stage, this feature
+     * is used by the updateViolationsCodebookLink method only
+     * @param cv the code violation clicked in the table
+     */
+    public void setActiveViolation(CodeViolation cv){
+        selectedViolation = cv;
+    }
+    
+    public void updateViolationsCodeBookLink(ActionEvent ae){
+        try {
+            CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+            CodeIntegrator ci = getCodeIntegrator();
+            EnforcableCodeElement ece = ci.getEnforcableCodeElement(newViolationCodeBookEleID);
+            if(ece != null){
+                selectedViolation.setViolatedEnfElement(ece);
+                cvi.updateCodeViolation(selectedViolation);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Success: Updated Violation with new CodeBook linking", ""));
+                
+            } else {
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to find CodeBook Entry by this ID, sorry. Please try again.", ""));
+            }
+        } catch (IntegrationException ex) {
+            Logger.getLogger(CaseProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
    
     /**
      * @param currentCase the currentCase to set
@@ -664,5 +706,33 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setFilteredEventList(ArrayList<EventCase> filteredEventList) {
         this.filteredEventList = filteredEventList;
+    }
+
+    /**
+     * @return the selectedViolation
+     */
+    public CodeViolation getSelectedViolation() {
+        return selectedViolation;
+    }
+
+    /**
+     * @param selectedViolation the selectedViolation to set
+     */
+    public void setSelectedViolation(CodeViolation selectedViolation) {
+        this.selectedViolation = selectedViolation;
+    }
+
+    /**
+     * @return the newViolationCodeBookEleID
+     */
+    public int getNewViolationCodeBookEleID() {
+        return newViolationCodeBookEleID;
+    }
+
+    /**
+     * @param newViolationCodeBookEleID the newViolationCodeBookEleID to set
+     */
+    public void setNewViolationCodeBookEleID(int newViolationCodeBookEleID) {
+        this.newViolationCodeBookEleID = newViolationCodeBookEleID;
     }
 }

@@ -86,8 +86,8 @@
                                     <p:spacer height="0px"/>
                                     <p:calendar value="#{violationAddBB.dateOfRecord}" 
                                                 mode="popup"  id="dateOfRecord"
-                                                showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                navigator="true" tabindex="2"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true" tabindex="2" timeInput="true" showHour="true" showMinute="true"
                                                 showButtonPanel="true" showTodayButton="true"
                                                 required="true"/>
                                     <h:message for="dateOfRecord" showDetail="false" showSummary="true" 

@@ -105,7 +105,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
                             ex.getMessage(), "Unable to generate automated event to log violation update"));
         }
         
-            return "caseViolations";
+            return "caseProfile";
     }
 
     /**

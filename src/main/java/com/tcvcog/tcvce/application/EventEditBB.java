@@ -19,25 +19,16 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
-import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCase;
 import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -46,11 +37,8 @@ import javax.faces.application.FacesMessage;
  */
 public class EventEditBB extends BackingBeanUtils implements Serializable {
     
-    // add event form fields
-    private ArrayList<EventCategory> eventCategoryList;
-    
-  
-    private EventCase event;
+    // add currentEvent form fields
+    private EventCase currentEvent;
     
     private String formEventDesc;
     private Date formEventDate;
@@ -59,9 +47,12 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
     private boolean activeEvent;
     private String formEventNotes;
     private boolean formRequireViewConfirmation;
+    private boolean formClearExistingViewConfirmation;
     
     private ArrayList<Person> propertyPersonList;
     private ArrayList<Person> formSelectedPersons;
+    
+    private boolean disableClearViewConfirmation;
     
     
     
@@ -74,10 +65,9 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
     public String editEvent(){
         EventCoordinator ec = getEventCoordinator();
         
-        EventCase e = getSessionBean().getActiveEvent();
+        EventCase e = currentEvent;
         
         // category is already set from initialization sequence
-        e.setCaseID(getSessionBean().getActiveCase().getCaseID());
         e.setEventDescription(formEventDesc);
         e.setActiveEvent(activeEvent);
         e.setEventOwnerUser(getFacesUser());
@@ -91,7 +81,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
         // now check for persons to connect
         
         try {
-            ec.updateEvent(e);
+            ec.updateEvent(e, formClearExistingViewConfirmation);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully updated event.", ""));
@@ -109,10 +99,13 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
     }
     
     
+    
+    
     /**
      * @return the formEventDesc
      */
     public String getFormEventDesc() {
+        formEventDesc = currentEvent.getEventDescription();
         return formEventDesc;
     }
 
@@ -120,9 +113,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
      * @return the formEventDate
      */
     public Date getFormEventDate() {
-        LocalDateTime current = LocalDateTime.now();
-        formEventDate = java.util.Date.from(current.atZone(ZoneId.systemDefault()).toInstant());
-        
+        formEventDate = java.util.Date.from(currentEvent.getDateOfRecord().atZone(ZoneId.systemDefault()).toInstant());
         return formEventDate;
     }
 
@@ -135,6 +126,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
      * @return the formDiscloseToMuni
      */
     public boolean isFormDiscloseToMuni() {
+        formDiscloseToMuni = currentEvent.isDiscloseToMunicipality();
         return formDiscloseToMuni;
     }
 
@@ -142,6 +134,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
      * @return the formDiscloseToPublic
      */
     public boolean isFormDiscloseToPublic() {
+        formDiscloseToPublic = currentEvent.isDiscloseToPublic();
         return formDiscloseToPublic;
     }
 
@@ -149,6 +142,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
      * @return the activeEvent
      */
     public boolean isActiveEvent() {
+        activeEvent = currentEvent.isActiveEvent();
         return activeEvent;
     }
 
@@ -156,23 +150,10 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
      * @return the formEventNotes
      */
     public String getFormEventNotes() {
+        formEventNotes = currentEvent.getNotes();
         return formEventNotes;
     }
 
-    /**
-     * @return the propertyPersonList
-     */
-    public ArrayList<Person> getPropertyPersonList() {
-        PersonIntegrator pi = getPersonIntegrator();
-        
-        
-        try {
-            propertyPersonList = pi.getPersonList(getSessionBean().getActiveProp());
-        } catch (IntegrationException ex) {
-            // do nothing
-        }
-        return propertyPersonList;
-    }
 
     /**
      * @param formEventDesc the formEventDesc to set
@@ -241,20 +222,19 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the event
+     * @return the currentEvent
      */
-    public EventCase getEvent() {
+    public EventCase getCurrentEvent() {
         
-        EventCase currentEvent = getSessionBean().getActiveEvent();
-        event = currentEvent;
-        return event;
+        currentEvent = getSessionBean().getActiveEvent();
+        return this.currentEvent;
     }
 
     /**
-     * @param event the event to set
+     * @param currentEvent the currentEvent to set
      */
-    public void setEvent(EventCase event) {
-        this.event = event;
+    public void setCurrentEvent(EventCase currentEvent) {
+        this.currentEvent = currentEvent;
     }
 
   
@@ -264,6 +244,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
      * @return the formRequireViewConfirmation
      */
     public boolean isFormRequireViewConfirmation() {
+        formRequireViewConfirmation = currentEvent.isRequiresViewConfirmation();
         return formRequireViewConfirmation;
     }
 
@@ -274,8 +255,35 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
         this.formRequireViewConfirmation = formRequireViewConfirmation;
     }
 
+    /**
+     * @return the disableClearViewConfirmation
+     */
+    public boolean isDisableClearViewConfirmation() {
+        disableClearViewConfirmation = !(currentEvent.getViewConfirmedBy() != null);
+        return disableClearViewConfirmation;
+    }
+
+    /**
+     * @param disableClearViewConfirmation the disableClearViewConfirmation to set
+     */
+    public void setDisableClearViewConfirmation(boolean disableClearViewConfirmation) {
+        this.disableClearViewConfirmation = disableClearViewConfirmation;
+    }
+
+    /**
+     * @return the formClearExistingViewConfirmation
+     */
+    public boolean isFormClearExistingViewConfirmation() {
+        return formClearExistingViewConfirmation;
+    }
+
+    /**
+     * @param formClearExistingViewConfirmation the formClearExistingViewConfirmation to set
+     */
+    public void setFormClearExistingViewConfirmation(boolean formClearExistingViewConfirmation) {
+        this.formClearExistingViewConfirmation = formClearExistingViewConfirmation;
+    }
+
    
-    
-    
     
 }

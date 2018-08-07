@@ -867,6 +867,10 @@
             <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        <navigation-case>
+            <from-outcome>eventEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/eventEdit.xhtml</to-view-id>
+        </navigation-case>
     </navigation-rule>
 
         

@@ -90,7 +90,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         }
         
         
-        return "";
+        return "caseProfile";
     }
     
     public String issueCitation(){
@@ -135,12 +135,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
      * @return the currentCitation
      */
     public Citation getCurrentCitation() {
-        
         currentCitation = getSessionBean().getActiveCitation();
-        
-        
-        
-        
         return currentCitation;
     }
 

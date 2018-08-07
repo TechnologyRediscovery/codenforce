@@ -398,7 +398,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         return v;
     }
 
-    public CodeViolation getCodeViolationByViolationID(int violationID) throws IntegrationException {
+    public CodeViolation getCodeViolation(int violationID) throws IntegrationException {
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n"
                 + "       entrytimestamp, stipulatedcompliancedate, actualcompliancdate, \n"
                 + "       penalty, description, notes\n"
