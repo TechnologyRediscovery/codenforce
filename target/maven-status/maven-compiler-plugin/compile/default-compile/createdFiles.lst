@@ -68,6 +68,7 @@ com/tcvcog/tcvce/occupancy/entities/Space.class
 com/tcvcog/tcvce/application/PropertyProfileBB.class
 com/tcvcog/tcvce/domain/ViolationException.class
 com/tcvcog/tcvce/entities/CitationStatus.class
+com/tcvcog/tcvce/entities/EventWithCasePropInfo.class
 com/tcvcog/tcvce/occupancy/entities/OccInspecFee.class
 com/tcvcog/tcvce/application/CheckRequestStatusBean.class
 com/tcvcog/tcvce/application/CodeSetElementBB.class
@@ -79,7 +80,6 @@ com/tcvcog/tcvce/application/PersonConnectBB.class
 com/tcvcog/tcvce/application/NavigationBB.class
 com/tcvcog/tcvce/application/RequestManagementBB.class
 com/tcvcog/tcvce/occupancy/application/OccupancyInspectionFeeBB.class
-com/tcvcog/tcvce/entities/EventProperty.class
 com/tcvcog/tcvce/entities/RequestStatus.class
 com/tcvcog/tcvce/application/CodeElementListBB.class
 com/tcvcog/tcvce/occupancy/coordinators/PaymentCoordinator.class

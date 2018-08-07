@@ -167,9 +167,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return new ArrayList<>();
     }
     
-    public String updateEvent(EventCase event) throws IntegrationException{
+    public String updateEvent(EventCase event, boolean clearViewConfirmation) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.updateEvent(event);
+        ei.updateEvent(event, clearViewConfirmation);
         
         return "caseProfile";
     }

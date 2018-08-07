@@ -14,15 +14,24 @@
             <ui:define name="content">
                 <f:view id="missionControlView">
                     <div class="mainContainer">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                        <h:messages id="missionControlMessages" globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
                         <h:form id="upcomingEventsForm">
 
                             <h1><h:outputText value="#{sessionBean.activeMuni.muniName}"/> Dashboard</h1>
 
-                            <h2>Upcoming Events</h2>
+                            <h2>Looming compliance timeframe events</h2>
                             
+                            <p:selectOneButton id="viewButtons" value="#{missionControlBB.timelineEventViewType}">
+                                <f:selectItem itemLabel="Today Only" itemValue="1" />
+                                <f:selectItem itemLabel="Next 7 Days" itemValue="2" />
+                                <f:selectItem itemLabel="Next Month" itemValue="3" />
+                                <f:selectItem itemLabel="Custom Range" itemValue="4" />
+                                <p:ajax update="caseEventTable"/>
+                            </p:selectOneButton>>
+                            
+                            <p:spacer height="10px"/>
 
                             <p:dataTable
                                 id="caseEventTable"
@@ -37,13 +46,12 @@
                                 scrollHeight="400"
                                 filteredValue="#{missionControlBB.filteredEventWithCasePropList}"
                                 widgetVar="caseEventTable"
-                                editable="true"
                                 >
                                 <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
                                 <p:column width="3%">
                                     <f:facet name="header">
-                                        <h:outputText value="Expand"/>
+                                        <h:outputText value="Ex"/>
                                     </f:facet>
                                     <p:rowToggler/>
                                 </p:column>
@@ -54,29 +62,6 @@
                                     </f:facet>
                                     <h:outputText value="#{e.prettyDateOfRecord}"/>
                                 </p:column>
-
-                                <p:column width="10%" sortBy="#{e.category.eventType.label}"
-                                          filterBy="#{e.category.eventType.label}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Type" />
-                                    </f:facet>
-                                    <h:outputText value="#{e.category.eventType.label}"/>
-                                </p:column>
-
-                                <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
-                                          filterBy="#{e.category.eventCategoryTitle}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{e.category.eventCategoryTitle}"/>
-                                </p:column>
-                                <p:column width="8%" filterBy="#{e.eventOwnerUser.LName}"
-                                          sortBy="#{e.eventOwnerUser.LName}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Creator" />
-                                    </f:facet>
-                                    <h:outputText value="#{e.eventOwnerUser.LName}"/>
-                                </p:column>
                                 <p:column width="15%" style="word-wrap: normal;">
                                     <f:facet name="header">
                                         <h:outputText value="Description" />
@@ -86,21 +71,49 @@
                                     </div>
                                 </p:column>
 
+                                <p:column width="10%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Case name (id)" />
+                                    </f:facet>
+                                          <h:outputText value="#{e.eventCase.caseName} (#{e.eventCase.caseID})"/>
+                                </p:column>
+                                
+                                <p:column width="10%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Property" />
+                                    </f:facet>
+                                          <h:outputText value="#{e.eventProp.address}"/>
+                                </p:column>
                                 <p:column width="5%">
                                     <f:facet name="header">
-                                        <h:outputText value="View Confirm?" />
+                                        <h:outputText value="Muni" />
                                     </f:facet>
-                                    <p:cellEditor>
-                                        <f:facet name="output">
-                                            <h:outputText value="#{e.viewConfirmedBy.LName}"/>
-                                        </f:facet>
-                                        <f:facet name="input">
-                                            <p:inputSwitch value="#{e.viewConfirmed}" onLabel="Yes" offLabel="No" />
-                                        </f:facet>
-                                    </p:cellEditor>
+                                          <h:outputText value="#{e.eventProp.muni.muniName}"/>
                                 </p:column>
-                                <p:column width="8%">
-                                    <p:rowEditor />
+                                
+                                <p:column width="10%" sortBy="#{e.category.eventType.label}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Event Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.category.eventType.label} - #{e.category.eventCategoryTitle}"/>
+                                </p:column>
+
+                                <p:column width="8%" filterBy="#{e.eventOwnerUser.LName}"
+                                          sortBy="#{e.eventOwnerUser.LName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Creator" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.eventOwnerUser.LName}"/>
+                                </p:column>
+
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Confirm view" />
+                                    </f:facet>
+                                    <p:commandButton value="Viewed!"
+                                                     actionListener="#{missionControlBB.updateEventViewData(e)}" 
+                                                     ajax="true" update="caseEventTable missionControlMessages"/>
+                                                     
                                 </p:column>
 
                                 <p:rowExpansion>
@@ -155,8 +168,7 @@
                                 </p:rowExpansion>
                             </p:dataTable>
                             
-                            <p:commandButton ajax="false" value="Update event view changes" icon="fa fa-edit" tabindex="1"
-                                             action="#{missionControlBB.updateEventViewData}"/>                
+                           
                             
                         </h:form>
                         <h:form id="dashboardHelpLinksFOrm">

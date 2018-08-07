@@ -87,7 +87,6 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PersonBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CaseProfileBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PersonAddBB.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/EventProperty.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/courtEntityIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/Event.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/EventConfigurationBB.java
@@ -151,4 +150,5 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/entities/OccInspecStatus.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PropertyUpdateBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/CitationStatusConverter.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/EventWithCasePropInfo.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/ActionRequestConfirmation.java

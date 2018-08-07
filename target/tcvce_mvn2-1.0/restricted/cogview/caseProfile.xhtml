@@ -16,7 +16,7 @@
                 <div class="mainContainer">
                     <f:view>
 
-                        <h:messages globalOnly="true" showDetail="false" showSummary="true"
+                        <h:messages id="caseProfileMessages" globalOnly="true" showDetail="false" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
 
@@ -45,8 +45,6 @@
                                     <p:commandButton ajax="false" action="caseEvents" icon="fa fa-plus"
                                                      value="Create new event"/>
 
-                                    <p:commandButton ajax="false" action="#{caseProfileBB.editSelectedEvent}"
-                                                     value="Edit Selected Event" icon="fa fa-edit"/>
                                     <p:spacer height="15px"/>
 
                                     <p:dataTable
@@ -73,14 +71,14 @@
                                             <p:rowToggler/>
                                         </p:column>
 
-                                        <p:column width="10%" sortBy="#{e.prettyDateOfRecord}">
+                                        <p:column width="11%" sortBy="#{e.dateOfRecord}">
                                             <f:facet name="header">
                                                 <h:outputText value="Date" />
                                             </f:facet>
                                             <h:outputText value="#{e.prettyDateOfRecord}"/>
                                         </p:column>
 
-                                        <p:column width="10%" sortBy="#{e.category.eventType.label}"
+                                        <p:column width="8%" sortBy="#{e.category.eventType.label}"
                                                   filterBy="#{e.category.eventType.label}">
                                             <f:facet name="header">
                                                 <h:outputText value="Type" />
@@ -88,21 +86,21 @@
                                             <h:outputText value="#{e.category.eventType.label}"/>
                                         </p:column>
 
-                                        <p:column width="20%" sortBy="#{e.category.eventCategoryTitle}"
+                                        <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
                                                   filterBy="#{e.category.eventCategoryTitle}">
                                             <f:facet name="header">
                                                 <h:outputText value="Category" />
                                             </f:facet>
                                             <h:outputText value="#{e.category.eventCategoryTitle}"/>
                                         </p:column>
-                                        <p:column width="8%" filterBy="#{e.eventOwnerUser.LName}"
+                                        <p:column width="5%" filterBy="#{e.eventOwnerUser.LName}"
                                                   sortBy="#{e.eventOwnerUser.LName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator" />
                                             </f:facet>
                                             <h:outputText value="#{e.eventOwnerUser.LName}"/>
                                         </p:column>
-                                        <p:column style="word-wrap: normal;">
+                                        <p:column width="20%" style="word-wrap: normal;">
                                             <f:facet name="header">
                                                 <h:outputText value="Description" />
                                             </f:facet>
@@ -110,50 +108,83 @@
                                                 <h:outputText value="#{e.eventDescription}"/>
                                             </div>
                                         </p:column>
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="edit" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-edit"
+                                                             action="#{caseProfileBB.editEvent(e)}" 
+                                                             ajax="false"/>
+
+                                        </p:column>
 
                                         <p:rowExpansion>
 
                                             <div class="outlinedBox">
                                                 <h2>Event Info</h2>
                                                 <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                             columnClasses="gridTd, gridTd">
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
                                                     
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Description" />
-                                                        
                                                         <div class="rowExpansion">
                                                             <h:outputText value="#{e.eventDescription}"/>
                                                         </div>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Disclose to Municipality Staff?"/>
-                                                        <p:spacer height="15px"/>
+                                                        <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
                                                         <div class="rowExpansion">
                                                             <h:outputText value="#{e.discloseToMunicipality}"/>
                                                         </div>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Disclose to public?"/>
-                                                        <p:spacer height="15px"/>
+                                                        <h:outputText styleClass="bold" value="Disclose to Public?" />
                                                         <div class="rowExpansion">
                                                             <h:outputText value="#{e.discloseToPublic}"/>
                                                         </div>
                                                     </h:panelGroup>
-
                                                     <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Active Event?"/>
-                                                        <p:spacer height="15px"/>
+                                                        <h:outputText styleClass="bold" value="Creation time stamp"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.eventTimeStamp}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Active Event?"/>
                                                         <div class="rowExpansion">
                                                             <h:outputText value="#{e.activeEvent}"/>
                                                         </div>
                                                     </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.requiresViewConfirmation}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="View confirmed by"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="View confirmed at"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.viewConfirmedAt}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    
+                                                    
 
                                                     <f:facet name="footer" class="leftalign">
-                                                        <h:outputLabel styleClass="bold" value="Notes"/>
+                                                        <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
                                                         <p:spacer height="15px"/>
-                                                        <div class="rowExpansion" style="leftalign">
+                                                        <div class="rowExpansion" style="text-align: left">
                                                             <h:outputText escape="false" value="#{e.notes}"/>
                                                         </div>
                                                     </f:facet>
@@ -375,6 +406,18 @@
                                             </f:facet>
                                             <h:outputText value="#{v.dateOfCitation}"/>
                                         </p:column>
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="re-link" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-link"
+                                                             actionListener="#{caseProfileBB.setActiveViolation(v)}" 
+                                                             ajax="true" oncomplete="PF('linkDialog').show()"/>
+
+                                        </p:column>
+                                        
+                                        
+
 
                                         <p:rowExpansion>
                                             <h:outputLabel value="Violated Element Details: "/>
@@ -403,6 +446,15 @@
                                         </p:rowExpansion>
 
                                     </p:dataTable> 
+                                    
+                                     <p:confirmDialog message="You can swap out the code book element of the selected violation by entering the ID number of the new violation in the box below. 
+                                                      You'll probably want to open the codebook for the current muni in a separate window so you can look up the ID numbers easily." severity="alert" widgetVar="linkDialog">
+
+                                        <h:outputLabel value="New CodeBook Element ID number"/>
+                                        <p:inputText value="#{caseProfileBB.newViolationCodeBookEleID}"/>
+                                        <p:commandButton ajax="true" actionListener="#{caseProfileBB.updateViolationsCodeBookLink}"
+                                                         value="Re-Link" icon="fa fa-link" oncomplete="PF('linkDialog').hide()" update="caseProfileMessages"/>
+                                    </p:confirmDialog>
 
                                     <p:spacer height="15px"/>
 

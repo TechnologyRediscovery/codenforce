@@ -49,6 +49,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     private ArrayList<EventWithCasePropInfo> eventWithCasePropList;
     private ArrayList<EventWithCasePropInfo> filteredEventWithCasePropList;
+    private int timelineEventViewType;
+    
     
     
     
@@ -58,28 +60,24 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public MissionControlBB() {
     }
     
-    public String updateEventViewData(){
+    public void updateEventViewData(EventWithCasePropInfo ev){
+        System.out.println("MissionControlBB.updateEventViewData | event selected ID: " + ev.getEventID());
         EventIntegrator ei = getEventIntegrator();
-        
-        ListIterator<EventWithCasePropInfo> evIterator = eventWithCasePropList.listIterator();
-        EventWithCasePropInfo ewcpl;
-        
-        while(evIterator.hasNext()){
-            ewcpl = evIterator.next();
-            
-            if(ewcpl.isViewConfirmed()){
-                try {
-                    ei.confirmEventView(getFacesUser(), ewcpl);
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Updated view info for event " 
-                                + ewcpl.getEventID(), ""));
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-                }
-            }
+        try {
+            ei.confirmEventView(getFacesUser(), ev);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Updated view info for event " 
+                        + ev.getEventID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
-        return "";
+        try {
+            eventWithCasePropList = (ArrayList<EventWithCasePropInfo>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
     
     public String switchMuni(){
@@ -210,10 +208,11 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the eventWithCasePropList
      */
-    public List<EventWithCasePropInfo> getEventWithCasePropList() {
+    public ArrayList<EventWithCasePropInfo> getEventWithCasePropList() {
         EventIntegrator ei = getEventIntegrator();
         try {
-            eventWithCasePropList = (ArrayList<EventWithCasePropInfo>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni());
+            eventWithCasePropList = 
+                    (ArrayList<EventWithCasePropInfo>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -240,7 +239,24 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public void setFilteredEventWithCasePropList(ArrayList<EventWithCasePropInfo> filteredEventWithCasePropList) {
         this.filteredEventWithCasePropList = filteredEventWithCasePropList;
     }
-    
+
+    /**
+     * @return the timelineEventViewType
+     */
+    public int getTimelineEventViewType() {
+        return timelineEventViewType;
+    }
+
+    /**
+     * @param timelineEventViewType the timelineEventViewType to set
+     */
+    public void setTimelineEventViewType(int timelineEventViewType) {
+        this.timelineEventViewType = timelineEventViewType;
+    }
+
+   
+
+   
     
 
    

@@ -224,7 +224,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                violationList.add(cvi.getCodeViolationByViolationID(rs.getInt("violationid")));
+                violationList.add(cvi.getCodeViolation(rs.getInt("violationid")));
                 
             }
             
