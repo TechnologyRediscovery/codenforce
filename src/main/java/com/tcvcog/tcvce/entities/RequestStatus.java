@@ -16,11 +16,13 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Eric C. Darsow
  */
-public enum RequestStatus {
+public enum RequestStatus implements Serializable{
     
     AwaitingReview("Awaiting Review"), 
     UnderInvestigation("Under Investigation"), 

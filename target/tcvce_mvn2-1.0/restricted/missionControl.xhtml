@@ -182,21 +182,21 @@
                             <h2>Key Indicators</h2>
 
                             <p>Data charts for testing purposes only: the data in these is arbitrary.</p>
-                            <h:panelGrid columns="2" columnClasses="gridTd, gridTd"
-                                         footerClass="gridFooter">
+                            
+                            <p:panelGrid columns="2" columnClasses="gridTd, gridTd">
 
                                 <h:panelGroup>
-                                    <p:chart type="bar" model="#{dashboardDataBB.model}"/>
+                                    <p:chart type="bar" model="#{dashboardDataBB.model}" style="height:300px"/>
 
                                 </h:panelGroup>
 
                                 <h:panelGroup>
-                                    <p:chart type="bar" model="#{dashboardDataBB.caseClosings}"/>
+                                    <p:chart type="bar" model="#{dashboardDataBB.caseClosings}" style="height:300px"/>
 
                                 </h:panelGroup>
 
 
-                            </h:panelGrid>
+                            </p:panelGrid>
 
 
 
@@ -207,9 +207,9 @@
                                       width="400"
                                       modal="false"
                                       height="600">
-                                <h2>Help Topic: Mission Control</h2>
+                                <h2>Help Topic: Dashboard</h2>
 
-                                <p>Mission control is both a set of links to various system tools and a display of key data metrics of the system.</p>
+                                <p>The dashboard is both a set of links to various system tools and a display of key data metrics of the system.</p>
 
                                 <h3>You current municipality</h3>
 

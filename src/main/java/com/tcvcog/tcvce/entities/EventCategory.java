@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -43,7 +44,7 @@ WITH (
  * 
  * @author Eric Darsow
  */
-public class EventCategory {
+public class EventCategory implements Serializable {
     
     private EventType eventType;
     private int categoryID;

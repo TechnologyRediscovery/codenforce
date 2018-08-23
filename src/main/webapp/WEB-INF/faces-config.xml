@@ -696,6 +696,12 @@
             <redirect />
         </navigation-case>
         
+        <navigation-case>
+            <from-outcome>contact</from-outcome>
+            <to-view-id>/public/system/documentation/contact.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
         
     </navigation-rule>
     

@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.occupancy.entities.OccPermit;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -13,7 +14,7 @@ import java.util.ArrayList;
  * @author Eric Darsow
  */
 
-public class Property {
+public class Property implements Serializable{
     
     private int propertyID;
     private Municipality muni;

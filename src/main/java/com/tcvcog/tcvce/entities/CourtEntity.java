@@ -16,13 +16,14 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author Adam Gutonski
  */
-public class CourtEntity {
+public class CourtEntity implements Serializable {
     
     private int courtEntityID;
     private String courtEntityOfficialNum;

@@ -17,11 +17,13 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+
 /**
  *  Represents a codesetelement stated with fidelity to the ERD
  * @author Eric C. Darsow
  */
-public class EnforcableCodeElement extends CodeElement{
+public class EnforcableCodeElement extends CodeElement implements Serializable{
     
     public EnforcableCodeElement(){
     

@@ -20,75 +20,87 @@
 
                     <f:view>
                         <h1>Locate a property</h1>
-                        <p>Search for and select a property to set as your 'active property' to which you can attach cases, events, and more.</p>
-
                         <h:form id="propertySearchForm">
 
-                            <p:fieldset legend="Search in all municipalities"
-                                        toggleable="true" collapsed="true" tabindex="1">
-
-                                <p:outputLabel for="propSearchIT">
-                                    <h:outputText value="House number and street name"/>
-                                </p:outputLabel>
-                                <p:inputText id="propSearchIT" value="#{propertySearchBB.addrPartAllMunis}" 
-                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
-                                <h:message for="propSearchIT" showDetail="false" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                <p:spacer height="5px"/>
-                                <p:commandButton
-                                    value="Search All Municipalities" tabindex="2" ajax="false"
-                                    icon="fa fa-search" actionListener="#{propertySearchBB.searchForPropertiesAllMunis}" />
-                            </p:fieldset>
-                            
-                            <p:spacer height="15px"/>
-                            
-
-                            <p:fieldset legend="Search in a selected municipality"
-                                        toggleable="true" collapsed="false" tabindex="2">
-
-                                <p:outputLabel for="propSearchITwMuni">
-                                    <h:outputText value="House number and street name"/>
-                                </p:outputLabel>
+                            <p:panelGrid columns="5">
                                 
-                                <p:inputText id="propSearchITwMuni" value="#{propertySearchBB.addrPart}" 
-                                             style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
+                                <h:panelGroup>
+                                    <p:outputLabel for="propSearchITwMuni">
+                                        <h:outputText value="House number"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="propSearchITwMuni" value="#{propertySearchBB.houseNum}" 
+                                         style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
+                                    <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="propSearchITStreet">
+                                        <h:outputText value="Street name"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="propSearchITStreet" value="#{propertySearchBB.streetName}" 
+                                                 style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
+
+                                    <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="personMuniSelectMenu">
+                                        <h:outputText value="Municipality"/>
+                                    </p:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:selectOneMenu id="personMuniSelectMenu" tabindex="5" required="false" value="#{propertySearchBB.selectedMuniCode}">
+                                        <f:selectItems value="#{muniBB.muniMap}"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="personMuniSelectMenu" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:commandButton
+                                        value="Search" tabindex="6" ajax="false"
+                                        icon="fa fa-search"  actionListener="#{propertySearchBB.searchForProperties}" />
+                                </h:panelGroup>
                                 
-                                <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                <p:spacer height="5px"/>
-
-                                <p:selectOneMenu id="personMuniSelectMenu" tabindex="4" required="false" value="#{propertySearchBB.selectedMuniCode}">
-                                    <f:selectItems value="#{muniBB.muniMap}"/>
-                                </p:selectOneMenu>
-
-                                <h:message for="personMuniSelectMenu" showDetail="false" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                <p:spacer height="5px"/>
-
-
-                                <p:commandButton
-                                    value="Search only in Selected Municipality" tabindex="5" ajax="false"
-                                    icon="fa fa-indent"  actionListener="#{propertySearchBB.searchForPropertiesSingleMuni}" />
-
-                            </p:fieldset>
+                                <h:panelGroup>
+                                    <p:outputLabel for="searchAllCB">
+                                        <h:outputText value="Search all municipalities"/>
+                                    </p:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:selectBooleanCheckbox id="searchAllCB" value="#{propertySearchBB.allMunis}" tabindex="7"
+                                                             widgetVar="allMuniCB" style="display: inline-block; margin-left: auto; margin-right: auto;"/>
+                                </h:panelGroup>
+                                
+                            </p:panelGrid>
                             
+                                <p:dialog header="About page: Mission Control" 
+                                      widgetVar="helpdlg" 
+                                      responsive="true" 
+                                      width="400"
+                                      modal="false"
+                                      height="600">
+                                <h2>Search tips</h2>
+                                
+                                <p>You may enter all or only part of an address for searching in either search field:</p> 
+                                
+                                <p>The property "398 HOMER DR" can be found by searching for "39" in House number and "hom" in street name.</p>
+                                
+                                <p>Searches are case inSensitIVe!</p>
+                                
+                                <p>You cannot "chop" characters from the middle of an address: 
+                                    So you cannot find our example 398 HOMER DR by searching for "38" and "her dr".</p>
 
+                                <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
 
-                            <p>Search note: You may enter all or only part of an address for searching: 
-                                "398 HOMER DR" can be found with "398 H" but NOT "3 HOM" 
-                                since you cannot "chop" characters from the middle of an address, 
-                                only from the front and back.</p>
-
-                            <p:spacer height="10"></p:spacer>
-                            <hr/>
-                            <p:spacer height="10"></p:spacer>
-
+                            </p:dialog>
+                            <p:spacer height="5px"/>
+                            <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                            <p:spacer height="5px"/>
 
                             <h2>Search Results:</h2>
 
-                            <p:commandButton ajax="false" value="View Profile for Selected Property &rarr;" 
-                                             icon="fa fa-home" tabindex="8" action="#{propertySearchBB.viewProperty}"/>
+                            
                             <p:spacer height="10px"/>
                             
                             <p:dataTable
@@ -103,6 +115,22 @@
                                 draggableRows="false" tabindex="6"
                                 >
 
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Profile"/>
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-binoculars"
+                                                     action="#{propertySearchBB.viewProperty(prop)}" 
+                                                     ajax="false"/>
+                                </p:column>
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Open CE Case"/>
+                                    </f:facet>
+                                    <p:commandButton icon="fa id-card-o"
+                                                     action="#{propertySearchBB.viewProperty(prop)}" 
+                                                     ajax="false"/>
+                                </p:column>
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Address"/>

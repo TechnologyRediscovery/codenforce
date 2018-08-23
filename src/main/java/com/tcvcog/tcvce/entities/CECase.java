@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
  *
  * @author cedba
  */
-public class CECase {
+public class CECase implements Serializable{
     
     private int caseID;
     private int publicControlCode;

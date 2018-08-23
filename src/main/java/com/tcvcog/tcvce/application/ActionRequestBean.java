@@ -297,7 +297,8 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = new PropertyIntegrator();
         
         try {
-            setPropList(pi.searchForProperties(addrPart, muniCode));
+//            MUST REPLACE ADDRPART WITH HOUSE NUM AND STREET NAME
+            setPropList(pi.searchForProperties(addrPart, addrPart, muniCode));
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));

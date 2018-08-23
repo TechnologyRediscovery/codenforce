@@ -17,13 +17,14 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class CitationStatus {
+public class CitationStatus implements Serializable {
     private int citationStatusID;
     private String statusTitle;
     private String description;

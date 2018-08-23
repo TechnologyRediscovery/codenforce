@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -26,7 +27,7 @@ import java.time.LocalDateTime;
  * 
  * @author Eric Darsow
  */
-public class Person {
+public class Person implements Serializable{
     
     private int personID;
     private PersonType personType;

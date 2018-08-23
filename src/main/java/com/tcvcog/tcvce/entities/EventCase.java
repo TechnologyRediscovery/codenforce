@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 * 
  * @author cedba
  */
-public class EventCase extends Event {
+public class EventCase extends Event implements Serializable{
     
     
     private int caseID;
