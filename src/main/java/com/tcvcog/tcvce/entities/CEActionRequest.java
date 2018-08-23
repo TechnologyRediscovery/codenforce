@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -31,7 +32,7 @@ import java.time.LocalDateTime;
  to an CEActionRequest to do with as they please (print, etc.)
  * @author Eric Darsow
  */
-public class CEActionRequest {
+public class CEActionRequest implements Serializable{
     
     // requests no longer have a status--remove when fully updated
     // for the full case model

@@ -5,11 +5,13 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author sylvia
  */
-public class EventWithCasePropInfo extends EventCase {
+public class EventWithCasePropInfo extends EventCase implements Serializable {
     
     private Property eventProp;
     private CECase eventCase;

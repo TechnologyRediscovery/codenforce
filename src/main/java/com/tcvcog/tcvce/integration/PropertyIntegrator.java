@@ -37,6 +37,7 @@ import java.util.ArrayList;
  */
 public class PropertyIntegrator extends BackingBeanUtils implements Serializable {
     
+    final int MAX_RESULTS = 100;
 
     /**
      * Creates a new instance of PropertyIntegrator
@@ -121,7 +122,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return p;
     }
     
-    public ArrayList<Property> searchForProperties(String addrPart) throws IntegrationException{
+    public ArrayList<Property> searchForProperties(String houseNum, String street) throws IntegrationException{
     
         String query = "select propertyid, municipality_municode, parid, lotandblock, address, \n" +
 "       propertyusetype, usegroup, constructiontype, countycode, apartmentno, \n" +
@@ -139,11 +140,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
  
         try {
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + addrPart + "%");
+            stmt.setString(1, "%" + houseNum + "%" + street + "%");
             System.out.println("PropertyIntegrator.searchForProperties | SQL: " + stmt.toString());
             rs = stmt.executeQuery();
-            while(rs.next()){
+            int counter = 0;
+            while(rs.next() && counter <= MAX_RESULTS){
                 propList.add(generatePropertyFromRS(rs));
+                counter++;
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -157,7 +160,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
-    public ArrayList<Property> searchForProperties(String addrPart, int muniID) throws IntegrationException{
+    public ArrayList<Property> searchForProperties(String houseNum, String street, int muniID) throws IntegrationException{
         String query = "SELECT propertyid, municipality_municode, parid, lotandblock, address, \n" +
 "       propertyusetype, usegroup, constructiontype, countycode, apartmentno, \n" +
 "       notes, addr_city, addr_state, addr_zip, ownercode, propclass, \n" +
@@ -172,12 +175,14 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
  
         try {
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + addrPart + "%");
+            stmt.setString(1, "%" + houseNum + "%" + street + "%");
             stmt.setInt(2, muniID);
             rs = stmt.executeQuery();
             System.out.println("PropertyIntegrator.searchForProperties - with muni | sql: " + stmt.toString());
-            while(rs.next()){
+            int counter = 0;
+            while(rs.next() && counter <= MAX_RESULTS){
                 propList.add(generatePropertyFromRS(rs));
+                counter++;
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -192,39 +197,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return propList;
         
     }
-    
-    // deprecated method after removing lookup table functionality for propertyusetype
-    
-//    public HashMap getPropertyUseTypesMap() throws IntegrationException{
-//        
-//        String query = "SELECT * FROM public.propertyusetype;";
-//        
-//        Connection con = getPostgresCon();
-//        ResultSet rs = null;
-//        Statement stmt = null;
-//            
-//        HashMap<String, Integer> propertyUseTypeMap = new HashMap();
-// 
-//        try {
-//            stmt = con.createStatement();
-//            rs = stmt.executeQuery(query);
-//            System.out.println("PropertyIntegrator.getPropertyUseTypesMap | sql: " + query);
-//            while(rs.next()){
-//                propertyUseTypeMap.put(rs.getString("name"),rs.getInt("propertyUseTypeID"));
-//            }
-//        } catch (SQLException ex) {
-//            System.out.println(ex.toString());
-//            throw new IntegrationException("Unable to build propertyUseTypesMap", ex);
-//        } finally{
-//             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-//             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-//             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-//        } // close finally
-//        
-//        return propertyUseTypeMap;
-//        
-//    }
-    
+  
     public String updateProperty(Property propToUpdate) throws IntegrationException{
         String query = "UPDATE public.property\n" +
                 "   SET parid=?, lotandblock=?, \n" +

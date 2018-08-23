@@ -17,11 +17,13 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Eric C. Darsow
  */
-public class CodeElementGuideEntry {
+public class CodeElementGuideEntry implements Serializable {
     
     private int guideEntryID;
     private String category;
