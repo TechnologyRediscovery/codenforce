@@ -42,13 +42,13 @@
                                         </f:facet>
                                         <h:outputText value="#{c.categoryID}"/>
                                     </p:column>
-                                    <p:column width="10%">
+                                    <p:column width="10%" sortBy="#{c.eventType.label}">
                                         <f:facet name="header">
                                             <h:outputText value="Event Type" />
                                         </f:facet>
                                         <h:outputText value="#{c.eventType.label}"/>
                                     </p:column>
-                                    <p:column width="15%">
+                                    <p:column width="15%" sortBy="#{c.eventCategoryTitle}">
                                         <f:facet name="header">
                                             <h:outputText value="Category" />
                                         </f:facet>

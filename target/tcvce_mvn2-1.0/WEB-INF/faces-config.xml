@@ -689,6 +689,14 @@
             <to-view-id>/public/system/documentation/technical/technical.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>about</from-outcome>
+            <to-view-id>/public/system/documentation/about.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
     </navigation-rule>
     
     <!--Properties-->

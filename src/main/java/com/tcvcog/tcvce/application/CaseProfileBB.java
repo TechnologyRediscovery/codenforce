@@ -31,12 +31,14 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCase;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -70,10 +72,23 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     private ArrayList<Citation> citationList;
     private Citation selectedCitation;
     
+    private HashMap<CasePhase, String> imageFilenameMap;
+    private String phaseDiagramImageFilename;
+    
     /**
      * Creates a new instance of CaseManageBB
      */
     public CaseProfileBB() {
+        imageFilenameMap = new HashMap<>();
+        imageFilenameMap.put(CasePhase.PrelimInvestigationPending, "stage1_prelim.svg");
+        imageFilenameMap.put(CasePhase.NoticeDelivery, "stage1_notice.svg");
+        imageFilenameMap.put(CasePhase.InitialComplianceTimeframe, "stage2_initial.svg");
+        imageFilenameMap.put(CasePhase.SecondaryComplianceTimeframe, "stage2_secondary.svg");
+        imageFilenameMap.put(CasePhase.AwaitingHearingDate, "stage3_awaiting.svg");
+        imageFilenameMap.put(CasePhase.HearingPreparation, "stage3_prep.svg");
+        imageFilenameMap.put(CasePhase.InitialPostHearingComplianceTimeframe, "stage3_postHearing.svg");
+        imageFilenameMap.put(CasePhase.SecondaryPostHearingComplianceTimeframe, "stage3_postHearing.svg");
+        imageFilenameMap.put(CasePhase.Closed, "stage3_closed.svg");
     }
     
     public String editEvent(EventCase ev){
@@ -273,7 +288,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     public String addViolation(){
         // no logic needed in the backing bean
-        // sinec we just forward to the selectElement page
+        // since we just forward to the selectElement page
         
         return "violationSelectElement";
     }
@@ -433,6 +448,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public void updateViolationsCodeBookLink(ActionEvent ae){
+        CaseIntegrator casei = getCaseIntegrator();
         try {
             CodeViolationIntegrator cvi = getCodeViolationIntegrator();
             CodeIntegrator ci = getCodeIntegrator();
@@ -443,7 +459,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Success: Updated Violation with new CodeBook linking", ""));
-                
+                currentCase = casei.getCECase(currentCase.getCaseID());
             } else {
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -452,6 +468,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         } catch (IntegrationException ex) {
             Logger.getLogger(CaseProfileBB.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }
    
     /**
@@ -734,5 +751,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setNewViolationCodeBookEleID(int newViolationCodeBookEleID) {
         this.newViolationCodeBookEleID = newViolationCodeBookEleID;
+    }
+
+    /**
+     * @return the phaseDiagramImageFilename
+     */
+    public String getPhaseDiagramImageFilename() {
+        phaseDiagramImageFilename = imageFilenameMap.get(currentCase.getCasePhase());
+        return phaseDiagramImageFilename;
+    }
+
+    /**
+     * @param phaseDiagramImageFilename the phaseDiagramImageFilename to set
+     */
+    public void setPhaseDiagramImageFilename(String phaseDiagramImageFilename) {
+        this.phaseDiagramImageFilename = phaseDiagramImageFilename;
     }
 }

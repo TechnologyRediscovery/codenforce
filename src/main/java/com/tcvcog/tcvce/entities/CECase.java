@@ -22,6 +22,11 @@ public class CECase {
     private PropertyUnit propertyUnit;
     private User user;
 
+    
+    // This is a possible source of bugs:
+    // each CodeViolation also contains a case Object. I think
+    // we should pass the case in with the violation for linking
+    // and not store CECase objects in the violation
     private ArrayList<CodeViolation> violationList;
     private ArrayList<EventCase> eventList;
     

@@ -25,7 +25,7 @@ public enum CasePhase {
 
     PrelimInvestigationPending("Preliminary Investigation Pending"),
     NoticeDelivery("Notice of Violation Delivery"),
-    InitialComplianceTimeframe("Intitial Compliance Timeframe"),
+    InitialComplianceTimeframe("Initial Compliance Timeframe"),
     SecondaryComplianceTimeframe("Secondary Compliance Timeframe"),
     AwaitingHearingDate("Awaiting Hearing"),
     HearingPreparation("Hearing Preparation"),

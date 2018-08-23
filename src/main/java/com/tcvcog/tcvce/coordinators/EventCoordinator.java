@@ -51,6 +51,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * TODO: finish
+     * @return 
+     */
     public EventType[] getUserAdmnisteredEventTypeList(){
         EventType[] eventTypeList = EventType.values();
             
@@ -59,6 +63,16 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Core coordinator method called by all other classes who want to 
+     * create their own event. Restricts the event type based on current
+     * case phase (closed cases cannot have action, origination, or compliance events.
+     * Includes the instantiation of Event objects
+     * @param c the case to which the event should be attached
+     * @param ec the type of event to attach to the case
+     * @return an initialized event with basic properties set
+     * @throws CaseLifecyleException thrown if the case is in an improper state for proposed event
+     */
     public EventCase getInitializedEvent(CECase c, EventCategory ec) throws CaseLifecyleException{
         
         // check to make sure the case isn't closed before allowing event into the switched blocks
@@ -76,7 +90,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             
         }
         
-        // the moment of event instantiaion
+        // the moment of event instantiaion!!!!
         EventCase event = new EventCase();
         event.setCategory(ec);
         event.setActiveEvent(true);
@@ -86,6 +100,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return event;
     }
     
+    
+    /**
+     * Factory method for event categories.
+     * Whoever calls this method will still need to do basic setup of the event 
+     * before sending to integrator
+     * @return an EventCategory container with basic properties set
+     */
     public EventCategory getInitializedEventCateogry(){
         EventCategory ec =  new EventCategory();
         ec.setUserdeployable(true);
@@ -93,15 +114,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // TODO: finishing autoconfiguring these 
         return ec;
     }
-    
+
+    /**
+     * Creates a populated event to log the change of a code violation update. 
+     * The event is coming to us from the violationEditBB with the description and disclosures flags
+     * correct. This method needs to set the description from the resource bundle, and 
+     * set the date of record to the current date
+     * @param ceCase the CECase whose violation was updated
+     * @param cv the code violation being updated
+     * @param event An initialized event
+     * @throws IntegrationException bubbled up from the integrator
+     * @throws EventException 
+     */
     public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCase event) throws IntegrationException, EventException{
         EventIntegrator ei = getEventIntegrator();
-        
-        
-        
-        // the event is coming to us from the violationEditBB with the description and disclosures flags
-        // correct. This method needs to set the description from the resource bundle, and 
-        // set the date of record to the current date
         String updateViolationDescr = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("violationChangeEventDescription");
         // fetch the event category id from the event category bundle under the key updateViolationEventCategoryID
         // now we're ready to log the event
@@ -121,10 +147,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // disclose to public from violation coord
         event.setActiveEvent(true);
         
-        
         ei.insertEvent(event);
-
-        
     }
     
     public EventCase generateViolationComplianceEvent(ArrayList<CodeViolation> violationList) throws IntegrationException{

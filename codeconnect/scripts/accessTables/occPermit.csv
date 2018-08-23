@@ -1,0 +1,937 @@
+inspectionID|permitComments|dateIssued|temporaryPermit
+1|None|2015-06-02 00:00:00|False
+2|None|None|False
+3|None|None|False
+4|None|None|False
+5|None|2015-05-01 00:00:00|False
+6|None|2015-05-01 00:00:00|False
+7|None|2015-05-01 00:00:00|False
+8|None|2015-05-01 00:00:00|False
+9|None|None|False
+10|None|None|False
+11|None|2015-05-12 00:00:00|False
+12|None|2015-05-13 00:00:00|False
+13|None|2015-07-17 00:00:00|False
+14|None|2015-06-02 00:00:00|False
+15|None|None|False
+16|None|None|False
+17|None|2015-05-22 00:00:00|False
+18|None|2015-05-22 00:00:00|False
+19|None|2015-06-05 00:00:00|False
+20|None|2015-06-05 00:00:00|False
+21|None|2015-06-02 00:00:00|False
+22|None|2015-06-02 00:00:00|False
+23|None|2015-06-02 00:00:00|False
+24|None|2015-06-24 00:00:00|False
+25|None|2015-06-24 00:00:00|False
+26|None|2015-06-24 00:00:00|False
+27|None|2015-06-24 00:00:00|False
+28|None|None|False
+29|None|2015-06-23 00:00:00|False
+30|None|2015-06-23 00:00:00|False
+31|None|None|False
+32|None|2015-07-07 00:00:00|False
+33|None|2016-02-26 00:00:00|False
+34|None|None|False
+35|None|2015-07-17 00:00:00|False
+36|None|None|False
+37|None|None|False
+38|None|None|False
+39|None|None|False
+40|None|2015-08-05 00:00:00|False
+41|None|2015-08-07 00:00:00|False
+42|None|2015-08-07 00:00:00|False
+43|None|None|False
+44|None|2015-08-14 00:00:00|False
+45|None|None|False
+46|None|None|False
+47|None|2015-08-25 00:00:00|False
+48|None|None|False
+49|None|None|False
+50|None|2015-12-11 00:00:00|False
+51|None|None|False
+52|9132016-1|2016-09-13 00:00:00|False
+53|None|None|False
+54|None|None|False
+55|None|None|False
+56|None|None|False
+57|None|None|False
+58|None|None|False
+59|None|None|False
+60|None|None|False
+61|None|None|False
+62|None|2015-09-30 00:00:00|False
+63|None|2015-09-22 00:00:00|False
+64|None|2015-09-15 00:00:00|False
+65|None|None|False
+66|None|2015-06-12 00:00:00|False
+67|None|2015-10-06 00:00:00|False
+68|None|None|False
+69|None|None|False
+70|None|None|False
+71|None|None|False
+72|None|2016-02-26 00:00:00|False
+73|None|None|False
+74|None|None|False
+75|None|None|False
+76|None|2015-10-28 00:00:00|False
+77|None|2015-10-23 00:00:00|False
+78|None|2015-10-20 00:00:00|False
+79|None|2015-10-14 00:00:00|False
+80|None|None|False
+81|None|None|False
+82|None|None|False
+83|None|2015-12-08 00:00:00|False
+84|None|2015-11-04 00:00:00|False
+85|None|2015-11-03 00:00:00|False
+86|None|None|False
+87|None|2015-12-08 00:00:00|False
+88|None|2015-12-11 00:00:00|False
+89|None|2015-12-11 00:00:00|False
+90|None|None|False
+91|None|2016-01-06 00:00:00|False
+92|None|2016-01-04 00:00:00|False
+93|None|None|False
+94|None|2016-01-06 00:00:00|False
+95|None|None|False
+96|None|None|False
+97|None|2016-01-27 00:00:00|False
+98|None|None|False
+99|None|2016-02-08 00:00:00|False
+100|None|None|False
+101|None|None|False
+102|None|2016-03-02 00:00:00|False
+103|None|2016-03-02 00:00:00|False
+104|None|2016-02-26 00:00:00|False
+105|None|2016-02-26 00:00:00|False
+106|None|2016-02-26 00:00:00|False
+107|None|2016-02-26 00:00:00|False
+108|None|2016-02-26 00:00:00|False
+109|None|2016-02-23 00:00:00|False
+110|None|2016-02-23 00:00:00|False
+111|None|2016-02-19 00:00:00|False
+112|None|2016-02-19 00:00:00|False
+113|None|None|False
+114|None|None|False
+115|None|None|False
+116|None|None|False
+117|None|None|False
+118|None|None|False
+119|None|2016-03-11 00:00:00|False
+120|None|None|False
+121|None|None|False
+122|None|None|False
+123|None|None|False
+124|None|2016-03-15 00:00:00|False
+125|None|2016-03-15 00:00:00|False
+126|None|None|False
+127|None|2016-03-18 00:00:00|False
+128|None|2016-03-18 00:00:00|False
+129|None|2016-03-25 00:00:00|False
+130|None|None|False
+131|None|2016-03-22 00:00:00|False
+132|None|None|False
+133|None|None|False
+134|None|2016-03-29 00:00:00|False
+135|None|None|False
+136|None|None|False
+137|None|None|False
+138|None|None|False
+139|None|None|False
+140|None|None|False
+141|None|2016-04-22 00:00:00|False
+142|None|None|False
+143|None|2016-04-22 00:00:00|False
+144|None|None|False
+145|None|2016-04-22 00:00:00|False
+146|None|2016-04-26 00:00:00|False
+147|None|None|False
+148|None|None|False
+149|None|None|False
+150|None|None|False
+237|2016-01|None|True
+238|None|None|False
+239|None|None|False
+240|None|None|False
+241|void|None|False
+242|None|None|False
+151|None|None|False
+152|None|None|False
+153|None|None|False
+154|None|2016-05-06 00:00:00|False
+155|None|2016-05-04 00:00:00|False
+156|None|2016-05-10 00:00:00|False
+157|None|None|False
+158|None|None|False
+159|None|2016-05-13 00:00:00|False
+160|None|2016-05-13 00:00:00|False
+161|None|None|False
+162|None|None|False
+163|None|2016-06-08 00:00:00|False
+164|None|None|False
+165|None|None|False
+166|None|None|False
+167|None|2016-06-17 00:00:00|False
+168|None|None|False
+169|None|None|False
+170|None|None|False
+171|None|None|False
+172|None|2016-06-28 00:00:00|False
+173|None|None|False
+175|None|None|False
+176|None|2016-05-27 00:00:00|False
+177|2016-01|None|False
+178|None|2016-06-06 00:00:00|False
+179|None|2016-06-09 00:00:00|False
+180|None|2016-06-13 00:00:00|False
+181|None|None|False
+182|None|2016-06-13 00:00:00|False
+183|None|2016-06-13 00:00:00|False
+184|None|2016-06-13 00:00:00|False
+185|None|2016-06-13 00:00:00|False
+186|2016-1|2016-06-22 00:00:00|False
+187|2016-1|2016-06-22 00:00:00|False
+188|None|2016-06-22 00:00:00|False
+189|None|None|False
+190|None|None|False
+191|2016-1|None|True
+192|None|None|True
+193|2016-1|None|False
+194|None|None|False
+195|None|None|False
+196|None|None|False
+197|None|None|False
+198|None|None|False
+199|None|None|False
+200|None|None|False
+201|None|None|False
+202|None|None|False
+203|None|None|False
+204|None|None|False
+205|None|None|False
+206|None|None|False
+207|None|None|False
+208|2016-1|None|False
+209|None|None|False
+210|None|None|False
+211|None|None|False
+212|None|None|False
+213|None|None|False
+214|None|None|False
+215|None|None|False
+216|None|None|False
+217|None|None|False
+218|None|None|False
+219|None|None|False
+220|None|None|False
+221|None|None|False
+222|None|None|False
+223|2016-01|None|False
+224|None|2016-07-19 00:00:00|False
+225|None|2016-07-19 00:00:00|False
+226|None|None|False
+227|None|None|False
+228|None|None|False
+229|?|None|False
+230|None|None|False
+231|None|None|False
+232|None|2016-07-26 00:00:00|False
+233|None|2016-07-29 00:00:00|False
+234|None|None|False
+235|None|None|False
+236|None|None|False
+302|2016-01|None|False
+303|2016-219 5th apt 2-01|None|False
+304|2016-apt A-01|None|False
+305|324 commerce apt 27-2016-01|None|False
+306|324 commerce st apt 32-2016-01|None|False
+307|apt 31-2016-01|None|False
+308|apt 25-2016-01|None|False
+309|2016-01|None|False
+310|2016-01|2016-11-08 00:00:00|False
+311|2016-01|None|False
+312|2016-01|2016-09-14 00:00:00|False
+313|2016-1035 5th-01|2016-09-15 00:00:00|False
+314|2016-01|None|False
+315|2016-01|None|False
+317|9/14/2016|None|False
+318|2016-01|None|False
+319|2016-01|None|False
+320|091516-01|None|False
+321|2016-01|2016-09-16 00:00:00|False
+322|2016-01|None|True
+323|2016-01|2016-09-16 00:00:00|False
+324|091616-01|2016-09-16 00:00:00|False
+325|091616-02|None|False
+582|2016-107-1|None|False
+583|2016-1|2016-12-13 00:00:00|False
+584|2016-1|2016-12-13 00:00:00|False
+585|2016-01|None|False
+243|None|None|False
+244|None|None|False
+245|2016-1|None|False
+246|None|None|False
+247|None|None|False
+248|None|None|False
+249|None|None|False
+250|None|None|False
+251|2016-1|None|False
+252|2016-1|None|False
+253|2016-1|2016-08-16 00:00:00|False
+254|None|None|False
+255|2016-1|None|False
+256|None|None|False
+257|None|None|False
+258|None|None|False
+259|None|None|False
+260|2016-01|None|False
+261|2016-?-1|None|False
+262|001|None|False
+263|None|None|False
+264|2016-01-129|None|False
+265|None|None|False
+266|None|2016-08-19 00:00:00|False
+267|None|2016-08-19 00:00:00|False
+268|None|2016-08-19 00:00:00|False
+269|None|2016-08-19 00:00:00|False
+270|None|2016-08-26 00:00:00|False
+271|None|None|False
+272|2016-1|2016-08-24 00:00:00|False
+273|None|None|False
+274|2016-1|2016-08-31 00:00:00|False
+283|2016-001|None|False
+284|2016-a-1|None|False
+285|2016-a-1|None|False
+286|2016-apt1-1|2016-09-02 00:00:00|False
+288|2016-1|None|False
+289|2016-002|None|False
+291|2016-001|None|False
+293|9-7-16-1|2016-09-06 00:00:00|False
+294|2016-01|2016-09-08 00:00:00|False
+295|2016-01|2016-09-09 00:00:00|False
+296|111111|None|False
+297|2016-01|None|True
+298|2016-01|None|True
+299|Apt 101|2016-08-02 00:00:00|False
+300|Apt 204|2016-08-02 00:00:00|False
+301|Apt 302|2016-08-02 00:00:00|False
+326|091616-03|2016-09-16 00:00:00|False
+327|2016-2nd floor-01|None|False
+328|2016-01|None|False
+329|2016-1|2016-09-20 00:00:00|False
+331|2016-01|2016-09-20 00:00:00|False
+332|411 comm apt 25|None|False
+333|2016-a-1|2016-09-20 00:00:00|False
+334|2016-01|None|False
+335|092016-02|2016-09-20 00:00:00|False
+336|2016-1|None|False
+337|2016-1|None|False
+338|2016-01|None|False
+340|2016-01|2016-09-22 00:00:00|False
+341|2016 539 6th street|2016-09-02 00:00:00|False
+342|2016 586 7th street|None|True
+343|2016-102-01|2016-09-23 00:00:00|False
+344|2016-002|2016-09-13 00:00:00|False
+345|2016-001|None|False
+346|2016-002|None|False
+347|2016-1|2016-09-13 00:00:00|False
+348|2016-1 #9|2016-09-26 00:00:00|False
+349|2016-1 #1|2016-09-26 00:00:00|False
+350|2016-1 #7|None|False
+351|2016-001|None|False
+352|2016-1|None|False
+353|2016-001|None|False
+354|2016-001|None|False
+355|2016-001|None|False
+356|2016-001|None|False
+357|2016-1|None|False
+358|2016-1|None|False
+359|2016-2nd floor-01|2016-09-27 00:00:00|False
+360|2016-2nd floor-01|None|False
+361|2016-1|None|False
+362|2016-apt B-01|2016-11-29 00:00:00|False
+363|2016-apt C-01|2016-11-29 00:00:00|False
+364|2016-apt3-01|None|False
+365|2016-2nd floor-01|2016-09-28 00:00:00|False
+366|2016-01|None|False
+367|092316-01|2016-09-23 00:00:00|False
+368|092716-01|None|False
+369|2016-01|2016-10-06 00:00:00|False
+370|2016-1st floor-01|None|False
+371|2016-4-01|2016-10-03 00:00:00|False
+372|2016-3-01|2016-10-03 00:00:00|False
+373|2016-1-01|None|False
+374|10/3/2016|2016-10-03 00:00:00|False
+375|10/3/2016|None|False
+376|2016-01|None|False
+377|2016-01|None|False
+378|10/4/003|None|False
+379|2016-01|None|False
+380|10/4/2014|None|False
+381|10/4/2016|None|False
+382|2016-01|2016-11-08 00:00:00|False
+383|2016-01|None|False
+384|2016-01|None|False
+385|2016-01|None|False
+386|2016-01|None|False
+387|10/4/001|None|False
+388|10/4/002|None|False
+389|10/5/001|None|False
+390|10/6/2016|None|False
+391|2016-01|2016-10-07 00:00:00|False
+392|10/4/003|2016-10-07 00:00:00|False
+393|100716-02|2016-10-07 00:00:00|False
+394|100716-01|2016-10-07 00:00:00|False
+395|093016-01|2016-10-21 00:00:00|False
+396|10/6/002|None|False
+397|2016-01|None|False
+398|101116-01|2016-10-17 00:00:00|False
+399|101116-02|2016-10-11 00:00:00|False
+400|2016-21-1|None|False
+401|2016-1-1|2016-11-08 00:00:00|False
+402|2016-6-1|None|False
+403|2016-01|None|False
+404|2106-6-1|2016-10-13 00:00:00|False
+405|10/18/001|None|False
+406|2016-01-apt 1|None|False
+407|2016-01-apt2|None|False
+408|101316-01|2016-10-13 00:00:00|False
+411|101416-01|2016-10-21 00:00:00|False
+412|101416-02|2016-10-25 00:00:00|False
+413|2016-apt|2016-10-17 00:00:00|False
+414|2016-01|None|False
+415|2016-01-127|None|False
+416|2016-121-01|2016-10-18 00:00:00|False
+417|2016-aptb-01|None|False
+418|2016-aptc-01|None|False
+419|10/17/16|None|False
+420|101816-01|2016-11-07 00:00:00|False
+421|091616-02|2016-10-18 00:00:00|False
+422|2016-01|None|False
+423|2016-01|None|False
+424|2016-2-01|2016-10-20 00:00:00|False
+425|2016-1-01|None|False
+426|2016-01|None|False
+427|2016-01|None|False
+428|0802160-02|2016-10-21 00:00:00|False
+429|2016-A-02|None|False
+430|2016-1112-01|None|False
+431|10/25/ 001|None|False
+432|2016-1|2016-10-25 00:00:00|False
+433|102516-01|2016-10-25 00:00:00|False
+434|2016-592-01|2016-10-26 00:00:00|False
+435|2016-594-1|2016-10-26 00:00:00|False
+436|10/26/003|None|False
+437|10/26/004|2016-10-26 00:00:00|False
+438|2016-594-01|2016-10-26 00:00:00|False
+439|10/26/005|2016-10-26 00:00:00|False
+440|10/26/002|2016-10-26 00:00:00|False
+441|10/26/001|2016-10-26 00:00:00|False
+442|10/27/001|None|False
+443|10/17/004|None|False
+444|2016-1|None|False
+445|10/17/002|2016-10-17 00:00:00|False
+446|10/17/003|2016-10-17 00:00:00|False
+447|2016-3-1|None|False
+448|2016-A-02|2016-10-31 00:00:00|False
+449|2016-01|2016-10-31 00:00:00|False
+450|2016-01|None|False
+451|2016-01-apt1|None|False
+452|2016-01|None|False
+453|2016-22-1|2016-11-01 00:00:00|False
+454|2016-12-1|2016-11-08 00:00:00|False
+455|2016-354-1|None|False
+456|2016-3-1|2016-11-01 00:00:00|False
+457|2016- front-1|None|False
+458|2016-apt1-01|None|False
+459|2016-apt2-01|None|False
+460|2016-1|2016-11-01 00:00:00|False
+461|2016-01|2016-11-01 00:00:00|False
+462|2016-1112-1|2016-11-01 00:00:00|False
+463|2016-01|2016-12-05 00:00:00|False
+464|2016-1 #7|None|False
+465|2016|None|False
+466|2016-01|None|False
+467|2016-Front-01|None|False
+468|2016-Rear-01|None|False
+469|2016-354-1|None|False
+470|2016-354-1|2016-11-04 00:00:00|False
+471|2016-01|None|False
+472|110416-01|2016-11-04 00:00:00|False
+473|110416-02|2016-11-04 00:00:00|False
+474|2016-219-2--01|None|False
+475|2016-1|2016-11-07 00:00:00|False
+476|2016-100 st joseph-210-01|2016-11-07 00:00:00|False
+477|2016-01|None|False
+478|2016-apt c-02|None|False
+479|2016-apt b-02|None|False
+480|2016-21-1|2016-11-08 00:00:00|False
+481|2016-1-1|2016-11-08 00:00:00|False
+482|2016-110-1|2016-11-10 00:00:00|False
+483|2016-12-1|2016-11-08 00:00:00|False
+484|2016_02|2016-11-08 00:00:00|False
+485|2016-01|None|False
+486|2016-01-a|2016-11-01 00:00:00|False
+487|2016-01-b|None|False
+488|2016-01|2016-11-08 00:00:00|False
+489|2016-01|None|False
+490|2016-01|None|False
+491|2016-01-apt 1|None|False
+492|2016-apt5-01|2016-11-22 00:00:00|False
+493|2016-apt11,13-01|None|False
+494|2016-01|2016-11-21 00:00:00|False
+495|2016-apta-01|None|False
+496|2016-front-01|None|False
+497|2016-rear-01|2016-11-09 00:00:00|False
+498|2016-390-1|2016-11-09 00:00:00|False
+499|2016-1-1|None|False
+501|2016-01|None|False
+502|2016-01|None|False
+503|2016-4-1|None|False
+504|2016-2-1|2016-11-14 00:00:00|False
+505|2016-apt1-01|2016-11-10 00:00:00|False
+506|2016-apt2-01|2016-11-10 00:00:00|False
+507|2016-a-2|2016-12-08 00:00:00|False
+508|2016-01|None|False
+509|2016-459-01|None|False
+510|2016-1|None|False
+511|2016-apta-02|None|False
+512|2016-front-02|2016-11-16 00:00:00|False
+513|2016-#7-1|2016-11-14 00:00:00|False
+514|2016-01|2016-11-14 00:00:00|False
+515|2016-#4-1|None|False
+516|2016-#116-1|None|False
+517|2016-01|None|False
+518|2016-1|2016-12-20 00:00:00|False
+519|2016-1|2016-11-22 00:00:00|False
+520|2016-1|None|False
+521|2016-01|2016-11-16 00:00:00|False
+522|2016-01|2016-11-16 00:00:00|False
+523|2016-737a-01|None|False
+524|2016-834-1|None|False
+525|2016-1|None|False
+526|2016-01|None|False
+527|2016-#4-1|2016-11-17 00:00:00|False
+528|2016-102w-01|2016-11-21 00:00:00|False
+529|2016-01|2016-11-17 00:00:00|False
+530|2016-01|2016-11-17 00:00:00|False
+531|2016-01|2016-11-17 00:00:00|False
+532|2016-01|None|False
+533|2016-01|2016-11-17 00:00:00|False
+534|2016-01|None|False
+535|2016-01|None|False
+536|2016-01|None|False
+537|2016-apt2 1st fl-01|None|False
+538|2016-1|None|False
+539|2016-123-01|2016-11-21 00:00:00|False
+540|2016-125-01|None|False
+541|2016-1|2016-12-20 00:00:00|False
+542|2016-129-01|None|False
+543|2016-1VOID|None|False
+544|2016-01|None|False
+545|2016-01|2016-11-21 00:00:00|False
+546|2016-925-1|None|False
+547|2016-01|None|False
+548|2016-1|None|False
+549|2016-1|None|False
+550|2016-1-1|2016-11-22 00:00:00|False
+551|2016-737a-01|2016-11-23 00:00:00|False
+552|2016-02|2016-11-23 00:00:00|False
+553|2016-apt1-01|None|False
+554|2016-apt2-01|2016-12-01 00:00:00|False
+555|2016-b-01|None|False
+556|2016-2nd floor front-02|2016-11-29 00:00:00|False
+557|2016-2nd floor back-02|2016-11-29 00:00:00|False
+558|2016-upper-01|2016-11-29 00:00:00|False
+559|2016-apt109-01|2016-11-28 00:00:00|False
+560|2016-1|None|False
+561|2017-01|None|False
+562|2016-01|None|False
+563|2016-01|None|False
+564|2016-01|None|True
+565|2016-01|2016-11-30 00:00:00|False
+566|2016-1|None|False
+567|2016-1|2016-11-29 00:00:00|False
+568|2016-apt7-01|None|False
+569|2016-01|2016-12-01 00:00:00|False
+570|2016-15-1|2016-12-06 00:00:00|False
+571|2016-1|None|True
+572|2016-01|None|False
+573|2016-01|2016-12-05 00:00:00|False
+574|2016-459-01|None|False
+575|2016-1|None|False
+576|2016-1116-01|2016-12-08 00:00:00|False
+577|2016-01|2016-12-22 00:00:00|False
+578|2016-01|2016-12-08 00:00:00|False
+579|2016-01|2016-12-12 00:00:00|False
+580|2016-01|None|True
+581|2016-1|None|False
+586|2016-01|None|False
+587|2016-apt2-01|None|False
+588|2016-1-1|2016-12-13 00:00:00|False
+589|2016-3-1|2017-01-06 00:00:00|False
+590|2016-01|2017-01-09 00:00:00|False
+591|2016-02|2016-12-12 00:00:00|False
+592|2016-02|None|False
+593|2016--1|None|False
+594|2016-01|2016-12-13 00:00:00|False
+595|void|None|False
+596|2016-2|2016-12-16 00:00:00|False
+597|ipm inspct.|None|False
+598|IMPC inspct|None|False
+599|2016-01|2016-12-15 00:00:00|False
+600|2016-451-01|2016-12-22 00:00:00|False
+601|2016-01|None|False
+602|2016-459-02|None|False
+603|2016-01|None|False
+604|impc inspct.|None|False
+605|2016-01|2016-12-19 00:00:00|False
+606|2016-457-01|None|False
+607|2016-459b-01|None|False
+608|2016-01|None|True
+609|2016-01|None|False
+610|2016-288-01|None|False
+611|2016-110-1|None|False
+612|IPMC inspct.|None|False
+613|2016-01|None|False
+728|2017-410-01|None|False
+729|2017-23-01|None|False
+730|2017-388-01|None|False
+731|2017-308A-01|None|False
+614|2016-1|2016-12-27 00:00:00|False
+615|2016-210-2016|None|False
+616|2016|None|False
+617|2016-1|None|False
+618|2016-1|None|False
+619|2016-931-apt.3-1|None|False
+620|2016-1|None|False
+621|ipmc|None|False
+622|2016-459-02|None|False
+623|2016-457-01|None|False
+624|2016-459b-01|None|False
+625|2016-A-1|None|False
+626|2016-B-1|None|False
+627|2017|None|False
+628|2017-01|None|False
+629|2017-931 -apt.1-01|None|False
+630|2016-311-apt.3-1|None|False
+631|2016-apt2-01|None|False
+632|2016-01|2017-01-04 00:00:00|False
+633|2017-01|2017-01-05 00:00:00|False
+634|2017-01|None|False
+635|2017-303-01|None|False
+636|2017-1|None|False
+637|IPMC inspection|None|False
+638|2017-168-01|None|False
+639|2016-1040-1|None|False
+640|2016-01|None|False
+641|2016-apt1-01|2017-01-10 00:00:00|False
+642|2017-01|None|False
+643|2017-apt1-01|None|False
+644|2017-apt28-01|None|False
+645|2017-apt27-01|None|False
+646|void-test|None|False
+647|2017-A-01|None|False
+648|2017-01|None|False
+649|2017-202-01|None|False
+650|2017-01|None|False
+651|IPMC Inspct.|None|False
+652|2016-298-01|None|False
+653|2016-01|None|False
+654|2016-01-01|None|False
+655|2017-01|None|False
+656|2016-1|None|False
+657|2017-01|None|False
+658|2017-01|None|False
+659|IPMC 502 wall rear|None|False
+660|2017-aptb-01|None|False
+661|2017-201-01|None|False
+662|2017-01|None|False
+664|2017-01|None|False
+665|2017-1st floor-01|None|False
+666|2017-01|None|False
+668|2016-01|None|False
+669|2017-01|None|False
+670|2017-01|None|False
+671|IPMC insp.|None|False
+673|2017-455-01|None|False
+674|2017-3729-01|None|False
+675|2017-110-01|None|False
+676|2017-206-01|None|False
+677|2017-209-01|None|False
+678|2017-210-01|None|False
+679|2017-01|None|False
+680|2017-01|None|False
+681|2017-01|None|False
+682|2017-A-01|None|False
+683|2017-01|None|False
+684|2017-A-01|None|False
+685|2017-01|None|False
+686|2017-01|None|False
+687|2017-01|None|False
+688|2017-A-01|None|False
+689|2017-01|None|False
+690|2017-01|None|False
+691|2017-01|None|False
+692|2017-apt9-01|None|False
+693|2017-1705-01|None|False
+694|2016-4-01|None|False
+695|2016-01|None|False
+696|2017-02|None|False
+697|2016-02|None|False
+698|2017-02|None|False
+699|2016-apt3 2nd flr-01|None|False
+700|2016-apt4 3rd flr-01|None|False
+701|None|None|False
+702|2017-apt12-01|None|False
+703|2017-315-01|None|False
+704|2017-01|None|False
+705|2017-01|None|False
+706|2017-210-01|None|False
+707|IPMC inspct 01|None|False
+708|2017-apt4-01|None|False
+709|2017-310-01|None|False
+710|2017-208-01|None|False
+711|2017-2310-01|None|False
+712|2017-34-01|None|False
+713|2017-01|None|False
+714|2017-01|None|False
+715|2017-380apt3-01|None|False
+716|2017-380apt7-01|None|False
+717|2017-01|None|False
+718|2017-Apt3-01|None|False
+719|2017-01|None|False
+720|2017-01|None|False
+721|2017-apt1-01|None|False
+722|2017-apt12-01|None|False
+723|2017-3832-01|None|False
+724|2017-1537-01|None|True
+725|2017-1527-01|None|False
+726|2017-01|None|False
+727|2017-01|None|False
+732|2017-308E-01|None|False
+733|2017-216D-01|None|False
+734|2017-210F-01|None|False
+735|2017-210B-01|None|False
+736|2017-222A-01|None|False
+737|2017-215E-01|None|False
+738|2017-221D-01|None|False
+739|2017-221A-01|None|False
+740|2017-01|None|False
+741|2017-01|None|False
+742|2017-4075-01|None|False
+743|2017-106-01|None|False
+744|2016-305-01|None|False
+745|2017-B-01|None|False
+746|2017-01|None|False
+747|2017-215B-01|None|False
+748|2017-419-01|None|False
+749|2017-409-01|None|False
+750|2017-01|None|False
+751|2017-01|None|False
+752|2017-01|None|False
+753|2017-rear-01|None|False
+754|2017-01|None|False
+755|Void|None|False
+756|2017-400-01|None|False
+757|2017-402-01|None|False
+758|2017-501-01|None|False
+759|2017-501 rear-01|None|False
+760|2017-General-01|None|False
+761|2017-01|None|False
+762|2017-816-01|None|False
+763|2017-104-01|None|False
+764|2017-apt2-1|None|False
+765|2017-01|None|False
+766|2017-01|None|False
+767|2017-01|None|False
+768|2017-3615-01|None|False
+769|IPMC ins. Apt. 1|None|False
+770|2017-apt23-01|None|False
+771|2017-apt25-01|None|False
+772|27 re inspection|None|False
+773|2017-apt33-01|None|False
+774|2017-apt36-01|None|False
+775|2017-apt48-01|None|False
+776|2017-apt1-01|None|False
+777|2017-01|None|False
+778|2017-2025-01|None|False
+779|2017-1450-01|None|False
+780|2017-apt1-01|None|False
+781|2017-01|None|True
+782|2017-01|None|True
+783|2017-01|None|True
+784|2017-01|None|True
+785|2017-01|None|False
+786|2017-4221-01|None|False
+787|2017-501-01|None|False
+788|2017-126-01|None|False
+789|2017-2425-01|None|False
+790|2017-apt34-01|None|False
+791|2017-01|None|False
+792|2017-140-01|None|False
+793|2016-821-01|None|False
+794|2016-01|None|False
+795|2017-01|None|True
+796|2017-01|None|False
+797|2017-1011-01|None|False
+798|2017-1016-01|None|False
+799|2017-01|None|False
+800|2017-D-01|None|False
+801|2017-C-01|None|False
+802|2017-307-01|None|False
+803|2017-01|None|True
+804|None|None|False
+805|2017-246-01|None|False
+806|2017-314-01|None|False
+807|None|None|False
+808|2017-900-01|None|False
+809|2017-123-01|None|False
+810|2017-403-01|None|False
+811|2017-1118-01|None|False
+812|2016-01|None|False
+813|2017-01|None|False
+943|2017-341-01|None|False
+944|2017-2021-01|None|False
+945|2017-485-01|None|False
+946|2017-3769-01|None|False
+947|2017-01|None|False
+948|2017-01|None|False
+949|2017-02|None|False
+950|2017-492-01|None|False
+951|2017-2508-01|None|False
+952|2016-01|None|False
+953|2017-apt.2-01|None|False
+954|2017-2413-01|None|False
+955|2017-A-01|None|False
+956|2017-01|None|False
+957|2017-01|None|False
+958|2017-a-01|None|False
+959|2017-A-01|None|False
+814|2016-01|None|False
+815|2016-01|None|False
+816|2017-3726-01|None|False
+817|2017-2002-01|None|False
+818|2017-2015-01|None|False
+819|2017-apt2-01|None|False
+820|2017-aptc-01|None|False
+821|2017-01|None|False
+822|2017-01|None|True
+823|2017-A-01|None|False
+827|None|None|False
+828|2017-3770-01|None|False
+829|2017-01|None|False
+830|2017-884-01|None|False
+831|2017-518-01|None|False
+832|2017-01|None|True
+833|2017-01|None|False
+834|2017-01|None|False
+835|2017-407-01|None|False
+836|2017-01|None|True
+837|2017-1901-01|None|False
+838|2017-121-01|None|False
+839|2017-apt3-01|None|False
+840|2017-201-01|None|False
+841|2016-964-01|None|False
+842|2017-123-01|None|False
+843|2017-apt1-01|None|False
+844|None|None|False
+845|2017-33-01|None|False
+846|2017-1887-01|None|False
+847|2017-3-01|None|False
+848|2017-01|None|False
+849|2017-01|None|True
+850|2016-01|None|False
+851|2017-apt2-01|None|False
+852|22017-4-01|None|False
+853|2017-419-01|None|False
+854|2017-322-01|None|False
+855|2017-108-01|None|False
+856|2017-01|None|False
+857|2017|None|False
+858|2017-01|None|False
+859|2017-apt3-01|None|False
+860|2017-01|None|False
+861|2017-01|None|True
+862|2017-01|None|False
+863|2017-apt1-01|None|False
+864|2017-apt2-01|None|False
+865|2017-apt1-01|None|False
+866|2017-apt1-01|None|False
+867|2017-01|None|False
+868|2017-01|None|False
+869|2017-rear-01|None|False
+870|VOID|None|False
+871|2017-2294-01|None|True
+872|2017-56-01|None|False
+873|2017-1-01|None|False
+874|2017-259-01|None|False
+875|2017-apt1-01|None|False
+876|2017-a-01|None|False
+877|2017-a-01|None|False
+878|2017-106-01|None|False
+879|2017-01|None|False
+880|2017-apt2-01|None|False
+881|2017-apt1-01|None|False
+882|2017-217-01|None|False
+883|2017-2190-01|None|False
+884|2017-2611-01|None|False
+885|2017-2023-01|None|False
+886|Void|None|False
+887|2017-apt6-01|None|False
+888|2017-apt2-01|None|False
+889|2017-apt2-01|None|False
+890|2017-01|None|False
+891|2017-01|None|False
+892|2017-01|None|True
+893|2017-102-01|None|False
+894|2017-162-01|None|False
+895|2017-01|None|False
+896|2017-apt2-01|None|False
+897|2017-116-01|None|False
+898|2017-apt2-01|None|False
+899|2017-01|None|False
+900|2017-105-01|None|False
+901|IPMC inspct.|None|False
+902|2017-21-01|None|False
+903|2017-130-01|None|False
+904|2017-20-01|None|False
+905|2017-apt2-01|None|False
+906|2017-apt.7-01|None|False
+907|2017-01|None|False
+908|2017-300B-01|None|False
+909|2017-221b-01|None|False
+910|2017-215d-01|None|False
+911|2017-304a-01|None|False
+912|2017-01|None|True
+913|2017-3920-01|None|False
+914|2017-1008-01|None|True
+915|2017-01|None|False
+916|2017-01|None|False
+917|2017-44-01|None|False
+918|2017-3204-01|None|False
+919|2017-front-01|None|False
+920|2017-apt1-01|None|False
+921|2017-301-01|None|False
+922|2017-01|None|False
+923|2017-2394-01|None|False
+924|None|None|False
+925|2017-2520-01|None|False
+926|2017-31-01|None|False
+927|2017-145-01|None|False
+928|2017-01|None|True
+929|2017-02|None|False
+930|2017-01|None|False
+931|2017-1509-01|None|False
+932|2017-02|None|False
+933|2017-3907-01|None|False
+934|2017-apt1-01|None|False
+935|2017-3816-01|None|False
+936|2017-4-01|None|False
+937|2017-apt2-01|None|False
+938|2017-117 apt2-01|None|False
+939|2017-01|None|False
+940|2017-apt.22-01|None|False
+941|2017-110-01|None|False
+942|2017-124-01|None|False
+960|2017-01|None|False
