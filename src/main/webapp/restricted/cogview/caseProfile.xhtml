@@ -20,7 +20,7 @@
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
 
-                        <h1>Code Enforcement Case Profile</h1>
+                        <h1>Case Profile: 
                         
                         <h:outputText value="#{caseProfileBB.currentCase.caseName}"/>
                         <span> @ </span>
@@ -29,8 +29,9 @@
                         <h:outputText value="#{caseProfileBB.currentCase.property.muni.muniName}"/>
                         <span> (case ID#: </span>
                         <h:outputText value="#{caseProfileBB.currentCase.caseID}"/>
-                        <span> ) </span>
+                        <span> ) </span></h1>
                         
+                        <p:graphicImage width="1000px" style="margin-left: 5px;" value="/resources/phasediagrams/#{caseProfileBB.phaseDiagramImageFilename}"/>
                         <p:spacer height="10px"/>
                          
                         <p:tabView id="ceactionTabView" 

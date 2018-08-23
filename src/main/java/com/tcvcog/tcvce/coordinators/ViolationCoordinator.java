@@ -23,6 +23,9 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -59,10 +62,22 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         return v;
     }
     
-    
+    /**
+     * Standard coordinator method which calls the integration method after 
+     * checking businses rules. 
+     * ALSO creates a corresponding timeline event to match the stipulated compliance
+     * date on the violation that's added.
+     * @param v
+     * @throws IntegrationException
+     * @throws ViolationException 
+     */
     public void addNewCodeViolation(CodeViolation v) throws IntegrationException, ViolationException{
         
         CodeViolationIntegrator vi = getCodeViolationIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        EventCategory eventCat = ec.getInitializedEventCateogry();
+        eventCat.setEventType(EventType.Timeline);
+        eventCat.setRequiresviewconfirmation(true);
         
         if(verifyCodeViolationAttributes(v)){
             vi.insertCodeViolation(v);

@@ -1,0 +1,937 @@
+property_propertyID|inspectionID|firstInspectionDate|inspectionPassDate|GENERATEreinspect|GENERATEresolved|inspectionComments
+12470|1|2015-04-14 00:00:00|2015-06-02 00:00:00|False|False|None
+14902|2|2015-04-17 00:00:00|None|False|True|None
+15987|3|2015-04-21 00:00:00|None|False|True|None
+12520|4|2015-04-24 00:00:00|None|False|True|None
+12425|5|2015-04-28 00:00:00|2015-05-01 00:00:00|False|True|None
+15318|6|2015-04-28 00:00:00|2015-05-01 00:00:00|False|True|None
+15318|7|2015-05-01 00:00:00|2015-05-01 00:00:00|False|True|None
+12425|8|2015-05-01 00:00:00|2015-05-01 00:00:00|False|True|None
+16158|9|2015-05-05 00:00:00|None|False|True|None
+15773|10|2015-05-05 00:00:00|None|False|True|None
+15987|11|2015-05-12 00:00:00|2015-05-12 00:00:00|False|True|None
+15871|12|2015-05-13 00:00:00|2015-05-13 00:00:00|False|True|None
+12368|13|2015-05-13 00:00:00|2015-07-17 00:00:00|False|True|None
+15465|14|2015-05-19 00:00:00|2015-06-02 00:00:00|False|False|None
+15989|15|2015-05-19 00:00:00|None|False|True|None
+12192|16|2015-05-26 00:00:00|None|False|False|None
+12520|17|2015-05-22 00:00:00|2015-05-22 00:00:00|False|True|None
+15773|18|2015-05-22 00:00:00|2015-05-22 00:00:00|False|True|None
+15254|19|2015-05-22 00:00:00|2015-06-05 00:00:00|False|True|None
+15254|20|2015-06-05 00:00:00|2015-06-05 00:00:00|False|False|None
+15465|21|2015-06-02 00:00:00|2015-06-02 00:00:00|False|True|None
+12192|22|2015-06-02 00:00:00|2015-06-02 00:00:00|False|True|None
+12470|23|2015-06-02 00:00:00|2015-06-02 00:00:00|False|True|None
+16799|24|2015-06-19 00:00:00|2015-06-24 00:00:00|False|False|None
+13427|25|2015-06-23 00:00:00|2015-06-24 00:00:00|False|False|None
+16799|26|2015-06-24 00:00:00|2015-06-24 00:00:00|False|True|None
+13427|27|2015-06-24 00:00:00|2015-06-24 00:00:00|False|True|None
+14682|28|2015-06-16 00:00:00|None|False|True|None
+16039|29|2015-06-12 00:00:00|2015-06-23 00:00:00|False|True|None
+16039|30|2015-06-23 00:00:00|2015-06-23 00:00:00|False|True|None
+13542|31|2015-06-29 00:00:00|None|False|False|None
+14682|32|2015-07-07 00:00:00|2015-07-07 00:00:00|False|True|None
+14637|33|2015-07-08 00:00:00|2016-02-26 00:00:00|False|True|None
+12073|34|2015-07-10 00:00:00|None|False|False|None
+12368|35|2015-07-17 00:00:00|2015-07-17 00:00:00|False|True|None
+12210|36|2015-07-21 00:00:00|None|False|True|None
+15262|37|2015-07-21 00:00:00|None|False|True|None
+12167|38|2015-08-04 00:00:00|None|False|True|None
+15443|39|2015-08-04 00:00:00|None|False|True|None
+15262|40|2015-08-05 00:00:00|2015-08-05 00:00:00|False|True|None
+12167|41|2015-08-07 00:00:00|2015-08-07 00:00:00|False|False|None
+16158|42|2015-08-07 00:00:00|2015-08-07 00:00:00|False|True|None
+16420|43|2015-08-07 00:00:00|None|False|False|None
+12210|44|2015-08-14 00:00:00|2015-08-14 00:00:00|False|True|None
+13545|45|2015-08-18 00:00:00|None|False|True|None
+14816|46|2015-08-18 00:00:00|None|False|False|None
+13545|47|2015-08-25 00:00:00|2015-08-25 00:00:00|False|True|None
+15443|48|2015-08-28 00:00:00|None|False|True|None
+13447|49|2015-08-28 00:00:00|None|False|True|None
+14598|50|2015-08-28 00:00:00|2015-12-11 00:00:00|False|True|None
+13511|51|2015-09-08 00:00:00|None|False|True|None
+12209|52|2016-09-13 00:00:00|2016-09-13 00:00:00|False|False|None
+15192|53|2015-09-02 00:00:00|None|False|True|None
+15398|54|2015-09-11 00:00:00|None|False|True|None
+14572|55|2015-09-11 00:00:00|None|False|True|None
+15267|56|2015-06-02 00:00:00|None|False|True|None
+15267|57|2015-06-16 00:00:00|None|False|True|None
+14643|58|2015-09-18 00:00:00|None|False|True|None
+12137|59|2015-09-22 00:00:00|None|False|True|None
+13904|60|2015-09-30 00:00:00|None|False|True|None
+15386|61|2015-09-29 00:00:00|None|False|True|None
+15192|62|2015-09-30 00:00:00|2015-09-30 00:00:00|False|False|None
+14643|63|2015-09-22 00:00:00|2015-09-22 00:00:00|False|False|None
+15398|64|2015-09-15 00:00:00|2015-09-15 00:00:00|False|False|None
+12220|65|2015-10-02 00:00:00|None|False|True|None
+15989|66|2015-06-12 00:00:00|2015-06-12 00:00:00|False|True|None
+13447|67|2015-10-06 00:00:00|2015-10-06 00:00:00|False|False|None
+15357|68|2015-10-06 00:00:00|None|False|True|None
+12223|69|2015-10-06 00:00:00|None|False|True|None
+16352|70|2015-10-09 00:00:00|None|False|True|None
+12568|71|2015-10-16 00:00:00|None|False|True|None
+12037|72|2015-10-16 00:00:00|2016-02-26 00:00:00|False|True|None
+12220|73|2015-10-27 00:00:00|None|False|True|None
+15715|74|2015-10-27 00:00:00|None|False|False|None
+12220|75|2015-10-28 00:00:00|None|False|False|None
+13904|76|2015-10-28 00:00:00|2015-10-28 00:00:00|False|False|None
+12137|77|2015-10-23 00:00:00|2015-10-23 00:00:00|False|False|None
+12568|78|2015-10-20 00:00:00|2015-10-20 00:00:00|False|False|None
+14572|79|2015-10-14 00:00:00|2015-10-14 00:00:00|False|False|None
+12661|80|2015-11-03 00:00:00|None|False|False|None
+12661|81|2015-11-10 00:00:00|None|False|False|None
+12474|82|2015-12-01 00:00:00|None|False|True|None
+13137|83|2015-11-20 00:00:00|2015-12-08 00:00:00|False|True|None
+13511|84|2015-11-04 00:00:00|2015-11-04 00:00:00|False|False|None
+15357|85|2015-11-03 00:00:00|2015-11-03 00:00:00|False|False|None
+15290|86|2015-11-13 00:00:00|None|False|False|None
+13137|87|2015-12-08 00:00:00|2015-12-08 00:00:00|False|False|None
+14598|88|2015-09-18 00:00:00|2015-12-11 00:00:00|False|True|None
+14598|89|2015-12-11 00:00:00|2015-12-11 00:00:00|False|False|None
+13405|90|2015-12-11 00:00:00|None|False|False|None
+15772|91|2015-12-29 00:00:00|2016-01-06 00:00:00|False|True|None
+12223|92|2016-01-04 00:00:00|2016-01-04 00:00:00|False|False|None
+12025|93|2016-01-06 00:00:00|None|False|True|None
+15772|94|2016-01-06 00:00:00|2016-01-06 00:00:00|False|False|None
+14502|95|2016-01-20 00:00:00|None|False|True|None
+14800|96|2016-01-26 00:00:00|None|False|True|None
+14800|97|2016-01-27 00:00:00|2016-01-27 00:00:00|False|False|None
+15213|98|2016-01-29 00:00:00|None|False|False|None
+14502|99|2016-02-08 00:00:00|2016-02-08 00:00:00|False|False|None
+13511|100|2016-02-09 00:00:00|None|False|False|None
+13218|101|2016-02-23 00:00:00|None|False|True|None
+13218|102|2016-03-02 00:00:00|2016-03-02 00:00:00|False|False|None
+15976|103|2016-03-02 00:00:00|2016-03-02 00:00:00|False|False|None
+12037|104|2016-02-16 00:00:00|2016-02-26 00:00:00|False|True|None
+12037|105|2016-02-26 00:00:00|2016-02-26 00:00:00|False|False|None
+15386|106|2016-02-26 00:00:00|2016-02-26 00:00:00|False|False|None
+14637|107|2016-02-12 00:00:00|2016-02-26 00:00:00|False|True|None
+14637|108|2016-02-26 00:00:00|2016-02-26 00:00:00|False|False|None
+12622|109|2016-02-16 00:00:00|2016-02-23 00:00:00|False|True|None
+12622|110|2016-02-23 00:00:00|2016-02-23 00:00:00|False|False|None
+15304|111|2016-02-09 00:00:00|2016-02-19 00:00:00|False|True|None
+15304|112|2016-02-19 00:00:00|2016-02-19 00:00:00|False|False|None
+15525|113|2016-02-19 00:00:00|None|False|False|None
+15179|114|2016-02-26 00:00:00|None|False|False|None
+15311|115|2016-02-23 00:00:00|None|False|True|None
+12612|116|2016-02-12 00:00:00|None|False|False|None
+12612|117|2016-02-23 00:00:00|None|False|False|None
+12481|118|2016-02-12 00:00:00|None|False|False|None
+15311|119|2016-03-11 00:00:00|2016-03-11 00:00:00|False|False|None
+15290|120|2016-03-11 00:00:00|None|False|True|None
+14855|121|2016-03-11 00:00:00|None|False|True|None
+14902|122|2016-03-04 00:00:00|None|False|True|None
+14950|123|2016-03-02 00:00:00|None|False|True|None
+12025|124|2016-03-15 00:00:00|2016-03-15 00:00:00|False|False|None
+15290|125|2016-03-15 00:00:00|2016-03-15 00:00:00|False|False|None
+16313|126|2016-03-15 00:00:00|None|False|True|None
+16313|127|2016-03-18 00:00:00|2016-03-18 00:00:00|False|False|None
+12474|128|2016-03-18 00:00:00|2016-03-18 00:00:00|False|False|None
+14855|129|2016-03-25 00:00:00|2016-03-25 00:00:00|False|False|None
+12768|130|2016-03-22 00:00:00|None|False|True|None
+12768|131|2016-03-22 00:00:00|2016-03-22 00:00:00|False|False|None
+14902|132|2016-03-22 00:00:00|None|False|True|None
+14402|133|2016-03-28 00:00:00|None|False|False|None
+14902|134|2016-03-29 00:00:00|2016-03-29 00:00:00|False|False|None
+16709|135|2016-03-29 00:00:00|None|False|False|None
+12012|136|2016-04-05 00:00:00|None|False|False|None
+16041|137|2016-04-15 00:00:00|None|False|True|None
+12390|138|2016-04-19 00:00:00|None|False|True|None
+15536|139|2016-04-19 00:00:00|None|False|True|None
+16047|140|2016-04-19 00:00:00|None|False|False|None
+16352|141|2016-04-22 00:00:00|2016-04-22 00:00:00|False|False|None
+14674|142|2016-04-22 00:00:00|None|False|True|None
+15536|143|2016-04-22 00:00:00|2016-04-22 00:00:00|False|False|None
+16200|144|2016-04-22 00:00:00|None|False|True|None
+14950|145|2016-04-22 00:00:00|2016-04-22 00:00:00|False|False|None
+14674|146|2016-04-26 00:00:00|2016-04-26 00:00:00|False|False|None
+15248|147|2016-04-27 00:00:00|None|False|True|None
+15781|148|2016-04-27 00:00:00|None|False|False|None
+14176|149|2016-04-27 00:00:00|None|False|False|None
+12588|150|2016-05-03 00:00:00|None|False|False|None
+18237|237|2016-08-02 00:00:00|None|False|False|yard debris shall be removed, accessory structures need to be free from defects and other deficiencies vegetation on house must be cut back to within borough limits. All utilities shall be turned on at the time of inspection
+12214|238|2016-08-05 00:00:00|None|False|False|None
+19265|239|2016-08-02 00:00:00|None|False|False|None
+18076|240|2016-08-02 00:00:00|None|False|False|None
+18380|241|2016-08-03 00:00:00|None|False|False|None
+18508|242|2016-08-05 00:00:00|None|False|False|None
+15256|151|2016-05-03 00:00:00|None|False|False|None
+12501|152|2016-05-03 00:00:00|None|False|False|None
+15384|153|2016-05-06 00:00:00|None|False|False|None
+12390|154|2016-05-06 00:00:00|2016-05-06 00:00:00|False|False|None
+16041|155|2016-05-04 00:00:00|2016-05-04 00:00:00|False|False|None
+16200|156|2016-05-10 00:00:00|2016-05-10 00:00:00|False|False|None
+13228|157|2016-05-10 00:00:00|None|False|True|None
+14210|158|2016-05-10 00:00:00|None|False|False|None
+15248|159|2016-05-13 00:00:00|2016-05-13 00:00:00|False|False|None
+13228|160|2016-05-13 00:00:00|2016-05-13 00:00:00|False|False|None
+12157|161|2016-05-13 00:00:00|None|False|False|None
+18508|162|2016-06-03 00:00:00|None|False|False|None
+15927|163|2016-06-08 00:00:00|2016-06-08 00:00:00|False|True|None
+16377|164|2016-06-07 00:00:00|None|False|False|None
+16377|165|2016-06-14 00:00:00|None|False|True|None
+15473|166|2016-06-14 00:00:00|None|False|False|None
+13983|167|2016-06-17 00:00:00|2016-06-17 00:00:00|False|False|None
+18425|168|2016-06-17 00:00:00|None|False|False|None
+17980|169|2016-06-21 00:00:00|None|False|False|None
+16709|170|2016-06-21 00:00:00|None|False|False|None
+14542|171|2016-06-27 00:00:00|None|False|False|None
+13105|172|2016-06-27 00:00:00|2016-06-28 00:00:00|False|False|None
+19077|173|2016-06-23 00:00:00|None|False|False|None
+12991|175|2016-06-27 00:00:00|None|False|False|None
+17670|176|2016-05-27 00:00:00|2016-05-27 00:00:00|False|False|None
+17177|177|2016-05-27 00:00:00|None|False|False|None
+17259|178|2016-05-27 00:00:00|2016-06-06 00:00:00|False|False|None
+17687|179|2016-06-09 00:00:00|2016-06-09 00:00:00|False|False|None
+19408|180|2016-06-13 00:00:00|2016-06-13 00:00:00|False|False|None
+19409|181|2016-06-13 00:00:00|None|False|False|None
+19410|182|2016-06-13 00:00:00|2016-06-13 00:00:00|False|False|None
+17063|183|2016-06-13 00:00:00|2016-06-13 00:00:00|False|False|None
+17293|184|2016-06-13 00:00:00|2016-06-13 00:00:00|False|False|None
+17074|185|2016-06-13 00:00:00|2016-06-13 00:00:00|False|False|None
+17315|186|2016-06-22 00:00:00|2016-06-22 00:00:00|False|False|None
+17315|187|2016-06-22 00:00:00|2016-06-22 00:00:00|False|False|None
+17533|188|2016-06-22 00:00:00|2016-06-22 00:00:00|False|False|None
+17277|189|2016-06-22 00:00:00|None|False|False|None
+17962|190|2016-06-29 00:00:00|None|False|False|None
+17630|191|2016-07-06 00:00:00|None|False|False|None
+17630|192|None|None|False|False|None
+17115|193|2016-07-06 00:00:00|None|False|False|None
+17127|194|2016-07-06 00:00:00|None|False|False|None
+17122|195|2016-07-06 00:00:00|None|False|False|None
+19409|196|2016-07-06 00:00:00|None|False|False|None
+19412|197|2016-07-06 00:00:00|None|False|False|None
+14592|198|2016-07-07 00:00:00|None|False|False|None
+12026|199|2016-07-07 00:00:00|None|False|False|None
+18650|200|2016-07-08 00:00:00|None|False|False|None
+17122|201|2016-07-12 00:00:00|None|True|False|None
+17849|202|2016-07-12 00:00:00|None|False|False|None
+17127|203|2016-07-12 00:00:00|None|False|False|None
+17125|204|2016-07-12 00:00:00|None|False|False|None
+17203|205|2016-07-12 00:00:00|None|False|False|None
+19414|206|2016-07-12 00:00:00|None|False|False|None
+19415|207|2016-07-12 00:00:00|None|False|False|None
+19416|208|2016-07-12 00:00:00|None|False|False|None
+17224|209|2016-07-12 00:00:00|None|False|False|None
+14542|210|2016-07-12 00:00:00|None|False|False|None
+19293|211|2016-07-12 00:00:00|None|False|False|None
+11964|212|2016-07-14 00:00:00|None|False|False|None
+11964|213|2016-07-14 00:00:00|None|False|False|None
+11964|214|2016-07-14 00:00:00|None|False|False|None
+11964|215|2016-07-14 00:00:00|None|False|False|None
+11964|216|2016-07-14 00:00:00|None|False|False|None
+17496|217|2016-07-14 00:00:00|None|False|False|None
+17310|218|2016-07-14 00:00:00|None|False|False|None
+17153|219|2016-07-19 00:00:00|None|False|False|None
+17310|220|2016-07-19 00:00:00|None|False|False|None
+19414|221|2016-07-19 00:00:00|None|False|False|None
+19423|222|2016-07-19 00:00:00|None|False|False|None
+19415|223|2016-07-19 00:00:00|None|False|False|None
+17711|224|2016-07-19 00:00:00|2016-07-19 00:00:00|False|False|None
+17496|225|2016-07-19 00:00:00|2016-07-19 00:00:00|False|False|None
+19293|226|2016-07-20 00:00:00|None|False|False|None
+18456|227|2016-07-25 00:00:00|None|False|False|None
+20129|228|2016-07-25 00:00:00|None|False|False|None
+18127|229|2016-07-22 00:00:00|None|False|False|None
+19344|230|2016-07-22 00:00:00|None|False|False|None
+17224|231|2016-07-26 00:00:00|None|False|False|None
+17203|232|2016-07-26 00:00:00|2016-07-26 00:00:00|False|False|None
+18818|233|2016-07-29 00:00:00|2016-07-29 00:00:00|False|False|None
+19205|234|2016-08-02 00:00:00|None|False|False|None
+15213|235|2016-08-02 00:00:00|None|False|False|None
+11964|236|2016-08-02 00:00:00|None|False|False|None
+17877|302|2016-09-13 00:00:00|None|False|False|None
+17243|303|2016-09-13 00:00:00|None|False|False|None
+17329|304|2016-09-13 00:00:00|None|False|False|None
+17319|305|2016-09-13 00:00:00|None|False|False|None
+17319|306|2016-09-13 00:00:00|None|False|False|None
+20668|307|2016-09-13 00:00:00|None|False|False|None
+20668|308|2016-09-13 00:00:00|None|False|False|None
+17802|309|2016-09-13 00:00:00|None|False|False|Front steps damaged outlet in bedroom #2 damaged/not functioning outlet in upstairs failed to function properly
+17207|310|2016-09-13 00:00:00|2016-11-08 00:00:00|False|False|None
+17323|311|2016-09-13 00:00:00|None|False|False|None
+18334|312|2016-09-14 00:00:00|2016-09-14 00:00:00|True|False|None
+20024|313|2016-09-15 00:00:00|2016-09-15 00:00:00|False|False|None
+20674|314|2016-09-13 00:00:00|None|False|False|The screens in the bedroom where torn and damaged to a point of inoperability. Please repair/replace the screens. The bathroom tub and sink flood the catch dran when drained, causing flooding in the bathroom. Please repair the plumbing
+20672|315|2016-09-13 00:00:00|None|False|False|The GFCI in the bathroom did not function when tested. Please have the GFCI repaired.
+20233|317|2016-09-14 00:00:00|None|True|False|*The switch located at the lower right hand side of the furnace lacks a cover plate. Install and re-schedule inspection.
+20671|318|2016-09-13 00:00:00|None|False|False|The windows in the bedrooms and living room did not function properly, please repair the windows. The shower head was vacant from the shower, Please repair the shower head. The outlet nearest the windows in the kitchen had no power going to it. Please repair the outlet.
+17370|319|2016-09-13 00:00:00|None|False|False|The door in the kitchen leading to the exterior of the house was boarded shut. Please repair the door to function properly. There where electrical wires exposed due to outlets being pulled from the wall. Please be sure all outlets function properly and are installed correctly. Please be sure that all smoke detectors function properly, and that there is one in each bedroom, one on each floor and one outside of the sleeping areas.
+14565|320|2016-09-15 00:00:00|None|False|False|None
+19293|321|2016-09-16 00:00:00|2016-09-16 00:00:00|False|False|None
+19529|322|2016-09-16 00:00:00|None|False|False|water was off. Water must be on plumbing is incomplete must have a Gfci in the laundry room
+18018|323|2016-09-16 00:00:00|2016-09-16 00:00:00|False|False|None
+13623|324|2016-09-16 00:00:00|2016-09-16 00:00:00|False|False|None
+12569|325|2016-09-16 00:00:00|None|False|False|304.4 I.P.M.C. Premises Identification numbers lot less than 4 inches and 0.5 width and plainly visible
+20205|582|2016-12-20 00:00:00|None|True|False|None
+20108|583|2016-12-13 00:00:00|2016-12-13 00:00:00|False|False|None
+19952|584|2016-12-13 00:00:00|2016-12-13 00:00:00|False|False|None
+15098|585|2016-12-15 00:00:00|None|True|False|Bathroom: No label for no working GFI Study 1st floor: Open ground Bedroom 1st floor: Smoke detector Badroom 2 1st floor: Smoke detector Basement: Smoke detector quiet. New battery? Basement: Open ground, outlet near washroom cardsiib@aol.com
+19291|243|2016-08-05 00:00:00|None|False|False|None
+20550|244|2016-08-08 00:00:00|None|False|False|None
+20126|245|2016-08-08 00:00:00|None|True|False|None
+17125|246|2016-08-09 00:00:00|None|False|False|None
+19423|247|2016-08-09 00:00:00|None|False|False|None
+19015|248|2016-08-10 00:00:00|None|False|False|None
+20613|249|2016-08-11 00:00:00|None|False|False|None
+19291|250|2016-08-12 00:00:00|None|False|False|None
+17768|251|2016-08-16 00:00:00|None|False|False|None
+20328|252|2016-08-11 00:00:00|None|False|False|None
+20328|253|2016-08-16 00:00:00|2016-08-16 00:00:00|False|False|None
+20668|254|2016-08-16 00:00:00|None|False|False|None
+17198|255|2016-08-23 00:00:00|None|False|False|None
+14176|256|2016-08-23 00:00:00|None|False|False|None
+18345|257|2016-08-24 00:00:00|None|False|False|None
+19844|258|2016-08-25 00:00:00|None|False|False|None
+19015|259|2016-08-26 00:00:00|None|False|False|None
+18334|260|2016-08-26 00:00:00|None|False|False|None
+19844|261|2016-08-29 00:00:00|None|False|False|None
+17213|262|2016-08-30 00:00:00|None|False|False|None
+17723|263|2016-08-30 00:00:00|None|False|False|None
+17159|264|2016-08-30 00:00:00|None|False|False|None
+17634|265|2016-08-30 00:00:00|None|False|False|None
+18863|266|2016-08-19 00:00:00|2016-08-19 00:00:00|False|False|None
+18863|267|2016-08-19 00:00:00|2016-08-19 00:00:00|False|False|None
+19121|268|2016-08-19 00:00:00|2016-08-19 00:00:00|False|False|None
+19218|269|2016-08-19 00:00:00|2016-08-19 00:00:00|False|False|None
+19025|270|2016-08-19 00:00:00|2016-08-26 00:00:00|False|True|None
+18898|271|2016-08-19 00:00:00|None|False|False|None
+18604|272|2016-08-24 00:00:00|2016-08-24 00:00:00|False|False|None
+19086|273|2016-08-30 00:00:00|None|False|False|None
+20535|274|2016-08-31 00:00:00|2016-08-31 00:00:00|False|False|None
+19782|283|2016-09-01 00:00:00|None|False|False|None
+17738|284|2016-09-01 00:00:00|None|False|False|None
+17126|285|2016-09-01 00:00:00|None|False|False|None
+18990|286|2016-09-02 00:00:00|2016-09-02 00:00:00|True|False|None
+17050|288|2016-09-06 00:00:00|None|False|False|None
+19782|289|2016-09-06 00:00:00|None|True|False|None
+19994|291|2016-09-02 00:00:00|None|True|False|None
+15315|293|2016-09-06 00:00:00|2016-09-06 00:00:00|False|False|None
+20015|294|2016-09-08 00:00:00|2016-09-08 00:00:00|True|False|None
+18637|295|2016-09-09 00:00:00|2016-09-09 00:00:00|False|False|None
+19864|296|2016-09-12 00:00:00|None|False|False|None
+20267|297|2016-09-12 00:00:00|None|False|False|doors in upstairs do not function. Crack in foundation in basement near window next to exterior door Siding damaged on side of shed/ garage Awening on rear of house damaged deteriorating bricks at peak vent
+19854|298|2016-09-12 00:00:00|None|False|False|damaged closet door on second floor garage electrical boxed ripped off wall. Ttee caused wires to damage the box
+17031|299|2016-08-02 00:00:00|2016-08-02 00:00:00|False|False|None
+17031|300|2016-08-02 00:00:00|2016-08-02 00:00:00|False|False|None
+17031|301|2016-08-02 00:00:00|2016-08-02 00:00:00|False|False|None
+16710|326|2016-09-16 00:00:00|2016-09-16 00:00:00|False|False|None
+18186|327|2016-09-19 00:00:00|None|False|False|second floor apartment
+17673|328|2016-09-20 00:00:00|None|False|False|block damaged due to gutter failing. Fescia under gutter not fascened. Paint missing from exterior of house due to water corrosion.. Siding pulling from house on the front of house. I, Jesse Lachimia, arrived at 417 card ave Wilmerding at approx. 9:50 am on 9/20/16, and waited for 40 minutes. The owner never arrived.
+17199|329|2016-09-20 00:00:00|2016-09-20 00:00:00|False|False|None
+20674|331|2016-09-20 00:00:00|2016-09-20 00:00:00|True|False|None
+17319|332|2016-09-20 00:00:00|None|False|False|None
+17126|333|2016-09-20 00:00:00|2016-09-20 00:00:00|True|False|None
+14567|334|2016-09-20 00:00:00|None|False|False|None
+15493|335|2016-09-20 00:00:00|2016-09-20 00:00:00|False|False|None
+17425|336|2016-10-11 00:00:00|None|False|False|None
+17425|337|2016-11-08 00:00:00|None|True|False|None
+20383|338|2016-09-22 00:00:00|None|False|False|None
+20383|340|2016-09-22 00:00:00|2016-09-22 00:00:00|True|False|None
+19209|341|2016-08-30 00:00:00|2016-09-02 00:00:00|False|False|None
+18946|342|2016-09-02 00:00:00|None|True|False|None
+18832|343|2016-09-23 00:00:00|2016-09-23 00:00:00|False|False|None
+19994|344|2016-09-13 00:00:00|2016-09-13 00:00:00|False|False|None
+20645|345|2016-09-07 00:00:00|None|True|False|None
+20645|346|2016-09-13 00:00:00|None|False|False|None
+18863|347|2016-09-13 00:00:00|2016-09-13 00:00:00|False|False|None
+20465|348|2016-09-26 00:00:00|2016-09-26 00:00:00|False|False|None
+20465|349|2016-09-26 00:00:00|2016-09-26 00:00:00|False|False|None
+20465|350|2016-09-26 00:00:00|None|False|False|None
+20676|351|2016-09-13 00:00:00|None|False|False|None
+19266|352|2016-09-13 00:00:00|None|True|False|* Swimming pool gate shall be self closing, self latching, & swing in towards the pool.
+18380|353|2016-09-16 00:00:00|None|True|False|None
+18380|354|2016-09-19 00:00:00|None|False|False|None
+19268|355|2016-09-21 00:00:00|None|True|False|None
+19358|356|2016-09-26 00:00:00|None|True|False|* Occupany of any dwelling house, apartment, or other living quarters, without first obtaining a Certificate of Occupancy is a violation of Ordinance No. 978 with associated fines. Correct the above addresssed issues and schedule inspection #2.
+17592|357|2016-09-27 00:00:00|None|False|False|None
+17060|358|2016-09-27 00:00:00|None|False|False|None
+18186|359|2016-09-27 00:00:00|2016-09-27 00:00:00|True|False|None
+19355|360|2016-09-27 00:00:00|None|False|False|None
+17065|361|2016-09-27 00:00:00|None|False|False|None
+17380|362|2016-09-27 00:00:00|2016-11-29 00:00:00|False|False|There was a faint smell of gas near the dryer and the hot water tank. Please be sure there are no leaks in the gas supply. There was no door for the bathroom. Please install a door to the bathroom entrance. The siding and stone fascade on the house where damaged/missing. Please repair the siding and stone fascade to be functional, complete, and so that it prevents the weather and elements from entering the house.
+17380|363|2016-09-27 00:00:00|2016-11-29 00:00:00|False|False|Stairs on rear of house were damaged and pulling away from the house. They where not secure or sturdy. Please repair the stairs exiting the rear of the dwelling.
+20677|364|2016-09-28 00:00:00|None|False|False|Bedroom# 2 has a receptacle outlet that is falling off the wall.
+19355|365|2016-09-28 00:00:00|2016-09-28 00:00:00|True|False|None
+19217|366|2016-09-28 00:00:00|None|True|False|None
+15624|367|2016-09-23 00:00:00|2016-09-23 00:00:00|False|False|None
+15932|368|2016-09-27 00:00:00|None|False|False|This is the tthird inspection, was advised by David Moore469-771-5153, that the electricity and water were turned on. I was unable to complete prior inspection due to no electricity and running water. On this day, I attempted to inspect the property; however, the water and electricity were still not on. Called David Moore and left him a voicemail advising him of this. As of 9-28-16, I have not hear back from Mr. Moore.
+17592|369|2016-09-29 00:00:00|2016-10-06 00:00:00|True|False|None
+20610|370|2016-10-03 00:00:00|None|False|False|None
+20610|371|2016-10-03 00:00:00|2016-10-03 00:00:00|False|False|None
+20610|372|2016-10-03 00:00:00|2016-10-03 00:00:00|False|False|None
+20610|373|2016-10-03 00:00:00|None|False|False|None
+20233|374|2016-10-03 00:00:00|2016-10-03 00:00:00|False|False|None
+18308|375|2016-10-03 00:00:00|None|True|False|"302.1 Sanitation - Remove all trash from the rear yard of the dwelling. 302.4 Weeds - Cut and remove all weeds / high grass from the rear of the dwelling. 704.2 Smoke alarms - Install a smoke alarm in each bedroom / outside of the sleeping rooms / and one on each level. 605.2 Receptacle - Receptacle in the bathroom shall be GFCI protected. 604.3 Electrical systems hazards - Plugs along the kithen countertop shall be GFCI protected. 505.4 Hot water tank - Drip l;eg shall extend to within 6"" from the floor."
+17225|376|2016-10-04 00:00:00|None|True|False|doors missing,or uninstalled to enter bedrooms. Water present in bathroom. Water damage on floor of bathroom. Stove is leaking gass. Interior door in attic is broken. House appears to be sinking. Dwelling is occupied without occupancy permit.
+17065|377|2016-10-05 00:00:00|None|True|False|None
+18994|378|2016-10-04 00:00:00|None|True|False|None
+17060|379|2016-10-04 00:00:00|None|True|False|None
+18368|380|2016-06-15 00:00:00|None|True|False|None
+17935|381|2016-10-03 00:00:00|None|True|False|None
+17207|382|2016-10-04 00:00:00|2016-11-08 00:00:00|True|False|None
+17363|383|2016-10-04 00:00:00|None|False|False|None
+17802|384|2016-10-11 00:00:00|None|True|False|None
+20672|385|2016-10-04 00:00:00|None|False|False|None
+20671|386|2016-10-04 00:00:00|None|False|False|None
+19142|387|2016-10-04 00:00:00|None|True|False|None
+19142|388|2016-10-05 00:00:00|None|True|False|None
+19947|389|2016-10-05 00:00:00|None|True|False|None
+18551|390|None|None|False|False|None
+17618|391|2016-10-07 00:00:00|2016-10-07 00:00:00|False|False|None
+18994|392|2016-10-07 00:00:00|2016-10-07 00:00:00|True|False|None
+16263|393|2016-10-07 00:00:00|2016-10-07 00:00:00|False|False|None
+15932|394|2016-10-07 00:00:00|2016-10-07 00:00:00|False|False|None
+15253|395|2016-09-30 00:00:00|2016-10-21 00:00:00|False|False|No House I.D. numbers on exterior
+18669|396|2016-10-06 00:00:00|None|True|False|303.1 - The hot tub shall be properly protected both electrically and by guard (4 ft. high) or approved safety cover. 304.6 - The exterior covering (brick veneer) shall prevent passage of exterior elements through its barrier. (repair cracks)
+17708|397|2016-10-11 00:00:00|None|False|False|None
+12091|398|2016-10-11 00:00:00|2016-10-17 00:00:00|False|False|upstairs bathroom, master bedroom and basement electrical outlets all show open grounds.
+15795|399|2016-10-11 00:00:00|2016-10-11 00:00:00|False|False|None
+18551|400|2016-10-12 00:00:00|None|False|False|apt 21
+19060|401|2016-10-12 00:00:00|2016-11-08 00:00:00|True|False|None
+19111|402|2016-10-12 00:00:00|None|False|False|None
+19920|403|2016-10-13 00:00:00|None|False|False|None
+19111|404|2016-10-12 00:00:00|2016-10-13 00:00:00|True|False|None
+19061|405|2016-10-18 00:00:00|None|True|False|The water shall be on at the time of inspection. All shut-off valves shall be functional. All plumbing shall be free from leaks.
+20542|406|2016-10-13 00:00:00|None|False|False|None
+20542|407|2016-10-13 00:00:00|None|False|False|None
+15186|408|2016-10-07 00:00:00|2016-10-13 00:00:00|False|False|None
+14503|411|2016-10-14 00:00:00|2016-10-21 00:00:00|False|False|GARAGE DOOR SECTION HAS EXPOSED WOOD, LACKS PROTECTIVE COATING
+16161|412|2016-10-14 00:00:00|2016-10-25 00:00:00|False|False|None
+20572|413|2016-10-17 00:00:00|2016-10-17 00:00:00|False|False|None
+19920|414|2016-10-17 00:00:00|None|True|False|None
+17159|415|2016-10-18 00:00:00|None|True|False|None
+17160|416|2016-10-18 00:00:00|2016-10-18 00:00:00|False|False|None
+17380|417|2016-10-18 00:00:00|None|True|False|None
+17380|418|2016-10-18 00:00:00|None|True|False|None
+19063|419|2016-10-17 00:00:00|None|False|False|None
+12098|420|2016-10-18 00:00:00|2016-11-07 00:00:00|False|False|Exposed wiring in living room closet.
+12569|421|2016-10-18 00:00:00|2016-10-18 00:00:00|False|False|None
+17165|422|2016-10-19 00:00:00|None|False|False|None
+17476|423|2016-10-20 00:00:00|None|False|False|Bathroom door does not shut
+20610|424|2016-10-20 00:00:00|2016-10-20 00:00:00|True|False|None
+20610|425|2016-10-20 00:00:00|None|True|False|None
+20340|426|2016-10-21 00:00:00|None|False|False|awening over front door is damaged, front screen door is damaged and needs repair. Stairs going to garage are damaged and unsafe for travel. Garage has damage to roof and fescia board
+20125|427|2016-10-21 00:00:00|None|False|False|None
+12471|428|2016-08-02 00:00:00|2016-10-21 00:00:00|False|False|make sure outlet in Master Bath is GFCI or put cover plate on it
+17323|429|2016-10-25 00:00:00|None|False|False|None
+19701|430|2016-10-25 00:00:00|None|False|False|ō
+18659|431|2016-10-25 00:00:00|None|True|False|* All electrical shall be installed as per code and in a safe manner. (no loose wire ends exposed / furnace room)
+20333|432|2016-10-25 00:00:00|2016-10-25 00:00:00|False|False|None
+12157|433|2016-10-25 00:00:00|2016-10-25 00:00:00|False|False|None
+19142|434|2016-10-26 00:00:00|2016-10-26 00:00:00|True|False|None
+19142|435|2016-10-26 00:00:00|2016-10-26 00:00:00|True|False|None
+19251|436|2016-10-26 00:00:00|None|True|False|None
+19251|437|2016-10-26 00:00:00|2016-10-26 00:00:00|False|False|None
+20681|438|2016-10-26 00:00:00|2016-10-26 00:00:00|False|False|None
+18659|439|2016-10-26 00:00:00|2016-10-26 00:00:00|False|False|None
+18397|440|2016-10-26 00:00:00|2016-10-26 00:00:00|False|False|None
+18255|441|2016-10-26 00:00:00|2016-10-26 00:00:00|False|False|None
+19118|442|2016-11-08 00:00:00|None|False|False|None
+18763|443|2016-10-17 00:00:00|None|True|False|* There is a fence at the rear / side of the property that is falling in to the neighboring property. If the fence belongs to 219 Brinton, it needs addressed. Without survey, unable to verify. * Also, the possibility of this structure neing 2 units exists.
+19805|444|2016-10-27 00:00:00|None|False|False|None
+18484|445|2016-10-17 00:00:00|2016-10-17 00:00:00|True|False|None
+18484|446|2016-10-17 00:00:00|2016-10-17 00:00:00|False|False|None
+20682|447|2016-10-28 00:00:00|None|False|False|None
+17323|448|2016-10-31 00:00:00|2016-10-31 00:00:00|True|False|None
+20125|449|2016-10-31 00:00:00|2016-10-31 00:00:00|True|False|None
+20131|450|2016-10-31 00:00:00|None|False|False|garage shingles on side of structure and fescia board pealing off. 302.7 accessory structures.
+17445|451|2016-10-31 00:00:00|None|False|False|backyard needs railing to back pateo. Awening to back pateo damagrd. Needs repaired
+17862|452|2016-11-01 00:00:00|None|False|False|None
+19861|453|2016-11-01 00:00:00|2016-11-01 00:00:00|False|False|None
+19861|454|2016-11-01 00:00:00|2016-11-08 00:00:00|True|False|None
+18523|455|2016-11-01 00:00:00|None|False|False|None
+20682|456|2016-11-01 00:00:00|2016-11-01 00:00:00|True|False|None
+18303|457|2016-11-01 00:00:00|None|True|False|None
+17653|458|2016-11-01 00:00:00|None|False|False|all outlets serving kitchen counters must be GFCI protected windows must function as designed. Window must be able to stay open or closed on own.
+17653|459|2016-11-01 00:00:00|None|False|False|None
+17979|460|2016-11-01 00:00:00|2016-11-01 00:00:00|False|False|None
+17862|461|2016-11-01 00:00:00|2016-11-01 00:00:00|True|False|None
+19701|462|2016-11-01 00:00:00|2016-11-01 00:00:00|True|False|None
+19358|463|2016-11-03 00:00:00|2016-12-05 00:00:00|True|False|damaged wall and ceiling in basement must be repaired. Damaged wall at top of steps need repaired no light in laundry room. Damaged ceiling in laundry room. Damaged walls in 1st floor bathroom need repairs. Light in bedroom does not function.
+20465|464|2016-11-03 00:00:00|None|True|False|None
+17628|465|2016-11-18 00:00:00|None|False|False|None
+17513|466|2016-11-03 00:00:00|None|False|False|exposed wood where window was remodelled. 302.4 Protective treatment. Exposed wood at rear door where door was tesized livingroom windows do not latch 304.13 windows, skylights and doorframes. Bedroom #1 window comes off track/wont stay open. Bedroom #2 window wont latch. Electric heater missing faceplate in attic bedroom
+17157|467|2016-11-03 00:00:00|None|False|False|bedroom door knob broken.
+17145|468|2016-11-03 00:00:00|None|False|False|None
+18522|469|2016-11-01 00:00:00|None|False|False|None
+18522|470|2016-11-04 00:00:00|2016-11-04 00:00:00|True|False|None
+17476|471|2016-11-09 00:00:00|None|False|False|electrical:2 hot neutral reverse in living room. Open ground in living room. Bedroom #1 hot neutral reverse bedroom #1 ceiling fan missing fan, light does not function kitchen outlet has hot neutral reverse
+15554|472|2016-11-04 00:00:00|2016-11-04 00:00:00|False|False|None
+12989|473|2016-11-04 00:00:00|2016-11-04 00:00:00|False|False|None
+17243|474|2016-11-07 00:00:00|None|True|False|None
+19805|475|2016-11-07 00:00:00|2016-11-07 00:00:00|True|False|None
+17039|476|2016-11-07 00:00:00|2016-11-07 00:00:00|False|False|None
+17223|477|2016-11-07 00:00:00|None|False|False|walls and ceiling need to have no damage or p pealing wallpaper need smoke detectors 1 on each floor, 1 in each sleeping area, and 1 outside the sleeping areas
+17380|478|2016-11-08 00:00:00|None|False|False|tennent has moved out, apartment is vacant
+17380|479|2016-11-08 00:00:00|None|False|False|apartment is vacant
+18551|480|2016-11-08 00:00:00|2016-11-08 00:00:00|True|False|None
+19060|481|2016-11-08 00:00:00|2016-11-08 00:00:00|True|False|None
+19860|482|2016-11-10 00:00:00|2016-11-10 00:00:00|False|False|None
+19861|483|2016-11-08 00:00:00|2016-11-08 00:00:00|True|False|None
+17207|484|2016-11-08 00:00:00|2016-11-08 00:00:00|False|False|None
+17097|485|2016-11-08 00:00:00|None|False|False|basement receptacles not functioning bedroom#1 damaged receptacle outlets bedroom#3 window not functioning bedroom#4 window not functioning.
+20542|486|2016-11-01 00:00:00|2016-11-01 00:00:00|True|False|None
+20542|487|2016-11-03 00:00:00|None|True|False|None
+17370|488|2016-11-08 00:00:00|2016-11-08 00:00:00|True|False|None
+17363|489|2016-11-08 00:00:00|None|False|False|None
+17393|490|2016-11-08 00:00:00|None|False|False|no water service broken doorbell handrail to basement missing
+18342|491|None|None|False|False|None
+18911|492|2016-11-22 00:00:00|2016-11-22 00:00:00|False|False|None
+18342|493|None|None|False|False|None
+17324|494|2016-11-21 00:00:00|2016-11-21 00:00:00|False|False|None
+17329|495|2016-11-09 00:00:00|None|True|False|None
+17157|496|2016-11-09 00:00:00|None|False|False|holes in walls in basement, holes in baement ceiling. Bedroom door damaged.?
+17145|497|2016-11-09 00:00:00|2016-11-09 00:00:00|True|False|None
+19118|498|2016-11-09 00:00:00|2016-11-09 00:00:00|True|False|None
+18318|499|2016-11-15 00:00:00|None|False|False|None
+18733|501|2016-11-10 00:00:00|None|False|False|chimney needs repaired due to leak, exterior rear insulbrick damaged and exposing the wood underneath.
+18506|502|2016-11-17 00:00:00|None|False|False|None
+19060|503|2016-11-10 00:00:00|None|True|False|carpet runner in between bedrm (chuck's note)
+19060|504|2016-11-10 00:00:00|2016-11-14 00:00:00|True|False|None
+17653|505|2016-11-10 00:00:00|2016-11-10 00:00:00|True|False|None
+17653|506|2016-11-10 00:00:00|2016-11-10 00:00:00|True|False|None
+17738|507|2016-12-08 00:00:00|2016-12-08 00:00:00|False|False|None
+17368|508|2016-12-08 00:00:00|None|False|False|Nonfuctioning stairway door Damaged brick façade Broken doorknob upstairs bedroom 1
+18803|509|2016-11-14 00:00:00|None|False|False|damaged cabinets under sink. Damaged screen door, latch broken. Basement door knob damaged closet door doesn’t function upstairs Already occupied.
+19644|510|2016-11-22 00:00:00|None|False|False|None
+17329|511|2016-11-14 00:00:00|None|False|False|None
+17157|512|2016-11-15 00:00:00|2016-11-16 00:00:00|False|False|None
+19913|513|2016-11-14 00:00:00|2016-11-14 00:00:00|False|False|None
+19529|514|2016-11-14 00:00:00|2016-11-14 00:00:00|True|False|None
+20002|515|2016-11-15 00:00:00|None|False|False|None
+19860|516|2016-11-22 00:00:00|None|False|False|None
+17338|517|2016-11-15 00:00:00|None|False|False|None
+20472|518|2016-12-06 00:00:00|2016-12-20 00:00:00|True|False|bedroom door has holes in it
+17703|519|2016-11-22 00:00:00|2016-11-22 00:00:00|False|False|None
+17558|520|None|None|False|False|None
+17476|521|2016-11-16 00:00:00|2016-11-16 00:00:00|True|False|None
+17141|522|2016-11-16 00:00:00|2016-11-16 00:00:00|False|False|None
+17153|523|2016-11-16 00:00:00|None|False|False|None
+20588|524|2016-11-17 00:00:00|None|False|False|None
+19448|525|2016-11-17 00:00:00|None|False|False|None
+17673|526|2016-11-17 00:00:00|None|False|False|closet door in hallway does not function. Closet I bedroom#1 does not function living room window does not latch living room gfci has ópen ground side of buildings finish is damaged
+20002|527|2016-11-15 00:00:00|2016-11-17 00:00:00|True|False|None
+18814|528|2016-11-21 00:00:00|2016-11-21 00:00:00|False|False|None
+20267|529|2016-11-17 00:00:00|2016-11-17 00:00:00|True|False|None
+20131|530|2016-11-17 00:00:00|2016-11-17 00:00:00|True|False|None
+17393|531|2016-11-17 00:00:00|2016-11-17 00:00:00|True|False|None
+17363|532|2016-11-17 00:00:00|None|False|False|kitchen cupboards damaged large amounts of dog feces in the basement.
+17097|533|2016-11-17 00:00:00|2016-11-17 00:00:00|True|False|None
+17513|534|2016-11-18 00:00:00|None|True|False|windows in attick fell off track when attempted to open and jammed. House occupied without permit.
+17445|535|2016-11-18 00:00:00|None|True|False|None
+17772|536|None|None|False|False|None
+17123|537|2017-03-09 00:00:00|None|False|False|None
+20634|538|2016-11-28 00:00:00|None|False|False|None
+17160|539|2016-11-21 00:00:00|2016-11-21 00:00:00|False|False|None
+17160|540|2016-11-21 00:00:00|None|True|False|None
+19513|541|2016-11-29 00:00:00|2016-12-20 00:00:00|True|False|None
+17159|542|2016-11-22 00:00:00|None|True|False|None
+19691|543|None|None|False|False|None
+18308|544|2016-11-21 00:00:00|None|True|False|None
+17338|545|2016-11-21 00:00:00|2016-11-21 00:00:00|True|False|None
+20179|546|2017-03-14 00:00:00|None|True|False|washer blocking path of egress in basement
+18717|547|2016-12-08 00:00:00|None|False|False|basement door to storage needs repaired or removed.
+19484|548|2016-11-22 00:00:00|None|False|False|None
+20629|549|2016-11-22 00:00:00|None|False|False|None
+18318|550|2016-11-22 00:00:00|2016-11-22 00:00:00|True|False|None
+17153|551|2016-11-23 00:00:00|2016-11-23 00:00:00|True|False|None
+17513|552|2016-11-23 00:00:00|2016-11-23 00:00:00|False|False|None
+17792|553|2016-12-01 00:00:00|None|False|False|Bedroom door #2 broken/off hinges. Needs repaired/replaced
+17792|554|2016-12-01 00:00:00|2016-12-01 00:00:00|False|False|None
+17286|555|2016-12-01 00:00:00|None|True|False|door to bedroom damaged. Needs replaced or repaired
+17380|556|2016-11-29 00:00:00|2016-11-29 00:00:00|False|False|None
+17380|557|2016-11-29 00:00:00|2016-11-29 00:00:00|False|False|None
+17201|558|2016-11-29 00:00:00|2016-11-29 00:00:00|False|False|None
+17283|559|2016-11-28 00:00:00|2016-11-28 00:00:00|False|False|None
+19792|560|2016-12-15 00:00:00|None|False|False|Living room: Hot neutral reverse Dining Room: Open ground, patio door no handle doesn’t seal Kitchen: Countertops not GFCI x2, hole under sink & leaking, damage, damaged floor tiles Enclosed patio: Windows don't latch, no deadbolt on door Basement: Furnace leaking & damaged, doors not latches, broken window in basement 2nd floor landing: Open vent, tub access panel broken open 2nd floor bathroom: Door damaged, Master bedroom: Broken heating vent 2nd bedroom: Broken heating vent, broken window Exterior: Damaged fence backyard
+18479|561|2017-05-09 00:00:00|None|False|False|all living spaces require two outlets
+17165|562|2016-11-28 00:00:00|None|True|False|None
+17631|563|2016-12-05 00:00:00|None|False|False|None
+17821|564|None|None|False|False|None
+17673|565|2016-11-29 00:00:00|2016-11-30 00:00:00|True|False|None
+19484|566|2016-11-29 00:00:00|None|True|False|None
+20629|567|2016-11-29 00:00:00|2016-11-29 00:00:00|True|False|None
+18911|568|2016-12-02 00:00:00|None|False|False|None
+17708|569|2016-12-01 00:00:00|2016-12-01 00:00:00|True|False|None
+19861|570|2016-12-06 00:00:00|2016-12-06 00:00:00|False|False|None
+19832|571|2016-12-06 00:00:00|None|False|False|None
+14479|572|2016-12-06 00:00:00|None|False|False|Garage door leading into house has to be fire rated for 35 minutes.
+12232|573|2016-12-05 00:00:00|2016-12-05 00:00:00|True|False|None
+18803|574|2016-12-05 00:00:00|None|True|False|None
+20109|575|2016-12-13 00:00:00|None|True|False|None
+19701|576|2016-12-06 00:00:00|2016-12-08 00:00:00|True|False|None
+15391|577|2016-12-22 00:00:00|2016-12-22 00:00:00|False|False|None
+15313|578|2016-12-08 00:00:00|2016-12-08 00:00:00|False|False|None
+19292|579|2016-12-12 00:00:00|2016-12-12 00:00:00|False|False|None
+18195|580|2016-12-09 00:00:00|None|False|False|None
+19818|581|None|None|False|False|None
+18368|586|2016-12-09 00:00:00|None|False|False|cabinet in kitchen missing top
+17829|587|2016-12-12 00:00:00|None|False|False|Construction not finished
+18908|588|2016-12-13 00:00:00|2016-12-13 00:00:00|False|False|None
+18908|589|2016-12-13 00:00:00|2017-01-06 00:00:00|False|False|None
+18368|590|2017-01-09 00:00:00|2017-01-09 00:00:00|True|False|None
+18717|591|2016-12-12 00:00:00|2016-12-12 00:00:00|False|False|None
+14479|592|2016-12-12 00:00:00|None|False|False|None
+18814|593|2016-12-15 00:00:00|None|False|False|None
+13134|594|2016-12-13 00:00:00|2016-12-13 00:00:00|False|False|None
+19371|595|2016-12-13 00:00:00|None|False|False|None
+18946|596|2016-12-13 00:00:00|2016-12-16 00:00:00|True|False|None
+18591|597|2016-12-14 00:00:00|None|False|False|peiling paint in areas of basement
+19753|598|2016-12-15 00:00:00|None|False|False|basement light fixtures not operable basement needs dust cleaned porch needs debris moved general construction debris needs cleaned
+14567|599|2016-12-15 00:00:00|2016-12-15 00:00:00|True|False|None
+18846|600|2016-12-22 00:00:00|2016-12-22 00:00:00|False|False|None
+18278|601|None|None|False|False|None
+18803|602|2016-12-20 00:00:00|None|False|False|Bathroom door needs repaired
+18996|603|2016-12-22 00:00:00|None|False|False|suport next to basement stairs not secure
+20387|604|2016-12-19 00:00:00|None|False|False|house numbers not installed on house, light fixture in basement not secure, more than two appliances are being operated on one maybe two outlets. Kitchen gfci wired backwards bathroom gfci backwards bedrooms need smoke detectors laundry gfci not secure in box 2nd bath gfci wired backwards basement bedroom needs smoke detector
+20563|605|2016-12-19 00:00:00|2016-12-19 00:00:00|True|False|None
+18803|606|2016-12-20 00:00:00|None|False|False|None
+18803|607|2016-12-20 00:00:00|None|False|False|None
+12116|608|2016-12-22 00:00:00|None|False|False|Visible house numbering
+12110|609|2017-01-11 00:00:00|None|False|False|None
+18859|610|2016-12-22 00:00:00|None|False|False|None
+20205|611|2016-12-20 00:00:00|None|True|False|not paid, but inspection was performed application isnt submitted either.
+18814|612|2016-12-21 00:00:00|None|False|False|None
+17475|613|2016-12-23 00:00:00|None|True|False|Missing step on stairway leading to front porch Plug holes in siding. Damaged door to basement. Nonfunctional backdoor deadbolt Many upstairs outlets damaged or pulling out of wall Front door bottom plate
+18966|728|2017-02-21 00:00:00|None|False|False|garbage can needed
+18551|729|2017-03-07 00:00:00|None|False|False|None
+19118|730|2017-02-22 00:00:00|None|False|False|None
+17295|731|2017-03-02 00:00:00|None|False|False|None
+19747|614|2016-12-27 00:00:00|2016-12-27 00:00:00|False|False|None
+18996|615|2016-12-22 00:00:00|None|False|False|hall window doesn’t latch
+17504|616|None|None|False|False|None
+18277|617|2016-12-27 00:00:00|None|True|False|doorbell inoperable, laundry room gfci inoperable house needs a th-orough cleaning
+19768|618|2016-12-27 00:00:00|None|False|False|hole in interior door, bedroom doesn’t have outlets, deadbolt doesn’t fully engage, exterior õutlet inoperable
+20383|619|2017-01-03 00:00:00|None|False|False|None
+18500|620|2016-12-28 00:00:00|None|False|False|None
+20021|621|2016-12-29 00:00:00|None|False|False|emergency lights don’t funtion
+18803|622|None|None|True|False|None
+18803|623|None|None|True|False|None
+18803|624|None|None|True|False|None
+19967|625|None|None|True|False|None
+19967|626|None|None|True|False|None
+19114|627|None|None|False|False|None
+17698|628|None|None|False|False|None
+20383|629|2017-02-07 00:00:00|None|True|False|None
+18714|630|2017-01-03 00:00:00|None|True|False|outlet cover, for phone, not installed in bedrooms, emergency light outside inoperable, electric meter is loose,
+17829|631|2017-01-03 00:00:00|None|True|False|None
+17630|632|2017-01-04 00:00:00|2017-01-04 00:00:00|True|False|None
+17134|633|2017-01-05 00:00:00|2017-01-05 00:00:00|False|False|None
+17846|634|None|None|False|False|water in basement due to unkown leak. Front door window cracked
+18813|635|2017-01-11 00:00:00|None|False|False|None
+20304|636|2017-01-10 00:00:00|None|False|False|None
+20298|637|2017-01-09 00:00:00|None|False|False|water shut off notices have been given. Curtain hanger on front door isnt secure,
+12768|638|2017-01-09 00:00:00|None|False|False|None
+20378|639|2017-01-10 00:00:00|None|True|False|None
+17877|640|2017-01-09 00:00:00|None|True|False|None
+17792|641|2017-01-10 00:00:00|2017-01-10 00:00:00|True|False|None
+17864|642|2017-02-02 00:00:00|None|False|False|None
+17319|643|2017-01-13 00:00:00|None|True|False|None
+17319|644|2017-01-13 00:00:00|None|False|False|None
+17319|645|2017-01-13 00:00:00|None|True|False|None
+19978|646|2017-01-10 00:00:00|None|False|False|None
+17202|647|2017-01-13 00:00:00|None|False|False|None
+17771|648|2017-01-13 00:00:00|None|False|False|water main line broken. Bedroom door jam broken, door not functioning properly
+16037|649|2017-01-12 00:00:00|None|True|False|None
+19357|650|2017-01-13 00:00:00|None|True|False|damaged door bell
+19791|651|2017-01-12 00:00:00|None|False|False|None
+18859|652|2017-01-17 00:00:00|None|True|False|None
+18529|653|2017-01-17 00:00:00|None|False|False|basement exit not secure
+17986|654|2017-01-17 00:00:00|None|True|False|None
+18520|655|2017-01-17 00:00:00|None|False|False|None
+19812|656|2017-01-31 00:00:00|None|False|False|None
+17488|657|2017-01-19 00:00:00|None|True|False|exterior doors screwed shut, need deadbolts on doors
+17211|658|2017-01-23 00:00:00|None|True|False|siding under porch roof incomplete
+19334|659|2017-01-18 00:00:00|None|False|False|*main sewer line for the residence was leaking into the basement at the time of inspection
+19346|660|2017-01-19 00:00:00|None|False|False|None
+18832|661|2017-01-19 00:00:00|None|False|False|None
+17361|662|2017-01-19 00:00:00|None|True|False|hatch to basement from exterior is damaged and delapidated.
+19262|664|2017-01-20 00:00:00|None|True|False|bedroom room missing second outlet, bedroom doors don’t close and or latch properly, malfunctioning switch in front bedroom, none operational light sockets and outlets in basement, peeling and chipping paint in stairwell, down stairs windows don’t open,
+17554|665|2017-01-20 00:00:00|None|False|False|Flashing around living room window catches window and prevents it from opening.
+12462|666|2017-01-20 00:00:00|None|False|False|None
+19745|668|2017-01-31 00:00:00|None|True|False|None
+17646|669|2017-01-26 00:00:00|None|False|False|window in dining room do not latch
+19291|670|2017-01-26 00:00:00|None|False|False|None
+20055|671|2017-01-23 00:00:00|None|False|False|missing light switch cover in dining room, all occupiable rooms are required to have two usable outlets
+18846|673|2017-01-26 00:00:00|None|False|False|did not include a tenant name on the application -GH
+13282|674|2017-01-30 00:00:00|None|True|False|None
+17039|675|2017-02-10 00:00:00|None|False|False|None
+17039|676|2017-02-10 00:00:00|None|False|False|None
+17039|677|2017-02-10 00:00:00|None|False|False|None
+17039|678|2017-02-10 00:00:00|None|False|False|None
+20564|679|2017-02-23 00:00:00|None|False|False|exterior needs maintenace from landscape standpoint
+18825|680|None|None|False|False|None
+17363|681|None|None|False|False|None
+17059|682|2017-02-02 00:00:00|None|False|False|None
+17289|683|2017-02-02 00:00:00|None|False|False|basement hatchway needs to open from inside
+17289|684|2017-02-02 00:00:00|None|False|False|bedroom door needs painted
+17204|685|2017-02-02 00:00:00|None|False|False|None
+17203|686|2017-02-02 00:00:00|None|False|False|None
+17836|687|2017-02-02 00:00:00|None|False|False|None
+17836|688|2017-02-02 00:00:00|None|False|False|None
+17224|689|None|None|False|False|None
+17059|690|2017-02-02 00:00:00|None|False|False|None
+19063|691|2017-02-02 00:00:00|None|False|False|None
+18921|692|2017-02-06 00:00:00|None|False|False|None
+11967|693|2017-02-03 00:00:00|None|False|False|None
+19111|694|2017-01-31 00:00:00|None|True|False|None
+19690|695|2017-02-28 00:00:00|None|False|False|None
+18825|696|2017-02-13 00:00:00|None|False|False|None
+18277|697|2017-02-14 00:00:00|None|True|False|None
+19262|698|2017-02-01 00:00:00|None|True|False|None
+17123|699|2017-03-09 00:00:00|None|False|False|None
+17123|700|2017-03-09 00:00:00|None|False|False|window in master bedroom not functioning
+18669|701|2017-02-06 00:00:00|None|False|False|None
+18921|702|2017-02-06 00:00:00|None|False|False|None
+15796|703|2017-02-08 00:00:00|None|True|False|None
+18733|704|2017-02-13 00:00:00|None|False|False|None
+19230|705|2017-02-23 00:00:00|None|False|False|None
+18996|706|2017-02-13 00:00:00|None|False|False|None
+18801|707|2017-01-25 00:00:00|None|False|False|1.missing downspouts 2. Missing protective treatment in multiple areas of the exterior of the house. 3. Mildew growing on exterior of residence. 4. misc. garbage and rubbish present on the premises. 5. Missing hand rail on one side of house, rusty hand rail on other side. 6. Residence roof and accessory structure roof contain missing shingles and flashing 7. Steps and sidewalks are uneven and create a hazard while walking. 8. Multiple interior walls had peeling paint, and missing drywall and paint. 9. Wall outlet covers are missing, cracked and/or broken. 10. Multiple instances of exposed wiring are present throughout the house. 11.multiple ceiling fixtures are missing, broken, and/or not secure to the structure 12. Multiple areas of residence have rubbish, garbage, and building materials present 13. Building isn't secure from intrusion 14. multiple windows have cracks/holes in glazing. 15. Multiple instances of deficient plumbing were found from missing piping to unsecure toilets 16. Handrails and guards are deficient due to missing rails/guards, mold/mildew growing on banisters etc. 17. Multiple instances of mildew and mold were found inside the residence
+17605|708|None|None|False|False|None
+17039|709|2017-02-10 00:00:00|None|False|False|None
+17039|710|2017-02-10 00:00:00|None|True|False|None
+15290|711|2017-02-10 00:00:00|None|False|False|None
+15153|712|2017-02-10 00:00:00|None|False|False|None
+18457|713|2017-02-13 00:00:00|None|True|False|None
+18086|714|2017-02-14 00:00:00|None|False|False|Smoke detectors are required on every floor, and in each sleeping area.
+18814|715|2017-02-14 00:00:00|None|False|False|None
+18814|716|2017-02-14 00:00:00|None|False|False|None
+18506|717|2017-02-24 00:00:00|None|False|False|None
+19321|718|2017-02-23 00:00:00|None|False|False|None
+19975|719|2017-02-14 00:00:00|None|False|False|None
+17497|720|2017-02-16 00:00:00|None|True|False|None
+19861|721|2017-02-23 00:00:00|None|False|False|None
+19861|722|2017-02-23 00:00:00|None|False|False|None
+12267|723|2017-02-17 00:00:00|None|True|False|kawoodpa@comcast.net
+15436|724|2017-02-24 00:00:00|None|False|False|Full inspection report in Nick's folder on server, titled 1537 Beulah. *Could not gain entry to interior of property.* -Sidewalk needs resurfaced and is sinking into the ground and crumbling in spots. -Both retaining walls are crumbling, deteriorated, and failing. -Brick planter between garage doors is crumbling and needs repaired or removed. -Garage doors and frames need repainted. -Frame around right garage door is dilapidated and rotted and needs repaired. -Porch is in a severe state of deterioration. -Porch railing is rusting, broken, and needs repainted. -Front door frame needs repainted. -Front door screen door has a broken button on the handle. -Front projecting window frame needs repainted. -Light fixture on the brick fence on the left side of the property is broken. -All railings in back yard are broken, rusted, and need repainted. -Back projecting window frame needs repainted. -Gutters in back of the house have weeds growing in them. -Overhang extentions above back yard second floor windows needs repainted.
+12506|725|2017-02-17 00:00:00|None|False|False|-Open ground in dining room by front window. -2 open grounds in living room -Open ground on porch (make sure if replaced, replacement is GFCI) -2 open ground in side room on either side of china cabinet -2 Hot/Neutral reverses in side room -Open ground in 2nd floor storage room -Open ground in master bedroom (above where scale was) -Open ground in bedroom near dresser -Open ground in basement -Open ground in laundry room
+18573|726|2017-02-28 00:00:00|None|True|False|None
+17978|727|2017-02-21 00:00:00|None|True|False|None
+17295|732|2017-03-02 00:00:00|None|False|False|None
+17295|733|2017-03-02 00:00:00|None|False|False|None
+17295|734|2017-03-02 00:00:00|None|False|False|None
+17295|735|2017-03-02 00:00:00|None|False|False|None
+17295|736|2017-03-27 00:00:00|None|False|False|None
+17261|737|2017-03-02 00:00:00|None|False|False|None
+17261|738|2017-03-02 00:00:00|None|False|False|None
+17261|739|2017-03-02 00:00:00|None|False|False|None
+17384|740|None|None|False|False|None
+17397|741|2017-02-24 00:00:00|None|True|False|None
+13028|742|2017-03-01 00:00:00|None|True|False|None
+17031|743|2017-02-27 00:00:00|None|False|False|None
+17031|744|2017-02-27 00:00:00|None|False|False|None
+20298|745|2017-02-27 00:00:00|None|False|False|open neutral in outlet in basement,
+17464|746|2017-03-02 00:00:00|None|False|False|None
+17261|747|None|None|False|False|None
+17235|748|None|None|False|False|None
+17235|749|None|None|False|False|None
+18680|750|2017-03-09 00:00:00|None|True|False|None
+20344|751|2017-03-07 00:00:00|None|True|False|None
+20554|752|2017-03-07 00:00:00|None|False|False|None
+20393|753|2017-03-07 00:00:00|None|False|False|None
+20237|754|2017-03-14 00:00:00|None|False|False|None
+19690|755|None|None|False|False|None
+19334|756|2017-02-28 00:00:00|None|False|False|*No water service to apartment
+19334|757|2017-02-28 00:00:00|None|False|False|None
+19334|758|2017-02-28 00:00:00|None|False|False|None
+19334|759|2017-02-28 00:00:00|None|False|False|None
+19334|760|2017-02-28 00:00:00|None|False|False|None
+18143|761|2017-03-02 00:00:00|None|False|False|None
+12882|762|2017-03-02 00:00:00|None|True|False|None
+13534|763|2017-03-02 00:00:00|None|True|False|None
+18990|764|2017-03-03 00:00:00|None|True|False|None
+18572|765|2017-03-17 00:00:00|None|False|False|None
+18865|766|2017-03-10 00:00:00|None|True|False|None
+18532|767|2017-03-06 00:00:00|None|True|False|bathroom window latch damaged
+15225|768|2017-03-03 00:00:00|None|True|False|None
+18456|769|None|None|False|False|None
+17319|770|2017-03-03 00:00:00|None|False|False|window in living room damaged, does not stay open.
+17319|771|2017-03-03 00:00:00|None|False|False|None
+17319|772|2017-03-03 00:00:00|None|False|False|None
+17319|773|2017-03-03 00:00:00|None|False|False|None
+17319|774|2017-03-03 00:00:00|None|False|False|window in bedroom #2 does not latch
+17319|775|2017-03-03 00:00:00|None|False|False|None
+19256|776|2017-03-06 00:00:00|None|False|False|None
+18983|777|2017-03-16 00:00:00|None|True|False|Damaged front door, trim around window in front door. Broken mirror in bathroom
+12605|778|2017-03-07 00:00:00|None|True|False|Inspection report on file as Word document named '2025 Beulah' in Nick's folder on server
+12573|779|2017-02-14 00:00:00|None|True|False|None
+17123|780|2017-03-09 00:00:00|None|False|False|None
+19223|781|2017-03-09 00:00:00|None|False|False|None
+17532|782|2017-03-13 00:00:00|None|False|False|None
+19337|783|2017-03-13 00:00:00|None|False|False|None
+19174|784|2017-03-13 00:00:00|None|False|False|None
+19179|785|2017-03-16 00:00:00|None|False|False|None
+12080|786|2017-03-09 00:00:00|None|True|False|None
+14323|787|2017-03-09 00:00:00|None|True|False|None
+13342|788|2017-03-09 00:00:00|None|True|False|None
+16742|789|2017-03-09 00:00:00|None|False|False|Inspection report on server in Nick's folder, titled 2425 Greensburg
+18342|790|2017-05-16 00:00:00|None|False|False|None
+18958|791|2017-03-16 00:00:00|None|False|False|None
+12105|792|2017-03-10 00:00:00|None|False|False|Exterior: -Back porch outlet has open ground Interior: -3 GFCIs needed in kitchen -GFCI in 2nd floor bathroom -Office window opener loose -2 GFCIs in master bath Basement: -2 GFCIs needed in laundry room -Label breakers
+20120|793|2017-03-14 00:00:00|None|False|False|None
+19464|794|2017-03-14 00:00:00|None|True|False|None
+17516|795|None|None|False|False|None
+18435|796|2017-03-13 00:00:00|None|False|False|None
+19866|797|2017-03-14 00:00:00|None|False|False|None
+19866|798|2017-03-14 00:00:00|None|False|False|None
+18753|799|2017-03-21 00:00:00|None|True|False|None
+18640|800|2017-03-14 00:00:00|None|True|False|None
+18640|801|2017-03-14 00:00:00|None|True|False|None
+17039|802|2017-03-20 00:00:00|None|False|False|None
+19290|803|2017-03-21 00:00:00|None|False|False|"*if future use is a rental, then all exterior doors are required to have min. 1"" throw deadbolts. Grass exceeds borough limits on height (needs to be cut) All stair ways with more than 4 risers are required to have a handrail on one side."
+17154|804|None|None|False|False|None
+21007|805|2017-03-15 00:00:00|None|True|False|Open ground outlets: -4 in 1st flloor living room -2 in 1st floor rear right room -2 in 1st floor rear left room -2 in kitchen (these don't need to be GFCI protected because they're 6 ft away from sink) -1 in 1st floor kitchen -1 in garage -3 in 2nd floor left bedroom -2 in second floor right bedroom
+20768|806|2017-03-15 00:00:00|None|True|False|None
+20528|807|None|None|False|False|None
+16859|808|2016-07-26 00:00:00|None|True|False|None
+13802|809|2017-02-21 00:00:00|None|True|False|None
+16262|810|2016-07-05 00:00:00|None|True|False|None
+19701|811|2017-03-16 00:00:00|None|True|False|None
+20122|812|2017-03-21 00:00:00|None|True|False|Premises Identification is missing numbers
+20340|813|2017-03-21 00:00:00|None|True|False|"upstairs right bedroom fixture untested due to lack of bulb * all exterior doors are required to have deadbolts with a minimum throw of 1"" +front screen door damaged."
+13420|943|2017-05-12 00:00:00|None|False|False|None
+12261|944|2017-05-12 00:00:00|None|False|False|None
+13853|945|2017-04-13 00:00:00|None|True|False|None
+12372|946|2017-05-11 00:00:00|None|False|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS"""
+19850|947|2017-05-16 00:00:00|None|False|False|doorbell switch not secure and doesn’t work grass needs cut awnings need cleaned items are leftover from previous tenants need removed cable lines not secured to house
+20499|948|2017-05-16 00:00:00|None|False|False|weeds are growing through walkways
+19149|949|2017-05-15 00:00:00|None|False|False|None
+14948|950|2017-05-04 00:00:00|None|True|False|None
+13002|951|2017-05-15 00:00:00|None|False|False|None
+18818|952|2017-05-16 00:00:00|None|False|False|None
+19294|953|2017-05-16 00:00:00|None|False|False|check with borough about electrical inspection
+15090|954|2017-05-16 00:00:00|None|False|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS"""
+17204|955|None|None|False|False|None
+17738|956|None|None|False|False|None
+17127|957|None|None|False|False|None
+17127|958|None|None|False|False|None
+17125|959|None|None|False|False|None
+20335|814|2017-03-21 00:00:00|None|True|False|water leak in basement (floor was very wet, please ensure that the water leak has been completely resolved) Collapsing basement wall, and deteriorating floor joists in coal cellar room, as well as inoperable light fixture.
+20445|815|2017-03-21 00:00:00|None|True|False|None
+15596|816|2017-03-21 00:00:00|None|False|False|1. One outlet on back porch was not GFCI. 2. Other outlet on back porch had GFCI but would not trip and must be repaired. 3. GFCI in bathroom on second floor pulled away from wall when plugs were removed. Must be securely fastened. 4. GFCI in main basement room on the side wall, in between the two windows, would not reset and therefore had no power. This outlet does not need to be GFCI, so it may be replaced with a 3 prong outlet if it cannot be repaired. GFCIs are always recommended, though.
+13139|817|2017-03-17 00:00:00|None|True|False|Door frame in laundry room was broken/loose.
+13374|818|2017-03-17 00:00:00|None|True|False|GFCI needed: -2 in kitchen -1 in main bathroom -1 in master bathroom -1 in laundry room, near wash tub -2 in basement near bar sink
+18604|819|2017-03-20 00:00:00|None|False|False|None
+19346|820|2017-03-23 00:00:00|None|False|False|None
+18126|821|2017-03-23 00:00:00|None|True|False|No show of owner, unable to complete inspection
+18937|822|2017-03-23 00:00:00|None|True|False|kitchen window does not latch upstairs windows do not latch
+17883|823|2017-03-27 00:00:00|None|False|False|None
+18351|827|None|None|False|False|None
+14661|828|2017-03-21 00:00:00|None|False|False|None
+19929|829|2017-03-28 00:00:00|None|False|False|None
+14666|830|2017-01-18 00:00:00|None|True|False|None
+16542|831|2016-12-14 00:00:00|None|True|False|None
+17083|832|2017-03-23 00:00:00|None|False|False|None
+18736|833|2017-04-06 00:00:00|None|False|False|None
+18899|834|None|None|False|False|None
+16261|835|2016-09-07 00:00:00|None|True|False|None
+19196|836|2017-03-30 00:00:00|None|False|False|chain link fence dmaged and needs repairs. No water or electric services on
+12172|837|2017-03-24 00:00:00|None|False|False|REPORT ON SERVER UNDER 'NICK'>'INSPECTION REPORTS'
+17160|838|2017-03-24 00:00:00|None|False|False|None
+18604|839|2017-03-31 00:00:00|None|False|False|None
+18863|840|2017-03-28 00:00:00|None|False|False|None
+19996|841|2017-03-28 00:00:00|None|False|False|None
+19860|842|2017-03-28 00:00:00|None|False|False|None
+17307|843|2017-03-28 00:00:00|None|True|False|None
+17160|844|None|None|False|False|None
+13107|845|2017-03-28 00:00:00|None|True|False|REPORT ON SERVER UNDER 'NICK'>INSPECTION REPORTS
+12564|846|2017-03-28 00:00:00|None|False|False|Water was off. Mailbox leaning.
+19060|847|2017-04-03 00:00:00|None|False|False|None
+19363|848|2017-03-30 00:00:00|None|False|False|None
+18091|849|2017-04-03 00:00:00|None|False|False|None
+18127|850|2017-04-04 00:00:00|None|False|False|None
+17265|851|2017-03-30 00:00:00|None|True|False|None
+17265|852|2017-03-30 00:00:00|None|False|False|None
+12785|853|2017-03-01 00:00:00|None|True|False|None
+16281|854|2017-03-13 00:00:00|None|True|False|None
+12801|855|2016-06-14 00:00:00|None|True|False|None
+17334|856|None|None|False|False|None
+17505|857|2017-03-31 00:00:00|None|False|False|None
+17833|858|None|None|False|False|None
+17673|859|2017-04-03 00:00:00|None|False|False|None
+18014|860|None|None|False|False|None
+19264|861|2017-04-07 00:00:00|None|False|False|None
+20044|862|2017-04-04 00:00:00|None|True|False|None
+20153|863|2017-04-11 00:00:00|None|False|False|*missing screen/window in kitchen screen door Backbedroom window has broken hardware needs repaired basement door needs deadbolt interior entrance door deadbolt doesn’t line up with lock plate weeds in backyard need cut tree half fallen and yard debris needs to be removed front porch out of plumb.
+20153|864|2017-04-11 00:00:00|None|False|False|*bathroom window wont latch or easily close bedroom window wont operate
+20072|865|2017-04-11 00:00:00|None|False|False|None
+20194|866|2017-04-11 00:00:00|None|False|False|None
+20305|867|2017-04-11 00:00:00|None|False|False|Stove gas feed needs 1/4 turn shut off valve installed
+20138|868|None|None|False|False|None
+20001|869|2017-04-06 00:00:00|None|False|False|second exterior door must have deadbolt. Garage to house door must br 20 minute fire rated door
+20301|870|None|None|False|False|None
+15339|871|2017-04-03 00:00:00|None|True|False|INSPECTION REPORT ON SERVER UNDER 'NICK>INSPECTION REPORTS'
+12751|872|2017-04-03 00:00:00|None|True|False|INSPECTION REPORT ON SERVER UNDER 'NICK>INSPECTION REPORTS'
+13558|873|2017-04-03 00:00:00|None|False|False|None
+13567|874|2017-04-03 00:00:00|None|False|False|None
+18635|875|2017-04-04 00:00:00|None|False|False|None
+17207|876|2017-04-11 00:00:00|None|False|False|kitchen window doesn’t function.
+17206|877|2017-04-11 00:00:00|None|False|False|damaged kitchen countertops
+21059|878|2017-04-05 00:00:00|None|True|False|None
+17844|879|2017-04-10 00:00:00|None|False|False|None
+17307|880|2017-04-10 00:00:00|None|True|False|gfci serving countertop not grounded, not labled
+18378|881|2017-04-10 00:00:00|None|False|False|occupied sade mccune. Cancelled due to doctor appointment
+20894|882|2017-04-05 00:00:00|None|True|False|None
+15872|883|2017-04-07 00:00:00|None|False|False|INSPECTION REPORT ON SERVER UNDER 'NICK>INSPECTION REPORTS'
+12488|884|2017-04-07 00:00:00|None|False|False|INSPECTION REPORT ON SERVER UNDER 'NICK>INSPECTION REPORTS'
+12163|885|2017-04-07 00:00:00|None|True|False|None
+20649|886|None|None|False|False|None
+17011|887|2017-04-10 00:00:00|None|False|False|None
+17184|888|None|None|False|False|None
+17644|889|None|None|False|False|None
+20256|890|2017-04-20 00:00:00|None|False|False|Damaged front fence and gait.
+20017|891|2017-04-25 00:00:00|None|False|False|None
+19149|892|2017-04-13 00:00:00|None|True|False|No water service.
+18813|893|2017-04-13 00:00:00|None|False|False|None
+12168|894|2017-04-11 00:00:00|None|False|False|None
+17335|895|2017-04-13 00:00:00|None|False|False|None
+17653|896|2017-04-13 00:00:00|None|False|False|None
+16546|897|2017-02-02 00:00:00|None|True|False|None
+18484|898|2017-04-20 00:00:00|None|False|False|None
+19391|899|2017-04-17 00:00:00|None|False|False|None
+16365|900|2017-04-18 00:00:00|None|False|False|None
+20205|901|2017-04-18 00:00:00|None|False|False|None
+19861|902|2017-04-18 00:00:00|None|False|False|None
+13097|903|2017-04-21 00:00:00|None|True|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS"""
+14818|904|2017-04-21 00:00:00|None|True|False|None
+18918|905|2017-04-24 00:00:00|None|True|False|None
+20390|906|2017-04-25 00:00:00|None|False|False|None
+20593|907|2017-04-25 00:00:00|None|False|False|None
+17295|908|None|None|False|False|None
+17295|909|None|None|False|False|None
+17295|910|2017-04-28 00:00:00|None|False|False|None
+17295|911|None|None|False|False|None
+18909|912|2017-05-04 00:00:00|None|False|False|None
+15067|913|2017-04-19 00:00:00|None|False|False|None
+20800|914|2017-04-26 00:00:00|None|False|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS'."
+19046|915|2017-04-27 00:00:00|None|False|False|None
+17714|916|2017-04-27 00:00:00|None|False|False|Basement hatchway must have latching mechanism operatable from inside of building
+14801|917|2017-04-28 00:00:00|None|True|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS"""
+16352|918|2017-04-28 00:00:00|None|False|False|None
+20393|919|2017-05-01 00:00:00|None|False|False|None
+17113|920|2017-05-05 00:00:00|None|False|False|None
+18832|921|2017-05-11 00:00:00|None|False|False|None
+17366|922|None|None|False|False|None
+15327|923|2017-05-02 00:00:00|None|False|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS"""
+16352|924|None|None|False|False|None
+15344|925|2017-04-28 00:00:00|None|False|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS"""
+14593|926|2017-04-28 00:00:00|None|True|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS"""
+20969|927|2017-05-03 00:00:00|None|False|False|None
+17378|928|2017-05-04 00:00:00|None|False|False|None
+18937|929|2017-05-04 00:00:00|None|False|False|None
+18358|930|2017-05-08 00:00:00|None|False|False|None
+15401|931|2017-05-05 00:00:00|None|False|False|None
+18143|932|2017-05-08 00:00:00|None|False|False|None
+13991|933|2017-03-20 00:00:00|None|True|False|None
+17859|934|2017-05-11 00:00:00|None|False|False|None
+14765|935|2017-05-09 00:00:00|None|False|False|None
+15598|936|2017-05-09 00:00:00|None|False|False|"INSPECTION REPORT ON SERVER UNDER ""NICK>INSPECTION REPORTS"""
+17113|937|2017-05-05 00:00:00|None|False|False|None
+17113|938|2017-05-05 00:00:00|None|False|False|None
+19979|939|2017-05-09 00:00:00|None|True|False|An approved emergency exit sign is needed above the Main entrance door. Emergency lighting needs to be operable.
+18342|940|2017-05-16 00:00:00|None|False|False|None
+18913|941|2017-05-11 00:00:00|None|False|False|Electrical outlets on exterior wall facing center ave were dead, similar to a breaker being tripped.
+16672|942|2015-05-11 00:00:00|None|True|False|None
+17101|960|None|None|False|False|None

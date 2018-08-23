@@ -23,6 +23,8 @@
 
                             <h2>Looming compliance timeframe events</h2>
                             
+                            <ui:remove>
+                                
                             <p:selectOneButton id="viewButtons" value="#{missionControlBB.timelineEventViewType}">
                                 <f:selectItem itemLabel="Today Only" itemValue="1" />
                                 <f:selectItem itemLabel="Next 7 Days" itemValue="2" />
@@ -30,6 +32,7 @@
                                 <f:selectItem itemLabel="Custom Range" itemValue="4" />
                                 <p:ajax update="caseEventTable"/>
                             </p:selectOneButton>>
+                            </ui:remove>
                             
                             <p:spacer height="10px"/>
 

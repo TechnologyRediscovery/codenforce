@@ -34,7 +34,10 @@ public class CeCasesBB extends BackingBeanUtils implements Serializable{
 
     
     private ArrayList<CECase> caseList;
+    private ArrayList<CECase> filteredCaseList;    
+    
     private ArrayList<CECase> caseHistoryList;
+    private ArrayList<CECase> filteredCaseHistoryList;
     private CECase selectedCase;
     private ArrayList<EventCase> recentEventList;
     private ArrayList<Person> muniPeopleList;
@@ -45,10 +48,10 @@ public class CeCasesBB extends BackingBeanUtils implements Serializable{
     public CeCasesBB() {
     }
     
-    public String viewCase(){
-        getSessionBean().setActiveCase(selectedCase);
+    public String viewCase(CECase c){
+        getSessionBean().setActiveCase(c);
         // make the property associated with a selected case the active property
-        getSessionBean().setActiveProp(selectedCase.getProperty());
+        getSessionBean().setActiveProp(c.getProperty());
         return "caseProfile";
     }
 
@@ -145,6 +148,34 @@ public class CeCasesBB extends BackingBeanUtils implements Serializable{
      */
     public void setCaseHistoryList(ArrayList<CECase> caseHistoryList) {
         this.caseHistoryList = caseHistoryList;
+    }
+
+    /**
+     * @return the filteredCaseList
+     */
+    public ArrayList<CECase> getFilteredCaseList() {
+        return filteredCaseList;
+    }
+
+    /**
+     * @return the filteredCaseHistoryList
+     */
+    public ArrayList<CECase> getFilteredCaseHistoryList() {
+        return filteredCaseHistoryList;
+    }
+
+    /**
+     * @param filteredCaseList the filteredCaseList to set
+     */
+    public void setFilteredCaseList(ArrayList<CECase> filteredCaseList) {
+        this.filteredCaseList = filteredCaseList;
+    }
+
+    /**
+     * @param filteredCaseHistoryList the filteredCaseHistoryList to set
+     */
+    public void setFilteredCaseHistoryList(ArrayList<CECase> filteredCaseHistoryList) {
+        this.filteredCaseHistoryList = filteredCaseHistoryList;
     }
 
    

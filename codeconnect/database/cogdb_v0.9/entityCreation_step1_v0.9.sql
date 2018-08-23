@@ -1343,7 +1343,6 @@ CREATE SEQUENCE IF NOT EXISTS listitemchange_seq
     CACHE 1;
 
 
-
 CREATE TABLE listchangerequest
 (
     changeID                    INTEGER DEFAULT nextval('listitemchange_seq') PRIMARY KEY,

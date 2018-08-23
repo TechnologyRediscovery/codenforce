@@ -20,13 +20,16 @@
                     <h1><h:outputText value="Case history for #{sessionBean.activeMuni.muniName}"/></h1>
                     <f:view>
                         <h:form id="caseViewForm">
+                            
                             <p:dataTable
                                 id="caseTable"
                                 var="c"
                                 selectionMode="single"
                                 selection="#{ceCasesBB.selectedCase}"
+                                filteredValue="#{ceCasesBB.filteredCaseList}"
                                 rowKey="#{c.caseID}"
                                 rowExpandMode="multiple"
+                                widgetVar="ceViewTable"
                                 value="#{ceCasesBB.caseHistoryList}"
                                 tableStyleClass="primeDataTable">
                                 <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
@@ -36,11 +39,19 @@
                                 </p:column>
                                 <p:column width="5%">
                                     <f:facet name="header">
+                                        <h:outputText value="view" />
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-binoculars"
+                                                     action="#{ceCasesBB.viewCase(c)}" 
+                                                     ajax="false"/>
+                                </p:column>
+                                <p:column width="5%">
+                                    <f:facet name="header">
                                         <h:outputText value="Case ID" />
                                     </f:facet>
                                     <h:outputText value="#{c.caseID}"/>
                                 </p:column>
-                                <p:column width="15%">
+                                <p:column width="15%" sortBy="#{c.property.address}">
                                     <f:facet name="header">
                                         <h:outputText value="Property" />
                                     </f:facet>
@@ -52,19 +63,21 @@
                                     </f:facet>
                                     <h:outputText value="#{c.caseName}"/>
                                 </p:column>
-                                <p:column width="25%">
+                                <p:column width="25%" sortBy="#{c.casePhase.label}"
+                                          filterBy="#{c.casePhase.label}">
                                     <f:facet name="header">
                                         <h:outputText value="Phase" />
                                     </f:facet>
-                                    <h:outputText value="#{c.casePhase}"/>
+                                    <h:outputText value="#{c.casePhase.label}"/>
                                 </p:column>
-                                <p:column width="10%">
+                                <p:column width="10%" sortBy="#{c.originationDate}">
                                     <f:facet name="header">
                                         <h:outputText value="Date Opened" />
                                     </f:facet>
                                     <h:outputText value="#{c.originiationDatePretty}"/>
                                 </p:column>
-                                <p:column>
+                                <p:column sortBy="#{c.user.LName}"
+                                          filterBy="#{c.user.LName}">
                                     <f:facet name="header">
                                         <h:outputText value="Manager" />
                                     </f:facet>
@@ -77,26 +90,15 @@
                                         columns="3" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd"
                                          footerClass="gridFooter" style="vertical-align: top;">
-                                        
-                                        
-                                        
-                                        
                                         <h:panelGroup>
-                                            
                                         </h:panelGroup>
                                     </h:panelGrid>
                                     <h:outputText value="Public access control Code: #{c.publicControlCode}"/>
                                 </p:rowExpansion>
                             </p:dataTable>
-
+                            
+                            
                             <p:spacer height="10px"/>
-
-                            <p:commandButton ajax="false" value="View Case Profile" 
-                                             action="#{ceCasesBB.viewCase}"/>
-
-                        
-                        
-                        
 
                         </h:form>
                        

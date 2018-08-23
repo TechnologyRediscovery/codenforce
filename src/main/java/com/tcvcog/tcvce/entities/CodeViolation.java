@@ -27,6 +27,8 @@ public class CodeViolation {
     private int violationID;
     private EnforcableCodeElement violatedEnfElement;
     private int ceCaseID;
+    // TODO: Remove this member: We shouldn't recursively store the
+    // violation's case inside inte violation. It is stored in a CECase!
     private CECase attachedCase;
     private int citationID;
     private LocalDateTime dateOfCitation;

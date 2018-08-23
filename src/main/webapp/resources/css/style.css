@@ -270,7 +270,7 @@ div.headerLink a:before, a:visited{
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
-    height: 30px;
+    height: 50px;
     
     background-color: #163F8A;
     margin-left: 0px;
@@ -336,6 +336,7 @@ div.headerLink a:before, a:visited{
 /*this mainContainer class is the containing bins on each user page*/
 .mainContainer{
 }
+
 
 .primaryContentContainer{
   
@@ -771,3 +772,19 @@ tr.caseOpen{
     background-color: green;
 }
 
+
+/* Documentation styling */
+.docContainer{
+    max-width: 800px;
+    
+}
+
+.pageContentsList{
+    list-style-type: none;
+}
+    
+    
+.pageContentsList li{
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
