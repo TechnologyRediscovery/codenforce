@@ -74,8 +74,8 @@ public class PropertySearchBB extends BackingBeanUtils implements Serializable {
     }
     
     public String openCECase(Property prop){
-        
-        return "";
+        getSessionBean().setActiveProp(prop);
+        return "addNewCase";
     }
     
     public String updateProperty(){

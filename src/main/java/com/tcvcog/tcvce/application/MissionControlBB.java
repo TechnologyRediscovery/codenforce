@@ -36,6 +36,16 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+ 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.LocalDateTime;
+
 /**
  *
  * @author Eric C. Darsow
@@ -47,9 +57,9 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private ArrayList<Municipality> muniList;
     private Municipality selectedMuni;
     
-    private ArrayList<EventWithCasePropInfo> eventWithCasePropList;
+    private ArrayList<EventWithCasePropInfo> timelineEventList;
     private ArrayList<EventWithCasePropInfo> filteredEventWithCasePropList;
-    private int timelineEventViewType;
+    private int timelineEventViewDateRange;
     
     
     
@@ -58,6 +68,37 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * Creates a new instance of InitiateSessionBB
      */
     public MissionControlBB() {
+    }
+    
+    public void testPDF(ActionEvent ev){
+        String DEST = "/home/sylvia/GlassFish_Server/glassfish/domains/domain1/applications/helloPDF.pdf";
+        File file = new File(DEST);
+        System.out.println("MissionControlBB.testPDF | can write to loc: " + file.canWrite());
+        file.getParentFile().mkdirs();
+        //Initialize PDF writer
+        Document document;
+        PdfWriter writer;
+        try {
+            writer = new PdfWriter(file);
+        //Initialize PDF document
+        PdfDocument pdf = new PdfDocument(writer);
+ 
+        // Initialize document
+        document = new Document(pdf);
+ 
+        //Add paragraph to the document
+        document.add(new Paragraph("Hello World!"));
+ 
+        //Close document
+        document.close();
+            System.out.println("wrote pdf!");
+        
+        } catch (FileNotFoundException ex) {
+            System.out.println("MissionControlBB.testPDF");
+            System.out.println(ex);
+        }
+ 
+        
     }
     
     public void updateEventViewData(EventWithCasePropInfo ev){
@@ -73,11 +114,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
-        try {
-            eventWithCasePropList = (ArrayList<EventWithCasePropInfo>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+            getTimelineEventList();
     }
     
     public String switchMuni(){
@@ -206,24 +243,25 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the eventWithCasePropList
+     * @return the timelineEventList
      */
-    public ArrayList<EventWithCasePropInfo> getEventWithCasePropList() {
+    public ArrayList<EventWithCasePropInfo> getTimelineEventList() {
         EventIntegrator ei = getEventIntegrator();
         try {
-            eventWithCasePropList = 
-                    (ArrayList<EventWithCasePropInfo>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni());
+            timelineEventList = 
+                    (ArrayList<EventWithCasePropInfo>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni(), 
+                            LocalDateTime.now(), LocalDateTime.now().plusDays(365));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        return eventWithCasePropList;
+        return timelineEventList;
     }
 
     /**
-     * @param eventWithCasePropList the eventWithCasePropList to set
+     * @param timelineEventList the timelineEventList to set
      */
-    public void setEventWithCasePropList(ArrayList<EventWithCasePropInfo> eventWithCasePropList) {
-        this.eventWithCasePropList = eventWithCasePropList;
+    public void setTimelineEventList(ArrayList<EventWithCasePropInfo> timelineEventList) {
+        this.timelineEventList = timelineEventList;
     }
 
     /**
@@ -241,17 +279,17 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the timelineEventViewType
+     * @return the timelineEventViewDateRange
      */
-    public int getTimelineEventViewType() {
-        return timelineEventViewType;
+    public int getTimelineEventViewDateRange() {
+        return timelineEventViewDateRange;
     }
 
     /**
-     * @param timelineEventViewType the timelineEventViewType to set
+     * @param timelineEventViewDateRange the timelineEventViewDateRange to set
      */
-    public void setTimelineEventViewType(int timelineEventViewType) {
-        this.timelineEventViewType = timelineEventViewType;
+    public void setTimelineEventViewDateRange(int timelineEventViewDateRange) {
+        this.timelineEventViewDateRange = timelineEventViewDateRange;
     }
 
    

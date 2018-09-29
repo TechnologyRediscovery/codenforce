@@ -15,6 +15,11 @@
             <var>eventCategories</var>
         </resource-bundle>
         
+        <resource-bundle>
+            <base-name>dbFixedValueLookup</base-name>
+            <var>dbFixedValueLookup</var>
+        </resource-bundle>
+        
     </application>
     
     <!--application-scoped beans-->
@@ -740,6 +745,16 @@
     
     <navigation-rule>
         <from-view-id>/restricted/cogview/propertyProfile.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>addNewCase</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+        
+    
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/propertySearch.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>addNewCase</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>

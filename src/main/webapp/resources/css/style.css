@@ -59,28 +59,52 @@ h3{
     
 }
 
+h4{
+    color: darkgray;
+    font-style: italic;
+}
+
 .darkFont{
     color:#163F8A;
 }
 
 /*************** END HEADERS ****************/
 
-/*********** MENU *********************/
+/*********** MENUS and TABS*********************/
 .ui-panelmenu-header {
     font-size: 0.8em;
     font-weight: normal;
     font-style: normal;
     background-color: #04284A;
-    color: white;
+    color: green;
     
     
 }
 
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
-/*    text-shadow: none;
-    color:white;*/
+.tabText{
+    color:orange;
+}
+
+.menuLabel{
+    color:white;
     
 }
+
+
+/* Main accordion menu on left */
+.ui-panelmenu .ui-panelmenu-header a{
+    text-shadow: none;
+    color:white;
+}
+
+/*Case profile coloring */
+.ui-tabs-nav li a {
+    color: black;
+}
+
+
+
+
 
 
 
@@ -462,10 +486,16 @@ div.headerLinkCont{
     overflow-wrap: normal;
 }
 
+.wrapText{
+    white-space: normal;
+    overflow-wrap: normal;
+}
+
 .outlinedBox{
     margin: 15px;
     border: thin solid #4774A0;
     padding: 10px;
+    background-color: white;
 }
 
 .activeObjectBox{
@@ -547,7 +577,10 @@ div.ccBox{
 
 /* ------------------TABLE STYLES ----------------------*/
 
-
+.ui-expanded-row-content{
+    background-color: #04284A;
+    
+}
 
 
 table.primeDataTable td{

@@ -23,7 +23,7 @@
                         to investigate a possible municipal code violation.
                     </p>
 
-                    <p>Please provide the requested information in each tab below to complete your request: </p>
+                    <p>Populate form fields in each tab below to complete your request: </p>
 
                     <f:view>
                         <p:tabView id="ceactionTabView" 
@@ -48,11 +48,19 @@
                                         <f:selectItems value="#{actionRequestBean.muniMap}"/>
                                     </p:selectOneMenu>
                                     
-                                    <p style="font-style: italic; font-size: small;">Only the municipalies listed in this menu are
+                                    <p style="font-style: italic; font-size: small;">Only the municipalities listed in this menu are
                                         served by the Turtle Creek Valley Council of Governments Code Enforcement program.</p>
 
                                     <p:spacer height="10px"/>
 
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <ui:remove>
+                                        
                                     <p:outputLabel for="isNotAtAddress" value="Is your concern located on a specific property?"/>
 
                                     <p:spacer width="15px"/>
@@ -61,6 +69,11 @@
                                                    value="#{actionRequestBean.form_atSpecificAddress}" 
                                                    onLabel="Yes" offLabel="No" 
                                                    onchange="PF('propFS').toggle(); PF('noPropFS').toggle()"/>
+                                    </ui:remove>
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
+                                    <!--REMOVED REMOVED REMOVED REMOVED-->
 
                                     <p:spacer width="15px"/>
 
@@ -74,22 +87,41 @@
                                         <p>Please search for and select the property of concern using this search tool.</p>
 
                                         <p:spacer height="10px"/>
-                                        <p:outputLabel for="searchAddressPart" value="Enter the house number and street name (example: '2323 carrick'. Omit 'avenue', 'ln', etc.)"/>
-                                        
-                                        <p:inputText style="width: 100%" required="true" tabindex="3"
-                                                     id="searchAddressPart"   value="#{actionRequestBean.addrPart}"/>
-                                        <h:message for="searchAddressPart" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        
-                                        <p:spacer height="10px"/>
 
-                                        <p:commandButton
-                                            value="Search in Selected Municipality" tabindex="4" ajax="false"
-                                            actionListener="#{actionRequestBean.searchForPropertiesSingleMuni}" />
+                                        <p:panelGrid columns="3" layout="grid">
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="propSearchITwMuni">
+                                                    <h:outputText value="House number"/>
+                                                </p:outputLabel>
+                                                <p:inputText id="propSearchITwMuni" value="#{actionRequestBean.houseNum}" 
+                                                             style="width: 100px;" tabindex="3" required="false" styleClass="inputText"/>
+                                                <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="propSearchITStreet">
+                                                    <h:outputText value="Street name"/>
+                                                </p:outputLabel>
+                                                <p:inputText id="propSearchITStreet" value="#{actionRequestBean.streetName}" 
+                                                             style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
+                                                <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:commandButton
+                                                    value="Search in Selected Municipality" tabindex="4" ajax="false" icon="fa fa-search"
+                                                    actionListener="#{actionRequestBean.searchForPropertiesSingleMuni}" />
+                                            </h:panelGroup>
+
+                                        </p:panelGrid> 
+
 
                                         <!--Display of properties from search-->
                                         <h3>Search Results:</h3>
-                                        <p>Click on the desired property or try your search again</p>
+                                        <p>Click to select the desired property or try your search again</p>
 
                                         <p:dataTable
                                             id="propTableInput"
@@ -127,7 +159,7 @@
 
                                         <p:spacer height="10px"/>
 
-                                        <p:commandButton   ajax="false" tabindex="6"
+                                        <p:commandButton   ajax="false" tabindex="6" 
                                                            value="Use selected property and go to next step" id="propSelectButton"
                                                            actionListener="#{actionRequestBean.storePropertyLocationInfo}"/>
 
@@ -137,6 +169,13 @@
 
                                 <p:spacer height="15px"/>
 
+                                <!--REMOVED REMOVED REMOVED-->
+                                <!--REMOVED REMOVED REMOVED-->
+                                <!--REMOVED REMOVED REMOVED-->
+                                <!--REMOVED REMOVED REMOVED-->
+                                <!--REMOVED REMOVED REMOVED-->
+                                <ui:remove>
+                                    
                                 <h:form id="CEActionRequestForm">
                                     <p:fieldset id="noPropertyFieldSet" toggleable="true" collapsed="true" 
                                                 legend="Enter Non-property Location" widgetVar="noPropFS">
@@ -159,6 +198,10 @@
 
                                     </p:fieldset>
                                 </h:form>
+                                </ui:remove>
+                                <!--REMOVED REMOVED REMOVED-->
+                                <!--REMOVED REMOVED REMOVED-->
+                                <!--REMOVED REMOVED REMOVED-->
                             </p:tab>
 
                             <p:tab title="Step 2: Request Details" id="s2Details">

@@ -44,6 +44,7 @@ public class Constants {
     
     public final static String MESSAGE_BUNDLE= "msgs";
     public final static String EVENT_CATEGORY_BUNDLE = "eventCategories";
+    public final static String DB_FIXED_VALUE_BUNDLE = "dbFixedValueLookup";
     
     
     

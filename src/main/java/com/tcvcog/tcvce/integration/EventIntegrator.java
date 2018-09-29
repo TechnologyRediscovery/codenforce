@@ -382,6 +382,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println("EventInteegrator.getEventByEventID| sql: " + stmt.toString());
 
            stmt.executeUpdate();
+           
+           // only call the method if the view has been confirmed--so there's something to clear
+           if(clearViewConfirmation && (event.getViewConfirmedAt() != null)){
+               clearViewConfFromEvent(event);
+           }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -392,6 +397,31 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
+    }
+    
+    private void clearViewConfFromEvent(EventCase ec) throws IntegrationException{
+        String query = "UPDATE ceevent SET viewconfirmedby = null, "
+                + "viewconfirmedat = null WHERE eventid = ?;";
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, ec.getEventID());
+            
+            System.out.println("EventIntegrator.clearViewConfFromEvent | stmt: " + stmt.toString());
+           stmt.executeUpdate(); 
+           
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive event", ex);
+
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
     }
     
     public void deleteEvent(EventCase event) throws IntegrationException{
@@ -454,7 +484,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;
     }
     
-    public List<EventWithCasePropInfo> getUpcomingTimelineEvents(Municipality m) throws IntegrationException{
+    public List<EventWithCasePropInfo> getUpcomingTimelineEvents(Municipality m, LocalDateTime start, LocalDateTime end) throws IntegrationException{
         
         ArrayList<EventWithCasePropInfo> eventList = new ArrayList<>();
         
@@ -462,11 +492,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.login_userid, ceevent.disclosetomunicipality, \n" +
 "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requiresviewconfirmation, ceevent.hidden, \n" +
 "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, property.propertyid, cecase.caseid, ceeventcategory.categoryid\n" +
-"FROM ceevent 	INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid)\n" +
+" FROM ceevent 	INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid)\n" +
 "		INNER JOIN cecase ON (cecase_caseid = caseid)\n" +
 "		INNER JOIN property on (property_propertyid = propertyid)\n" +
-"WHERE categorytype = CAST ('Timeline' AS ceeventtype)\n" +
-"		AND dateofrecord >= now()\n" +
+" WHERE categorytype = CAST ('Timeline' AS ceeventtype)\n" +
+"		AND dateofrecord >= ? AND dateofrecord <= ? \n" +
 "		AND activeevent = TRUE\n" +
 "		AND ceevent.requiresviewconfirmation = TRUE\n" +
 "		AND hidden = FALSE\n" +
@@ -483,8 +513,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         try {
 
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, m.getMuniCode());
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(start));
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(end));
+            stmt.setInt(3, m.getMuniCode());
+            System.out.println("EventIntegrator.getUpcomingTimelineEvents | stmt: " + stmt.toString());
             rs = stmt.executeQuery();
+            System.out.println("EventIntegrator.getUpcomingTimelineEvents | rs size: " + rs.getFetchSize());
 
             while(rs.next()){
                 EventWithCasePropInfo ev = new EventWithCasePropInfo();

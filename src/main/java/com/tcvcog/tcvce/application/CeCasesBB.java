@@ -64,7 +64,12 @@ public class CeCasesBB extends BackingBeanUtils implements Serializable{
         int muniCodeForFetching = getSessionBean().getActiveMuni().getMuniCode();
         
         try {
-            caseList = ci.getOpenCECases(muniCodeForFetching);
+            if(caseList == null){
+                caseList = ci.getOpenCECases(muniCodeForFetching);
+                
+            } else{
+                return caseList;
+            }
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 

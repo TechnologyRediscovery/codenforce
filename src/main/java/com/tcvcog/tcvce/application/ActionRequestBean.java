@@ -51,7 +51,9 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     private int currentTabIndex;
 
     private ArrayList<Property> propList;
-    private String addrPart;
+    
+    private String houseNum;
+    private String streetName;
     
     private int violationTypeID;
     private String violationTypeName;
@@ -105,7 +107,6 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
      */
     public String submitActionRequest() {
         
-        
         CEActionRequestIntegrator integrator = getcEActionRequestIntegrator();
         
         // start by pulling the person fields and sending them to be entered
@@ -146,17 +147,17 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
             integrator.submitCEActionRequest(currentRequest);
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                       "ActionRequestBean.submitActionRequest: request submitted", ""));
+                       "Success! Your request has been submitted and passed to our code enforcement team.", ""));
 
             // now go back to integrator and get the request that was just submitted to display to the user
             getCEActionRequestByPublicCC(controlCode);
 
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
-               getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable write request into the database, our apologies!", 
-                            "Please call your municipal office and report your concern by phone."));
+//               getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                            "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
+//                            "Please call your municipal office and report your concern by phone."));
             return "";
         }
         return "success";
@@ -190,9 +191,11 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         System.out.println("ActionRequestBean | violationType ID: " + violationTypeID);
         
         // check for first tab completed
-        if(selectedProperty != null 
+        if((selectedProperty != null 
                 && violationTypeID <= 0
-                && form_requestorLName == null) {
+                && form_requestorLName == null) 
+                || 
+                (form_nonPropertyLocation != null && !form_atSpecificAddress)) {
             System.out.println("selecting tab index 1");
             currentTabIndex = 1; // go to request details tab
         // check for second tab com1pleted
@@ -255,18 +258,18 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
              System.out.println(ex.toString());
                getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
+                            "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
                             "You might call your municipal office to report this error and make a request over the phone. "
                                     + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
             
             
         } catch (NullPointerException ex){
              System.out.println(ex.toString());
-               getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
-                            "You might call your municipal office to report this error and make a request over the phone. "
-                                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
+//               getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                            "NULL POINTER ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
+//                            "You might call your municipal office to report this error and make a request over the phone. "
+//                                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
         }
 //        manageTabs();
         
@@ -297,8 +300,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = new PropertyIntegrator();
         
         try {
-//            MUST REPLACE ADDRPART WITH HOUSE NUM AND STREET NAME
-            setPropList(pi.searchForProperties(addrPart, addrPart, muniCode));
+            setPropList(pi.searchForProperties(houseNum, streetName, muniCode));
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));
@@ -704,10 +706,10 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the addrPart
+     * @return the houseNum
      */
-    public String getAddrPart() {
-        return addrPart;
+    public String getHouseNum() {
+        return houseNum;
     }
 
     /**
@@ -718,10 +720,10 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param addrPart the addrPart to set
+     * @param houseNum the houseNum to set
      */
-    public void setAddrPart(String addrPart) {
-        this.addrPart = addrPart;
+    public void setHouseNum(String houseNum) {
+        this.houseNum = houseNum;
     }
 
     /**
@@ -736,5 +738,19 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
      */
     public void setTabView(TabView tabView) {
         this.tabView = tabView;
+    }
+
+    /**
+     * @return the streetName
+     */
+    public String getStreetName() {
+        return streetName;
+    }
+
+    /**
+     * @param streetName the streetName to set
+     */
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
     }
 }

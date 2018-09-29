@@ -50,7 +50,7 @@
                                         <h:outputText value="Municipality"/>
                                     </p:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectOneMenu id="personMuniSelectMenu" tabindex="5" required="false" value="#{propertySearchBB.selectedMuniCode}">
+                                    <p:selectOneMenu id="personMuniSelectMenu" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertySearchBB.selectedMuniCode}">
                                         <f:selectItems value="#{muniBB.muniMap}"/>
                                     </p:selectOneMenu>
                                     <h:message for="personMuniSelectMenu" showDetail="false" showSummary="true" 
@@ -69,12 +69,12 @@
                                     </p:outputLabel>
                                     <p:spacer height="5px"/>
                                     <p:selectBooleanCheckbox id="searchAllCB" value="#{propertySearchBB.allMunis}" tabindex="7"
-                                                             widgetVar="allMuniCB" style="display: inline-block; margin-left: auto; margin-right: auto;"/>
+                                                             widgetVar="allMuniCB" onchange="PF('muniSelectMenu').disable()"/>
                                 </h:panelGroup>
                                 
                             </p:panelGrid>
                             
-                                <p:dialog header="About page: Mission Control" 
+                                <p:dialog header="Search Tips" 
                                       widgetVar="helpdlg" 
                                       responsive="true" 
                                       width="400"
@@ -107,17 +107,15 @@
                                 id="propSearchTable"
                                 var="prop"
                                 value="#{propertySearchBB.propList}"
-                                selectionMode="single"
                                 selection="#{propertySearchBB.selectedProperty}"
                                 rowKey="#{prop.propertyID}"
                                 tableStyleClass="primeDataTable"
-                                scrollable="true" scrollHeight="200" 
                                 draggableRows="false" tabindex="6"
                                 >
 
                                 <p:column width="5%">
                                     <f:facet name="header">
-                                        <h:outputText value="Profile"/>
+                                        <h:outputText value="View Profile"/>
                                     </f:facet>
                                     <p:commandButton icon="fa fa-binoculars"
                                                      action="#{propertySearchBB.viewProperty(prop)}" 
@@ -125,10 +123,10 @@
                                 </p:column>
                                 <p:column width="5%">
                                     <f:facet name="header">
-                                        <h:outputText value="Open CE Case"/>
+                                        <h:outputText value="New Case"/>
                                     </f:facet>
-                                    <p:commandButton icon="fa id-card-o"
-                                                     action="#{propertySearchBB.viewProperty(prop)}" 
+                                    <p:commandButton icon="fa fa-legal"
+                                                     action="#{propertySearchBB.openCECase(prop)}" 
                                                      ajax="false"/>
                                 </p:column>
                                 <p:column>
