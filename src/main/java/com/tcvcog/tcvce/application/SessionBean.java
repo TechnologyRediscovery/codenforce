@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Citation;
@@ -32,6 +33,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.faces.bean.ManagedBean;
@@ -83,6 +85,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public CECase getActiveCase() {
         return activeCase;
+    }
+    
+    public void refreshActiveCase() throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        if(activeCase != null){
+            CECase c = ci.getCECase(activeCase.getCaseID());
+            activeCase = c;
+        }
     }
 
     /**

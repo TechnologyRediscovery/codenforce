@@ -84,7 +84,9 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
             ec.updateEvent(e, formClearExistingViewConfirmation);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Successfully updated event.", ""));
+                            "Successfully updated event ID: " + e.getEventID() , ""));
+            
+            getSessionBean().refreshActiveCase();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -92,14 +94,8 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
                             ex.getMessage(), 
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
         } 
-        
-        
-        
         return "caseProfile";
     }
-    
-    
-    
     
     /**
      * @return the formEventDesc

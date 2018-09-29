@@ -14,7 +14,7 @@
             <ui:define name="content">
                 <f:view id="docHomeView">
                     
-                    <div class="mainContainer">
+                     <div class="docContainer">
 
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
@@ -23,8 +23,143 @@
                         <h1>Core concepts in CodeConneect</h1>
                         
                         <p:accordionPanel>
-                            <p:tab title="Municipal code terms">
-                                <h:outputText value="Code element, code sets (code books), code sources, and code violations"/>
+                            <p:tab title="User types and permissions">
+                                <h2>Permissions systems overview</h2>
+                                
+                                <p>User page access is managed by the Glassfish servlet container security
+                                mechanism. Within the set of users with access to load page X, access to command
+                                buttons will vary based on user needs.</p>
+                                
+                                <h4>Privilege inheritance</h4>
+                                <p>In general, the authorized actions of a higher-level user (listed toward the bottom of the list) include all
+                                of those permitted to users at a lower authorization level. For example, client municipality staff can see everything a 
+                                client municipality viewer can see.</p>
+                                
+                                <hr/>
+                                
+                                <h3>Public</h3>
+                                <p>The most restricted, non-login based user. Not issued an authenticated user token by the server.</p>
+                                
+                                <h4>Authorized actions</h4>
+                                <ol>
+                                    <li>Submit new and retrieve existing code enforcement action requests</li>
+                                    <li>Submit and retrieve previously submitted occupancy permit applications</li>
+                                    <li>Attach note events to cases for which a public access control code has been issued</li>
+                                    <li>View contact information for all participating municipality and umbrella organization offices</li>
+                                </ol>
+                                
+                                <hr/>
+                                
+                                <h3>Client municipality viewer</h3>
+                                
+                                <p>Embodied in a town council person in an oversight but not
+                                managerial role in the system.</p>
+                                
+                                <ol>
+                                    <li>View municipality-level statistics and query results</li>
+                                    <li>Browse open and historic cases down to the case summary level</li>
+                                    <li>Add communication notes to open cases</li>
+                                </ol>
+                                
+                                <hr/>
+                                <h3>Client municipality staff</h3>
+                                <p></p>
+                                <ol>
+                                    <li>View all municipality-specific data not restricted by authorized Officers</li>
+                                    <li>Add communication and meeting events to both open and closed cases</li>
+                                    <li>Authorize occupancy permit applications to proceed to inspection</li>
+                                    <li>Run all municipality-level data queries</li>
+                                </ol>
+                                
+                                <h4>Data control duties</h4>
+                                <ol>
+                                    <li>Release case-level reports, permits, etc., to authorized people</li>
+                                    <li>Designate communication events created by muni-staff users as publicly viewable</li>
+                                    <li>Enable, disable, and re-key public access control codes</li>
+                                </ol>
+                                
+                                <hr/>
+                                
+                                <h3>Code enforcement officer</h3>
+                                
+                                    <p>The only non-developer user who can carry out enforcement actions in the system, which are enumerated below:</p>
+                                    <ol>
+                                        <li>Open code enforcement and inspection cases</li>
+                                        <li>Attach violations to code enforcement cases</li>
+                                        <li>Compose notices of violation</li>
+                                        <li>Issue citations for violations</li>
+                                        <li>Carry out inspection-related events</li>
+                                        <li>Enable, disable, and re-key public access control codes</li>
+                                    </ol>
+                                    
+                                
+                                <h4>Data control duties</h4>
+                                <ol>
+                                    <li>Designate events as officer-only events</li>
+                                    <li>Designate most event types as publicly viewable</li>
+                                </ol>
+                                
+                                <hr/>
+                                    
+                                
+                                <h3>COG Staff</h3>
+                                
+                                    <p>Embodied in a person who works for an organization which serves several different municipalities
+                                    and may field case-related inquiries.</p>
+                                
+                                    <h4>Permissions</h4>
+                                
+                                    <ol>
+                                        <li>Add message, meeting, and communication events to all cases in authorized municipalities</li>
+                                        <li>Enable, disable, and re-key public access control codes</li>
+                                        <li>Run multi-client municipality queries</li>
+                                        <li>Change a case's manager</li>
+                                        <li>Edit high-level code collections, such as code sources and code books</li>
+                                    </ol>
+
+                                    <h4>Data control duties</h4>
+                                    <ol>
+                                        <li>Enable, disable, and re-key public access control codes</li>
+                                        <li>Reset and audit municipality application review process settings </li>
+                                    </ol>
+
+                                <hr/>
+
+                                <h3>System Administrator</h3>
+                                
+                                    <p>Designated to one user per service umbrella, which in 2018 and 2019
+                                    consists of a council of governments, such as the Turtle Creek Valley Council of Governments
+                                    or the Steel Rivers Council of Governments.</p>
+
+                                    <ol>
+                                        <li>Carry out and audit all actions available to any system user</li>
+                                        <li>Edit municipality-level settings and core data</li>
+                                        <li>Configure system events of all shapes and sizes</li>
+                                        <li>Create high-level code collections, such as code sources and code books</li>
+                                        <li>Designated as the case manager for system-level data storage cases used to log 
+                                        data changes of various kinds</li>
+                                        <li>View all system user action logs</li>
+                                        <li></li>
+                                        <li></li>
+                                    </ol>
+                                    
+                                <h4>Data control duties</h4>
+                                    <ol>
+                                        <li>Monitor system data integrity ruthlessly</li>
+                                    </ol>
+                                <hr/>
+                                
+                                <h3>Developer</h3>
+
+                                    <p>Granted system application-level access to both the sever and database to carry out all essential
+                                    system life cycle events:</p>
+
+                                    <ol>
+                                        <li>Compiling source, pushing to server, configuring server</li>
+                                        <li>Creating and restoring database backups</li>
+                                        <li>Create users and grant any system permission available</li>
+                                    </ol>
+
                             </p:tab>
                             <p:tab title="What key code enforcement actions does the system track?">
                                 <h:outputText value=""/>

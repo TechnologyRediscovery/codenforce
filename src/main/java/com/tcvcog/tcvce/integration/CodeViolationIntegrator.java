@@ -62,7 +62,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt = con.prepareStatement(query);
             //stmt.setInt(1, v.getViolationID());
             stmt.setInt(1, v.getViolatedEnfElement().getCodeSetElementID());
-            stmt.setInt(2, v.getAttachedCase().getCaseID());
+            stmt.setInt(2, v.getCeCaseID());
             //stmt.setString(3, v.getCitationID());
 
             //stmt.setTimestamp(4, java.sql.Timestamp.valueOf(v.getDateOfCitation()));

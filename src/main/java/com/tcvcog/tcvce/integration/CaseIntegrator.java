@@ -86,15 +86,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         ArrayList<CECase> caseList = new ArrayList();
         String query = "SELECT \n" +
             "  caseid, \n" +
-            "  municipality.municode\n" +
-            "FROM \n" +
-            "  public.cecase, \n" +
-            "  public.property, \n" +
-            "  public.municipality\n" +
+            "  property.municipality_municode\n" +
+            "FROM public.cecase INNER JOIN public.property ON (property_propertyid = propertyid)\n" +
             "WHERE \n" +
-            "  cecase.property_propertyid = property.propertyid AND\n" +
-            "  property.municipality_municode = municipality.municode AND\n" +
-            "  municipality.municode = ? AND casephase <> 'Closed'::casephase AND casephase <> 'LegacyImported'::casephase;";
+            "  property.municipality_municode = ? AND casephase <> 'Closed'::casephase AND casephase <> 'LegacyImported'::casephase;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -105,6 +100,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(1, muniCode);
             //System.out.println("CaseIntegrator.| sql: " + stmt.toString());
             rs = stmt.executeQuery();
+            System.out.println("CaseIntegrator.getOpenCECases | stmt: " + stmt.toString());
+            System.out.println("CaseIntegrator.getOpenCECases | rs count: " + rs.getFetchSize());
             
             while(rs.next()){
                 caseList.add(getCECase(rs.getInt("caseid")));
@@ -325,6 +322,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 stmt.setTimestamp(4, java.sql.Timestamp
                         .valueOf(cecase.getClosingDate()));
                 
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
             }
             stmt.setString(5, cecase.getNotes());
             stmt.setInt(6, cecase.getCaseID());

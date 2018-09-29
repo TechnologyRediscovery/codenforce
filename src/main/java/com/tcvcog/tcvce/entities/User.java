@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 
 /**
  *
@@ -31,6 +32,8 @@ public class User implements Serializable{
     // note password is not stored in the business object!
     private String password;
     private int muniCode;
+    private LinkedList<Municipality> authMunis;
+    // To be deprecated 
     private Municipality muni;
     private String fName;
     private String lName;

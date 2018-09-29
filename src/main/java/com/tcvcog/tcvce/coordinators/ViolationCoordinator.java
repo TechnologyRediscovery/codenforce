@@ -54,7 +54,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
                 .plusDays(ece.getNormDaysToComply()));
         v.setPenalty(ece.getNormPenalty());
         v.setDateOfRecord(LocalDateTime.now());
-        v.setAttachedCase(c);
+        v.setCeCaseID(c.getCaseID());
         // control is passed back to the violationAddBB which stores this 
         // generated violation under teh activeCodeViolation in the session
         // which the ViolationAddBB then picks up and edits

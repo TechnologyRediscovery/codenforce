@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class CECase implements Serializable{
     
     private int caseID;
     private int publicControlCode;
+    private boolean paccEnabled;
     
     private Property property;
     private PropertyUnit propertyUnit;
@@ -48,6 +50,15 @@ public class CECase implements Serializable{
     @Override
     public String toString(){
         return caseName;
+    }
+    
+    public String getCaseStage(){
+        
+        return "A";
+    }
+    
+    public int getCaseAge(){
+        return java.time.Period.between(creationTimestamp.toLocalDate(), LocalDate.now()).getDays();
     }
     
     /**
@@ -259,6 +270,20 @@ public class CECase implements Serializable{
      */
     public void setClosingDatePretty(String closingDatePretty) {
         this.closingDatePretty = closingDatePretty;
+    }
+
+    /**
+     * @return the paccEnabled
+     */
+    public boolean isPaccEnabled() {
+        return paccEnabled;
+    }
+
+    /**
+     * @param paccEnabled the paccEnabled to set
+     */
+    public void setPaccEnabled(boolean paccEnabled) {
+        this.paccEnabled = paccEnabled;
     }
     
     

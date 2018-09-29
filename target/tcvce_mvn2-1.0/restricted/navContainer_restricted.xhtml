@@ -111,7 +111,7 @@
                     <h:form id="panelMenu">
                         <p:panelMenu style="width:100%">
 
-                            <p:submenu label="General" expanded="true">
+                            <p:submenu styleClass="menuLabel" label="General" expanded="true">
                                 <p:menuitem value="Dashboard" action="missionControl" ajax="false" icon="ui-icon-disk" />
                                 <p:menuitem value="Help" action="help" ajax="false" icon="ui-icon-disk" />
                             </p:submenu>
@@ -143,12 +143,15 @@
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
                                 <p:menuitem value="New Event" action="caseEvents"  ajax="false" 
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
+                                <ui:remove>
+                                    
                                 <p:menuitem value="Violations" action="caseViolations"  ajax="false" 
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
                                 <p:menuitem value="Notices" action="caseNotices"  ajax="false" 
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
                                 <p:menuitem value="Citations" action="caseCitations"  ajax="false" 
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
+                                </ui:remove>
                             </p:submenu>
 
                             <p:separator />
@@ -178,7 +181,10 @@
                             <p:separator />
 
                             <p:submenu label="Public">
+                                <ui:remove>
+                                    
                                 <p:menuitem value="Public Dashboard" action="publicPortal" ajax="false" icon="ui-icon-document" />
+                                </ui:remove>
                                 <p:menuitem value="Submit CE Action Request" action="ceActionRequest" ajax="false" icon="ui-icon-document"/>
                             </p:submenu>
 

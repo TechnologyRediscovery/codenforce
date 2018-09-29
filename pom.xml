@@ -12,8 +12,10 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <itext.version>RELEASE</itext.version>
+        
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.primefaces</groupId>
@@ -31,6 +33,42 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>kernel</artifactId>
+        <version>${itext.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>io</artifactId>
+        <version>${itext.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>layout</artifactId>
+        <version>${itext.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>pdfa</artifactId>
+        <version>${itext.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>sign</artifactId>
+        <version>${itext.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>barcodes</artifactId>
+        <version>${itext.version}</version>
+    </dependency>
+
     </dependencies>
 
     <build>
@@ -80,6 +118,7 @@
                     </execution>
                 </executions>
             </plugin>
+            
         </plugins>
     </build>
     <repositories>

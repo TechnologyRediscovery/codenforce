@@ -28,9 +28,6 @@ public class CodeViolation implements Serializable{
     private int violationID;
     private EnforcableCodeElement violatedEnfElement;
     private int ceCaseID;
-    // TODO: Remove this member: We shouldn't recursively store the
-    // violation's case inside inte violation. It is stored in a CECase!
-    private CECase attachedCase;
     private int citationID;
     private LocalDateTime dateOfCitation;
     private LocalDateTime dateOfRecord;
@@ -223,19 +220,5 @@ public class CodeViolation implements Serializable{
         this.entryTimeStamp = entryTimeStamp;
     }
 
-    /**
-     * @return the attachedCase
-     */
-    public CECase getAttachedCase() {
-        return attachedCase;
-    }
-
-    /**
-     * @param attachedCase the attachedCase to set
-     */
-    public void setAttachedCase(CECase attachedCase) {
-        this.attachedCase = attachedCase;
-    }
-       
-    
+   
 }
