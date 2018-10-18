@@ -29,7 +29,7 @@ public enum RoleType {
     EnforcementOfficial("Enforcement Authorized Staff"),
     MuniStaff("Municipal Government Staff"),
     MuniReader("Municipal Government Viewer"),
-    Public("Public at Large");
+    Public("Public at Large"); 
    
     private final String label;
     

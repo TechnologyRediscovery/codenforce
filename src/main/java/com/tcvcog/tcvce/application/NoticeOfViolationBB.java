@@ -40,7 +40,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.List;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -55,10 +57,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private ArrayList<TextBlock> blockListByMuni;
     
     private Person selectedRecipient;
-    private ArrayList<Person> personCandidateAL;
+    private List<Person> personCandidateAL;
+    private List<TextBlock> selectedBlockList;
     
     private boolean addPersonByID;
     private int recipientPersonID;
+    
+    private Person addedPerson;
     
     private TextBlock greetingBlock;
     private TextBlock introBlock;
@@ -82,6 +87,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         useTb2 = false;
         useTb3 = false;
         useTb4 = false;
+        addedPerson = new Person();
+    }
+    
+    public void addBlockToList(ActionEvent ae){
+        System.out.println("NoticeOfViolationBB.addBlockToList");
+        selectedBlockList.add(greetingBlock);
     }
     
     public String assembleNotice(){
@@ -518,7 +529,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the personCandidateAL
      */
-    public ArrayList<Person> getPersonCandidateAL() {
+    public List<Person> getPersonCandidateAL() {
         PersonIntegrator pi = getPersonIntegrator();
         
         Property prop = getSessionBean().getActiveProp();
@@ -619,6 +630,34 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setUseTb4(boolean useTb4) {
         this.useTb4 = useTb4;
+    }
+
+    /**
+     * @return the addedPerson
+     */
+    public Person getAddedPerson() {
+        return addedPerson;
+    }
+
+    /**
+     * @param addedPerson the addedPerson to set
+     */
+    public void setAddedPerson(Person addedPerson) {
+        this.addedPerson = addedPerson;
+    }
+
+    /**
+     * @return the selectedBlockList
+     */
+    public List<TextBlock> getSelectedBlockList() {
+        return selectedBlockList;
+    }
+
+    /**
+     * @param selectedBlockList the selectedBlockList to set
+     */
+    public void setSelectedBlockList(List<TextBlock> selectedBlockList) {
+        this.selectedBlockList = selectedBlockList;
     }
     
 }

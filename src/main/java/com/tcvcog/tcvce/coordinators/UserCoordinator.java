@@ -39,7 +39,6 @@ import javax.faces.application.FacesMessage;
 @Named("userCoordinator")
 public class UserCoordinator extends BackingBeanUtils implements Serializable {
 
-     Connection con = null;
     
     /**
      * Creates a new instance of UserCoordinator
@@ -50,6 +49,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * DEPRECATED with move to glassfish servlet authentication
      * Responds to login requests by taking the loginName and loginPassword
      * and searching the database for a registered user. If a user is found
      * in the DB, a User object is created and returned, allow the user to progress 
@@ -66,14 +66,13 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.DataStoreException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public User getUser(String loginName, String loginPassword) 
+    private User getUser(String loginName, String loginPassword) 
             throws ObjectNotFoundException, DataStoreException, IntegrationException {
         System.out.println("UserCoordinator.geUser | given: " + loginName + " " + loginPassword);
-        con = getPostgresCon();
         User authenticatedUser = null;
         UserIntegrator ui = getUserIntegrator();
         
-        authenticatedUser = ui.getAuthenticatedUser(loginName, loginPassword);
+//        authenticatedUser = ui.getAuthenticatedUser(loginName, loginPassword);
         if (authenticatedUser != null){
             
             getSessionBean().setActiveUser(authenticatedUser);
@@ -99,7 +98,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         System.out.println("UserCoordinator.geUser | given: " + loginName );
         User authenticatedUser;
         UserIntegrator ui = getUserIntegrator();
-                con = getPostgresCon();
         authenticatedUser = ui.getUser(loginName);
         if(authenticatedUser.isAccessPermitted()){
             return authenticatedUser;

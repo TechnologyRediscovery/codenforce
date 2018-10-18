@@ -60,7 +60,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return "addNewCase";
     }
     
-    public String viewPersonProfile(){
+    public String viewPersonProfile(Person p){
+        System.out.println("PropertyProfileBB.viewPersonProfile");
         getSessionBean().setActivePerson(selectedPerson);
         return "personProfile";
     }
@@ -76,6 +77,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
         }
         return currentProperty;
+    }
+    
+    public String viewCase(CECase c){
+        
+        return "caseProfile";
     }
 
     /**
@@ -175,10 +181,5 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedCECase(CECase selectedCECase) {
         this.selectedCECase = selectedCECase;
-    }
-    
-    
-    
-    
-    
+    }  
 }

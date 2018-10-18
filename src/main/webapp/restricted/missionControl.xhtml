@@ -21,7 +21,7 @@
 
                         <h1><h:outputText value="#{sessionBean.activeMuni.muniName}"/> Dashboard</h1>
 
-                        
+
                         <p:panelGrid columns="2" layout="grid"
                                      columnClasses="gridTd, gridTd">
 
@@ -29,7 +29,7 @@
                                 <h2>CE Case docket</h2>
 
                                 <h:form id="caseViewForm">
-                        <p:commandLink ajax="false" actionListener="#{missionControlBB.testPDF}" value="Export simple PDF"/>
+                                    <p:commandLink ajax="false" actionListener="#{missionControlBB.testPDF}" value="Export simple PDF"/>
                                     <p:dataTable
                                         id="caseTable"
                                         var="c"
@@ -39,7 +39,6 @@
                                         widgetVar="ceViewTable"
                                         value="#{ceCasesBB.caseList}"
                                         tableStyleClass="primeDataTable">
-
 
                                         <p:column width="5%" exportable="false">
                                             <p:rowToggler />
@@ -77,7 +76,7 @@
                                             </f:facet>
                                             <h:outputText value="#{c.caseStage}"/>
                                         </p:column>
-                                        
+ 
                                         <p:column width="20%"
                                                   sortBy="#{c.casePhase.label}"
                                                   filterBy="#{c.casePhase.label}">
@@ -93,7 +92,7 @@
                                             </f:facet>
                                             <h:outputText value="#{c.caseAge}"/>
                                         </p:column>
-                                        
+
                                         <p:rowExpansion>
                                             <div class="outlinedBox">
                                                 <h3>Code enforcement case details</h3>
@@ -173,9 +172,9 @@
                                             </div>
                                         </p:rowExpansion>
                                     </p:dataTable>
-                                    
+
                                     <p:spacer height="10px"/>
-                                    
+
                                     <p:commandLink value="Export case docket as pdf" ajax="false">
                                         <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
                                     </p:commandLink>
@@ -186,13 +185,13 @@
                                 </h:form>
 
                             </h:panelGroup>  
-                            
+
                             <h:panelGroup>
                                 <h:form id="upcomingEventsForm">
                                     <h2>Timeline notices</h2>
 
                                     <ui:remove>
-                                        
+
                                         <p:selectOneMenu id="viewOptions" value="#{missionControlBB.timelineEventViewDateRange}">
                                             <f:selectItem itemLabel="Today Only" itemValue="1" />
                                             <f:selectItem itemLabel="Today and tomorrow" itemValue="2" />
@@ -430,7 +429,7 @@
                                                             <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
                                                         </div>
                                                     </h:panelGroup>
-                                                    
+
                                                     <h:panelGroup>
                                                         <h:outputLabel styleClass="bold" value="ID"/>
                                                         <p:spacer height="5px"/>

@@ -17,16 +17,20 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.tcvcog.tcvce.application.BackingBeanUtils;
+
 /**
  *
  * @author Eric C. Darsow
  */
-public class LogCoordinator {
+public class LogCoordinator extends BackingBeanUtils {
 
     /**
      * Creates a new instance of LoggingCoordinator
      */
     public LogCoordinator() {
     }
+    
+    
     
 }

@@ -6,7 +6,6 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import org.primefaces.model.menu.Submenu;
 import java.io.Serializable;
 import org.primefaces.model.menu.DefaultMenuItem;
@@ -42,7 +41,7 @@ public class NavMenuBean extends BackingBeanUtils implements Serializable{
     
     public MenuModel getModel(){
         model = new DefaultMenuModel();
-        UserAuthorized user = getSessionBean().getSessionUser();
+        User user = getFacesUser();
         
         switch(user.getRoleType()){
             
