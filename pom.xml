@@ -23,10 +23,11 @@
             <artifactId>primefaces</artifactId>
             <version>6.0</version>
         </dependency> 
+        <!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
         <dependency>
-            <groupId>jdbc_pg</groupId>
-            <artifactId>pgdriver</artifactId>
-            <version>1</version>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901-1.jdbc4</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -35,40 +36,40 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-        <groupId>com.itextpdf</groupId>
-        <artifactId>kernel</artifactId>
-        <version>${itext.version}</version>
-    </dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>kernel</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
 
-    <dependency>
-        <groupId>com.itextpdf</groupId>
-        <artifactId>io</artifactId>
-        <version>${itext.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
 
-    <dependency>
-        <groupId>com.itextpdf</groupId>
-        <artifactId>layout</artifactId>
-        <version>${itext.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
 
-    <dependency>
-        <groupId>com.itextpdf</groupId>
-        <artifactId>pdfa</artifactId>
-        <version>${itext.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>pdfa</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
 
-    <dependency>
-        <groupId>com.itextpdf</groupId>
-        <artifactId>sign</artifactId>
-        <version>${itext.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>sign</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
 
-    <dependency>
-        <groupId>com.itextpdf</groupId>
-        <artifactId>barcodes</artifactId>
-        <version>${itext.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>barcodes</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
 
     </dependencies>
 
