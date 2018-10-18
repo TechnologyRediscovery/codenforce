@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -32,7 +33,7 @@ public class User implements Serializable{
     // note password is not stored in the business object!
     private String password;
     private int muniCode;
-    private LinkedList<Municipality> authMunis;
+    private List<Municipality> authMunis;
     // To be deprecated 
     private Municipality muni;
     private String fName;
@@ -55,6 +56,15 @@ public class User implements Serializable{
      * Creates a new instance of User
      */
     public User() {
+    }
+    
+    /**
+     * Creates a new instance of User
+     * @param munis The municipality objects for the munis this user
+     * can search and manipulate data within
+     */
+    public User(LinkedList<Municipality> munis) {
+        authMunis = munis;
     }
 
 
@@ -352,7 +362,19 @@ public class User implements Serializable{
         this.address_state = address_state;
     }
 
-    
-    
+    /**
+     * @return the authMunis
+     */
+    public List<Municipality> getAuthMunis() {
+        return authMunis;
+    }
+
+    /**
+     * 
+     * @param ml 
+     */
+    public void setAuthMuis(List<Municipality> ml) {
+        authMunis = ml;
+    }
     
 }

@@ -120,7 +120,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         e.setDiscloseToMunicipality(formDiscloseToMuni);
         e.setDiscloseToPublic(formDiscloseToPublic);
         e.setRequiresViewConfirmation(formRequireViewConfirmation);
-        e.setNotes(formEventDesc);
+        e.setNotes(formEventNotes);
 //        e.setEventPersons(formSelectedPersons);
         
         // now check for persons to connect

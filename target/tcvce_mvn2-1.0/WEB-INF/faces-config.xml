@@ -10,6 +10,12 @@
             <var>msgs</var>
         </resource-bundle>
         
+       
+        <resource-bundle>
+            <base-name>loggingcategories</base-name>
+            <var>loggingcategories</var>
+        </resource-bundle>
+        
         <resource-bundle>
             <base-name>eventCategories</base-name>
             <var>eventCategories</var>
@@ -1207,6 +1213,11 @@
     <managed-bean>
         <managed-bean-name>dashboardDataBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.DashboardDataBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>navMenuBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 </faces-config>

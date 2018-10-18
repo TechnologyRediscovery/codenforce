@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2018 Turtle Creek Valley
 Council of Governments, PA
  *
@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.integration.LogIntegrator;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import com.tcvcog.tcvce.util.Constants;
 
 /**
  *
@@ -59,7 +61,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @return success or failure String used by faces to navigate to the internal page
      * or the error page
      */
-    public String initiateInternalSession(){
+    public String initiateInternalSession() throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
         System.out.println("SessionInitializer.initiateInternalSession");
         FacesContext facesContext = getFacesContext();
@@ -75,15 +77,21 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 // get the user's default municipality
                 Municipality muni = extractedUser.getMuni();
                 getSessionBean().setActiveMuni(muni);
-                // grab code set ID from the muni object, ask integrator for the CodeSet object, 
+                // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
                 getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getDefaultCodeSetID()));
+
+                getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
+                        Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
+                         "SessionInitializer.initiateInternalSession | Created internal session", false, false);
             
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Good morning, " + extractedUser.getFName() + "!", ""));
             }
         
         } catch (IntegrationException ex) {
+            getLogIntegrator().makeLogEntry(99, getSessionID(),2,"SessionInitializer.initiateInternalSession | user lookup integration error", 
+                    true, true);
             System.out.println("SessionInitializer.intitiateInternalSession | error getting facesUser");
             System.out.println(ex);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, 
@@ -101,7 +109,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     /**
      * @return the glassfishUser
      */
-    public String getGlassfishUser() {
+    private String getGlassfishUser() {
         
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
@@ -112,26 +120,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         return glassfishUser;
     }
 
-    /**
-     * @return the sessionID
-     */
-    public String getSessionID() {
-        
-        FacesContext fc = getFacesContext();
-        HttpSession session = (HttpSession) fc.getExternalContext().getSession(false);
-        // prints out the current session attributes to standard out
-//        Enumeration e = session.getAttributeNames();
-//        System.out.println("SessionInitailzier.getSessionID | Dumping lots of attrs");
-//        while (e.hasMoreElements())
-//        {
-//          String attr = (String)e.nextElement();
-//          System.out.println("      attr  = "+ attr);
-//          Object value = session.getValue(attr);
-//          System.out.println("      value = "+ value);
-//        }
-        sessionID = session.getId();
-        return sessionID;
-    }
+    
 
     /**
      * @return the retrievedCOGUser

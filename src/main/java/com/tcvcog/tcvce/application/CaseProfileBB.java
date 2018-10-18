@@ -31,6 +31,8 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCase;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -127,6 +129,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     public String recordCompliance() throws IntegrationException{
         CaseCoordinator cc = getCaseCoordinator();
+        RoleType u = getSessionBean().getActiveUser().getRoleType(); 
         
         EventCoordinator ec = getEventCoordinator();
         System.out.println("CaseManageBB.recordCompliance | selectedViolations size: " + selectedViolations.size());

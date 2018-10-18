@@ -87,7 +87,7 @@
                                         <div class="under-icon-link-container">
                                             <h:commandLink  action="#{missionControlBB.logout}" styleClass="headerLink">
                                                 <h:outputText value=" "/>   
-                                                <h:outputText value="Logout #{facesUser.FName} #{facesUser.LName}"/>
+                                                <h:outputText value="Logout #{facesUser.FName} #{facesUser.LName} (#{facesUser.roleType.label})"/>
                                             </h:commandLink>
                                         </div>
                                     </h:panelGroup>
@@ -109,12 +109,22 @@
             <div class="flexing-box-sidebar">
                 <f:view id="sideBarView">
                     <h:form id="panelMenu">
+                        
+                        <ui:remove>
+                            
+                            <h2>Dynamic Menu</h2>
+                            <p:menu model="#{navMenuBean.model}"/>
+
+                            <h2>Static Menu</h2>
+                        </ui:remove>
+
+                        
                         <p:panelMenu style="width:100%">
 
                             <p:submenu styleClass="menuLabel" label="General" expanded="true">
                                 <p:menuitem value="Dashboard" action="missionControl" ajax="false" icon="ui-icon-disk" />
                                 <p:menuitem value="Help" action="help" ajax="false" icon="ui-icon-disk" />
-                            </p:submenu>
+                            </p:submenu> 
 
                             <p:submenu label="Properties &amp; Persons" expanded="true">
                                 <p:menuitem value="Property search" action="propertySearch" ajax="false" icon="ui-icon-disk" />

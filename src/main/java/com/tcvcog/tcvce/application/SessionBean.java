@@ -85,6 +85,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public CECase getActiveCase() {
         return activeCase;
+        
     }
     
     public void refreshActiveCase() throws IntegrationException{

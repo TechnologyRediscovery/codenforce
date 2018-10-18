@@ -34,6 +34,7 @@ testing/RoomType.class
 com/tcvcog/tcvce/coordinators/ViolationCoordinator.class
 com/tcvcog/tcvce/application/TextBlockBB.class
 com/tcvcog/tcvce/application/DashboardDataBB.class
+com/tcvcog/tcvce/application/NavMenuBean$1.class
 com/tcvcog/tcvce/coordinators/CaseCoordinator.class
 com/tcvcog/tcvce/integration/SystemIntegrator.class
 com/tcvcog/tcvce/occupancy/entities/PaymentType.class
@@ -104,6 +105,7 @@ com/tcvcog/tcvce/application/UserBB.class
 com/tcvcog/tcvce/entities/CodeElementGuideEntry.class
 com/tcvcog/tcvce/entities/Person.class
 com/tcvcog/tcvce/application/EventEditBB.class
+com/tcvcog/tcvce/application/NavMenuBean.class
 com/tcvcog/tcvce/application/CourtEntityBB.class
 com/tcvcog/tcvce/application/SpaceTypeBB.class
 com/tcvcog/tcvce/entities/EnforcableCodeElement.class

@@ -139,9 +139,8 @@
                                 <p:dataTable
                                     id="caseTable"
                                     var="c"
-                                    selectionMode="single"
-                                    selection="#{ceCasesBB.selectedCase}"
                                     rowKey="#{c.caseID}"
+                                    widgetVar="propProfileCaseTable"
                                     rowExpandMode="multiple"
                                     value="#{propertyProfileBB.ceCaseList}"
                                     tableStyleClass="primeDataTable">
@@ -156,6 +155,14 @@
                                         </f:facet>
                                         <h:outputText value="#{c.caseID}"/>
                                     </p:column>
+                                     <p:column width="8%" exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="view" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-clipboard"
+                                                             action="#{ceCasesBB.viewCase(c)}" 
+                                                             ajax="false"/>
+                                        </p:column>
                                     <p:column width="15%">
                                         <f:facet name="header">
                                             <h:outputText value="Property" />
@@ -188,7 +195,8 @@
                                     </p:column>
 
                                     <p:rowExpansion>
-
+                                        <div class="outlinedBox">
+                                            
                                         <h:panelGrid
                                             columns="3" border="0" 
                                              cellpadding="5" columnClasses="gridTd, gridTd"
@@ -197,13 +205,10 @@
                                             </h:panelGroup>
                                         </h:panelGrid>
                                         <h:outputText value="Public access control Code: #{c.publicControlCode}"/>
+                                        </div>
                                     </p:rowExpansion>
                                 </p:dataTable>
 
-                                <p:spacer height="10px"/>
-
-                                <p:commandButton ajax="false" value="View Case Profile" 
-                                                 action="#{ceCasesBB.viewCase}"/>
                             </h:form>
 
                             <p:spacer height="10px"/>
@@ -243,6 +248,15 @@
                                         <h:outputText value="ID" />
                                     </f:facet>
                                     <h:outputText value="#{p.personID}"/>
+                                </p:column>
+
+                                <p:column width="8%" exportable="false">
+                                    <f:facet name="header">
+                                        <h:outputText value="Edit" />
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-clipboard"
+                                                     action="#{propertyProfileBB.viewPersonProfile(p)}" 
+                                                     ajax="false"/>
                                 </p:column>
                                 
                                 <p:column width="10%" sortBy="#{p.personType.label}"
@@ -287,8 +301,8 @@
                                     <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
                                 </p:column>
                                 
-                                
                                 <p:rowExpansion>
+                                    <div class="outlinedBox">
                                     <h2>Full person listing for <h:outputText value="#{p.firstName} #{p.lastName}"/> </h2>
                                     <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                  columnClasses="gridTd, gridTd, gridTd, gridTd">
@@ -416,6 +430,7 @@
                                             </div>
                                         </f:facet>
                                     </h:panelGrid>
+                                    </div>
                                 </p:rowExpansion>
                             </p:dataTable>
 

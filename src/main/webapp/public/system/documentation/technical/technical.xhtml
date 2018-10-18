@@ -22,16 +22,18 @@
 
                         <h1>Technical reference</h1>
                         
+                        <h2 id="top">Contents</h2>
                             <ul class="pageContentsList">
                                 <li><a href="#license">Licensing: GPL v.3</a></li>
-                                <li><a href="#propsCasesEvents">Technology stack</a></li>
-                                <li><a href="#openingACase">System requirements</a></li>
-                                <li><a href="#phases1">Installation overview</a></li>
-                                <li><a href="#events"></a>Security highlights</li>
-                                <li><a href="#violations">Feature list</a></li>
-                                <li><a href="#noticesCreate">Development cycles</a></li>
-                                <li><a href="#noticesSend">Legacy integration options</a></li>
-                                <li><a href="#citations">Work process management</a></li>
+                                <li><a href="#technologies">Technology stack</a></li>
+                                <li><a href="#stack">System requirements</a></li>
+                                <li><a href="#installing">Installation overview</a></li>
+                                <li><a href="#security"></a>Security highlights</li>
+                                <li><a href="#features">Feature list</a></li>
+                                <li><a href="#dev">Development cycles</a></li>
+                                <li><a href="#migration">Legacy integration options</a></li>
+                                <li><a href="#workprocess">Work process management</a></li>
+                                <li><a href="#logging">Logging</a></li>
                             </ul>
                         
                         <h2 id="license">Licensing</h2>
@@ -49,6 +51,41 @@
                             but cannot easily do so without abandoning the original system entirely. </p>
                         
                         
+                        <p><a href="#top">top</a></p>
+                        <hr/>
+                        
+                        <h2 id="security"></h2>
+                            
+                        <h3>Authentication flow</h3>
+                        <ol>
+                            <li>Login link directs use to missionControl, which is behind an
+                            access restriction wall, prompting Glassfish to direct page flow to the
+                            authentication page designated in web.xml confif file.</li>
+                            <li>User submits credentials, which are handed to the SessionInitializer Session-scoped bean.</li>
+                            <li>Session initializer extracts authenticated user from the servlet session and
+                            uses that username to get a FacesUser from the UserIntegrator</li>
+                            <li></li>
+                            <li></li>
+                        </ol>
+                        
+                        <p><a href="#top">top</a></p>
+                        <hr/>
+                        
+                        <h2 id="logging">Logging</h2>
+                        
+                        <p>Logging exists on two levels:</p>
+                        <ol>
+                            <li>Code enforcement and inspection case events: user-facing, workflow-centric, stored in event-related tables. See DB documentation</li>
+                            <li>Direct database log to table genlog and others: Category mapped</li>
+                        </ol>
+                        
+                        <p>You can pull from message bundle files which are key/value pairs stored in a text file with a name tracked by JSF.</p>
+                        
+                        <span class="mono">getResourceBundle(Constants.MESSAGE_BUNDLE).getString("automaticClosingEventDescription")</span>
+                        
+                        
+                        <p><a href="#top">top</a></p>
+                        <hr/>
                         
                     </div>
                 </f:view>

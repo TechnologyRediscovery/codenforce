@@ -59,11 +59,14 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
+import javax.servlet.http.HttpSession;
 
 
 /**
- *
- * @author cedba
+ * Collection of convenience methods for accessing application-level objects
+ * that beans of various scopes use, most notably Coordinators and Integrators
+ * 
+ * @author Xander Darsow
  */
 
 public class BackingBeanUtils implements Serializable{
@@ -169,8 +172,10 @@ public class BackingBeanUtils implements Serializable{
 
     }
 
-    // deleted setter
-    
+    /**
+     * Chops up the current time to get seven random digits
+     * @return 
+     */
     public int getControlCodeFromTime(){
          long dateInMs = new Date().getTime();
          
@@ -625,6 +630,24 @@ public class BackingBeanUtils implements Serializable{
      */
     public void setFacesUser(User facesUser) {
         this.facesUser = facesUser;
+    }
+    
+    public String getSessionID(){
+        
+        FacesContext fc = getFacesContext();
+        HttpSession session = (HttpSession) fc.getExternalContext().getSession(false);
+        // prints out the current session attributes to standard out
+//        Enumeration e = session.getAttributeNames();
+//        System.out.println("SessionInitailzier.getSessionID | Dumping lots of attrs");
+//        while (e.hasMoreElements())
+//        {
+//          String attr = (String)e.nextElement();
+//          System.out.println("      attr  = "+ attr);
+//          Object value = session.getValue(attr);
+//          System.out.println("      value = "+ value);
+//        }
+        String sessionID = session.getId();
+        return sessionID;
     }
 
 }

@@ -21,6 +21,9 @@
                             <h1>Oops, we've got an error!</h1>
                             <h:form id="errorPageForm">
                                 <h:outputText value="Application root: #{request.contextPath}/restricted/"/>
+                                <h:outputText value="#{systemServicesBB.logSub}"/>
+                                
+                                
                                 <p>No fear, the Back button is...up there! Please click Back (or alt + left arrow) and try another pathway.</p>
                                 
                                 <h2>Reporting errors</h2>

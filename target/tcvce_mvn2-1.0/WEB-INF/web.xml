@@ -83,29 +83,56 @@
     
     <!--security cases-->
     <security-role>
+        <role-name>developer</role-name>
+    </security-role>
+    
+    <security-role>
+        <role-name>sysadmin</role-name>
+    </security-role>
+    
+    <security-role>
         <role-name>cogstaff</role-name>
+    </security-role>
+    
+    <security-role>
+        <role-name>enforcementofficial</role-name>
+    </security-role>
+    
+    <security-role>
+        <role-name>munistaff</role-name>
+    </security-role>
+    
+    <security-role>
+        <role-name>munireader</role-name>
+    </security-role>
+    
+    <security-role>
+        <role-name>public</role-name>
     </security-role>
     
     <security-role>
         <role-name>authuser</role-name>
     </security-role>
     
-    <security-role>
-        <role-name>nonexistentrole</role-name>
-    </security-role>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>developer</web-resource-name>
+            <url-pattern>/restricted/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>developer</role-name>
+        </auth-constraint>
+    </security-constraint>
     
     
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>restrictedContent</web-resource-name>
             <url-pattern>/restricted/*</url-pattern>
-            <http-method>PUT</http-method>
-            <http-method>GET</http-method>
-            <http-method>DELETE</http-method>
-            <http-method>POST</http-method>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>authuser</role-name>
+            <role-name>sysadmin</role-name>
         </auth-constraint>
     </security-constraint>
     
@@ -113,14 +140,54 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>cogstaff</web-resource-name>
-            <url-pattern>/restricted/ce/*</url-pattern>
-            <http-method>PUT</http-method>
-            <http-method>GET</http-method>
-            <http-method>DELETE</http-method>
-            <http-method>POST</http-method>
+            <url-pattern>/restricted/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>cogstaff</role-name>
         </auth-constraint>
     </security-constraint>
+    
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>all_code_enforcement</web-resource-name>
+            <url-pattern>/restricted/ce/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>enforcementofficial</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>staff</web-resource-name>
+            <url-pattern>/restricted/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>munistaff</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>mreader</web-resource-name>
+            <url-pattern>/restricted/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>munireader</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>restricted</web-resource-name>
+            <url-pattern>/restricted/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>authuser</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    
 </web-app>

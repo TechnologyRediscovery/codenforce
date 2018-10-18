@@ -496,6 +496,10 @@ div.headerLinkCont{
     border: thin solid #4774A0;
     padding: 10px;
     background-color: white;
+/*    These two attributes are taken from .rowExpansion to see if we can use
+    only .outlinedBox divs for the row expansion*/
+    white-space: normal;
+    overflow-wrap: normal;
 }
 
 .activeObjectBox{
