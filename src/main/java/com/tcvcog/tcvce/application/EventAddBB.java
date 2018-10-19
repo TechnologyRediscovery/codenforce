@@ -157,7 +157,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         // get user back to the most logical case page
         switch(e.getCategory().getEventType()){
             case Compliance:
-                return "caseViolations";
+                return "caseProfile";
             default:
                 return "caseProfile";
                 

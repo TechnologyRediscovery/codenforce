@@ -39,6 +39,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import javax.faces.application.FacesMessage;
 
@@ -149,7 +150,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         ViolationCoordinator vc = getViolationCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
-        ArrayList<CodeViolation> activeViolationList = getSessionBean().getActiveViolationList();
+        List<CodeViolation> activeViolationList = getSessionBean().getActiveViolationList();
         ListIterator<CodeViolation> li = activeViolationList.listIterator();
         CodeViolation cv;
         
@@ -525,21 +526,45 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
    
-   public Citation generateNewCitation(ArrayList<CodeViolation> violationList){
+   public Citation generateNewCitation(List<CodeViolation> violationList){
        Citation newCitation = new Citation();
        ArrayList<CodeViolation> al = new ArrayList<>();
        ListIterator<CodeViolation> li = violationList.listIterator();
        CodeViolation cv;
+       
+       StringBuilder notesBuilder = new StringBuilder();
+       notesBuilder.append("Failure to comply with the following ordinances:\n");
+       
+       
        
        while(li.hasNext()){
            
            cv = li.next();
            System.out.println("CaseCoordinator.generateNewCitation | linked list item: " 
                    + cv.getDescription());
+           
+           // build a nice note section that lists the elements cited
+           notesBuilder.append("* Chapter ");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdchapterNo());
+           notesBuilder.append(":");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdchapterTitle());
+           notesBuilder.append(", Section ");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSecNum());
+           notesBuilder.append(":");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSecTitle());
+           notesBuilder.append(", Subsection ");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSubSecNum());
+           notesBuilder.append(": ");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSubSecTitle());
+           notesBuilder.append("\n\n");
+           
            al.add(cv);
            
        }
        newCitation.setViolationList(al);
+       newCitation.setNotes(notesBuilder.toString());
+       newCitation.setIsActive(true);
+       
        return newCitation;
    }
    

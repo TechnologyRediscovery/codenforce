@@ -893,22 +893,6 @@
     
     </navigation-rule>
     
-    
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/caseProfile.xhtml</from-view-id>
-        <navigation-case>
-            <from-action>#{caseProfileBB.addViolation}</from-action>
-            <from-outcome>violationSelectElement</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        <navigation-case>
-            <from-outcome>eventEdit</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/eventEdit.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
-
-        
     <navigation-rule>
         <from-view-id>/restricted/cogstaff/ce/requestManagement.xhtml</from-view-id>
         <navigation-case>
@@ -961,6 +945,8 @@
     </navigation-rule>
     
     
+    
+   
     <navigation-rule>
         <from-view-id>/restricted/cogview/caseProfile.xhtml</from-view-id>
         <navigation-case>
@@ -969,11 +955,21 @@
             <to-view-id>/restricted/cogstaff/ce/violationEdit.xhtml</to-view-id>
             <redirect />
         </navigation-case>
-    </navigation-rule>
-    
-   
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/caseProfile.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{caseProfileBB.createCitationFromSelected}</from-action>
+            <from-outcome>citationEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{caseProfileBB.createCitationForAllViolations}</from-action>
+            <from-outcome>citationEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{caseProfileBB.updateCitation}</from-action>
+            <from-outcome>citationEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
+        </navigation-case>
         <navigation-case>
             <from-action>#{eventAddBB.startNewEvent}</from-action>
             <from-outcome>eventAdd</from-outcome>
@@ -985,6 +981,22 @@
             <from-outcome>eventAdd</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/eventAdd.xhtml</to-view-id>
             <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{caseProfileBB.recordCompliance}</from-action>
+            <from-outcome>eventAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/eventAdd.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{caseProfileBB.addViolation}</from-action>
+            <from-outcome>violationSelectElement</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>eventEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/eventEdit.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
     

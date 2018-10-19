@@ -36,6 +36,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -62,7 +63,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeElement activeCodeElement;
     private EnforcableCodeElement selectedEnfCodeElement;
     private CodeViolation activeCodeViolation;
-    private ArrayList<CodeViolation> activeViolationList;
+    private List<CodeViolation> activeViolationList;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
  
 
@@ -162,7 +163,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the activeViolationList
      */
-    public ArrayList<CodeViolation> getActiveViolationList() {
+    public List<CodeViolation> getActiveViolationList() {
         return activeViolationList;
     }
 
@@ -253,7 +254,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @param activeViolationList the activeViolationList to set
      */
-    public void setActiveViolationList(ArrayList<CodeViolation> activeViolationList) {
+    public void setActiveViolationList(List<CodeViolation> activeViolationList) {
         this.activeViolationList = activeViolationList;
     }
 
