@@ -505,32 +505,18 @@
                         </p:panelGrid>
 
 
-                        <!--REMOVED REMOVED REMOVED-->
-                        <!--REMOVED REMOVED REMOVED-->
-                        <!--REMOVED REMOVED REMOVED-->
-                        <ui:remove>
 
                             <h2>Key Indicators</h2>
 
                             <p>Data charts for testing purposes only: the data in these is arbitrary.</p>
 
-                            <p:panelGrid columns="2" columnClasses="gridTd, gridTd">
+                            <p:panelGrid columns="1" columnClasses="gridTd">
 
                                 <h:panelGroup>
-                                    <p:chart type="bar" model="#{dashboardDataBB.model}" style="height:300px"/>
+                                    <p:chart type="bar" model="#{dashboardDataBB.caseCountByPhase}" style="width:1200px; height:1000px"/>
 
                                 </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <p:chart type="bar" model="#{dashboardDataBB.caseClosings}" style="height:300px"/>
-
-                                </h:panelGroup>
-
-
                             </p:panelGrid>
-                        </ui:remove>
-                        <!--REMOVED REMOVED REMOVED-->
-                        <!--REMOVED REMOVED REMOVED-->
 
 
                         <h:form id="dashboardHelpLinksFOrm">

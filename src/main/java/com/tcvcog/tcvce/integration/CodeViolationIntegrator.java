@@ -371,6 +371,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
 
         CodeViolation v = new CodeViolation();
         CodeIntegrator ci = getCodeIntegrator();
+        CitationIntegrator citInt = getCitationIntegrator();
         System.out.println("CodeViolationIntegreator.generateCodeViolationFromRS | Current RS entry: " + rs.getString("description"));
 
         v.setViolationID(rs.getInt("violationid"));
@@ -395,6 +396,8 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         v.setPenalty(rs.getDouble("penalty"));
         v.setDescription(rs.getString("description"));
         v.setNotes(rs.getString("notes"));
+        v.setCitationIDList(citInt.getCitationIDs(v.getViolationID()));
+        
         return v;
     }
 

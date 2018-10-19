@@ -53,8 +53,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private String formLetterText;
     private Date formDateOfRecord;
     private NoticeOfViolation currentNotice;
-    private ArrayList<CodeViolation> activeVList;
-    private ArrayList<TextBlock> blockListByMuni;
+    private List<CodeViolation> activeVList;
+    private List<TextBlock> blockListByMuni;
     
     private Person selectedRecipient;
     private List<Person> personCandidateAL;
@@ -155,7 +155,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
     
-    private StringBuilder appendViolationList(ArrayList<CodeViolation> vlist, StringBuilder sb){
+    private StringBuilder appendViolationList(List<CodeViolation> vlist, StringBuilder sb){
         
         Iterator<CodeViolation> iter = vlist.iterator();
         
@@ -351,7 +351,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the textBlockListByMuni
      */
-    public ArrayList<TextBlock> getTextBlockListByMuni() {
+    public List<TextBlock> getTextBlockListByMuni() {
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         
         Municipality m = getSessionBean().getActiveCodeSet().getMuni();
@@ -373,7 +373,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the activeVList
      */
-    public ArrayList<CodeViolation> getActiveVList() {
+    public List<CodeViolation> getActiveVList() {
         
         activeVList = getSessionBean().getActiveViolationList();
         return activeVList;

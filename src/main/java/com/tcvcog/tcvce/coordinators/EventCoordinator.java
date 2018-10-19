@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import javax.faces.application.FacesMessage;
 
@@ -150,7 +151,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ei.insertEvent(event);
     }
     
-    public EventCase generateViolationComplianceEvent(ArrayList<CodeViolation> violationList) throws IntegrationException{
+    public EventCase generateViolationComplianceEvent(List<CodeViolation> violationList) throws IntegrationException{
         EventCase e = new EventCase();
         EventIntegrator ei = getEventIntegrator();
         e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(

@@ -408,9 +408,9 @@
 
                                         <p:column>
                                             <f:facet name="header">
-                                                <h:outputText value="Citation Date" />
+                                                <h:outputText value="Citations" />
                                             </f:facet>
-                                            <h:outputText value="#{v.dateOfCitation}"/>
+                                            <h:outputText value="#{v.citationsStringList}"/>
                                         </p:column>
                                         <p:column width="5%">
                                             <f:facet name="header">
@@ -457,6 +457,7 @@
                                         </p:rowExpansion>
 
                                     </p:dataTable> 
+                                    <p style="font-style: italic; font-size: 0.8em; margin-bottom: 0px;">(To clear selections, click a violation while holding down the control key.)</p>
                                     
                                      <p:confirmDialog message="You can swap out the code book element of the selected violation by entering the ID number of the new violation in the box below. 
                                                       You'll probably want to open the codebook for the current muni in a separate window so you can look up the ID numbers easily." severity="alert" widgetVar="linkDialog">
@@ -476,7 +477,6 @@
                                     <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
                                                      value="Edit violation details"
                                                      icon="fa fa-edit"/>
-                                    <p style="font-style: italic; font-size: 0.8em; margin-bottom: 0px;">(To clear selections, re-access this "Violations" page from the left sidebar.)</p>
 
 
                                     <p:spacer height="5px"/>
@@ -681,9 +681,11 @@
 
                                         <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
                                                      value="Updated selected citation"/>
-
+                                        <ui:remove>
+                                            
                                         <p:commandButton ajax="false" action="#{caseProfileBB.deleteCitation}"
                                                      value="Nuke selected citation forever"/>
+                                        </ui:remove>
 
                                     <p:separator/>
                                 </h:form>

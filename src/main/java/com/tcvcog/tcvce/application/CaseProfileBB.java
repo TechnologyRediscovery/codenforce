@@ -41,6 +41,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -59,19 +61,19 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     private EventCase eventForTriggeringCasePhaseAdvancement;
     
-    private ArrayList<EventCase> eventList;
-    private ArrayList<EventCase> filteredEventList;
+    private List<EventCase> eventList;
+    private List<EventCase> filteredEventList;
     private EventCase selectedEvent;
     
-    private ArrayList<CodeViolation> fullCaseViolationList;
-    private ArrayList<CodeViolation> selectedViolations;
+    private List<CodeViolation> fullCaseViolationList;
+    private List<CodeViolation> selectedViolations;
     private CodeViolation selectedViolation;
     private int newViolationCodeBookEleID;
     
-    private ArrayList<NoticeOfViolation> noticeList;
+    private List<NoticeOfViolation> noticeList;
     private NoticeOfViolation selectedNotice;
     
-    private ArrayList<Citation> citationList;
+    private List<Citation> citationList;
     private Citation selectedCitation;
     
     private HashMap<CasePhase, String> imageFilenameMap;
@@ -81,6 +83,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * Creates a new instance of CaseManageBB
      */
     public CaseProfileBB() {
+        //TODO: move somewhere else! This is too hackey. Needs a resource bundle for
+        // changing image IDs without recompiling!
         imageFilenameMap = new HashMap<>();
         imageFilenameMap.put(CasePhase.PrelimInvestigationPending, "stage1_prelim.svg");
         imageFilenameMap.put(CasePhase.NoticeDelivery, "stage1_notice.svg");
@@ -129,7 +133,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     public String recordCompliance() throws IntegrationException{
         CaseCoordinator cc = getCaseCoordinator();
-        RoleType u = getSessionBean().getActiveUser().getRoleType(); 
+        RoleType u = getFacesUser().getRoleType(); 
         
         EventCoordinator ec = getEventCoordinator();
         System.out.println("CaseManageBB.recordCompliance | selectedViolations size: " + selectedViolations.size());
@@ -172,8 +176,17 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         System.out.println("CaseManageBB.createNewNoticeOfViolation | current case: " + currentCase);
 
         if(!fullCaseViolationList.isEmpty()){
+            if(vListHasNoComplianceDates(fullCaseViolationList)){
+                
             getSessionBean().setActiveViolationList(fullCaseViolationList);
             return "noticeOfViolationBuilder";
+            } else {
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Yikes! You may not create a notice for violation "
+                                + "with a compliance date!", ""));
+                return "";
+            }
         }
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -188,8 +201,16 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         System.out.println("CaseManageBB.createNewNoticeOfViolationForSelected | current case: " + currentCase);
         
         if(!fullCaseViolationList.isEmpty()){
+            if(vListHasNoComplianceDates(selectedViolations)){
             getSessionBean().setActiveViolationList(selectedViolations);
             return "noticeOfViolationBuilder";
+            } else {
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Yikes! You may not create a notice for a violation "
+                                + "with a compliance date!", ""));
+                return "";
+            }
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -199,16 +220,36 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+    private boolean vListHasNoComplianceDates(List<CodeViolation> vList){
+        Iterator<CodeViolation> it = vList.iterator();
+        CodeViolation cv;
+        boolean noComplianceDates = true;
+        while(it.hasNext()){
+            cv = it.next();
+            if(cv.getActualComplianceDate() != null){
+                noComplianceDates = false;
+                break;
+            }
+        }
+        return noComplianceDates;
+    }
+    
     
     public String createCitationForAllViolations(){
         System.out.println("CaseManageBB.createCitationForAllViolations | current case tostring: " 
                 + currentCase);
 //        if(!currentCase.getViolationList().isEmpty()){
         if(currentCase != null){
-            
-            CaseCoordinator cc = getCaseCoordinator();
-            getSessionBean().setActiveCitation(cc.generateNewCitation(fullCaseViolationList));
-            return "citationEdit";
+            if(vListHasNoComplianceDates(selectedViolations)){
+                CaseCoordinator cc = getCaseCoordinator();
+                getSessionBean().setActiveCitation(cc.generateNewCitation(fullCaseViolationList));
+                return "citationEdit";
+            } else {
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Yikes! You may not cite a violation with a compliance date!", ""));
+                return "";
+            }
         }
         getFacesContext().addMessage(null,
         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -219,14 +260,17 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     public String createCitationFromSelected(){
         System.out.println("CaseManageBB.createCitationFromSelected");
         if(!selectedViolations.isEmpty()){
-            
-            CaseCoordinator cc = getCaseCoordinator();
-
-            getSessionBean().setActiveCitation(cc.generateNewCitation(selectedViolations));
-
-            return "citationEdit";
+            if(vListHasNoComplianceDates(selectedViolations)){
+                CaseCoordinator cc = getCaseCoordinator();
+                getSessionBean().setActiveCitation(cc.generateNewCitation(selectedViolations));
+                return "citationEdit";
+            } else {
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Yikes! You may not cite a violation with a compliance date!", ""));
+                return "";
+            }
         }
-        
         getFacesContext().addMessage(null,
         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 "Please select a violation and try again", ""));
@@ -484,7 +528,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the eventList
      */
-    public ArrayList<EventCase> getEventList() {
+    public List<EventCase> getEventList() {
         eventList = currentCase.getEventList();
         return eventList;
     }
@@ -499,7 +543,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the fullCaseViolationList
      */
-    public ArrayList<CodeViolation> getFullCaseViolationList() {
+    public List<CodeViolation> getFullCaseViolationList() {
         ViolationCoordinator vc = getViolationCoordinator();
         try {
             fullCaseViolationList = vc.getCodeViolations(currentCase);
@@ -517,7 +561,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the selectedViolation
      */
-    public ArrayList<CodeViolation> getSelectedViolations() {
+    public List<CodeViolation> getSelectedViolations() {
         return selectedViolations;
     }
 
@@ -566,7 +610,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the noticeList
      */
-    public ArrayList<NoticeOfViolation> getNoticeList() {
+    public List<NoticeOfViolation> getNoticeList() {
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         
         try {
@@ -587,12 +631,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the citationList
      */
-    public ArrayList<Citation> getCitationList() {
+    public List<Citation> getCitationList() {
         CitationIntegrator ci = getCitationIntegrator();
         
         
         try {
-            citationList = ci.getCitationsByCase(getSessionBean().getActiveCase());
+            citationList = ci.getCitations(getSessionBean().getActiveCase());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -717,7 +761,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the filteredEventList
      */
-    public ArrayList<EventCase> getFilteredEventList() {
+    public List<EventCase> getFilteredEventList() {
         return filteredEventList;
     }
 

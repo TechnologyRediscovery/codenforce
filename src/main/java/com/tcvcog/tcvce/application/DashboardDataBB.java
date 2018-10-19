@@ -5,7 +5,14 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
@@ -19,7 +26,7 @@ import org.primefaces.model.chart.HorizontalBarChartModel;
  */
 public class DashboardDataBB extends BackingBeanUtils implements Serializable{
 
-    private BarChartModel model;
+    private BarChartModel caseCountByPhase;
     private BarChartModel caseClosings;
     
     private BarChartModel barModel;
@@ -65,118 +72,69 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
      
     private void createBarModels() {
         createBarModel();
-        createHorizontalBarModel();
     }
      
     private void createBarModel() {
-        barModel = initBarModel();
-         
-        barModel.setTitle("Bar Chart");
-        barModel.setLegendPosition("ne");
-         
-        Axis xAxis = barModel.getAxis(AxisType.X);
-        xAxis.setLabel("Gender");
-         
-        Axis yAxis = barModel.getAxis(AxisType.Y);
-        yAxis.setLabel("Births");
-        yAxis.setMin(0);
-        yAxis.setMax(200);
-    }
-     
-    private void createHorizontalBarModel() {
-        horizontalBarModel = new HorizontalBarChartModel();
- 
-        ChartSeries boys = new ChartSeries();
-        boys.setLabel("Boys");
-        boys.set("2004", 50);
-        boys.set("2005", 96);
-        boys.set("2006", 44);
-        boys.set("2007", 55);
-        boys.set("2008", 25);
- 
-        ChartSeries girls = new ChartSeries();
-        girls.setLabel("Girls");
-        girls.set("2004", 52);
-        girls.set("2005", 60);
-        girls.set("2006", 82);
-        girls.set("2007", 35);
-        girls.set("2008", 120);
- 
-        horizontalBarModel.addSeries(boys);
-        horizontalBarModel.addSeries(girls);
-         
-        horizontalBarModel.setTitle("Horizontal and Stacked");
-        horizontalBarModel.setLegendPosition("e");
-        horizontalBarModel.setStacked(true);
-         
-        Axis xAxis = horizontalBarModel.getAxis(AxisType.X);
-        xAxis.setLabel("Births");
-        xAxis.setMin(0);
-        xAxis.setMax(200);
-         
-        Axis yAxis = horizontalBarModel.getAxis(AxisType.Y);
-        yAxis.setLabel("Gender");        
-    }
-    
-    
-    /**
-     * Creates a new instance of DashboardDataBB
-     */
-    public DashboardDataBB() {
-        model = new BarChartModel();
+        
+         caseCountByPhase = new BarChartModel();
         
         ChartSeries cases = new ChartSeries();
         cases.setLabel("Cases");
-        cases.set("Investigation", 12);
-        cases.set("Notice", 22);
-        cases.set("Citation", 5);
+        Map<String, Integer> ccMap = getCaseCountMap();
+        Set<String> phaseKeys = ccMap.keySet();
+        for (String key : phaseKeys) {
+            cases.set(key ,ccMap.get(key));
+        }
         
-        model.addSeries(cases);
-        model.setTitle("Cases by stage");
-        model.setLegendPosition("ne");
         
-        Axis xAxis = model.getAxis(AxisType.X);
-        xAxis.setLabel("Case Stage");
+        caseCountByPhase.addSeries(cases);
+        caseCountByPhase.setTitle("Case count by phase");
+        caseCountByPhase.setLegendPosition("ne");
+        caseCountByPhase.getAxis(AxisType.X).setTickAngle(45);
         
-        Axis yAxis = model.getAxis(AxisType.Y);
+        Axis xAxis = caseCountByPhase.getAxis(AxisType.X);
+        xAxis.setLabel("Case Phase");
+        
+        Axis yAxis = caseCountByPhase.getAxis(AxisType.Y);
         yAxis.setLabel("Num of open cases");
         yAxis.setMin(0);
         yAxis.setMax(100);
         
-        caseClosings = new BarChartModel();
+    }
+     
+   
+    /**
+     * Creates a new instance of DashboardDataBB
+     */
+    public DashboardDataBB() {
         
-        ChartSeries closings = new ChartSeries();
-        closings.setLabel("Closing");
-        closings.set("No notice required", 2);
-        closings.set("During notice period", 3);
-        closings.set("Through citation", 20);
-        
-        caseClosings.addSeries(cases);
-        caseClosings.setTitle("Case closings");
-        caseClosings.setLegendPosition("ne");
-        
-        Axis xAxis2 = caseClosings.getAxis(AxisType.X);
-        xAxis2.setLabel("Closing pathway");
-        
-        Axis yAxis2 = caseClosings.getAxis(AxisType.Y);
-        yAxis2.setLabel("Num of cases");
-        yAxis2.setMin(0);
-        yAxis2.setMax(30);
+    }
+    
+    private Map<String, Integer> getCaseCountMap(){
+        Map<String, Integer> caseCountMap = null;
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        try {
+             caseCountMap = mi.getCaseCountsByPhase(getSessionBean().getActiveMuni().getMuniCode());
+        } catch (IntegrationException ex) {
+            Logger.getLogger(DashboardDataBB.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("DashboardDataBB.getCaseCountMap");
+        }
+        return caseCountMap;
     }
 
     /**
-     * @return the model
+     * @return the caseCountByPhase
      */
-    public BarChartModel getModel() {
+    public BarChartModel getCaseCountByPhase() {
         System.out.println("DashboardDataBB.DashboardDataBB.getModel");
-        return model;
+        return caseCountByPhase;
     }
 
     /**
-     * @param model the model to set
+     * @param caseCountByPhase the caseCountByPhase to set
      */
-    public void setModel(BarChartModel model) {
-        this.model = model;
+    public void setCaseCountByPhase(BarChartModel caseCountByPhase) {
+        this.caseCountByPhase = caseCountByPhase;
     }
 
     /**

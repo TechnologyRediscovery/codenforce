@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Municipality;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -28,6 +29,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Map;
 import javax.faces.bean.ManagedProperty;
 
 /**
@@ -36,6 +38,7 @@ import javax.faces.bean.ManagedProperty;
  */
 public class MunicipalityIntegrator extends BackingBeanUtils implements Serializable {
 
+    // this is a test injected bean -- not currently working as of 19-OCT-18
     @ManagedProperty(value="#{codeIntegrator}")
     private CodeIntegrator ci;
     
@@ -44,6 +47,46 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
      * Creates a new instance of MunicipalityIntegrator
      */
     public MunicipalityIntegrator() {
+        
+        
+    }
+    
+    public Map<String, Integer> getCaseCountsByPhase(int muniCode) throws IntegrationException{
+        CasePhase[] phaseValuesArray = CasePhase.values();
+        
+        Map<String, Integer> caseCountMap = new HashMap<>();
+        PreparedStatement stmt = null;
+        Connection con = null;
+        String query = "SELECT count(caseid) FROM cecase join property "
+                + "ON property.propertyid = cecase.property_propertyid "
+                + "WHERE property.municipality_municode = ? "
+                + "AND casephase = CAST(? AS casephase) ;";
+        ResultSet rs = null;
+ 
+        try {
+            con = getPostgresCon();
+            for(CasePhase c: phaseValuesArray){
+                stmt = con.prepareStatement(query);
+                stmt.setInt(1, muniCode);
+                String phaseString = c.toString();
+                stmt.setString(2, phaseString);
+                rs = stmt.executeQuery();
+                while(rs.next()){
+                    caseCountMap.put(phaseString, rs.getInt(1));
+                }
+            
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getCaseCountsByPhase", ex);
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return caseCountMap;
         
         
     }
