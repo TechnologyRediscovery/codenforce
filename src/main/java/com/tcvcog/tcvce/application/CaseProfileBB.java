@@ -200,7 +200,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         
         System.out.println("CaseManageBB.createNewNoticeOfViolationForSelected | current case: " + currentCase);
         
-        if(!fullCaseViolationList.isEmpty()){
+        if(!selectedViolations.isEmpty()){
             if(vListHasNoComplianceDates(selectedViolations)){
             getSessionBean().setActiveViolationList(selectedViolations);
             return "noticeOfViolationBuilder";

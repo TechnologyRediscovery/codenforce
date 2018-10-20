@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.faces.bean.ManagedProperty;
 
@@ -52,9 +53,20 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     public Map<String, Integer> getCaseCountsByPhase(int muniCode) throws IntegrationException{
-        CasePhase[] phaseValuesArray = CasePhase.values();
         
-        Map<String, Integer> caseCountMap = new HashMap<>();
+        CasePhase[] phaseValuesArray = new CasePhase[8];
+        phaseValuesArray[0] = CasePhase.PrelimInvestigationPending;
+        phaseValuesArray[1] = CasePhase.NoticeDelivery;
+        phaseValuesArray[2] = CasePhase.InitialComplianceTimeframe;
+        phaseValuesArray[3] = CasePhase.SecondaryComplianceTimeframe;
+        phaseValuesArray[4] = CasePhase.AwaitingHearingDate;
+        phaseValuesArray[5] = CasePhase.HearingPreparation;
+        phaseValuesArray[6] = CasePhase.InitialPostHearingComplianceTimeframe;
+        phaseValuesArray[7] = CasePhase.SecondaryPostHearingComplianceTimeframe;
+        //CasePhase[] phaseValuesArray = CasePhase.values();
+        
+        
+        Map<String, Integer> caseCountMap = new LinkedHashMap<>();
         PreparedStatement stmt = null;
         Connection con = null;
         String query = "SELECT count(caseid) FROM cecase join property "

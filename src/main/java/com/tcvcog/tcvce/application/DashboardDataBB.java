@@ -98,7 +98,7 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
         Axis yAxis = caseCountByPhase.getAxis(AxisType.Y);
         yAxis.setLabel("Num of open cases");
         yAxis.setMin(0);
-        yAxis.setMax(100);
+        yAxis.setMax(15);
         
     }
      
