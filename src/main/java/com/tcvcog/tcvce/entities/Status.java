@@ -17,7 +17,6 @@ public abstract class Status implements Serializable {
     protected int statusID;
     protected String statusTitle;
     protected String description;
-    private Icon icon;
 
     /**
      * @return the statusID
@@ -81,27 +80,17 @@ public abstract class Status implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        if (!obj.equals(this.statusTitle)) {
+        final CitationStatus other = (CitationStatus) obj;
+        if (this.statusID != other.statusID) {
             return false;
         }
-        if (!obj.equals(this.description)) {
+        if (!Objects.equals(this.statusTitle, other.statusTitle)) {
+            return false;
+        }
+        if (!Objects.equals(this.description, other.description)) {
             return false;
         }
         return true;
-    }
-
-    /**
-     * @return the icon
-     */
-    public Icon getIcon() {
-        return icon;
-    }
-
-    /**
-     * @param icon the icon to set
-     */
-    public void setIcon(Icon icon) {
-        this.icon = icon;
     }
     
 }

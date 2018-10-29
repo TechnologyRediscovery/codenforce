@@ -161,6 +161,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return caseList;
     }
     
+    /**
+     * This method generates a new CECase
+     * @param ceCaseID
+     * @return
+     * @throws IntegrationException 
+     */
     public CECase getCECase(int ceCaseID) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
@@ -173,7 +179,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = null;
-        CECase c = new CECase();
+        CECase c = null;
         
         try {
             
@@ -184,6 +190,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
+                // I can avoid returning an empty CECase object by only instantiating
+                // if the result set has an entry. Since it's quering a DB key field
+                // it can only have a maximum of one returned result
+                c = new CECase();
                 c.setCaseID(rs.getInt("caseid"));
                 c.setPublicControlCode(rs.getInt("cecasepubliccc"));
                 c.setProperty(pi.getProperty(rs.getInt("property_propertyid")));

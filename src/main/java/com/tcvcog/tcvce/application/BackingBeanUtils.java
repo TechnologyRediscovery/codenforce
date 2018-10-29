@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegratorPublic;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -92,6 +93,7 @@ public class BackingBeanUtils implements Serializable{
     
     private PropertyIntegrator propertyIntegrator;
     private CEActionRequestIntegrator cEActionRequestIntegrator;
+    private CEActionRequestIntegratorPublic cEActionRequestIntegratorPublic;
     
     private ChecklistIntegrator checklistIntegrator;
     private OccupancyInspectionIntegrator occupancyInspectionIntegrator;
@@ -648,6 +650,23 @@ public class BackingBeanUtils implements Serializable{
 //        }
         String sessionID = session.getId();
         return sessionID;
+    }
+    
+
+    /**
+     * @return the cEActionRequestIntegratorPublic
+     */
+    public CEActionRequestIntegratorPublic getcEActionRequestIntegratorPublic() {
+        ExternalContext ec = getFacesContext().getExternalContext();
+        cEActionRequestIntegratorPublic = (CEActionRequestIntegratorPublic) ec.getSessionMap().get("ceActionRequestIntegratorPublic");
+        return cEActionRequestIntegratorPublic;
+    }
+
+    /**
+     * @param cEActionRequestIntegratorPublic the cEActionRequestIntegratorPublic to set
+     */
+    public void setcEActionRequestIntegratorPublic(CEActionRequestIntegratorPublic cEActionRequestIntegratorPublic) {
+        this.cEActionRequestIntegratorPublic = cEActionRequestIntegratorPublic;
     }
 
 }

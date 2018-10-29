@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.KeyCard;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
@@ -55,7 +56,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CECase activeCase;
     private EventCase activeEvent;
     private Person activePerson;
-    private User activeUser;
     private NoticeOfViolation activeNotice;
     private CEActionRequest actionRequest;
     private CodeSet activeCodeSet;
@@ -65,6 +65,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeViolation activeCodeViolation;
     private List<CodeViolation> activeViolationList;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
+    private KeyCard keyCard;
  
 
     /**
@@ -111,13 +112,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         return activePerson;
     }
 
-    /**
-     * @return the activeUser
-     */
-    public User getActiveUser() {
-        return activeUser;
-    }
-
+   
     /**
      * @return the activeNotice
      */
@@ -202,13 +197,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.activePerson = activePerson;
     }
 
-    /**
-     * @param activeUser the activeUser to set
-     */
-    public void setActiveUser(User activeUser) {
-        this.activeUser = activeUser;
-    }
-
+   
     /**
      * @param activeNotice the activeNotice to set
      */
@@ -320,6 +309,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setActiveCodeElement(CodeElement activeCodeElement) {
         this.activeCodeElement = activeCodeElement;
+    }
+
+    /**
+     * @return the keyCard
+     */
+    public KeyCard getKeyCard() {
+        return keyCard;
+    }
+
+    /**
+     * @param keyCard the keyCard to set
+     */
+    public void setKeyCard(KeyCard keyCard) {
+        this.keyCard = keyCard;
     }
     
 }

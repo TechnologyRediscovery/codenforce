@@ -20,16 +20,14 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.DataStoreException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import java.sql.Connection;
 import java.io.Serializable;
 import com.tcvcog.tcvce.domain.ObjectNotFoundException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.KeyCard;
+import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.UserIntegrator;
-import javax.faces.application.FacesMessage;
 
 /**
  *
@@ -75,7 +73,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
 //        authenticatedUser = ui.getAuthenticatedUser(loginName, loginPassword);
         if (authenticatedUser != null){
             
-            getSessionBean().setActiveUser(authenticatedUser);
+            // session bean doesn't store user--it's in the context map
+            //getSessionBean().setActiveUser(authenticatedUser);
         }
          
         return authenticatedUser;
@@ -99,7 +98,11 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         User authenticatedUser;
         UserIntegrator ui = getUserIntegrator();
         authenticatedUser = ui.getUser(loginName);
-        if(authenticatedUser.isAccessPermitted()){
+        // integrator sets high level system access permissions
+        if(authenticatedUser.isSystemAccessPermitted()){
+            // set user permissions with the role type that comes from the DB
+            // which the Integrator sets
+            authenticatedUser.setKeyCard(acquireAccessKeyCard(authenticatedUser.getRoleType()));
             return authenticatedUser;
             
         } else {
@@ -109,6 +112,83 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                     + "this message in error, please contact system administrator "
                     + "Eric Darsow at 412.923.9907.");
         }
+    }
+    
+    /**
+     * Container for all access control mechanism authorization switches
+     * 
+     * NOTE: This is the ONLY method system wide that calls any setters for
+     * access permissions
+     * 
+     * @param rt
+     * @return a User object whose access controls switches are configured
+     */
+    private KeyCard acquireAccessKeyCard(RoleType rt){
+        KeyCard card = null;
+        
+        switch(rt){
+            case Developer:
+                card = new KeyCard( true,   //developer
+                                    true,   // sysadmin
+                                    true,   // cogstaff
+                                    true,   // enfOfficial
+                                    true,   // muniStaff
+                                    true);  // muniReader
+               break;
+            
+            case SysAdmin:
+                card = new KeyCard( false,   //developer
+                                    true,   // sysadmin
+                                    true,   // cogstaff
+                                    false,   // enfOfficial
+                                    true,   // muniStaff
+                                    true);  // muniReader
+               break;
+               
+               
+            case CogStaff:
+                card = new KeyCard( false,   //developer
+                                    false,   // sysadmin
+                                    true,   // cogstaff
+                                    false,   // enfOfficial
+                                    true,   // muniStaff
+                                    true);  // muniReader
+               break;
+               
+               
+            case EnforcementOfficial:
+                card = new KeyCard( false,   //developer
+                                    false,   // sysadmin
+                                    false,   // cogstaff
+                                    true,   // enfOfficial
+                                    true,   // muniStaff
+                                    true);  // muniReader
+               break;
+               
+            case MuniStaff:
+                card = new KeyCard( false,   //developer
+                                    false,   // sysadmin
+                                    false,   // cogstaff
+                                    false,   // enfOfficial
+                                    true,   // muniStaff
+                                    true);  // muniReader
+               break;
+               
+            case MuniReader:
+                card = new KeyCard( false,   //developer
+                                    false,   // sysadmin
+                                    false,   // cogstaff
+                                    false,   // enfOfficial
+                                    false,   // muniStaff
+                                    true);  // muniReader
+               break;
+               
+               
+            default:
+               
+        }
+        
+        return card;
     }
     
 } // close class

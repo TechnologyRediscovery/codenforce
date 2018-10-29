@@ -10,9 +10,9 @@
         <title>Statistics</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../../restricted/navContainer_restricted.xhtml">
+        <ui:composition template="./../restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="statisticsForm">
+                <f:view id="NAME_ME">
                     
                     <div class="mainContainer">
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
@@ -26,7 +26,7 @@
                         <h:form id="statisticsForm">
 
 
-                            <h2>Key Indicators for <h:outputText value="#{sessionBean.sessionMuni.muniName}"/></h2>
+                            <h2>Key Indicators for <h:outputText value="#{sessionBean.activeMuni.muniName}"</h2>
 
                             <p:panelGrid columns="1" columnClasses="gridTd">
 

@@ -68,7 +68,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             stmt2 = con.prepareStatement(queryCitationViolationTable);
             
             stmt1.setString(1, citation.getCitationNo());
-            stmt1.setInt(2, citation.getStatus().getCitationStatusID());
+            stmt1.setInt(2, citation.getStatus().getStatusID());
             stmt1.setInt(3, citation.getOrigin_courtentity().getCourtEntityID());
             stmt1.setInt(4, citation.getUserOwner().getUserID());
             stmt1.setTimestamp(5, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
@@ -307,7 +307,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, citation.getCitationNo());
-            stmt.setInt(2, citation.getStatus().getCitationStatusID());
+            stmt.setInt(2, citation.getStatus().getStatusID());
             stmt.setInt(3, citation.getOrigin_courtentity().getCourtEntityID());
             stmt.setInt(4, citation.getUserOwner().getUserID());
             stmt.setTimestamp(5, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
@@ -432,7 +432,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
     public CitationStatus generateCitationStatus(ResultSet rs) throws IntegrationException{
         CitationStatus cs = new CitationStatus();
         try {
-            cs.setCitationStatusID(rs.getInt("statusid"));
+            cs.setStatusID(rs.getInt("statusid"));
             cs.setStatusTitle(rs.getString("statusname"));
             cs.setDescription(rs.getString("description"));
         } catch (SQLException ex) {
@@ -477,7 +477,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, cs.getCitationStatusID());
+            stmt.setInt(1, cs.getStatusID());
             stmt.execute();
             
             getFacesContext().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -513,7 +513,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             
             
             getFacesContext().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Citation no. " + cs.getCitationStatusID() + " has been updated", ""));
+                    "Citation no. " + cs.getStatusID() + " has been updated", ""));
 
             
         } catch (SQLException ex) {

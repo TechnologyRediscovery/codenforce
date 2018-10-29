@@ -8,8 +8,10 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  *
@@ -248,6 +250,10 @@ public class CECase implements Serializable{
      * @return the originiationDatePretty
      */
     public String getOriginiationDatePretty() {
+        DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE dd MM yyyy, HH:mm");
+        
+        originiationDatePretty = originationDate.format(f);
+        
         return originiationDatePretty;
     }
 

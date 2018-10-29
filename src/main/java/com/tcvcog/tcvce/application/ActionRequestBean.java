@@ -27,6 +27,7 @@ import java.time.ZoneId;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegratorPublic;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -108,6 +109,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     public String submitActionRequest() {
         
         CEActionRequestIntegrator integrator = getcEActionRequestIntegrator();
+        CEActionRequestIntegratorPublic cearqp = getcEActionRequestIntegratorPublic();
         
         // start by pulling the person fields and sending them to be entered
         // into db as a person. The ID of this person is returned, and used in our
@@ -129,7 +131,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         if (form_atSpecificAddress){
             currentRequest.setRequestProperty(selectedProperty);
         } else {
-            currentRequest.setNonAddressDescription(form_nonPropertyLocation);
+            currentRequest.setAddressOfConcern(form_nonPropertyLocation);
         }
         
         currentRequest.setIssueType_issueTypeID(violationTypeID);
@@ -150,7 +152,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
                        "Success! Your request has been submitted and passed to our code enforcement team.", ""));
 
             // now go back to integrator and get the request that was just submitted to display to the user
-            getCEActionRequestByPublicCC(controlCode);
+            cearqp.getCEActionRequestByControlCode(controlCode);
 
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
@@ -162,24 +164,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         }
         return "success";
     }
-    
-    private void getCEActionRequestByPublicCC(int cc){
-        CEActionRequest actionRequest = null;
-        CEActionRequestIntegrator ceai = getcEActionRequestIntegrator();
-        try {
-            actionRequest = ceai.getActionRequestByControlCode(cc);
-        } catch (IntegrationException ex) {
-            System.out.println(ex.toString());
-               getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to retrieve action request by control code, our apologies!", 
-                            "Please call your municipal office and report your concern by phone."));
-        }
-        // now set this action request for the session to have and send the user to the
-        // confirmation page
-        
-        getSessionBean().setActionRequest(actionRequest);
-    } // close method
+   
     
     /**
      * Coordinates the active tab index based on the status of various

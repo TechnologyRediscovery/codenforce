@@ -1055,6 +1055,11 @@
         <from-view-id>*</from-view-id>
     
         <navigation-case>
+            <from-outcome>statistics</from-outcome>
+            <to-view-id>/restricted/cogview/statistics.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>   
+        <navigation-case>
             <from-outcome>codeGuideView</from-outcome>
             <to-view-id>/restricted/cogview/codeGuideView.xhtml</to-view-id>
             <redirect />
@@ -1231,5 +1236,20 @@
         <managed-bean-name>navMenuBean</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>actionRequestManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ActionRequestManageBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cEActionRequestIntegratorPublic</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.CEActionRequestIntegratorPublic</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cEPublicAccessBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEPublicAccessBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>
