@@ -40,6 +40,7 @@ public class CEActionRequest implements Serializable{
     
     private int requestID;
     private int requestPublicCC;
+    private CEActionRequestStatus requestStatus;
 
     private Municipality muni;
     private int personID;
@@ -62,7 +63,6 @@ public class CEActionRequest implements Serializable{
 
     private boolean isAtKnownAddress;
     private String addressOfConcern;
-    private String nonAddressDescription;
     
     private String requestDescription;
     private boolean isUrgent;
@@ -364,19 +364,6 @@ public class CEActionRequest implements Serializable{
         this.personID = personID;
     }
 
-    /**
-     * @return the nonAddressDescription
-     */
-    public String getNonAddressDescription() {
-        return nonAddressDescription;
-    }
-
-    /**
-     * @param nonAddressDescription the nonAddressDescription to set
-     */
-    public void setNonAddressDescription(String nonAddressDescription) {
-        this.nonAddressDescription = nonAddressDescription;
-    }
 
     /**
      * @return the muni
@@ -433,6 +420,20 @@ public class CEActionRequest implements Serializable{
      */
     public void setDaysSinceDateOfRecord(long daysSinceDateOfRecord) {
         this.daysSinceDateOfRecord = daysSinceDateOfRecord;
+    }
+
+    /**
+     * @return the requestStatus
+     */
+    public CEActionRequestStatus getRequestStatus() {
+        return requestStatus;
+    }
+
+    /**
+     * @param requestStatus the requestStatus to set
+     */
+    public void setRequestStatus(CEActionRequestStatus requestStatus) {
+        this.requestStatus = requestStatus;
     }
 
    

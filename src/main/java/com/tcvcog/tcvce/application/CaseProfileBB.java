@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Citation;
@@ -33,6 +34,7 @@ import com.tcvcog.tcvce.entities.EventCase;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -75,6 +77,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     private List<Citation> citationList;
     private Citation selectedCitation;
+    
+    private List<CEActionRequest> actionRequestList;
+    private CEActionRequest selectedActionRequest;
     
     private HashMap<CasePhase, String> imageFilenameMap;
     private String phaseDiagramImageFilename;
@@ -488,6 +493,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * Used in the violation table to set the clicked violation row
      * as the system's current violation. At this stage, this feature
      * is used by the updateViolationsCodebookLink method only
+     * 
+     * Note that the member variable that this "setter" sets is
+     * also the memvar that setSel3ectedViolation sets
      * @param cv the code violation clicked in the table
      */
     public void setActiveViolation(CodeViolation cv){
@@ -813,5 +821,41 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setPhaseDiagramImageFilename(String phaseDiagramImageFilename) {
         this.phaseDiagramImageFilename = phaseDiagramImageFilename;
+    }
+
+    /**
+     * @return the actionRequestList
+     */
+    public List<CEActionRequest> getActionRequestList() {
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        try {
+            actionRequestList = ceari.getCEActionRequestListByCase(currentCase.getCaseID());
+        } catch (IntegrationException ex) {
+            System.out.println("CaseProfileBB.getActionRequestList | "
+                    + "unable to generate action request list by case");
+        }
+        
+        return actionRequestList;
+    }
+
+    /**
+     * @return the selectedActionRequest
+     */
+    public CEActionRequest getSelectedActionRequest() {
+        return selectedActionRequest;
+    }
+
+    /**
+     * @param actionRequestList the actionRequestList to set
+     */
+    public void setActionRequestList(List<CEActionRequest> actionRequestList) {
+        this.actionRequestList = actionRequestList;
+    }
+
+    /**
+     * @param selectedActionRequest the selectedActionRequest to set
+     */
+    public void setSelectedActionRequest(CEActionRequest selectedActionRequest) {
+        this.selectedActionRequest = selectedActionRequest;
     }
 }

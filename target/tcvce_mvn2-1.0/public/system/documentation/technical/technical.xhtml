@@ -71,6 +71,33 @@
                         <p><a href="#top">top</a></p>
                         <hr/>
                         
+                        <h2 id="security">Security</h2>
+                        
+                        <p>Use access is the primary security mechanism 
+                        at work in CodeConnect. The basic flow is this:</p>
+                        
+                            <ol>
+                                <li>Once Glassfish lets a user through upon request
+                                to view the restricted access page: missionControl.xhtml,
+                                the Glassfish user is retrieved and used to
+                                ask the UserIntegrator for a user built into the
+                                JSF system.</li>
+                                <li>The UserCoordinator asks the DB via the Integrator
+                                if there is a user by this ID. </li>
+                                <li>If a User object is, indeed, returned and the User has been granted system access, the user's
+                                RoleType is extracted and passed to the KeyCard generation method accessible privately by the
+                                UserCoordinator. That method uses the RoleType to create a KeyCard object whose
+                                six permission switches have been set.</li>
+                                <li>This keycard object is stored in both the User itself and stored in the SessionBean under KeyCard
+                                for use by Beans to control their button availability. </li>
+                                <li>When possible, the FacesUser's KeyCard should be extracted from the session map</li>
+                                <li></li>
+
+                            </ol>
+
+                        <p><a href="#top">top</a></p>
+                        <hr/>
+                        
                         <h2 id="logging">Logging</h2>
                         
                         <p>Logging exists on two levels:</p>

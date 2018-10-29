@@ -88,7 +88,7 @@ public class UserUpdateBB extends BackingBeanUtils implements Serializable{
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         u.setActivityStopDate(formActivityStopDate.toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        u.setAccessPermitted(formAccessPermitted);
+        u.setSystemAccessPermitted(formAccessPermitted);
         try {
             ui.updateUser(u);
             getFacesContext().addMessage(null,
@@ -268,7 +268,7 @@ public class UserUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formAccessPermitted
      */
     public boolean isFormAccessPermitted() {
-        formAccessPermitted = userToUpdate.isAccessPermitted();
+        formAccessPermitted = userToUpdate.isSystemAccessPermitted();
         return formAccessPermitted;
     }
 

@@ -417,7 +417,7 @@
                                                 <h:outputText value="re-link" />
                                             </f:facet>
                                             <p:commandButton icon="fa fa-link"
-                                                             actionListener="#{caseProfileBB.setActiveViolation(v)}" 
+                                                             actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
                                                              ajax="true" oncomplete="PF('linkDialog').show()"/>
 
                                         </p:column>
@@ -678,6 +678,184 @@
                                         </p:rowExpansion>
 
                                     </p:dataTable>
+
+                                        <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
+                                                     value="Updated selected citation"/>
+                                        <ui:remove>
+                                            
+                                        <p:commandButton ajax="false" action="#{caseProfileBB.deleteCitation}"
+                                                     value="Nuke selected citation forever"/>
+                                        </ui:remove>
+
+                                    <p:separator/>
+                                </h:form>
+                                 
+                             </p:tab>
+                            
+                            
+                             <p:tab title="Action Requests" id="tab-actionrequests">
+                                 
+                                <h:form id="actionRequestForm">
+                                    <p:dataTable
+                                        id="actionRequestTable"
+                                        var="r"
+                                        selectionMode="single"
+                                        selection="#{caseProfileBB.selectedActionRequest}"
+                                        rowKey="#{r.requestID}"
+                                        value="#{caseProfileBB.actionRequestList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true">
+
+
+                                        <p:column width="5%">
+                                            <p:rowToggler />
+                                        </p:column>
+
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <div class="wrapText">
+                                                <h:outputText value="#{r.requestID}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Issue Type" />
+                                            </f:facet>
+                                            <div class="wrapText">
+                                                <h:outputText value="#{r.issueTypeString}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Address" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{r.requestProperty.address}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Submitted" />
+                                            </f:facet>
+                                            <div class="wrapText">
+                                                <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
+                                            </div>
+                                        </p:column>
+
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Age" />
+                                            </f:facet>
+                                            <h:outputText value="#{r.daysSinceDateOfRecord}"/>
+                                        </p:column>
+
+                                        <ui:remove>
+                                            
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Link" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-link" action="#{ceActionRequestsBB.viewSelectedActionRequest}">
+                                                <f:setPropertyActionListener value="#{r}" target="#{ceActionRequestsBB.selectedRequest}"/>
+                                            </p:commandButton>
+                                        </p:column>
+                                        </ui:remove>
+                                        <p:rowExpansion>
+
+                                            <div class="outlinedBox">
+                                                <h3>Code Enforcement Action Request</h3>
+                                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                             columnClasses="gridTd, gridTd">
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel class="bold" value="Issue Type" />
+                                                        <p:spacer height="5px"/>
+                                                        <div class="wrapText">
+                                                            <h:outputText value="#{r.issueTypeString}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel class="bold" value="Address" />
+                                                        <p:spacer height="5px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{r.requestProperty.address}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <h:outputLabel class="bold" value="Date Submitted" />
+                                                        <p:spacer height="5px"/>
+                                                        <div class="wrapText">
+                                                            <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="ID"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="wrapText">
+                                                            <h:outputText value="#{r.requestID}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <div class="wrapText">
+                                                            <h:outputLabel styleClass="bold" value="Human safety issue?"/>
+                                                            <p:spacer height="5px"/>
+                                                            <h:outputText value="#{r.isUrgent}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+
+                                                        <div class="wrapText">
+                                                            <h:outputLabel styleClass="bold" value="Requestor (#{r.actionRequestorPerson.personType.label}): "/>
+                                                            <p:spacer height="5px"/>
+
+                                                            <h:outputText value="#{r.actionRequestorPerson.firstName} "/> 
+                                                            <h:outputText value="#{r.actionRequestorPerson.lastName}"/><br/> 
+                                                            <h:outputText value="#{r.actionRequestorPerson.address_street}"/> <br/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.address_city}, "/> 
+                                                            <h:outputText value="#{r.actionRequestorPerson.address_state} "/> 
+                                                            <h:outputText value="#{r.actionRequestorPerson.address_zip}"/> 
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Contact: "/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="wrapText"> 
+                                                            <h:outputText value="Phone (cell): "/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.phoneCell}"/> <br/>
+                                                            <h:outputText value="Phone (work): "/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> <br/>
+                                                            <h:outputText value="Phone (home): "/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br/>
+                                                            <h:outputText value="Email: "/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.email}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+
+
+                                                    <f:facet name="footer" class="leftalign">
+                                                        <h:outputLabel styleClass="bold" value="Request description"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion" style="leftalign">
+                                                            <h:outputText escape="false" value="#{r.requestDescription}"/>
+                                                        </div>
+                                                    </f:facet>
+                                                </h:panelGrid>
+                                            </div>
+
+                                        </p:rowExpansion>
+                                    </p:dataTable>
+
 
                                         <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
                                                      value="Updated selected citation"/>

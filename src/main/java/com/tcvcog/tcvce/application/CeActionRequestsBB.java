@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -30,7 +31,9 @@ import javax.faces.application.FacesMessage;
  */
 public class CeActionRequestsBB extends BackingBeanUtils implements Serializable {
 
-    private ArrayList<CEActionRequest> requestList;
+    private List<CEActionRequest> requestList;
+    private List<CEActionRequest> unlinkedRequestList;
+    
     private CEActionRequest selectedRequest;
     /**
      * Creates a new instance of CeActionRequestsBB
@@ -41,7 +44,7 @@ public class CeActionRequestsBB extends BackingBeanUtils implements Serializable
      /**
      * @return the requestList
      */
-    public ArrayList<CEActionRequest> getRequestList() {
+    public List<CEActionRequest> getRequestList() {
         CEActionRequestIntegrator ari = getcEActionRequestIntegrator();
         if(requestList == null){
             try {
@@ -80,6 +83,15 @@ public class CeActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public void setSelectedRequest(CEActionRequest selectedRequest) {
         this.selectedRequest = selectedRequest;
+    }
+
+   
+
+    /**
+     * @param unlinkedRequestList the unlinkedRequestList to set
+     */
+    public void setUnlinkedRequestList(ArrayList<CEActionRequest> unlinkedRequestList) {
+        this.unlinkedRequestList = unlinkedRequestList;
     }
     
 }

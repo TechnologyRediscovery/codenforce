@@ -149,7 +149,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setTimestamp(18, java.sql.Timestamp
                     .valueOf(userToInsert.getActivityStopDate()));
-            stmt.setBoolean(19, userToInsert.isAccessPermitted());
+            stmt.setBoolean(19, userToInsert.isSystemAccessPermitted());
             stmt.setInt(20, userToInsert.getUserID());
             
             System.out.println("UserIntegrator.insertUser | sql: " + stmt.toString());
@@ -204,7 +204,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                     .valueOf(userToUpdate.getActivityStartDate()));
             stmt.setTimestamp(18, java.sql.Timestamp
                     .valueOf(userToUpdate.getActivityStopDate()));
-            stmt.setBoolean(19, userToUpdate.isAccessPermitted());
+            stmt.setBoolean(19, userToUpdate.isSystemAccessPermitted());
             
             stmt.setInt(20, userToUpdate.getUserID());
             System.out.println("UserIntegrator.updateUser | sql: " + stmt.toString());
@@ -229,17 +229,21 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     private User generateUser(ResultSet rs) throws IntegrationException{
-        User user = new User();
+        User user = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         int userID;
         try {
             userID = rs.getInt("userid");
-            user.setUserID(userID);
+            // the central control mechanism for user access: only configurable
+            // upon User object construction!
+            user = new User(userID, RoleType.valueOf(rs.getString("userrole")));
+            user.setSystemAccessPermitted(rs.getBoolean("accesspermitted"));
+            
             user.setAuthMuis(getUserAuthMunis(userID));
-            user.setRoleType(RoleType.valueOf(rs.getString("userrole")));
             user.setUsername(rs.getString("username"));
-            user.setPassword(rs.getString("password"));
+            // passwords managed by Glassfish
+            //user.setPassword(rs.getString("password"));
             user.setMuniCode(rs.getInt("muni_municode"));
             user.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_muniCode")));
             
@@ -266,7 +270,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 user.setActivityStopDate(rs.getTimestamp("activitystopdate").toLocalDateTime());
                 
             }
-            user.setAccessPermitted(rs.getBoolean("accesspermitted"));
             
         } catch (SQLException ex) {
             throw new IntegrationException("Cannot create user", ex);
@@ -297,7 +300,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         User newUser = new User();
-        String query = "SELECT * from login where userid = ?;";
+        // broken query
+        String query = "SELECT from login where userid = ?;";
         
         PreparedStatement stmt = null;
         

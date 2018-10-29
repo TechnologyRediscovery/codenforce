@@ -41,6 +41,18 @@ import javax.faces.application.FacesMessage;
 
 /**
  *
+ * Object playing the role of coordinator in the MVC framework by interfacing between
+ * the JSF backing beans and the database integration classes.
+ * 
+ * This role involves several duties:
+ * 
+ * <ol>
+ * <li>Generating new events for Code Enforcement and occupancy</li>
+ * <li>Checking event creation permissions before allowing events of
+ * restricted categories to be attached to other system objects.</li>
+ * </ol>
+ * 
+ * 
  * @author Eric C. Darsow
  */
 public class EventCoordinator extends BackingBeanUtils implements Serializable{
@@ -69,6 +81,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * create their own event. Restricts the event type based on current
      * case phase (closed cases cannot have action, origination, or compliance events.
      * Includes the instantiation of Event objects
+     * 
      * @param c the case to which the event should be attached
      * @param ec the type of event to attach to the case
      * @return an initialized event with basic properties set
@@ -151,10 +164,19 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ei.insertEvent(event);
     }
     
+    
+    /**
+     * Configures an event which represents the moment of compliance with
+     * a code violation attached to a code enforcement case
+     * 
+     * @param violationList
+     * @return a partially-baked event ready for inserting
+     * @throws IntegrationException 
+     */
     public EventCase generateViolationComplianceEvent(List<CodeViolation> violationList) throws IntegrationException{
         EventCase e = new EventCase();
         EventIntegrator ei = getEventIntegrator();
-        e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
+          e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
         e.setEventDescription("Compliance with municipal code achieved");
         e.setActiveEvent(true);
@@ -231,6 +253,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ll;
     }
     
+    /**
+     * The currentCase argument must be a CECase with the desired case phase set
+     * The past phase is passed in separately, allowing for phase changes to
+     * any phase from any other phase
+     * @param currentCase
+     * @param pastPhase
+     * @throws IntegrationException
+     * @throws CaseLifecyleException 
+     */
     public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase) throws IntegrationException, CaseLifecyleException{
         
         EventIntegrator ei = getEventIntegrator();

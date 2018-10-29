@@ -19,27 +19,13 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 
 /**
- *
+ * 
  * @author Eric C. Darsow
  */
-public enum RequestStatus implements Serializable{
+public class CEActionRequestStatus extends Status implements Serializable{
     
-    AwaitingReview("Awaiting Review"), 
-    UnderInvestigation("Under Investigation"), 
-    NoViolationFound("No Violation Found"), 
-    CitationFiled("Citation Filed"),
-    Resolved("Request Process Resolved");
+    // superclass Status has title, description, and ID
+   
     
-    private final String label;
-    
-    private RequestStatus(String label){
-        this.label = label;
-        
-    }
-    
-    public String getLabel(){
-        return label;
-    
-    }
     
 }

@@ -40,6 +40,9 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
  
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,6 +64,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private ArrayList<EventWithCasePropInfo> filteredEventWithCasePropList;
     private int timelineEventViewDateRange;
     
+ 
     
     
     
@@ -100,6 +104,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
  
         
     }
+    
     
     public void updateEventViewData(EventWithCasePropInfo ev){
         System.out.println("MissionControlBB.updateEventViewData | event selected ID: " + ev.getEventID());

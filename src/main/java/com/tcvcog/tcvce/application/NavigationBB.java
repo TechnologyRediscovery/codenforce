@@ -164,8 +164,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveUser
      */
     public boolean isNoActiveUser() {
-        SessionBean sb = getSessionBean();
-        noActiveUser = (sb.getActiveUser() == null); 
+        noActiveUser = (getFacesUser() == null); 
         return noActiveUser;
     }
 
