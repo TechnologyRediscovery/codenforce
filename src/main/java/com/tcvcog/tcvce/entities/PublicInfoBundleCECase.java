@@ -19,22 +19,20 @@ import java.util.Objects;
 public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializable {
     
     private int caseID;
+    private int pacc_cecase;
     private boolean paccEnabled;
 
     private CasePhase casePhase;
     // extract only the publicly released events from the CECase's list
     
     
-    // not used
     private LocalDateTime originationDate;
-    
     private String originiationDatePretty;
 
     private LocalDateTime closingDate;
-    
     private String closingDatePretty;
     
-    private List<CECaseEvent> publicEventList;
+    private List<EventCase> publicEventList;
     
     private LocalDateTime mostRecentLoggedEvent;
     
@@ -45,46 +43,14 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<h2>");
-        sb.append("Code Enforcement Case");
-        sb.append("</h2>");
-        sb.append("<p>");
-        
-        sb.append("<span class=\"bold\">");
-        sb.append("Public access code: ");
-        sb.append("</span>");
-        sb.append(getPacc());
-        sb.append("<br />");
-        
-         sb.append("<span class=\"bold\">");
-        sb.append("Property Address: ");
-        sb.append("</span>");
-        sb.append(getPropertyAddress());
-        sb.append("<br />");
-        
-        sb.append("<span class=\"bold\">");
-        sb.append("Case opening date: ");
-        sb.append("</span>");
-        sb.append(originiationDatePretty);
-        sb.append("<br />");
-        
-        sb.append("<span class=\"bold\">");
-        sb.append("Case closing date: ");
-        sb.append("</span>");
-        sb.append(closingDatePretty);
-        sb.append("<br />");
-        
-        sb.append("</p>");
-        
-        return sb.toString();
-        
+        return "PublicInfoBundleCECase{" + "caseID=" + caseID + ", pacc_cecase=" + pacc_cecase + ", paccEnabled=" + paccEnabled + ", casePhase=" + casePhase + ", originationDate=" + originationDate + ", originiationDatePretty=" + originiationDatePretty + ", closingDate=" + closingDate + ", closingDatePretty=" + closingDatePretty + ", publicEventList=" + publicEventList + ", mostRecentLoggedEvent=" + mostRecentLoggedEvent + ", countNoticeLetters=" + countNoticeLetters + ", countViolations=" + countViolations + ", countCitations=" + countCitations + '}';
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 89 * hash + this.caseID;
+        hash = 89 * hash + this.pacc_cecase;
         hash = 89 * hash + (this.paccEnabled ? 1 : 0);
         hash = 89 * hash + Objects.hashCode(this.casePhase);
         hash = 89 * hash + Objects.hashCode(this.originationDate);
@@ -112,6 +78,9 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
         }
         final PublicInfoBundleCECase other = (PublicInfoBundleCECase) obj;
         if (this.caseID != other.caseID) {
+            return false;
+        }
+        if (this.pacc_cecase != other.pacc_cecase) {
             return false;
         }
         if (this.paccEnabled != other.paccEnabled) {
@@ -220,6 +189,12 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
         return caseID;
     }
 
+    /**
+     * @return the pacc_cecase
+     */
+    public int getPacc_cecase() {
+        return pacc_cecase;
+    }
 
     /**
      * @return the paccEnabled
@@ -266,7 +241,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @return the publicEventList
      */
-    public List<CECaseEvent> getPublicEventList() {
+    public List<EventCase> getPublicEventList() {
         return publicEventList;
     }
 
@@ -277,7 +252,12 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
         this.caseID = caseID;
     }
 
-  
+    /**
+     * @param pacc_cecase the pacc_cecase to set
+     */
+    public void setPacc_cecase(int pacc_cecase) {
+        this.pacc_cecase = pacc_cecase;
+    }
 
     /**
      * @param paccEnabled the paccEnabled to set
@@ -324,7 +304,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @param publicEventList the publicEventList to set
      */
-    public void setPublicEventList(List<CECaseEvent> publicEventList) {
+    public void setPublicEventList(List<EventCase> publicEventList) {
         this.publicEventList = publicEventList;
     }
     

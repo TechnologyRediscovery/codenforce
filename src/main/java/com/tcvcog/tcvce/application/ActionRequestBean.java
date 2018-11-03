@@ -27,7 +27,6 @@ import java.time.ZoneId;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegratorPublic;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -109,7 +108,6 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     public String submitActionRequest() {
         
         CEActionRequestIntegrator integrator = getcEActionRequestIntegrator();
-        CEActionRequestIntegratorPublic cearqp = getcEActionRequestIntegratorPublic();
         
         // start by pulling the person fields and sending them to be entered
         // into db as a person. The ID of this person is returned, and used in our
@@ -150,9 +148,6 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 
                        "Success! Your request has been submitted and passed to our code enforcement team.", ""));
-
-            // now go back to integrator and get the request that was just submitted to display to the user
-            cearqp.getCEActionRequestByControlCode(controlCode);
 
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());

@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
@@ -66,6 +67,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<CodeViolation> activeViolationList;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private KeyCard keyCard;
+    private List<PublicInfoBundle> infoBundleList;
  
 
     /**
@@ -323,6 +325,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setKeyCard(KeyCard keyCard) {
         this.keyCard = keyCard;
+    }
+
+    /**
+     * @return the infoBundleList
+     */
+    public List<PublicInfoBundle> getInfoBundleList() {
+        return infoBundleList;
+    }
+
+    /**
+     * @param infoBundleList the infoBundleList to set
+     */
+    public void setInfoBundleList(List<PublicInfoBundle> infoBundleList) {
+        this.infoBundleList = infoBundleList;
     }
     
 }

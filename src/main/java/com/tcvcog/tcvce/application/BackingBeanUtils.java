@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
@@ -28,7 +29,6 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegratorPublic;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -93,7 +93,7 @@ public class BackingBeanUtils implements Serializable{
     
     private PropertyIntegrator propertyIntegrator;
     private CEActionRequestIntegrator cEActionRequestIntegrator;
-    private CEActionRequestIntegratorPublic cEActionRequestIntegratorPublic;
+    private PublicInfoCoordinator publicInfoCoordinator;
     
     private ChecklistIntegrator checklistIntegrator;
     private OccupancyInspectionIntegrator occupancyInspectionIntegrator;
@@ -651,22 +651,26 @@ public class BackingBeanUtils implements Serializable{
         String sessionID = session.getId();
         return sessionID;
     }
+
+    /**
+     * @return the publicInfoCoordinator
+     */
+    public PublicInfoCoordinator getPublicInfoCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{publicInfoCoordinator}", PublicInfoCoordinator.class);
+        publicInfoCoordinator = (PublicInfoCoordinator) ve.getValue(context.getELContext());
+        
+        return publicInfoCoordinator;
+    }
+
+    /**
+     * @param publicInfoCoordinator the publicInfoCoordinator to set
+     */
+    public void setPublicInfoCoordinator(PublicInfoCoordinator publicInfoCoordinator) {
+        this.publicInfoCoordinator = publicInfoCoordinator;
+    }
     
 
-    /**
-     * @return the cEActionRequestIntegratorPublic
-     */
-    public CEActionRequestIntegratorPublic getcEActionRequestIntegratorPublic() {
-        ExternalContext ec = getFacesContext().getExternalContext();
-        cEActionRequestIntegratorPublic = (CEActionRequestIntegratorPublic) ec.getSessionMap().get("ceActionRequestIntegratorPublic");
-        return cEActionRequestIntegratorPublic;
-    }
-
-    /**
-     * @param cEActionRequestIntegratorPublic the cEActionRequestIntegratorPublic to set
-     */
-    public void setcEActionRequestIntegratorPublic(CEActionRequestIntegratorPublic cEActionRequestIntegratorPublic) {
-        this.cEActionRequestIntegratorPublic = cEActionRequestIntegratorPublic;
-    }
 
 }

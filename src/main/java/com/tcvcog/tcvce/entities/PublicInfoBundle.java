@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 public abstract class PublicInfoBundle {
 
     private int pacc;
-    private boolean showDetailsPageButton;
-    private boolean showAddMessageButton;
     private boolean paccEnabled;
     private String paccStatusMessage;
     
@@ -176,34 +174,6 @@ public abstract class PublicInfoBundle {
      */
     public void setPaccStatusMessage(String paccStatusMessage) {
         this.paccStatusMessage = paccStatusMessage;
-    }
-
-    /**
-     * @return the showDetailsPageButton
-     */
-    public boolean isShowDetailsPageButton() {
-        return showDetailsPageButton;
-    }
-
-    /**
-     * @param showDetailsPageButton the showDetailsPageButton to set
-     */
-    public void setShowDetailsPageButton(boolean showDetailsPageButton) {
-        this.showDetailsPageButton = showDetailsPageButton;
-    }
-
-    /**
-     * @return the showAddMessageButton
-     */
-    public boolean isShowAddMessageButton() {
-        return showAddMessageButton;
-    }
-
-    /**
-     * @param showAddMessageButton the showAddMessageButton to set
-     */
-    public void setShowAddMessageButton(boolean showAddMessageButton) {
-        this.showAddMessageButton = showAddMessageButton;
     }
     
     

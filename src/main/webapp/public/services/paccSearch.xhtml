@@ -21,9 +21,12 @@
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
 
+
                         <h1>Public Data Access Portal</h1>
 
                         <h:form id="checkRequestStatusForm">
+
+
 
                             <h:outputLabel for="controlCode" >
                                 <h:outputText value="Enter your 6-digit public access control code (PACC)" styleClass="uiLabel" />
@@ -42,58 +45,14 @@
                                 immediate="false"/>
 
 
-                            <p:dataList id="bundleDL" emptyMessage="Please enter a valid control code to retrieve data" 
-                                        value="#{publicInfoBB.publicInfoBundleList}" 
-                                        var="pib" type="definition">
-
-                                <div class="publicInfoBundleContainer">
-
-
-                                    <h:outputText escape="false" value="#{pib}"/>
-
-                                    <p:spacer height="5px"/>
-
-
-                                    <p:commandButton actionListener="#{publicInfoBB.setSelectedBundle(pib)}"
-                                                     value="Attach Message"
-                                                     oncomplete="PF('messageDialog').show()"
-                                                     ajax="true" rendered="#{pib.showAddMessageButton}"/>
-
-                                    <p:commandButton action="#{publicInfoBB.viewPACCRecordDetails(pib)}"
-                                                     value="View details"
-                                                     ajax="false" rendered="#{pib.showDetailsPageButton}"/>
-
-                                </div>
-
-
+                            <p:dataList id="bundleDL" emptyMessage="Please enter a valid control code to retrieve data" value="#{publicInfoBB.publicInfoBundleList}" var="db" type="definition">
+                                <h:outputText escape="false" value="#{db}"/>
+                                <p:spacer height="5px"/>
+                                <p:commandButton actionListener="#{publicInfoBB.attachMessage(pib)}"
+                                                 value="Attach Message"/>
                             </p:dataList>
 
                         </h:form>
-
-
-
-                        <p:confirmDialog message="Type your message to the code enforcement staff in the box below." 
-                                         severity="alert" widgetVar="messageDialog">
-
-                            <h:form id="messageForm">
-
-
-                                <h:outputText value="You are attaching a note to bundle with a type: #{publicInfoBB.selectedBundle.typeName}"/>
-
-                                <p:spacer height="15px"/>
-                                <p:inputTextarea id="message-ita" style="width: 300px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
-                                <p:spacer height="15px"/>
-                                <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage}"
-                                                 value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
-                                                 update="paccSearchMessages
-                                                 messageForm:message-ita"/>
-                                <p>Please note that all messages submitted through this portal become part of the permanent case record
-                                    and may be included in documents prepare for town councils and magistrates. </p>
-                            </h:form>
-                        </p:confirmDialog>
-
-
-
                     </div>
                 </f:view>
 

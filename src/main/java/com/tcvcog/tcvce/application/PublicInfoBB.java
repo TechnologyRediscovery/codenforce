@@ -6,10 +6,8 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
-import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,7 +24,6 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
     private List<PublicInfoBundle> publicInfoBundleList;
     private PublicInfoBundle selectedBundle;
     private int submittedPACC;
-    private String publicMessage;
     
     
     /**
@@ -52,45 +49,15 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
             }
         } catch (IntegrationException ex) {
               getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to search for info bundles, sorry!", "This is a system error."));
-        } catch (CaseLifecycleException ex) {
-            System.out.println(ex);
-        }
-        
-    }
-    
-    public String viewPACCRecordDetails(PublicInfoBundle pib){
-        if(pib instanceof PublicInfoBundleCECase){
-            PublicInfoBundleCECase pibCase = (PublicInfoBundleCECase) pib;
-            getSessionBean().setPibCECase(pibCase);
-            return "publicInfoCECase";
-            
-        }
-        return "";
-    }
-    
-    public void attachMessage(ActionEvent ev){
-        PublicInfoCoordinator pic = getPublicInfoCoordinator();
-        try {
-            pic.attachMessageToBundle(selectedBundle, publicMessage);
-            getFacesContext().addMessage(null,
-                  new FacesMessage(FacesMessage.SEVERITY_INFO,
-                          "Public case note added", ""));
-
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to attach messages at this time, sorry!", 
-                            "This is a system error and has been logged for debugging."));
-        
+                            "Unable to search for info bundles, sorry!", "This is a system error."));
         }
-        publicMessage = null;
-        
         
     }
     
-    
+    public void attachMessage(PublicInfoBundle pib){
+        
+    }
 
     /**
      * @return the publicInfoBundleList
@@ -128,32 +95,12 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param sb
+     * @param selectedBundle the selectedBundle to set
      */
-    public void setSelectedBundle(PublicInfoBundle sb) {
-        System.out.println("PublicInfoBB.setSelectedBundle | Bundle type: " + sb.getTypeName());
-        this.selectedBundle = sb;
-    }
-
-    /**
-     * @return the publicMessage
-     */
-    public String getPublicMessage() {
-        return publicMessage;
-    }
-
-    /**
-     * @param publicMessage the publicMessage to set
-     */
-    public void setPublicMessage(String publicMessage) {
-        this.publicMessage = publicMessage;
+    public void setSelectedBundle(PublicInfoBundle selectedBundle) {
+        this.selectedBundle = selectedBundle;
     }
     
-    
-    public String goToIntensityManage(){
-        
-        return "intensityManage";
-    }
     
     
 }
