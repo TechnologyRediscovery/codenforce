@@ -17,14 +17,8 @@
 package com.tcvcog.tcvce.application;
 
 
-import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegratorPublic;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.faces.event.ActionEvent;
 import javax.faces.application.FacesMessage;
 
 /**

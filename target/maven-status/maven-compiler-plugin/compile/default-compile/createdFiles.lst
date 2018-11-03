@@ -7,7 +7,6 @@ com/tcvcog/tcvce/entities/CodifiedMunicipality.class
 com/tcvcog/tcvce/occupancy/application/OccupancyPermitTypeBB.class
 com/tcvcog/tcvce/occupancy/entities/OccInspecStatus.class
 com/tcvcog/tcvce/integration/CodeViolationIntegrator.class
-com/tcvcog/tcvce/application/Visit.class
 com/tcvcog/tcvce/application/SessionInitializer.class
 testing/InspectableCodeElementIntegrator.class
 testing/TestDB.class
@@ -150,7 +149,6 @@ com/tcvcog/tcvce/util/EventCategoryConverter.class
 com/tcvcog/tcvce/integration/PersonIntegrator.class
 com/tcvcog/tcvce/application/CeCasesBB.class
 com/tcvcog/tcvce/integration/CodeIntegrator.class
-com/tcvcog/tcvce/application/courtEntityIntegrator.class
 com/tcvcog/tcvce/coordinators/CodeCoordinator.class
 com/tcvcog/tcvce/entities/CodeViolation.class
 com/tcvcog/tcvce/coordinators/EventCoordinator.class

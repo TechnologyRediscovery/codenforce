@@ -568,6 +568,11 @@
             <to-view-id>/public/services/submitCERequest.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        <navigation-case>
+            <from-outcome>paccSearch</from-outcome>
+            <to-view-id>/public/services/paccSearch.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
 
     </navigation-rule>
     
@@ -1216,7 +1221,6 @@
     </navigation-rule>
     
     
-    <!-- ************ non-wildcard nav cases ************************-->
     <managed-bean>
         <managed-bean-name>ceActionRequestsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CeActionRequestsBB</managed-bean-class>
@@ -1243,13 +1247,12 @@
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <managed-bean-name>cEActionRequestIntegratorPublic</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.CEActionRequestIntegratorPublic</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>publicInfoBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
-        <managed-bean-name>cEPublicAccessBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CEPublicAccessBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
+        <managed-bean-name>publicInfoCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.PublicInfoCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
 </faces-config>

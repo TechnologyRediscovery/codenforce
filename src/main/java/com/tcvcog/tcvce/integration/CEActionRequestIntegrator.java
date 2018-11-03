@@ -44,6 +44,56 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     public CEActionRequestIntegrator() {
     }
     
+    
+    
+    public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException{
+        CEActionRequest newActionRequest = null;
+        
+       StringBuilder sb = new StringBuilder();
+        List<CEActionRequest> requestList = new ArrayList<>();
+      sb.append("SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, \n" +
+"	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n" +
+"	dateofrecord, addressofconcern, \n" +
+"	notataddress, requestdescription, isurgent, anonymityRequested, \n" +
+"	cecase_caseid, coginternalnotes, \n" +
+"	muniinternalnotes, publicexternalnotes,\n" +
+"	actionRqstIssueType.typeName AS typename\n" +
+"	FROM public.ceactionrequest \n" +
+"		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid");
+        sb.append(" WHERE requestpubliccc= ?;");
+        
+        // for degugging
+        // System.out.println("Select Statement: ");
+        // System.out.println(sb.toString());
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, controlCode);
+            System.out.println("CEActionRequestorIntegrator.getActionRequestByControlCode | SQL: " + stmt.toString());
+            // Retrieve action data from postgres
+           rs = stmt.executeQuery();
+           
+           
+           // loop through the result set and reat an action request from each
+           while(rs.next()){
+               requestList.add(generateActionRequestFromRS(rs));
+         
+           }
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        return requestList;
+    } // close getActionRequest
+    
+    
     public void submitCEActionRequest(CEActionRequest actionRequest) throws IntegrationException{
         int controlCode = 0;
         

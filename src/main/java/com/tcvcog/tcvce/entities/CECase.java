@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -23,6 +24,15 @@ public class CECase implements Serializable{
     private int publicControlCode;
     private boolean paccEnabled;
     
+    /**
+     * Code enforcement action requests are generally linked
+    * to a code enforcement case by the code officers.
+    * This switch allows the release of the allowed
+    * case info to any holder of a PACC for a CEActionRequest
+    * that contains a link to this case.
+     */
+    private boolean allowForwardLinkedPublicAccess;
+    
     private Property property;
     private PropertyUnit propertyUnit;
     private User user;
@@ -34,6 +44,7 @@ public class CECase implements Serializable{
     // and not store CECase objects in the violation
     private ArrayList<CodeViolation> violationList;
     private ArrayList<EventCase> eventList;
+    private List<Citation> citationList;
     
     private String caseName;
     private CasePhase casePhase;
@@ -251,9 +262,7 @@ public class CECase implements Serializable{
      */
     public String getOriginiationDatePretty() {
         DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE dd MM yyyy, HH:mm");
-        
         originiationDatePretty = originationDate.format(f);
-        
         return originiationDatePretty;
     }
 
@@ -290,6 +299,34 @@ public class CECase implements Serializable{
      */
     public void setPaccEnabled(boolean paccEnabled) {
         this.paccEnabled = paccEnabled;
+    }
+
+    /**
+     * @return the citationList
+     */
+    public List<Citation> getCitationList() {
+        return citationList;
+    }
+
+    /**
+     * @param citationList the citationList to set
+     */
+    public void setCitationList(List<Citation> citationList) {
+        this.citationList = citationList;
+    }
+
+    /**
+     * @return the allowForwardLinkedPublicAccess
+     */
+    public boolean isAllowForwardLinkedPublicAccess() {
+        return allowForwardLinkedPublicAccess;
+    }
+
+    /**
+     * @param allowForwardLinkedPublicAccess the allowForwardLinkedPublicAccess to set
+     */
+    public void setAllowForwardLinkedPublicAccess(boolean allowForwardLinkedPublicAccess) {
+        this.allowForwardLinkedPublicAccess = allowForwardLinkedPublicAccess;
     }
     
     

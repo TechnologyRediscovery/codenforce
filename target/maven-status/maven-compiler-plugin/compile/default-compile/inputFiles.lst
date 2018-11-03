@@ -17,6 +17,7 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/application/PaymentBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/domain/CaseLifecyleException.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/EventEditBB.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/PublicInfoBundleCEActionRequest.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/SearchParams.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/CECase.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/Citation.java
@@ -53,6 +54,7 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/NoticeOfViolationBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/SessionInitializer.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/PropertyIntegrator.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/courtEntityIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/integration/OccupancyInspectionIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/Municipality.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/ActionRequestBean.java
@@ -66,9 +68,9 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/ViolationSelectElementBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/coordinators/CodeCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CodeElementGuideBB.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/PublicInfoBundleConverter.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/coordinators/ViolationCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/integration/PaymentIntegrator.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/Visit.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CheckRequestStatusBean.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/application/PaymentTypeBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/Person.java
@@ -85,12 +87,13 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/coordinators/UserCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/KeyCard.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/domain/EventException.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/coordinators/PublicInfoCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/testing/InspectableCodeElement.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/PublicInfoBundleCECase.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PersonBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CaseProfileBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PersonAddBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/NavMenuBean.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/courtEntityIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/Event.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/CEActionRequestStatusConverter.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/EventConfigurationBB.java
@@ -103,6 +106,7 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/CodeViolation.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/EnforcableCodeElement.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/Constants.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/PublicInfoBundle.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CourtEntityBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/entities/OccPermitType.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PersonUpdateBB.java
@@ -118,7 +122,6 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/coordinators/PropertyUnitCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/SessionBean.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/CourtEntityConverter.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/CEActionRequestIntegratorPublic.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/DashboardDataBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/EventCategoryConverter.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CodeElementBB.java
@@ -158,5 +161,6 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/entities/OccInspecStatus.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PropertyUpdateBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/CitationStatusConverter.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PublicInfoBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/EventWithCasePropInfo.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/ActionRequestConfirmation.java
