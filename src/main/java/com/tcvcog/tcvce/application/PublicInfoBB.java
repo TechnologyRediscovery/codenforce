@@ -24,6 +24,7 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
     private List<PublicInfoBundle> publicInfoBundleList;
     private PublicInfoBundle selectedBundle;
     private int submittedPACC;
+    private String publicMessage;
     
     
     /**
@@ -55,9 +56,26 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void attachMessage(PublicInfoBundle pib){
+    public void attachMessage(ActionEvent ev){
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
+        try {
+            pic.attachMessageToBundle(selectedBundle, publicMessage);
+            getFacesContext().addMessage(null,
+                  new FacesMessage(FacesMessage.SEVERITY_INFO,
+                          "Public case note added", ""));
+
+        } catch (IntegrationException ex) {
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to attach messages at this time.", 
+                            "This is a system error and has been logged for debugging."));
+        
+        }
+        
         
     }
+    
+    
 
     /**
      * @return the publicInfoBundleList
@@ -99,6 +117,20 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedBundle(PublicInfoBundle selectedBundle) {
         this.selectedBundle = selectedBundle;
+    }
+
+    /**
+     * @return the publicMessage
+     */
+    public String getPublicMessage() {
+        return publicMessage;
+    }
+
+    /**
+     * @param publicMessage the publicMessage to set
+     */
+    public void setPublicMessage(String publicMessage) {
+        this.publicMessage = publicMessage;
     }
     
     

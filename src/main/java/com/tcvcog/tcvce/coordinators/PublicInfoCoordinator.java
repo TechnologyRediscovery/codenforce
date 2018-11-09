@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,10 +55,21 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         pib.setRequestID(req.getRequestID());
         pib.setPacc(req.getRequestPublicCC());
 
-        pib.setPaccStatusMessage("Code Enforcement Data Available");
+        pib.setPaccStatusMessage("Public access enabled");
+        pib.setAddressAssociated(!req.getNotAtAddress());
+        if(!req.getNotAtAddress()){
+            pib.setPropertyAddress(req.getRequestProperty().getAddress());
+        }
+        
+        pib.setMuni(req.getMuni());
+        
+        // there's no case manager to attach to an unlinked action request
+        
+        
+        
         
         // TODO: populate from text file
-        pib.setTypeName("Code Enforcement ACtion Request");
+        pib.setTypeName("Code Enforcement Action Request");
         
         pib.setActionRequestorFLname(req.getActionRequestorPerson().getFirstName() 
                                     + " " + req.getActionRequestorPerson().getLastName());
@@ -74,5 +86,34 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return pib;
         
     }
+    
+    public void attachMessageToBundle(PublicInfoBundle bundle, String message) throws IntegrationException{
+        
+        LocalDateTime current = LocalDateTime.now();
+        
+        
+        PublicInfoBundleCEActionRequest requestBundle;
+        requestBundle = (PublicInfoBundleCEActionRequest) bundle;
+        
+        System.out.println("PublicInfoCoordinator.attachmessagToBundle: In coordinator");
+        
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        if(bundle instanceof PublicInfoBundleCEActionRequest){
+            System.out.println("PublicInfoCoordinator.attachmessagToBundle: Found CEActionBundle");
+            StringBuilder sb = new StringBuilder();
+            sb.append(requestBundle.getPublicExternalNotes());
+            sb.append("<br/><br/>");
+            sb.append("PUBLIC CASE NOTE ADDED AT ");
+            sb.append(current.toString());
+            sb.append(message);
+            ceari.attachMessageToCEActionRequest(requestBundle, message);
+            
+        }
+        
+        
+        
+    }
+    
+    
     
 }
