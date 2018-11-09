@@ -22,11 +22,13 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.SearchParams;
 import com.tcvcog.tcvce.entities.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -44,6 +46,36 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     public CEActionRequestIntegrator() {
     }
     
+    public void attachMessageToCEActionRequest(PublicInfoBundleCEActionRequest request, String message) throws IntegrationException{
+        String q =  "UPDATE public.ceactionrequest\n" +
+                    "   SET publicexternalnotes = ? WHERE requestid = ?;";
+        
+        
+        
+        // for degugging
+        // System.out.println("Select Statement: ");
+        // System.out.println(sb.toString());
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(q);
+            stmt.setString(1, message);
+            stmt.setInt(2, request.getRequestID());
+            System.out.println("CEActionRequestorIntegrator.attachMessageToCEActionRequest | statement: " + stmt.toString());
+            // Retrieve action data from postgres
+            stmt.execute();
+           
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
+        } finally{
+            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
     
     
     public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException{

@@ -301,7 +301,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         User newUser = new User();
         // broken query
-        String query = "SELECT from login where userid = ?;";
+        String query = "SELECT * from login where userid = ?;";
         
         PreparedStatement stmt = null;
         
