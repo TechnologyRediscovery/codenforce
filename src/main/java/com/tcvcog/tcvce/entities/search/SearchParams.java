@@ -3,23 +3,32 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tcvcog.tcvce.entities;
+package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.Municipality;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- *
- * @author sylvia
+ * Encapsulates municipality restrictions and start/end
+ * dates for searching. Types for all three commonmly used date
+ * formats system wide are included in the params object
+ * and the conversions are made automatically based on the
+ * LocalDateTime value, allowing objects on the front end and 
+ * integration end to just grab the date Type they need and go!
+ * @author Sylvia Garland
  */
 public class SearchParams implements Serializable{
+    
     
     private Municipality muni;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private java.util.Date startDateUtilDate;
     private java.util.Date endDateUtilDate;
+    private java.sql.Timestamp startDateSQLDate;
+    private java.sql.Timestamp endDateSQLDate;
     
     
     
@@ -27,15 +36,6 @@ public class SearchParams implements Serializable{
        
    }
    
-   public java.sql.Timestamp getStartDateForPG(){
-       return java.sql.Timestamp.valueOf(getStartDate());
-       
-   }
-   
-   public java.sql.Timestamp getEndDateForPG(){
-       return java.sql.Timestamp.valueOf(getEndDate());
-   }
-
    
     /**
      * @return the muni
@@ -65,13 +65,14 @@ public class SearchParams implements Serializable{
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
         this.startDateUtilDate = startDateUtilDate;
+        startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     /**
      * @return the endDateUtilDate
      */
     public java.util.Date getEndDateUtilDate() {
-        startDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+        endDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
         return endDateUtilDate;
     }
 
@@ -80,6 +81,7 @@ public class SearchParams implements Serializable{
      */
     public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
         this.endDateUtilDate = endDateUtilDate;
+        endDate = endDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     /**
@@ -109,6 +111,38 @@ public class SearchParams implements Serializable{
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
+
+    /**
+     * @return the startDateSQLDate
+     */
+    public java.sql.Timestamp getStartDateSQLDate() {
+        startDateSQLDate = java.sql.Timestamp.valueOf(getStartDate());
+        return startDateSQLDate;
+    }
+
+    /**
+     * @return the endDateSQLDate
+     */
+    public java.sql.Timestamp getEndDateSQLDate() {
+        endDateSQLDate = java.sql.Timestamp.valueOf(getEndDate());
+        return endDateSQLDate;
+    }
+
+    /**
+     * @param startDateSQLDate the startDateSQLDate to set
+     */
+    public void setStartDateSQLDate(java.sql.Timestamp startDateSQLDate) {
+        this.startDateSQLDate = startDateSQLDate;
+    }
+
+    /**
+     * @param endDateSQLDate the endDateSQLDate to set
+     */
+    public void setEndDateSQLDate(java.sql.Timestamp endDateSQLDate) {
+        this.endDateSQLDate = endDateSQLDate;
+    }
+
+    
 
    
     

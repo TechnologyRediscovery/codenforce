@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tcvcog.tcvce.entities;
+package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.CEActionRequestStatus;
+import com.tcvcog.tcvce.entities.search.SearchParams;
 import java.io.Serializable;
 
 /**

@@ -23,8 +23,8 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
-import com.tcvcog.tcvce.entities.SearchParams;
-import com.tcvcog.tcvce.entities.SearchParamsCEActionRequests;
+import com.tcvcog.tcvce.entities.search.SearchParams;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.*;
 import java.io.Serializable;
@@ -403,8 +403,6 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         return statusList;
-        
-        
     }
     
     
@@ -452,8 +450,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         sb.append("AND submittedtimestamp BETWEEN ? AND ? "); // parm 2 and 3
         
         if(params.isUseAttachedToCase()){
-            if(params.isAttachedToCase()) sb.append("AND cecase_caseid IS NOT NULL ");
-            else sb.append("AND cecase_caseid IS NULL ");
+            if(params.isAttachedToCase()){
+                sb.append("AND cecase_caseid IS NOT NULL ");
+            }
+            else{
+                sb.append("AND cecase_caseid IS NULL ");
+            }
         }
         
         
@@ -467,8 +469,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
          try {
            stmt = con.prepareStatement(sb.toString());
            stmt.setInt(1, params.getMuni().getMuniCode());
-           stmt.setTimestamp(2, params.getStartDateForPG());
-           stmt.setTimestamp(3, params.getEndDateForPG());
+           stmt.setTimestamp(2, params.getStartDateSQLDate());
+           stmt.setTimestamp(3, params.getEndDateSQLDate());
              System.out.println("CEActionRequestIntegrator.getCEActionRequestList | stmt: "+ stmt.toString());
            rs = stmt.executeQuery();
            while(rs.next()){

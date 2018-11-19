@@ -10,7 +10,6 @@ com/tcvcog/tcvce/integration/CodeViolationIntegrator.class
 com/tcvcog/tcvce/application/SessionInitializer.class
 testing/InspectableCodeElementIntegrator.class
 testing/TestDB.class
-com/tcvcog/tcvce/entities/SearchParams.class
 com/tcvcog/tcvce/application/UserUpdateBB.class
 com/tcvcog/tcvce/application/CaseProfileBB.class
 com/tcvcog/tcvce/domain/EventException.class
@@ -66,7 +65,6 @@ com/tcvcog/tcvce/util/EntityConverter.class
 com/tcvcog/tcvce/application/CeActionRequestsBB.class
 com/tcvcog/tcvce/entities/PublicInfoBundle.class
 com/tcvcog/tcvce/entities/ListChangeRequest.class
-com/tcvcog/tcvce/entities/SearchParamsCEActionRequests.class
 com/tcvcog/tcvce/util/PaymentTypeConverter.class
 com/tcvcog/tcvce/occupancy/entities/Space.class
 com/tcvcog/tcvce/coordinators/PublicInfoCoordinator.class

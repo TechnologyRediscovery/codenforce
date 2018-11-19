@@ -42,13 +42,14 @@
                                             <h:panelGroup>
 
 
-                                                <p:calendar value="#{actionRequestManageBB.searchParams.startDateUtilDate}" 
-                                                               mode="popup"  id="searchStartDate"
+                                                <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query end date"/>
+                                                <p:calendar id="eventDateCalStart" value="#{actionRequestManageBB.searchParams.startDateUtilDate}" 
+                                                               mode="popup"  
                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                                                showButtonPanel="true" showTodayButton="true"
                                                                required="true"/>
-                                                    <h:message for="eventDateCal" showDetail="false" showSummary="true" 
+                                                    <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                 
                                                 
@@ -56,27 +57,86 @@
                                             <h:panelGroup>
 
 
-                                                <p:calendar value="#{actionRequestManageBB.searchParams.endDateUtilDate}" 
-                                                               mode="popup"  id="searchStopDate"
+                                                <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="Query end date"/>
+                                                <p:calendar id="eventDateCalEnd" value="#{actionRequestManageBB.searchParams.endDateUtilDate}" 
+                                                               mode="popup" 
                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                                                showButtonPanel="true" showTodayButton="true"
-                                                               required="true"/>
-                                                   <h:message for="eventDateCal" showDetail="false" showSummary="true" 
+                                                               required="true" />
+                                                   <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                
-                                                
-                                            </h:panelGroup>
-                                            <h:panelGroup>
-                                                <p:outputLabel id="useMarkedUrgentol" for="useMarkedUrgent" value="Use marked urgent"/>
-                                                    <p:selectBooleanCheckbox id="useMarkedUrgent" value="#{actionRequestManageBB.searchParams.useMarkedUrgent}"/>
-                                                <p:outputLabel for="useMarkedUrgentcb" value="Urgent request?"/>
-                                                    <p:selectBooleanCheckbox id="useMarkedUrgentcb" value="#{actionRequestManageBB.searchParams.markedUrgent}"/>
                                                 
                                                 
                                             </h:panelGroup>
 
                                         </h:panelGrid>
+                                    
+                                    <p:fieldset legend="Advanced search options"
+                                                toggleable="true" collapsed="false">
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd">
+                                            
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useAttachedToCaseOL" for="useAttachedToCase" value="Filter by case attachment?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useAttachedToCase" value="#{actionRequestManageBB.searchParams.useAttachedToCase}" />
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <p:outputLabel id="attachedToCaseOL" for="attachedToCaseCB" value="Attached to case"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="attachedToCaseCB" value="#{actionRequestManageBB.searchParams.attachedToCase}" disabled="false" />
+                                            </h:panelGroup>
+                                            
+                                            
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useMarkedUrgentol" for="useMarkedUrgent" value="Filter by safety hazard?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useMarkedUrgent" value="#{actionRequestManageBB.searchParams.useMarkedUrgent}" />
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <p:outputLabel id="markedUrgentOL" for="useMarkedUrgentcb" value="Safety hazard"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useMarkedUrgentcb" value="#{actionRequestManageBB.searchParams.markedUrgent}" disabled="false"  widgetVar="sbUrgent" />
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useRequestIDOL" for="useRequestIDCB" value="Search by Request ID?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useRequestIDCB" value="#{actionRequestManageBB.searchParams.useRequestID}" />
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <p:outputLabel id="requestIDOL" for="requestIDIT" value="Request ID:"/>
+                                                <p:spacer height="5px"/>
+                                                <p:inputText id="requestIDIT" value="#{actionRequestManageBB.searchParams.requestID}" disabled="false" type="Integer"/>
+                                                <h:message for="requestIDIT" showDetail="false" showSummary="true" 
+                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                   
+                                            </h:panelGroup>
+                                            
+                                        </h:panelGrid>
+                                            
+                                                    
+                                        
+                                        
+                                    </p:fieldset>
+                                    
+                                    <p:commandButton ajax="true" value="Update results" actionListener="#{actionRequestManageBB.updateRequestList}"
+                                                     update="
+                                                     eventDateCalStart
+                                                     eventDateCalEnd
+                                                     useAttachedToCase
+                                                     attachedToCaseCB
+                                                     useMarkedUrgent
+                                                     useMarkedUrgentcb
+                                                     useRequestIDCB
+                                                     requestIDIT
+                                                     actionRequestTable"/>
+                                    
+                                    
                                     
                                     
                                     <h2>Query results</h2>

@@ -10,7 +10,7 @@ import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.SearchParamsCEActionRequests;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.util.List;
@@ -38,6 +38,12 @@ public class ActionRequestManageBB extends BackingBeanUtils {
     private SearchParamsCEActionRequests searchParams;
     
     // search stuff
+    
+    public void updateRequestList(ActionEvent ev){
+        requestList = null;
+        System.out.println("ActionRequestManagebb.updateRequestList");
+        
+    }
     
     
      /**
@@ -72,21 +78,16 @@ public class ActionRequestManageBB extends BackingBeanUtils {
      * @return the requestList
      */
     public List<CEActionRequest> getRequestList() {
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        SearchParamsCEActionRequests params = new SearchParamsCEActionRequests();
-        
-        params.setMuni(getSessionBean().getActiveMuni());
-        params = (SearchParamsCEActionRequests) cc.configureDefaultSearchParams(params);
-        
+        System.out.println("ActionRequestManageBB.getRequestList");
         
         CEActionRequestIntegrator ari = getcEActionRequestIntegrator();
         
         if(requestList == null || requestList.isEmpty()){
             System.out.println("CeActionRequestsBB.getUnlinkedRequestList | unlinkedrequests is null");
             try {
-                requestList = ari.getCEActionRequestList(params);
+                requestList = ari.getCEActionRequestList(searchParams);
             } catch (IntegrationException ex) {
+                System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                                 "Unable to load action requests due to an error in the Integration Module", ""));
@@ -216,6 +217,12 @@ public class ActionRequestManageBB extends BackingBeanUtils {
      * @return the searchParams
      */
     public SearchParamsCEActionRequests getSearchParams() {
+        System.out.println("ActionRequestManageBB.getSearchparams");
+        if(searchParams == null){
+            System.out.println("ActionRequestManageBB.getSearchparams | params is null");
+            SearchCoordinator sc = getSearchCoordinator();
+            searchParams = sc.getDefaultSearchParamsCEActionRequests();
+        }
         return searchParams;
     }
 

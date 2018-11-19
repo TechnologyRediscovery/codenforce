@@ -48,7 +48,7 @@ public class CeActionRequestsBB extends BackingBeanUtils implements Serializable
         CEActionRequestIntegrator ari = getcEActionRequestIntegrator();
         if(requestList == null){
             try {
-                requestList = ari.getCEActionRequestList(getSessionBean().getActiveMuni().getMuniCode());
+                requestList = ari.getCEActionRequestListByCase(getSessionBean().getActiveCase().getCaseID());
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
