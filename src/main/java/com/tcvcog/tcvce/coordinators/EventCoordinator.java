@@ -100,7 +100,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 )
         ){
             
-            throw new CaseLifecyleException("This event cannot be attached to a closed cases");
+            throw new CaseLifecyleException("This event cannot be attached to a closed case");
             
         }
         
@@ -112,6 +112,19 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         System.out.println("EventCoordinator.getInitalizedEvent | eventCat: " 
                 + event.getCategory().getEventCategoryTitle());
         return event;
+    }
+    
+    /**
+     * For use by the public messaging system which attaches events to code enforcement
+     * cases without having access to the entire CECase object--only the caseid
+     * @param caseID to which the event should be attached
+     * @return an instantiated EventCase object ready to be configured
+     */
+    public EventCase getInitializedEvent(int caseID){
+        EventCase event = new EventCase();
+        event.setCaseID(caseID);
+        return event;
+        
     }
     
     
@@ -128,6 +141,53 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // TODO: finishing autoconfiguring these 
         return ec;
     }
+    
+    /**
+     * Factory method for creating event categories when only the categoryID
+     * is available. This is handy since the insertEvent method on the integrator
+     * really only needs the categoryID for storing in the database
+     * @param catID the categoryID of the EventCategory you want
+     * @return an instantiated EventCategory object
+     */
+    public EventCategory getInitiatlizedEventCategory(int catID){
+        EventCategory ec =  new EventCategory();
+        ec.setCategoryID(catID);
+        return ec;
+    }
+    
+    /**
+     * Takes in a well-formed event message from the CaseCoordinator and
+     * initializes the appropriate properties on the event before insertion
+     * @param caseID id of the case to which the event should be attached
+     * @param message the text of the event description message
+     * @throws IntegrationException in the case of broken integration process
+     */
+    public void attachPublicMessagToCECase(int caseID, String message) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        
+        
+        int publicMessageEventCategory = Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("publicCECaseMessage"));
+        EventCategory ec = getInitiatlizedEventCategory(publicMessageEventCategory);
+        
+        // setup all the event properties
+        EventCase event = getInitializedEvent(caseID);
+        event.setCategory(ec);
+        event.setDateOfRecord(LocalDateTime.now());
+        event.setEventDescription(message);
+        event.setEventOwnerUser(getSystemRobotUser());
+        event.setDiscloseToMunicipality(true);
+        event.setDiscloseToPublic(true);
+        event.setActiveEvent(true);
+        event.setHidden(false);
+        event.setNotes("Event created by a public user");
+        
+        
+        // sent the built event to the integrator!
+        ei.insertEvent(event);
+        
+    }
+    
+    
 
     /**
      * Creates a populated event to log the change of a code violation update. 

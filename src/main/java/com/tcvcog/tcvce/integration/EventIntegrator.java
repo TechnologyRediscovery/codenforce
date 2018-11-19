@@ -276,6 +276,14 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
+    /**
+     * Attaches an Event to a code enforcement case. No checking of logic occurs
+     * in this integration method, so the caller should always be a coordiantor
+     * who has vetted the event and the associated case.
+     * @param event a fully-baked event ready for insertion. An EventCase contains
+     * an integer of the caseID to which the event should be attached
+     * @throws IntegrationException when the system is unable to store event in DB
+     */
     public void insertEvent(EventCase event) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         int insertedEventID = 0;

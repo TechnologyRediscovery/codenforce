@@ -36,15 +36,11 @@ public class CECase implements Serializable{
     private Property property;
     private PropertyUnit propertyUnit;
     private User user;
-
     
-    // This is a possible source of bugs:
-    // each CodeViolation also contains a case Object. I think
-    // we should pass the case in with the violation for linking
-    // and not store CECase objects in the violation
-    private ArrayList<CodeViolation> violationList;
-    private ArrayList<EventCase> eventList;
+    private List<CodeViolation> violationList;
+    private List<EventCase> eventList;
     private List<Citation> citationList;
+    private List<NoticeOfViolation> noticeList;
     
     private String caseName;
     private CasePhase casePhase;
@@ -203,7 +199,7 @@ public class CECase implements Serializable{
     /**
      * @return the violationList
      */
-    public ArrayList<CodeViolation> getViolationList() {
+    public List<CodeViolation> getViolationList() {
         return violationList;
     }
 
@@ -217,7 +213,7 @@ public class CECase implements Serializable{
     /**
      * @return the eventList
      */
-    public ArrayList<EventCase> getEventList() {
+    public List<EventCase> getEventList() {
         return eventList;
     }
 
@@ -327,6 +323,20 @@ public class CECase implements Serializable{
      */
     public void setAllowForwardLinkedPublicAccess(boolean allowForwardLinkedPublicAccess) {
         this.allowForwardLinkedPublicAccess = allowForwardLinkedPublicAccess;
+    }
+
+    /**
+     * @return the noticeList
+     */
+    public List<NoticeOfViolation> getNoticeList() {
+        return noticeList;
+    }
+
+    /**
+     * @param noticeList the noticeList to set
+     */
+    public void setNoticeList(List<NoticeOfViolation> noticeList) {
+        this.noticeList = noticeList;
     }
     
     

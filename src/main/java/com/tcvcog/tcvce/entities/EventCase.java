@@ -10,23 +10,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
 
-/**
- *
- * corresponding database table DDL
- * 
- * 
-   INSERT INTO public.ceevent(
-            eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, 
-            eventtimestamp, eventdescription, login_userid, disclosetomunicipality, 
-            disclosetopublic, activeevent, requiresviewconfirmation, viewconfirmed, 
-            hidden, notes)
-    VALUES (?, ?, ?, ?, 
-            ?, ?, ?, ?, 
-            ?, ?, ?, ?, 
-            ?, ?);
 
-* 
- * @author cedba
+/**
+ * A subclass of Event designed for Code Enforcement case specific
+ * attributes on Event. 
+ * @author sylvia
  */
 public class EventCase extends Event implements Serializable{
     

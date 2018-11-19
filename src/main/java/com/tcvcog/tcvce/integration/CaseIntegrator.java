@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -171,10 +172,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         EventIntegrator ei = getEventIntegrator();
+        CitationIntegrator ci = getCitationIntegrator();
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-            "       login_userid, casename, casephase, originationdate, closingdate, \n" +
-            "       notes, creationtimestamp \n" +
+            "            login_userid, casename, casephase, originationdate, closingdate, \n" +
+            "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
             "  FROM public.cecase WHERE caseid = ?;";
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -194,17 +196,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 // if the result set has an entry. Since it's quering a DB key field
                 // it can only have a maximum of one returned result
                 c = new CECase();
+                
                 c.setCaseID(rs.getInt("caseid"));
                 c.setPublicControlCode(rs.getInt("cecasepubliccc"));
                 c.setProperty(pi.getProperty(rs.getInt("property_propertyid")));
                 c.setPropertyUnit(null); // change when units are integrated
                 
                 c.setUser(ui.getUser(rs.getInt("login_userid")));
-                
-                // big list additions here
-                c.setEventList(ei.getEventsByCaseID(ceCaseID));
-                c.setViolationList(cvi.getCodeViolations(ceCaseID));
-                
                 
                 c.setCaseName(rs.getString("casename"));
                 c.setCasePhase(CasePhase.valueOf(rs.getString("casephase")));
@@ -224,6 +222,15 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                     c.setCreationTimestamp(rs.getTimestamp("creationtimestamp")
                             .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
                 }
+                
+                c.setPaccEnabled(rs.getBoolean("paccenabled"));
+                c.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
+                
+                // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
+                c.setEventList(ei.getEventsByCaseID(ceCaseID));
+                c.setNoticeList(cvi.getNoticeOfViolationList(c));
+                c.setCitationList(ci.getCitations(c));
+                c.setViolationList(cvi.getCodeViolations(ceCaseID));
             }
             
         } catch (SQLException ex) {
@@ -237,6 +244,43 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
         
         return c;
+    }
+    
+    public List<CECase> getCECasesByPACC(int pacc) throws IntegrationException{
+        
+        ArrayList<CECase> caseList = new ArrayList();
+        String query = "SELECT caseid FROM public.cecase WHERE cecasepubliccc = ?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, pacc);
+            System.out.println("CaseIntegrator.getCECasesByPacc | sql: " + stmt.toString());
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                caseList.add(getCECase(rs.getInt("caseid")));
+                
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot search for cases by PACC, sorry", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return caseList;
+        
+        
+        
+        
     }
     
 

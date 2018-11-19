@@ -521,6 +521,13 @@ div.headerLinkCont{
    
 }
 
+.publicInfoBundleContainer{
+    margin: 15px;
+    border: #04284A solid thick;
+    padding: 10px;
+    
+}
+
 
 
 /* ****************** CLOSE DIVS ************************/
@@ -631,6 +638,12 @@ tr.reinspect{
 
 td.gridTd {
     border: none;
+}
+
+.panelGridData{
+    border-collapse: collapse;
+    margin: 0px;
+    border: 1px solid black;
 }
 
 td.gridFooter {
