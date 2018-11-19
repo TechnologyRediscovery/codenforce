@@ -45,16 +45,26 @@
                                 immediate="false"/>
 
 
-                            <p:dataList id="bundleDL" emptyMessage="Please enter a valid control code to retrieve data" value="#{publicInfoBB.publicInfoBundleList}" var="db" type="definition">
+                            <p:dataList id="bundleDL" emptyMessage="Please enter a valid control code to retrieve data" value="#{publicInfoBB.publicInfoBundleList}" var="pib" type="definition">
                                 
+                                <div class="publicInfoBundleContainer">
+                                    
                                 
-                                <h:outputText escape="false" value="#{db}"/>
-                                <p:spacer height="5px"/>
-                                <p:commandButton actionListener="#{publicInfoBB.setSelectedBundle(pib)}"
-                                                 value="Attach Message"
-                                                 oncomplete="PF('messageDialog').show()"
-                                                 ajax="true"/>
-                                
+                                    <h:outputText escape="false" value="#{pib}"/>
+
+                                    <p:spacer height="5px"/>
+
+
+                                    <p:commandButton actionListener="#{publicInfoBB.setSelectedBundle(pib)}"
+                                                     value="Attach Message"
+                                                     oncomplete="PF('messageDialog').show()"
+                                                     ajax="true" rendered="#{pib.showAddMessageButton}"/>
+
+                                    <p:commandButton action="#{publicInfoBB.viewPACCRecordDetails(pib)}"
+                                                     value="View details"
+                                                     ajax="false" rendered="#{pib.showDetailsPageButton}"/>
+
+                                </div>
                                 
                                 
                             </p:dataList>
@@ -69,7 +79,11 @@
                                     <h:form id="messageForm">
                                         
                                         
+                                        <h:outputText value="You are attaching a note to bundle with a type: #{publicInfoBB.selectedBundle.typeName}"/>
+                                        
+                                        <p:spacer height="15px"/>
                                         <p:inputTextarea style="width: 300px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                        <p:spacer height="15px"/>
                                         <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage}"
                                                          value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
                                                          update="paccSearchMessages"/>

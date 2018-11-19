@@ -58,7 +58,7 @@
                             <h:panelGroup>
                                 <h:outputLabel styleClass="bold" value="Property:"/>
                                 <div class="rowExpansion">
-                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.propertyAddress}"/><br />
+                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.propertyAddress}"/><br/>
                                     <h:outputText value="#{pIBCECaseBB.activePIBCECase.muni.muniName}"/>
                                 </div>
                             </h:panelGroup>
@@ -91,7 +91,7 @@
                                 <p:spacer height="5px"/>
                                 <div class="rowExpansion" style="leftalign">
                                     <h:outputText value="#{pIBCECaseBB.activePIBCECase.caseManagerName}"/>
-                                    <br />
+                                    <br/>
                                     <h:outputText value="#{pIBCECaseBB.activePIBCECase.caseManagerContact}"/>
                                 </div>
                             </h:panelGroup>
@@ -159,7 +159,7 @@
                                         <p:commandButton ajax="true" actionListener="#{pIBCECaseBB.attachMessageToCase}"
                                                          value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
                                                          update="pibMessages"/>
-                                        <p>Messages submitted through this portal become part of the permanent case record<br />
+                                        <p>Messages submitted through this portal become part of the permanent case record<br/>
                                         and are included in documents prepared for town councils and magistrates. </p>
                                     </h:form>
                                     </p:confirmDialog>
@@ -201,7 +201,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Date" />
                                             </f:facet>
-                                            <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                            <h:outputText value="#{e.prettyDateOfRecord}"/>
                                         </p:column>
 
 
@@ -213,11 +213,11 @@
                                         </p:column>
                                         
                                         <p:column width="5%"
-                                                  sortBy="#{e.owner.person.lastName}">
+                                                  sortBy="#{e.eventOwnerUser.LName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator name" />
                                             </f:facet>
-                                            <h:outputText value="#{e.owner.person.lastName}"/>
+                                            <h:outputText value="#{e.eventOwnerUser.LName}"/>
                                         </p:column>
                                         
                                         <p:column width="20%" style="word-wrap: normal;">
@@ -258,21 +258,21 @@
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.requireRequestedEventInsert}"/>
+                                                            <h:outputText value="#{e.requiresViewConfirmation}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed by"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.responderActual.LName}"/>
+                                                            <h:outputText value="#{e.viewConfirmedBy.LName}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed at"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.responseTimestamp}"/>
+                                                            <h:outputText value="#{e.viewConfirmedAt}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     

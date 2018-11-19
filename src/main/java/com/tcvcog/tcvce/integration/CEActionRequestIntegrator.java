@@ -81,9 +81,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException{
         CEActionRequest newActionRequest = null;
         
-       StringBuilder sb = new StringBuilder();
-        List<CEActionRequest> requestList = new ArrayList<>();
-      sb.append("SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, \n" +
+       List<CEActionRequest> requestList = new ArrayList<>();
+       String q = "SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, \n" +
 "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n" +
 "	dateofrecord, addressofconcern, \n" +
 "	notataddress, requestdescription, isurgent, anonymityRequested, \n" +
@@ -91,8 +90,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 "	muniinternalnotes, publicexternalnotes,\n" +
 "	actionRqstIssueType.typeName AS typename\n" +
 "	FROM public.ceactionrequest \n" +
-"		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid");
-        sb.append(" WHERE requestpubliccc= ?;");
+"		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid" +
+" WHERE requestpubliccc= ?;";
         
         // for degugging
         // System.out.println("Select Statement: ");
@@ -102,7 +101,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         ResultSet rs = null;
         try {
             con = getPostgresCon();
-            stmt = con.prepareStatement(sb.toString());
+            stmt = con.prepareStatement(q.toString());
             stmt.setInt(1, controlCode);
             System.out.println("CEActionRequestorIntegrator.getActionRequestByControlCode | SQL: " + stmt.toString());
             // Retrieve action data from postgres
@@ -203,7 +202,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
            actionRequest.setRequestID(rs.getInt("requestid"));
            actionRequest.setRequestPublicCC(rs.getInt("requestPubliccc"));
            actionRequest.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
-           actionRequest.setRequestProperty(propI.getProperty(rs.getInt("property_propertyID")));
+           actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
+           if(!actionRequest.isIsAtKnownAddress()){
+            actionRequest.setRequestProperty(propI.getProperty(rs.getInt("property_propertyID")));   
+           }
            actionRequest.setActionRequestorPerson(pi.getPerson(rs.getInt("actrequestor_requestorid")));
            
            actionRequest.setIssueType_issueTypeID(rs.getInt("issuetype_issuetypeid"));
@@ -214,7 +216,6 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
            
            actionRequest.setDaysSinceDateOfRecord(getDaysSince(actionRequest.getDateOfRecord()));
            actionRequest.setAddressOfConcern(rs.getString("addressofconcern"));
-           actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
            
            actionRequest.setRequestDescription(rs.getString("requestDescription"));
            actionRequest.setIsUrgent(rs.getBoolean("isurgent"));

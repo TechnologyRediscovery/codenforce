@@ -34,6 +34,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
+import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
@@ -68,6 +69,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private KeyCard keyCard;
     private List<PublicInfoBundle> infoBundleList;
+    private PublicInfoBundleCECase pibCECase;
  
 
     /**
@@ -339,6 +341,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setInfoBundleList(List<PublicInfoBundle> infoBundleList) {
         this.infoBundleList = infoBundleList;
+    }
+
+    /**
+     * @return the pibCECase
+     */
+    public PublicInfoBundleCECase getPibCECase() {
+        return pibCECase;
+    }
+
+    /**
+     * @param pibCECase the pibCECase to set
+     */
+    public void setPibCECase(PublicInfoBundleCECase pibCECase) {
+        this.pibCECase = pibCECase;
     }
     
 }

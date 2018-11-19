@@ -72,6 +72,34 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Called by the PIBCECaseBB when a public user wishes to add an event
+     * to the case they are viewing online. This method stitches together the
+     * message text, messenger name, and messenger phone number before
+     * passing the info back to the EventCoordinator
+     * @param caseID can be extracted from the public info bundle
+     * @param msg the text of the message the user wants to add to the case 
+     * @param messagerName the first and last name of the person submitting the message
+     * Note that this submission info is not YET wired into the actual Person objects
+     * in the system.
+     * @param messagerPhone a simple String rendering of whatever the user types in. Length validation only.
+     */
+    public void attachPublicMessage(int caseID, String msg, String messagerName, String messagerPhone) throws IntegrationException{
+        StringBuilder sb = new StringBuilder();
+        sb.append("Case note added by ");
+        sb.append(messagerName);
+        sb.append(" with contact number: ");
+        sb.append(messagerPhone);
+        sb.append(": ");
+        sb.append("<br/><br/>");
+        sb.append(msg);
+        
+        EventCoordinator ec = getEventCoordinator();
+        ec.attachPublicMessagToCECase(caseID, sb.toString());
+        
+        
+    }
+    
+    /**
      * Called by the CaseManageBB when the user requests to change the case phase manually.
      * Note that this method is responsible for storing the case's phase before the change, 
      * updating the case Object itself, and then passing the updated CECase object
@@ -388,7 +416,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * A catch-the-rest method that simple adds the event to the case without
      * any additional logic or processing. Called by the default case in the
-     * event delegator method
+     * event delegator method. Passes the duty of calling the integrator
+     * to the insertEvent on the EventCoordinator
      * @param c the case to which the event should be attached
      * @param e the event to be attached
      * @throws IntegrationException thrown if the integrator cannot get the data

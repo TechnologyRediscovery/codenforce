@@ -604,6 +604,16 @@
         </navigation-case>
     </navigation-rule>
         
+    
+    <navigation-rule>
+        <from-view-id>/public/services/paccSearch.xhtml</from-view-id>  
+        <navigation-case>
+            <from-outcome>publicInfoCECase</from-outcome>
+            <to-view-id>/public/services/viewPIBCECase.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+        
     <!--site-wide navigation-->    
 
 
@@ -1254,5 +1264,10 @@
         <managed-bean-name>publicInfoCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.PublicInfoCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>pIBCECaseBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PIBCECaseBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

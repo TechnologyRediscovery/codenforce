@@ -619,13 +619,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @return the noticeList
      */
     public List<NoticeOfViolation> getNoticeList() {
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        
-        try {
-            noticeList = cvi.getNoticeOfViolationList(getSessionBean().getActiveCase());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+        noticeList = getSessionBean().getActiveCase().getNoticeList();
         return noticeList;
     }
 
@@ -640,15 +634,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @return the citationList
      */
     public List<Citation> getCitationList() {
-        CitationIntegrator ci = getCitationIntegrator();
         
-        
-        try {
-            citationList = ci.getCitations(getSessionBean().getActiveCase());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        System.out.println("CaseManageBB.getCitationList | list size: " + citationList.size());
+        citationList = getSessionBean().getActiveCase().getCitationList();
         return citationList;
     }
 

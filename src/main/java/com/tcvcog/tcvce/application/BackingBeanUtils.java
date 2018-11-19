@@ -49,6 +49,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 // system integrators
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -143,6 +144,21 @@ public class BackingBeanUtils implements Serializable{
         return bundle;
     }
     
+    /**
+     * A hacky way of creating a temporary User object who only
+     * has an ID number and no access permissions or ID info. Used for inserting
+     * events by public folks who don't have an actual User in the system.
+     * The ID of this user is pulled from the message bundles.
+     * @return the system robot user with only an ID number
+     */
+    public User getSystemRobotUser(){
+        User u = new User();
+        u.setUserID(Integer.parseInt(
+                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("cogRobotUserID")));
+        
+        return u;
+    }
     
     
     public void setUserCoordinator(UserCoordinator userCoordinator){

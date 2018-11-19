@@ -25,6 +25,7 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
     private String actionRequestorFLname;
     private String issueTypeString;
     private String caseLinkStatus;
+    private boolean linkedToCase;
     
     private String formattedSubmittedTimeStamp;
     private String requestDescription;
@@ -34,9 +35,9 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<h3>");
+        sb.append("<h2>");
         sb.append("Code Enforcement Action Request");
-        sb.append("</h3>");
+        sb.append("</h2>");
         sb.append("<p>");
         
         sb.append("<span class=\"bold\">");
@@ -273,5 +274,19 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
      */
     public void setPublicExternalNotes(String publicExternalNotes) {
         this.publicExternalNotes = publicExternalNotes;
+    }
+
+    /**
+     * @return the linkedToCase
+     */
+    public boolean isLinkedToCase() {
+        return linkedToCase;
+    }
+
+    /**
+     * @param linkedToCase the linkedToCase to set
+     */
+    public void setLinkedToCase(boolean linkedToCase) {
+        this.linkedToCase = linkedToCase;
     }
 }

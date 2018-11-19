@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
+import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
@@ -54,6 +55,16 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
                             "Unable to search for info bundles, sorry!", "This is a system error."));
         }
         
+    }
+    
+    public String viewPACCRecordDetails(PublicInfoBundle pib){
+        if(pib instanceof PublicInfoBundleCECase){
+            PublicInfoBundleCECase pibCase = (PublicInfoBundleCECase) pib;
+            getSessionBean().setPibCECase(pibCase);
+            return "publicInfoCECase";
+            
+        }
+        return "";
     }
     
     public void attachMessage(ActionEvent ev){
@@ -113,10 +124,11 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param selectedBundle the selectedBundle to set
+     * @param sb
      */
-    public void setSelectedBundle(PublicInfoBundle selectedBundle) {
-        this.selectedBundle = selectedBundle;
+    public void setSelectedBundle(PublicInfoBundle sb) {
+        System.out.println("PublicInfoBB.setSelectedBundle | Bundle type: " + sb.getTypeName());
+        this.selectedBundle = sb;
     }
 
     /**
