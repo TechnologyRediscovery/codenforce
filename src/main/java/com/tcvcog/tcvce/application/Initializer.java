@@ -158,6 +158,11 @@ public class Initializer implements ServletContextListener{
         LogIntegrator logInt = new LogIntegrator();
         servletContext.setAttribute("logIntegrator", logInt);
         
+        // this is a session-scoped bean stored in the session map
+        SearchCoordinator sc = new SearchCoordinator();
+        servletContext.setAttribute("searchCoordinator", sc);
+        
+        
 //        SessionBean sb = new SessionBean();
 //        servletContext.setAttribute("sessionBean", sb);
     }

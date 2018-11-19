@@ -105,6 +105,8 @@ public class BackingBeanUtils implements Serializable{
     private SystemIntegrator systemIntegrator;
     private LogIntegrator logIntegrator;
     
+    private SearchCoordinator searchCoordinator;
+    
     private User facesUser;
     
     /**
@@ -614,6 +616,17 @@ public class BackingBeanUtils implements Serializable{
         logIntegrator = (LogIntegrator) ve.getValue(context.getELContext());
         
         return logIntegrator;
+    }
+    
+     /**
+     * @return the sessionBean
+     */
+    public SearchCoordinator getSearchCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{searchCoordinator}", SearchCoordinator.class);
+        searchCoordinator = (SearchCoordinator) ve.getValue(context.getELContext());
+        return searchCoordinator;
     }
 
     /**

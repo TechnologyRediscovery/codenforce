@@ -1254,7 +1254,7 @@
     <managed-bean>
         <managed-bean-name>actionRequestManageBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ActionRequestManageBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
         <managed-bean-name>publicInfoBB</managed-bean-name>
@@ -1269,5 +1269,10 @@
         <managed-bean-name>pIBCECaseBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PIBCECaseBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>searchCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.SearchCoordinator</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
 </faces-config>

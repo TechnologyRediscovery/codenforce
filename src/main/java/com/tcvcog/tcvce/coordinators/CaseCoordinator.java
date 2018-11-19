@@ -31,8 +31,8 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.SearchParams;
-import com.tcvcog.tcvce.entities.SearchParamsCEActionRequests;
+import com.tcvcog.tcvce.entities.search.SearchParams;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
@@ -281,49 +281,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         refreshCase(c);
     }
     
-    
-    /**
-     * The temporarily hard-coded values for default search parameters for various
-     * types of search Param objects
-     * 
-     * This method checks for type and sets subclass-specific search params
-     * 
-     * Caller must configure muni
-     * 
-     * @param params An instantiated SearchParams object or subclass
-     * @return the same input SearchParams object with params configured
-     */
-    public SearchParams configureDefaultSearchParams(SearchParams params){
-        
-        if(params instanceof SearchParamsCEActionRequests){
-            System.out.println("CaseCoordinator.configureDefaultSearchParams "
-                    + "| found actionrequest param object");
-            SearchParamsCEActionRequests ceactionParams 
-                    = (SearchParamsCEActionRequests) params;
-            LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
-            ceactionParams.setStartDate(pastTenYears);
-            ceactionParams.setEndDate(LocalDateTime.now());
-            
-            ceactionParams.setUseAttachedToCase(true);
-            ceactionParams.setAttachedToCase(false);
-            
-            ceactionParams.setUseDescribedLocation(false);
-            
-            ceactionParams.setUseDescriptionContains(false);
-            
-            ceactionParams.setUseLastNameOfRequestor(false);
-            
-            ceactionParams.setUseMarkedUrgent(false);
-            
-            ceactionParams.setUseNotAtAddress(false);
-            
-            ceactionParams.setUseRequestStatus(false);
-            
-        }
-        
-        return params;
-        
-    }
     
     
     

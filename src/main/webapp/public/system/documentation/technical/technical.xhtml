@@ -34,6 +34,7 @@
                                 <li><a href="#migration">Legacy integration options</a></li>
                                 <li><a href="#workprocess">Work process management</a></li>
                                 <li><a href="#logging">Logging</a></li>
+                                <li><a href="#searching">Searching</a></li>
                             </ul>
                         
                         <h2 id="license">Licensing</h2>
@@ -101,6 +102,31 @@
                         <h2 id="logging">Logging</h2>
                         
                         <p>Logging exists on two levels:</p>
+                        <ol>
+                            <li>Code enforcement and inspection case events: user-facing, workflow-centric, stored in event-related tables. See DB documentation</li>
+                            <li>Direct database log to table genlog and others: Category mapped</li>
+                        </ol>
+                        
+                        <p>You can pull from message bundle files which are key/value pairs stored in a text file with a name tracked by JSF.</p>
+                        
+                        <span class="mono">getResourceBundle(Constants.MESSAGE_BUNDLE).getString("automaticClosingEventDescription")</span>
+                        
+                        
+                        <p><a href="#top">top</a></p>
+                        <hr/>
+                        
+                        <h2 id="searching">Searching</h2>
+                        
+                        <p>Searching for DB objects actually occurs each time any key list in the system is loaded. 
+                        The following list summarizes the key mechanisms at work</p>
+                        
+                        <ul>
+                            <li>A SearchParams object encapsulates allowable municipalities for 
+                                searching and search dates of all relevant search types</li>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                        
                         <ol>
                             <li>Code enforcement and inspection case events: user-facing, workflow-centric, stored in event-related tables. See DB documentation</li>
                             <li>Direct database log to table genlog and others: Category mapped</li>
