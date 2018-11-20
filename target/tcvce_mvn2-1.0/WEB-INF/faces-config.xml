@@ -254,10 +254,10 @@
     </managed-bean>
   
     <managed-bean>
-        <description>Models a request for code enforcement action</description>
+        <description>Coordinates view-coordinator interactions around code enforcement actions</description>
         <managed-bean-name>actionRequestBean</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ActionRequestBean</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
+        <managed-bean-scope>flow</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
@@ -919,9 +919,8 @@
     </navigation-rule>
     
     <navigation-rule>
-        <from-view-id>/restricted/muniview/ceActionRequests.xhtml</from-view-id>
+        <from-view-id>*</from-view-id>
         <navigation-case>
-            <from-action>#{ceActionRequestsBB.viewSelectedActionRequest}</from-action>
             <from-outcome>actionRequestManage</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/actionRequestManage.xhtml</to-view-id>
         </navigation-case>

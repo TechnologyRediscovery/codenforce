@@ -30,8 +30,6 @@ public class ActionRequestManageBB extends BackingBeanUtils {
     private List<CEActionRequestStatus> statusList;
     private CEActionRequestStatus selectedStatus;
     
-    
-    private CEActionRequest currentCEActionRequest;
     private List<CEActionRequest> requestList;
     private int ceCaseIDForConnection;
     
@@ -46,18 +44,10 @@ public class ActionRequestManageBB extends BackingBeanUtils {
     }
     
     
-     /**
-     * @return the currentCEActionRequest
-     */
-    public CEActionRequest getCurrentCEActionRequest() {
-        return currentCEActionRequest;
-    }
-
-    /**
-     * @param currentCEActionRequest the currentCEActionRequest to set
-     */
-    public void setCurrentCEActionRequest(CEActionRequest currentCEActionRequest) {
-        this.currentCEActionRequest = currentCEActionRequest;
+    public String manageActionRequest(CEActionRequest req){
+        getSessionBean().setActionRequest(req);
+        return "actionRequestManage";
+        
     }
 
     /**
@@ -109,17 +99,18 @@ public class ActionRequestManageBB extends BackingBeanUtils {
     
     public void connectActionRequestToCECase(){
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        // TODO: create event if the CEAR is connected to a CECASE
         EventIntegrator ei = getEventIntegrator();
         
         try {
-            ceari.connectActionRequestToCECase(currentCEActionRequest.getRequestID(), 
+            ceari.connectActionRequestToCECase(currentRequest.getRequestID(), 
                     ceCaseIDForConnection, 
                     getFacesUser().getUserID());
             
             
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully linked action request ID: " 
-                        + currentCEActionRequest.getRequestID() 
+                        + currentRequest.getRequestID() 
                         + " to code enforcement case ID: " + ceCaseIDForConnection
                         + "\n REFRESH your page to see the changes reflected in the action list", ""));
             // force a list reset
@@ -189,6 +180,14 @@ public class ActionRequestManageBB extends BackingBeanUtils {
      * @return the statusList
      */
     public List<CEActionRequestStatus> getStatusList() {
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        if(statusList == null){
+            try {
+                statusList = ceari.getRequestStatusList();
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+        }
         return statusList;
     }
 

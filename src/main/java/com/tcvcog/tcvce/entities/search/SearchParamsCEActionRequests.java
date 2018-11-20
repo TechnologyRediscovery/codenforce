@@ -18,17 +18,8 @@ public class SearchParamsCEActionRequests extends SearchParams implements Serial
     private boolean useRequestStatus;
     private CEActionRequestStatus requestStatus;
     
-    private boolean useDescriptionContains;
-    private String descriptionContains;
-    
-    private boolean useLastNameOfRequestor;
-    private String lastNameOfRequestor;
-    
     private boolean useNotAtAddress;
     private boolean notAtAnAddress;
-    
-    private boolean useDescribedLocation;
-    private boolean describedLocation;
     
     private boolean useMarkedUrgent;
     private boolean markedUrgent;
@@ -54,27 +45,7 @@ public class SearchParamsCEActionRequests extends SearchParams implements Serial
         this.requestStatus = requestStatus;
     }
 
-    /**
-     * @return the descriptionContains
-     */
-    public String getDescriptionContains() {
-        return descriptionContains;
-    }
-
-    /**
-     * @param descriptionContains the descriptionContains to set
-     */
-    public void setDescriptionContains(String descriptionContains) {
-        this.descriptionContains = descriptionContains;
-    }
-
-    /**
-     * @return the lastNameOfRequestor
-     */
-    public String getLastNameOfRequestor() {
-        return lastNameOfRequestor;
-    }
-
+   
     /**
      * @return the notAtAnAddress
      */
@@ -82,12 +53,7 @@ public class SearchParamsCEActionRequests extends SearchParams implements Serial
         return notAtAnAddress;
     }
 
-    /**
-     * @return the describedLocation
-     */
-    public boolean isDescribedLocation() {
-        return describedLocation;
-    }
+
 
     /**
      * @return the markedUrgent
@@ -110,25 +76,12 @@ public class SearchParamsCEActionRequests extends SearchParams implements Serial
         return requestID;
     }
 
-    /**
-     * @param lastNameOfRequestor the lastNameOfRequestor to set
-     */
-    public void setLastNameOfRequestor(String lastNameOfRequestor) {
-        this.lastNameOfRequestor = lastNameOfRequestor;
-    }
-
+   
     /**
      * @param notAtAnAddress the notAtAnAddress to set
      */
     public void setNotAtAnAddress(boolean notAtAnAddress) {
         this.notAtAnAddress = notAtAnAddress;
-    }
-
-    /**
-     * @param describedLocation the describedLocation to set
-     */
-    public void setDescribedLocation(boolean describedLocation) {
-        this.describedLocation = describedLocation;
     }
 
     /**
@@ -160,32 +113,13 @@ public class SearchParamsCEActionRequests extends SearchParams implements Serial
     }
 
     /**
-     * @return the useDescriptionContains
-     */
-    public boolean isUseDescriptionContains() {
-        return useDescriptionContains;
-    }
-
-    /**
-     * @return the useLastNameOfRequestor
-     */
-    public boolean isUseLastNameOfRequestor() {
-        return useLastNameOfRequestor;
-    }
-
-    /**
      * @return the useNotAtAddress
      */
     public boolean isUseNotAtAddress() {
         return useNotAtAddress;
     }
 
-    /**
-     * @return the useDescribedLocation
-     */
-    public boolean isUseDescribedLocation() {
-        return useDescribedLocation;
-    }
+    
 
     /**
      * @return the useMarkedUrgent
@@ -215,19 +149,6 @@ public class SearchParamsCEActionRequests extends SearchParams implements Serial
         this.useRequestStatus = useRequestStatus;
     }
 
-    /**
-     * @param useDescriptionContains the useDescriptionContains to set
-     */
-    public void setUseDescriptionContains(boolean useDescriptionContains) {
-        this.useDescriptionContains = useDescriptionContains;
-    }
-
-    /**
-     * @param useLastNameOfRequestor the useLastNameOfRequestor to set
-     */
-    public void setUseLastNameOfRequestor(boolean useLastNameOfRequestor) {
-        this.useLastNameOfRequestor = useLastNameOfRequestor;
-    }
 
     /**
      * @param useNotAtAddress the useNotAtAddress to set
@@ -236,12 +157,6 @@ public class SearchParamsCEActionRequests extends SearchParams implements Serial
         this.useNotAtAddress = useNotAtAddress;
     }
 
-    /**
-     * @param useDescribedLocation the useDescribedLocation to set
-     */
-    public void setUseDescribedLocation(boolean useDescribedLocation) {
-        this.useDescribedLocation = useDescribedLocation;
-    }
 
     /**
      * @param useMarkedUrgent the useMarkedUrgent to set

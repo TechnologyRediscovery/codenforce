@@ -80,14 +80,10 @@ public abstract class Status implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CitationStatus other = (CitationStatus) obj;
-        if (this.statusID != other.statusID) {
+        if (!obj.equals(this.statusTitle)) {
             return false;
         }
-        if (!Objects.equals(this.statusTitle, other.statusTitle)) {
-            return false;
-        }
-        if (!Objects.equals(this.description, other.description)) {
+        if (!obj.equals(this.description)) {
             return false;
         }
         return true;

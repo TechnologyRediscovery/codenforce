@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Citation;
@@ -31,8 +32,6 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.search.SearchParams;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
@@ -627,4 +626,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        citint.updateCitation(c);
        
    }
+   
+   public CEActionRequest getNewActionRequest(){
+       System.out.println("CaseCoordinator.getNewActionRequest");
+       return new CEActionRequest();
+       
+   }
+   
 }
