@@ -12,7 +12,7 @@ import java.time.ZoneId;
 
 /**
  * Encapsulates municipality restrictions and start/end
- * dates for searching. Types for all three commonmly used date
+ * dates for searching. Types for all three commonly used date
  * formats system wide are included in the params object
  * and the conversions are made automatically based on the
  * LocalDateTime value, allowing objects on the front end and 

@@ -13,33 +13,28 @@
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="requestCEActionFlow1View">
-
+                    
                     <div class="mainContainer">
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
                         <h1>Request Code Enforcement Action</h1>
-
+                        
                         <h:outputText value="This is the first page of the request ce action flow sequence"/>
 
-                        <h:form id="requestCEActionFlowFormChooseMuni">
+                        <h:form id="NAME_ME">
 
-                            <p:outputLabel for="muniSelectMenu" value="Choose your municipality:"/>
-                            <p:spacer height="5px"/>
-                            
-                            <p:selectOneMenu id="muniSelectMenu" 
-                                             tabindex="1" 
-                                             required="true"
-                                             value="#{cEActionRequestSubmitBB.selectedMuni}">
-                                <f:converter converterId="muniConverter"/>
-                                <f:selectItem itemLabel="select a municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                            </p:selectOneMenu>
-                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="false" value="describe your issue" 
+                                             action="#{personBB.viewPersonProfile}"/>
 
-                            <p:commandButton ajax="false" value="Next step: Choose a property" 
-                                             action="#{cEActionRequestSubmitBB.storeSelectedMuni}"/>
                         </h:form>
+                        
+                        
+
+
+
+
+
                     </div>
                 </f:view>
             </ui:define>

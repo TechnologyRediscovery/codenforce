@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.util.Date;
 import java.io.Serializable;
@@ -43,8 +44,6 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     
     // for request lookup
     
-    private CEActionRequest submittedRequest;
-    private CEActionRequest currentRequest;
     private Person currentPerson;
     
     private TabView tabView;
@@ -71,6 +70,8 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     private Date form_dateOfRecord;
     
     private boolean form_anonymous;
+    
+    private int submittedRequestPACC;
     
     // located address
         
@@ -99,15 +100,24 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         System.out.println("ActionRequestBean.ActionRequestBean");
     }
     
+    public String getReturnValue(){
+        return "paccSearch";
+        
+    }
+    
     
     /**
      * This action method is called when the request code enforcement
      * action request is submitted online (submit button in submitCERequest
-     * @return 
+     * @return the page ID for navigation
      */
     public String submitActionRequest() {
         
-        CEActionRequestIntegrator integrator = getcEActionRequestIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
+        CEActionRequest req = cc.getNewActionRequest();
+        
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        int submittedActionRequestID = 0;
         
         // start by pulling the person fields and sending them to be entered
         // into db as a person. The ID of this person is returned, and used in our
@@ -117,47 +127,50 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         // the person or the request bounces
         int personID = storeActionRequestorPerson();
         
-        currentRequest = new CEActionRequest();
-        currentRequest.setPersonID(personID);
-        currentRequest.setMuniCode(muniCode);
+        req.setPersonID(personID);
+        req.setMuniCode(muniCode);
         
         int controlCode = getControlCodeFromTime();
-        currentRequest.setRequestPublicCC(controlCode);
+        req.setRequestPublicCC(controlCode);
         
-        currentRequest.setIsAtKnownAddress(form_atSpecificAddress);
+        req.setIsAtKnownAddress(form_atSpecificAddress);
         
         if (form_atSpecificAddress){
-            currentRequest.setRequestProperty(selectedProperty);
+            req.setRequestProperty(selectedProperty);
         } else {
-            currentRequest.setAddressOfConcern(form_nonPropertyLocation);
+            req.setAddressOfConcern(form_nonPropertyLocation);
         }
         
-        currentRequest.setIssueType_issueTypeID(violationTypeID);
-        currentRequest.setRequestDescription(form_requestDescription);
-        currentRequest.setDateOfRecord(form_dateOfRecord
+        req.setIssueType_issueTypeID(violationTypeID);
+        req.setRequestDescription(form_requestDescription);
+        req.setDateOfRecord(form_dateOfRecord
                 .toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        currentRequest.setIsUrgent(form_isUrgent);
+        req.setIsUrgent(form_isUrgent);
+        
         // note that the time stamp is applied by the integration layer
         // with a simple call to the backing bean getTimeStamp method
 
         try { 
             // send the request into the DB
-            integrator.submitCEActionRequest(currentRequest);
+            submittedActionRequestID = ceari.submitCEActionRequest(req);
+            getSessionBean().setActionRequest(ceari.getActionRequestByRequestID(submittedActionRequestID));
+            
+            // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 
                        "Success! Your request has been submitted and passed to our code enforcement team.", ""));
+            return "success";
 
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
-//               getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-//                            "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
-//                            "Please call your municipal office and report your concern by phone."));
+               getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
+                            "Please call your municipal office and report your concern by phone."));
             return "";
         }
-        return "success";
     }
    
     
@@ -274,13 +287,12 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     }
 
       
-    public void searchForPropertiesSingleMuni(ActionEvent event){
+    public void searchForPropertiesSingleMuni(ActionEvent ev){
         System.out.println("ActionRequestBean.searchForPropertiesSingleMuni | municode: " + muniCode);
-        System.out.println("");
-        PropertyIntegrator pi = new PropertyIntegrator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
-            setPropList(pi.searchForProperties(houseNum, streetName, muniCode));
+            propList = pi.searchForProperties(houseNum, streetName, muniCode);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));
@@ -524,33 +536,6 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     }
 
 
-    /**
-     * @return the submittedRequest
-     */
-    public CEActionRequest getSubmittedRequest() {
-        return submittedRequest;
-    }
-
-    /**
-     * @param submittedRequest the submittedRequest to set
-     */
-    public void setSubmittedRequest(CEActionRequest submittedRequest) {
-        this.submittedRequest = submittedRequest;
-    }
-
-    /**
-     * @return the currentRequest
-     */
-    public CEActionRequest getCurrentRequest() {
-        return currentRequest;
-    }
-
-    /**
-     * @param currentRequest the currentRequest to set
-     */
-    public void setCurrentRequest(CEActionRequest currentRequest) {
-        this.currentRequest = currentRequest;
-    }
 
     /**
      * @return the currentPerson
@@ -703,6 +688,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
      * @param houseNum the houseNum to set
      */
     public void setHouseNum(String houseNum) {
+        System.out.println("ActionRequestBean.setHouseNum");
         this.houseNum = houseNum;
     }
 
@@ -732,5 +718,19 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
      */
     public void setStreetName(String streetName) {
         this.streetName = streetName;
+    }
+
+    /**
+     * @return the submittedRequestPACC
+     */
+    public int getSubmittedRequestPACC() {
+        return submittedRequestPACC;
+    }
+
+    /**
+     * @param submittedRequestPACC the submittedRequestPACC to set
+     */
+    public void setSubmittedRequestPACC(int submittedRequestPACC) {
+        this.submittedRequestPACC = submittedRequestPACC;
     }
 }

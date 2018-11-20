@@ -33,16 +33,18 @@
 
                                     <h2>Code Enforcement Action Requests</h2>
                                     
-                                    <h3>Search</h3>
+                                    <h3>Results below show all unattached action requests. Use advanced search options to specify a different result set.</h3>
                                     
-                                    
+                                    <p:fieldset legend="Advanced search options"
+                                                toggleable="true" collapsed="false">
+                                        
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd">
                                             
                                             <h:panelGroup>
 
 
-                                                <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query end date"/>
+                                                <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query start date "/>
                                                 <p:calendar id="eventDateCalStart" value="#{actionRequestManageBB.searchParams.startDateUtilDate}" 
                                                                mode="popup"  
                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -51,13 +53,10 @@
                                                                required="true"/>
                                                     <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                
-                                                
                                             </h:panelGroup>
+                                            
                                             <h:panelGroup>
-
-
-                                                <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="Query end date"/>
+                                                <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="Query end date "/>
                                                 <p:calendar id="eventDateCalEnd" value="#{actionRequestManageBB.searchParams.endDateUtilDate}" 
                                                                mode="popup" 
                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -66,40 +65,28 @@
                                                                required="true" />
                                                    <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                
-                                                
                                             </h:panelGroup>
-
-                                        </h:panelGrid>
-                                    
-                                    <p:fieldset legend="Advanced search options"
-                                                toggleable="true" collapsed="false">
-                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd, gridTd">
                                             
                                             <h:panelGroup>
                                                 <p:outputLabel id="useAttachedToCaseOL" for="useAttachedToCase" value="Filter by case attachment?"/>
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="useAttachedToCase" value="#{actionRequestManageBB.searchParams.useAttachedToCase}" />
                                             </h:panelGroup>
-                                            
                                             <h:panelGroup>
                                                 <p:outputLabel id="attachedToCaseOL" for="attachedToCaseCB" value="Attached to case"/>
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="attachedToCaseCB" value="#{actionRequestManageBB.searchParams.attachedToCase}" disabled="false" />
                                             </h:panelGroup>
                                             
-                                            
                                             <h:panelGroup>
                                                 <p:outputLabel id="useMarkedUrgentol" for="useMarkedUrgent" value="Filter by safety hazard?"/>
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="useMarkedUrgent" value="#{actionRequestManageBB.searchParams.useMarkedUrgent}" />
                                             </h:panelGroup>
-                                            
                                             <h:panelGroup>
                                                 <p:outputLabel id="markedUrgentOL" for="useMarkedUrgentcb" value="Safety hazard"/>
                                                 <p:spacer height="5px"/>
-                                                <p:selectBooleanCheckbox id="useMarkedUrgentcb" value="#{actionRequestManageBB.searchParams.markedUrgent}" disabled="false"  widgetVar="sbUrgent" />
+                                                <p:selectBooleanCheckbox id="useMarkedUrgentcb" value="#{actionRequestManageBB.searchParams.markedUrgent}" disabled="false" />
                                             </h:panelGroup>
                                             
                                             <h:panelGroup>
@@ -107,23 +94,43 @@
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="useRequestIDCB" value="#{actionRequestManageBB.searchParams.useRequestID}" />
                                             </h:panelGroup>
-                                            
                                             <h:panelGroup>
                                                 <p:outputLabel id="requestIDOL" for="requestIDIT" value="Request ID:"/>
                                                 <p:spacer height="5px"/>
-                                                <p:inputText id="requestIDIT" value="#{actionRequestManageBB.searchParams.requestID}" disabled="false" type="Integer"/>
+                                                <p:inputText id="requestIDIT" value="#{actionRequestManageBB.searchParams.requestID}" disabled="false"/>
                                                 <h:message for="requestIDIT" showDetail="false" showSummary="true" 
                                                      warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                   
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useActionRequestStatusOL" for="useRequestIDCB" value="Search by Request status?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useActionRequestStatusSB" value="#{actionRequestManageBB.searchParams.useRequestStatus}" />
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+
+                                                <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{actionRequestManageBB.searchParams.requestStatus}">
+                                                    <f:converter converterId="ceActionRequestStatusConverter"/>
+                                                    <f:selectItems value="#{actionRequestManageBB.statusList}"
+                                                                   var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useNotAtAddressOL" for="useNotAtAddressCB" value="Filter by not at address?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useNotAtAddressCB" value="#{actionRequestManageBB.searchParams.useNotAtAddress}" />
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <p:outputLabel id="notAtAddressOL" for="notAtAddressCB" value="Not at an address"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="notAtAddressCB" value="#{actionRequestManageBB.searchParams.notAtAnAddress}" disabled="false" />
                                             </h:panelGroup>
                                             
                                         </h:panelGrid>
+                                        <p:spacer height="15px"/>
                                             
                                                     
-                                        
-                                        
-                                    </p:fieldset>
-                                    
                                     <p:commandButton ajax="true" value="Update results" actionListener="#{actionRequestManageBB.updateRequestList}"
                                                      update="
                                                      eventDateCalStart
@@ -134,8 +141,16 @@
                                                      useMarkedUrgentcb
                                                      useRequestIDCB
                                                      requestIDIT
+                                                     useActionRequestStatusSB
+                                                     ceactionrequeststatusmenu
+                                                     useNotAtAddressCB
+                                                     notAtAddressCB
                                                      actionRequestTable"/>
                                     
+                                    
+                                        
+                                        
+                                    </p:fieldset>
                                     
                                     
                                     
@@ -208,9 +223,9 @@
                                                 <h:outputText value="Link" />
                                             </f:facet>
                                             <p:commandButton icon="fa fa-link" 
-                                                             actionListener="#{actionRequestManageBB.setCurrentCEActionRequest(r)}"
-                                                             ajax="true" 
-                                                             oncomplete="PF('connectDialog').show()"/>
+                                                             action="#{actionRequestManageBB.manageActionRequest(r)}"
+                                                             ajax="false" 
+                                                             value="Manage request"/>
                                                     
                                         </p:column>
                                         <p:rowExpansion>
@@ -306,19 +321,36 @@
 
                                 </h:form>
                                 
-                                <p:confirmDialog message="Type the id number of the case to which you would like to connect this action request.. 
-                                                      You'll want to ensure that the proper case ID is selected since connect requests are not shown on this list anymore, and they can get lost in an incorrect case." 
-                                                      severity="alert" widgetVar="connectDialog">
+                                <p:confirmDialog message="" 
+                                                 severity="alert" widgetVar="connectDialog">
+                                    
+                                    <h2>Manage code enforcement action request</h2>
 
                                     <h:form id="connectForm">
-                                        
+
                                         <h:outputLabel value="Code Enforcement Case ID"/>
                                         <p:inputText value="#{actionRequestManageBB.ceCaseIDForConnection}"/>
                                         <p:commandButton ajax="true" actionListener="#{actionRequestManageBB.connectActionRequestToCECase}"
                                                          value="Connect" icon="fa fa-link" oncomplete="PF('connectDialog').hide()" 
                                                          update="missionControlMessages"/>
+
+                                        <p:spacer height="5px"/>
+                                        <h:outputText value="#{actionRequestManageBB.currentRequest.requestStatus.statusTitle}"/>
+                                        <p:spacer height="5px"/>
+
+                                        <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{actionRequestManageBB.selectedStatus}"
+                                                         rendered="#{sessionBean.keyCard.hasEnfOfficialPermissions}">
+                                            <f:converter converterId="ceActionRequestStatusConverter"/>
+                                            <p:ajax update="ceactionrequeststatusmenu"></p:ajax>
+                                            <f:selectItems value="#{actionRequestManageBB.selectedStatus}"
+                                                           var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
+
+                                        </p:selectOneMenu>
+
+
+
                                     </h:form>
-                                    </p:confirmDialog>
+                                </p:confirmDialog>
                                 
                             </p:tab>
                             

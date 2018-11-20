@@ -21,36 +21,31 @@
 
 
                         <h:form>
+
+
+                            <h:outputLabel styleClass="bold" value="Status:"/>
+                            <p:spacer height="5px"/>
+                            <h:outputText value="#{actionRequestManageBB.currentRequest.requestStatus.statusTitle}"/>
+                            <p:spacer height="5px"/>
+
+                            <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{actionRequestManageBB.searchParams.requestStatus}">
+                                <f:converter converterId="ceActionRequestStatusConverter"/>
+                                <f:selectItems value="#{actionRequestManageBB.statusList}"
+                                               var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
+                            </p:selectOneMenu>
                             
-                                
-                                    <h:outputLabel styleClass="bold" value="ID"/>
-                                    <p:spacer height="5px"/>
-                                    <h:outputText value="#{actionRequestManageBB.currentRequest.requestStatus.statusTitle}"/>
-                                    <p:spacer height="5px"/>
-                                    
-                                    <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{actionRequestManageBB.selectedStatus}"
-                                                     rendered="#{sessionBean.keyCard.hasEnfOfficialPermissions}">
-                                        <f:converter converterId="ceActionRequestStatusConverter"/>
-                                        <p:ajax update="ceactionrequeststatusmenu"></p:ajax>
-                                        <f:selectItems value="#{actionRequestManageBB.selectedStatus}"
-                                                       var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
-                                        
-                                    </p:selectOneMenu>
-                                    
-                                    <h:message for="ceactionrequeststatusmenu" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    <p:commandButton ajax="true" value="Change request status" 
-                                                     update="actionRequestStatusOT" rendered="#{sessionBean.keyCard.hasEnfOfficialPermissions}"
-                                                     action="#{actionRequestManageBB.changeActionRequestStatus}"/>
-                                    
-                            
-                            
-                                    
+                            <p:commandButton ajax="true" value="Change request status" 
+                                             update="actionRequestStatusOT" rendered="#{sessionBean.keyCard.hasEnfOfficialPermissions}"
+                                             action="#{actionRequestManageBB.changeActionRequestStatus}"/>
+
+
+
+
 
                             <h2>Request details </h2>
                             <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                          columnClasses="gridTd, gridTd">
-                                
+
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="ID"/>
                                     <p:spacer height="5px"/>
@@ -59,7 +54,7 @@
                                     </div>
                                 </h:panelGroup>
 
-                                
+
                                 <h:panelGroup>
                                     <h:outputLabel class="bold" value="Issue Type" />
                                     <p:spacer height="5px"/>
@@ -83,8 +78,8 @@
                                         <h:outputText value="#{actionRequestManageBB.currentRequest.isUrgent}"/>
                                     </div>
                                 </h:panelGroup>
-                                
-                                
+
+
 
                                 <h:panelGroup>
                                     <div class="wrapText">
@@ -93,8 +88,8 @@
                                         <h:outputText value="#{actionRequestManageBB.currentRequest.addressOfConcern}"/>
                                     </div>
                                 </h:panelGroup>
-                                
-                                
+
+
                                 <h:panelGroup>
                                     <h:outputLabel class="bold" value="Linked property" />
                                     <p:spacer height="5px"/>
@@ -118,6 +113,7 @@
                                         <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.address_city}, "/> 
                                         <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.address_state} "/> 
                                         <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.address_zip}"/> 
+                                    </div>
                                     <p:spacer height="5px"/>
                                     <h:outputLabel styleClass="bold" value="Contact: "/>
                                     <p:spacer height="5px"/>
@@ -146,17 +142,17 @@
                                     <h:outputLabel styleClass="bold" value="System internal notes"/>
                                     <p:inputTextarea value="#{actionRequestManageBB.currentRequest.cogInternalNotes}"/>
                                     <p:spacer height="5px"/>
-                                    
+
                                     <h:outputLabel styleClass="bold" value="Municipality notes"/>
                                     <p:inputTextarea value="#{actionRequestManageBB.currentRequest.muniInternalNotes}"/>
                                     <p:spacer height="5px"/>
-                                    
+
                                     <h:outputLabel styleClass="bold" value="Public notes"/>
                                     <p:inputTextarea value="#{actionRequestManageBB.currentRequest.publicExternalNotes}"/>
                                     <p:spacer height="5px"/>
                                 </f:facet>
                             </h:panelGrid>
-                            
+
                             <p:commandButton ajax="false" action="#{actionRequestManageBB.updateActionRequest}"/>
                         </h:form>
                     </div>

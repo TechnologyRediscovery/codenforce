@@ -48,9 +48,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             
             sps.setUseAttachedToCase(true);
             sps.setAttachedToCase(false);
-            sps.setUseDescribedLocation(false);
-            sps.setUseDescriptionContains(false);
-            sps.setUseLastNameOfRequestor(false);
             sps.setUseMarkedUrgent(false);
             sps.setUseNotAtAddress(false);
             sps.setUseRequestStatus(false);
