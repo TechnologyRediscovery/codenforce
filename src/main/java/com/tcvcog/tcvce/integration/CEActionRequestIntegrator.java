@@ -30,6 +30,7 @@ import java.sql.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -177,7 +178,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
             controlCode = actionRequest.getRequestPublicCC();
             stmt.setInt(1, controlCode);
-            stmt.setInt(2, actionRequest.getMuniCode());
+            stmt.setInt(2, actionRequest.getMuni().getMuniCode());
 
             if (actionRequest.isIsAtKnownAddress()) {
                 stmt.setInt(3, actionRequest.getRequestProperty().getPropertyID());
@@ -711,5 +712,32 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         return requestList;
     } // close method
+    
+    
+    /**
+     * @return the violationMap
+     */
+    public HashMap<String, Integer> getViolationMap() {
+        
+        
+       HashMap<String, Integer> violationMap = new HashMap<>();
+        
+        Connection con = getPostgresCon();
+        String query = "SELECT issueTypeID, typeName FROM public.actionRqstIssueType;";
+        ResultSet rs;
+ 
+        try {
+            Statement stmt = con.createStatement();
+            rs = stmt.executeQuery(query);
+            while(rs.next()){
+                violationMap.put(rs.getString("typeName"), rs.getInt("issueTypeID"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+        } // end try/catch
+        return violationMap;
+    }
+
+    
 
 } // close class

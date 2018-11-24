@@ -23,6 +23,7 @@ public class SearchParams implements Serializable{
     
     
     private Municipality muni;
+    // for CECases this corresponds with the case opening date
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private java.util.Date startDateUtilDate;

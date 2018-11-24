@@ -7,16 +7,10 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
-import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -27,9 +21,6 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
 
     private Municipality currentMuni;
     
-    private Map<String, Integer> styleMap;
-    
-    
     
     /**
      * Creates a new instance of MunicipalityManageBB
@@ -37,38 +28,23 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
     public MunicipalityManageBB() {
     }
     
-    @PostConstruct
-    public void initBean(){
-        UserIntegrator ui = getUserIntegrator();
-        SystemIntegrator si = getSystemIntegrator();
-       
-        
-        try {
-            styleMap = si.getPrintStyleMap();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        
-    }
-    
     public String updateMuni(){
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-//        try {
-//            mi.updateMuniComplete(currentMuni);
+        try {
+            mi.updateMuni(currentMuni);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Successfully updated municipality info!", ""));
-//            getSessionBean().setSessionMuni(mi.getMuni(currentMuni.getMuniCode()));
-//        } catch (IntegrationException ex) {
-//            getFacesContext().addMessage(null,
-//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-//                "Unable to update municipality info due to a system error", 
-//                        "This could be because the code set"
-//                        + "ID or the code source ID you entered is not an "
-//                        + "actual database record ID. Check in the "
-//                        + "\"municipal code\" section to verify ID numbers"));
-//        }
+            getSessionBean().setActiveMuni(mi.getMuniFromMuniCode(currentMuni.getMuniCode()));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Unable to update municipality info due to a system error", 
+                        "This could be because the code set"
+                        + "ID or the code source ID you entered is not an "
+                        + "actual database record ID. Check in the "
+                        + "\"municipal code\" section to verify ID numbers"));
+        }
         
         return "";
         
@@ -79,7 +55,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getSessionMuni();
+        currentMuni = getSessionBean().getActiveMuni();
         return currentMuni;
     }
 
@@ -88,21 +64,6 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
      */
     public void setCurrentMuni(Municipality currentMuni) {
         this.currentMuni = currentMuni;
-    }
-
-
-    /**
-     * @return the styleMap
-     */
-    public Map<String, Integer> getStyleMap() {
-        return styleMap;
-    }
-
-    /**
-     * @param styleMap the styleMap to set
-     */
-    public void setStyleMap(Map<String, Integer> styleMap) {
-        this.styleMap = styleMap;
     }
     
 }

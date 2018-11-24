@@ -5,46 +5,47 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.Municipality;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
- *
+ * Encapsulates municipality restrictions and start/end
+ * dates for searching. Types for all three commonly used date
+ * formats system wide are included in the params object
+ * and the conversions are made automatically based on the
+ * LocalDateTime value, allowing objects on the front end and 
+ * integration end to just grab the date Type they need and go!
  * @author Sylvia Garland
  */
-public class SearchParamsCECase 
-        extends SearchParams 
-        implements Serializable{
-    
-    
+public class SearchParamsCECase extends SearchParams implements Serializable{
     
     private boolean useIsOpen;
     private boolean isOpen;
+    
+    private boolean useCaseCloseDateRange;
+    private LocalDateTime caseCloseStartDate;
+    private LocalDateTime caseCloseEndDate;
+    
+    private boolean useCasePhases;
+    // this list will contain an empty case whose
+    // phase we want to select in the search
+    // kinda hackey, I know.
+    private List<CECase> casePhasesList;
+    
+    private boolean useCaseManagerID;
+    private int caseManagerID;
+    
+    
+    
+    
+    
    
-    private List<String> dateSearchOptions;
-    private String dateToSearchCECases;
-
-    private boolean useCasePhase;
-    private CasePhase casePhase;
     
-    private boolean useCaseStage;
-    private CaseStage caseStage;
-    private List<CasePhase> caseStageAsPhaseList; 
-    
-    private boolean useProperty;
-    private Property property;
-    
-    private boolean usePropertyInfoCase;
-    private boolean propertyInfoCase;
-    
-    private boolean useCaseManager;
-    private User caseManagerUser;
     
    public SearchParamsCECase(){
        
@@ -65,17 +66,52 @@ public class SearchParamsCECase
     }
 
     /**
-     * @return the useCaseManager
+     * @return the useCaseCloseDateRange
      */
-    public boolean isUseCaseManager() {
-        return useCaseManager;
+    public boolean isUseCaseCloseDateRange() {
+        return useCaseCloseDateRange;
+    }
+
+    /**
+     * @return the caseCloseStartDate
+     */
+    public LocalDateTime getCaseCloseStartDate() {
+        return caseCloseStartDate;
+    }
+
+    /**
+     * @return the caseCloseEndDate
+     */
+    public LocalDateTime getCaseCloseEndDate() {
+        return caseCloseEndDate;
+    }
+
+    /**
+     * @return the useCasePhases
+     */
+    public boolean isUseCasePhases() {
+        return useCasePhases;
+    }
+
+    /**
+     * @return the casePhasesList
+     */
+    public List<CECase> getCasePhasesList() {
+        return casePhasesList;
+    }
+
+    /**
+     * @return the useCaseManagerID
+     */
+    public boolean isUseCaseManagerID() {
+        return useCaseManagerID;
     }
 
     /**
      * @return the caseManagerID
      */
-    public User getCaseManagerID() {
-        return getCaseManagerUser();
+    public int getCaseManagerID() {
+        return caseManagerID;
     }
 
     /**
@@ -92,217 +128,53 @@ public class SearchParamsCECase
         this.isOpen = isOpen;
     }
 
-   
-   
     /**
-     * @param useCaseManager the useCaseManager to set
+     * @param useCaseCloseDateRange the useCaseCloseDateRange to set
      */
-    public void setUseCaseManager(boolean useCaseManager) {
-        this.useCaseManager = useCaseManager;
-    }
-
-    
-   
-
-    /**
-     * @return the useCasePhase
-     */
-    public boolean isUseCasePhase() {
-        return useCasePhase;
+    public void setUseCaseCloseDateRange(boolean useCaseCloseDateRange) {
+        this.useCaseCloseDateRange = useCaseCloseDateRange;
     }
 
     /**
-     * @return the casePhase
+     * @param caseCloseStartDate the caseCloseStartDate to set
      */
-    public CasePhase getCasePhase() {
-        return casePhase;
+    public void setCaseCloseStartDate(LocalDateTime caseCloseStartDate) {
+        this.caseCloseStartDate = caseCloseStartDate;
     }
 
     /**
-     * @return the useCaseStage
+     * @param caseCloseEndDate the caseCloseEndDate to set
      */
-    public boolean isUseCaseStage() {
-        return useCaseStage;
+    public void setCaseCloseEndDate(LocalDateTime caseCloseEndDate) {
+        this.caseCloseEndDate = caseCloseEndDate;
     }
 
     /**
-     * @return the useProperty
+     * @param useCasePhases the useCasePhases to set
      */
-    public boolean isUseProperty() {
-        return useProperty;
+    public void setUseCasePhases(boolean useCasePhases) {
+        this.useCasePhases = useCasePhases;
     }
 
     /**
-     * @return the property
+     * @param casePhasesList the casePhasesList to set
      */
-    public Property getProperty() {
-        return property;
+    public void setCasePhasesList(List<CECase> casePhasesList) {
+        this.casePhasesList = casePhasesList;
     }
 
     /**
-     * @return the usePropertyInfoCase
+     * @param useCaseManagerID the useCaseManagerID to set
      */
-    public boolean isUsePropertyInfoCase() {
-        return usePropertyInfoCase;
+    public void setUseCaseManagerID(boolean useCaseManagerID) {
+        this.useCaseManagerID = useCaseManagerID;
     }
 
     /**
-     * @return the propertyInfoCase
+     * @param caseManagerID the caseManagerID to set
      */
-    public boolean isPropertyInfoCase() {
-        return propertyInfoCase;
-    }
-
-    /**
-     * @return the caseManagerUser
-     */
-    public User getCaseManagerUser() {
-        return caseManagerUser;
-    }
-
-    /**
-     * @param useCasePhase the useCasePhase to set
-     */
-    public void setUseCasePhase(boolean useCasePhase) {
-        this.useCasePhase = useCasePhase;
-    }
-
-    /**
-     * @param casePhase the casePhase to set
-     */
-    public void setCasePhase(CasePhase casePhase) {
-        this.casePhase = casePhase;
-    }
-
-    /**
-     * @param useCaseStage the useCaseStage to set
-     */
-    public void setUseCaseStage(boolean useCaseStage) {
-        this.useCaseStage = useCaseStage;
-    }
-
-    /**
-     * @param useProperty the useProperty to set
-     */
-    public void setUseProperty(boolean useProperty) {
-        this.useProperty = useProperty;
-    }
-
-    /**
-     * @param property the property to set
-     */
-    public void setProperty(Property property) {
-        this.property = property;
-    }
-
-    /**
-     * @param usePropertyInfoCase the usePropertyInfoCase to set
-     */
-    public void setUsePropertyInfoCase(boolean usePropertyInfoCase) {
-        this.usePropertyInfoCase = usePropertyInfoCase;
-    }
-
-    /**
-     * @param propertyInfoCase the propertyInfoCase to set
-     */
-    public void setPropertyInfoCase(boolean propertyInfoCase) {
-        this.propertyInfoCase = propertyInfoCase;
-    }
-
-    /**
-     * @param caseManagerUser the caseManagerUser to set
-     */
-    public void setCaseManagerUser(User caseManagerUser) {
-        this.caseManagerUser = caseManagerUser;
-    }
-
-    /**
-     * @return the dateToSearchCECases
-     */
-    public String getDateToSearchCECases() {
-        return dateToSearchCECases;
-    }
-
-    /**
-     * @param dateToSearchCECases the dateToSearchCECases to set
-     */
-    public void setDateToSearchCECases(String dateToSearchCECases) {
-        this.dateToSearchCECases = dateToSearchCECases;
-    }
-
-    /**
-     * @return the caseStageAsPhaseList
-     */
-    public List<CasePhase> getCaseStageAsPhaseList() {
-        List<CasePhase> phaseList = new ArrayList<>();
-        if(caseStage != null){
-            switch(caseStage){
-                case Investigation:
-                    phaseList.add(CasePhase.PrelimInvestigationPending);
-                    phaseList.add(CasePhase.NoticeDelivery);
-                    break;
-                
-                case Enforcement:
-                    phaseList.add(CasePhase.InitialComplianceTimeframe);
-                    phaseList.add(CasePhase.SecondaryPostHearingComplianceTimeframe);
-                    break;
-                    
-                case Citation:
-                    phaseList.add(CasePhase.AwaitingHearingDate);
-                    phaseList.add(CasePhase.HearingPreparation);
-                    phaseList.add(CasePhase.InitialPostHearingComplianceTimeframe);
-                    phaseList.add(CasePhase.SecondaryPostHearingComplianceTimeframe);
-                    break;
-                
-                case Closed:
-                    phaseList.add(CasePhase.Closed);
-                    phaseList.add(CasePhase.InactiveHolding);
-                    break;
-            }
-        }
-        
-        caseStageAsPhaseList = phaseList;
-        return caseStageAsPhaseList;
-    }
-
-    /**
-     * @param caseStageAsPhaseList the caseStageAsPhaseList to set
-     */
-    public void setCaseStageAsPhaseList(List<CasePhase> caseStageAsPhaseList) {
-        this.caseStageAsPhaseList = caseStageAsPhaseList;
-    }
-
-    /**
-     * @return the caseStage
-     */
-    public CaseStage getCaseStage() {
-        return caseStage;
-    }
-
-    /**
-     * @param caseStage the caseStage to set
-     */
-    public void setCaseStage(CaseStage caseStage) {
-        this.caseStage = caseStage;
-    }
-
-    /**
-     * @return the dateSearchOptions
-     */
-    public List<String> getDateSearchOptions() {
-        List<String> dateOptList = new ArrayList<>();
-        dateOptList.add("Opening date of record");
-        dateOptList.add("Database record timestamp");
-        dateOptList.add("Closing date");
-        dateSearchOptions = dateOptList;
-        return dateSearchOptions;
-    }
-
-    /**
-     * @param dateSearchOptions the dateSearchOptions to set
-     */
-    public void setDateSearchOptions(List<String> dateSearchOptions) {
-        this.dateSearchOptions = dateSearchOptions;
+    public void setCaseManagerID(int caseManagerID) {
+        this.caseManagerID = caseManagerID;
     }
    
    

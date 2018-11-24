@@ -40,6 +40,7 @@ public class Municipality implements Serializable{
     private int population;
     private boolean activeInProgram;
     private int defaultCodeSetID;
+    private int issuingPermitCodeSourceID;
 
     /**
      * @return the muniCode
@@ -309,6 +310,20 @@ public class Municipality implements Serializable{
      */
     public void setDefaultCodeSetID(int defaultCodeSetID) {
         this.defaultCodeSetID = defaultCodeSetID;
+    }
+
+    /**
+     * @return the issuingPermitCodeSourceID
+     */
+    public int getIssuingPermitCodeSourceID() {
+        return issuingPermitCodeSourceID;
+    }
+
+    /**
+     * @param issuingPermitCodeSourceID the issuingPermitCodeSourceID to set
+     */
+    public void setIssuingPermitCodeSourceID(int issuingPermitCodeSourceID) {
+        this.issuingPermitCodeSourceID = issuingPermitCodeSourceID;
     }
 
     

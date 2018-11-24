@@ -18,7 +18,7 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Select a property in <h:outputText value="#{sessionBean.ceactionRequestForSubmission.muni.muniName}"/></h1>
+                        <h1>Select a property in <h:outputText value="#{sessionBean.actionRequest.muni.muniName}"/></h1>
                         
                         <h:form id="requestCEActionFlowFormChooseProperty">
                             
@@ -32,7 +32,7 @@
                                                 <p:outputLabel for="propSearchHouseNumIT">
                                                     <h:outputText value="House number"/>
                                                 </p:outputLabel>
-                                                <p:inputText id="propSearchHouseNumIT" value="#{cEActionRequestSubmitBB.houseNum}" 
+                                                <p:inputText id="propSearchHouseNumIT" value="#{actionRequestBean.houseNum}" 
                                                              style="width: 100px;" tabindex="3" required="false" styleClass="inputText">
                                                 </p:inputText>
                                                 <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
@@ -43,7 +43,7 @@
                                                 <p:outputLabel for="propSearchStreetIT">
                                                     <h:outputText value="Street name"/>
                                                 </p:outputLabel>
-                                                <p:inputText id="propSearchStreetIT" value="#{cEActionRequestSubmitBB.streetName}" 
+                                                <p:inputText id="propSearchStreetIT" value="#{actionRequestBean.streetName}" 
                                                              style="width: 200px;" tabindex="4" required="false" styleClass="inputText">
                                                 </p:inputText>
                                                 <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
@@ -53,7 +53,7 @@
                                             <h:panelGroup>
                                                 <p:commandButton
                                                     value="Search in Selected Municipality" tabindex="4" ajax="true" icon="fa fa-search"
-                                                    actionListener="#{cEActionRequestSubmitBB.searchForPropertiesSingleMuni}" 
+                                                    actionListener="#{actionRequestBean.searchForPropertiesSingleMuni}" 
                                                     update=    "propSearchHouseNumIT
                                                                 propSearchStreetIT
                                                                 propertyResultTable"/>
@@ -69,10 +69,10 @@
                                         <p:dataTable
                                             id="propertyResultTable"
                                             var="prop" 
-                                            value="#{cEActionRequestSubmitBB.propList}"
+                                            value="#{actionRequestBean.propList}"
                                             selectionMode="single" tabindex="5"
                                             scrollable="true" scrollHeight="150" 
-                                            selection="#{sessionBean.ceactionRequestForSubmission.requestProperty}"
+                                            selection="#{sessionBean.actionRequest.requestProperty}"
                                             rowKey="#{prop.propertyID}">
                                             <p:column>
                                                 <f:facet name="header">
@@ -89,25 +89,22 @@
 
                                             </p:column>
 
-                                <ui:remove>
-                                                
-                                                <p:column>
+                                            <p:column>
 
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Type" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{prop.propertyUseTypeString}"/>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.propertyUseType}"/>
 
-                                                </p:column>
+                                            </p:column>
 
-                                </ui:remove>
                                         </p:dataTable>
 
                                         <p:spacer height="10px"/>
 
 
                             <p:commandButton ajax="false" value="Next step: Describe your concern" 
-                                             action="#{cEActionRequestSubmitBB.storePropertyInfo}"/>
+                                             action="#{actionRequestBean.storePropertyInfo}"/>
 
                         </h:form>
                     </div>

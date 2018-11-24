@@ -18,7 +18,7 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Describe your concern at <h:outputText value="#{sessionBean.ceactionRequestForSubmission.requestProperty.address}"/> in <h:outputText value="#{sessionBean.ceactionRequestForSubmission.muni.muniName}"/></h1>
+                        <h1>Describe your concern at <h:outputText value="#{sessionBean.actionRequest.requestProperty.address}"/> in <h:outputText value="#{sessionBean.actionRequest.muni.muniName}"/></h1>
                         
 
                         <h:form id="requestCEActionFlowFormDescribeConcern">
@@ -29,14 +29,12 @@
                                     </h:outputLabel>
 
                                     <p:selectOneListbox 
-                                        id="violationSOLB" tabindex="1"
-                                        required="true"
-                                        style="width: 100%;" value="#{sessionBean.ceactionRequestForSubmission.issueType_issueTypeID}">
+                                        id="violationSOLB" tabindex="8"
+                                        style="width: 100%;"
+                                        value="#{sessionBean.actionRequest.issueType_issueTypeID}">
 
-                                        <f:selectItems value="#{cEActionRequestSubmitBB.violationTypeMap}"/>
+                                        <f:selectItems value="#{actionRequestBean.violationTypeMap}"/>
                                     </p:selectOneListbox>
-                                    <h:message for="violationSOLB" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     <p:spacer height="10px"/>
 
@@ -47,10 +45,11 @@
                                     <p:inputTextarea 
                                         id="requestDescription" 
                                         styleClass="textArea" 
-                                        rows="6" tabindex="2"
+                                        rows="6" tabindex="9"
                                         required="true" 
                                         style="width: 100%;"
-                                        value="#{sessionBean.ceactionRequestForSubmission.requestDescription}" />
+                                        value="#{sessionBean.actionRequest.requestDescription}"
+                                        />
                                     <h:message for="requestDescription" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
@@ -60,12 +59,11 @@
                                         <h:outputText styleClass="uiLabel" value="If different from today, select the date of the incident or condition you are reporting" />
                                     </h:outputLabel>
 
-                                                <p:calendar value="#{sessionBean.ceactionRequestForSubmission.dateOfRecordUtilDate}" 
-                                                mode="popup" tabindex="3"
+                                    <p:calendar value="#{sessionBean.actionRequest.dateOfRecordUtilDate}" 
+                                                mode="popup" tabindex="10"
                                                 id="dateOfRecord"
                                                 showOn="button"
-                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                maxdate="#{cEActionRequestSubmitBB.currentDate}"
+                                                pattern="EEE, dd MMM, yyyy"
                                                 navigator="true"
                                                 showButtonPanel="true"
                                                 showTodayButton="true"/>
@@ -78,25 +76,16 @@
                                     <p:outputLabel for="isIUrgentSwitch">
                                         <h:outputText styleClass="uiLabel"  value="Does this issue involve immediate human safety hazards?"/> 
                                     </p:outputLabel>
-                                   
-                                    <p:spacer height="10px"/>
 
-                                    <p:inputSwitch tabindex="4" id="isIUrgentSwitch" 
+
+                                    <p:inputSwitch tabindex="11" id="isIUrgentSwitch" value="#{sessionBean.actionRequest.isUrgent}" 
                                                    onLabel="Yes" offLabel="No" />
-                                    
-                                        <h:outputLabel for="remainAnonymousIS" >
-                                            <h:outputText styleClass="uiLabel" value="Do you wish to remain anonymous during the code enforcement investigation?" />
-                                        </h:outputLabel>
-                                    <p:inputSwitch id="remainAnonymousIS" 
-                                                   value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested}" 
-                                                   onLabel="Yes" 
-                                                   offLabel="No" tabindex="5"/>
 
                                     <p:spacer height="10px"/>
 
-                                    <p:commandButton  ajax="false" tabindex="6"
-                                                      value="Next: Upload photos of your concern" id="continueToPhotoUploadButton"
-                                                      action="#{cEActionRequestSubmitBB.saveConcernDescriptions}"/>
+                                    <p:commandButton  ajax="false" tabindex="12"
+                                                      value="Next: Your contact details" id="continueToContactInfoButton"
+                                                      action="#{actionRequestBean.addRequestorDetails}"/>
 
                         </h:form>
                         

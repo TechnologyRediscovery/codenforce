@@ -21,18 +21,23 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import java.util.Date;
 import java.io.Serializable;
 import org.primefaces.component.tabview.TabView;
-
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import java.time.ZoneId;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 /**
@@ -54,11 +59,14 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     private String houseNum;
     private String streetName;
     
+    private Map<String, Integer> violationTypeMap;
     private int violationTypeID;
     private String violationTypeName;
     
     private int muniCode;
     private HashMap muniMap;
+    private Municipality selectedMuni;
+    private List<Municipality> muniList;
     
     private Property selectedProperty;
     
@@ -107,17 +115,52 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     
     
     /**
+     * Entry mechanism to the Code Enforcement Action Request creation process
+     * We grab the muni the user selected, set it in the new Action Request
+     * and store it in the session bean which we'll access and manipulate
+     * over the next few pages and finally submit on the last page. This is
+     * a poor person's flow system
+     * @return String pointer to the next step in the process: choose property
+     */
+    public String storeSelectedMuni(){
+        CEActionRequest cear;
+        CaseCoordinator cc = getCaseCoordinator();
+        cear = cc.getNewActionRequest();
+        cear.setMuni(selectedMuni);
+        getSessionBean().setActionRequest(cear);
+        return "chooseProperty";
+    }
+    
+    public String storePropertyInfo(){
+        // set by the xhtml page itself
+//        getSessionBean().getActionRequest().setRequestProperty(selectedProperty);
+        return "describeConcern";
+    }
+    
+    public String addRequestorDetails(){
+//        User u = getSessionBean().getFacesUser();
+//        if(u == null){
+            return "requestorDetails";
+//            
+//        } else {
+//            
+//            return "reviewAndSubmit";
+//        }
+        
+    }
+    
+    
+    /**
      * This action method is called when the request code enforcement
      * action request is submitted online (submit button in submitCERequest
      * @return the page ID for navigation
      */
     public String submitActionRequest() {
         
-        CaseCoordinator cc = getCaseCoordinator();
-        CEActionRequest req = cc.getNewActionRequest();
-        
+        CEActionRequest req = getSessionBean().getActionRequest();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        int submittedActionRequestID = 0;
+        
+        int submittedActionRequestID;
         
         // start by pulling the person fields and sending them to be entered
         // into db as a person. The ID of this person is returned, and used in our
@@ -125,30 +168,29 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-        int personID = storeActionRequestorPerson();
+        int personID = storeActionRequestorPerson(getSessionBean().getActionRequest().getActionRequestorPerson());
         
         req.setPersonID(personID);
-        req.setMuniCode(muniCode);
         
         int controlCode = getControlCodeFromTime();
         req.setRequestPublicCC(controlCode);
         
-        req.setIsAtKnownAddress(form_atSpecificAddress);
+        req.setIsAtKnownAddress(true);
         
-        if (form_atSpecificAddress){
-            req.setRequestProperty(selectedProperty);
-        } else {
-            req.setAddressOfConcern(form_nonPropertyLocation);
-        }
-        
-        req.setIssueType_issueTypeID(violationTypeID);
-        req.setRequestDescription(form_requestDescription);
-        req.setDateOfRecord(form_dateOfRecord
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        req.setIsUrgent(form_isUrgent);
-        
+//        if (form_atSpecificAddress){
+//            req.setRequestProperty(selectedProperty);
+//        } else {
+//            req.setAddressOfConcern(form_nonPropertyLocation);
+//        }
+//        
+//        req.setIssueType_issueTypeID(violationTypeID);
+//        req.setRequestDescription(form_requestDescription);
+//        req.setDateOfRecord(form_dateOfRecord
+//                .toInstant()
+//                .atZone(ZoneId.systemDefault())
+//                .toLocalDateTime());
+//        req.setIsUrgent(form_isUrgent);
+//        
         // note that the time stamp is applied by the integration layer
         // with a simple call to the backing bean getTimeStamp method
 
@@ -212,14 +254,11 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         }
     }
     
-    public int storeActionRequestorPerson(){
-        PersonIntegrator personIntegrator = getPersonIntegrator();
+    public String populateActionRequestorPerson(){
         
-        int insertedPersonID = 0;
         currentPerson = new Person();
-        
         currentPerson.setPersonType(submittingPersonType);
-        currentPerson.setMuniCode(muniCode);
+        currentPerson.setMuniCode(getSessionBean().getActionRequest().getMuni().getMuniCode());
         
         currentPerson.setFirstName(form_requestorFName);
         currentPerson.setLastName(form_requestorLName);
@@ -244,9 +283,19 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         // the insertion of this person will be timestamped
         // by the integrator class
         
+        getSessionBean().getActionRequest().setActionRequestorPerson(currentPerson);
+        
+        return "reviewAndSubmit";
+        
+    }
+    
+    public int storeActionRequestorPerson(Person p){
+        PersonIntegrator personIntegrator = getPersonIntegrator();
+        
+        int insertedPersonID = 0;
         
         try {
-            insertedPersonID = personIntegrator.insertPerson(currentPerson);
+            insertedPersonID = personIntegrator.insertPerson(p);
         } catch (IntegrationException ex) {
              System.out.println(ex.toString());
                getFacesContext().addMessage(null,
@@ -292,7 +341,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
-            propList = pi.searchForProperties(houseNum, streetName, muniCode);
+            propList = pi.searchForProperties(houseNum, streetName, getSessionBean().getActionRequest().getMuni().getMuniCode());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));
@@ -732,5 +781,55 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
      */
     public void setSubmittedRequestPACC(int submittedRequestPACC) {
         this.submittedRequestPACC = submittedRequestPACC;
+    }
+
+    /**
+     * @return the selectedMuni
+     */
+    public Municipality getSelectedMuni() {
+        return selectedMuni;
+    }
+
+    /**
+     * @param selectedMuni the selectedMuni to set
+     */
+    public void setSelectedMuni(Municipality selectedMuni) {
+        this.selectedMuni = selectedMuni;
+    }
+
+    /**
+     * @return the muniList
+     */
+    public List<Municipality> getMuniList() {
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        try {
+            muniList = mi.getCompleteMuniList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return muniList;
+    }
+
+    /**
+     * @param muniList the muniList to set
+     */
+    public void setMuniList(List<Municipality> muniList) {
+        this.muniList = muniList;
+    }
+
+    /**
+     * @return the violationTypeMap
+     */
+    public Map<String, Integer> getViolationTypeMap() {
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        violationTypeMap = ceari.getViolationMap();
+        return violationTypeMap;
+    }
+
+    /**
+     * @param violationTypeMap the violationTypeMap to set
+     */
+    public void setViolationTypeMap(Map<String, Integer> violationTypeMap) {
+        this.violationTypeMap = violationTypeMap;
     }
 }

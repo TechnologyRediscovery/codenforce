@@ -111,7 +111,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query = "SELECT municode, muniname, address_street, address_city, "
                 + "address_state, address_zip, phone, "
                 + "fax, email, managername, "
-                + "managerphone, population, activeinprogram, defaultcodeset\n" +
+                + "managerphone, population, activeinprogram, defaultcodeset, occpermitissuingsource_sourceid\n" +
                 "FROM public.municipality WHERE municode = ?;";
         ResultSet rs = null;
  
@@ -160,6 +160,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setPopulation(rs.getInt("population"));
         muni.setActiveInProgram(rs.getBoolean("activeinprogram"));             
         muni.setDefaultCodeSetID(rs.getInt("defaultcodeset"));
+        muni.setIssuingPermitCodeSourceID(rs.getInt("occpermitissuingsource_sourceid"));
         
         return muni;
     }
@@ -192,8 +193,48 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     //TODO: finish me
-    public void updateMuni(Municipality muni){
+    public void updateMuni(Municipality muni) throws IntegrationException{
         
+        Connection con = getPostgresCon();
+        String query =  "UPDATE public.municipality\n" +
+                        "   SET muniname=?, address_street=?, address_city=?, address_state=?, \n" +
+                        "       address_zip=?, phone=?, fax=?, email=?, managername=?, managerphone=?, \n" +
+                        "       population=?, activeinprogram=?, defaultcodeset=?, occpermitissuingsource_sourceid=?\n" +
+                        " WHERE municode=?;";
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+ 
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, muni.getMuniName());
+            stmt.setString(2, muni.getAddress_street());
+            stmt.setString(3, muni.getAddress_city());
+            stmt.setString(4, muni.getAddress_state());
+            stmt.setString(5, muni.getAddress_zip());
+            stmt.setString(6, muni.getPhone());
+            stmt.setString(7, muni.getFax());
+            stmt.setString(8, muni.getEmail());
+            stmt.setString(9, muni.getManagerName());
+            stmt.setString(10, muni.getManagerPhone());
+            stmt.setInt(11, muni.getPopulation());
+            stmt.setBoolean(12, muni.isActiveInProgram());
+            stmt.setInt(13, muni.getDefaultCodeSetID());
+            stmt.setInt(14, muni.getIssuingPermitCodeSourceID());
+            stmt.setInt(15, muni.getMuniCode());
+            
+            System.out.println("MunicipalityIntegrator.updateMuni | stmt: " + stmt.toString());
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.generateCompleteMuniNameIDMap", ex);
+
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
         
     }
    
