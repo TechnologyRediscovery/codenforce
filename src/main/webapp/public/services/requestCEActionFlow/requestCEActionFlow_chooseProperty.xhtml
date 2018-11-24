@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Choose a property</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="requestCEActionFlow1View">
+                    
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h1>Select a property in <h:outputText value="#{sessionBean.actionRequest.muni.muniName}"/></h1>
+                        
+                        <h:form id="requestCEActionFlowFormChooseProperty">
+                            
+                              <p>Please search for and select the property of concern using this search tool.</p>
+
+                                        <p:spacer height="10px"/>
+
+                                        <p:panelGrid columns="3" layout="grid">
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="propSearchHouseNumIT">
+                                                    <h:outputText value="House number"/>
+                                                </p:outputLabel>
+                                                <p:inputText id="propSearchHouseNumIT" value="#{actionRequestBean.houseNum}" 
+                                                             style="width: 100px;" tabindex="3" required="false" styleClass="inputText">
+                                                </p:inputText>
+                                                <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="propSearchStreetIT">
+                                                    <h:outputText value="Street name"/>
+                                                </p:outputLabel>
+                                                <p:inputText id="propSearchStreetIT" value="#{actionRequestBean.streetName}" 
+                                                             style="width: 200px;" tabindex="4" required="false" styleClass="inputText">
+                                                </p:inputText>
+                                                <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:commandButton
+                                                    value="Search in Selected Municipality" tabindex="4" ajax="true" icon="fa fa-search"
+                                                    actionListener="#{actionRequestBean.searchForPropertiesSingleMuni}" 
+                                                    update=    "propSearchHouseNumIT
+                                                                propSearchStreetIT
+                                                                propertyResultTable"/>
+                                            </h:panelGroup>
+
+                                        </p:panelGrid> 
+
+
+                                        <!--Display of properties from search-->
+                                        <h3>Search Results:</h3>
+                                        <p>Click to select the desired property or try your search again</p>
+
+                                        <p:dataTable
+                                            id="propertyResultTable"
+                                            var="prop" 
+                                            value="#{actionRequestBean.propList}"
+                                            selectionMode="single" tabindex="5"
+                                            scrollable="true" scrollHeight="150" 
+                                            selection="#{sessionBean.actionRequest.requestProperty}"
+                                            rowKey="#{prop.propertyID}">
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Address" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.address}"/>
+                                            </p:column>
+                                            <p:column>
+
+                                                <f:facet name="header">
+                                                    <h:outputText value="Municipality" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.muni.muniName}"/>
+
+                                            </p:column>
+
+                                            <p:column>
+
+                                                <f:facet name="header">
+                                                    <h:outputText value="Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.propertyUseType}"/>
+
+                                            </p:column>
+
+                                        </p:dataTable>
+
+                                        <p:spacer height="10px"/>
+
+
+                            <p:commandButton ajax="false" value="Next step: Describe your concern" 
+                                             action="#{actionRequestBean.storePropertyInfo}"/>
+
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Enter action requestor details</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="requestCEActionRequestFlowViewRequestorDetails">
+
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        
+                        <h1>Requestor details</h1>
+
+                        <h:form id="requestCEActionFlowFormRequestorDetails">
+
+                            <h:outputLabel for="requestorType" >
+                                <h:outputText styleClass="uiLabel" value="Please choose the most appropriate role that describes you:" />
+                            </h:outputLabel>
+
+                            <p:selectOneMenu 
+                                id="requestorType" 
+                                required="true" tabindex="13"
+                                value="#{actionRequestBean.submittingPersonType}">
+
+                                <f:selectItems 
+                                    value="#{actionRequestBean.submittingPersonTypes}"
+                                    var="p" 
+                                    itemValue="#{p}"
+                                    itemLabel="#{p.label}"/>
+
+                            </p:selectOneMenu>
+                            <h:message for="requestorType" showDetail="true" showSummary="false" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                            <p:spacer width="10px"/>
+
+                            <p style="font-style: italic; font-size: small;">Press the "Tab" key to move between input boxes.</p>
+
+                            <h:panelGrid columns="2" columnClasses="gridTd, gridTd, gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorFirstName" >
+                                        <h:outputText styleClass="uiLabel" value="First Name*" />
+                                    </h:outputLabel>
+                                    <h:inputText 
+                                        id="requestorFirstName" size="30"  tabindex="14"
+                                        value="#{actionRequestBean.form_requestorFName}" styleClass="inputText" 
+                                        required="true"/>
+                                    <h:message for="requestorFirstName" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorLastName" >
+                                        <h:outputText styleClass="uiLabel" value="Last Name*" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorLastName" size="30" value="#{actionRequestBean.form_requestorLName}" 
+                                                 styleClass="inputText" required="false" tabindex="15"/>
+                                    <h:message for="requestorLastName" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorJobTitle" >
+                                        <h:outputText styleClass="uiLabel" value="Job Title (if applicable)" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorJobTitle" size="30" value="#{actionRequestBean.form_requestorJobtitle}" 
+                                                 styleClass="inputText" required="false" tabindex="16"/>
+                                    <h:message for="requestorJobTitle" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorPhoneCell" >
+                                        <h:outputText styleClass="uiLabel" value="Phone (cell)" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorPhoneCell" size="15" value="#{actionRequestBean.form_requestor_phoneCell}" 
+                                                 styleClass="inputText" required="false" tabindex="17"/>
+                                    <h:message for="requestorPhoneCell" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorPhoneHome" >
+                                        <h:outputText styleClass="uiLabel" value="Phone (home)" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorPhoneHome" size="15" value="#{actionRequestBean.form_requestor_phoneHome}" 
+                                                 styleClass="inputText" required="false" tabindex="18"/>
+                                    <h:message for="requestorPhoneHome" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorPhoneWork" >
+                                        <h:outputText styleClass="uiLabel" value="Phone (work)" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorPhoneWork" size="15" value="#{actionRequestBean.form_requestor_phoneWork}" 
+                                                 styleClass="inputText" required="false" tabindex="19"/>
+                                    <h:message for="requestorPhoneWork" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorEmail" >
+                                        <h:outputText styleClass="uiLabel" value="Email" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorEmail" size="30" value="#{actionRequestBean.form_requestor_email}" 
+                                                 styleClass="inputText" required="false" tabindex="20"/>
+                                    <h:message for="requestorEmail" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorAddressStreet" >
+                                        <h:outputText styleClass="uiLabel" value="Street Address*" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorAddressStreet" size="30" value="#{actionRequestBean.form_requestor_addressStreet}" 
+                                                 styleClass="inputText" required="false" tabindex="21"/>
+                                    <h:message for="requestorAddressStreet" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorAddressCity" >
+                                        <h:outputText styleClass="uiLabel" value="City*" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorAddressCity" size="30" value="#{actionRequestBean.form_requestor_addressCity}" 
+                                                 styleClass="inputText" required="false" tabindex="22"/>
+                                    <h:message for="requestorAddressCity" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorAddressZip" >
+                                        <h:outputText styleClass="uiLabel" value="ZIP Code*" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorAddressZip" size="10" value="#{actionRequestBean.form_requestor_addressZip}" 
+                                                 styleClass="inputText" required="false" tabindex="23"/>
+                                    <h:message for="requestorAddressZip" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requestorAddressState" >
+                                        <h:outputText styleClass="uiLabel" value="State Abbreviation*" />
+                                    </h:outputLabel>
+                                    <h:inputText id="requestorAddressState" size="2" value="#{actionRequestBean.form_requestor_addressState}" 
+                                                 styleClass="inputText" required="true" tabindex="24"/>
+                                    <h:message for="requestorAddressState" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <f:facet name="footer">
+                                    <h:panelGroup>
+                                        <h:outputLabel for="remainAnonymousIS" >
+                                            <h:outputText styleClass="uiLabel" value="Do you wish to remain anonymous during the code enforcement investigation?" />
+                                        </h:outputLabel>
+                                        <p:inputSwitch id="remainAnonymousIS" value="#{actionRequestBean.form_anonymous}" onLabel="Yes" offLabel="No" tabindex="25"/>
+                                    </h:panelGroup>
+                                </f:facet>
+
+                            </h:panelGrid>
+                            <p:spacer width="10px"/>
+
+                            <p:commandButton ajax="false" value="Review request and submit" 
+                                             action="#{actionRequestBean.populateActionRequestorPerson}"/>
+
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

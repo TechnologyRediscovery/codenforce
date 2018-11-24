@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Describe code enforcement concern</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="requestCEActionFlow1View">
+                    
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h1>Describe your concern at <h:outputText value="#{sessionBean.actionRequest.requestProperty.address}"/> in <h:outputText value="#{sessionBean.actionRequest.muni.muniName}"/></h1>
+                        
+
+                        <h:form id="requestCEActionFlowFormDescribeConcern">
+                            
+                            
+                                    <h:outputLabel for="violationSOLB" >
+                                        <h:outputText styleClass="uiLabel" value="Choose the category of concern from the list or select 'other' and explain your concern below" />
+                                    </h:outputLabel>
+
+                                    <p:selectOneListbox 
+                                        id="violationSOLB" tabindex="8"
+                                        style="width: 100%;"
+                                        value="#{sessionBean.actionRequest.issueType_issueTypeID}">
+
+                                        <f:selectItems value="#{actionRequestBean.violationTypeMap}"/>
+                                    </p:selectOneListbox>
+
+                                    <p:spacer height="10px"/>
+
+                                    <h:outputLabel for="requestDescription" >
+                                        <h:outputText styleClass="uiLabel" value="Please describe the specifics of the code enforcement concern selected above" />
+                                    </h:outputLabel>
+
+                                    <p:inputTextarea 
+                                        id="requestDescription" 
+                                        styleClass="textArea" 
+                                        rows="6" tabindex="9"
+                                        required="true" 
+                                        style="width: 100%;"
+                                        value="#{sessionBean.actionRequest.requestDescription}"
+                                        />
+                                    <h:message for="requestDescription" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    <p:spacer height="10px"/>
+
+                                    <h:outputLabel for="dateOfRecord" >
+                                        <h:outputText styleClass="uiLabel" value="If different from today, select the date of the incident or condition you are reporting" />
+                                    </h:outputLabel>
+
+                                    <p:calendar value="#{sessionBean.actionRequest.dateOfRecordUtilDate}" 
+                                                mode="popup" tabindex="10"
+                                                id="dateOfRecord"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"/>
+
+                                    <h:message for="dateOfRecord" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    <p:spacer height="10px"/>
+
+                                    <p:outputLabel for="isIUrgentSwitch">
+                                        <h:outputText styleClass="uiLabel"  value="Does this issue involve immediate human safety hazards?"/> 
+                                    </p:outputLabel>
+
+
+                                    <p:inputSwitch tabindex="11" id="isIUrgentSwitch" value="#{sessionBean.actionRequest.isUrgent}" 
+                                                   onLabel="Yes" offLabel="No" />
+
+                                    <p:spacer height="10px"/>
+
+                                    <p:commandButton  ajax="false" tabindex="12"
+                                                      value="Next: Your contact details" id="continueToContactInfoButton"
+                                                      action="#{actionRequestBean.addRequestorDetails}"/>
+
+                        </h:form>
+                        
+                        
+
+
+
+
+
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

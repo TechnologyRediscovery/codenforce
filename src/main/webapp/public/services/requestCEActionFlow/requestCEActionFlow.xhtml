@@ -13,28 +13,36 @@
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="requestCEActionFlow1View">
-                    
+
                     <div class="mainContainer">
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
                         <h1>Request Code Enforcement Action</h1>
-                        
+
                         <h:outputText value="This is the first page of the request ce action flow sequence"/>
 
-                        <h:form id="NAME_ME">
+                        <h:form id="requestCEActionFlowFormChooseMuni">
 
-                            <p:commandButton ajax="false" value="describe your issue" 
-                                             action="#{personBB.viewPersonProfile}"/>
+
+                            <p:outputLabel for="muniSM" value="Choose your municipality:"/>
+
+                            <p:spacer height="5px"/>
+
+                            <p:selectOneMenu
+                                id="muniSM" tabindex="1"
+                                value="#{actionRequestBean.selectedMuni}">
+                                <f:converter converterId="muniConverter"/>
+                                <f:selectItems id="muniNameList" value="#{actionRequestBean.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                            </p:selectOneMenu>
+
+
+
+
+                            <p:commandButton ajax="false" value="To step 2 of 4: Choose a property" 
+                                             action="#{actionRequestBean.storeSelectedMuni}"/>
 
                         </h:form>
-                        
-                        
-
-
-
-
-
                     </div>
                 </f:view>
             </ui:define>

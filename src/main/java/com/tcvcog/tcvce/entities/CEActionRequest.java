@@ -18,13 +18,14 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * Models the entity: code enforcement action request.This object blends data from several database tables to create
  a conceptual model of a single request.
  
- The jsf page for submitting a request act on an CEActionRequest object
- and will edit the values of member varibles
+ The JSF page for submitting a request act on an CEActionRequest object
+ and will edit the values of member variables
  on this object and can then ask for the request to be read into the DB.
  
  A reference to an CEActionRequest object will be attached to the 
@@ -52,7 +53,6 @@ public class CEActionRequest implements Serializable{
     private String issueTypeString; //populated from linked table
     
     private int muniCode;
-    private CECase linkedCase; // probably only use caseID
     private int caseID;
     
     private java.time.LocalDateTime submittedTimeStamp;
@@ -60,6 +60,8 @@ public class CEActionRequest implements Serializable{
     
     private java.time.LocalDateTime dateOfRecord;
     private long daysSinceDateOfRecord;
+    
+    private java.util.Date dateOfRecordUtilDate;
 
     private boolean isAtKnownAddress;
     private String addressOfConcern;
@@ -306,19 +308,6 @@ public class CEActionRequest implements Serializable{
 
 
 
-    /**
-     * @return the linkedCase
-     */
-    public CECase getLinkedCase() {
-        return linkedCase;
-    }
-
-    /**
-     * @param linkedCase the linkedCase to set
-     */
-    public void setLinkedCase(CECase linkedCase) {
-        this.linkedCase = linkedCase;
-    }
 
     /**
      * @return the anonymitiyRequested
@@ -434,6 +423,21 @@ public class CEActionRequest implements Serializable{
      */
     public void setRequestStatus(CEActionRequestStatus requestStatus) {
         this.requestStatus = requestStatus;
+    }
+
+    /**
+     * @return the dateOfRecordUtilDate
+     */
+    public java.util.Date getDateOfRecordUtilDate() {
+        return dateOfRecordUtilDate;
+    }
+
+    /**
+     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
+     */
+    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
+        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
+        dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
    

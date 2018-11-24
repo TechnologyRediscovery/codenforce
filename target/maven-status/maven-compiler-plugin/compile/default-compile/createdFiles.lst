@@ -1,5 +1,5 @@
 com/tcvcog/tcvce/application/EventAddBB.class
-com/tcvcog/tcvce/resultsets/PublicViolationSet.class
+com/tcvcog/tcvce/entities/search/SearchParams.class
 com/tcvcog/tcvce/entities/TextBlock.class
 com/tcvcog/tcvce/application/ActionRequestBean.class
 com/tcvcog/tcvce/entities/PropertyWithLists.class
@@ -16,12 +16,14 @@ com/tcvcog/tcvce/domain/EventException.class
 com/tcvcog/tcvce/occupancy/coordinators/OccupancyCoordinator.class
 com/tcvcog/tcvce/application/CaseUpdateBB.class
 com/tcvcog/tcvce/application/NoticeOfViolationBB.class
+com/tcvcog/tcvce/application/PIBCECaseBB.class
 com/tcvcog/tcvce/util/TextBlockConverter.class
 com/tcvcog/tcvce/coordinators/EventCoordinator$1.class
 com/tcvcog/tcvce/occupancy/entities/OccPermitApplicationReason.class
 com/tcvcog/tcvce/application/CodeElementGuideAddUpdateBB.class
 com/tcvcog/tcvce/application/ActionRequestConfirmation.class
 com/tcvcog/tcvce/application/CodeSetBuilderBB.class
+com/tcvcog/tcvce/entities/search/SearchParamsCEActionRequests.class
 com/tcvcog/tcvce/application/PropertyUpdateBB.class
 com/tcvcog/tcvce/entities/Event.class
 com/tcvcog/tcvce/entities/CEActionRequest.class
@@ -86,6 +88,7 @@ com/tcvcog/tcvce/application/NavigationBB.class
 com/tcvcog/tcvce/application/ActionRequestManageBB.class
 com/tcvcog/tcvce/application/PublicInfoBB.class
 com/tcvcog/tcvce/application/RequestManagementBB.class
+com/tcvcog/tcvce/application/SearchCoordinator.class
 com/tcvcog/tcvce/occupancy/application/OccupancyInspectionFeeBB.class
 com/tcvcog/tcvce/application/CodeElementListBB.class
 com/tcvcog/tcvce/occupancy/coordinators/PaymentCoordinator.class

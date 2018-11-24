@@ -254,10 +254,10 @@
     </managed-bean>
   
     <managed-bean>
-        <description>Coordinates view-coordinator interactions around code enforcement actions</description>
+        <description>Coordinates view-coordinator ignteractions around code enforcement actions</description>
         <managed-bean-name>actionRequestBean</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ActionRequestBean</managed-bean-class>
-        <managed-bean-scope>flow</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
@@ -550,24 +550,10 @@
     </navigation-rule>
     
     <!--Public-->
-
-    <navigation-rule>
-        <from-view-id>/public/services/submitCERequest.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>success</from-outcome>
-            <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
-    
     <navigation-rule>
 
         <from-view-id>*</from-view-id>    
         
-        <navigation-case>
-            <from-outcome>ceActionRequest</from-outcome>
-            <to-view-id>/public/services/submitCERequest.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
         <navigation-case>
             <from-outcome>paccSearch</from-outcome>
             <to-view-id>/public/services/paccSearch.xhtml</to-view-id>
@@ -614,6 +600,71 @@
         </navigation-case>
     </navigation-rule>
         
+    <!--ceaction request flow-->    
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>ceActionRequest</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>requestCEActionFlow</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</to-view-id>
+        </navigation-case>
+        <redirect />
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</from-view-id>  
+        <navigation-case>
+            <from-outcome>chooseProperty</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_chooseProperty.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>describeConcern</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_describeConcern.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>requestorDetails</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_requestorDetails.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>reviewAndSubmit</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+        
+
+    <navigation-rule>
+        <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit</from-view-id>
+        <navigation-case>
+            <from-outcome>success</from-outcome>
+            <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+        
+    
+    
+    
     <!--site-wide navigation-->    
 
 
@@ -1273,5 +1324,10 @@
         <managed-bean-name>searchCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.SearchCoordinator</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>municipalityManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

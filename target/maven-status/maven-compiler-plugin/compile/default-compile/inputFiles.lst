@@ -23,11 +23,11 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/CitationIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/entities/ChecklistBlueprint.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/NavigationBB.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/resultsets/PublicViolationSet.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/PersonIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/domain/BaseException.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/User.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/integration/OccupancyPermitIntegrator.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/search/SearchParamsCECase.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/domain/ViolationException.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/MuniBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/EventCategory.java
@@ -104,6 +104,7 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/entities/InspectedElement.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/PropertyWithLists.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/UserUpdateBB.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/MunicipalityManageBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/CodeViolation.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/EnforcableCodeElement.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/Constants.java
