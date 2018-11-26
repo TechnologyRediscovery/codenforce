@@ -24,20 +24,15 @@ import org.primefaces.component.tabview.TabView;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
-import java.time.ZoneId;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 /**
@@ -45,7 +40,7 @@ import javax.faces.event.ActionEvent;
  * @author cedba
  */
 
-public class ActionRequestBean extends BackingBeanUtils implements Serializable{
+public class CEActionRequestsBB extends BackingBeanUtils implements Serializable{
     
     // for request lookup
     
@@ -63,8 +58,6 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     private int violationTypeID;
     private String violationTypeName;
     
-    private int muniCode;
-    private HashMap muniMap;
     private Municipality selectedMuni;
     private List<Municipality> muniList;
     
@@ -101,7 +94,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     /**
      * Creates a new instance of ActionRequestBean
      */
-    public ActionRequestBean(){
+    public CEActionRequestsBB(){
         // set date of record to current date
         form_dateOfRecord = new Date();
         currentTabIndex = 0;
@@ -321,7 +314,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
     
     public void storePropertyLocationInfo(ActionEvent event){
         manageTabs();
-//        System.out.println("ActionRequestBean.storePropertyLocationInfo | selectedProp: " + selectedProperty.getAddress());
+//        System.out.println("CEActionRequestsBB.storePropertyLocationInfo | selectedProp: " + selectedProperty.getAddress());
         
     }
     
@@ -337,7 +330,6 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
 
       
     public void searchForPropertiesSingleMuni(ActionEvent ev){
-        System.out.println("ActionRequestBean.searchForPropertiesSingleMuni | municode: " + muniCode);
         PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
@@ -570,21 +562,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         this.violationTypeName = violationTypeName;
     }
 
-    /**
-     * @return the muniCode
-     */
-    public int getMuniCode() {
-        return muniCode;
-    }
-
-    /**
-     * @param muniCode the muniCode to set
-     */
-    public void setMuniCode(int muniCode) {
-        this.muniCode = muniCode;
-    }
-
-
+    
 
     /**
      * @return the currentPerson
@@ -653,16 +631,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         return PersonType.values();
     }
 
-    /**
-     * @return the muniMap
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public HashMap getMuniMap() throws IntegrationException {
-        MunicipalityIntegrator muniInt = getMunicipalityIntegrator();
-        muniMap = muniInt.getMunicipalityMap(); 
-        return muniMap;
-    }
-
+   
     /**
      * @return the selectedProperty
      */
@@ -705,13 +674,7 @@ public class ActionRequestBean extends BackingBeanUtils implements Serializable{
         this.form_requestor_addressState = form_requestor_addressState;
     }
 
-    /**
-     * @param muniMap the muniMap to set
-     */
-    public void setMuniMap(HashMap muniMap) {
-        this.muniMap = muniMap;
-    }
-
+  
     /**
      * @return the propList
      */
