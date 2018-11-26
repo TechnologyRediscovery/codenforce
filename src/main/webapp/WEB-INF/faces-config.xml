@@ -256,16 +256,16 @@
     <managed-bean>
         <description>Coordinates view-coordinator ignteractions around code enforcement actions</description>
         <managed-bean-name>actionRequestBean</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ActionRequestBean</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <description>Provides backing bean utilities for the action requestmanagement.xhtml page</description>
         <managed-bean-name>requestManagementBean</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.RequestManagementBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <description>Backing bean for the action request checking form and results page.</description>
@@ -654,7 +654,7 @@
         
 
     <navigation-rule>
-        <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit</from-view-id>
+        <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>success</from-outcome>
             <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>

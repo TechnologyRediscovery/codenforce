@@ -31,6 +31,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -81,6 +83,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         return caseList;
     }
+    
+    
     
     public ArrayList getOpenCECases(int muniCode) throws IntegrationException{
         
@@ -169,11 +173,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public CECase getCECase(int ceCaseID) throws IntegrationException{
-        PropertyIntegrator pi = getPropertyIntegrator();
-        UserIntegrator ui = getUserIntegrator();
-        EventIntegrator ei = getEventIntegrator();
-        CitationIntegrator ci = getCitationIntegrator();
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
             "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
@@ -192,45 +191,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                // I can avoid returning an empty CECase object by only instantiating
-                // if the result set has an entry. Since it's quering a DB key field
-                // it can only have a maximum of one returned result
-                c = new CECase();
-                
-                c.setCaseID(rs.getInt("caseid"));
-                c.setPublicControlCode(rs.getInt("cecasepubliccc"));
-                c.setProperty(pi.getProperty(rs.getInt("property_propertyid")));
-                c.setPropertyUnit(null); // change when units are integrated
-                
-                c.setUser(ui.getUser(rs.getInt("login_userid")));
-                
-                c.setCaseName(rs.getString("casename"));
-                c.setCasePhase(CasePhase.valueOf(rs.getString("casephase")));
-                
-                c.setOriginationDate(rs.getTimestamp("originationdate")
-                        .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-                c.setOriginiationDatePretty(getPrettyDate(c.getOriginationDate()));
-                
-                if(rs.getTimestamp("closingdate") != null){
-                    c.setClosingDate(rs.getTimestamp("closingdate")
-                            .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-                    c.setClosingDatePretty(getPrettyDate(c.getClosingDate()));
-                    
-                }
-                c.setNotes(rs.getString("notes"));
-                if(rs.getTimestamp("creationtimestamp") != null){
-                    c.setCreationTimestamp(rs.getTimestamp("creationtimestamp")
-                            .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-                }
-                
-                c.setPaccEnabled(rs.getBoolean("paccenabled"));
-                c.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
-                
-                // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
-                c.setEventList(ei.getEventsByCaseID(ceCaseID));
-                c.setNoticeList(cvi.getNoticeOfViolationList(c));
-                c.setCitationList(ci.getCitations(c));
-                c.setViolationList(cvi.getCodeViolations(ceCaseID));
+                c = generateCECase(rs);
             }
             
         } catch (SQLException ex) {
@@ -243,6 +204,55 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
+        return c;
+    }
+    
+    public CECase generateCECase(ResultSet rs) throws SQLException, IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        UserIntegrator ui = getUserIntegrator();
+        EventIntegrator ei = getEventIntegrator();
+        CitationIntegrator ci = getCitationIntegrator();
+        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        int ceCaseID = rs.getInt("caseid");
+        
+        CECase c = new CECase();
+
+        c.setCaseID(ceCaseID);
+        c.setPublicControlCode(rs.getInt("cecasepubliccc"));
+        c.setProperty(pi.getProperty(rs.getInt("property_propertyid")));
+        c.setPropertyUnit(null); // change when units are integrated
+
+        c.setUser(ui.getUser(rs.getInt("login_userid")));
+
+        c.setCaseName(rs.getString("casename"));
+        c.setCasePhase(CasePhase.valueOf(rs.getString("casephase")));
+
+        c.setOriginationDate(rs.getTimestamp("originationdate")
+                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        c.setOriginiationDatePretty(getPrettyDate(c.getOriginationDate()));
+
+        if(rs.getTimestamp("closingdate") != null){
+            c.setClosingDate(rs.getTimestamp("closingdate")
+                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            c.setClosingDatePretty(getPrettyDate(c.getClosingDate()));
+
+        }
+        c.setNotes(rs.getString("notes"));
+        if(rs.getTimestamp("creationtimestamp") != null){
+            c.setCreationTimestamp(rs.getTimestamp("creationtimestamp")
+                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
+
+        c.setPaccEnabled(rs.getBoolean("paccenabled"));
+        c.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
+
+        // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
+        c.setEventList(ei.getEventsByCaseID(ceCaseID));
+        c.setNoticeList(cvi.getNoticeOfViolationList(c));
+        c.setCitationList(ci.getCitations(c));
+        c.setViolationList(cvi.getCodeViolations(ceCaseID));
+        c.setRequestList(ceari.getCEActionRequestListByCase(rs.getInt("caseid")));
         return c;
     }
     

@@ -1,1060 +1,798 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2017 cedba
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.DataCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.reports.ReportCEARList;
-import com.tcvcog.tcvce.entities.search.Query;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.util.Date;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import org.primefaces.component.tabview.TabView;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-import org.primefaces.model.chart.DonutChartModel;
-
 /**
- * Primary backing bean for managing all code enforcement action requests.
- * Contains four methods, each of which routes a selected request down a
- * workflow pathway and adjusts the request object's status accordingly.
  *
- * Also contains utility methods for manipulating and editing requests.
- *
- * @author Ellen Baskem
+ * @author cedba
  */
-public class CEActionRequestsBB extends BackingBeanUtils implements Serializable {
 
-    private CEActionRequest selectedRequest;
-    private List<CEActionRequest> requestList;
-    private ReportCEARList reportConfig;
+public class CEActionRequestsBB extends BackingBeanUtils implements Serializable{
+    
+    // for request lookup
+    
+    private Person currentPerson;
+    
+    private TabView tabView;
+    private int currentTabIndex;
 
-    private DonutChartModel requestReasonDonut;
-
-    private List<CEActionRequestStatus> statusList;
-    private CEActionRequestStatus selectedStatus;
-
-    private List<QueryCEAR> queryList;
-    private QueryCEAR selectedQueryCEAR;
-    private SearchParamsCEActionRequests searchParams;
-
-    private CEActionRequestStatus selectedChangeToStatus;
-    private String invalidMessage;
-    private String noViolationFoundMessage;
-
-    private String internalMessageText;
-    private String muniMessageText;
-    private String publicMessageText;
-
-    private Person selectedPersonForAttachment;
-
-    private ArrayList<CECase> caseListForSelectedProperty;
-    private String houseNumSearch;
-    private String streetNameSearch;
-
-    private CECase selectedCaseForAttachment;
-
-    private Municipality muniForPropSwitchSearch;
-    private Property propertyForPropSwitch;
-    private List<Property> propertyList;
-
-    private int ceCaseIDForConnection;
-    private boolean disablePACCControl;
-    private boolean disabledDueToRoutingNotAllowed;
+    private ArrayList<Property> propList;
+    
+    private String houseNum;
+    private String streetName;
+    
+    private Map<String, Integer> violationTypeMap;
+    private int violationTypeID;
+    private String violationTypeName;
+    
+    private Municipality selectedMuni;
+    private List<Municipality> muniList;
+    
+    private Property selectedProperty;
+    
+    private boolean form_atSpecificAddress;
+    private String form_nonPropertyLocation;
+    
+    private String form_requestDescription;
+    private boolean form_isUrgent;
+    private Date form_dateOfRecord;
+    
+    private boolean form_anonymous;
+    
+    private int submittedRequestPACC;
+    
+    // located address
+        
+    private PersonType submittingPersonType;
+    private String form_requestorFName;
+    private String form_requestorLName;
+    private String form_requestorJobtitle;
+    
+    private String form_requestor_phoneCell;
+    private String form_requestor_phoneHome;
+    private String form_requestor_phoneWork;
+    
+    private String form_requestor_email;
+    private String form_requestor_addressStreet;
+    private String form_requestor_addressCity;
+    private String form_requestor_addressZip;
+    private String form_requestor_addressState;
 
     /**
-     * Creates a new instance of ActionRequestManageBB
+     * Creates a new instance of ActionRequestBean
      */
-    public CEActionRequestsBB() {
-
-    }
-
-    @PostConstruct
-    public void initBean() {
-        SearchCoordinator sc = getSearchCoordinator();
-
-        QueryCEAR sessionQuery = getSessionBean().getQueryCEAR();
-
-        selectedRequest = getSessionBean().getSessionCEAR();
-
-        try {
-            requestList = sc.runQuery(sessionQuery).getResults();
-            if (selectedRequest == null && requestList.size() > 0) {
-                selectedRequest = requestList.get(0);
-                generateCEARReasonDonutModel();
-            }
-            selectedQueryCEAR = sessionQuery;
-            searchParams = sessionQuery.getParmsList().get(0);
-            queryList = sc.buildQueryCEARList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
-        } catch (IntegrationException | AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-        }
-        
-        CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator searchCoord = getSearchCoordinator();
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
-                getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
-        rpt.setPrintFullCEARQueue(false);
-        try {
-            QueryCEAR query = searchCoord.assembleQueryCEAR(
-                                                QueryCEAREnum.CUSTOM, 
-                                                getSessionBean().getSessionUser(), 
-                                                getSessionBean().getSessionMuni(), 
-                                                null);
-            List<CEActionRequest> singleReqList = new ArrayList<>();
-            if(selectedRequest != null){
-                selectedRequest.setInsertPageBreakBefore(false);
-                singleReqList.add(selectedRequest);
-                query.addToResults(singleReqList);
-            }
-            query.setExecutionTimestamp(LocalDateTime.now());
-            rpt.setBOBQuery(query);
-            rpt.setGenerationTimestamp(LocalDateTime.now());
-            rpt.setTitle("Code enforcement request");
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Unable to build query, sorry!", ""));
-        }
-        reportConfig = rpt;
-    }
-
-    private void generateCEARReasonDonutModel() {
-        DataCoordinator dc = getDataCoordinator();
-        
-        if(requestList != null && requestList.size() > 0){
-
-            CaseCoordinator cc = getCaseCoordinator();
-            DonutChartModel donut =  new DonutChartModel();
-
-            donut.addCircle(dc.computeCountsByCEARReason(requestList));
-
-            donut.setTitle("Requests by reason");
-            donut.setLegendPosition("nw");
-            donut.setShowDataLabels(true);
-            
-            requestReasonDonut = donut;
-        } 
-    }
-
-    public void executeQuery(ActionEvent ev) {
-        SearchCoordinator searchC = getSearchCoordinator();
-        try {
-            requestList = searchC.runQuery(selectedQueryCEAR).getResults();
-            generateCEARReasonDonutModel();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                             "Your query completed with " + requestList.size() + " results!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Unable to query action requests, sorry", ""));
-        } catch (AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             ex.getMessage(), ""));
-        }
-
-    }
-
-    public void executeCustomQuery(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator searchCoord = getSearchCoordinator();
-        try {
-            
-            selectedQueryCEAR = searchCoord.assembleQueryCEAR(
-                                                    QueryCEAREnum.CUSTOM,
-                                                    getSessionBean().getSessionUser(), 
-                                                    getSessionBean().getSessionMuni(), 
-                                                    searchParams);
-            requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
-            
-            generateCEARReasonDonutModel();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                             "Your query completed with " + requestList.size() + " results!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Unable to query action requests, sorry", ""));
-        } catch (AuthorizationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             ex.getMessage(), ""));
-        }
-    }
-
-    public void prepareReportMultiCEAR(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator searchCoord = getSearchCoordinator();
-        
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
-                getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
-        
-        rpt.setPrintFullCEARQueue(true);
-        if (selectedQueryCEAR != null) {
-            //go run the Query if it hasn't been yet
-            if(!selectedQueryCEAR.isExecutedByIntegrator()){
-                try {
-                    selectedQueryCEAR = searchCoord.runQuery(selectedQueryCEAR);
-                } catch (AuthorizationException | IntegrationException ex) {
-                    System.out.println(ex);
-                }
-            }
-            rpt.setTitle("Code enforcement requests: " + selectedQueryCEAR.getQueryName().getTitle());
-            rpt.setNotes(selectedQueryCEAR.getQueryName().getDesc());
-            rpt.setBOBQuery(selectedQueryCEAR);
-
-        }
-        reportConfig = rpt;
+    public CEActionRequestsBB(){
+        // set date of record to current date
+        form_dateOfRecord = new Date();
+        currentTabIndex = 0;
+        System.out.println("ActionRequestBean.ActionRequestBean");
     }
     
-    public String generateReportSingleCEAR() {
-        getSessionBean().setSessionCEAR(selectedRequest);
-        getSessionBean().setSessionReport(reportConfig);
-        getSessionBean().setQueryCEAR(selectedQueryCEAR);
-        return "reportCEARList";
-
+    public String getReturnValue(){
+        return "paccSearch";
+        
     }
     
-    public String generateReportMultiCEAR(){
-        getSessionBean().setSessionCEAR(selectedRequest);
-        
-        Collections.sort(reportConfig.getBOBQuery().getBOBResultList());
-        
-        // tell the first request in the list to not print a page break before itself
-        reportConfig.getBOBQuery().getBOBResultList().get(0).setInsertPageBreakBefore(false);
-        
-        getSessionBean().setSessionReport(reportConfig);
-        getSessionBean().setQueryCEAR(selectedQueryCEAR);
-        return "reportCEARList";
+    
+    /**
+     * Entry mechanism to the Code Enforcement Action Request creation process
+     * We grab the muni the user selected, set it in the new Action Request
+     * and store it in the session bean which we'll access and manipulate
+     * over the next few pages and finally submit on the last page. This is
+     * a poor person's flow system
+     * @return String pointer to the next step in the process: choose property
+     */
+    public String storeSelectedMuni(){
+        CEActionRequest cear;
+        CaseCoordinator cc = getCaseCoordinator();
+        cear = cc.getNewActionRequest();
+        cear.setMuni(selectedMuni);
+        getSessionBean().setActionRequest(cear);
+        return "chooseProperty";
     }
-
-    public String path1CreateNewCaseAtProperty() {
+    
+    public String storePropertyInfo(){
+        // set by the xhtml page itself
+//        getSessionBean().getActionRequest().setRequestProperty(selectedProperty);
+        return "describeConcern";
+    }
+    
+    public String addRequestorDetails(){
+//        User u = getSessionBean().getFacesUser();
+//        if(u == null){
+            return "requestorDetails";
+//            
+//        } else {
+//            
+//            return "reviewAndSubmit";
+//        }
+        
+    }
+    
+    
+    /**
+     * This action method is called when the request code enforcement
+     * action request is submitted online (submit button in submitCERequest
+     * @return the page ID for navigation
+     */
+    public String submitActionRequest() {
+        
+        CEActionRequest req = getSessionBean().getActionRequest();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        
+        int submittedActionRequestID;
+        
+        // start by pulling the person fields and sending them to be entered
+        // into db as a person. The ID of this person is returned, and used in our
+        // insertion of the action request as a whole. 
+        
+        // LT goal: bundle these into a transaction that is rolled back if either 
+        // the person or the request bounces
+        int personID = storeActionRequestorPerson(getSessionBean().getActionRequest().getActionRequestorPerson());
+        
+        req.setPersonID(personID);
+        
+        int controlCode = getControlCodeFromTime();
+        req.setRequestPublicCC(controlCode);
+        
+        req.setIsAtKnownAddress(true);
+        
+//        if (form_atSpecificAddress){
+//            req.setRequestProperty(selectedProperty);
+//        } else {
+//            req.setAddressOfConcern(form_nonPropertyLocation);
+//        }
+//        
+//        req.setIssueType_issueTypeID(violationTypeID);
+//        req.setRequestDescription(form_requestDescription);
+//        req.setDateOfRecord(form_dateOfRecord
+//                .toInstant()
+//                .atZone(ZoneId.systemDefault())
+//                .toLocalDateTime());
+//        req.setIsUrgent(form_isUrgent);
+//        
+        // note that the time stamp is applied by the integration layer
+        // with a simple call to the backing bean getTimeStamp method
 
-        if (selectedRequest != null) {
-            if (selectedRequest.getRequestProperty() != null) {
-                getSessionBean().setSessionProperty(selectedRequest.getRequestProperty());
-            }
-
-            MessageBuilderParams mbp = new MessageBuilderParams();
-            mbp.user = getSessionBean().getSessionUser();
-            mbp.existingContent = selectedRequest.getPublicExternalNotes();
-            mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader");
-            mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation");
-            mbp.newMessageContent = "";
-
-            selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
-
-            // force the bean to go to the integrator and fetch a fresh, updated
-            // list of action requests
-            try {
-                ceari.updateActionRequestNotes(selectedRequest);
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                 "Unable to update action request with case attachment notes", ""));
-            }
-        } else {
+        try { 
+            // send the request into the DB
+            submittedActionRequestID = ceari.submitCEActionRequest(req);
+            getSessionBean().setActionRequest(ceari.getActionRequestByRequestID(submittedActionRequestID));
+            
+            // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Please select an action request from the table to open a new case", ""));
+               new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                       "Success! Your request has been submitted and passed to our code enforcement team.", ""));
+            return "success";
+
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+               getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
+                            "Please call your municipal office and report your concern by phone."));
             return "";
         }
-
-        updateSelectedRequestStatusWithBundleKey("actionRequestNewCaseStatusCode");
-
-// This shelf will be checked by the case creation coordinator
-        // and link the request to the new case so we don't lose track of it
-        getSessionBean().setCeactionRequestForSubmission(selectedRequest);
-
-        return "addNewCase";
     }
-
-    public void path2UseSelectedCaseForAttachment(CECase c) {
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        selectedCaseForAttachment = c;
-        try {
-            ceari.connectActionRequestToCECase(selectedRequest.getRequestID(), selectedCaseForAttachment.getCaseID(), getSessionBean().getSessionUser().getUserID());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Successfully connected action request ID " + selectedRequest.getRequestID()
-                    + " to code enforcement case ID " + selectedCaseForAttachment.getCaseID(), ""));
-        } catch (CaseLifecycleException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Unable to connect request to case.",
-                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-//          selectedRequest.
-        selectedRequest.setCaseID(selectedCaseForAttachment.getCaseID());
-        updateSelectedRequestStatusWithBundleKey("actionRequestExistingCaseStatusCode");
-        // force a reload of request list
-        requestList = null;
-    }
-
-    public void path3AttachInvalidMessage(ActionEvent ev) {
-        if (selectedRequest != null) {
-            CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-            updateSelectedRequestStatusWithBundleKey("actionRequestInvalidStatusCode");
-
-            // build message to document change
-            MessageBuilderParams mcc = new MessageBuilderParams();
-            mcc.user = getSessionBean().getSessionUser();
-            mcc.existingContent = selectedRequest.getPublicExternalNotes();
-            mcc.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestHeader");
-            mcc.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestExplanation");
-            mcc.newMessageContent = invalidMessage;
-            selectedRequest.setPublicExternalNotes(appendNoteBlock(mcc));
-            try {
-                ceari.updateActionRequestNotes(selectedRequest);
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Public case note added to action request ID " + selectedRequest.getRequestID() + ".", ""));
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to write message to The Database",
-                                "This is a system level error that must be corrected by a sys admin--sorries!."));
-            }
+   
+    
+    /**
+     * Coordinates the active tab index based on the status of various
+     * form fields. it's not pretty, but it's functional
+     */
+    private void manageTabs(){
+        System.out.println("ActionRequestBean | manageTab | prop: " + selectedProperty);
+        System.out.println("ActionRequestBean | manageTab | lname: " + form_requestorLName);
+        System.out.println("ActionRequestBean | violationType ID: " + violationTypeID);
+        
+        // check for first tab completed
+        if((selectedProperty != null 
+                && violationTypeID <= 0
+                && form_requestorLName == null) 
+                || 
+                (form_nonPropertyLocation != null && !form_atSpecificAddress)) {
+            System.out.println("selecting tab index 1");
+            currentTabIndex = 1; // go to request details tab
+        // check for second tab com1pleted
+        } else if(selectedProperty != null
+                && violationTypeID > 0
+                && form_requestorLName == null) {
+            System.out.println("selecting tab index 2");
+            currentTabIndex = 2; // to to contact info tab
+        // check for third tab completed
+        } else if(selectedProperty != null
+                && violationTypeID > 0
+                && form_requestorLName != null){
+            System.out.println("selecting tab index 3");
+            currentTabIndex = 3; // go to final tab
+            
         } else {
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "You just tried to attach a message to a nonexistent request!",
-                    "Choose the request to manage on the left, then click manage"));
+            currentTabIndex = 0;
         }
-        requestList = null;
-    }
-
-    public void path4AttachNoViolationFoundMessage(ActionEvent ev) {
-        if (selectedRequest != null) {
-
-            CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-
-            updateSelectedRequestStatusWithBundleKey("actionRequestNoViolationStatusCode");
-
-            // build message to document change
-            MessageBuilderParams mbp = new MessageBuilderParams();
-            mbp.user = getSessionBean().getSessionUser();
-            mbp.existingContent = selectedRequest.getPublicExternalNotes();
-            mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundHeader");
-            mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundExplanation");
-            mbp.newMessageContent = noViolationFoundMessage;
-
-            selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
-
-            // force the bean to go to the integrator and fetch a fresh, updated
-            // list of action requests
-            requestList = null;
-            try {
-                ceari.updateActionRequestNotes(selectedRequest);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Public case note added to action request ID " + selectedRequest.getRequestID() + ".", ""));
-
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to write message to The Database",
-                                "This is a system level error that must be corrected by a sys admin--sorries!."));
-            }
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "No request selected!",
-                            "Choose the request to manage on the left, then click manage"));
+        if(tabView != null){
+          tabView.setActiveIndex(currentTabIndex);
         }
-    }
-
-    private void updateSelectedRequestStatusWithBundleKey(String newStatusKey) {
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-
-        try {
-            selectedRequest.setRequestStatus(ceari.getRequestStatus(Integer.parseInt(
-                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                            .getString(newStatusKey))));
-            ceari.updateActionRequestStatus(selectedRequest);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Status changed on request ID " + selectedRequest.getRequestID(), ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to change request status",
-                            "This is a system level error that must be corrected by a sys admin--sorries!."));
-        }
-    }
-
-    public void updateRequestList(ActionEvent ev) {
-        requestList = null;
-        System.out.println("ActionRequestManagebb.updateRequestList");
-    }
-
-    public void searchForProperties(ActionEvent ev) {
-
-        PropertyIntegrator pi = getPropertyIntegrator();
-        try {
-            propertyList = pi.searchForProperties(houseNumSearch, streetNameSearch, muniForPropSwitchSearch.getMuniCode());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Your search completed with " + propertyList.size() + " results", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to complete a property search! Sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-
-    }
-
-    public void updateRequestProperty(ActionEvent ev) {
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-
-        Property formerProp = selectedRequest.getRequestProperty();
-        selectedRequest.setRequestProperty(propertyForPropSwitch);
-
-        try {
-            ceari.updateActionRequestProperty(selectedRequest);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Done! Property udpate for request ID " + selectedRequest.getRequestID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to change request property, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-
-        StringBuilder sb = new StringBuilder();
-        if (formerProp != null) {
-            sb.append("Previous address: ");
-            sb.append(formerProp.getAddress());
-            sb.append(" (");
-            sb.append(formerProp.getMuni().getMuniName());
-            sb.append(")");
-            sb.append("New address: ");
-            sb.append(selectedRequest.getRequestProperty().getAddress());
-            sb.append(" (");
-            sb.append(selectedRequest.getRequestProperty().getMuni().getMuniName());
-            sb.append(")");
-        } else {
-            sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("noPreviousAddress"));
-        }
-
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionBean().getSessionUser();
-        mbp.existingContent = selectedRequest.getPublicExternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedHeader");
-        mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedExplanation");
-        mbp.newMessageContent = sb.toString();
-
-        selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
-        try {
-            ceari.updateActionRequestNotes(selectedRequest);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Automatic case note generated for property update", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to add property change note to public listing, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-        // force table reload to show changes
-        requestList = null;
-    }
-
-    public void selectNewRequestPerson(Person p) {
-        selectedPersonForAttachment = p;
-    }
-
-    public void updateRequestor(ActionEvent ev) {
-        System.out.println("CEActionRequestsBB.updateRequestor");
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        selectedRequest.setRequestor(selectedPersonForAttachment);
-
-        try {
-            ceari.updateActionRequestor(selectedRequest);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Done! Requestor is now: "
-                    + String.valueOf(selectedRequest.getRequestor().getFirstName())
-                    + String.valueOf(selectedRequest.getRequestor().getLastName())
-                    + " for action request ID: " + selectedRequest.getRequestID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to change requestor person",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-    }
-
-    public void changePACCAccess() {
-        System.out.println("CEActionRequestsBB.changePACCAccess");
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-
-        try {
-            ceari.updatePACCAccess(selectedRequest);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Done! Public access status is now: " + String.valueOf(selectedRequest.isPaccEnabled())
-                    + " for action request ID: " + selectedRequest.getRequestID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to add change public access code status",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-    }
-
-    public void attachInternalMessage(ActionEvent ev) {
-
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionBean().getSessionUser();
-        mbp.existingContent = selectedRequest.getCogInternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("internalNote");
-        mbp.explanation = "";
-        mbp.newMessageContent = internalMessageText;
-        String newNotes = appendNoteBlock(mbp);
-        System.out.println("CEActionRequestsBB.attachInternalMessage | msg before adding to request: " + newNotes);
-        selectedRequest.setCogInternalNotes(newNotes);
-        try {
-            ceari.updateActionRequestNotes(selectedRequest);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                     "Done: added internal note to request ID " + selectedRequest.getRequestID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to update notes, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-
-    }
-
-    public void attachMuniMessage(ActionEvent ev) {
-
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionBean().getSessionUser();
-        mbp.existingContent = selectedRequest.getMuniNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("muniNote");
-        mbp.explanation = "";
-        mbp.newMessageContent = muniMessageText;
-
-        selectedRequest.setMuniNotes(appendNoteBlock(mbp));
-        try {
-            ceari.updateActionRequestNotes(selectedRequest);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Done: Added a municipal-only notes to request ID " + selectedRequest.getRequestID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to update notes, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-
-    }
-
-    public void attachPublicMessage(ActionEvent ev) {
-
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionBean().getSessionUser();
-        mbp.existingContent = selectedRequest.getPublicExternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("externalNote");
-        mbp.explanation = "";
-        mbp.newMessageContent = publicMessageText;
-
-        selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
-        try {
-            ceari.updateActionRequestNotes(selectedRequest);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Done: Added a public note to request ID " + selectedRequest.getRequestID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                     "Unable to update notes, sorry!",
-                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
-        }
-
     }
     
-    public void deletePhoto(int blobID){
-        // TODO: remove entry from linker tbale for deleted photos
-        for(Integer bid : this.selectedRequest.getBlobIDList()){
-            if(bid.compareTo(blobID) == 0){
-                this.selectedRequest.getBlobIDList().remove(bid);
-                break;
-            }
-        }
+    public String populateActionRequestorPerson(){
+        
+        currentPerson = new Person();
+        currentPerson.setPersonType(submittingPersonType);
+        currentPerson.setMuniCode(getSessionBean().getActionRequest().getMuni().getMuniCode());
+        
+        currentPerson.setFirstName(form_requestorFName);
+        currentPerson.setLastName(form_requestorLName);
+        currentPerson.setJobTitle(form_requestorJobtitle);
+        
+        currentPerson.setPhoneCell(form_requestor_phoneCell);
+        currentPerson.setPhoneHome(form_requestor_phoneHome);
+        currentPerson.setPhoneWork(form_requestor_phoneWork);
+        
+        currentPerson.setEmail(form_requestor_email);
+        currentPerson.setAddress_street(form_requestor_addressStreet);
+        currentPerson.setAddress_city(form_requestor_addressCity);
+        currentPerson.setAddress_zip(form_requestor_addressZip);
+        currentPerson.setAddress_state(form_requestor_addressState);
+        
+        currentPerson.setNotes("[System-Generated] This person was created "
+                + "from the code enforcement action request form");
+        
+        currentPerson.setIsActive(true);
+        currentPerson.setIsUnder18(false);
+        
+        // the insertion of this person will be timestamped
+        // by the integrator class
+        
+        getSessionBean().getActionRequest().setActionRequestorPerson(currentPerson);
+        
+        return "reviewAndSubmit";
+        
+    }
+    
+    public int storeActionRequestorPerson(Person p){
+        PersonIntegrator personIntegrator = getPersonIntegrator();
+        
+        int insertedPersonID = 0;
+        
         try {
-            getBlobCoordinator().deleteBlob(blobID);
+            insertedPersonID = personIntegrator.insertPerson(p);
+        } catch (IntegrationException ex) {
+             System.out.println(ex.toString());
+               getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
+                            "You might call your municipal office to report this error and make a request over the phone. "
+                                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
+            
+            
+        } catch (NullPointerException ex){
+             System.out.println(ex.toString());
+//               getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                            "NULL POINTER ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
+//                            "You might call your municipal office to report this error and make a request over the phone. "
+//                                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
+        }
+//        manageTabs();
+        
+        return insertedPersonID;
+        
+    } // close storePerson 
+    
+    public void storePropertyLocationInfo(ActionEvent event){
+        manageTabs();
+//        System.out.println("CEActionRequestsBB.storePropertyLocationInfo | selectedProp: " + selectedProperty.getAddress());
+        
+    }
+    
+    public void storeNoPropertyInfo(ActionEvent event){
+        manageTabs();
+        System.out.println("ActionRequestBean.storeNoPropertyInfo | request location: " + form_nonPropertyLocation);
+    }
+    
+    public void incrementalFormContinue(ActionEvent event){
+        manageTabs();
+        System.out.println("ActionRequestBean.incrementalFormContinue | tabview: " + currentTabIndex);
+    }
+
+      
+    public void searchForPropertiesSingleMuni(ActionEvent ev){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        try {
+            propList = pi.searchForProperties(houseNum, streetName, getSessionBean().getActionRequest().getMuni().getMuniCode());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Your search completed with " + getPropList().size() + " results", ""));
+            
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to complete a property search! Sorry!", ""));
+            
+        }
+    }
+    
+    
+    /**
+     * @return the form_nonPropertyLocation
+     */
+    public String getForm_nonPropertyLocation() {
+        return form_nonPropertyLocation;
+    }
+
+    /**
+     * @param form_nonPropertyLocation the form_nonPropertyLocation to set
+     */
+    public void setForm_nonPropertyLocation(String form_nonPropertyLocation) {
+        this.form_nonPropertyLocation = form_nonPropertyLocation;
+    }
+
+    /**
+     * @return the form_atSpecificAddress
+     */
+    public boolean isForm_atSpecificAddress() {
+        form_atSpecificAddress = true;
+        return form_atSpecificAddress;
+    }
+
+    /**
+     * @param form_atSpecificAddress the form_atSpecificAddress to set
+     */
+    public void setForm_atSpecificAddress(boolean form_atSpecificAddress) {
+        this.form_atSpecificAddress = form_atSpecificAddress;
+    }
+
+    /**
+     * @return the form_requestDescription
+     */
+    public String getForm_requestDescription() {
+        return form_requestDescription;
+    }
+
+    /**
+     * @param form_requestDescription the form_requestDescription to set
+     */
+    public void setForm_requestDescription(String form_requestDescription) {
+        this.form_requestDescription = form_requestDescription;
+    }
+
+    /**
+     * @return the form_isUrgent
+     */
+    public boolean isForm_isUrgent() {
+        return form_isUrgent;
+    }
+
+    /**
+     * @param form_isUrgent the form_isUrgent to set
+     */
+    public void setForm_isUrgent(boolean form_isUrgent) {
+        this.form_isUrgent = form_isUrgent;
+    }
+
+    /**
+     * @return the form_dateOfRecord
+     */
+    public Date getForm_dateOfRecord() {
+        return form_dateOfRecord;
+    }
+
+    /**
+     * @param form_dateOfRecord the form_dateOfRecord to set
+     */
+    public void setForm_dateOfRecord(Date form_dateOfRecord) {
+        this.form_dateOfRecord = form_dateOfRecord;
+    }
+
+    /**
+     * @return the form_requestorFName
+     */
+    public String getForm_requestorFName() {
+        return form_requestorFName;
+    }
+
+    /**
+     * @param form_requestorFName the form_requestorFName to set
+     */
+    public void setForm_requestorFName(String form_requestorFName) {
+        this.form_requestorFName = form_requestorFName;
+    }
+
+    /**
+     * @return the form_requestorLName
+     */
+    public String getForm_requestorLName() {
+        return form_requestorLName;
+    }
+
+    /**
+     * @param form_requestorLName the form_requestorLName to set
+     */
+    public void setForm_requestorLName(String form_requestorLName) {
+        this.form_requestorLName = form_requestorLName;
+    }
+
+    /**
+     * @return the form_requestor_phoneCell
+     */
+    public String getForm_requestor_phoneCell() {
+        return form_requestor_phoneCell;
+    }
+
+    /**
+     * @param form_requestor_phoneCell the form_requestor_phoneCell to set
+     */
+    public void setForm_requestor_phoneCell(String form_requestor_phoneCell) {
+        this.form_requestor_phoneCell = form_requestor_phoneCell;
+    }
+
+    /**
+     * @return the form_requestor_email
+     */
+    public String getForm_requestor_email() {
+        return form_requestor_email;
+    }
+
+    /**
+     * @param form_requestor_email the form_requestor_email to set
+     */
+    public void setForm_requestor_email(String form_requestor_email) {
+        this.form_requestor_email = form_requestor_email;
+    }
+
+    /**
+     * @return the form_requestor_addressStreet
+     */
+    public String getForm_requestor_addressStreet() {
+        return form_requestor_addressStreet;
+    }
+
+    /**
+     * @param form_requestor_addressStreet the form_requestor_addressStreet to set
+     */
+    public void setForm_requestor_addressStreet(String form_requestor_addressStreet) {
+        this.form_requestor_addressStreet = form_requestor_addressStreet;
+    }
+
+    /**
+     * @return the form_requestor_addressCity
+     */
+    public String getForm_requestor_addressCity() {
+        return form_requestor_addressCity;
+    }
+
+    /**
+     * @param form_requestor_addressCity the form_requestor_addressCity to set
+     */
+    public void setForm_requestor_addressCity(String form_requestor_addressCity) {
+        this.form_requestor_addressCity = form_requestor_addressCity;
+    }
+
+    /**
+     * @return the form_requestor_addressZip
+     */
+    public String getForm_requestor_addressZip() {
+        return form_requestor_addressZip;
+    }
+
+    /**
+     * @param form_requestor_addressZip the form_requestor_addressZip to set
+     */
+    public void setForm_requestor_addressZip(String form_requestor_addressZip) {
+        this.form_requestor_addressZip = form_requestor_addressZip;
+    }
+
+    /**
+     * @return the form_anonymous
+     */
+    public boolean isForm_anonymous() {
+        return form_anonymous;
+    }
+
+    /**
+     * @param form_anonymous the form_anonymous to set
+     */
+    public void setForm_anonymous(boolean form_anonymous) {
+        this.form_anonymous = form_anonymous;
+    }
+
+   
+
+    /**
+     * @return the violationTypeID
+     */
+    public int getViolationTypeID() {
+        return violationTypeID;
+    }
+
+    /**
+     * @param violationTypeID the violationTypeID to set
+     */
+    public void setViolationTypeID(int violationTypeID) {
+        this.violationTypeID = violationTypeID;
+    }
+
+    /**
+     * @return the violationTypeName
+     */
+    public String getViolationTypeName() {
+        return violationTypeName;
+    }
+
+    /**
+     * @param violationTypeName the violationTypeName to set
+     */
+    public void setViolationTypeName(String violationTypeName) {
+        this.violationTypeName = violationTypeName;
+    }
+
+    
+
+    /**
+     * @return the currentPerson
+     */
+    public Person getCurrentPerson() {
+        return currentPerson;
+    }
+
+    /**
+     * @param currentPerson the currentPerson to set
+     */
+    public void setCurrentPerson(Person currentPerson) {
+        this.currentPerson = currentPerson;
+    }
+
+    /**
+     * @return the submittingPersonType
+     */
+    public PersonType getSubmittingPersonType() {
+        submittingPersonType = PersonType.Public;
+        return submittingPersonType;
+    }
+
+    /**
+     * @param submittingPersonType the submittingPersonType to set
+     */
+    public void setSubmittingPersonType(PersonType submittingPersonType) {
+        this.submittingPersonType = submittingPersonType;
+    }
+
+    /**
+     * @return the form_requestor_phoneHome
+     */
+    public String getForm_requestor_phoneHome() {
+        return form_requestor_phoneHome;
+    }
+
+    /**
+     * @param form_requestor_phoneHome the form_requestor_phoneHome to set
+     */
+    public void setForm_requestor_phoneHome(String form_requestor_phoneHome) {
+        this.form_requestor_phoneHome = form_requestor_phoneHome;
+    }
+
+    /**
+     * @return the form_requestor_phoneWork
+     */
+    public String getForm_requestor_phoneWork() {
+        return form_requestor_phoneWork;
+    }
+
+    /**
+     * @param form_requestor_phoneWork the form_requestor_phoneWork to set
+     */
+    public void setForm_requestor_phoneWork(String form_requestor_phoneWork) {
+        this.form_requestor_phoneWork = form_requestor_phoneWork;
+    }
+
+    
+
+    /**
+     * @return the submittingPersonTypes
+     */
+    public PersonType[] getSubmittingPersonTypes() {
+        
+        return PersonType.values();
+    }
+
+   
+    /**
+     * @return the selectedProperty
+     */
+    public Property getSelectedProperty() {
+        return selectedProperty;
+    }
+
+    /**
+     * @param selectedProperty the selectedProperty to set
+     */
+    public void setSelectedProperty(Property selectedProperty) {
+        this.selectedProperty = selectedProperty;
+    }
+
+    /**
+     * @return the form_requestorJobtitle
+     */
+    public String getForm_requestorJobtitle() {
+        return form_requestorJobtitle;
+    }
+
+    /**
+     * @return the form_requestor_addressState
+     */
+    public String getForm_requestor_addressState() {
+        return form_requestor_addressState;
+    }
+
+    /**
+     * @param form_requestorJobtitle the form_requestorJobtitle to set
+     */
+    public void setForm_requestorJobtitle(String form_requestorJobtitle) {
+        this.form_requestorJobtitle = form_requestorJobtitle;
+    }
+
+    /**
+     * @param form_requestor_addressState the form_requestor_addressState to set
+     */
+    public void setForm_requestor_addressState(String form_requestor_addressState) {
+        this.form_requestor_addressState = form_requestor_addressState;
+    }
+
+  
+    /**
+     * @return the propList
+     */
+    public ArrayList getPropList() {
+        return propList;
+    }
+
+    /**
+     * @return the houseNum
+     */
+    public String getHouseNum() {
+        return houseNum;
+    }
+
+    /**
+     * @param propList the propList to set
+     */
+    public void setPropList(ArrayList propList) {
+        this.propList = propList;
+    }
+
+    /**
+     * @param houseNum the houseNum to set
+     */
+    public void setHouseNum(String houseNum) {
+        System.out.println("ActionRequestBean.setHouseNum");
+        this.houseNum = houseNum;
+    }
+
+    /**
+     * @return the tabView
+     */
+    public TabView getTabView() {
+        return tabView;
+    }
+
+    /**
+     * @param tabView the tabView to set
+     */
+    public void setTabView(TabView tabView) {
+        this.tabView = tabView;
+    }
+
+    /**
+     * @return the streetName
+     */
+    public String getStreetName() {
+        return streetName;
+    }
+
+    /**
+     * @param streetName the streetName to set
+     */
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
+    /**
+     * @return the submittedRequestPACC
+     */
+    public int getSubmittedRequestPACC() {
+        return submittedRequestPACC;
+    }
+
+    /**
+     * @param submittedRequestPACC the submittedRequestPACC to set
+     */
+    public void setSubmittedRequestPACC(int submittedRequestPACC) {
+        this.submittedRequestPACC = submittedRequestPACC;
+    }
+
+    /**
+     * @return the selectedMuni
+     */
+    public Municipality getSelectedMuni() {
+        return selectedMuni;
+    }
+
+    /**
+     * @param selectedMuni the selectedMuni to set
+     */
+    public void setSelectedMuni(Municipality selectedMuni) {
+        this.selectedMuni = selectedMuni;
+    }
+
+    /**
+     * @return the muniList
+     */
+    public List<Municipality> getMuniList() {
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        try {
+            muniList = mi.getCompleteMuniList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-    }
-
-    public void manageActionRequest(CEActionRequest req) {
-        System.out.println("ActionRequestManagebb.manageActionRequest req: " + req.getRequestID());
-        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "You are now managing request ID: " + req.getRequestID(), ""));
-        selectedRequest = req;
-
+        return muniList;
     }
 
     /**
-     * @return the ceCaseIDForConnection
+     * @param muniList the muniList to set
      */
-    public int getCeCaseIDForConnection() {
-        return ceCaseIDForConnection;
+    public void setMuniList(List<Municipality> muniList) {
+        this.muniList = muniList;
     }
 
     /**
-     * @param ceCaseIDForConnection the ceCaseIDForConnection to set
+     * @return the violationTypeMap
      */
-    public void setCeCaseIDForConnection(int ceCaseIDForConnection) {
-        this.ceCaseIDForConnection = ceCaseIDForConnection;
-    }
-
-    public void updateActionRequestStatus(ActionEvent ev) {
-        System.out.println("updateStatus");
+    public Map<String, Integer> getViolationTypeMap() {
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        if (selectedChangeToStatus != null) {
-
-            selectedRequest.setRequestStatus(selectedChangeToStatus);
-            try {
-                ceari.updateActionRequestStatus(selectedRequest);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully changed request status for request ID: " + selectedRequest.getCaseID(), ""));
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_WARN,
-                                "Unable to update request ID : " + selectedRequest.getCaseID(), ""));
-
-            }
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Please select a request status from the drop-down box to proceed", ""));
-
-        }
-        // force a reload of request list
-        requestList = null;
-
+        violationTypeMap = ceari.getViolationMap();
+        return violationTypeMap;
     }
 
     /**
-     * @return the selectedRequest
+     * @param violationTypeMap the violationTypeMap to set
      */
-    public CEActionRequest getSelectedRequest() {
-
-        return selectedRequest;
+    public void setViolationTypeMap(Map<String, Integer> violationTypeMap) {
+        this.violationTypeMap = violationTypeMap;
     }
-
-    /**
-     * @param selectedRequest the selectedRequest to set
-     */
-    public void setSelectedRequest(CEActionRequest selectedRequest) {
-        this.selectedRequest = selectedRequest;
-    }
-
-    /**
-     * @return the statusList
-     */
-    public List<CEActionRequestStatus> getStatusList() {
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        if (statusList == null) {
-            try {
-                statusList = ceari.getRequestStatusList();
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-        }
-        return statusList;
-    }
-
-    /**
-     * @return the selectedStatus
-     */
-    public CEActionRequestStatus getSelectedStatus() {
-        return selectedStatus;
-    }
-
-    /**
-     * @param statusList the statusList to set
-     */
-    public void setStatusList(List<CEActionRequestStatus> statusList) {
-        this.statusList = statusList;
-    }
-
-    /**
-     * @param selectedStatus the selectedStatus to set
-     */
-    public void setSelectedStatus(CEActionRequestStatus selectedStatus) {
-        this.selectedStatus = selectedStatus;
-    }
-
-    /**
-     * @return the searchParams
-     */
-    public SearchParamsCEActionRequests getSearchParams() {
-        return searchParams;
-    }
-
-    /**
-     * @param searchParams the searchParams to set
-     */
-    public void setSearchParams(SearchParamsCEActionRequests searchParams) {
-        this.searchParams = searchParams;
-    }
-
-    /**
-     * @return the selectedChangeToStatus
-     */
-    public CEActionRequestStatus getSelectedChangeToStatus() {
-        return selectedChangeToStatus;
-    }
-
-    /**
-     * @param selectedChangeToStatus the selectedChangeToStatus to set
-     */
-    public void setSelectedChangeToStatus(CEActionRequestStatus selectedChangeToStatus) {
-        this.selectedChangeToStatus = selectedChangeToStatus;
-    }
-
-    /**
-     * @return the invalidMessage
-     */
-    public String getInvalidMessage() {
-        return invalidMessage;
-    }
-
-    /**
-     * @param invalidMessage the invalidMessage to set
-     */
-    public void setInvalidMessage(String invalidMessage) {
-        this.invalidMessage = invalidMessage;
-    }
-
-    /**
-     * @return the caseListForSelectedProperty
-     */
-    public ArrayList<CECase> getCaseListForSelectedProperty() {
-        CaseIntegrator ci = getCaseIntegrator();
-        if (selectedRequest != null) {
-            try {
-                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty());
-                System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            } catch (CaseLifecycleException ex) {
-                System.out.println(ex);
-            }
-        }
-        return caseListForSelectedProperty;
-    }
-
-    /**
-     * @param caseListForSelectedProperty the caseListForSelectedProperty to set
-     */
-    public void setCaseListForSelectedProperty(ArrayList<CECase> caseListForSelectedProperty) {
-        this.caseListForSelectedProperty = caseListForSelectedProperty;
-    }
-
-    /**
-     * @return the selectedCaseForAttachment
-     */
-    public CECase getSelectedCaseForAttachment() {
-        return selectedCaseForAttachment;
-    }
-
-    /**
-     * @param selectedCaseForAttachment the selectedCaseForAttachment to set
-     */
-    public void setSelectedCaseForAttachment(CECase selectedCaseForAttachment) {
-        this.selectedCaseForAttachment = selectedCaseForAttachment;
-    }
-
-    /**
-     * @return the noViolationFoundMessage
-     */
-    public String getNoViolationFoundMessage() {
-        return noViolationFoundMessage;
-    }
-
-    /**
-     * @param noViolationFoundMessage the noViolationFoundMessage to set
-     */
-    public void setNoViolationFoundMessage(String noViolationFoundMessage) {
-        this.noViolationFoundMessage = noViolationFoundMessage;
-    }
-
-    /**
-     * @return the disabledDueToRoutingNotAllowed
-     */
-    public boolean getIsDisabledDueToRoutingNotAllowed() {
-        CaseCoordinator cc = getCaseCoordinator();
-
-        disabledDueToRoutingNotAllowed
-                = !(cc.determineCEActionRequestRoutingActionEnabledStatus(
-                        selectedRequest,
-                        getSessionBean().getSessionUser()));
-
-        return disabledDueToRoutingNotAllowed;
-    }
-
-    /**
-     * @param disabledDueToRoutingNotAllowed the disabledDueToRoutingNotAllowed
-     * to set
-     */
-    public void setDisabledDueToRoutingNotAllowed(boolean disabledDueToRoutingNotAllowed) {
-        this.disabledDueToRoutingNotAllowed = disabledDueToRoutingNotAllowed;
-    }
-
-    /**
-     * @return the internalMessageText
-     */
-    public String getInternalMessageText() {
-        return internalMessageText;
-    }
-
-    /**
-     * @return the muniMessageText
-     */
-    public String getMuniMessageText() {
-        return muniMessageText;
-    }
-
-    /**
-     * @return the publicMessageText
-     */
-    public String getPublicMessageText() {
-        return publicMessageText;
-    }
-
-    /**
-     * @param internalMessageText the internalMessageText to set
-     */
-    public void setInternalMessageText(String internalMessageText) {
-        this.internalMessageText = internalMessageText;
-    }
-
-    /**
-     * @param muniMessageText the muniMessageText to set
-     */
-    public void setMuniMessageText(String muniMessageText) {
-        this.muniMessageText = muniMessageText;
-    }
-
-    /**
-     * @param publicMessageText the publicMessageText to set
-     */
-    public void setPublicMessageText(String publicMessageText) {
-        this.publicMessageText = publicMessageText;
-    }
-
-    /**
-     * @return the muniForPropSwitchSearch
-     */
-    public Municipality getMuniForPropSwitchSearch() {
-        return muniForPropSwitchSearch;
-    }
-
-    /**
-     * @return the propertyForPropSwitch
-     */
-    public Property getPropertyForPropSwitch() {
-        return propertyForPropSwitch;
-    }
-
-    /**
-     * @param muniForPropSwitchSearch the muniForPropSwitchSearch to set
-     */
-    public void setMuniForPropSwitchSearch(Municipality muniForPropSwitchSearch) {
-        this.muniForPropSwitchSearch = muniForPropSwitchSearch;
-    }
-
-    /**
-     * @param propertyForPropSwitch the propertyForPropSwitch to set
-     */
-    public void setPropertyForPropSwitch(Property propertyForPropSwitch) {
-        this.propertyForPropSwitch = propertyForPropSwitch;
-    }
-
-    /**
-     * @return the propertyList
-     */
-    public List<Property> getPropertyList() {
-        return propertyList;
-    }
-
-    /**
-     * @param propertyList the propertyList to set
-     */
-    public void setPropertyList(List<Property> propertyList) {
-        this.propertyList = propertyList;
-    }
-
-    /**
-     * @return the houseNumSearch
-     */
-    public String getHouseNumSearch() {
-        return houseNumSearch;
-    }
-
-    /**
-     * @return the streetNameSearch
-     */
-    public String getStreetNameSearch() {
-        return streetNameSearch;
-    }
-
-    /**
-     * @param houseNumSearch the houseNumSearch to set
-     */
-    public void setHouseNumSearch(String houseNumSearch) {
-        this.houseNumSearch = houseNumSearch;
-    }
-
-    /**
-     * @param streetNameSearch the streetNameSearch to set
-     */
-    public void setStreetNameSearch(String streetNameSearch) {
-        this.streetNameSearch = streetNameSearch;
-    }
-
-    /**
-     * @return the disablePACCControl
-     */
-    public boolean isDisablePACCControl() {
-        disablePACCControl = false;
-        if (getSessionBean().getSessionUser().getKeyCard().isHasMuniStaffPermissions() == false) {
-            disablePACCControl = true;
-        }
-        return disablePACCControl;
-    }
-
-    /**
-     * @param disablePACCControl the disablePACCControl to set
-     */
-    public void setDisablePACCControl(boolean disablePACCControl) {
-        this.disablePACCControl = disablePACCControl;
-    }
-
-    /**
-     * @return the selectedPersonForAttachment
-     */
-    public Person getSelectedPersonForAttachment() {
-        return selectedPersonForAttachment;
-    }
-
-    /**
-     * @param selectedPersonForAttachment the selectedPersonForAttachment to set
-     */
-    public void setSelectedPersonForAttachment(Person selectedPersonForAttachment) {
-        this.selectedPersonForAttachment = selectedPersonForAttachment;
-    }
-
-
-    /**
-     * @return the selectedQueryCEAR
-     */
-    public QueryCEAR getSelectedQueryCEAR() {
-        return selectedQueryCEAR;
-    }
-
-    /**
-     * @param selectedQueryCEAR the selectedQueryCEAR to set
-     */
-    public void setSelectedQueryCEAR(QueryCEAR selectedQueryCEAR) {
-        this.selectedQueryCEAR = selectedQueryCEAR;
-    }
-
-    /**
-     * @return the queryList
-     */
-    public List<QueryCEAR> getQueryList() {
-        return queryList;
-    }
-
-    /**
-     * @param queryList the queryList to set
-     */
-    public void setQueryList(List<QueryCEAR> queryList) {
-        this.queryList = queryList;
-    }
-
-    /**
-     * @return the requestList
-     */
-    public List<CEActionRequest> getRequestList() {
-        return requestList;
-    }
-
-    /**
-     * @param requestList the requestList to set
-     */
-    public void setRequestList(List<CEActionRequest> requestList) {
-        this.requestList = requestList;
-    }
-
-    /**
-     * @return the reportConfig
-     */
-    public ReportCEARList getReportConfig() {
-        return reportConfig;
-    }
-
-    /**
-     * @param reportConfig the reportConfig to set
-     */
-    public void setReportConfig(ReportCEARList reportConfig) {
-        this.reportConfig = reportConfig;
-    }
-
-    /**
-     * @return the requestReasonDonut
-     */
-    public DonutChartModel getRequestReasonDonut() {
-        if(requestReasonDonut == null){
-            requestReasonDonut = new DonutChartModel();
-        }
-        return requestReasonDonut;
-    }
-
-    /**
-     * @param requestReasonDonut the requestReasonDonut to set
-     */
-    public void setRequestReasonDonut(DonutChartModel requestReasonDonut) {
-        this.requestReasonDonut = requestReasonDonut;
-    }
-
 }
