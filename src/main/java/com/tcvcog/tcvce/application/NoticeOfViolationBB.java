@@ -227,7 +227,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         System.out.println("NoticeOfViolationBB.QueueNotice");
         CaseCoordinator caseCoord = getCaseCoordinator();
         
-        CECase ceCase = getSessionBean().getActiveCase();
+        CECase ceCase = getSessionBean().getcECase();
 
         NoticeOfViolation notice = getSessionBean().getActiveNotice();
 //        NoticeOfViolation notice = caseCoord.generateNoticeSkeleton(ceCase);
@@ -267,7 +267,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public String saveNoticeDraft(){
         
-        CECase c = getSessionBean().getActiveCase();
+        CECase c = getSessionBean().getcECase();
         NoticeOfViolation notice = getSessionBean().getActiveNotice();
         
         CodeViolationIntegrator ci = getCodeViolationIntegrator();

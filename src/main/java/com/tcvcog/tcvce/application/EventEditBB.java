@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -38,7 +38,7 @@ import javax.faces.application.FacesMessage;
 public class EventEditBB extends BackingBeanUtils implements Serializable {
     
     // add currentEvent form fields
-    private EventCase currentEvent;
+    private EventCECase currentEvent;
     
     private String formEventDesc;
     private Date formEventDate;
@@ -65,7 +65,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
     public String editEvent(){
         EventCoordinator ec = getEventCoordinator();
         
-        EventCase e = currentEvent;
+        EventCECase e = currentEvent;
         
         // category is already set from initialization sequence
         e.setEventDescription(formEventDesc);
@@ -220,7 +220,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the currentEvent
      */
-    public EventCase getCurrentEvent() {
+    public EventCECase getCurrentEvent() {
         
         currentEvent = getSessionBean().getActiveEvent();
         return this.currentEvent;
@@ -229,7 +229,7 @@ public class EventEditBB extends BackingBeanUtils implements Serializable {
     /**
      * @param currentEvent the currentEvent to set
      */
-    public void setCurrentEvent(EventCase currentEvent) {
+    public void setCurrentEvent(EventCECase currentEvent) {
         this.currentEvent = currentEvent;
     }
 

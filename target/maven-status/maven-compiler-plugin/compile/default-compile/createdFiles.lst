@@ -1,7 +1,6 @@
 com/tcvcog/tcvce/application/EventAddBB.class
 com/tcvcog/tcvce/entities/search/SearchParams.class
 com/tcvcog/tcvce/entities/TextBlock.class
-com/tcvcog/tcvce/application/ActionRequestBean.class
 com/tcvcog/tcvce/entities/PropertyWithLists.class
 com/tcvcog/tcvce/entities/CodifiedMunicipality.class
 com/tcvcog/tcvce/occupancy/application/OccupancyPermitTypeBB.class
@@ -51,7 +50,6 @@ com/tcvcog/tcvce/entities/NoticeOfViolation.class
 com/tcvcog/tcvce/entities/CodeElement.class
 com/tcvcog/tcvce/integration/CEActionRequestIntegrator.class
 com/tcvcog/tcvce/application/SystemServicesBB.class
-com/tcvcog/tcvce/entities/EventCase.class
 com/tcvcog/tcvce/application/CodeSourceBB.class
 com/tcvcog/tcvce/application/BackingBeanUtils.class
 com/tcvcog/tcvce/application/PersonAddBB.class
@@ -64,7 +62,6 @@ com/tcvcog/tcvce/entities/Municipality.class
 com/tcvcog/tcvce/util/Constants.class
 com/tcvcog/tcvce/occupancy/application/PaymentBB.class
 com/tcvcog/tcvce/util/EntityConverter.class
-com/tcvcog/tcvce/application/CeActionRequestsBB.class
 com/tcvcog/tcvce/entities/PublicInfoBundle.class
 com/tcvcog/tcvce/entities/ListChangeRequest.class
 com/tcvcog/tcvce/util/PaymentTypeConverter.class
@@ -85,7 +82,6 @@ com/tcvcog/tcvce/domain/EventExceptionDeprecated.class
 com/tcvcog/tcvce/application/MuniBB.class
 com/tcvcog/tcvce/application/PersonConnectBB.class
 com/tcvcog/tcvce/application/NavigationBB.class
-com/tcvcog/tcvce/application/ActionRequestManageBB.class
 com/tcvcog/tcvce/application/PublicInfoBB.class
 com/tcvcog/tcvce/application/RequestManagementBB.class
 com/tcvcog/tcvce/application/SearchCoordinator.class
@@ -161,7 +157,6 @@ com/tcvcog/tcvce/occupancy/entities/OccPermitType.class
 com/tcvcog/tcvce/integration/CitationIntegrator.class
 com/tcvcog/tcvce/util/EventCategoryConverter.class
 com/tcvcog/tcvce/integration/PersonIntegrator.class
-com/tcvcog/tcvce/application/CeCasesBB.class
 com/tcvcog/tcvce/integration/CodeIntegrator.class
 com/tcvcog/tcvce/coordinators/CodeCoordinator.class
 com/tcvcog/tcvce/entities/CodeViolation.class

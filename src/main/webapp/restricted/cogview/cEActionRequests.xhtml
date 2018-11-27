@@ -1,0 +1,509 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Code Enforcement Action Requests</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="CEActionRequestsView">
+                    <div class="mainContainer">
+                        <h:messages id="ceActionRequestsMessages" globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                        <h1>Code Enforcement Action Requests in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
+
+
+
+                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                     columnClasses="gridTd, gridTd">
+
+                            <h:panelGroup>
+
+                                <h:form id="actionRequestListForm">
+                                    <h2>Current Request List</h2>
+                                    <p:commandButton ajax="false" value="Submit Action Request" action="requestCEActionFlow"/>
+
+                                    <h3>Results below show all unattached action requests. Use advanced search options to specify a different result set.</h3>
+
+
+
+
+                                    <p:fieldset legend="Advanced search options"
+                                                toggleable="true" collapsed="true">
+
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd">
+
+                                            <h:panelGroup>
+
+
+                                                <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query start date "/>
+                                                <p:calendar id="eventDateCalStart" value="#{cEActionRequestsBB.searchParams.startDateUtilDate}" 
+                                                            mode="popup"  
+                                                            showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                            navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                            showButtonPanel="true" showTodayButton="true"
+                                                            required="true"/>
+                                                <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="Query end date "/>
+                                                <p:calendar id="eventDateCalEnd" value="#{cEActionRequestsBB.searchParams.endDateUtilDate}" 
+                                                            mode="popup" 
+                                                            showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                            navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                            showButtonPanel="true" showTodayButton="true"
+                                                            required="true" />
+                                                <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useAttachedToCaseOL" for="useAttachedToCase" value="Filter by case attachment?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useAttachedToCase" value="#{cEActionRequestsBB.searchParams.useAttachedToCase}" />
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <p:outputLabel id="attachedToCaseOL" for="attachedToCaseCB" value="Attached to case"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="attachedToCaseCB" value="#{cEActionRequestsBB.searchParams.attachedToCase}" disabled="false" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useMarkedUrgentol" for="useMarkedUrgent" value="Filter by safety hazard?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useMarkedUrgent" value="#{cEActionRequestsBB.searchParams.useMarkedUrgent}" />
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <p:outputLabel id="markedUrgentOL" for="useMarkedUrgentcb" value="Safety hazard"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useMarkedUrgentcb" value="#{cEActionRequestsBB.searchParams.markedUrgent}" disabled="false" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useRequestIDOL" for="useRequestIDCB" value="Search by Request ID?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useRequestIDCB" value="#{cEActionRequestsBB.searchParams.useRequestID}" />
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <p:outputLabel id="requestIDOL" for="requestIDIT" value="Request ID:"/>
+                                                <p:spacer height="5px"/>
+                                                <p:inputText id="requestIDIT" value="#{cEActionRequestsBB.searchParams.requestID}" disabled="false"/>
+                                                <h:message for="requestIDIT" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useActionRequestStatusOL" for="useRequestIDCB" value="Search by Request status?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useActionRequestStatusSB" value="#{cEActionRequestsBB.searchParams.useRequestStatus}" />
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+
+                                                <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{cEActionRequestsBB.searchParams.requestStatus}">
+                                                    <f:converter converterId="ceActionRequestStatusConverter"/>
+                                                    <f:selectItems value="#{cEActionRequestsBB.statusList}"
+                                                                   var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel id="useNotAtAddressOL" for="useNotAtAddressCB" value="Filter by not at address?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="useNotAtAddressCB" value="#{cEActionRequestsBB.searchParams.useNotAtAddress}" />
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <p:outputLabel id="notAtAddressOL" for="notAtAddressCB" value="Not at an address"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="notAtAddressCB" value="#{cEActionRequestsBB.searchParams.notAtAnAddress}" disabled="false" />
+                                            </h:panelGroup>
+
+                                        </h:panelGrid>
+                                        <p:spacer height="15px"/>
+
+
+                                        <p:commandButton ajax="true" value="Update results" actionListener="#{cEActionRequestsBB.updateRequestList}"
+                                                         update="
+                                                         eventDateCalStart
+                                                         eventDateCalEnd
+                                                         useAttachedToCase
+                                                         attachedToCaseCB
+                                                         useMarkedUrgent
+                                                         useMarkedUrgentcb
+                                                         useRequestIDCB
+                                                         requestIDIT
+                                                         useActionRequestStatusSB
+                                                         ceactionrequeststatusmenu
+                                                         useNotAtAddressCB
+                                                         notAtAddressCB
+                                                         actionRequestTable"/>
+
+                                    </p:fieldset>
+
+
+                                    <h2>CE Action Requests</h2>
+                                    <h:messages id="actionQueryMessages" globalOnly="true" showDetail="true" showSummary="true"
+                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                    </h:messages>
+
+                                    <p:dataTable
+                                        id="actionRequestTable"
+                                        var="r"
+                                        rowKey="#{r.requestID}"
+                                        value="#{cEActionRequestsBB.requestList}"
+                                        tableStyleClass="primeDataTable"
+                                        resizableColumns="true"
+                                        
+                                        rowExpandMode="multiple"
+                                        reflow="true"
+                                        expandedRow="false"
+
+                                        >
+
+                                        <ui:remove>
+                                            
+                                        <p:ajax event="rowSelect" 
+                                                update=":actionRequestManageForm:sr-id-ot"/>
+
+                                        </ui:remove>
+
+                                        <p:column width="5%">
+                                            <p:rowToggler />
+                                        </p:column>
+
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <div class="wrapText">
+                                                <h:outputText value="#{r.requestID}"/>
+                                            </div>
+                                        </p:column>
+
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Issue Type" />
+                                            </f:facet>
+                                            <div class="wrapText">
+                                                <h:outputText value="#{r.issueTypeString}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Address" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{r.requestProperty.address}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Submitted" />
+                                            </f:facet>
+                                            <div class="wrapText">
+                                                <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
+                                            </div>
+                                        </p:column>
+
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Age" />
+                                            </f:facet>
+                                            <h:outputText value="#{r.daysSinceDateOfRecord}"/>
+                                        </p:column>
+
+
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Link" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-link" 
+                                                             action="#{cEActionRequestsBB.manageActionRequest(r)}"
+                                                             ajax="true"  immediate="true" 
+                                                             value="Manage request"
+                                                             
+                                                             disabled="true"/>
+
+                                        </p:column>
+                                        <p:rowExpansion>
+
+                                            <div class="outlinedBox">
+                                                <h3>Code Enforcement Action Request</h3>
+                                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                             columnClasses="gridTd, gridTd">
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel class="bold" value="Issue Type" />
+                                                        <p:spacer height="5px"/>
+                                                        <div class="wrapText">
+                                                            <h:outputText value="#{r.issueTypeString}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel class="bold" value="Address" />
+                                                        <p:spacer height="5px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{r.requestProperty.address}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel class="bold" value="PACC" />
+                                                        <p:spacer height="5px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{r.requestPublicCC}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <h:outputLabel class="bold" value="Date Submitted" />
+                                                        <p:spacer height="5px"/>
+                                                        <div class="wrapText">
+                                                            <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="ID"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="wrapText">
+                                                            <h:outputText value="#{r.requestID}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <div class="wrapText">
+                                                            <h:outputLabel styleClass="bold" value="Human safety issue?"/>
+                                                            <p:spacer height="5px"/>
+                                                            <h:outputText value="#{r.isUrgent}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+
+                                                        <div class="wrapText">
+                                                            <h:outputLabel styleClass="bold" value="Requestor (#{r.actionRequestorPerson.personType.label}): "/>
+                                                            <p:spacer height="5px"/>
+
+                                                            <h:outputText value="#{r.actionRequestorPerson.firstName} "/> 
+                                                            <h:outputText value="#{r.actionRequestorPerson.lastName}"/><br/> 
+                                                            <h:outputText value="#{r.actionRequestorPerson.address_street}"/> <br/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.address_city}, "/> 
+                                                            <h:outputText value="#{r.actionRequestorPerson.address_state} "/> 
+                                                            <h:outputText value="#{r.actionRequestorPerson.address_zip}"/> 
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Contact: "/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="wrapText"> 
+                                                            <h:outputText value="Phone (cell): "/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.phoneCell}"/> <br/>
+                                                            <h:outputText value="Phone (work): "/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> <br/>
+                                                            <h:outputText value="Phone (home): "/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br/>
+                                                            <h:outputText value="Email: "/>
+                                                            <h:outputText value="#{r.actionRequestorPerson.email}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+
+
+                                                    <f:facet name="footer" class="leftalign">
+                                                        <h:outputLabel styleClass="bold" value="Request description"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion" style="leftalign">
+                                                            <h:outputText escape="false" value="#{r.requestDescription}"/>
+                                                        </div>
+                                                    </f:facet>
+                                                </h:panelGrid>
+                                            </div>
+
+                                        </p:rowExpansion>
+                                    </p:dataTable>
+
+                                </h:form>
+                            </h:panelGroup>
+
+                                
+                            
+                            <!--Right column of action requests-->
+                            <h:panelGroup>
+                            <ui:remove>
+                                <h2>Manage selected request</h2>
+
+                                <h3>Request Status</h3>
+
+                                <h:form id="actionRequestManageForm">
+
+                                    <h:outputLabel styleClass="bold" value="Status:"/>
+                                    <p:spacer height="5px"/>
+                                    <h:outputText id="sr-status-ot" value="#{cEActionRequestsBB.selectedRequest.requestStatus.statusTitle}"/>
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel styleClass="bold" for="ceactionrequeststatusmenu" value="Change status to:"/>
+                                    <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{cEActionRequestsBB.selectedChangeToStatus}">
+                                        <f:converter converterId="ceActionRequestStatusConverter"/>
+                                        <f:selectItems value="#{cEActionRequestsBB.statusList}"
+                                                       var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
+                                    </p:selectOneMenu>
+
+                                    <p:commandButton ajax="true" value="Change request status" 
+                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                     action="#{cEActionRequestsBB.changeActionRequestStatus}"/>
+
+                                    <h3>Request details</h3>
+                                    <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                 columnClasses="gridTd, gridTd" id="actionRequestManagePanelGrid">
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="ID"/>
+                                            <p:spacer height="5px"/>
+                                            <div class="wrapText">
+                                                <h:outputText id="sr-id-ot" value="#{cEActionRequestsBB.selectedRequest.requestID}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel class="bold" value="Issue Type" />
+                                            <p:spacer height="5px"/>
+                                            <div class="wrapText">
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel class="bold" value="Date Submitted" />
+                                            <p:spacer height="5px"/>
+                                            <div class="wrapText">
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.formattedSubmittedTimeStamp}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <div class="wrapText">
+                                                <h:outputLabel styleClass="bold" value="Human safety issue?"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.isUrgent}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <div class="wrapText">
+                                                <h:outputLabel styleClass="bold" value="Non-registered location"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.addressOfConcern}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel class="bold" value="Linked property" />
+                                            <p:spacer height="5px"/>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
+                                            </div>
+                                            <p:commandButton ajax="false" value="Change linked property" action="#{cEActionRequestsBB.updateActionRequest}"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+
+                                            <div class="wrapText">
+                                                <h:outputLabel styleClass="bold" value="Requestor (#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.personType.label}): "/>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.firstName} "/> 
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.lastName}"/><br/> 
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.address_street}"/> <br/>
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.address_city}, "/> 
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.address_state} "/> 
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.address_zip}"/> 
+                                            </div>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Contact: "/>
+                                            <p:spacer height="5px"/>
+                                            <div class="wrapText"> 
+                                                <h:outputText value="Phone (cell): "/>
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.phoneCell}"/> <br/>
+                                                <h:outputText value="Phone (work): "/>
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.phoneWork}"/> <br/>
+                                                <h:outputText value="Phone (home): "/>
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.phoneHome}"/> <br/>
+                                                <h:outputText value="Email: "/>
+                                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.email}"/>
+                                            </div>
+                                            <p:commandButton ajax="false" value="Verify person and maintain property link" action="#{cEActionRequestsBB.updateActionRequest}"/>
+                                            <p:commandButton ajax="false" value="Verify person but link to different property" action="#{cEActionRequestsBB.updateActionRequest}"/>
+                                        </h:panelGroup>
+
+                                        <f:facet name="footer" class="leftalign">
+                                            <h:outputLabel styleClass="bold" value="Request description"/>
+                                            <p:spacer height="15px"/>
+                                            <div class="rowExpansion" style="leftalign">
+                                                <h:outputText escape="false" value="#{cEActionRequestsBB.selectedRequest.requestDescription}"/>
+                                            </div>
+                                            <h:outputLabel styleClass="bold" value="System internal notes"/>
+                                            <p:inputTextarea value="#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Municipality notes"/>
+                                            <p:inputTextarea value="#{cEActionRequestsBB.selectedRequest.muniInternalNotes}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Public notes"/>
+                                            <p:inputTextarea value="#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
+                                            <p:spacer height="5px"/>
+                                        </f:facet>
+                                    </h:panelGrid>
+
+                                    <h3>Tools</h3>
+                                    <p:commandButton ajax="false" action="#{cEActionRequestsBB.updateActionRequest}"/>
+                                </h:form>
+                            </ui:remove>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <p:confirmDialog message="" 
+                                         severity="alert" widgetVar="connectDialog">
+                            <h2>Manage code enforcement action request</h2>
+
+                            <h:form id="connectForm">
+
+                                <h:outputLabel value="Code Enforcement Case ID"/>
+                                <p:inputText value="#{cEActionRequestsBB.ceCaseIDForConnection}"/>
+                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.connectActionRequestToCECase}"
+                                                 value="Connect" icon="fa fa-link" oncomplete="PF('connectDialog').hide()" 
+                                                 update="ceActionRequestsMessages"/>
+                                <p:spacer height="5px"/>
+                                <h:outputText value="#{cEActionRequestsBB.selectedRequest.requestStatus.statusTitle}"/>
+                                <p:spacer height="5px"/>
+
+                                <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{cEActionRequestsBB.selectedChangeToStatus}"
+                                                 rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
+                                    <f:converter converterId="ceActionRequestStatusConverter"/>
+                                    <p:ajax update="ceactionrequeststatusmenu"></p:ajax>
+                                    <f:selectItems value="#{cEActionRequestsBB.statusList}"
+                                                   var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
+                                </p:selectOneMenu>
+
+                            </h:form>
+                        </p:confirmDialog>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

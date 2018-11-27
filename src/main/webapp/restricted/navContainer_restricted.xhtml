@@ -192,11 +192,9 @@
                             <p:separator />
 
                             <p:submenu label="Public">
-                                <ui:remove>
                                     
-                                <p:menuitem value="Public Dashboard" action="publicPortal" ajax="false" icon="ui-icon-document" />
-                                </ui:remove>
-                                <p:menuitem value="Submit CE Action Request" action="ceActionRequest" ajax="false" icon="ui-icon-document"/>
+                                <p:menuitem value="Public Dashboard" action="systemHome" ajax="false" icon="ui-icon-document" />
+                                <p:menuitem value="Submit CE Action Request" action="requestCEActionFlow" ajax="false" icon="ui-icon-document"/>
                                 <p:menuitem value="PACC Search" action="paccSearch" ajax="false" icon="ui-icon-document"/>
                             </p:submenu>
 
@@ -244,7 +242,7 @@
                             <h:form id="sessionInfoFormRow2">
                                 <div class="activeObjectBox">
                                     <h:outputText styleClass="infoBarDataLabel" value="case: " />
-                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.activeCase.caseName}  "/> 
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.cECase}"/> 
                                     <p:commandButton styleClass="sessionInfoButton" 
                                                      action="caseEvents" 
                                                      value="log new event" 

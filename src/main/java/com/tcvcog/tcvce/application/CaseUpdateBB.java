@@ -142,7 +142,7 @@ public class CaseUpdateBB extends BackingBeanUtils implements Serializable{
      */
     public CECase getCurrentCase() {
         
-        currentCase = getSessionBean().getActiveCase();
+        currentCase = getSessionBean().getcECase();
         return currentCase;
     }
 

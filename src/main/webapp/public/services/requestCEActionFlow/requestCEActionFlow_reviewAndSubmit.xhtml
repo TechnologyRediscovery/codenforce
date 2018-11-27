@@ -26,10 +26,10 @@
                             
                             
                             <p>
-                                <h:outputText value="#{sessionBean.actionRequest.actionRequestorPerson.firstName}"/>
-                                <h:outputText value="#{sessionBean.actionRequest.muni.muniName}"/>
-                                <h:outputText value="#{sessionBean.actionRequest.requestProperty.address}"/>
-                                <h:outputText value="#{sessionBean.actionRequest.requestDescription}"/>
+                                <h:outputText value="#{sessionBean.workingActionRequest.actionRequestorPerson.firstName}"/>
+                                <h:outputText value="#{sessionBean.workingActionRequest.muni.muniName}"/>
+                                <h:outputText value="workingActionRequest.actionRequest.requestProperty.address}"/>
+                                <h:outputText value="workingActionRequest.actionRequest.requestDescription}"/>
                                 
                                 
                             </p>
@@ -38,7 +38,7 @@
                                 id="submitRequest" ajax="false"
                                 value="Submit Code Enforcement Request" 
                                 styleClass="buttonOwnLine" tabindex="1"
-                                action="#{actionRequestBean.submitActionRequest}"/>
+                                action="#{cEActionRequestSubmitBB.submitActionRequest}"/>
 
                         </h:form>
 

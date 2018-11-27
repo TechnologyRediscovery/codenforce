@@ -38,7 +38,7 @@ public class CECase implements Serializable{
     private User user;
     
     private List<CodeViolation> violationList;
-    private List<EventCase> eventList;
+    private List<EventCECase> eventList;
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
     private List<CEActionRequest> requestList;
@@ -214,14 +214,14 @@ public class CECase implements Serializable{
     /**
      * @return the eventList
      */
-    public List<EventCase> getEventList() {
+    public List<EventCECase> getEventList() {
         return eventList;
     }
 
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(ArrayList<EventCase> eventList) {
+    public void setEventList(ArrayList<EventCECase> eventList) {
         this.eventList = eventList;
     }
 

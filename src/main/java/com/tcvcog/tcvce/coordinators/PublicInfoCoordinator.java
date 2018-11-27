@@ -9,7 +9,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
@@ -110,8 +110,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setCaseManagerContact(c.getUser().getPhoneWork());
             
             
-            pib.setPublicEventList(new ArrayList<EventCase>());
-            for(EventCase ev: c.getEventList()){
+            pib.setPublicEventList(new ArrayList<EventCECase>());
+            for(EventCECase ev: c.getEventList()){
                 if(ev.isDiscloseToPublic()){
                     pib.getPublicEventList().add(ev);
                 }

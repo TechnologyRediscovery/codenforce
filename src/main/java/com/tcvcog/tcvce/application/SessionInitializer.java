@@ -76,7 +76,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                         + "| facesUserFromDB: " + extractedUser.getLName());
                 // get the user's default municipality
                 Municipality muni = extractedUser.getMuni();
-                getSessionBean().setKeyCard(extractedUser.getKeyCard());
+                getSessionBean().setAccessKeyCard(extractedUser.getKeyCard());
                 getSessionBean().setActiveMuni(muni);
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean

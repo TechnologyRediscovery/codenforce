@@ -17,7 +17,7 @@
                 <f:view>
                     <div class="mainContainer">
 
-                        <h1>Manage action request ID: <h:outputText id="actionRequestStatusOT" value="#{actionRequestManageBB.currentRequest.requestID}"/></h1>
+                        <h1>Manage action request ID: <h:outputText id="actionRequestStatusOT" value="#{actionRequestManageBB.selectedRequest.requestID}"/></h1>
 
 
                         <h:form>
@@ -25,7 +25,7 @@
 
                             <h:outputLabel styleClass="bold" value="Status:"/>
                             <p:spacer height="5px"/>
-                            <h:outputText value="#{actionRequestManageBB.currentRequest.requestStatus.statusTitle}"/>
+                            <h:outputText value="#{actionRequestManageBB.selectedRequest.requestStatus.statusTitle}"/>
                             <p:spacer height="5px"/>
 
                             <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{actionRequestManageBB.searchParams.requestStatus}">
@@ -35,7 +35,7 @@
                             </p:selectOneMenu>
                             
                             <p:commandButton ajax="true" value="Change request status" 
-                                             update="actionRequestStatusOT" rendered="#{sessionBean.keyCard.hasEnfOfficialPermissions}"
+                                             update="actionRequestStatusOT" rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
                                              action="#{actionRequestManageBB.changeActionRequestStatus}"/>
 
 
@@ -47,7 +47,7 @@
                                     <h:outputLabel styleClass="bold" value="ID"/>
                                     <p:spacer height="5px"/>
                                     <div class="wrapText">
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.requestID}"/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.requestID}"/>
                                     </div>
                                 </h:panelGroup>
 
@@ -56,7 +56,7 @@
                                     <h:outputLabel class="bold" value="Issue Type" />
                                     <p:spacer height="5px"/>
                                     <div class="wrapText">
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.issueTypeString}"/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.issueTypeString}"/>
                                     </div>
                                 </h:panelGroup>
 
@@ -64,7 +64,7 @@
                                     <h:outputLabel class="bold" value="Date Submitted" />
                                     <p:spacer height="5px"/>
                                     <div class="wrapText">
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.formattedSubmittedTimeStamp}"/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.formattedSubmittedTimeStamp}"/>
                                     </div>
                                 </h:panelGroup>
 
@@ -72,7 +72,7 @@
                                     <div class="wrapText">
                                         <h:outputLabel styleClass="bold" value="Human safety issue?"/>
                                         <p:spacer height="5px"/>
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.isUrgent}"/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.isUrgent}"/>
                                     </div>
                                 </h:panelGroup>
 
@@ -82,7 +82,7 @@
                                     <div class="wrapText">
                                         <h:outputLabel styleClass="bold" value="Non-registered location"/>
                                         <p:spacer height="5px"/>
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.addressOfConcern}"/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.addressOfConcern}"/>
                                     </div>
                                 </h:panelGroup>
 
@@ -91,8 +91,8 @@
                                     <h:outputLabel class="bold" value="Linked property" />
                                     <p:spacer height="5px"/>
                                     <div class="rowExpansion">
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.requestProperty.address}"/>
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.requestProperty.muni.muniName}"/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.requestProperty.address}"/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.requestProperty.muni.muniName}"/>
                                     </div>
                                     <p:commandButton ajax="false" value="Change linked property" action="#{actionRequestManageBB.updateActionRequest}"/>
                                 </h:panelGroup>
@@ -101,28 +101,28 @@
                                 <h:panelGroup>
 
                                     <div class="wrapText">
-                                        <h:outputLabel styleClass="bold" value="Requestor (#{actionRequestManageBB.currentRequest.actionRequestorPerson.personType.label}): "/>
+                                        <h:outputLabel styleClass="bold" value="Requestor (#{actionRequestManageBB.selectedRequest.actionRequestorPerson.personType.label}): "/>
                                         <p:spacer height="5px"/>
 
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.firstName} "/> 
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.lastName}"/><br/> 
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.address_street}"/> <br/>
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.address_city}, "/> 
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.address_state} "/> 
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.address_zip}"/> 
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.firstName} "/> 
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.lastName}"/><br/> 
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.address_street}"/> <br/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.address_city}, "/> 
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.address_state} "/> 
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.address_zip}"/> 
                                     </div>
                                     <p:spacer height="5px"/>
                                     <h:outputLabel styleClass="bold" value="Contact: "/>
                                     <p:spacer height="5px"/>
                                     <div class="wrapText"> 
                                         <h:outputText value="Phone (cell): "/>
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.phoneCell}"/> <br/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.phoneCell}"/> <br/>
                                         <h:outputText value="Phone (work): "/>
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.phoneWork}"/> <br/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.phoneWork}"/> <br/>
                                         <h:outputText value="Phone (home): "/>
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.phoneHome}"/> <br/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.phoneHome}"/> <br/>
                                         <h:outputText value="Email: "/>
-                                        <h:outputText value="#{actionRequestManageBB.currentRequest.actionRequestorPerson.email}"/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.email}"/>
                                     </div>
                                     <p:commandButton ajax="false" value="Verify person and maintain property link" action="#{actionRequestManageBB.updateActionRequest}"/>
                                     <p:commandButton ajax="false" value="Verify person but link to different property" action="#{actionRequestManageBB.updateActionRequest}"/>
@@ -134,18 +134,18 @@
                                     <h:outputLabel styleClass="bold" value="Request description"/>
                                     <p:spacer height="15px"/>
                                     <div class="rowExpansion" style="leftalign">
-                                        <h:outputText escape="false" value="#{actionRequestManageBB.currentRequest.requestDescription}"/>
+                                        <h:outputText escape="false" value="#{actionRequestManageBB.selectedRequest.requestDescription}"/>
                                     </div>
                                     <h:outputLabel styleClass="bold" value="System internal notes"/>
-                                    <p:inputTextarea value="#{actionRequestManageBB.currentRequest.cogInternalNotes}"/>
+                                    <p:inputTextarea value="#{actionRequestManageBB.selectedRequest.cogInternalNotes}"/>
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel styleClass="bold" value="Municipality notes"/>
-                                    <p:inputTextarea value="#{actionRequestManageBB.currentRequest.muniInternalNotes}"/>
+                                    <p:inputTextarea value="#{actionRequestManageBB.selectedRequest.muniInternalNotes}"/>
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel styleClass="bold" value="Public notes"/>
-                                    <p:inputTextarea value="#{actionRequestManageBB.currentRequest.publicExternalNotes}"/>
+                                    <p:inputTextarea value="#{actionRequestManageBB.selectedRequest.publicExternalNotes}"/>
                                     <p:spacer height="5px"/>
                                 </f:facet>
                             </h:panelGrid>

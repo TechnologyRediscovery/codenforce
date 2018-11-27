@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.domain.EventExceptionDeprecated;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
@@ -280,11 +280,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * Attaches an Event to a code enforcement case. No checking of logic occurs
      * in this integration method, so the caller should always be a coordiantor
      * who has vetted the event and the associated case.
-     * @param event a fully-baked event ready for insertion. An EventCase contains
-     * an integer of the caseID to which the event should be attached
+     * @param event a fully-baked event ready for insertion. An EventCECase contains
+ an integer of the caseID to which the event should be attached
      * @throws IntegrationException when the system is unable to store event in DB
      */
-    public void insertEvent(EventCase event) throws IntegrationException{
+    public void insertEvent(EventCECase event) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         int insertedEventID = 0;
         
@@ -357,7 +357,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     
     
-    public void updateEvent(EventCase event, boolean clearViewConfirmation) throws IntegrationException{
+    public void updateEvent(EventCECase event, boolean clearViewConfirmation) throws IntegrationException{
         String query = "UPDATE public.ceevent\n" +
             "   SET ceeventcategory_catid=?, cecase_caseid=?, dateofrecord=?, \n" +
             "       eventtimestamp=now(), eventdescription=?, login_userid=?, disclosetomunicipality=?, \n" +
@@ -407,7 +407,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private void clearViewConfFromEvent(EventCase ec) throws IntegrationException{
+    private void clearViewConfFromEvent(EventCECase ec) throws IntegrationException{
         String query = "UPDATE ceevent SET viewconfirmedby = null, "
                 + "viewconfirmedat = null WHERE eventid = ?;";
         
@@ -432,7 +432,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public void deleteEvent(EventCase event) throws IntegrationException{
+    public void deleteEvent(EventCECase event) throws IntegrationException{
         String query = "DELETE FROM public.ceevent WHERE eventid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -456,8 +456,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private EventCase generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException{
-        EventCase ev = new EventCase();
+    private EventCECase generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException{
+        EventCECase ev = new EventCECase();
         UserIntegrator ui = getUserIntegrator();
         
         ev.setEventID(rs.getInt("eventid"));
@@ -581,9 +581,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public List<EventCase> getEventsRequiringViewConfirmation(User u){
-        EventCase ev = null;
-        ArrayList<EventCase> eventList = new ArrayList<>();
+    public List<EventCECase> getEventsRequiringViewConfirmation(User u){
+        EventCECase ev = null;
+        ArrayList<EventCECase> eventList = new ArrayList<>();
         
         String query = "";
         Connection con = getPostgresCon();
@@ -615,7 +615,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public void confirmEventView(User u, EventCase ev) throws IntegrationException{
+    public void confirmEventView(User u, EventCECase ev) throws IntegrationException{
         
         String query = "UPDATE ceevent SET viewconfirmedby = ?,\n" +
 "		viewconfirmedat = now()\n" +
@@ -640,8 +640,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
 
-    public EventCase getEventByEventID(int eventID) throws IntegrationException{
-        EventCase ev = null;
+    public EventCECase getEventByEventID(int eventID) throws IntegrationException{
+        EventCECase ev = null;
         
         String query = "SELECT * FROM public.ceevent WHERE eventid = ?;";
         Connection con = getPostgresCon();
@@ -672,8 +672,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;
     }
     
-    public ArrayList<EventCase> getEventsByCaseID(int caseID) throws IntegrationException{
-        ArrayList<EventCase> eventList = new ArrayList();
+    public ArrayList<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException{
+        ArrayList<EventCECase> eventList = new ArrayList();
         
         String query = "SELECT * FROM public.ceevent WHERE cecase_caseid = ?;";
         Connection con = getPostgresCon();

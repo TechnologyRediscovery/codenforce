@@ -25,8 +25,10 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/NavigationBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/PersonIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/domain/BaseException.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CEActionRequestsBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/User.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/integration/OccupancyPermitIntegrator.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/EventCECase.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/search/SearchParamsCECase.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/domain/ViolationException.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/MuniBB.java
@@ -37,7 +39,6 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PropertyProfileBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/CodeElementGuideEntry.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CodeElementListBB.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CeActionRequestsBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/resultsets/PropertySet.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/coordinators/PaymentCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/entities/Payment.java
@@ -45,9 +46,11 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/MissionControlBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/NoticeOfViolation.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/entities/SpaceType.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CECasesBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CodeSourceAddUpdateBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/CaseIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/domain/IntegrationException.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CENoticeAcknowledgementsBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/CodeSet.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PersonConnectBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/NoticeOfViolationBB.java
@@ -56,7 +59,6 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/courtEntityIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/integration/OccupancyInspectionIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/Municipality.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/ActionRequestBean.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CitationBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/CitationStatus.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/integration/ChecklistIntegrator.java
@@ -76,7 +78,6 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/Person.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/CodeElement.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/SystemServicesBB.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CeCasesBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CodeSourceBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CodeSetBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/EventAddBB.java
@@ -111,15 +112,16 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/PublicInfoBundle.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CourtEntityBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/entities/OccPermitType.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CEActionRequestSubmitBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/PersonUpdateBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/application/OccupancyInspectionFeeBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/PropertyUnit.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/SystemIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/TextBlockConverter.java
+/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CEComplianceTimeframeClosingsBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/Status.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/CEActionRequest.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/RoleType.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/entities/EventCase.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/util/EntityConverter.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/coordinators/PropertyUnitCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/SessionBean.java
@@ -129,7 +131,6 @@
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/CodeElementBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/occupancy/coordinators/OccupancyCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/domain/DataStoreException.java
-/home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/ActionRequestManageBB.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/integration/LogIntegrator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/coordinators/LogCoordinator.java
 /home/sylvia/NetBeansProjects/tcvce_mvn2/src/main/java/com/tcvcog/tcvce/application/UserBB.java

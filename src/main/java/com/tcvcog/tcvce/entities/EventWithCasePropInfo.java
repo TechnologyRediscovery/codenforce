@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class EventWithCasePropInfo extends EventCase implements Serializable {
+public class EventWithCasePropInfo extends EventCECase implements Serializable {
     
     private Property eventProp;
     private CECase eventCase;

@@ -573,7 +573,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         sb.append("WHERE muni_municode = ? "); // param 1
 
         // as long as this isn't an ID only search, do the normal SQL building process
-        if (!params.isUseRequestID()) {
+         if (!params.isUseRequestID()) {
             sb.append("AND submittedtimestamp BETWEEN ? AND ? "); // parm 2 and 3 without ID
             
             if(params.isUseRequestStatus()){
