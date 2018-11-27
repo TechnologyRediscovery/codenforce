@@ -40,7 +40,7 @@ public class ActionRequestConfirmation extends BackingBeanUtils implements Seria
      */
     public CEActionRequest getActionRequest() {
         
-        actionRequest = getSessionBean().getActionRequest();
+        actionRequest = getSessionBean().getcEActionRequest();
         
         return actionRequest;
     }

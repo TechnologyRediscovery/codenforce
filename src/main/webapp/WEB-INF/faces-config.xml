@@ -255,10 +255,17 @@
   
     <managed-bean>
         <description>Coordinates view-coordinator ignteractions around code enforcement actions</description>
-        <managed-bean-name>actionRequestBean</managed-bean-name>
+        <managed-bean-name>cEActionRequestsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+  
+    <managed-bean>
+        <description>Used by the submission system for action requests</description>
+        <managed-bean-name>cEActionRequestSubmitBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestSubmitBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <description>Provides backing bean utilities for the action requestmanagement.xhtml page</description>
@@ -361,9 +368,9 @@
     
     <managed-bean>
         <managed-bean-name>ceCasesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CeCasesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECasesBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>caseProfileBB</managed-bean-name>
@@ -605,8 +612,8 @@
     <navigation-rule>
         <from-view-id>*</from-view-id>  
         <navigation-case>
-            <from-outcome>ceActionRequest</from-outcome>
-            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</to-view-id>
+            <from-outcome>cEActionRequests</from-outcome>
+            <to-view-id>/restricted/cogview/cEActionRequests.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -670,7 +677,7 @@
 
     
     <navigation-rule>
-        <from-view-id>/restricted/cogview/ceCases.xhtml</from-view-id>
+        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
         
         <navigation-case>
             <from-action>#{ceCasesBB.viewCase}</from-action>
@@ -687,7 +694,7 @@
         
         <navigation-case>
             <from-outcome>ceCases</from-outcome>
-            <to-view-id>/restricted/cogview/ceCases.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -887,7 +894,7 @@
 
         <navigation-case>
             <from-outcome>ceCases</from-outcome>
-            <to-view-id>/restricted/cogview/ceCases.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
 
@@ -983,7 +990,7 @@
         <navigation-case>
             <from-action>#{caseAddBB.addNewCase}</from-action>
             <from-outcome>ceCases</from-outcome>
-            <to-view-id>/restricted/cogview/ceCases.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -1303,9 +1310,9 @@
     </managed-bean>
     <managed-bean>
         <managed-bean-name>actionRequestManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ActionRequestManageBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>publicInfoBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
@@ -1328,6 +1335,16 @@
     <managed-bean>
         <managed-bean-name>municipalityManageBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cEComplianceTimeframeClosingsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEComplianceTimeframeClosingsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cENoticeAcknowledgementsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CENoticeAcknowledgementsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

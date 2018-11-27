@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
@@ -30,7 +30,7 @@ import javax.faces.application.FacesMessage;
  *
  * @author Eric C. Darsow
  */
-public class CeCasesBB extends BackingBeanUtils implements Serializable{
+public class CECasesBB extends BackingBeanUtils implements Serializable{
 
     
     private ArrayList<CECase> caseList;
@@ -39,17 +39,17 @@ public class CeCasesBB extends BackingBeanUtils implements Serializable{
     private ArrayList<CECase> caseHistoryList;
     private ArrayList<CECase> filteredCaseHistoryList;
     private CECase selectedCase;
-    private ArrayList<EventCase> recentEventList;
+    private ArrayList<EventCECase> recentEventList;
     private ArrayList<Person> muniPeopleList;
     
     /**
      * Creates a new instance of ceCasesBB
      */
-    public CeCasesBB() {
+    public CECasesBB() {
     }
     
     public String viewCase(CECase c){
-        getSessionBean().setActiveCase(c);
+        getSessionBean().setcECase(c);
         // make the property associated with a selected case the active property
         getSessionBean().setActiveProp(c.getProperty());
         return "caseProfile";
@@ -102,7 +102,7 @@ public class CeCasesBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the recentEventList
      */
-    public ArrayList<EventCase> getRecentEventList() {
+    public ArrayList<EventCECase> getRecentEventList() {
         return recentEventList;
     }
 
@@ -123,7 +123,7 @@ public class CeCasesBB extends BackingBeanUtils implements Serializable{
     /**
      * @param recentEventList the recentEventList to set
      */
-    public void setRecentEventList(ArrayList<EventCase> recentEventList) {
+    public void setRecentEventList(ArrayList<EventCECase> recentEventList) {
         this.recentEventList = recentEventList;
     }
 

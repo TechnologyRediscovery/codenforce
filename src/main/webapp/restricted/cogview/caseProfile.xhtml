@@ -197,7 +197,7 @@
                                     
                                     
                                     <p:commandLink value="Export event history as pdf" ajax="false">
-                                        <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{sessionBean.activeCase.property.address}_idno#{sessionBean.activeCase.caseID}_eventHistory"/>
+                                        <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{sessionBean.activeCECase.property.address}_idno#{sessionBean.activeCECase.caseID}_eventHistory"/>
                                     </p:commandLink>
 
 
@@ -760,6 +760,8 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Link" />
                                             </f:facet>
+                                            <!--work out what to do with these references-->
+                                            
                                             <p:commandButton icon="fa fa-link" action="#{ceActionRequestsBB.viewSelectedActionRequest}">
                                                 <f:setPropertyActionListener value="#{r}" target="#{ceActionRequestsBB.selectedRequest}"/>
                                             </p:commandButton>

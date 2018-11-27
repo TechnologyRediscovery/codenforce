@@ -380,6 +380,11 @@ div.headerLink a:before, a:visited{
 .mainContainer{
 }
 
+.mainContainerDashboard{
+    width:800px;
+    display:block;
+}
+
 
 .primaryContentContainer{
   
@@ -530,30 +535,6 @@ div.headerLinkCont{
 
 
 
-/* ****************** CLOSE DIVS ************************/
-
-
-
-
-/* --------------- IMAGES ---------------------------*/
-
-
-img{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-img.header{
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-
-
-
-/*************** END IMAGES ****************************/
-
 
 div.headerLinks{
     display: block;
@@ -583,7 +564,44 @@ div.ccBox{
 }
 
 
+/* ****************** CLOSE DIVS ************************/
 
+
+
+
+/* --------------- IMAGES ---------------------------*/
+
+
+img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img.header{
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+
+
+
+/*************** END IMAGES ****************************/
+
+
+/* ------------------DASHBOARD STYLES ----------------------*/
+
+.bignum{
+    font-size: 600%;
+    font-weight: bold;
+}
+
+.bignum-header{
+    font-weight: bold;
+}
+
+
+/*************** END DASHBOARD ****************************/
 
 
 /* ------------------TABLE STYLES ----------------------*/
@@ -665,6 +683,14 @@ td.userBarTd{
 
 .leftalign{
     text-align: left;
+}
+
+gridTd-bignum{
+}
+
+.gridTd-mccontainer{
+    background-color: #163F8A;
+    
 }
 
 /***********************CLOSE TABLE STYLES**********************/

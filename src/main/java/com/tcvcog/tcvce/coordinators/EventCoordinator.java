@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
@@ -87,7 +87,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return an initialized event with basic properties set
      * @throws CaseLifecyleException thrown if the case is in an improper state for proposed event
      */
-    public EventCase getInitializedEvent(CECase c, EventCategory ec) throws CaseLifecyleException{
+    public EventCECase getInitializedEvent(CECase c, EventCategory ec) throws CaseLifecyleException{
         
         // check to make sure the case isn't closed before allowing event into the switched blocks
         if(c.getCasePhase() == CasePhase.Closed && 
@@ -105,7 +105,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         // the moment of event instantiaion!!!!
-        EventCase event = new EventCase();
+        EventCECase event = new EventCECase();
         event.setCategory(ec);
         event.setActiveEvent(true);
         event.setHidden(false);
@@ -118,10 +118,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * For use by the public messaging system which attaches events to code enforcement
      * cases without having access to the entire CECase object--only the caseid
      * @param caseID to which the event should be attached
-     * @return an instantiated EventCase object ready to be configured
+     * @return an instantiated EventCECase object ready to be configured
      */
-    public EventCase getInitializedEvent(int caseID){
-        EventCase event = new EventCase();
+    public EventCECase getInitializedEvent(int caseID){
+        EventCECase event = new EventCECase();
         event.setCaseID(caseID);
         return event;
         
@@ -170,7 +170,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCategory ec = getInitiatlizedEventCategory(publicMessageEventCategory);
         
         // setup all the event properties
-        EventCase event = getInitializedEvent(caseID);
+        EventCECase event = getInitializedEvent(caseID);
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
         event.setEventDescription(message);
@@ -200,7 +200,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException bubbled up from the integrator
      * @throws EventException 
      */
-    public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCase event) throws IntegrationException, EventException{
+    public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCECase event) throws IntegrationException, EventException{
         EventIntegrator ei = getEventIntegrator();
         String updateViolationDescr = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("violationChangeEventDescription");
         // fetch the event category id from the event category bundle under the key updateViolationEventCategoryID
@@ -233,8 +233,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return a partially-baked event ready for inserting
      * @throws IntegrationException 
      */
-    public EventCase generateViolationComplianceEvent(List<CodeViolation> violationList) throws IntegrationException{
-        EventCase e = new EventCase();
+    public EventCECase generateViolationComplianceEvent(List<CodeViolation> violationList) throws IntegrationException{
+        EventCECase e = new EventCECase();
         EventIntegrator ei = getEventIntegrator();
           e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
@@ -273,7 +273,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return new ArrayList<>();
     }
     
-    public String updateEvent(EventCase event, boolean clearViewConfirmation) throws IntegrationException{
+    public String updateEvent(EventCECase event, boolean clearViewConfirmation) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ei.updateEvent(event, clearViewConfirmation);
         
@@ -281,7 +281,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public void insertEvent(EventCase e) throws IntegrationException{
+    public void insertEvent(EventCECase e) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ei.insertEvent(e);
         
@@ -299,7 +299,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws CaseLifecyleException
      * @throws ViolationException 
      */
-    public void initiateEventProcessing(CECase c, EventCase e) throws IntegrationException, CaseLifecyleException, ViolationException{
+    public void initiateEventProcessing(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseCoordinator cc = getCaseCoordinator();
         
         cc.processCEEvent(c, e);
@@ -309,7 +309,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public ArrayList getEventList(CECase currentCase) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ArrayList<EventCase> ll = ei.getEventsByCaseID(currentCase.getCaseID());
+        ArrayList<EventCECase> ll = ei.getEventsByCaseID(currentCase.getCaseID());
         return ll;
     }
     
@@ -326,8 +326,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         EventIntegrator ei = getEventIntegrator();
         
-        CECase c = getSessionBean().getActiveCase();
-        EventCase event = getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
+        CECase c = getSessionBean().getcECase();
+        EventCECase event = getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("casePhaseChangeEventCatID"))));
         
         StringBuilder sb = new StringBuilder();
@@ -356,8 +356,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) throws IntegrationException, CaseLifecyleException{
           EventIntegrator ei = getEventIntegrator();
         
-        CECase c = getSessionBean().getActiveCase();
-        EventCase event = getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
+        CECase c = getSessionBean().getcECase();
+        EventCECase event = getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("casePhaseManualOverride"))));
         
         StringBuilder sb = new StringBuilder();
@@ -393,10 +393,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException
      * @throws CaseLifecyleException 
      */
-    public EventCase getActionEventForCaseAdvancement(CECase c) throws IntegrationException, CaseLifecyleException{
+    public EventCECase getActionEventForCaseAdvancement(CECase c) throws IntegrationException, CaseLifecyleException{
         CasePhase cp = c.getCasePhase();
         EventIntegrator ei = getEventIntegrator();
-        EventCase e = new EventCase();
+        EventCECase e = new EventCECase();
         
         switch(cp){
             case PrelimInvestigationPending:
