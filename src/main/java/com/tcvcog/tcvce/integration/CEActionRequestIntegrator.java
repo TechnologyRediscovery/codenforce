@@ -71,24 +71,42 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+    }
+    public void updateActionRequestNotes(CEActionRequest request) throws IntegrationException {
+        String q = "UPDATE public.ceactionrequest "
+                + "SET coginternalnotes = ?, "
+                + "muniinternalnotes = ?,"
+                + "publicexternalnotes = ? "
+                + "WHERE requestid = ?;";
+
+        // for degugging
+        // System.out.println("Select Statement: ");
+        // System.out.println(sb.toString());
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(q);
+            stmt.setString(1, request.getCogInternalNotes());
+            stmt.setString(2, request.getMuniInternalNotes());
+            stmt.setString(3, request.getPublicExternalNotes());
+            stmt.setInt(4, request.getRequestID());
+            System.out.println("CEActionRequestorIntegrator.attachMessageToCEActionRequest | statement: " + stmt.toString());
+            // Retrieve action data from postgres
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
     }
 
@@ -100,7 +118,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
                 + "	dateofrecord, addressofconcern, \n"
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
-                + "	cecase_caseid, coginternalnotes, \n"
+                + "	cecase_caseid, coginternalnotes, status_id, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
                 + "	actionRqstIssueType.typeName AS typename\n"
                 + "	FROM public.ceactionrequest \n"
@@ -130,24 +148,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("CEActionRequestorIntegrator.getActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return requestList;
     } // close getActionRequest
@@ -226,18 +229,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("Integration Error: Problem inserting new Code Enforcement Action Request", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
 
     }
@@ -249,14 +242,16 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         PropertyIntegrator propI = getPropertyIntegrator();
+        
+        actionRequest.setRequestStatus(getRequestStatus(rs.getInt("status_id")));
 
         actionRequest.setRequestID(rs.getInt("requestid"));
         actionRequest.setRequestPublicCC(rs.getInt("requestPubliccc"));
         actionRequest.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
         actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
-        if (!actionRequest.isIsAtKnownAddress()) {
-            actionRequest.setRequestProperty(propI.getProperty(rs.getInt("property_propertyID")));
-        }
+//        if (!actionRequest.isIsAtKnownAddress()) {
+        actionRequest.setRequestProperty(propI.getProperty(rs.getInt("property_propertyID")));
+//        }
         actionRequest.setActionRequestorPerson(pi.getPerson(rs.getInt("actrequestor_requestorid")));
 
         actionRequest.setIssueType_issueTypeID(rs.getInt("issuetype_issuetypeid"));
@@ -318,18 +313,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("Integration Error: Problem connecting action request to cecase", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
 
@@ -339,7 +325,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         sb.append("SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, \n"
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
-                + "	dateofrecord, addressofconcern, \n"
+                + "	dateofrecord, addressofconcern, status_id, \n"
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
@@ -372,75 +358,37 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return newActionRequest;
     } // close getActionRequest
 
-    public void updateActionRequest(CEActionRequest req) throws IntegrationException {
-        CEActionRequest newActionRequest = null;
+    public void updateActionRequestStatus(CEActionRequest req) throws IntegrationException {
 
-        String q = "";
+        String q = "UPDATE ceactionrequest SET status_id = ? WHERE requestid = ?;";
 
-        // for degugging
-        // System.out.println("Select Statement: ");
-        // System.out.println(sb.toString());
         Connection con = null;
         PreparedStatement stmt = null;
-        ResultSet rs = null;
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
-//            stmt.setInt(1, req.get);
-            System.out.println("CEActionRequestorIntegrator.getActionRequest | statement: " + stmt.toString());
+            stmt.setInt(1, req.getRequestStatus().getStatusID());
+            stmt.setInt(2, req.getRequestID());
+            System.out.println("CEActionRequestorIntegrator.updateActionRequestStatus | statement: " + stmt.toString());
             // Retrieve action data from postgres
-            rs = stmt.executeQuery();
+            stmt.executeUpdate();
 
-            // loop through the result set and reat an action request from each
-            while (rs.next()) {
-                newActionRequest = generateActionRequestFromRS(rs);
-                System.out.println("CEActionRequestorIntegrator.getActionRequest | Retrieved Request: " + newActionRequest.getRequestID());
-            }
-
+            
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
 
     }
@@ -457,7 +405,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         }
         return arqs;
     }
-
+    
+    
     public List<CEActionRequestStatus> getRequestStatusList() throws IntegrationException {
 
         List<CEActionRequestStatus> statusList = new ArrayList();
@@ -481,26 +430,42 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("CEActionRequestorIntegrator.getActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return statusList;
+    }
+
+    public CEActionRequestStatus getRequestStatus(int statusID) throws IntegrationException {
+
+        CEActionRequestStatus status = null;
+        String query = "SELECT statusid, title, description\n"
+                + "  FROM public.ceactionrequeststatus WHERE statusid = ?;";
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1,statusID);
+            rs = stmt.executeQuery();
+
+            // loop through the result set and reat an action request from each
+            while (rs.next()) {
+                status = generateCEActionRequestStatus(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return status;
     }
 
     public ArrayList getCEActionRequestList(int muniCode) throws IntegrationException {
@@ -527,24 +492,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
 
         }// close try/catch
 
@@ -641,24 +592,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
 
         }// close try/catch
 
@@ -689,24 +626,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             System.out.println(ex);
             throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
 
         }// close try/catch
 

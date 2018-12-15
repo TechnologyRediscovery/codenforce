@@ -224,6 +224,7 @@
                                     <p:commandButton value="switch" styleClass="sessionInfoButton" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
                                     <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
                                         <f:converter converterId="muniConverter"/>
+                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
                                         <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                     </p:selectOneMenu>
                                     <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 

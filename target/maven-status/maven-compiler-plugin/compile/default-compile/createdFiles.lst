@@ -5,6 +5,7 @@ com/tcvcog/tcvce/entities/PropertyWithLists.class
 com/tcvcog/tcvce/entities/CodifiedMunicipality.class
 com/tcvcog/tcvce/occupancy/application/OccupancyPermitTypeBB.class
 com/tcvcog/tcvce/occupancy/entities/OccInspecStatus.class
+com/tcvcog/tcvce/application/CECasesBB.class
 com/tcvcog/tcvce/integration/CodeViolationIntegrator.class
 com/tcvcog/tcvce/application/SessionInitializer.class
 testing/InspectableCodeElementIntegrator.class
@@ -34,6 +35,7 @@ testing/RoomType.class
 com/tcvcog/tcvce/coordinators/ViolationCoordinator.class
 com/tcvcog/tcvce/application/TextBlockBB.class
 com/tcvcog/tcvce/application/DashboardDataBB.class
+com/tcvcog/tcvce/application/CEActionRequestsBB.class
 com/tcvcog/tcvce/application/NavMenuBean$1.class
 com/tcvcog/tcvce/coordinators/CaseCoordinator.class
 com/tcvcog/tcvce/entities/Status.class
@@ -69,6 +71,7 @@ com/tcvcog/tcvce/occupancy/entities/Space.class
 com/tcvcog/tcvce/coordinators/PublicInfoCoordinator.class
 com/tcvcog/tcvce/entities/KeyCard.class
 com/tcvcog/tcvce/application/PropertyProfileBB.class
+com/tcvcog/tcvce/entities/search/SearchParamsCECase.class
 com/tcvcog/tcvce/domain/ViolationException.class
 com/tcvcog/tcvce/coordinators/UserCoordinator$1.class
 com/tcvcog/tcvce/entities/CitationStatus.class
@@ -77,6 +80,7 @@ com/tcvcog/tcvce/occupancy/entities/OccInspecFee.class
 com/tcvcog/tcvce/application/CheckRequestStatusBean.class
 com/tcvcog/tcvce/application/CodeSetElementBB.class
 com/tcvcog/tcvce/integration/CaseIntegrator.class
+com/tcvcog/tcvce/application/MunicipalityManageBB.class
 com/tcvcog/tcvce/entities/PropertyUnit.class
 com/tcvcog/tcvce/domain/EventExceptionDeprecated.class
 com/tcvcog/tcvce/application/MuniBB.class
@@ -90,6 +94,7 @@ com/tcvcog/tcvce/application/CodeElementListBB.class
 com/tcvcog/tcvce/occupancy/coordinators/PaymentCoordinator.class
 com/tcvcog/tcvce/domain/BaseException.class
 com/tcvcog/tcvce/coordinators/LogCoordinator.class
+com/tcvcog/tcvce/application/CEComplianceTimeframeClosingsBB.class
 com/tcvcog/tcvce/entities/RoleType.class
 com/tcvcog/tcvce/application/Initializer.class
 com/tcvcog/tcvce/util/CEActionRequestStatusConverter.class
@@ -113,6 +118,7 @@ com/tcvcog/tcvce/application/UserBB.class
 com/tcvcog/tcvce/entities/CodeElementGuideEntry.class
 com/tcvcog/tcvce/entities/Person.class
 com/tcvcog/tcvce/application/EventEditBB.class
+com/tcvcog/tcvce/application/CEActionRequestSubmitBB.class
 com/tcvcog/tcvce/application/NavMenuBean.class
 com/tcvcog/tcvce/application/CourtEntityBB.class
 com/tcvcog/tcvce/application/SpaceTypeBB.class
@@ -158,8 +164,10 @@ com/tcvcog/tcvce/integration/CitationIntegrator.class
 com/tcvcog/tcvce/util/EventCategoryConverter.class
 com/tcvcog/tcvce/integration/PersonIntegrator.class
 com/tcvcog/tcvce/integration/CodeIntegrator.class
+com/tcvcog/tcvce/application/CENoticeAcknowledgementsBB.class
 com/tcvcog/tcvce/coordinators/CodeCoordinator.class
 com/tcvcog/tcvce/entities/CodeViolation.class
+com/tcvcog/tcvce/entities/EventCECase.class
 com/tcvcog/tcvce/integration/courtEntityIntegrator.class
 com/tcvcog/tcvce/coordinators/EventCoordinator.class
 testing/InspectableCodeElement.class

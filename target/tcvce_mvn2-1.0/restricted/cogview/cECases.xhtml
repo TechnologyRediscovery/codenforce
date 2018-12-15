@@ -27,7 +27,12 @@
                                 <h2>CE Case docket</h2>
 
                                 <h:form id="caseViewForm">
-                                    <p:commandLink ajax="false" actionListener="#{missionControlBB.testPDF}" value="Export simple PDF"/>
+                                    
+                                    
+                                    <p:commandLink value="Export case docket as pdf" ajax="false">
+                                        <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
+                                    </p:commandLink>
+                                    <p:spacer height="15px"/>
                                     <p:dataTable
                                         id="caseTable"
                                         var="c"
@@ -171,11 +176,6 @@
                                         </p:rowExpansion>
                                     </p:dataTable>
 
-                                    <p:spacer height="10px"/>
-
-                                    <p:commandLink value="Export case docket as pdf" ajax="false">
-                                        <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
-                                    </p:commandLink>
 
                                     <p:spacer height="10px"/>
                                 </h:form>

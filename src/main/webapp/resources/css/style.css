@@ -381,7 +381,7 @@ div.headerLink a:before, a:visited{
 }
 
 .mainContainerDashboard{
-    width:800px;
+
     display:block;
 }
 
@@ -418,14 +418,6 @@ p.note{
     font-style: italic;
 }
 
-img.headerImg{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-
-
 div.headerLinkCont{
     display: inline-block;
     float: right;
@@ -444,11 +436,14 @@ div.headerLinkCont{
 .userToolBar{
     display: block;
     float: right;
-    clear: none;
-    height: 90px;
+    clear: none; 
+   height: 90px;
 }
 
-
+.gridTd-splitPage{
+    max-width: 600px;
+    vertical-align: top;
+}
 
 
 /* *********END MAIN PAGE LAYOUT BOXES ***************/
@@ -582,6 +577,14 @@ img.header{
     margin-top: 15px;
     margin-bottom: 15px;
 }
+
+
+img.headerImg{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 
 
 
