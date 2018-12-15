@@ -199,6 +199,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             sb.append(current.toString());
             sb.append("<br/><br/>");
             sb.append(message);
+            sb.append("<br/><br/>");
             System.out.println("PublicInfoCoordinator.attachmessagToBundle | message: " + sb.toString());
             ceari.attachMessageToCEActionRequest(requestBundle, sb.toString());
         } else if(bundle.getTypeName().equals("CECASE")){

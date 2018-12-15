@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 
 /**
  * Models the entity: code enforcement action request.This object blends data from several database tables to create
@@ -439,6 +440,125 @@ public class CEActionRequest implements Serializable{
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
         dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + this.requestID;
+        hash = 73 * hash + this.requestPublicCC;
+        hash = 73 * hash + Objects.hashCode(this.requestStatus);
+        hash = 73 * hash + Objects.hashCode(this.muni);
+        hash = 73 * hash + this.personID;
+        hash = 73 * hash + Objects.hashCode(this.actionRequestorPerson);
+        hash = 73 * hash + Objects.hashCode(this.requestProperty);
+        hash = 73 * hash + this.issueType_issueTypeID;
+        hash = 73 * hash + Objects.hashCode(this.issueTypeString);
+        hash = 73 * hash + this.muniCode;
+        hash = 73 * hash + this.caseID;
+        hash = 73 * hash + Objects.hashCode(this.submittedTimeStamp);
+        hash = 73 * hash + Objects.hashCode(this.formattedSubmittedTimeStamp);
+        hash = 73 * hash + Objects.hashCode(this.dateOfRecord);
+        hash = 73 * hash + (int) (this.daysSinceDateOfRecord ^ (this.daysSinceDateOfRecord >>> 32));
+        hash = 73 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
+        hash = 73 * hash + (this.isAtKnownAddress ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.addressOfConcern);
+        hash = 73 * hash + Objects.hashCode(this.requestDescription);
+        hash = 73 * hash + (this.isUrgent ? 1 : 0);
+        hash = 73 * hash + (this.anonymitiyRequested ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.cogInternalNotes);
+        hash = 73 * hash + Objects.hashCode(this.muniInternalNotes);
+        hash = 73 * hash + Objects.hashCode(this.publicExternalNotes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CEActionRequest other = (CEActionRequest) obj;
+        if (this.requestID != other.requestID) {
+            return false;
+        }
+        if (this.requestPublicCC != other.requestPublicCC) {
+            return false;
+        }
+        if (this.personID != other.personID) {
+            return false;
+        }
+        if (this.issueType_issueTypeID != other.issueType_issueTypeID) {
+            return false;
+        }
+        if (this.muniCode != other.muniCode) {
+            return false;
+        }
+        if (this.caseID != other.caseID) {
+            return false;
+        }
+        if (this.daysSinceDateOfRecord != other.daysSinceDateOfRecord) {
+            return false;
+        }
+        if (this.isAtKnownAddress != other.isAtKnownAddress) {
+            return false;
+        }
+        if (this.isUrgent != other.isUrgent) {
+            return false;
+        }
+        if (this.anonymitiyRequested != other.anonymitiyRequested) {
+            return false;
+        }
+        if (!Objects.equals(this.issueTypeString, other.issueTypeString)) {
+            return false;
+        }
+        if (!Objects.equals(this.formattedSubmittedTimeStamp, other.formattedSubmittedTimeStamp)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressOfConcern, other.addressOfConcern)) {
+            return false;
+        }
+        if (!Objects.equals(this.requestDescription, other.requestDescription)) {
+            return false;
+        }
+        if (!Objects.equals(this.cogInternalNotes, other.cogInternalNotes)) {
+            return false;
+        }
+        if (!Objects.equals(this.muniInternalNotes, other.muniInternalNotes)) {
+            return false;
+        }
+        if (!Objects.equals(this.publicExternalNotes, other.publicExternalNotes)) {
+            return false;
+        }
+        if (!Objects.equals(this.requestStatus, other.requestStatus)) {
+            return false;
+        }
+        if (!Objects.equals(this.muni, other.muni)) {
+            return false;
+        }
+        if (!Objects.equals(this.actionRequestorPerson, other.actionRequestorPerson)) {
+            return false;
+        }
+        if (!Objects.equals(this.requestProperty, other.requestProperty)) {
+            return false;
+        }
+        if (!Objects.equals(this.submittedTimeStamp, other.submittedTimeStamp)) {
+            return false;
+        }
+        if (!Objects.equals(this.dateOfRecord, other.dateOfRecord)) {
+            return false;
+        }
+        if (!Objects.equals(this.dateOfRecordUtilDate, other.dateOfRecordUtilDate)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 
    
 }

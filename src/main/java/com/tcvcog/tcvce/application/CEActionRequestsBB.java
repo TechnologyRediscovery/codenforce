@@ -35,6 +35,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     
     private CEActionRequestStatus selectedChangeToStatus;
+    private String invalidMessage;
     
     private int ceCaseIDForConnection;
     
@@ -52,6 +53,49 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void manageActionRequest(CEActionRequest req){
         System.out.println("ActionRequestManagebb.manageActionRequest req: " + req.getRequestID());
         selectedRequest = req;
+        
+    }
+    
+    public void attachInvalidMessage(ActionEvent ev){
+        if(selectedRequest != null){
+
+            CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+            StringBuilder sb = new StringBuilder();
+            sb.append(selectedRequest.getPublicExternalNotes());
+            sb.append("<br/><br/>********************************<br/>");
+            sb.append("Note added by ");
+            sb.append(getFacesUser().getFName());
+            sb.append(" ");
+            sb.append(getFacesUser().getLName());
+            sb.append(" at ");
+            sb.append(getCurrentTimeStamp().toString());
+            sb.append("<br/>");
+            sb.append("********************************<br/>");
+            sb.append(invalidMessage);
+            sb.append("<br/><br/>");
+            selectedRequest.setPublicExternalNotes(sb.toString());
+            // force the bean to go to the integrator and fetch a fresh, updated
+            // list of action requests
+            requestList = null;
+            try {
+                ceari.updateActionRequestNotes(selectedRequest);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                                "Public case note added to action request ID " + selectedRequest.getRequestID() + ".",""));
+
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                                "Unable to write message to The Database", 
+                                "This is a system level error that must be corrected by a sys admin--sorries!."));
+            }
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "You just tried to attach a message to a nonexistent request!", 
+                            "Choose the request to manage on the left, then click manage"));
+        }
+        
         
     }
 
@@ -141,27 +185,46 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     }
     
-    public String updateActionRequest(){
+    public void updateActionRequestStatus(ActionEvent ev){
+        System.out.println("updateStatus");
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        try {
-            ceari.updateActionRequest(selectedRequest);
-        } catch (IntegrationException ex) {
+        if(selectedChangeToStatus != null){
             
+            selectedRequest.setRequestStatus(selectedChangeToStatus);
+            try {
+                ceari.updateActionRequestStatus(selectedRequest);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Successfully changed request status for request ID: " + selectedRequest.getCaseID(), ""));
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                            "Unable to update request ID : " + selectedRequest.getCaseID(), ""));
+
+            } 
+        } else {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR
+                        ,"Please select a request status from the drop-down box to proceed" , ""));
             
         }
-        return "missionControl";
-        
+    
     }
     
-    public void changeActionRequestStatus(ActionEvent ev){
+    public String createNewCaseAtProperty(){
+        if(selectedRequest != null){
+            if(selectedRequest.getRequestProperty() != null){
+                getSessionBean().setActiveProp(selectedRequest.getRequestProperty());
+            }
+        } else {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR
+                        ,"Please select an action request from the table to open a new case" , ""));
+            return "";
+            
+        }
         
-        
-        
-    }
-    
-    public void searchForCEActionRequests(ActionEvent ev){
-        
-        
+        return "addNewCase";
     }
     
     
@@ -170,7 +233,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      * @return the selectedRequest
      */
     public CEActionRequest getSelectedRequest() {
-        selectedRequest = getSessionBean().getcEActionRequest();
+
         return selectedRequest;
     }
 
@@ -269,6 +332,20 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public void setRequestListSize(int requestListSize) {
         this.requestListSize = requestListSize;
+    }
+
+    /**
+     * @return the invalidMessage
+     */
+    public String getInvalidMessage() {
+        return invalidMessage;
+    }
+
+    /**
+     * @param invalidMessage the invalidMessage to set
+     */
+    public void setInvalidMessage(String invalidMessage) {
+        this.invalidMessage = invalidMessage;
     }
     
 }

@@ -119,23 +119,13 @@
                         <p:spacer height="10px"/>
                         <hr/>
                         <p:spacer height="10px"/>
-                        <h:form id="propertyDataBitsForm">
-
-                            <h2>Action Requests</h2>
-                            <p>Access point for reviewing and processing code enforcement action requests 
-                                submitted through the public request portal or by municipal staff.</p>
-
-
-                            <p:commandButton ajax="fakse" value="Manage Code Enforcement Request &rarr;" action="manageActionRequest" disabled="true"/>
-
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
-
+                        
+                        
                             <h2>Active Code enforcement cases</h2>
-                                <p:commandButton ajax="false"  value="Open a new case &rarr;" action="#{propertyProfileBB.createCase}"/>
 
                                 <h:form id="caseViewForm">
+                                <p:commandButton ajax="false"  value="Open a new code enforcement case &rarr;" action="#{propertyProfileBB.createCase}"/>
+                                <p:spacer height="10px"/>
                                 <p:dataTable
                                     id="caseTable"
                                     var="c"
@@ -214,6 +204,20 @@
                             <p:spacer height="10px"/>
                             <hr/>
                             <p:spacer height="10px"/>
+                        
+                        <h:form id="propertyDataBitsForm">
+
+                            <h2>Action Requests</h2>
+                            <p>Access point for reviewing and processing code enforcement action requests 
+                                submitted through the public request portal or by municipal staff.</p>
+
+
+                            <p:commandButton ajax="fakse" value="Manage Code Enforcement Request &rarr;" action="manageActionRequest" disabled="true"/>
+
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+
 
                             <h2>Property-connected person</h2>
 

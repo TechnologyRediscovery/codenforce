@@ -125,8 +125,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
     
     public String storePropertyInfo(){
-        // set by the xhtml page itself
-//        getSessionBean().getActionRequest().setRequestProperty(selectedProperty);
+        if(getSessionBean().getWorkingActionRequest().getRequestProperty() == null){
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                       "Please select a property from the list of search results to continue.", ""));
+            return "";
+        }
         return "describeConcern";
     }
     
