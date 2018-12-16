@@ -245,39 +245,57 @@
                             <h:panelGroup>
                                 <h:form id="req-details-form">
 
-                                    <h2>Manage selected request</h2>
-                                    <h3>Request Status</h3>
+                                    <h2>Details: Request ID #<h:outputText value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </h2>
 
-                                    <h:outputLabel styleClass="bold" value="Status:"/>
+                                    <h:outputLabel styleClass="bold" value="Processing Status:"/>
                                     <p:spacer height="5px"/>
                                     
                                     <h:outputText id="selr-status-ot" value="#{cEActionRequestsBB.selectedRequest.requestStatus.statusTitle}"/>
+                                    
+                                    
                                     <p:spacer height="15px"/>
                                     
+                                    <ui:remove>
+                                        
+                                        <h3>After investigating this request:</h3>
+                                        
+                                    
                                     <h:outputLabel styleClass="bold" for="ceactionrequeststatusmenu" value="Change status to:"/>
+                                    
                                     <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{cEActionRequestsBB.selectedChangeToStatus}">
                                         <f:converter converterId="ceActionRequestStatusConverter"/>
                                         <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
                                         <f:selectItems value="#{cEActionRequestsBB.statusList}"
                                                        var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
                                     </p:selectOneMenu>
+                                    
                                     <p:commandButton ajax="true" value="Change request status" 
                                                      rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
                                                      actionListener="#{cEActionRequestsBB.updateActionRequestStatus}"
                                                      update="actionRequestListForm:actionRequestTable
                                                      req-details-form:selr-status-ot"/>
-                                    <p:spacer height="10px"/>
                                     
-                                    <p:commandButton value="Mark request as invalid"
-                                                     onclick="PF('invalidDialog').show()"/>
+                                    <p:spacer height="10px"/>
+                                    </ui:remove>
 
-                                    <h3>Open Code Enforcement Case</h3>
-
+                                    
                                     <p:commandButton ajax="false" value="Open new CE Case at this property" 
                                                      rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
                                                      action="#{cEActionRequestsBB.createNewCaseAtProperty}"
                                                      update="ceActionRequestsMessages"/>
+                                    
+                                    <p:commandButton value="Attach to existing code enforcement case"
+                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                     onclick="PF('attach-to-case-dialog').show()"
+                                                     update="attach-to-existing-case-form:cases-on-selected-request-property-DS"/>
+                                    
+                                    <p:commandButton value="No violation found"
+                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                     onclick="PF('no-violation-found-dialog').show()"/>
 
+                                    <p:commandButton value="Mark request as invalid"
+                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                     onclick="PF('invalidDialog').show()"/>
 
                                 <h3>Request details</h3>
 
@@ -393,11 +411,15 @@
                             </h:panelGroup>
                         </h:panelGrid>
 
-                        <p:confirmDialog message="Mark request: invalid" 
-                                         severity="alert" widgetVar="invalidDialog">
+                        
+                        <p:confirmDialog message="Mark request as invalid" 
+                                         severity="alert" widgetVar="invalidDialog"
+                                         closable="true"
+                                         rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="messageForm">
                                 <h:outputLabel for="invalidMessageITA" value="What makes this an invalid request?"/>
+                                <p:spacer height="15px"/>
                                 <p:inputTextarea id="invalidMessageITA" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.invalidMessage}"/>
                                 <p:spacer height="15px"/>
                                 <p>This message, your name, and a timestamp will be appended <br/>to the public note section of request ID 
@@ -405,13 +427,71 @@
 
                                 <p:spacer height="15px"/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachInvalidMessage}"
-                                                 value="Submit" icon="fa fa-link" oncomplete="PF('invalidDialog').hide()" 
+                                                 value="Submit" icon="fa fa-link" oncomplete="PF('invalidDialog').hide()"
+                                                 rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
                                                  update="req-details-form:selr-notes-public
                                                  msgForm:ceActionRequestsMessages
                                                  actionRequestListForm:actionRequestTable"/>
-
                             </h:form>
                         </p:confirmDialog>
+                        
+                        
+                        <p:confirmDialog message="Mark request: No Violation Found" 
+                                         severity="alert" widgetVar="no-violation-found-dialog"
+                                         closable="true"
+                                         rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="no-violation-message-form">
+                                <h:outputLabel for="noViolationMessageITA" value="Describe the results of your request investigation:"/>
+                                <p:spacer height="15px"/>
+                                <p:inputTextarea id="noViolationMessageITA" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.noViolationFoundMessage}"/>
+                                <p:spacer height="15px"/>
+                                <p>This message, your name, and a timestamp will be appended <br/>to the public note section of request ID 
+                                    <h:outputText escape="false" value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </p>
+
+                                <p:spacer height="15px"/>
+                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachNoViolationFoundMessage}"
+                                                 value="Submit" icon="fa fa-link" oncomplete="PF('invalidDialog').hide()"
+                                                 rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                 update="req-details-form:selr-notes-public
+                                                 msgForm:ceActionRequestsMessages
+                                                 actionRequestListForm:actionRequestTable"/>
+                            </h:form>
+                        </p:confirmDialog>
+                        
+                        
+                        <p:confirmDialog message="Attach request to existing case" 
+                                         severity="alert" widgetVar="attach-to-case-dialog"
+                                         closable="true"
+                                         rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="attach-to-existing-case-form">
+                                
+                                <p>Choose an existing case on <h:outputLabel for="invalidMessageITA" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>:</p>
+                                <p:dataScroller
+                                    id="cases-on-selected-request-property-DS"
+                                    value="#{cEActionRequestsBB.caseListForSelectedProperty}"
+                                    var="c">
+                                    <p>Case ID: <h:outputText value="#{c.caseID}"/> <br/>
+                                        Name: <h:outputText value="#{c.caseName}" /> <br/>
+                                        Phase: <h:outputText value="#{c.casePhase.label}"/> <br/>
+                                        Opening date: <h:outputText value="#{c.originiationDatePretty}"/> <br/>
+                                        Closing date: <h:outputText value="#{c.closingDatePretty}"/> <br/>
+                                    </p>
+                                    <p:commandButton value="Assign request to this case"
+                                                     actionListener="#{cEActionRequestsBB.useSelectedCaseForAttachment(c)}"
+                                                     update="msgForm:ceActionRequestsMessages"
+                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                     oncomplete="PF('attach-to-case-dialog').hide()"/>
+                                    <hr/>
+                                    
+                                </p:dataScroller>
+                            </h:form>
+                        </p:confirmDialog>
+                        
+                        
+                        
+                        
                     </div>
                 </f:view>
             </ui:define>
