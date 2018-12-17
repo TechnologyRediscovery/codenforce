@@ -479,10 +479,12 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     /**
      * @return the actionsAllowedOnSelectedRequest
      */
+    
     public boolean isActionsAllowedOnSelectedRequest() {
         actionsAllowedOnSelectedRequest = true;
         if(selectedRequest.getRequestStatus().getStatusID() == 
-                Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestInitialStatusCode"))){
+                Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("actionRequestInitialStatusCode"))){
             actionsAllowedOnSelectedRequest = false;
         }
         return actionsAllowedOnSelectedRequest;
