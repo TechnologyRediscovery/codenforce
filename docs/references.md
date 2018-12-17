@@ -1,4 +1,7 @@
 # Resources by project topic
+## Java EE
+The [Java Enterprise Edition (EE)](https://docs.oracle.com/javaee/7/index.html) is a goliath set of packages. We use java EE servlets and its entire JSF system. The [Java EE 7 platform specification](https://docs.oracle.com/javaee/7/api/toc.htm) is the familiar javadoc generated reference.
+
 ## Markdown
 Solid [markdown tutorial](https://daringfireball.net/projects/markdown/syntax) by daringfireball which provides an overview of each syntactical element with an eye for  explanations of reasons for various features and discussions of use cases.
 
