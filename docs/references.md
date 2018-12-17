@@ -1,7 +1,4 @@
 # Resources by project topic
-## Official Documentation!!! Java EE
-The [Java Enterprise Edition (EE)](https://docs.oracle.com/javaee/7/index.html) is a goliath set of packages. We use java EE servlets and its entire JSF system. The [Java EE 7 platform specification](https://docs.oracle.com/javaee/7/api/toc.htm) is the familiar javadoc generated reference.
-
 ## Markdown
 Solid [markdown tutorial](https://daringfireball.net/projects/markdown/syntax) by daringfireball which provides an overview of each syntactical element with an eye for  explanations of reasons for various features and discussions of use cases.
 
@@ -26,7 +23,7 @@ Their [official PDF guide](https://www.primefaces.org/documentation.html) is ind
 
 The PF [Javadoc smells bad](https://www.primefaces.org/docs/api/6.0/), but is linked here in case it gets fleshed out.
 
-## WildFly/JBOSS
+## Glassfish
 The [big cheeze tutorial on installing glassfish on ubuntu](https://www.nabisoft.com/tutorials/glassfish/installing-glassfish-41-on-ubuntu) with actual security explanations. Created by Nabi Zamani.
 
 Official admin guide: the [365-page pdf on all things glassfish](https://javaee.github.io/glassfish/doc/5.0/administration-guide.pdf) is a must-open doc when working with server config
