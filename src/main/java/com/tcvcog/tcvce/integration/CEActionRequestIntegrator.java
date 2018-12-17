@@ -366,6 +366,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         return newActionRequest;
     } // close getActionRequest
 
+    /**
+     * Updates the status of the passed in CEActionRequest. 
+     * @param req The status of the inputted Request must be that to which you'd
+     * like the DB to reflect
+     * @throws IntegrationException 
+     */
     public void updateActionRequestStatus(CEActionRequest req) throws IntegrationException {
 
         String q = "UPDATE ceactionrequest SET status_id = ? WHERE requestid = ?;";
