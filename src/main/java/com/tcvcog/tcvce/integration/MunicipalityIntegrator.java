@@ -42,6 +42,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     // this is a test injected bean -- not currently working as of 19-OCT-18
     @ManagedProperty(value="#{codeIntegrator}")
     private CodeIntegrator ci;
+   
     
     private HashMap municipalityMap;
     /**
@@ -167,7 +168,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     
     public void generateCompleteMuniNameIDMap() throws IntegrationException{
         HashMap<String, Integer> muniMap = new HashMap<>();
-        
+       
         Connection con = getPostgresCon();
         String query = "SELECT muniCode, muniName FROM municipality;";
         ResultSet rs = null;
@@ -195,7 +196,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     //TODO: finish me
     public void updateMuni(Municipality muni) throws IntegrationException{
         
-        Connection con = getPostgresCon();
+        Connection con = null;
         String query =  "UPDATE public.municipality\n" +
                         "   SET muniname=?, address_street=?, address_city=?, address_state=?, \n" +
                         "       address_zip=?, phone=?, fax=?, email=?, managername=?, managerphone=?, \n" +
