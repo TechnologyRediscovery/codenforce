@@ -11,27 +11,20 @@
     </h:head>
     <h:body>
         <ui:composition template="./../public/navContainer_public.xhtml">
-
             <ui:define name="content">
                 <f:view id="initiateSessionView">
                     <div class="mainContainer">
                         <h:form id="initiateSessionForm">
-                            
-                            
                             <h2 style="font-size: 1.5em; color:#purple">Please use Google Chrome ONLY! This resolves page hanging issues.</h2>
-                            
                             <h1>Update Notes [Friday, 24 Aug 2018]:</h1>
-                            
                             <ol>
                                 <li>The page hanging issue has been resolved! This resolution requires that we use <span class="bold">Google Chrome</span>, and NOT Mozilla Firefox (and certainly NOT Microsoft IE/Edge!)</li>
                                 <li>The About, Contact, and Help pages have been updated to "solid draft" and can be reviewed for edits</li>
                             </ol>
-                            
                             <h1>Continue to dashboard</h1>
-                                <p:commandButton ajax="false" value="Go to dashboard" action="#{sessionInitializer.initiateInternalSession}" icon="fa fa-chevron-right"/>
+                            <p:commandButton ajax="false" value="Go to dashboard" action="#{sessionInitializer.initiateInternalSession}" icon="fa fa-chevron-right"/>
                         </h:form>
                     </div>
-
                 </f:view>
             </ui:define>
         </ui:composition>

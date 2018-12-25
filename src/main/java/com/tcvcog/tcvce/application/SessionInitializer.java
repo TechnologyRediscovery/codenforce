@@ -60,6 +60,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * 
      * @return success or failure String used by faces to navigate to the internal page
      * or the error page
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public String initiateInternalSession() throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
