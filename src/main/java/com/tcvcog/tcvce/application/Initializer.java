@@ -70,15 +70,15 @@ public class Initializer implements ServletContextListener{
         System.out.println("Intilizer.contextInitialized -- start");
         
         ServletContext servletContext = event.getServletContext();
-        UserCoordinator userCoordinator = new UserCoordinator();
+//        UserCoordinator userCoordinator = new UserCoordinator();
         
         System.out.println("Intilizer.contextInitialized -- creating DB Connection");
-        PostgresConnectionFactory con = new PostgresConnectionFactory();
-        servletContext.setAttribute("dBConnection", con);
+//        PostgresConnectionFactory con = new PostgresConnectionFactory();
+//        servletContext.setAttribute("dBConnection", con);
         // this setAttribute system is not working as planned.
         
         //servletContext.setAttribute(Constants.USER_COORDINATOR_SCOPE, userCoordinator);
-        servletContext.setAttribute(Constants.USER_COORDINATOR_KEY, userCoordinator);
+//        servletContext.setAttribute(Constants.USER_COORDINATOR_KEY, userCoordinator);
         
         
         CodeCoordinator codeCoordinator = new CodeCoordinator();
@@ -161,7 +161,7 @@ public class Initializer implements ServletContextListener{
         // this is a session-scoped bean stored in the session map
         SearchCoordinator sc = new SearchCoordinator();
         servletContext.setAttribute("searchCoordinator", sc);
-        
+         
         
 //        SessionBean sb = new SessionBean();
 //        servletContext.setAttribute("sessionBean", sb);
