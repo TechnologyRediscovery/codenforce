@@ -73,11 +73,11 @@ public class PostgresConnectionFactory implements Serializable{
             System.out.println(ex);
         }
         finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) { /* ignored */}
-             }
+//            if (con != null) {
+//                try {
+//                    con.close();
+//                } catch (SQLException e) { /* ignored */}
+//             }
         
         } // close finally
         return con;
