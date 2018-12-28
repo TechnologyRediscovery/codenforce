@@ -12,11 +12,6 @@ import java.sql.SQLException;
 import com.tcvcog.tcvce.util.Constants;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 
 
 /**
@@ -54,21 +49,13 @@ public class PostgresConnectionFactory implements Serializable{
      * @return the con
      */
     public Connection getCon() {
-        System.out.println("DBConnection.constructor - Creating Pooling Datasource");
-//        try {
-//                Class.forName("org.postgresql.Driver");
-//            } catch (ClassNotFoundException ex) {
-//                System.out.println(ex.toString());
-//            }
-//        
-        Context initContext = null;
+        
         try {
-            initContext = new InitialContext();
-            ds = (DataSource)initContext.lookup("jdbc/cogpg");
-            System.out.println(ds.toString());
-            con = ds.getConnection("sylvia", "c0d3");
-        } catch (NamingException ex) {
-            System.out.println(ex);
+            //System.out.println("PostGresConnectionFactor.getCon");
+            
+//        source.setDataSourceName("cogpgnew");
+
+            con = source.getConnection();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
