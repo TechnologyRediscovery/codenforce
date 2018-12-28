@@ -145,6 +145,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
     public String loginToMissionControl(){
+        System.out.println("MissionControlBB.loginToMissionControl");
         
         return "startInitiationProcess";
     }

@@ -269,7 +269,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             rs = stmt.executeQuery(query);
             while(rs.next()){
                 m = getMuniFromMuniCode(rs.getInt("muniCode"));
-                System.out.println("MunicipalityIntegrator.getCompleteMuniList | adding muni: " + m.getMuniName());
                 ll.add(m);
                 
             }
