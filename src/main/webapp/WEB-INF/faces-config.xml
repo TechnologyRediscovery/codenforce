@@ -43,13 +43,6 @@
     </managed-bean>
     
     <managed-bean>
-        <description>Establishes the connection to the Code Enforcement Database for use throughout a session</description>
-        <managed-bean-name>dBConnection</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.PostgresConnectionFactory</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-
-    <managed-bean>
         <description>Stores constants for use in Java classes</description>
         <managed-bean-name>constants</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.util.Constants</managed-bean-class>
