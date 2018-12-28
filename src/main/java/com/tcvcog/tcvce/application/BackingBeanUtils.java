@@ -189,10 +189,10 @@ public class BackingBeanUtils implements Serializable{
         try {
             initContext = new InitialContext();
             dataSource = (DataSource)initContext.lookup("jdbc/cogpg");
-            System.out.println(dataSource.toString());
+//            System.out.println(dataSource.toString());
 //            connx = dataSource.getConnection("sylvia", "c0d3");
             connx = dataSource.getConnection(username, password);
-            System.out.println("BackingBeanUtils.getConnx | connectionob" + connx.toString());
+//            System.out.println("BackingBeanUtils.getConnx | connectionob" + connx.toString());
         } catch (NamingException | SQLException ex) {
             System.out.println(ex);
         }
