@@ -188,7 +188,7 @@ public class BackingBeanUtils implements Serializable{
         Context initContext = null;
         try {
             initContext = new InitialContext();
-            dataSource = (DataSource)initContext.lookup("jdbc/cogpg");
+            dataSource = (DataSource)initContext.lookup("jdbc/sample");
 //            System.out.println(dataSource.toString());
 //            connx = dataSource.getConnection("sylvia", "c0d3");
             connx = dataSource.getConnection(username, password);

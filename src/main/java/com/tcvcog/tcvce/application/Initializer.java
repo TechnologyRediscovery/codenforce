@@ -72,7 +72,7 @@ public class Initializer implements ServletContextListener{
         ServletContext servletContext = event.getServletContext();
 //        UserCoordinator userCoordinator = new UserCoordinator();
         
-        System.out.println("Intilizer.contextInitialized -- creating DB Connection");
+//        System.out.println("Intilizer.contextInitialized -- creating DB Connection");
 //        PostgresConnectionFactory con = new PostgresConnectionFactory();
 //        servletContext.setAttribute("dBConnection", con);
         // this setAttribute system is not working as planned.
