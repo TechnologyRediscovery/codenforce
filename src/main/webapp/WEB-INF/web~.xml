@@ -82,4 +82,8 @@
             <role-name>cogstaff</role-name>
         </auth-constraint>
     </security-constraint>
+    <resource-ref>
+        <res-ref-name>cogpostgres</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+    </resource-ref>
 </web-app>

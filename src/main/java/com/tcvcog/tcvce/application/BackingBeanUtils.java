@@ -24,7 +24,6 @@ import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
 import java.sql.Connection;
-import com.tcvcog.tcvce.integration.PostgresConnectionFactory;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.entities.User;
@@ -188,17 +187,17 @@ public class BackingBeanUtils implements Serializable{
         Context initContext = null;
         try {
             initContext = new InitialContext();
-            dataSource = (DataSource)initContext.lookup("jdbc/sample");
+            dataSource = (DataSource)initContext.lookup("java:/postgresDS");
 //            System.out.println(dataSource.toString());
 //            connx = dataSource.getConnection("sylvia", "c0d3");
-            connx = dataSource.getConnection(username, password);
+            connx = dataSource.getConnection();
 //            System.out.println("BackingBeanUtils.getConnx | connectionob" + connx.toString());
         } catch (NamingException | SQLException ex) {
             System.out.println(ex);
         }
         finally {
-            // removed to avoid a "connection closed error" when migrating to glassfish managed connection pool
-//            if (connx != null) { try { connx.close();} catch (SQLException e) { /* ignored */}}
+//             removed to avoid a "connection closed error" when migrating to glassfish managed connection pool
+            if (connx != null) { try { connx.close();} catch (SQLException e) { /* ignored */}}
         } 
         return connx;
       
