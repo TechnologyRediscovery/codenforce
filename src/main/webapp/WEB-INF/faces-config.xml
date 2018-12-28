@@ -26,6 +26,12 @@
             <var>dbFixedValueLookup</var>
         </resource-bundle>
         
+        
+        <resource-bundle>
+            <base-name>dbconnection</base-name>
+            <var>dbConnectionParams</var>
+        </resource-bundle>
+        
     </application>
     
     <!--application-scoped beans-->

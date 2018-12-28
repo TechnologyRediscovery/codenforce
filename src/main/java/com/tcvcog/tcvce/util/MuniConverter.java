@@ -34,7 +34,6 @@ public class MuniConverter extends EntityConverter implements Converter {
     
      @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        System.out.println("MuniConverter.getAsObject | title: " +titleS);
         if(titleS.isEmpty()) {
             return null; 
         }
@@ -51,7 +50,6 @@ public class MuniConverter extends EntityConverter implements Converter {
         
         Municipality m = (Municipality) o;
         String title = m.getMuniName();
-        System.out.println("MuniConverter.getAsString | title: " + title);
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;

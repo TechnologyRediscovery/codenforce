@@ -50,6 +50,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import java.sql.SQLException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -61,7 +62,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 
 /**
@@ -108,6 +113,9 @@ public class BackingBeanUtils implements Serializable{
     private SearchCoordinator searchCoordinator;
     
     private User facesUser;
+    
+    private DataSource dataSource;
+    private Connection connx;
     
     /**
      * Creates a new instance of BackingBeanUtils
@@ -169,27 +177,31 @@ public class BackingBeanUtils implements Serializable{
 
     /**
      * creates a PostgresConnectionFactory factory and calls getCon to get a handle on the
- database connection
+     * database connection
      * @return the postgresCon
      */
     public Connection getPostgresCon() {
-
-        // We definitely do not want to be creating a connection 
-        // factory in this location-- go get a bean!
-       // PostgresConnectionFactory factory = new PostgresConnectionFactory();
-       // return factory.getCon();
-       
-             
-         //System.out.println("BackingBeanUtils.getPostgresCon- Getting con through backing bean");
-         FacesContext context = getFacesContext();
-         PostgresConnectionFactory dbCon = context.getApplication()
-                 .evaluateExpressionGet(
-                         context, 
-                         "#{dBConnection}", 
-                         PostgresConnectionFactory.class);
-         return dbCon.getCon();
-         
-
+        String username = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("dbusername_readwrite");
+//        String username = getResourceBundle("dbconnection").getString("dbusername_readwrite");
+        String password = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("dbpassowrd_readwrite");
+//        String password = getResourceBundle("dbconnection").getString("dbpassowrd_readwrite");
+        Context initContext = null;
+        try {
+            initContext = new InitialContext();
+            dataSource = (DataSource)initContext.lookup("jdbc/cogpg");
+//            System.out.println(dataSource.toString());
+//            connx = dataSource.getConnection("sylvia", "c0d3");
+            connx = dataSource.getConnection(username, password);
+//            System.out.println("BackingBeanUtils.getConnx | connectionob" + connx.toString());
+        } catch (NamingException | SQLException ex) {
+            System.out.println(ex);
+        }
+        finally {
+            // removed to avoid a "connection closed error" when migrating to glassfish managed connection pool
+//            if (connx != null) { try { connx.close();} catch (SQLException e) { /* ignored */}}
+        } 
+        return connx;
+      
     }
 
     /**
@@ -699,7 +711,23 @@ public class BackingBeanUtils implements Serializable{
     public void setPublicInfoCoordinator(PublicInfoCoordinator publicInfoCoordinator) {
         this.publicInfoCoordinator = publicInfoCoordinator;
     }
-    
+
+    /**
+     * @return the dataSource
+     */
+    public DataSource getDataSource() {
+        
+        return dataSource;
+    }
+
+    /**
+     * @param dataSource the dataSource to set
+     */
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+       
 
 
 }
