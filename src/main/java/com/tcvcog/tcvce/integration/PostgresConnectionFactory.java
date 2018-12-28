@@ -10,6 +10,8 @@ import java.sql.Connection;
 import org.postgresql.jdbc3.Jdbc3PoolingDataSource;
 import java.sql.SQLException;
 import com.tcvcog.tcvce.util.Constants;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -52,11 +54,11 @@ public class PostgresConnectionFactory implements Serializable{
      */
     public Connection getCon() {
         
-        //System.out.println("PostGresConnectionFactor.getCon");
-        
-//        source.setDataSourceName("cogpgnew");
-       
         try {
+            //System.out.println("PostGresConnectionFactor.getCon");
+            
+//        source.setDataSourceName("cogpgnew");
+
             con = source.getConnection();
         } catch (SQLException ex) {
             ex.toString();

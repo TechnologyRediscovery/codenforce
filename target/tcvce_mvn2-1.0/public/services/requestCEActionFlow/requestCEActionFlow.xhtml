@@ -32,8 +32,10 @@
                             <p:selectOneMenu
                                 id="muniSM" tabindex="1"
                                 value="#{cEActionRequestSubmitBB.selectedMuni}">
+                                
                                 <f:converter converterId="muniConverter"/>
                                 <f:selectItems id="muniNameList" value="#{cEActionRequestSubmitBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                
                             </p:selectOneMenu>
 
 

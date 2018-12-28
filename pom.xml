@@ -17,17 +17,11 @@
         
     </properties>
 
-    <dependencies>
+    <dependencies> 
         <dependency>
-            <groupId>org.primefaces</groupId>
-            <artifactId>primefaces</artifactId>
-            <version>6.0</version>
-        </dependency> 
-        <!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
-        <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc3</version>
+            <version>42.2.5</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -70,6 +64,14 @@
             <artifactId>barcodes</artifactId>
             <version>${itext.version}</version>
         </dependency>
+
+<!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
+<dependency>
+    <groupId>org.primefaces</groupId>
+    <artifactId>primefaces</artifactId>
+    <version>6.0</version>
+</dependency>
+
 
     </dependencies>
 
