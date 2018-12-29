@@ -170,6 +170,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         HashMap<String, Integer> muniMap = new HashMap<>();
        
         Connection con = getPostgresCon();
+        
         String query = "SELECT muniCode, muniName FROM municipality;";
         ResultSet rs = null;
         Statement stmt = null;
@@ -264,6 +265,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         ResultSet rs = null;
         Statement stmt = null;
  
+        
+        System.out.println("MunicipalityIntegrator.gnerateCompleteMuniNameIDMap: con chars: " + con.toString());
         try {
             stmt = con.createStatement();
             rs = stmt.executeQuery(query);

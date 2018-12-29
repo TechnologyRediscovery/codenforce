@@ -183,11 +183,14 @@ public class BackingBeanUtils implements Serializable{
         String username = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("dbusername_readwrite");
 //        String username = getResourceBundle("dbconnection").getString("dbusername_readwrite");
         String password = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("dbpassowrd_readwrite");
+        String jndi_name = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("jndi_name");
 //        String password = getResourceBundle("dbconnection").getString("dbpassowrd_readwrite");
-        Context initContext = null;
+        
+Context initContext = null;
         try {
             initContext = new InitialContext();
-            dataSource = (DataSource)initContext.lookup("java:/postgresDS");
+            Context envCtx = (Context) initContext.lookup("java:comp/env");
+            dataSource = (DataSource) envCtx.lookup(jndi_name);
 //            System.out.println(dataSource.toString());
 //            connx = dataSource.getConnection("sylvia", "c0d3");
             connx = dataSource.getConnection();
@@ -197,7 +200,7 @@ public class BackingBeanUtils implements Serializable{
         }
         finally {
 //             removed to avoid a "connection closed error" when migrating to glassfish managed connection pool
-            if (connx != null) { try { connx.close();} catch (SQLException e) { /* ignored */}}
+//            if (connx != null) { try { connx.close();} catch (SQLException e) { /* ignored */}}
         } 
         return connx;
       
