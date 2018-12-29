@@ -41,6 +41,9 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     private CEActionRequestStatus selectedChangeToStatus;
     private String invalidMessage;
     private String noViolationFoundMessage;
+    private String internalMessageText;
+    private String muniMessageText;
+    private String publicMessageText;
     
     private ArrayList<CECase> caseListForSelectedProperty;
     private CECase selectedCaseForAttachment;
@@ -75,11 +78,20 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                         "Unable to connect request to case.", 
                         "This is a system level error that must be corrected by a sys admin--sorries!"));
         }
-        
+    }
     
+    
+    public void attachInternalMessage(ActionEvent ev){
         
     }
     
+    public void attachMuniMessage(ActionEvent ev){
+        
+    }
+    
+    public void attachPublicMessage(ActionEvent ev){
+        
+    }
     
     public void manageActionRequest(CEActionRequest req){
         System.out.println("ActionRequestManagebb.manageActionRequest req: " + req.getRequestID());
@@ -434,6 +446,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         if(selectedRequest != null){
             try {
                 caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty());
+                System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -495,6 +508,48 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public void setActionsAllowedOnSelectedRequest(boolean actionsAllowedOnSelectedRequest) {
         this.actionsAllowedOnSelectedRequest = actionsAllowedOnSelectedRequest;
+    }
+
+    /**
+     * @return the internalMessageText
+     */
+    public String getInternalMessageText() {
+        return internalMessageText;
+    }
+
+    /**
+     * @return the muniMessageText
+     */
+    public String getMuniMessageText() {
+        return muniMessageText;
+    }
+
+    /**
+     * @return the publicMessageText
+     */
+    public String getPublicMessageText() {
+        return publicMessageText;
+    }
+
+    /**
+     * @param internalMessageText the internalMessageText to set
+     */
+    public void setInternalMessageText(String internalMessageText) {
+        this.internalMessageText = internalMessageText;
+    }
+
+    /**
+     * @param muniMessageText the muniMessageText to set
+     */
+    public void setMuniMessageText(String muniMessageText) {
+        this.muniMessageText = muniMessageText;
+    }
+
+    /**
+     * @param publicMessageText the publicMessageText to set
+     */
+    public void setPublicMessageText(String publicMessageText) {
+        this.publicMessageText = publicMessageText;
     }
     
 }

@@ -93,7 +93,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
             stmt.setString(1, request.getCogInternalNotes());
-            stmt.setString(2, request.getMuniInternalNotes());
+            stmt.setString(2, request.getMuniNotes());
             stmt.setString(3, request.getPublicExternalNotes());
             stmt.setInt(4, request.getRequestID());
             System.out.println("CEActionRequestorIntegrator.attachMessageToCEActionRequest | statement: " + stmt.toString());
@@ -204,7 +204,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setBoolean(12, actionRequest.isAnonymitiyRequested());
             stmt.setString(13, actionRequest.getCogInternalNotes());
 
-            stmt.setString(14, actionRequest.getMuniInternalNotes());
+            stmt.setString(14, actionRequest.getMuniNotes());
             stmt.setString(15, actionRequest.getPublicExternalNotes());
             stmt.setInt(16, Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestInitialStatusCode")));
 
@@ -273,7 +273,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         actionRequest.setCogInternalNotes(rs.getString("coginternalnotes"));
 
-        actionRequest.setMuniInternalNotes(rs.getString("muniinternalnotes"));
+        actionRequest.setMuniNotes(rs.getString("muniinternalnotes"));
         actionRequest.setPublicExternalNotes(rs.getString("publicexternalnotes"));
         System.out.println("CEActionRequestIntegrator.generateActionRequestFromRS | Generated request: " + actionRequest.getRequestID());
         return actionRequest;

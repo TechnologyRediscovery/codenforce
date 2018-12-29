@@ -72,7 +72,7 @@ public class CEActionRequest implements Serializable{
     private boolean anonymitiyRequested;
     
     private String cogInternalNotes;
-    private String muniInternalNotes;
+    private String muniNotes;
     private String publicExternalNotes;
     // end threes
     
@@ -221,17 +221,17 @@ public class CEActionRequest implements Serializable{
     }
 
     /**
-     * @return the muniInternalNotes
+     * @return the muniNotes
      */
-    public String getMuniInternalNotes() {
-        return muniInternalNotes;
+    public String getMuniNotes() {
+        return muniNotes;
     }
 
     /**
-     * @param muniInternalNotes the muniInternalNotes to set
+     * @param muniNotes the muniNotes to set
      */
-    public void setMuniInternalNotes(String muniInternalNotes) {
-        this.muniInternalNotes = muniInternalNotes;
+    public void setMuniNotes(String muniNotes) {
+        this.muniNotes = muniNotes;
     }
 
     /**
@@ -466,7 +466,7 @@ public class CEActionRequest implements Serializable{
         hash = 73 * hash + (this.isUrgent ? 1 : 0);
         hash = 73 * hash + (this.anonymitiyRequested ? 1 : 0);
         hash = 73 * hash + Objects.hashCode(this.cogInternalNotes);
-        hash = 73 * hash + Objects.hashCode(this.muniInternalNotes);
+        hash = 73 * hash + Objects.hashCode(this.muniNotes);
         hash = 73 * hash + Objects.hashCode(this.publicExternalNotes);
         return hash;
     }
@@ -528,7 +528,7 @@ public class CEActionRequest implements Serializable{
         if (!Objects.equals(this.cogInternalNotes, other.cogInternalNotes)) {
             return false;
         }
-        if (!Objects.equals(this.muniInternalNotes, other.muniInternalNotes)) {
+        if (!Objects.equals(this.muniNotes, other.muniNotes)) {
             return false;
         }
         if (!Objects.equals(this.publicExternalNotes, other.publicExternalNotes)) {
