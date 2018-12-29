@@ -726,6 +726,15 @@ gridTd-bignum{
         
 }
 
+.button-size-small {
+    font-size: small;
+    font-weight: normal;
+}
+
+.cear-actions-button {
+    
+}
+
 
 .buttonOwnLine{
     display: block;
