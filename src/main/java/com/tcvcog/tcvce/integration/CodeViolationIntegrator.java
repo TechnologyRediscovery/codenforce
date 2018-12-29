@@ -62,7 +62,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt = con.prepareStatement(query);
             //stmt.setInt(1, v.getViolationID());
             stmt.setInt(1, v.getViolatedEnfElement().getCodeSetElementID());
-            stmt.setInt(2, v.getAttachedCase().getCaseID());
+            stmt.setInt(2, v.getCeCaseID());
             //stmt.setString(3, v.getCitationID());
 
             //stmt.setTimestamp(4, java.sql.Timestamp.valueOf(v.getDateOfCitation()));
@@ -371,6 +371,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
 
         CodeViolation v = new CodeViolation();
         CodeIntegrator ci = getCodeIntegrator();
+        CitationIntegrator citInt = getCitationIntegrator();
         System.out.println("CodeViolationIntegreator.generateCodeViolationFromRS | Current RS entry: " + rs.getString("description"));
 
         v.setViolationID(rs.getInt("violationid"));
@@ -395,10 +396,12 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         v.setPenalty(rs.getDouble("penalty"));
         v.setDescription(rs.getString("description"));
         v.setNotes(rs.getString("notes"));
+        v.setCitationIDList(citInt.getCitationIDs(v.getViolationID()));
+        
         return v;
     }
 
-    public CodeViolation getCodeViolationByViolationID(int violationID) throws IntegrationException {
+    public CodeViolation getCodeViolation(int violationID) throws IntegrationException {
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n"
                 + "       entrytimestamp, stipulatedcompliancedate, actualcompliancdate, \n"
                 + "       penalty, description, notes\n"

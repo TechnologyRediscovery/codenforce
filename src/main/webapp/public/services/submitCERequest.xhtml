@@ -23,20 +23,20 @@
                         to investigate a possible municipal code violation.
                     </p>
 
-                    <p>Please provide the requested information in each tab below to complete your request: </p>
+                    <p>Populate form fields in each tab below to complete your request: </p>
 
                     <f:view>
-                        <p:tabView id="ceactionTabView" 
-                                   widgetVar="tabview" effect="fade" 
+                        <h:form id="ceactionRequestForm">
+                        <p:tabView id="tabView" 
+                                   widgetVar="tabView" effect="fade" 
                                    effectDuration="fast"
                                    binding="#{actionRequestBean.tabView}">
                             
-                            <p:tab title="Step 1: Location" id="t1Location">
+                            <p:tab title="Step 1: Location" id="tab1Location">
                             
                                 <h:messages globalOnly="true" showDetail="false" showSummary="true"
                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"></h:messages>
                                 
-                                <h:form id="propLookupForm">
                                 
                                     <p:outputLabel for="muniSM" value="Choose your municipality:"/>
                                     
@@ -46,9 +46,10 @@
                                         id="muniSM" tabindex="1"
                                         value="#{actionRequestBean.muniCode}">
                                         <f:selectItems value="#{actionRequestBean.muniMap}"/>
+                                        <p:ajax update="ceactionRequestForm:tabView:muniSM"/>
                                     </p:selectOneMenu>
                                     
-                                    <p style="font-style: italic; font-size: small;">Only the municipalies listed in this menu are
+                                    <p style="font-style: italic; font-size: small;">Only the municipalities listed in this menu are
                                         served by the Turtle Creek Valley Council of Governments Code Enforcement program.</p>
 
                                     <p:spacer height="10px"/>
@@ -64,7 +65,6 @@
 
                                     <p:spacer width="15px"/>
 
-
                                     <p:fieldset id="propLookupFieldset" toggleable="true" collapsed="false" 
                                                 widgetVar="propFS" legend="Lookup Property">
 
@@ -74,25 +74,49 @@
                                         <p>Please search for and select the property of concern using this search tool.</p>
 
                                         <p:spacer height="10px"/>
-                                        <p:outputLabel for="searchAddressPart" value="Enter the house number and street name (example: '2323 carrick'. Omit 'avenue', 'ln', etc.)"/>
-                                        
-                                        <p:inputText style="width: 100%" required="true" tabindex="3"
-                                                     id="searchAddressPart"   value="#{actionRequestBean.addrPart}"/>
-                                        <h:message for="searchAddressPart" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        
-                                        <p:spacer height="10px"/>
 
-                                        <p:commandButton
-                                            value="Search in Selected Municipality" tabindex="4" ajax="false"
-                                            actionListener="#{actionRequestBean.searchForPropertiesSingleMuni}" />
+                                        <p:panelGrid columns="3" layout="grid">
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="propSearchHouseNumIT">
+                                                    <h:outputText value="House number"/>
+                                                </p:outputLabel>
+                                                <p:inputText id="propSearchHouseNumIT" value="#{actionRequestBean.houseNum}" 
+                                                             style="width: 100px;" tabindex="3" required="false" styleClass="inputText">
+                                                    <p:ajax update="ceactionRequestForm:tabView:propSearchHouseNumIT"/>
+                                                </p:inputText>
+                                                <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="propSearchStreetIT">
+                                                    <h:outputText value="Street name"/>
+                                                </p:outputLabel>
+                                                <p:inputText id="propSearchStreetIT" value="#{actionRequestBean.streetName}" 
+                                                             style="width: 200px;" tabindex="4" required="false" styleClass="inputText">
+                                                    <p:ajax update="ceactionRequestForm:tabView:propSearchStreetIT"/>
+                                                </p:inputText>
+                                                <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:commandButton
+                                                    value="Search in Selected Municipality" tabindex="4" ajax="true" icon="fa fa-search"
+                                                    actionListener="#{actionRequestBean.searchForPropertiesSingleMuni}" 
+                                                    update= "ceactionRequestForm:tabView:propertyResultTable"/>
+                                            </h:panelGroup>
+
+                                        </p:panelGrid> 
+
 
                                         <!--Display of properties from search-->
                                         <h3>Search Results:</h3>
-                                        <p>Click on the desired property or try your search again</p>
+                                        <p>Click to select the desired property or try your search again</p>
 
                                         <p:dataTable
-                                            id="propTableInput"
+                                            id="propertyResultTable"
                                             var="prop" 
                                             value="#{actionRequestBean.propList}"
                                             selectionMode="single" tabindex="5"
@@ -127,23 +151,19 @@
 
                                         <p:spacer height="10px"/>
 
-                                        <p:commandButton   ajax="false" tabindex="6"
-                                                           value="Use selected property and go to next step" id="propSelectButton"
-                                                           actionListener="#{actionRequestBean.storePropertyLocationInfo}"/>
-
                                     </p:fieldset>
 
-                                </h:form>
 
                                 <p:spacer height="15px"/>
 
-                                <h:form id="CEActionRequestForm">
+                                    
                                     <p:fieldset id="noPropertyFieldSet" toggleable="true" collapsed="true" 
                                                 legend="Enter Non-property Location" widgetVar="noPropFS">
 
                                         <h:outputLabel for="manualAddress" >
                                             <h:outputText value="Describe in detail the location of your code enforcement concern" styleClass="uiLabel" />
                                         </h:outputLabel>
+                                        
                                         <p style="font-style: italic; font-size: small;">Example: Alley connecting 3rd Street and 4th street.</p>
 
                                         <p:inputText id="manualAddress" value="#{actionRequestBean.form_nonPropertyLocation}" 
@@ -153,28 +173,37 @@
 
                                         <p:spacer height="10px"/>
 
+                            <ui:remove>
+                                            
+                                        
                                         <p:commandButton  ajax="false" tabindex="8"
                                                           value="Go to next step" id="continueToRequestDetailsButton" 
                                                           actionListener="#{actionRequestBean.storeNoPropertyInfo}"/>
+                            </ui:remove>
 
                                     </p:fieldset>
-                                </h:form>
+
+                                    <p:commandButton   ajax="true" tabindex="6" 
+                                                       value="Save and continue" id="propSelectButton"
+                                                       actionListener="#{actionRequestBean.storePropertyLocationInfo}"
+                                                       update="propertyResultTable
+                                                                manualAddress"
+                                                       onclick="PF('tabView').select(1)"/>
                             </p:tab>
 
                             <p:tab title="Step 2: Request Details" id="s2Details">
-                                <h:form id="requesDetailsForm">
                                     <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"></h:messages>
                                     <h2>Request Details</h2>
 
                                     <p:spacer height="10px"/>
 
-                                    <h:outputLabel for="violation" >
+                                    <h:outputLabel for="violationSOLB" >
                                         <h:outputText styleClass="uiLabel" value="Choose the category of concern from the list or select 'other' and explain your concern below" />
                                     </h:outputLabel>
 
                                     <p:selectOneListbox 
-                                        id="violation" tabindex="8"
+                                        id="violationSOLB" tabindex="8"
                                         style="width: 100%;"
                                         value="#{actionRequestBean.violationTypeID}">
 
@@ -183,19 +212,19 @@
 
                                     <p:spacer height="10px"/>
 
-                                    <h:outputLabel for="describeConcern" >
+                                    <h:outputLabel for="requestDescription" >
                                         <h:outputText styleClass="uiLabel" value="Please describe the specifics of the code enforcement concern selected above" />
                                     </h:outputLabel>
 
                                     <p:inputTextarea 
-                                        id="describeConcern" 
+                                        id="requestDescription" 
                                         styleClass="textArea" 
                                         rows="6" tabindex="9"
                                         required="true" 
                                         style="width: 100%;"
                                         value="#{actionRequestBean.form_requestDescription}"
                                         />
-                                    <h:message for="describeConcern" showDetail="true" showSummary="true" 
+                                    <h:message for="requestDescription" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     <p:spacer height="10px"/>
@@ -229,16 +258,18 @@
 
                                     <p:spacer height="10px"/>
 
-                                    <p:commandButton  ajax="false" tabindex="12"
-                                                      value="Continue to contact info" id="continueToContactInfoButton"
-                                                      actionListener="#{actionRequestBean.incrementalFormContinue}"/>
+                                    <p:commandButton  ajax="true" tabindex="12"
+                                                      value="Save and continue" id="continueToContactInfoButton"
+                                                      update=   "violationSOLB
+                                                                requestDescription
+                                                                dateOfRecord
+                                                                isIUrgentSwitch"
+                                                                onclick="PF('tabView').select(2)" />
 
-                                </h:form> 
 
                             </p:tab>
 
                             <p:tab title="Step 3: Contact Info" id="s3Contact">
-                                <h:form id="requstorContactInfo">  
                                     <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"></h:messages>
                                     <h2>Requestor Contact Information</h2>
@@ -264,7 +295,7 @@
 
                                     <p:spacer width="10px"/>
 
-                                    <p style="font-style: italic; font-size: small;">Press the "Tab" key to easily move between input boxes.</p>
+                                    <p style="font-style: italic; font-size: small;">Press the "Tab" key to move between input boxes.</p>
 
                                     <h:panelGrid columns="2" columnClasses="gridTd, gridTd, gridTd, gridTd"
                                                  footerClass="gridFooter">
@@ -383,24 +414,36 @@
 
                                         <f:facet name="footer">
                                             <h:panelGroup>
-                                                <h:outputLabel for="remainAnonymous" >
+                                                <h:outputLabel for="remainAnonymousIS" >
                                                     <h:outputText styleClass="uiLabel" value="Do you wish to remain anonymous during the code enforcement investigation?" />
                                                 </h:outputLabel>
-                                                <p:inputSwitch id="remainAnonymous" value="#{actionRequestBean.form_anonymous}" onLabel="Yes" offLabel="No" tabindex="25"/>
+                                                <p:inputSwitch id="remainAnonymousIS" value="#{actionRequestBean.form_anonymous}" onLabel="Yes" offLabel="No" tabindex="25"/>
                                             </h:panelGroup>
                                         </f:facet>
 
                                     </h:panelGrid>
                                     <p:spacer width="10px"/>
-                                    <p:commandButton  ajax="false" tabindex="26"
-                                                      value="Continue to final submission" id="continueToFinalSubmission"
-                                                      actionListener="#{actionRequestBean.incrementalFormContinue}"/>
-                                </h:form>   
+                                    <p:commandButton value="Back" onclick="PF('tabView').select(1)"/>
+                                    <p:commandButton  ajax="true" tabindex="26"
+                                                      value="Save and continue" id="continueToFinalSubmission"
+                                                      update=   "requestorType
+                                                                requestorFirstName
+                                                                requestorLastName
+                                                                requestorJobTitle
+                                                                requestorPhoneCell
+                                                                requestorPhoneHome
+                                                                requestorPhoneWork
+                                                                requestorEmail
+                                                                requestorAddressStreet
+                                                                requestorAddressCity
+                                                                requestorAddressState
+                                                                requestorAddressZip
+                                                                remainAnonymousIS"
+                                                                onclick="PF('tabView').select(2)" />
 
                             </p:tab>
 
                             <p:tab title="Step 4: Review &amp; Submit" id="ReviewAndSubmit">
-                                <h:form id="submitCERequestForm">
 
                                     <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"></h:messages>
@@ -421,9 +464,9 @@
                                     <p class="note">After successful form completion, you will be directed to a page listing your tracking number
                                         and a summary of the information you submitted.</p>
 
-                                </h:form>
                             </p:tab>
                         </p:tabView>
+                        </h:form>
                     </f:view>
                 </div>
             </ui:define>

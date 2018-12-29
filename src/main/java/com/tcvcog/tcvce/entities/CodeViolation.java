@@ -17,19 +17,25 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class CodeViolation {
+public class CodeViolation implements Serializable{
     private int violationID;
     private EnforcableCodeElement violatedEnfElement;
     private int ceCaseID;
-    private CECase attachedCase;
     private int citationID;
     private LocalDateTime dateOfCitation;
+    private List<Integer> citationIDList;
+    private String citationsStringList;
+    private int daysUntilStipulatedComplianceDate;
     private LocalDateTime dateOfRecord;
     private LocalDateTime entryTimeStamp;
     private LocalDateTime stipulatedComplianceDate;
@@ -221,18 +227,63 @@ public class CodeViolation {
     }
 
     /**
-     * @return the attachedCase
+     * @return the citationIDList
      */
-    public CECase getAttachedCase() {
-        return attachedCase;
+    public List<Integer> getCitationIDList() {
+        return citationIDList;
     }
 
     /**
-     * @param attachedCase the attachedCase to set
+     * @param citationIDList the citationIDList to set
      */
-    public void setAttachedCase(CECase attachedCase) {
-        this.attachedCase = attachedCase;
+    public void setCitationIDList(List<Integer> citationIDList) {
+        this.citationIDList = citationIDList;
     }
-       
-    
+
+    /**
+     * @return the citationsStringList
+     */
+    public String getCitationsStringList() {
+        StringBuilder sb = new StringBuilder();
+        Iterator<Integer> it;
+        
+        if(!citationIDList.isEmpty()){
+            sb.append("Citation IDs: ");
+            it = citationIDList.iterator();
+            while(it.hasNext()){
+                Integer i = it.next();
+                sb.append(String.valueOf(i));
+                if(it.hasNext()){
+                    sb.append(", ");
+                }
+            }
+            citationsStringList = sb.toString();
+        } else citationsStringList = "";
+        return citationsStringList;
+    }
+
+    /**
+     * @param citationsStringList the citationsStringList to set
+     */
+    public void setCitationsStringList(String citationsStringList) {
+        this.citationsStringList = citationsStringList;
+    }
+
+    /**
+     * @return the daysUntilStipulatedComplianceDate
+     */
+    public int getDaysUntilStipulatedComplianceDate() {
+        
+        return daysUntilStipulatedComplianceDate;
+    }
+
+    /**
+     * @param daysUntilStipulatedComplianceDate the daysUntilStipulatedComplianceDate to set
+     */
+    public void setDaysUntilStipulatedComplianceDate(int daysUntilStipulatedComplianceDate) {
+        this.daysUntilStipulatedComplianceDate = daysUntilStipulatedComplianceDate;
+    }
+
+   
+   
 }

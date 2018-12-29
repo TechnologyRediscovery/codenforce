@@ -40,7 +40,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.List;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -51,14 +53,17 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private String formLetterText;
     private Date formDateOfRecord;
     private NoticeOfViolation currentNotice;
-    private ArrayList<CodeViolation> activeVList;
-    private ArrayList<TextBlock> blockListByMuni;
+    private List<CodeViolation> activeVList;
+    private List<TextBlock> blockListByMuni;
     
     private Person selectedRecipient;
-    private ArrayList<Person> personCandidateAL;
+    private List<Person> personCandidateAL;
+    private List<TextBlock> selectedBlockList;
     
     private boolean addPersonByID;
     private int recipientPersonID;
+    
+    private Person addedPerson;
     
     private TextBlock greetingBlock;
     private TextBlock introBlock;
@@ -82,6 +87,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         useTb2 = false;
         useTb3 = false;
         useTb4 = false;
+        addedPerson = new Person();
+    }
+    
+    public void addBlockToList(ActionEvent ae){
+        System.out.println("NoticeOfViolationBB.addBlockToList");
+        selectedBlockList.add(greetingBlock);
     }
     
     public String assembleNotice(){
@@ -144,7 +155,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
     
-    private StringBuilder appendViolationList(ArrayList<CodeViolation> vlist, StringBuilder sb){
+    private StringBuilder appendViolationList(List<CodeViolation> vlist, StringBuilder sb){
         
         Iterator<CodeViolation> iter = vlist.iterator();
         
@@ -216,7 +227,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         System.out.println("NoticeOfViolationBB.QueueNotice");
         CaseCoordinator caseCoord = getCaseCoordinator();
         
-        CECase ceCase = getSessionBean().getActiveCase();
+        CECase ceCase = getSessionBean().getcECase();
 
         NoticeOfViolation notice = getSessionBean().getActiveNotice();
 //        NoticeOfViolation notice = caseCoord.generateNoticeSkeleton(ceCase);
@@ -256,7 +267,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public String saveNoticeDraft(){
         
-        CECase c = getSessionBean().getActiveCase();
+        CECase c = getSessionBean().getcECase();
         NoticeOfViolation notice = getSessionBean().getActiveNotice();
         
         CodeViolationIntegrator ci = getCodeViolationIntegrator();
@@ -340,7 +351,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the textBlockListByMuni
      */
-    public ArrayList<TextBlock> getTextBlockListByMuni() {
+    public List<TextBlock> getTextBlockListByMuni() {
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         
         Municipality m = getSessionBean().getActiveCodeSet().getMuni();
@@ -362,7 +373,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the activeVList
      */
-    public ArrayList<CodeViolation> getActiveVList() {
+    public List<CodeViolation> getActiveVList() {
         
         activeVList = getSessionBean().getActiveViolationList();
         return activeVList;
@@ -518,7 +529,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the personCandidateAL
      */
-    public ArrayList<Person> getPersonCandidateAL() {
+    public List<Person> getPersonCandidateAL() {
         PersonIntegrator pi = getPersonIntegrator();
         
         Property prop = getSessionBean().getActiveProp();
@@ -619,6 +630,34 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setUseTb4(boolean useTb4) {
         this.useTb4 = useTb4;
+    }
+
+    /**
+     * @return the addedPerson
+     */
+    public Person getAddedPerson() {
+        return addedPerson;
+    }
+
+    /**
+     * @param addedPerson the addedPerson to set
+     */
+    public void setAddedPerson(Person addedPerson) {
+        this.addedPerson = addedPerson;
+    }
+
+    /**
+     * @return the selectedBlockList
+     */
+    public List<TextBlock> getSelectedBlockList() {
+        return selectedBlockList;
+    }
+
+    /**
+     * @param selectedBlockList the selectedBlockList to set
+     */
+    public void setSelectedBlockList(List<TextBlock> selectedBlockList) {
+        this.selectedBlockList = selectedBlockList;
     }
     
 }

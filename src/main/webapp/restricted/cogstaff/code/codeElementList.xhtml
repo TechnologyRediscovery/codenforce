@@ -24,6 +24,18 @@
                             <h:messages globalOnly="false"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
 
+                            <p:commandButton
+                                id="updateCodeElement" value="Update Selected Element"
+                                styleClass="multiButtonLineButton" icon="fa fa-edit"
+                                action="#{codeElementListBB.updateSelectedCodeElement}"/>
+
+                            <p:commandButton
+                                id="deleteCodeElement" value="Nuke Selected Element"
+                                styleClass="multiButtonLineButton" icon="fa fa-ban"
+                                actionListener="#{codeElementListBB.deleteCodeElement}"/>
+
+                            <p:spacer height="5px"/>
+                            
                             <p:dataTable
                                 id="codeElementTable"
                                 var="element"
@@ -33,7 +45,6 @@
                                 rowKey="#{element.elementID}"
                                 tableStyleClass="primeDataTable"
                                 scrollable="true"
-                                scrollHeight="300"
                                 resizableColumns="true"
                                 rowExpandMode="multiple"
                                 expandedRow="false"
@@ -47,7 +58,7 @@
                                     <p:rowToggler/>
                                 </p:column>
                                 
-                                <p:column width="3%">
+                                <p:column width="5%" sortBy="#{element.elementID}">
                                     <f:facet name="header">
                                         <h:outputText value="ID#" />
                                     </f:facet>
@@ -116,6 +127,9 @@
                                 </p:column>
                                 
                                 <p:rowExpansion>
+                                     <div class="outlinedBox">
+                                    <h3>Code element detail:</h3>
+
                                     <h:outputLabel styleClass="bold" value="Technical Text"/>
                                     <p:spacer height="15px"/>
                                     <div class="rowExpansion">
@@ -136,21 +150,12 @@
                                     <div class="rowExpansion">
                                         <h:outputText escape="false" value="#{element.guideEntry.inspectionGuidelines}"/>
                                     </div>
+                                     </div>
                                 </p:rowExpansion>
                                 
                             </p:dataTable>
                             
                             <p:spacer height="15px"/>
-
-                            <p:commandButton
-                                id="updateCodeElement" value="Update Selected Element"
-                                styleClass="multiButtonLineButton" icon="fa fa-edit"
-                                action="#{codeElementListBB.updateSelectedCodeElement}"/>
-
-                            <p:commandButton
-                                id="deleteCodeElement" value="Nuke Selected Element"
-                                styleClass="multiButtonLineButton" icon="fa fa-ban"
-                                actionListener="#{codeElementListBB.deleteCodeElement}"/>
 
                         </h:form>
                 </div>

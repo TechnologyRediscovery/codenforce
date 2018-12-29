@@ -29,8 +29,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import javax.faces.application.FacesMessage;
 
@@ -66,7 +68,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             stmt2 = con.prepareStatement(queryCitationViolationTable);
             
             stmt1.setString(1, citation.getCitationNo());
-            stmt1.setInt(2, citation.getStatus().getCitationStatusID());
+            stmt1.setInt(2, citation.getStatus().getStatusID());
             stmt1.setInt(3, citation.getOrigin_courtentity().getCourtEntityID());
             stmt1.setInt(4, citation.getUserOwner().getUserID());
             stmt1.setTimestamp(5, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
@@ -104,7 +106,37 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
-    public Citation getCitationByID(int id) throws IntegrationException{
+    public List<Integer> getCitationIDs(int violationID) throws IntegrationException{
+        List<Integer> cList = new ArrayList<>();
+        String query = "SELECT citation_citationid FROM public.citationviolation WHERE codeviolation_violationid = ?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, violationID);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                cList.add(rs.getInt("citation_citationid"));
+                
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate citation list", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return cList;
+    }
+    
+    public Citation getCitation(int id) throws IntegrationException{
 
         String query = "SELECT citationid, citationno, status_statusid, origin_courtentity_entityid, \n" +
 "       login_userid, dateofrecord, transtimestamp, isactive, notes FROM public.citation WHERE citationid=?;";
@@ -136,7 +168,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         return c;
     }
     
-    public ArrayList<Citation> getCitationsByProperty(Property prop) throws IntegrationException{
+    public ArrayList<Citation> getCitations(Property prop) throws IntegrationException{
         //this doesn't work anymore since citations don't know about cases, we have to go through citationViolation
         // codeviolations know about cases
         
@@ -172,7 +204,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         return citationList;
     }
     
-    public ArrayList<Citation> getCitationsByCase(CECase ceCase) throws IntegrationException{
+    public ArrayList<Citation> getCitations(CECase ceCase) throws IntegrationException{
             
         String query =  "SELECT DISTINCT ON (citationID) citation.citationid, codeviolation.cecase_caseID FROM public.citationviolation 	\n" +
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
@@ -191,7 +223,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                citationList.add(getCitationByID(rs.getInt("citationid")));
+                citationList.add(getCitation(rs.getInt("citationid")));
             }
             
         } catch (SQLException ex) {
@@ -206,7 +238,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         return citationList;
     }
     
-    private ArrayList<CodeViolation> getCodeViolationsByCitation(Citation cid) throws IntegrationException{
+    private ArrayList<CodeViolation> getCodeViolations(Citation cid) throws IntegrationException{
         
         String query =  "SELECT codeviolation.violationid FROM public.citationviolation 	\n" +
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
@@ -224,7 +256,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                violationList.add(cvi.getCodeViolationByViolationID(rs.getInt("violationid")));
+                violationList.add(cvi.getCodeViolation(rs.getInt("violationid")));
                 
             }
             
@@ -255,7 +287,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             c.setTimeStamp(rs.getTimestamp("transTimeStamp").toLocalDateTime());
             c.setIsActive(rs.getBoolean("isActive"));
             c.setNotes(rs.getString("notes"));
-            c.setViolationList(getCodeViolationsByCitation(c));
+            c.setViolationList(getCodeViolations(c));
         } catch (SQLException | IntegrationException ex) {
             System.out.println(ex);
             throw new IntegrationException("Unable to build citation from RS", ex);
@@ -275,7 +307,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, citation.getCitationNo());
-            stmt.setInt(2, citation.getStatus().getCitationStatusID());
+            stmt.setInt(2, citation.getStatus().getStatusID());
             stmt.setInt(3, citation.getOrigin_courtentity().getCourtEntityID());
             stmt.setInt(4, citation.getUserOwner().getUserID());
             stmt.setTimestamp(5, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
@@ -400,7 +432,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
     public CitationStatus generateCitationStatus(ResultSet rs) throws IntegrationException{
         CitationStatus cs = new CitationStatus();
         try {
-            cs.setCitationStatusID(rs.getInt("statusid"));
+            cs.setStatusID(rs.getInt("statusid"));
             cs.setStatusTitle(rs.getString("statusname"));
             cs.setDescription(rs.getString("description"));
         } catch (SQLException ex) {
@@ -445,7 +477,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, cs.getCitationStatusID());
+            stmt.setInt(1, cs.getStatusID());
             stmt.execute();
             
             getFacesContext().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -481,7 +513,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             
             
             getFacesContext().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Citation no. " + cs.getCitationStatusID() + " has been updated", ""));
+                    "Citation no. " + cs.getStatusID() + " has been updated", ""));
 
             
         } catch (SQLException ex) {

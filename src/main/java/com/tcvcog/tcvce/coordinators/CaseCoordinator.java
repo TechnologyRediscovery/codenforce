@@ -22,11 +22,12 @@ import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
@@ -39,6 +40,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import javax.faces.application.FacesMessage;
 
@@ -64,7 +66,35 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         CECase newlyAddedCase = ci.insertNewCECase(newCase);
         
-        getSessionBean().setActiveCase(newlyAddedCase);
+        getSessionBean().setcECase(newlyAddedCase);
+        
+    }
+    
+    /**
+     * Called by the PIBCECaseBB when a public user wishes to add an event
+     * to the case they are viewing online. This method stitches together the
+     * message text, messenger name, and messenger phone number before
+     * passing the info back to the EventCoordinator
+     * @param caseID can be extracted from the public info bundle
+     * @param msg the text of the message the user wants to add to the case 
+     * @param messagerName the first and last name of the person submitting the message
+     * Note that this submission info is not YET wired into the actual Person objects
+     * in the system.
+     * @param messagerPhone a simple String rendering of whatever the user types in. Length validation only.
+     */
+    public void attachPublicMessage(int caseID, String msg, String messagerName, String messagerPhone) throws IntegrationException{
+        StringBuilder sb = new StringBuilder();
+        sb.append("Case note added by ");
+        sb.append(messagerName);
+        sb.append(" with contact number: ");
+        sb.append(messagerPhone);
+        sb.append(": ");
+        sb.append("<br/><br/>");
+        sb.append(msg);
+        
+        EventCoordinator ec = getEventCoordinator();
+        ec.attachPublicMessagToCECase(caseID, sb.toString());
+        
         
     }
     
@@ -109,7 +139,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public void processCEEvent(CECase c, EventCase e) 
+    public void processCEEvent(CECase c, EventCECase e) 
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
         
@@ -142,14 +172,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException in the case of a DB error
      * @throws CaseLifecyleException in the case of date mismatch
      */
-    private void processComplianceEvent(CECase c, EventCase e) 
+    private void processComplianceEvent(CECase c, EventCECase e) 
             throws ViolationException, IntegrationException, CaseLifecyleException{
         
         
         ViolationCoordinator vc = getViolationCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
-        ArrayList<CodeViolation> activeViolationList = getSessionBean().getActiveViolationList();
+        List<CodeViolation> activeViolationList = getSessionBean().getActiveViolationList();
         ListIterator<CodeViolation> li = activeViolationList.listIterator();
         CodeViolation cv;
         
@@ -213,7 +243,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                     + "inside while loop for compliance check with all violations: " + complianceWithAllViolations);
         } // close while
         
-        EventCase complianceClosingEvent;
+        EventCECase complianceClosingEvent;
         
         if (complianceWithAllViolations){
             System.out.println("CaseCoordinator.processComplianceEvent | "
@@ -228,7 +258,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
      
-    private void processClosingEvent(CECase c, EventCase e) throws IntegrationException, CaseLifecyleException{
+    private void processClosingEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
         
@@ -252,6 +282,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     
     
+    
     /**
      * Main controller method for event-related life cycle events. Requires event to be
      * loaded up with a caseID and an eventType. No eventID is required since it
@@ -261,7 +292,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    private void processActionEvent(CECase c, EventCase e) throws CaseLifecyleException, IntegrationException{
+    private void processActionEvent(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException{
         
         EventCoordinator ec = getEventCoordinator();
         // insert the triggering action event
@@ -271,7 +302,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         refreshCase(c);
     }
     
-    private void checkForAndCarryOutCasePhaseChange(CECase c, EventCase e) throws CaseLifecyleException, IntegrationException{
+    private void checkForAndCarryOutCasePhaseChange(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException{
         
         CaseIntegrator ci = getCaseIntegrator();
         CasePhase initialCasePhase = c.getCasePhase();
@@ -341,13 +372,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * A catch-the-rest method that simple adds the event to the case without
      * any additional logic or processing. Called by the default case in the
-     * event delegator method
+     * event delegator method. Passes the duty of calling the integrator
+     * to the insertEvent on the EventCoordinator
      * @param c the case to which the event should be attached
      * @param e the event to be attached
      * @throws IntegrationException thrown if the integrator cannot get the data
      * into the DB
      */
-    private void processGeneralEvent(CECase c, EventCase e) throws IntegrationException{
+    private void processGeneralEvent(CECase c, EventCECase e) throws IntegrationException{
         EventCoordinator ec = getEventCoordinator();
         ec.insertEvent(e);
         refreshCase(c);
@@ -452,7 +484,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             
         }
         
-        EventCase noticeEvent = new EventCase();
+        EventCECase noticeEvent = new EventCECase();
         EventCategory ec = new EventCategory();
         ec.setCategoryID(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued")));
@@ -484,7 +516,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         System.out.println("CaseCoordinator.refreshCase");
         CaseIntegrator ci = getCaseIntegrator();
         
-        getSessionBean().setActiveCase(ci.getCECase(c.getCaseID()));
+        getSessionBean().setcECase(ci.getCECase(c.getCaseID()));
         
     }
     
@@ -525,21 +557,45 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
    
-   public Citation generateNewCitation(ArrayList<CodeViolation> violationList){
+   public Citation generateNewCitation(List<CodeViolation> violationList){
        Citation newCitation = new Citation();
        ArrayList<CodeViolation> al = new ArrayList<>();
        ListIterator<CodeViolation> li = violationList.listIterator();
        CodeViolation cv;
+       
+       StringBuilder notesBuilder = new StringBuilder();
+       notesBuilder.append("Failure to comply with the following ordinances:\n");
+       
+       
        
        while(li.hasNext()){
            
            cv = li.next();
            System.out.println("CaseCoordinator.generateNewCitation | linked list item: " 
                    + cv.getDescription());
+           
+           // build a nice note section that lists the elements cited
+           notesBuilder.append("* Chapter ");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdchapterNo());
+           notesBuilder.append(":");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdchapterTitle());
+           notesBuilder.append(", Section ");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSecNum());
+           notesBuilder.append(":");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSecTitle());
+           notesBuilder.append(", Subsection ");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSubSecNum());
+           notesBuilder.append(": ");
+           notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSubSecTitle());
+           notesBuilder.append("\n\n");
+           
            al.add(cv);
            
        }
        newCitation.setViolationList(al);
+       newCitation.setNotes(notesBuilder.toString());
+       newCitation.setIsActive(true);
+       
        return newCitation;
    }
    
@@ -570,4 +626,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        citint.updateCitation(c);
        
    }
+   
+   public CEActionRequest getNewActionRequest(){
+       System.out.println("CaseCoordinator.getNewActionRequest");
+       return new CEActionRequest();
+       
+   }
+   
 }

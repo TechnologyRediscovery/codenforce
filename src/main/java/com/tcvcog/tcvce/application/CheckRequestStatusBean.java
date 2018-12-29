@@ -17,13 +17,8 @@
 package com.tcvcog.tcvce.application;
 
 
-import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.faces.event.ActionEvent;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -46,26 +41,19 @@ public class CheckRequestStatusBean extends BackingBeanUtils implements Serializ
     
     
     public String lookupRequest(){
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        try {
-            retrievedRequest = ceari.getActionRequestByControlCode(lookupControlCode);
+//        CEActionRequestIntegratorPublic ceari = getcEActionRequestIntegratorPublic();
+//            retrievedRequest = ceari.getActionRequestByControlCode(lookupControlCode);
             // now that we've got a request, store it in our session's active action request
             
-            getSessionBean().setActionRequest(retrievedRequest);
+            getSessionBean().setcEActionRequest(retrievedRequest);
             getFacesContext().addMessage(null, new FacesMessage 
                     (FacesMessage.SEVERITY_INFO, "Success! Code Enforcement Action Request Lookup returned the following information", ""));
             return "success";
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage 
-                    (FacesMessage.SEVERITY_ERROR, "Oops, a problem ocurred while retrieving your request. We apologize for any inconveneience", 
-                            "Please phone your borough office for more information about your request."));
-        }
-        
-        getFacesContext().addMessage(null, new FacesMessage 
-                (FacesMessage.SEVERITY_ERROR, "Sorry, no action requests exist in the system with that control code. "
-                        + "Please check the code you entered and search again.", ""));
-        return "";  // reload page
+//        
+//        getFacesContext().addMessage(null, new FacesMessage 
+//                (FacesMessage.SEVERITY_ERROR, "Sorry, no action requests exist in the system with that control code. "
+//                        + "Please check the code you entered and search again.", ""));
+//        return "";  // reload page
     }
 
     /**

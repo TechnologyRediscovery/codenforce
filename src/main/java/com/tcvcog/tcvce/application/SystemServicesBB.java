@@ -29,10 +29,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
- *
+ * A hodgepodge class of backing bean code for improvement suggestion stuff
+ * and related data
  * @author Eric C. Darsow
  */
 public class SystemServicesBB extends BackingBeanUtils implements Serializable{
@@ -47,6 +51,8 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private ArrayList<ImprovementSuggestion> filteredImpList;
     
     private ResultSet impSugs;
+    
+    private String logSub;
     
     
     /**
@@ -64,6 +70,16 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
             }
         }
         return "missionControl";
+    }
+    
+    public void logErrorPageLoad(){
+        try {
+            getLogIntegrator().makeLogEntry(getFacesUser().getUserID(),
+                    getSessionID(), 2, "error page hit", true, false);
+        } catch (IntegrationException ex) {
+            Logger.getLogger(SystemServicesBB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SystemServicesBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public String submitImprovementSuggestion(){
@@ -256,6 +272,22 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setImpSugs(ResultSet impSugs) {
         this.impSugs = impSugs;
+    }
+
+    /**
+     * @return the logSub
+     */
+    public String getLogSub() {
+        logErrorPageLoad();
+        logSub = "logged";
+        return logSub;
+    }
+
+    /**
+     * @param logSub the logSub to set
+     */
+    public void setLogSub(String logSub) {
+        this.logSub = logSub;
     }
     
     

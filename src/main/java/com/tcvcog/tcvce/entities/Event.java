@@ -17,13 +17,14 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class Event {
+public class Event implements Serializable {
     
     private int eventID;
     private EventCategory category;
@@ -37,6 +38,11 @@ public class Event {
     private boolean activeEvent;
     private boolean hidden;
     private String notes;
+    private boolean requiresViewConfirmation;
+    // this boolean is not mapped into DB--only for using switches by user
+    private boolean viewConfirmed;
+    private User viewConfirmedBy;
+    private LocalDateTime viewConfirmedAt;
 
     /**
      * @return the eventID
@@ -204,6 +210,62 @@ public class Event {
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the requiresViewConfirmation
+     */
+    public boolean isRequiresViewConfirmation() {
+        return requiresViewConfirmation;
+    }
+
+    /**
+     * @return the viewConfirmedBy
+     */
+    public User getViewConfirmedBy() {
+        return viewConfirmedBy;
+    }
+
+    /**
+     * @return the viewConfirmedAt
+     */
+    public LocalDateTime getViewConfirmedAt() {
+        return viewConfirmedAt;
+    }
+
+    /**
+     * @param requiresViewConfirmation the requiresViewConfirmation to set
+     */
+    public void setRequiresViewConfirmation(boolean requiresViewConfirmation) {
+        this.requiresViewConfirmation = requiresViewConfirmation;
+    }
+
+    /**
+     * @param viewConfirmedBy the viewConfirmedBy to set
+     */
+    public void setViewConfirmedBy(User viewConfirmedBy) {
+        this.viewConfirmedBy = viewConfirmedBy;
+    }
+
+    /**
+     * @param viewConfirmedAt the viewConfirmedAt to set
+     */
+    public void setViewConfirmedAt(LocalDateTime viewConfirmedAt) {
+        this.viewConfirmedAt = viewConfirmedAt;
+    }
+
+    /**
+     * @return the viewConfirmed
+     */
+    public boolean isViewConfirmed() {
+        return viewConfirmed;
+    }
+
+    /**
+     * @param viewConfirmed the viewConfirmed to set
+     */
+    public void setViewConfirmed(boolean viewConfirmed) {
+        this.viewConfirmed = viewConfirmed;
     }
 
     

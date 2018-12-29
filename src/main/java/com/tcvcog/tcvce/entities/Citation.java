@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import java.util.Objects;
  *
  * @author Eric C. Darsow
  */
-public class Citation {
+public class Citation implements Serializable {
     private int citationID;
     private String citationNo;
     private CitationStatus status;

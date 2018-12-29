@@ -119,6 +119,92 @@
                         <p:spacer height="10px"/>
                         <hr/>
                         <p:spacer height="10px"/>
+                        
+                        
+                            <h2>Active Code enforcement cases</h2>
+
+                                <h:form id="caseViewForm">
+                                <p:commandButton ajax="false"  value="Open a new code enforcement case &rarr;" action="#{propertyProfileBB.createCase}"/>
+                                <p:spacer height="10px"/>
+                                <p:dataTable
+                                    id="caseTable"
+                                    var="c"
+                                    rowKey="#{c.caseID}"
+                                    widgetVar="propProfileCaseTable"
+                                    rowExpandMode="multiple"
+                                    value="#{propertyProfileBB.ceCaseList}"
+                                    tableStyleClass="primeDataTable">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="3%">
+                                        <p:rowToggler />
+                                    </p:column>
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Case ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseID}"/>
+                                    </p:column>
+                                     <p:column width="8%" exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="view" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-clipboard"
+                                                             action="#{ceCasesBB.viewCase(c)}" 
+                                                             ajax="false"/>
+                                        </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Property" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.property.address}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseName}"/>
+                                    </p:column>
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Phase" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.casePhase}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Date Opened" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.originiationDatePretty}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Manager" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.user.LName}"/>
+                                    </p:column>
+
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+                                            
+                                        <h:panelGrid
+                                            columns="3" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd"
+                                             footerClass="gridFooter" style="vertical-align: top;">
+                                            <h:panelGroup>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                        <h:outputText value="Public access control Code: #{c.publicControlCode}"/>
+                                        </div>
+                                    </p:rowExpansion>
+                                </p:dataTable>
+
+                            </h:form>
+
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+                        
                         <h:form id="propertyDataBitsForm">
 
                             <h2>Action Requests</h2>
@@ -132,21 +218,6 @@
                             <hr/>
                             <p:spacer height="10px"/>
 
-                            <h2>Active Code enforcement cases</h2>
-                            <p:commandButton ajax="false"  value="Open a new case &rarr;" action="#{propertyProfileBB.createCase}"/>
-
-
-
-                            <p>Select a case in the table to view its details.</p>
-                            <!--Insert case table here-->
-
-
-                            <p:commandButton ajax="fakse" value="View selected case summary" action="caseSummary" disabled="true"/>
-
-
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
 
                             <h2>Property-connected person</h2>
 
@@ -181,6 +252,15 @@
                                         <h:outputText value="ID" />
                                     </f:facet>
                                     <h:outputText value="#{p.personID}"/>
+                                </p:column>
+
+                                <p:column width="8%" exportable="false">
+                                    <f:facet name="header">
+                                        <h:outputText value="Edit" />
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-clipboard"
+                                                     action="#{propertyProfileBB.viewPersonProfile(p)}" 
+                                                     ajax="false"/>
                                 </p:column>
                                 
                                 <p:column width="10%" sortBy="#{p.personType.label}"
@@ -225,8 +305,8 @@
                                     <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
                                 </p:column>
                                 
-                                
                                 <p:rowExpansion>
+                                    <div class="outlinedBox">
                                     <h2>Full person listing for <h:outputText value="#{p.firstName} #{p.lastName}"/> </h2>
                                     <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                  columnClasses="gridTd, gridTd, gridTd, gridTd">
@@ -354,6 +434,7 @@
                                             </div>
                                         </f:facet>
                                     </h:panelGrid>
+                                    </div>
                                 </p:rowExpansion>
                             </p:dataTable>
 

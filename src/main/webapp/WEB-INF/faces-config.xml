@@ -10,9 +10,26 @@
             <var>msgs</var>
         </resource-bundle>
         
+       
+        <resource-bundle>
+            <base-name>loggingcategories</base-name>
+            <var>loggingcategories</var>
+        </resource-bundle>
+        
         <resource-bundle>
             <base-name>eventCategories</base-name>
             <var>eventCategories</var>
+        </resource-bundle>
+        
+        <resource-bundle>
+            <base-name>dbFixedValueLookup</base-name>
+            <var>dbFixedValueLookup</var>
+        </resource-bundle>
+        
+        
+        <resource-bundle>
+            <base-name>dbconnection</base-name>
+            <var>dbConnectionParams</var>
         </resource-bundle>
         
     </application>
@@ -25,13 +42,6 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <description>Establishes the connection to the Code Enforcement Database for use throughout a session</description>
-        <managed-bean-name>dBConnection</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.PostgresConnectionFactory</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-
     <managed-bean>
         <description>Stores constants for use in Java classes</description>
         <managed-bean-name>constants</managed-bean-name>
@@ -243,9 +253,16 @@
     </managed-bean>
   
     <managed-bean>
-        <description>Models a request for code enforcement action</description>
-        <managed-bean-name>actionRequestBean</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ActionRequestBean</managed-bean-class>
+        <description>Coordinates view-coordinator ignteractions around code enforcement actions</description>
+        <managed-bean-name>cEActionRequestsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+  
+    <managed-bean>
+        <description>Used by the submission system for action requests</description>
+        <managed-bean-name>cEActionRequestSubmitBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestSubmitBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
@@ -253,8 +270,8 @@
         <description>Provides backing bean utilities for the action requestmanagement.xhtml page</description>
         <managed-bean-name>requestManagementBean</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.RequestManagementBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <description>Backing bean for the action request checking form and results page.</description>
@@ -350,9 +367,9 @@
     
     <managed-bean>
         <managed-bean-name>ceCasesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CeCasesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECasesBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>caseProfileBB</managed-bean-name>
@@ -539,22 +556,13 @@
     </navigation-rule>
     
     <!--Public-->
-
-    <navigation-rule>
-        <from-view-id>/public/services/submitCERequest.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>success</from-outcome>
-            <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
-    
     <navigation-rule>
 
         <from-view-id>*</from-view-id>    
         
         <navigation-case>
-            <from-outcome>ceActionRequest</from-outcome>
-            <to-view-id>/public/services/submitCERequest.xhtml</to-view-id>
+            <from-outcome>paccSearch</from-outcome>
+            <to-view-id>/public/services/paccSearch.xhtml</to-view-id>
             <redirect />
         </navigation-case>
 
@@ -588,12 +596,87 @@
         </navigation-case>
     </navigation-rule>
         
+    
+    <navigation-rule>
+        <from-view-id>/public/services/paccSearch.xhtml</from-view-id>  
+        <navigation-case>
+            <from-outcome>publicInfoCECase</from-outcome>
+            <to-view-id>/public/services/viewPIBCECase.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+        
+    <!--ceaction request flow-->    
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>cEActionRequests</from-outcome>
+            <to-view-id>/restricted/cogview/cEActionRequests.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>requestCEActionFlow</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</to-view-id>
+        </navigation-case>
+        <redirect />
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</from-view-id>  
+        <navigation-case>
+            <from-outcome>chooseProperty</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_chooseProperty.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>describeConcern</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_describeConcern.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>requestorDetails</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_requestorDetails.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
+            <from-outcome>reviewAndSubmit</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+        
+
+    <navigation-rule>
+        <from-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_reviewAndSubmit.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>success</from-outcome>
+            <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+        
+    
+    
+    
     <!--site-wide navigation-->    
 
 
     
     <navigation-rule>
-        <from-view-id>/restricted/cogview/ceCases.xhtml</from-view-id>
+        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
         
         <navigation-case>
             <from-action>#{ceCasesBB.viewCase}</from-action>
@@ -610,7 +693,7 @@
         
         <navigation-case>
             <from-outcome>ceCases</from-outcome>
-            <to-view-id>/restricted/cogview/ceCases.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -689,6 +772,20 @@
             <to-view-id>/public/system/documentation/technical/technical.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>about</from-outcome>
+            <to-view-id>/public/system/documentation/about.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>contact</from-outcome>
+            <to-view-id>/public/system/documentation/contact.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
     </navigation-rule>
     
     <!--Properties-->
@@ -725,7 +822,17 @@
     </navigation-rule>
     
     <navigation-rule>
-        <from-view-id>/restricted/cogview/propertyProfile.xhtml</from-view-id>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>addNewCase</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+        
+    
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/propertySearch.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>addNewCase</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
@@ -786,7 +893,7 @@
 
         <navigation-case>
             <from-outcome>ceCases</from-outcome>
-            <to-view-id>/restricted/cogview/ceCases.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
 
@@ -858,18 +965,6 @@
     
     </navigation-rule>
     
-    
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/caseProfile.xhtml</from-view-id>
-        <navigation-case>
-            <from-action>#{caseProfileBB.addViolation}</from-action>
-            <from-outcome>violationSelectElement</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
-
-        
     <navigation-rule>
         <from-view-id>/restricted/cogstaff/ce/requestManagement.xhtml</from-view-id>
         <navigation-case>
@@ -881,9 +976,8 @@
     </navigation-rule>
     
     <navigation-rule>
-        <from-view-id>/restricted/muniview/ceActionRequests.xhtml</from-view-id>
+        <from-view-id>*</from-view-id>
         <navigation-case>
-            <from-action>#{ceActionRequestsBB.viewSelectedActionRequest}</from-action>
             <from-outcome>actionRequestManage</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/actionRequestManage.xhtml</to-view-id>
         </navigation-case>
@@ -895,7 +989,7 @@
         <navigation-case>
             <from-action>#{caseAddBB.addNewCase}</from-action>
             <from-outcome>ceCases</from-outcome>
-            <to-view-id>/restricted/cogview/ceCases.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -922,6 +1016,8 @@
     </navigation-rule>
     
     
+    
+   
     <navigation-rule>
         <from-view-id>/restricted/cogview/caseProfile.xhtml</from-view-id>
         <navigation-case>
@@ -930,11 +1026,21 @@
             <to-view-id>/restricted/cogstaff/ce/violationEdit.xhtml</to-view-id>
             <redirect />
         </navigation-case>
-    </navigation-rule>
-    
-   
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/caseProfile.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{caseProfileBB.createCitationFromSelected}</from-action>
+            <from-outcome>citationEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{caseProfileBB.createCitationForAllViolations}</from-action>
+            <from-outcome>citationEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{caseProfileBB.updateCitation}</from-action>
+            <from-outcome>citationEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
+        </navigation-case>
         <navigation-case>
             <from-action>#{eventAddBB.startNewEvent}</from-action>
             <from-outcome>eventAdd</from-outcome>
@@ -946,6 +1052,22 @@
             <from-outcome>eventAdd</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/eventAdd.xhtml</to-view-id>
             <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{caseProfileBB.recordCompliance}</from-action>
+            <from-outcome>eventAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/eventAdd.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{caseProfileBB.addViolation}</from-action>
+            <from-outcome>violationSelectElement</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>eventEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/eventEdit.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
     
@@ -1003,6 +1125,11 @@
     <navigation-rule>
         <from-view-id>*</from-view-id>
     
+        <navigation-case>
+            <from-outcome>statistics</from-outcome>
+            <to-view-id>/restricted/cogview/statistics.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>   
         <navigation-case>
             <from-outcome>codeGuideView</from-outcome>
             <to-view-id>/restricted/cogview/codeGuideView.xhtml</to-view-id>
@@ -1160,7 +1287,6 @@
     </navigation-rule>
     
     
-    <!-- ************ non-wildcard nav cases ************************-->
     <managed-bean>
         <managed-bean-name>ceActionRequestsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CeActionRequestsBB</managed-bean-class>
@@ -1169,6 +1295,55 @@
     <managed-bean>
         <managed-bean-name>textBlockBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>dashboardDataBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.DashboardDataBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>navMenuBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>actionRequestManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>publicInfoBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+    <managed-bean>
+        <managed-bean-name>publicInfoCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.PublicInfoCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>pIBCECaseBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PIBCECaseBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>searchCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.SearchCoordinator</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>municipalityManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cEComplianceTimeframeClosingsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEComplianceTimeframeClosingsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cENoticeAcknowledgementsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CENoticeAcknowledgementsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

@@ -64,21 +64,6 @@
                                     <h:outputText value="#{cse.codeElement.source.sourceName}(#{cse.codeElement.source.sourceYear})"/>
                                 </p:column>
                                 
-                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.category}"
-                                          filterBy="#{cse.codeElement.guideEntry.category}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
-                                </p:column>
-                                
-                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
-                                          filterBy="#{cse.codeElement.guideEntry.subCategory}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Sub Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{cse.codeElement.guideEntry.subCategory}"/>
-                                </p:column>
                                 
                                 <p:column width="5%" sortBy="#{cse.codeElement.ordchapterNo}">
                                     <f:facet name="header">
@@ -124,6 +109,22 @@
                                         <h:outputText value="SubSec. Title" />
                                     </f:facet>
                                     <h:outputText value="#{cse.codeElement.ordSubSecTitle}"/>
+                                </p:column>
+                                
+                                 <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.category}"
+                                          filterBy="#{cse.codeElement.guideEntry.category}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
+                                </p:column>
+                                
+                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
+                                          filterBy="#{cse.codeElement.guideEntry.subCategory}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeElement.guideEntry.subCategory}"/>
                                 </p:column>
                                 
                                 

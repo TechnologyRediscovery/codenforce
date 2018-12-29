@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -334,14 +334,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     } // close insertPerson()
 
-    public void connectPersonsToEvent(EventCase ev, List<Person> personList) throws IntegrationException {
+    public void connectPersonsToEvent(EventCECase ev, List<Person> personList) throws IntegrationException {
         ListIterator li = personList.listIterator();
         while (li.hasNext()) {
             connectPersonToEvent(ev, (Person) li.next());
         }
     }
 
-    public void connectPersonToEvent(EventCase ev, Person p) throws IntegrationException {
+    public void connectPersonToEvent(EventCECase ev, Person p) throws IntegrationException {
 
         String query = "INSERT INTO public.ceeventperson(\n"
                 + " ceevent_eventid, person_personid)\n"

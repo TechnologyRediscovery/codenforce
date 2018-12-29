@@ -18,19 +18,36 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
+
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
+ 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -43,10 +60,66 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private ArrayList<Municipality> muniList;
     private Municipality selectedMuni;
     
+    private ArrayList<EventWithCasePropInfo> timelineEventList;
+    private ArrayList<EventWithCasePropInfo> filteredEventWithCasePropList;
+    private int timelineEventViewDateRange;
+    
+ 
+    
+    
+    
     /**
      * Creates a new instance of InitiateSessionBB
      */
     public MissionControlBB() {
+    }
+    
+    public void testPDF(ActionEvent ev){
+        String DEST = "/home/sylvia/GlassFish_Server/glassfish/domains/domain1/applications/helloPDF.pdf";
+        File file = new File(DEST);
+        System.out.println("MissionControlBB.testPDF | can write to loc: " + file.canWrite());
+        file.getParentFile().mkdirs();
+        //Initialize PDF writer
+        Document document;
+        PdfWriter writer;
+        try {
+            writer = new PdfWriter(file);
+        //Initialize PDF document
+        PdfDocument pdf = new PdfDocument(writer);
+ 
+        // Initialize document
+        document = new Document(pdf);
+ 
+        //Add paragraph to the document
+        document.add(new Paragraph("Hello World!"));
+ 
+        //Close document
+        document.close();
+            System.out.println("wrote pdf!");
+        
+        } catch (FileNotFoundException ex) {
+            System.out.println("MissionControlBB.testPDF");
+            System.out.println(ex);
+        }
+ 
+        
+    }
+    
+    
+    public void updateEventViewData(EventWithCasePropInfo ev){
+        System.out.println("MissionControlBB.updateEventViewData | event selected ID: " + ev.getEventID());
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            ei.confirmEventView(getFacesUser(), ev);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Updated view info for event " 
+                        + ev.getEventID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+            getTimelineEventList();
     }
     
     public String switchMuni(){
@@ -72,6 +145,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
     public String loginToMissionControl(){
+        System.out.println("MissionControlBB.loginToMissionControl");
         
         return "startInitiationProcess";
     }
@@ -173,7 +247,60 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public void setSelectedMuni(Municipality selectedMuni) {
         this.selectedMuni = selectedMuni;
     }
-    
+
+    /**
+     * @return the timelineEventList
+     */
+    public ArrayList<EventWithCasePropInfo> getTimelineEventList() {
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            timelineEventList = 
+                    (ArrayList<EventWithCasePropInfo>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni(), 
+                            LocalDateTime.now(), LocalDateTime.now().plusDays(365));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return timelineEventList;
+    }
+
+    /**
+     * @param timelineEventList the timelineEventList to set
+     */
+    public void setTimelineEventList(ArrayList<EventWithCasePropInfo> timelineEventList) {
+        this.timelineEventList = timelineEventList;
+    }
+
+    /**
+     * @return the filteredEventWithCasePropList
+     */
+    public List<EventWithCasePropInfo> getFilteredEventWithCasePropList() {
+        return filteredEventWithCasePropList;
+    }
+
+    /**
+     * @param filteredEventWithCasePropList the filteredEventWithCasePropList to set
+     */
+    public void setFilteredEventWithCasePropList(ArrayList<EventWithCasePropInfo> filteredEventWithCasePropList) {
+        this.filteredEventWithCasePropList = filteredEventWithCasePropList;
+    }
+
+    /**
+     * @return the timelineEventViewDateRange
+     */
+    public int getTimelineEventViewDateRange() {
+        return timelineEventViewDateRange;
+    }
+
+    /**
+     * @param timelineEventViewDateRange the timelineEventViewDateRange to set
+     */
+    public void setTimelineEventViewDateRange(int timelineEventViewDateRange) {
+        this.timelineEventViewDateRange = timelineEventViewDateRange;
+    }
+
+   
+
+   
     
 
    

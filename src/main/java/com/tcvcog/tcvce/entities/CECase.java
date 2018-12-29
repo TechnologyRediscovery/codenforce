@@ -5,25 +5,43 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  *
  * @author cedba
  */
-public class CECase {
+public class CECase implements Serializable{
     
     private int caseID;
     private int publicControlCode;
+    private boolean paccEnabled;
+    
+    /**
+     * Code enforcement action requests are generally linked
+    * to a code enforcement case by the code officers.
+    * This switch allows the release of the allowed
+    * case info to any holder of a PACC for a CEActionRequest
+    * that contains a link to this case.
+     */
+    private boolean allowForwardLinkedPublicAccess;
     
     private Property property;
     private PropertyUnit propertyUnit;
     private User user;
-
-    private ArrayList<CodeViolation> violationList;
-    private ArrayList<EventCase> eventList;
+    
+    private List<CodeViolation> violationList;
+    private List<EventCECase> eventList;
+    private List<Citation> citationList;
+    private List<NoticeOfViolation> noticeList;
+    private List<CEActionRequest> requestList;
     
     private String caseName;
     private CasePhase casePhase;
@@ -42,6 +60,15 @@ public class CECase {
     @Override
     public String toString(){
         return caseName;
+    }
+    
+    public String getCaseStage(){
+        
+        return "A";
+    }
+    
+    public int getCaseAge(){
+        return java.time.Period.between(creationTimestamp.toLocalDate(), LocalDate.now()).getDays();
     }
     
     /**
@@ -173,7 +200,7 @@ public class CECase {
     /**
      * @return the violationList
      */
-    public ArrayList<CodeViolation> getViolationList() {
+    public List<CodeViolation> getViolationList() {
         return violationList;
     }
 
@@ -187,14 +214,14 @@ public class CECase {
     /**
      * @return the eventList
      */
-    public ArrayList<EventCase> getEventList() {
+    public List<EventCECase> getEventList() {
         return eventList;
     }
 
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(ArrayList<EventCase> eventList) {
+    public void setEventList(ArrayList<EventCECase> eventList) {
         this.eventList = eventList;
     }
 
@@ -231,6 +258,8 @@ public class CECase {
      * @return the originiationDatePretty
      */
     public String getOriginiationDatePretty() {
+        DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE dd MM yyyy, HH:mm");
+        originiationDatePretty = originationDate.format(f);
         return originiationDatePretty;
     }
 
@@ -253,6 +282,76 @@ public class CECase {
      */
     public void setClosingDatePretty(String closingDatePretty) {
         this.closingDatePretty = closingDatePretty;
+    }
+
+    /**
+     * @return the paccEnabled
+     */
+    public boolean isPaccEnabled() {
+        return paccEnabled;
+    }
+
+    /**
+     * @param paccEnabled the paccEnabled to set
+     */
+    public void setPaccEnabled(boolean paccEnabled) {
+        this.paccEnabled = paccEnabled;
+    }
+
+    /**
+     * @return the citationList
+     */
+    public List<Citation> getCitationList() {
+        return citationList;
+    }
+
+    /**
+     * @param citationList the citationList to set
+     */
+    public void setCitationList(List<Citation> citationList) {
+        this.citationList = citationList;
+    }
+
+    /**
+     * @return the allowForwardLinkedPublicAccess
+     */
+    public boolean isAllowForwardLinkedPublicAccess() {
+        return allowForwardLinkedPublicAccess;
+    }
+
+    /**
+     * @param allowForwardLinkedPublicAccess the allowForwardLinkedPublicAccess to set
+     */
+    public void setAllowForwardLinkedPublicAccess(boolean allowForwardLinkedPublicAccess) {
+        this.allowForwardLinkedPublicAccess = allowForwardLinkedPublicAccess;
+    }
+
+    /**
+     * @return the noticeList
+     */
+    public List<NoticeOfViolation> getNoticeList() {
+        return noticeList;
+    }
+
+    /**
+     * @param noticeList the noticeList to set
+     */
+    public void setNoticeList(List<NoticeOfViolation> noticeList) {
+        this.noticeList = noticeList;
+    }
+
+    /**
+     * @return the requestList
+     */
+    public List<CEActionRequest> getRequestList() {
+        return requestList;
+    }
+
+    /**
+     * @param requestList the requestList to set
+     */
+    public void setRequestList(List<CEActionRequest> requestList) {
+        this.requestList = requestList;
     }
     
     

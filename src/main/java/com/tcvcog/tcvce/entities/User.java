@@ -18,6 +18,8 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -31,6 +33,8 @@ public class User implements Serializable{
     // note password is not stored in the business object!
     private String password;
     private int muniCode;
+    private List<Municipality> authMunis;
+    // To be deprecated 
     private Municipality muni;
     private String fName;
     private String lName;
@@ -46,12 +50,42 @@ public class User implements Serializable{
     private String notes;
     private LocalDateTime activityStartDate;
     private LocalDateTime activityStopDate;
-    private boolean accessPermitted;
+    
+    // permissions
+    private boolean systemAccessPermitted;
+    private KeyCard keyCard;
+    
+    
     
     /**
      * Creates a new instance of User
      */
     public User() {
+    }
+    
+    /**
+     * Creates a new instance of User
+     * @param id
+     * @param rt
+     */
+    public User(int id, RoleType rt) {
+        userID = id;
+        roleType = rt;
+    }
+    
+    public void setUserID(int uid){
+        userID = uid;
+    }
+    
+    
+    
+    /**
+     * Creates a new instance of User
+     * @param munis The municipality objects for the munis this user
+     * can search and manipulate data within
+     */
+    public User(LinkedList<Municipality> munis) {
+        authMunis = munis;
     }
 
 
@@ -63,24 +97,10 @@ public class User implements Serializable{
     }
 
     /**
-     * @param userID the userID to set
-     */
-    public void setUserID(int userID) {
-        this.userID = userID;
-    }
-
-    /**
      * @return the roleType
      */
     public RoleType getRoleType() {
         return roleType;
-    }
-
-    /**
-     * @param roleType the roleType to set
-     */
-    public void setRoleType(RoleType roleType) {
-        this.roleType = roleType;
     }
 
     /**
@@ -293,19 +313,7 @@ public class User implements Serializable{
         this.activityStopDate = activityStopDate;
     }
 
-    /**
-     * @return the accessPermitted
-     */
-    public boolean isAccessPermitted() {
-        return accessPermitted;
-    }
-
-    /**
-     * @param accessPermitted the accessPermitted to set
-     */
-    public void setAccessPermitted(boolean accessPermitted) {
-        this.accessPermitted = accessPermitted;
-    }
+   
 
     /**
      * @return the password
@@ -349,7 +357,57 @@ public class User implements Serializable{
         this.address_state = address_state;
     }
 
+    /**
+     * @return the authMunis
+     */
+    public List<Municipality> getAuthMunis() {
+        return authMunis;
+    }
+
+    /**
+     * 
+     * @param ml 
+     */
+    public void setAuthMuis(List<Municipality> ml) {
+        authMunis = ml;
+    }
+
     
-    
+    // no setters for access permissions private variables!!
+
+    /**
+     * @return the keyCard
+     */
+    public KeyCard getKeyCard() {
+        return keyCard;
+    }
+
+    /**
+     * @param keyCard the keyCard to set
+     */
+    public void setKeyCard(KeyCard keyCard) {
+        this.keyCard = keyCard;
+    }
+
+    /**
+     * @return the systemAccessPermitted
+     */
+    public boolean isSystemAccessPermitted() {
+        return systemAccessPermitted;
+    }
+
+    /**
+     * @param systemAccessPermitted the systemAccessPermitted to set
+     */
+    public void setSystemAccessPermitted(boolean systemAccessPermitted) {
+        this.systemAccessPermitted = systemAccessPermitted;
+    }
+
+    /**
+     * @param roleType the roleType to set
+     */
+    public void setRoleType(RoleType roleType) {
+        this.roleType = roleType;
+    }
     
 }

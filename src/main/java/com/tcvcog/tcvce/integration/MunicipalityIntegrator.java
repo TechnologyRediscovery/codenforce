@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Municipality;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -28,6 +29,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.faces.bean.ManagedProperty;
 
 /**
@@ -36,14 +39,67 @@ import javax.faces.bean.ManagedProperty;
  */
 public class MunicipalityIntegrator extends BackingBeanUtils implements Serializable {
 
+    // this is a test injected bean -- not currently working as of 19-OCT-18
     @ManagedProperty(value="#{codeIntegrator}")
     private CodeIntegrator ci;
+   
     
     private HashMap municipalityMap;
     /**
      * Creates a new instance of MunicipalityIntegrator
      */
     public MunicipalityIntegrator() {
+        
+        
+    }
+    
+    public Map<String, Integer> getCaseCountsByPhase(int muniCode) throws IntegrationException{
+        
+        CasePhase[] phaseValuesArray = new CasePhase[8];
+        phaseValuesArray[0] = CasePhase.PrelimInvestigationPending;
+        phaseValuesArray[1] = CasePhase.NoticeDelivery;
+        phaseValuesArray[2] = CasePhase.InitialComplianceTimeframe;
+        phaseValuesArray[3] = CasePhase.SecondaryComplianceTimeframe;
+        phaseValuesArray[4] = CasePhase.AwaitingHearingDate;
+        phaseValuesArray[5] = CasePhase.HearingPreparation;
+        phaseValuesArray[6] = CasePhase.InitialPostHearingComplianceTimeframe;
+        phaseValuesArray[7] = CasePhase.SecondaryPostHearingComplianceTimeframe;
+        //CasePhase[] phaseValuesArray = CasePhase.values();
+        
+        
+        Map<String, Integer> caseCountMap = new LinkedHashMap<>();
+        PreparedStatement stmt = null;
+        Connection con = null;
+        String query = "SELECT count(caseid) FROM cecase join property "
+                + "ON property.propertyid = cecase.property_propertyid "
+                + "WHERE property.municipality_municode = ? "
+                + "AND casephase = CAST(? AS casephase) ;";
+        ResultSet rs = null;
+ 
+        try {
+            con = getPostgresCon();
+            for(CasePhase c: phaseValuesArray){
+                stmt = con.prepareStatement(query);
+                stmt.setInt(1, muniCode);
+                String phaseString = c.toString();
+                stmt.setString(2, phaseString);
+                rs = stmt.executeQuery();
+                while(rs.next()){
+                    caseCountMap.put(phaseString, rs.getInt(1));
+                }
+            
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getCaseCountsByPhase", ex);
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return caseCountMap;
         
         
     }
@@ -56,7 +112,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query = "SELECT municode, muniname, address_street, address_city, "
                 + "address_state, address_zip, phone, "
                 + "fax, email, managername, "
-                + "managerphone, population, activeinprogram, defaultcodeset\n" +
+                + "managerphone, population, activeinprogram, defaultcodeset, occpermitissuingsource_sourceid\n" +
                 "FROM public.municipality WHERE municode = ?;";
         ResultSet rs = null;
  
@@ -105,14 +161,16 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setPopulation(rs.getInt("population"));
         muni.setActiveInProgram(rs.getBoolean("activeinprogram"));             
         muni.setDefaultCodeSetID(rs.getInt("defaultcodeset"));
+        muni.setIssuingPermitCodeSourceID(rs.getInt("occpermitissuingsource_sourceid"));
         
         return muni;
     }
     
     public void generateCompleteMuniNameIDMap() throws IntegrationException{
         HashMap<String, Integer> muniMap = new HashMap<>();
-        
+       
         Connection con = getPostgresCon();
+        
         String query = "SELECT muniCode, muniName FROM municipality;";
         ResultSet rs = null;
         Statement stmt = null;
@@ -137,8 +195,48 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     //TODO: finish me
-    public void updateMuni(Municipality muni){
+    public void updateMuni(Municipality muni) throws IntegrationException{
         
+        Connection con = null;
+        String query =  "UPDATE public.municipality\n" +
+                        "   SET muniname=?, address_street=?, address_city=?, address_state=?, \n" +
+                        "       address_zip=?, phone=?, fax=?, email=?, managername=?, managerphone=?, \n" +
+                        "       population=?, activeinprogram=?, defaultcodeset=?, occpermitissuingsource_sourceid=?\n" +
+                        " WHERE municode=?;";
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+ 
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, muni.getMuniName());
+            stmt.setString(2, muni.getAddress_street());
+            stmt.setString(3, muni.getAddress_city());
+            stmt.setString(4, muni.getAddress_state());
+            stmt.setString(5, muni.getAddress_zip());
+            stmt.setString(6, muni.getPhone());
+            stmt.setString(7, muni.getFax());
+            stmt.setString(8, muni.getEmail());
+            stmt.setString(9, muni.getManagerName());
+            stmt.setString(10, muni.getManagerPhone());
+            stmt.setInt(11, muni.getPopulation());
+            stmt.setBoolean(12, muni.isActiveInProgram());
+            stmt.setInt(13, muni.getDefaultCodeSetID());
+            stmt.setInt(14, muni.getIssuingPermitCodeSourceID());
+            stmt.setInt(15, muni.getMuniCode());
+            
+            System.out.println("MunicipalityIntegrator.updateMuni | stmt: " + stmt.toString());
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.generateCompleteMuniNameIDMap", ex);
+
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
         
     }
    
@@ -167,12 +265,13 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         ResultSet rs = null;
         Statement stmt = null;
  
+        
+        System.out.println("MunicipalityIntegrator.gnerateCompleteMuniNameIDMap: con chars: " + con.toString());
         try {
             stmt = con.createStatement();
             rs = stmt.executeQuery(query);
             while(rs.next()){
                 m = getMuniFromMuniCode(rs.getInt("muniCode"));
-                System.out.println("MunicipalityIntegrator.getCompleteMuniList | adding muni: " + m.getMuniName());
                 ll.add(m);
                 
             }

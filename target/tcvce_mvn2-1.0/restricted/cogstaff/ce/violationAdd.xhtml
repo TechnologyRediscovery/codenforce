@@ -31,9 +31,6 @@
                                 #{violationAddBB.currentViolation.codeViolated.codeElement.ordSubSecTitle}"/>
                             <p:spacer height="5px"/>
                             
-                            <h:outputText value="Current case Name: 
-                                          #{violationAddBB.currentViolation.attachedCase.caseName}"/>
-                            <p:spacer height="5px"/>
 
                             <h:outputText style="font-family: monospace; text-align: center; font-size: 1.4em;" value="#{violationAddBB.currentViolation.codeViolated.codeElement.ordTechnicalText}"/>
 
@@ -86,8 +83,8 @@
                                     <p:spacer height="0px"/>
                                     <p:calendar value="#{violationAddBB.dateOfRecord}" 
                                                 mode="popup"  id="dateOfRecord"
-                                                showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                navigator="true" tabindex="2"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true" tabindex="2" timeInput="true" showHour="true" showMinute="true"
                                                 showButtonPanel="true" showTodayButton="true"
                                                 required="true"/>
                                     <h:message for="dateOfRecord" showDetail="false" showSummary="true" 

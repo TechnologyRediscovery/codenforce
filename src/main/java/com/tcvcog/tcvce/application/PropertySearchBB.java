@@ -25,9 +25,11 @@ public class PropertySearchBB extends BackingBeanUtils implements Serializable {
 
     private String parid;
     private String address;
-    private String addrPart;
+    private String houseNum;
+    private String streetName;
     private String addrPartAllMunis;
     Connection con = null;
+    private boolean allMunis;
     
     private Property selectedProperty;
     private ArrayList<Property> propList;
@@ -39,81 +41,52 @@ public class PropertySearchBB extends BackingBeanUtils implements Serializable {
      * Creates a new instance of PropSearchBean
      */
     public PropertySearchBB() {
+        allMunis = false;
 
         
     } // close constructor
     
-    public void searchForPropertiesAllMunis(ActionEvent event){
-        System.out.println("PropSearchBean.searchForPropertiesAllMunis");
-        PropertyIntegrator pi = new PropertyIntegrator();
-        
-        try {
-            propList = pi.searchForProperties(addrPartAllMunis);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Your search completed with " + propList.size() + " results", ""));
-            
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        " Unable to complete a search search! ", ""));
-        }
-    }
-    
-    //this method should correlate to the "Search only in Selected Muni"
-    public void searchForPropertiesSingleMuni(ActionEvent event){
+   
+    public void searchForProperties(ActionEvent event){
         System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
         PropertyIntegrator pi = new PropertyIntegrator();
         
         try {
-            propList = pi.searchForProperties(addrPart, selectedMuniCode);
+            if(allMunis){
+                propList = pi.searchForProperties(houseNum, streetName);
+            } else {
+                propList = pi.searchForProperties(houseNum, streetName, selectedMuniCode);
+            }
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + propList.size() + " results", ""));
-            
-            
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to complete search! ", ""));
-            
         }
     }
     
-    public String viewProperty(){
-        System.out.println("PSearch.viewProperty");
-        
-        
-        
-        if(selectedProperty != null){
-            getSessionBean().setActiveProp(selectedProperty);
-            return "propertyProfile";
-        } else {
-            
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Please search for and select a property before trying to view its profile.", ""));
-            
-            return "";
-        }
+    public String viewProperty(Property prop){
+        getSessionBean().setActiveProp(prop);
+        return "propertyProfile";
+    }
+    
+    public String openCECase(Property prop){
+        getSessionBean().setActiveProp(prop);
+        return "addNewCase";
     }
     
     public String updateProperty(){
-        
-        
         
         if(selectedProperty != null){
             getSessionBean().setActiveProp(selectedProperty);
             return "propertyUpdate";
         } else {
-            
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Please search for and select a property before trying to view its profile.", ""));
-            
             return "";
         }
     }
@@ -147,17 +120,17 @@ public class PropertySearchBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the addrPart
+     * @return the houseNum
      */
-    public String getAddrPart() {
-        return addrPart;
+    public String getHouseNum() {
+        return houseNum;
     }
 
     /**
-     * @param addrPart the addrPart to set
+     * @param houseNum the houseNum to set
      */
-    public void setAddrPart(String addrPart) {
-        this.addrPart = addrPart;
+    public void setHouseNum(String houseNum) {
+        this.houseNum = houseNum;
     }
 
     /**
@@ -228,6 +201,34 @@ public class PropertySearchBB extends BackingBeanUtils implements Serializable {
      */
     public void setAddrPartAllMunis(String addrPartAllMunis) {
         this.addrPartAllMunis = addrPartAllMunis;
+    }
+
+    /**
+     * @return the streetName
+     */
+    public String getStreetName() {
+        return streetName;
+    }
+
+    /**
+     * @param streetName the streetName to set
+     */
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
+    /**
+     * @return the allMunis
+     */
+    public boolean isAllMunis() {
+        return allMunis;
+    }
+
+    /**
+     * @param allMunis the allMunis to set
+     */
+    public void setAllMunis(boolean allMunis) {
+        this.allMunis = allMunis;
     }
     
     

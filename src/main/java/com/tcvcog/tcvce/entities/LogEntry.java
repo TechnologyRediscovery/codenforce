@@ -17,13 +17,14 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class LogEntry {
+public class LogEntry implements Serializable{
     
     private int logEntryID;
     private LocalDateTime timeOfEntry;

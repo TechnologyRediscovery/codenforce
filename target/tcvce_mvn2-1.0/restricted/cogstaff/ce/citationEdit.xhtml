@@ -74,6 +74,8 @@
                                         </p:column>
 
                                         <p:rowExpansion>
+                                            <div class="outlinedBox">
+                                                
                                             <h:outputLabel value="Violated Element Details: "/>
                                             <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
                                                            #{v.violatedEnfElement.codeElement.ordSecNum} 
@@ -97,6 +99,7 @@
                                             <h:outputLabel value="Violation Notes: "/>
                                             <h:outputText value="#{v.notes}"/>
 
+                                            </div>
                                         </p:rowExpansion>
 
                                     </p:dataTable> 
@@ -136,8 +139,8 @@
                                             mode="popup" tabindex="3"
                                             id="formDateOfRecord"
                                             showOn="button"
-                                            pattern="EEE, dd MMM, yyyy"
-                                            navigator="true"
+                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                            navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                             showButtonPanel="true"
                                             showTodayButton="true"
                                             required="true"/>
@@ -183,10 +186,9 @@
                                 
                             </h:panelGrid>
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" value="Issue Citation" action="#{citationBB.issueCitation}" />
-                            <p:commandButton ajax="false" value="Update Citation" action="#{citationBB.updateCitation}" />
-                            <p:commandButton ajax="false" value="Cancel and return" action="caseProfile" />
-                            <p:commandButton disabled="true" ajax="false" value="Save but do NOT issue" action="#{citationBB.saveButDoNotIssueCitation}" />
+                            <p:commandButton ajax="false" value="Issue Citation" action="#{citationBB.issueCitation}" disabled="#{citationBB.issueCitationDisabled}" />
+                            <p:commandButton ajax="false" value="Update Citation" action="#{citationBB.updateCitation}" disabled="#{citationBB.updateCitationDisabled}"/>
+                            <p:commandButton ajax="false" value="Cancel and return to profile" action="caseProfile" />
                         </h:form>
                     </f:view>
                     

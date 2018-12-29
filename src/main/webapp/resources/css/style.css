@@ -59,28 +59,52 @@ h3{
     
 }
 
+h4{
+    color: darkgray;
+    font-style: italic;
+}
+
 .darkFont{
     color:#163F8A;
 }
 
 /*************** END HEADERS ****************/
 
-/*********** MENU *********************/
+/*********** MENUS and TABS*********************/
 .ui-panelmenu-header {
     font-size: 0.8em;
     font-weight: normal;
     font-style: normal;
     background-color: #04284A;
-    color: white;
+    color: green;
     
     
 }
 
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
-    text-shadow: none;
+.tabText{
+    color:orange;
+}
+
+.menuLabel{
     color:white;
     
 }
+
+
+/* Main accordion menu on left */
+.ui-panelmenu .ui-panelmenu-header a{
+    text-shadow: none;
+    color:white;
+}
+
+/*Case profile coloring */
+.ui-tabs-nav li a {
+    color: black;
+}
+
+
+
+
 
 
 
@@ -147,6 +171,20 @@ i.material-icons{
 
 /* ------------LINKS ------------------------- */
 
+
+a:link{
+    text-decoration: none;
+    color: #2C5F90;
+}
+
+a:visited{
+    color: #2C5F90;
+}
+
+a:hover{
+    color:#04284A;
+    text-decoration: underline;
+}
 
 .sblink{
     text-decoration: none;
@@ -232,9 +270,7 @@ div.headerLink a:before, a:visited{
     flex-direction: column;
     flex-wrap: nowrap;
     
-    
-    
-    justify-content: flex-start;
+     justify-content: flex-start;
     
     font-family: 'roboto', sans-serif;
     margin-left: 0px;
@@ -243,6 +279,10 @@ div.headerLink a:before, a:visited{
     margin-bottom: 0px;
     padding: 0px;
     
+}
+
+.narrow-content-container{
+    max-width: 800px;
 }
 
 .flexing-box-topbar{
@@ -272,14 +312,14 @@ div.headerLink a:before, a:visited{
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
-    height: 30px;
+    height: 50px;
     
     background-color: #163F8A;
     margin-left: 0px;
     margin-right: 0px;
     margin-top: 0px;
     margin-bottom: 0px;
-    padding: 10px;
+    padding-left: 0px;
     color: white;
     font-weight: normal;
     
@@ -291,6 +331,7 @@ div.headerLink a:before, a:visited{
     flex-grow: 1;
     flex-basis: 80%;
     flex-shrink: 1;
+    
     
     margin-left: 0px;
     padding: 10px;
@@ -339,6 +380,12 @@ div.headerLink a:before, a:visited{
 .mainContainer{
 }
 
+.mainContainerDashboard{
+
+    display:block;
+}
+
+
 .primaryContentContainer{
   
 }
@@ -371,14 +418,6 @@ p.note{
     font-style: italic;
 }
 
-img.headerImg{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-
-
 div.headerLinkCont{
     display: inline-block;
     float: right;
@@ -397,11 +436,14 @@ div.headerLinkCont{
 .userToolBar{
     display: block;
     float: right;
-    clear: none;
-    height: 90px;
+    clear: none; 
+   height: 90px;
 }
 
-
+.gridTd-splitPage{
+    max-width: 600px;
+    vertical-align: top;
+}
 
 
 /* *********END MAIN PAGE LAYOUT BOXES ***************/
@@ -427,6 +469,13 @@ div.headerLinkCont{
     font-style: italic;
 }
 
+.infoBarData{
+    font-size: 1.5em;
+    font-family: mono;
+    font-weight: bold;
+}
+
+
 /***************** CLOSE TEXT AND SPANS ***********************/
 
 
@@ -437,38 +486,49 @@ div.headerLinkCont{
     overflow-wrap: normal;
 }
 
+.wrapText{
+    white-space: normal;
+    overflow-wrap: normal;
+}
+
 .outlinedBox{
     margin: 15px;
     border: thin solid #4774A0;
     padding: 10px;
+    background-color: white;
+/*    These two attributes are taken from .rowExpansion to see if we can use
+    only .outlinedBox divs for the row expansion*/
+    white-space: normal;
+    overflow-wrap: normal;
+}
+
+.activeObjectBox{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
+    border: thin solid #4774A0;
+    padding: 5px;
+    font-size:small;
+    display: inline-block;
+    
+    
+}
+
+.activeObjectBox h4{
+    margin-top: 3px;
+    margin-bottom: 8px;
+   
+}
+
+.publicInfoBundleContainer{
+    margin: 15px;
+    border: #04284A solid thick;
+    padding: 10px;
+    
 }
 
 
-
-
-/* ****************** CLOSE DIVS ************************/
-
-
-
-
-/* --------------- IMAGES ---------------------------*/
-
-
-img{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-img.header{
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-
-
-
-/*************** END IMAGES ****************************/
 
 
 div.headerLinks{
@@ -499,23 +559,68 @@ div.ccBox{
 }
 
 
+/* ****************** CLOSE DIVS ************************/
 
+
+
+
+/* --------------- IMAGES ---------------------------*/
+
+
+img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img.header{
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+
+img.headerImg{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+
+
+
+/*************** END IMAGES ****************************/
+
+
+/* ------------------DASHBOARD STYLES ----------------------*/
+
+.bignum{
+    font-size: 600%;
+    font-weight: bold;
+}
+
+.bignum-header{
+    font-weight: bold;
+}
+
+
+/*************** END DASHBOARD ****************************/
 
 
 /* ------------------TABLE STYLES ----------------------*/
 
-
+.ui-expanded-row-content{
+    background-color: #04284A;
+    
+}
 
 
 table.primeDataTable td{
     font-size: small;
     white-space: normal;
-    overflow-wrap: normal;
+    word-wrap: normal;
 }
 
-.primeDataTable{
-    width: auto;
-}
 
 table.borders{
     
@@ -556,6 +661,12 @@ td.gridTd {
     border: none;
 }
 
+.panelGridData{
+    border-collapse: collapse;
+    margin: 0px;
+    border: 1px solid black;
+}
+
 td.gridFooter {
     border: none;
     
@@ -575,6 +686,14 @@ td.userBarTd{
 
 .leftalign{
     text-align: left;
+}
+
+gridTd-bignum{
+}
+
+.gridTd-mccontainer{
+    background-color: #163F8A;
+    
 }
 
 /***********************CLOSE TABLE STYLES**********************/
@@ -621,6 +740,14 @@ td.userBarTd{
     background: none;
 }
 
+.sessionInfoButton{
+    background: none;
+    
+}
+
+.sessionInfoButton span{
+    color: white;
+}
 
 /* ****************** CLOSE BUTTON STYLES ********************/
 
@@ -743,3 +870,19 @@ tr.caseOpen{
     background-color: green;
 }
 
+
+/* Documentation styling */
+.docContainer{
+    max-width: 800px;
+    
+}
+
+.pageContentsList{
+    list-style-type: none;
+}
+    
+    
+.pageContentsList li{
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}

@@ -1,0 +1,46 @@
+waiting:2.8736798262716796
+Scraping data from county: %s0373D00078000000
+newid:150604
+Scraped:[<span class="Data" id="BasicInfo1_lblAddress">528 LUCIA  DR<br/>PITTSBURGH, PA 15221</span>]
+528 LUCIA DR
+city:PITTSBURGH
+Zip:15221
+Inserting parcelid data: 0373D00078000000
+----- committed property core table -----
+personid:60604
+owner_raw_name:GARRIS LARRY R &  DENISE M (W)     
+Larry R Garris
+extracted owner:Larry R Garris
+--------- extracting owner address ------------
+Scraped:[<span class="DATA" id="lblChangeMail">528 LUCIA DR <br/>PITTSBURGH , PA 15221-5221</span>]
+528 LUCIA DR 
+city:PITTSBURGH 
+state:PA
+zip:15221
+extracted owner address: 528 LUCIA DR  PITTSBURGH , PA 15221
+Inserting person data for id: 60604
+person notes:In case of confusion, check autmated record entry with raw text from the county database:GARRIS LARRY R & DENISE M (W) Raw address: [<span class="DATA" id="lblChangeMail">528 LUCIA DR <br/>PITTSBURGH , PA 15221-5221</span>]
+----- committed person owner -----
+----- connected person owner to property -----
+----- built unit zero -----
+--------- running totals --------
+Props inserted: 605
+Persons inserted: 551
+********** DONE! *************
+waiting:2.560625731550763
+Scraping data from county: %s0450L00350000000
+newid:150605
+Scraped:[<span class="Data" id="BasicInfo1_lblAddress">W  R OF W<br/>PITTSBURGH, PA 15235</span>]
+W R OF W
+city:PITTSBURGH
+Zip:15235
+Traceback (most recent call last):
+  File "insertPropDataFromCntyUsingParid.py", line 615, in <module>
+    main()
+  File "insertPropDataFromCntyUsingParid.py", line 63, in main
+    insert_property_basetableinfo()
+  File "insertPropDataFromCntyUsingParid.py", line 139, in insert_property_basetableinfo
+    insertmap['lotandblock'] = extract_lotandblock_fromparid(parid)
+  File "insertPropDataFromCntyUsingParid.py", line 367, in extract_lotandblock_fromparid
+    lob = gl.group(1) + '-' + gl.group(2) + '-' + gl.group(3)
+AttributeError: 'NoneType' object has no attribute 'group'

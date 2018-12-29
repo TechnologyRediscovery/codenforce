@@ -65,6 +65,9 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
     private boolean formIsActive;
     private String formNotes;
     
+    private boolean issueCitationDisabled;
+    private boolean updateCitationDisabled;
+    
     private ArrayList<CodeViolation> violationList;
     
     public String updateCitation(){
@@ -90,7 +93,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         }
         
         
-        return "";
+        return "caseProfile";
     }
     
     public String issueCitation(){
@@ -121,26 +124,13 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         }
         return "caseProfile";
     }
-    
-    public String saveButDoNotIssueCitation(){
-        // if requested feature
-        return "";
-    }
-    
-    public String deleteCitation(){
-        return "";
-    }
-
+   
+   
     /**
      * @return the currentCitation
      */
     public Citation getCurrentCitation() {
-        
         currentCitation = getSessionBean().getActiveCitation();
-        
-        
-        
-        
         return currentCitation;
     }
 
@@ -328,6 +318,36 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
      */
     public void setCourtEntityList(ArrayList<CourtEntity> courtEntityList) {
         this.courtEntityList = courtEntityList;
+    }
+
+    /**
+     * @return the issueCitationDisabled
+     */
+    public boolean isIssueCitationDisabled() {
+        issueCitationDisabled = currentCitation.getCitationNo() != null;
+        return issueCitationDisabled;
+    }
+
+    /**
+     * @return the updateCitationDisabled
+     */
+    public boolean isUpdateCitationDisabled() {
+        updateCitationDisabled = currentCitation.getCitationNo() == null;
+        return updateCitationDisabled;
+    }
+
+    /**
+     * @param issueCitationDisabled the issueCitationDisabled to set
+     */
+    public void setIssueCitationDisabled(boolean issueCitationDisabled) {
+        this.issueCitationDisabled = issueCitationDisabled;
+    }
+
+    /**
+     * @param updateCitationDisabled the updateCitationDisabled to set
+     */
+    public void setUpdateCitationDisabled(boolean updateCitationDisabled) {
+        this.updateCitationDisabled = updateCitationDisabled;
     }
 
     

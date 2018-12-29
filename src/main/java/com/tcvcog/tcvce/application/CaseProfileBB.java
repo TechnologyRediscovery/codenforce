@@ -24,17 +24,29 @@ import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
+import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -47,27 +59,52 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     private CECase currentCase;
     private CasePhase nextPhase;
     private CasePhase[] casePhaseList;
-    private CasePhase selectedCasePhase;
+    private CasePhase selectedCasePhase; 
     
-    private EventCase eventForTriggeringCasePhaseAdvancement;
+    private EventCECase eventForTriggeringCasePhaseAdvancement;
     
-    private ArrayList<EventCase> eventList;
-    private ArrayList<EventCase> filteredEventList;
-    private EventCase selectedEvent;
+    private List<EventCECase> eventList;
+    private List<EventCECase> filteredEventList;
+    private EventCECase selectedEvent;
     
-    private ArrayList<CodeViolation> fullCaseViolationList;
-    private ArrayList<CodeViolation> selectedViolations;
+    private List<CodeViolation> fullCaseViolationList;
+    private List<CodeViolation> selectedViolations;
+    private CodeViolation selectedViolation;
+    private int newViolationCodeBookEleID;
     
-    private ArrayList<NoticeOfViolation> noticeList;
+    private List<NoticeOfViolation> noticeList;
     private NoticeOfViolation selectedNotice;
     
-    private ArrayList<Citation> citationList;
+    private List<Citation> citationList;
     private Citation selectedCitation;
+    
+    private List<CEActionRequest> actionRequestList;
+    private CEActionRequest selectedActionRequest;
+    
+    private HashMap<CasePhase, String> imageFilenameMap;
+    private String phaseDiagramImageFilename;
     
     /**
      * Creates a new instance of CaseManageBB
      */
     public CaseProfileBB() {
+        //TODO: move somewhere else! This is too hackey. Needs a resource bundle for
+        // changing image IDs without recompiling!
+        imageFilenameMap = new HashMap<>();
+        imageFilenameMap.put(CasePhase.PrelimInvestigationPending, "stage1_prelim.svg");
+        imageFilenameMap.put(CasePhase.NoticeDelivery, "stage1_notice.svg");
+        imageFilenameMap.put(CasePhase.InitialComplianceTimeframe, "stage2_initial.svg");
+        imageFilenameMap.put(CasePhase.SecondaryComplianceTimeframe, "stage2_secondary.svg");
+        imageFilenameMap.put(CasePhase.AwaitingHearingDate, "stage3_awaiting.svg");
+        imageFilenameMap.put(CasePhase.HearingPreparation, "stage3_prep.svg");
+        imageFilenameMap.put(CasePhase.InitialPostHearingComplianceTimeframe, "stage3_postHearing.svg");
+        imageFilenameMap.put(CasePhase.SecondaryPostHearingComplianceTimeframe, "stage3_postHearing.svg");
+        imageFilenameMap.put(CasePhase.Closed, "stage3_closed.svg");
+    }
+    
+    public String editEvent(EventCECase ev){
+        getSessionBean().setActiveEvent(ev);
+        return "eventEdit";
     }
     
     /**
@@ -101,13 +138,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     public String recordCompliance() throws IntegrationException{
         CaseCoordinator cc = getCaseCoordinator();
+        RoleType u = getFacesUser().getRoleType(); 
         
         EventCoordinator ec = getEventCoordinator();
         System.out.println("CaseManageBB.recordCompliance | selectedViolations size: " + selectedViolations.size());
         if(!selectedViolations.isEmpty()){
 
             // generate event for compliance with selected violations
-            EventCase e = ec.generateViolationComplianceEvent(selectedViolations);
+            EventCECase e = ec.generateViolationComplianceEvent(selectedViolations);
 
             // when event is submitted, send violation list to c
             getSessionBean().setActiveEvent(e);
@@ -138,13 +176,22 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     public String createNewNoticeForAllViolations(){
         
-        currentCase = getSessionBean().getActiveCase();
+        currentCase = getSessionBean().getcECase();
 
         System.out.println("CaseManageBB.createNewNoticeOfViolation | current case: " + currentCase);
 
         if(!fullCaseViolationList.isEmpty()){
+            if(vListHasNoComplianceDates(fullCaseViolationList)){
+                
             getSessionBean().setActiveViolationList(fullCaseViolationList);
             return "noticeOfViolationBuilder";
+            } else {
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Yikes! You may not create a notice for violation "
+                                + "with a compliance date!", ""));
+                return "";
+            }
         }
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -154,13 +201,21 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     public String createNewNoticeForSelectedViolations(){
         
-        currentCase = getSessionBean().getActiveCase();
+        currentCase = getSessionBean().getcECase();
         
         System.out.println("CaseManageBB.createNewNoticeOfViolationForSelected | current case: " + currentCase);
         
-        if(!fullCaseViolationList.isEmpty()){
+        if(!selectedViolations.isEmpty()){
+            if(vListHasNoComplianceDates(selectedViolations)){
             getSessionBean().setActiveViolationList(selectedViolations);
             return "noticeOfViolationBuilder";
+            } else {
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Yikes! You may not create a notice for a violation "
+                                + "with a compliance date!", ""));
+                return "";
+            }
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -170,16 +225,36 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+    private boolean vListHasNoComplianceDates(List<CodeViolation> vList){
+        Iterator<CodeViolation> it = vList.iterator();
+        CodeViolation cv;
+        boolean noComplianceDates = true;
+        while(it.hasNext()){
+            cv = it.next();
+            if(cv.getActualComplianceDate() != null){
+                noComplianceDates = false;
+                break;
+            }
+        }
+        return noComplianceDates;
+    }
+    
     
     public String createCitationForAllViolations(){
         System.out.println("CaseManageBB.createCitationForAllViolations | current case tostring: " 
                 + currentCase);
 //        if(!currentCase.getViolationList().isEmpty()){
         if(currentCase != null){
-            
-            CaseCoordinator cc = getCaseCoordinator();
-            getSessionBean().setActiveCitation(cc.generateNewCitation(fullCaseViolationList));
-            return "citationEdit";
+            if(vListHasNoComplianceDates(selectedViolations)){
+                CaseCoordinator cc = getCaseCoordinator();
+                getSessionBean().setActiveCitation(cc.generateNewCitation(fullCaseViolationList));
+                return "citationEdit";
+            } else {
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Yikes! You may not cite a violation with a compliance date!", ""));
+                return "";
+            }
         }
         getFacesContext().addMessage(null,
         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -190,14 +265,17 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     public String createCitationFromSelected(){
         System.out.println("CaseManageBB.createCitationFromSelected");
         if(!selectedViolations.isEmpty()){
-            
-            CaseCoordinator cc = getCaseCoordinator();
-
-            getSessionBean().setActiveCitation(cc.generateNewCitation(selectedViolations));
-
-            return "citationEdit";
+            if(vListHasNoComplianceDates(selectedViolations)){
+                CaseCoordinator cc = getCaseCoordinator();
+                getSessionBean().setActiveCitation(cc.generateNewCitation(selectedViolations));
+                return "citationEdit";
+            } else {
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Yikes! You may not cite a violation with a compliance date!", ""));
+                return "";
+            }
         }
-        
         getFacesContext().addMessage(null,
         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 "Please select a violation and try again", ""));
@@ -262,7 +340,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     public String addViolation(){
         // no logic needed in the backing bean
-        // sinec we just forward to the selectElement page
+        // since we just forward to the selectElement page
         
         return "violationSelectElement";
     }
@@ -403,7 +481,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      */
     public CECase getCurrentCase() {
         
-        currentCase = getSessionBean().getActiveCase();
+        currentCase = getSessionBean().getcECase();
         if(currentCase != null){
             System.out.println("CaseManageBB.getCurrentCase | currentCase Info: " + currentCase.getCaseName());
             
@@ -411,6 +489,42 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         return currentCase;
     }
 
+    /**
+     * Used in the violation table to set the clicked violation row
+     * as the system's current violation. At this stage, this feature
+     * is used by the updateViolationsCodebookLink method only
+     * 
+     * Note that the member variable that this "setter" sets is
+     * also the memvar that setSel3ectedViolation sets
+     * @param cv the code violation clicked in the table
+     */
+    public void setActiveViolation(CodeViolation cv){
+        selectedViolation = cv;
+    }
+    
+    public void updateViolationsCodeBookLink(ActionEvent ae){
+        CaseIntegrator casei = getCaseIntegrator();
+        try {
+            CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+            CodeIntegrator ci = getCodeIntegrator();
+            EnforcableCodeElement ece = ci.getEnforcableCodeElement(newViolationCodeBookEleID);
+            if(ece != null){
+                selectedViolation.setViolatedEnfElement(ece);
+                cvi.updateCodeViolation(selectedViolation);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Success: Updated Violation with new CodeBook linking", ""));
+                currentCase = casei.getCECase(currentCase.getCaseID());
+            } else {
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to find CodeBook Entry by this ID, sorry. Please try again.", ""));
+            }
+        } catch (IntegrationException ex) {
+            Logger.getLogger(CaseProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
    
     /**
      * @param currentCase the currentCase to set
@@ -422,7 +536,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the eventList
      */
-    public ArrayList<EventCase> getEventList() {
+    public List<EventCECase> getEventList() {
         eventList = currentCase.getEventList();
         return eventList;
     }
@@ -430,14 +544,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the selectedEvent
      */
-    public EventCase getSelectedEvent() {
+    public EventCECase getSelectedEvent() {
         return selectedEvent;
     }
 
     /**
      * @return the fullCaseViolationList
      */
-    public ArrayList<CodeViolation> getFullCaseViolationList() {
+    public List<CodeViolation> getFullCaseViolationList() {
         ViolationCoordinator vc = getViolationCoordinator();
         try {
             fullCaseViolationList = vc.getCodeViolations(currentCase);
@@ -455,21 +569,21 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the selectedViolation
      */
-    public ArrayList<CodeViolation> getSelectedViolations() {
+    public List<CodeViolation> getSelectedViolations() {
         return selectedViolations;
     }
 
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(ArrayList<EventCase> eventList) {
+    public void setEventList(ArrayList<EventCECase> eventList) {
         this.eventList = eventList;
     }
 
     /**
      * @param selectedEvent the selectedEvent to set
      */
-    public void setSelectedEvent(EventCase selectedEvent) {
+    public void setSelectedEvent(EventCECase selectedEvent) {
         this.selectedEvent = selectedEvent;
     }
 
@@ -504,14 +618,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the noticeList
      */
-    public ArrayList<NoticeOfViolation> getNoticeList() {
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        
-        try {
-            noticeList = cvi.getNoticeOfViolationList(getSessionBean().getActiveCase());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+    public List<NoticeOfViolation> getNoticeList() {
+        noticeList = getSessionBean().getcECase().getNoticeList();
         return noticeList;
     }
 
@@ -525,16 +633,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the citationList
      */
-    public ArrayList<Citation> getCitationList() {
-        CitationIntegrator ci = getCitationIntegrator();
+    public List<Citation> getCitationList() {
         
-        
-        try {
-            citationList = ci.getCitationsByCase(getSessionBean().getActiveCase());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        System.out.println("CaseManageBB.getCitationList | list size: " + citationList.size());
+        citationList = getSessionBean().getcECase().getCitationList();
         return citationList;
     }
 
@@ -562,7 +663,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
    
     
     public String takeNextAction(){
-        EventCase e = getEventForTriggeringCasePhaseAdvancement();
+        EventCECase e = getEventForTriggeringCasePhaseAdvancement();
         
         getSessionBean().setActiveEvent(e);
         
@@ -572,7 +673,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the eventForTriggeringCasePhaseAdvancement
      */
-    public EventCase getEventForTriggeringCasePhaseAdvancement() {
+    public EventCECase getEventForTriggeringCasePhaseAdvancement() {
         EventCoordinator ec = getEventCoordinator();
 
         try {
@@ -595,7 +696,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @param eventForTriggeringCasePhaseAdvancement the eventForTriggeringCasePhaseAdvancement to set
      */
-    public void setEventForTriggeringCasePhaseAdvancement(EventCase eventForTriggeringCasePhaseAdvancement) {
+    public void setEventForTriggeringCasePhaseAdvancement(EventCECase eventForTriggeringCasePhaseAdvancement) {
         this.eventForTriggeringCasePhaseAdvancement = eventForTriggeringCasePhaseAdvancement;
     }
 
@@ -655,14 +756,93 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the filteredEventList
      */
-    public ArrayList<EventCase> getFilteredEventList() {
+    public List<EventCECase> getFilteredEventList() {
         return filteredEventList;
     }
 
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(ArrayList<EventCase> filteredEventList) {
+    public void setFilteredEventList(ArrayList<EventCECase> filteredEventList) {
         this.filteredEventList = filteredEventList;
+    }
+
+    /**
+     * @return the selectedViolation
+     */
+    public CodeViolation getSelectedViolation() {
+        return selectedViolation;
+    }
+
+    /**
+     * @param selectedViolation the selectedViolation to set
+     */
+    public void setSelectedViolation(CodeViolation selectedViolation) {
+        this.selectedViolation = selectedViolation;
+    }
+
+    /**
+     * @return the newViolationCodeBookEleID
+     */
+    public int getNewViolationCodeBookEleID() {
+        return newViolationCodeBookEleID;
+    }
+
+    /**
+     * @param newViolationCodeBookEleID the newViolationCodeBookEleID to set
+     */
+    public void setNewViolationCodeBookEleID(int newViolationCodeBookEleID) {
+        this.newViolationCodeBookEleID = newViolationCodeBookEleID;
+    }
+
+    /**
+     * @return the phaseDiagramImageFilename
+     */
+    public String getPhaseDiagramImageFilename() {
+        phaseDiagramImageFilename = imageFilenameMap.get(currentCase.getCasePhase());
+        return phaseDiagramImageFilename;
+    }
+
+    /**
+     * @param phaseDiagramImageFilename the phaseDiagramImageFilename to set
+     */
+    public void setPhaseDiagramImageFilename(String phaseDiagramImageFilename) {
+        this.phaseDiagramImageFilename = phaseDiagramImageFilename;
+    }
+
+    /**
+     * @return the actionRequestList
+     */
+    public List<CEActionRequest> getActionRequestList() {
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        try {
+            actionRequestList = ceari.getCEActionRequestListByCase(currentCase.getCaseID());
+        } catch (IntegrationException ex) {
+            System.out.println("CaseProfileBB.getActionRequestList | "
+                    + "unable to generate action request list by case");
+        }
+        
+        return actionRequestList;
+    }
+
+    /**
+     * @return the selectedActionRequest
+     */
+    public CEActionRequest getSelectedActionRequest() {
+        return selectedActionRequest;
+    }
+
+    /**
+     * @param actionRequestList the actionRequestList to set
+     */
+    public void setActionRequestList(List<CEActionRequest> actionRequestList) {
+        this.actionRequestList = actionRequestList;
+    }
+
+    /**
+     * @param selectedActionRequest the selectedActionRequest to set
+     */
+    public void setSelectedActionRequest(CEActionRequest selectedActionRequest) {
+        this.selectedActionRequest = selectedActionRequest;
     }
 }

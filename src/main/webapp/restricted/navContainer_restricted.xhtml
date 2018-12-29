@@ -85,7 +85,10 @@
 
                                     <h:panelGroup>
                                         <div class="under-icon-link-container">
-                                            <h:commandLink  action="#{missionControlBB.logout}" value="Logout" styleClass="headerLink"/>
+                                            <h:commandLink  action="#{missionControlBB.logout}" styleClass="headerLink">
+                                                <h:outputText value=" "/>   
+                                                <h:outputText value="Logout #{facesUser.FName} #{facesUser.LName} (#{facesUser.roleType.label})"/>
+                                            </h:commandLink>
                                         </div>
                                     </h:panelGroup>
 
@@ -96,7 +99,7 @@
 
 
                         <div class="logoBox">
-                            <h2 id="logoHeader" style="font-weight: bold;">TCVCOG<br/>Code Enforcement<br />Data Hub</h2>
+                            <h2 id="logoHeader" style="font-weight: bold;">CodeConnect<br />Municipal Data Hub<br />Turtle Creek Valley COG</h2>
                         </div>
                     </f:view>
                 </div>
@@ -106,12 +109,23 @@
             <div class="flexing-box-sidebar">
                 <f:view id="sideBarView">
                     <h:form id="panelMenu">
+                        
+                        <ui:remove>
+                            
+                            <h2>Dynamic Menu</h2>
+                            <p:menu model="#{navMenuBean.model}"/>
+
+                            <h2>Static Menu</h2>
+                        </ui:remove>
+
+                        
                         <p:panelMenu style="width:100%">
 
-                            <p:submenu label="General" expanded="true">
-                                <p:menuitem value="Mission control" action="missionControl" ajax="false" icon="ui-icon-disk" />
+                            <p:submenu styleClass="menuLabel" label="General" expanded="true">
+                                <p:menuitem value="Dashboard" action="missionControl" ajax="false" icon="ui-icon-disk" />
+                                <p:menuitem value="Statistics" action="statistics" ajax="false" icon="ui-icon-disk" />
                                 <p:menuitem value="Help" action="help" ajax="false" icon="ui-icon-disk" />
-                            </p:submenu>
+                            </p:submenu> 
 
                             <p:submenu label="Properties &amp; Persons" expanded="true">
                                 <p:menuitem value="Property search" action="propertySearch" ajax="false" icon="ui-icon-disk" />
@@ -140,12 +154,15 @@
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
                                 <p:menuitem value="New Event" action="caseEvents"  ajax="false" 
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
+                                <ui:remove>
+                                    
                                 <p:menuitem value="Violations" action="caseViolations"  ajax="false" 
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
                                 <p:menuitem value="Notices" action="caseNotices"  ajax="false" 
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
                                 <p:menuitem value="Citations" action="caseCitations"  ajax="false" 
                                             icon="ui-icon-close" disabled="#{navigationBB.noActiveCase}"/>
+                                </ui:remove>
                             </p:submenu>
 
                             <p:separator />
@@ -165,8 +182,8 @@
 
                             <p:submenu label="Municpal code">
                                 <p:menuitem value="Code guide" action="codeGuideView" ajax="false" icon="ui-icon-arrowthick-1-s" />
-                                <p:menuitem value="Active code set" action="codeSetElementList" ajax="false" icon="ui-icon-arrowthick-1-s" />
-                                <p:menuitem value="Code sets" action="codeSetManage" ajax="false" icon="ui-icon-home" />
+                                <p:menuitem value="Active CodeBook" action="codeSetElementList" ajax="false" icon="ui-icon-arrowthick-1-s" />
+                                <p:menuitem value="Code Books" action="codeSetManage" ajax="false" icon="ui-icon-home" />
                                 <p:menuitem value="Code Sources" action="codeSourceManage" ajax="false" icon="ui-icon-home" />
                                 <p:menuitem value="Elements by source" action="codeElementList" ajax="false" icon="ui-icon-arrowthick-1-s" 
                                             disabled="#{navigationBB.noActiveSource}"/>
@@ -175,15 +192,17 @@
                             <p:separator />
 
                             <p:submenu label="Public">
-                                <p:menuitem value="Public Dashboard" action="publicPortal" ajax="false" icon="ui-icon-document" />
-                                <p:menuitem value="Submit CE Action Request" action="ceActionRequest" ajax="false" icon="ui-icon-document"/>
+                                    
+                                <p:menuitem value="Public Dashboard" action="systemHome" ajax="false" icon="ui-icon-document" />
+                                <p:menuitem value="Submit CE Action Request" action="requestCEActionFlow" ajax="false" icon="ui-icon-document"/>
+                                <p:menuitem value="PACC Search" action="paccSearch" ajax="false" icon="ui-icon-document"/>
                             </p:submenu>
 
                             <p:separator />
 
                             <p:submenu label="System">
                                 <p:menuitem value="User configuration" action="userManage" ajax="false" icon="ui-icon-document" />
-                                <p:menuitem value="Municipalities" action="muniManage" ajax="false" icon="ui-icon-arrowthick-1-s" disabled="true"/>
+                                <p:menuitem value="Muni info" action="muniManage" ajax="false" icon="ui-icon-arrowthick-1-s" disabled="false"/>
                                 <p:menuitem value="CE event config" action="eventManage" ajax="false" icon="ui-icon-arrowthick-1-s" />
                                 <p:menuitem value="Request list changes" action="selectItemListChange" ajax="false" icon="ui-icon-home" />
                                 <p:menuitem value="Report a bug" action="bugReporting" ajax="false" icon="ui-icon-arrowthick-1-s" />
@@ -198,28 +217,56 @@
                     <f:view id="sessionInfoView">
                         <div class="flexing-box-sessioninfo">
                             <h:form id="sessionInfoForm">
-                                <h:outputText value="User: "/>
-                                <h:outputText value="#{facesUser.FName} "/>   
-                                <h:outputText value="#{facesUser.LName}  | "/>
-                                <h:outputText value="Permissions: "/>
-                                <h:outputText value="#{facesUser.roleType.label}  | "/>   
-                                <h:outputText value="Municipality: "/>
-                                <h:outputText value="#{sessionBean.activeMuni.muniName} "/><br/> 
-                                <h:outputText value="Active Property: "/>
-                                <h:outputText value="#{sessionBean.activeProp.address} "/> 
-                                <h:outputText value="(#{sessionBean.activeProp.muni.muniName}  ) | "/>
-                                <h:outputText value="Active Case:"/>
-                                <h:outputText value="#{sessionBean.activeCase.caseName}  | "/> 
-                                <h:outputText value="Code Set: "/>
-                                <h:outputText value="#{sessionBean.activeCodeSet.codeSetName}  | " /> 
+            
+                                <div class="activeObjectBox">
+                                    <h:outputText styleClass="infoBarDataLabel" value="muni: "/>
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.activeMuni.muniName} "/> 
+                                    <p:commandButton value="switch" styleClass="sessionInfoButton" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
+                                    <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    </p:selectOneMenu>
+                                    <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+                                <div class="activeObjectBox">
+                                    <h:outputText styleClass="infoBarDataLabel" value="property: "/>
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.activeProp.address} "/> 
+                                    <h:outputText styleClass="infoBarData" value="(#{sessionBean.activeProp.muni.muniName})  "/>
+                                    <p:commandButton styleClass="sessionInfoButton" action="#{navigationBB.gotoPropertyProfile}" value="profile" ajax="false" icon="fa fa-home" disabled="#{navigationBB.noActiveProperty}"/>
+                                    <p:commandButton styleClass="sessionInfoButton" action="propertySearch" value="change prop" ajax="false" icon="fa fa-search"/>
+                                </div>
                             </h:form>
                         </div>
+                        <div class="flexing-box-sessioninfo">
+                            <h:form id="sessionInfoFormRow2">
+                                <div class="activeObjectBox">
+                                    <h:outputText styleClass="infoBarDataLabel" value="case: " />
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.cECase}"/> 
+                                    <p:commandButton styleClass="sessionInfoButton" 
+                                                     action="caseEvents" 
+                                                     value="log new event" 
+                                                     ajax="false"
+                                                     disabled="#{navigationBB.noActiveCase}"/>
+                                    <p:commandButton styleClass="sessionInfoButton" 
+                                                     action="caseProfile" 
+                                                     value="view case profile" 
+                                                     ajax="false"
+                                                     disabled="#{navigationBB.noActiveCase}"/>
+                                    <p:commandButton styleClass="sessionInfoButton" 
+                                                     action="ceCases" 
+                                                     value="list open cases" 
+                                                     ajax="false"/>
+                                </div>
+                            </h:form>
+                        </div>
+                    </f:view>
                         <div class="flexing-box-pagecontent">
                             <ui:insert name="content">
                                 <p>I am content in the template content</p>
                             </ui:insert>
                         </div>
-                    </f:view>
                 </div>
             </div>
         </div>

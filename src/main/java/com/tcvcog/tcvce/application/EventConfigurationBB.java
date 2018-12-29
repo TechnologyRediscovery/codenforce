@@ -188,21 +188,20 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
      * @return the eventCategoryList
      */
     public ArrayList<EventCategory> getEventCategoryList() {
-        try {
-            EventIntegrator ei = getEventIntegrator();
-            eventCategoryList = ei.getEventCategoryList();
-            //return eventCategoryList;
-        } catch (IntegrationException ex) {
-             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to load event category list", 
-                        "This must be corrected by the System Administrator"));
-        }
-        if(eventCategoryList != null){
+        if(eventCategoryList == null){
+            try {
+                EventIntegrator ei = getEventIntegrator();
+                eventCategoryList = ei.getEventCategoryList();
+                //return eventCategoryList;
+            } catch (IntegrationException ex) {
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Unable to load event category list", 
+                            "This must be corrected by the System Administrator"));
+            }
             return eventCategoryList;
             
         } else {
-            eventCategoryList = new ArrayList();
             return eventCategoryList;
         }
         

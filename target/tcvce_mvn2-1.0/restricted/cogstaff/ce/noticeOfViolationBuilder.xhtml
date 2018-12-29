@@ -11,364 +11,685 @@
     </h:head>
     <h:body>
         <ui:composition template="../../navContainer_restricted.xhtml">
-           
+
             <ui:define name="content">
                 <div class="mainContainer">
-                    
+
                     <h:messages globalOnly="true"
-                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                     </h:messages>
 
-                    
+
                     <h:form id="noticeBuilderForm">
 
-                        <h1>Notice of Violation Builder</h1>
+                        <p:wizard
+                            nextLabel="Next"
+                            backLabel="Back"
+                            showStepStatus="true"
+                            >
 
-                            <p>Select a pre-entered text block by name from the drop-down 
-                            menu under each of the following sub-headers. 
-                            Blank menus will not render any content in the generated letter.</p>
+                            <p:tab id="recipeint">
+                                <p:panel header="Select recipient">
+                                    <h:messages errorClass="msgError"/>
 
-                        
-                        <h2>Recipient</h2>
-                        
-                            <h3>Add recipient from property persons</h3>
-                            
-                            <p>Select the notice recipient from the list below of persons connected to <h:outputText value="#{sessionBean.activeProp.address}"/></p>
-                            
-                            <p:dataTable
-                                    id="selectPersonTable"
-                                    var="p"
-                                    selectionMode="single"
-                                    selection="#{noticeOfViolationBB.selectedRecipient}"
-                                    rowKey="#{p.personID}"
-                                    value="#{noticeOfViolationBB.personCandidateAL}"
-                                    tableStyleClass="primeDataTable"
-                                    expandedRow="false"
-                                    rowExpandMode="single">
-                              
-                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Person Type" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.personType.label}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Person ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.personID}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Municipality" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.muni.muniName}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="First" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.firstName}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Last" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.lastName}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Address" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.address_street}"/>
-                                    </p:column>
-                                </p:dataTable>
-                        
-                           
-                        <h3>Add recipient by Person ID</h3>
-                        
-                            <p>If you wish to send the letter to a person not on the list above, 
-                                enter the Person's ID number in the box below and toggle option switch to "Add from ID". 
-                                You can open the Persons's search page by "right-clicking" the link to "Persons" 
-                                on the left sidebar and opening that page in its own browser tab.</p>
-                                
-                        
-                            <p:inputSwitch id="addPersonByIdIS" value="#{noticeOfViolationBB.addPersonByID}" 
-                                           onLabel="Add by ID" offLabel="Add from data table" />
-                            
-                            <p:spacer height="5px"/>
-                            <h:commandLink  target="_blank" action="personSearch" value="Open person search in new tab"/>
-                            <p:spacer height="5px"/>
-                            
-                            <h:outputLabel for="personIDIT" value="Person ID Number: "/>
-                            
-                            <p:inputText id="personIDIT" value="#{noticeOfViolationBB.recipientPersonID}"/>
-                                           
-                        <h2>Greeting</h2>
+                                    <h1>Notice of Violation Builder</h1>
 
-                            <p:selectOneMenu 
-                                id="greeting"
-                                tabindex="1"
-                                value="#{noticeOfViolationBB.greetingBlock}">
-                                <f:converter converterId="textBlockConverter"/>
-                                <p:ajax update="greetingOT" immediate="true"/>
-                                <f:selectItems
-                                    value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                    var="block" 
-                                    itemValue="#{block}"
-                                    itemLabel="#{block.textBlockName}"/>
+                                    <p>Select a pre-entered text block by name from the drop-down 
+                                        menu under each of the following sub-headers. 
+                                        Blank menus will not render any content in the generated letter.</p>
 
-                            </p:selectOneMenu>
 
-                            <h4>Text preview:</h4>
-                                <p><h:outputText id="greetingOT" value="#{noticeOfViolationBB.greetingBlock.textBlockText}" /> </p>
+                                    <h3>Add recipient from property persons</h3>
 
-                        <h2>Introductory paragraph</h2>
-                            <p:selectOneMenu 
-                                id="intro"
-                                tabindex="s"
-                                value="#{noticeOfViolationBB.introBlock}">
-                                <f:converter converterId="textBlockConverter"/>
-                                <p:ajax update="introOT" immediate="true"/>
-                                <f:selectItems
-                                    value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                    var="block" 
-                                    itemValue="#{block}"
-                                    itemLabel="#{block.textBlockName}"/>
+                                    <p>Select the notice recipient from the list below of persons connected to <h:outputText value="#{sessionBean.activeProp.address}"/></p>
 
-                            </p:selectOneMenu>
+                                    <p:dataTable
+                                        id="newRecipientPersonTD"
+                                        var="p"
+                                        selectionMode="single"
+                                        selection="#{noticeOfViolationBB.selectedRecipient}"
+                                        rowKey="#{p.personID}"
+                                        value="#{noticeOfViolationBB.personCandidateAL}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="single">
 
-                            <h4>Text preview:</h4>
-                            <p><h:outputText id="introOT" value="#{noticeOfViolationBB.introBlock.textBlockText}" /> </p>
+                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                                
-                        <p:fieldset legend="Add more paragraphs"
-                            toggleable="true"
-                            collapsed="true">
-                            
-                            <h2>Optional text block 1</h2>
-                                <p:inputSwitch id="useOptional1" value="#{noticeOfViolationBB.useTb1}" 
-                                           onLabel="Use Block" offLabel="Don't use" />
-                                <p:spacer height="5px"/>
-                                <p:selectOneMenu 
-                                    id="optional1"
-                                    tabindex="7"
-                                    value="#{noticeOfViolationBB.tb1}">
-                                    <f:converter converterId="textBlockConverter"/>
-                                    <p:ajax update="optional1OT" immediate="true"/>
-                                    <f:selectItems
-                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                        var="block" 
-                                        itemValue="#{block}"
-                                        itemLabel="#{block.textBlockName}"/>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Person Type" />
+                                            </f:facet>
+                                            <h:outputText value="#{p.personType.label}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Person ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{p.personID}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Municipality" />
+                                            </f:facet>
+                                            <h:outputText value="#{p.muni.muniName}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="First" />
+                                            </f:facet>
+                                            <h:outputText value="#{p.firstName}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Last" />
+                                            </f:facet>
+                                            <h:outputText value="#{p.lastName}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Address" />
+                                            </f:facet>
+                                            <h:outputText value="#{p.address_street}"/>
+                                        </p:column>
+                                    </p:dataTable>
 
-                                </p:selectOneMenu>
 
-                                <h4>Text preview:</h4>
-                                <p><h:outputText id="optional1OT" value="#{noticeOfViolationBB.tb1.textBlockText}" /> </p>
+                                    <h3>Add recipient by Person ID</h3>
 
-                                
+                                    <p>If you wish to send the letter to a person not on the list above, 
+                                        enter the Person's ID number in the box below and toggle option switch to "Add from ID". 
+                                        You can open the Persons's search page by "right-clicking" the link to "Persons" 
+                                        on the left sidebar and opening that page in its own browser tab.</p>
 
-                            <h2>Optional text block 2</h2>
-                                        
-                                <p:inputSwitch id="useOptional2" value="#{noticeOfViolationBB.useTb2}" 
-                                           onLabel="Use Block" offLabel="Don't use" />
-                                <p:spacer height="5px"/>
-                                <p:selectOneMenu 
-                                    id="optional2"
-                                    tabindex="7"
-                                    value="#{noticeOfViolationBB.tb2}">
-                                    <f:converter converterId="textBlockConverter"/>
-                                    <p:ajax update="optional2OT" immediate="true"/>
-                                    <f:selectItems
-                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                        var="block" 
-                                        itemValue="#{block}"
-                                        itemLabel="#{block.textBlockName}"/>
 
-                                </p:selectOneMenu>
-
-                                <h4>Text preview:</h4>
-                                <p><h:outputText id="optional2OT" value="#{noticeOfViolationBB.tb2.textBlockText}" /> </p>
-                            
-                        </p:fieldset>
-
-                        <h2>Violation List</h2>
-
-                            <p>This is a fixed list of violations based on your choice on the previous page. 
-                                If this list is incorrect, click cancel and return to the violations page</p>
-
-                            <p:dataTable
-                                id="violationTable"
-                                value="#{noticeOfViolationBB.activeVList}"
-                                tableStyleClass="primeDataTable"
-                                draggableColumns="true"
-                                reflow="true"
-                                var="v"
-                                rowExpandMode="single"
-                                expandedRow="false">
-
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Code Element" />
-                                    </f:facet>
-                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
-                                </p:column>
-
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Stipulated Comp. Date" />
-                                    </f:facet>
-                                    <h:outputText value="#{v.stipulatedComplianceDate}"/>
-                                </p:column>
-
-                                <p:rowExpansion>
-                                    <h:outputLabel value="Violated Element Details: "/>
-                                    <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                   #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                   #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                   #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                   #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                    <p:inputSwitch id="addPersonByIdIS" value="#{noticeOfViolationBB.addPersonByID}" 
+                                                   onLabel="Add by ID" offLabel="Add from data table" />
 
                                     <p:spacer height="5px"/>
-
-                                    <h:outputLabel value="Penalty:"/>
-                                    <h:outputText value="#{v.penalty}"/>
-
-                                    <h:outputLabel value="Description: "/>
-                                    <h:outputText value="#{v.description}"/>
-
+                                    <h:commandLink  target="_blank" action="personSearch" value="Open person search in new tab"/>
                                     <p:spacer height="5px"/>
 
-                                    <h:outputLabel value="Violation Notes: "/>
-                                    <h:outputText value="#{v.notes}"/>
+                                    <h:outputLabel for="personIDIT" value="Person ID Number: "/>
 
-                                </p:rowExpansion>
+                                    <p:inputText id="personIDIT" value="#{noticeOfViolationBB.recipientPersonID}"/>
 
-                            </p:dataTable> 
+                                    <p:spacer height="10px"/>
 
-                            <p:spacer height="15px"/>
+                                    <p:commandButton id="chartBtn" value="Search for persons" type="button" />
+                                    
+                                    <p:overlayPanel for="chartBtn" dismissable="true"
+                                                    showCloseIcon="true"
+                                                    dynamic="true"
+                                                    widgetVar="personAddOP">
+                                        <h2>I can be put on top of stuff, but duplicating forms is mooey mal</h2>
 
-
-                        <h2>Compliance instructions</h2>
-                        
-                                <p:selectOneMenu 
-                                    id="compliance"
-                                    tabindex="7"
-                                    value="#{noticeOfViolationBB.complianceBlock}">
-                                    <f:converter converterId="textBlockConverter"/>
-                                    <p:ajax update="complianceOT" immediate="true"/>
-                                    <f:selectItems
-                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                        var="block" 
-                                        itemValue="#{block}"
-                                        itemLabel="#{block.textBlockName}"/>
-
-                                </p:selectOneMenu>
-
-                                <h4>Text preview:</h4>
-                                <p><h:outputText id="complianceOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
-
-                        <h2>Penalty notice</h2>
-                        
-                                <p:selectOneMenu 
-                                    id="penalty"
-                                    tabindex="7"
-                                    value="#{noticeOfViolationBB.penaltyBlock}">
-                                    <f:converter converterId="textBlockConverter"/>
-                                    <p:ajax update="penaltyOT" immediate="true"/>
-                                    <f:selectItems
-                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                        var="block" 
-                                        itemValue="#{block}"
-                                        itemLabel="#{block.textBlockName}"/>
-
-                                </p:selectOneMenu>
-
-                                <h4>Text preview:</h4>
-                                <p><h:outputText id="penaltyOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
-
-                                
-                        <p:fieldset legend="Add more paragraphs" toggleable="true" collapsed="true">
-                              
-                                  
-                            <h2>Optional text block 3</h2>
-                            
-                                <p:inputSwitch id="useOptional3" value="#{noticeOfViolationBB.useTb3}" 
-                                           onLabel="Use Block" offLabel="Don't use" />
-                                <p:spacer height="5px"/>
-                                
-                                <p:selectOneMenu 
-                                    id="optional3"
-                                    tabindex="7"
-                                    value="#{noticeOfViolationBB.tb3}">
-                                    <f:converter converterId="textBlockConverter"/>
-                                    <p:ajax update="optional3OT" immediate="true"/>
-                                    <f:selectItems
-                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                        var="block" 
-                                        itemValue="#{block}"
-                                        itemLabel="#{block.textBlockName}"/>
-
-                                </p:selectOneMenu>
-
-                                <h4>Text preview:</h4>
-                                <p><h:outputText id="optional3OT" value="#{noticeOfViolationBB.tb3.textBlockText}" /> </p>
-                            
-
-                            <h2>Optional text block 4</h2>
-                            
-                            
-                                <p:inputSwitch id="useOptional4" value="#{noticeOfViolationBB.useTb4}" 
-                                           onLabel="Use Block" offLabel="Don't use" />
-                                <p:spacer height="5px"/>
-                                
-                                <p:selectOneMenu 
-                                    id="optional4"
-                                    tabindex="7"
-                                    value="#{noticeOfViolationBB.tb4}">
-                                    <f:converter converterId="textBlockConverter"/>
-                                    <p:ajax update="optional4OT" immediate="true"/>
-                                    <f:selectItems
-                                        value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                        var="block" 
-                                        itemValue="#{block}"
-                                        itemLabel="#{block.textBlockName}"/>
-
-                                </p:selectOneMenu>
-
-                                <h4>Text preview:</h4>
-                                <p><h:outputText id="optional4OT" value="#{noticeOfViolationBB.tb4.textBlockText}" /> </p>
-                            
-                        </p:fieldset>
-
-                        <h2>Signature</h2>
-                        
-                        <p>
-                            <h:outputText id="sig1" value="#{facesUser.FName} #{facesUser.LName}"/><br/>
-                            <h:outputText id="sig2" value="#{facesUser.workTitle}"/><br/>
-                            <h:outputText id="sig3" value="#{facesUser.muni.muniName}"/><br/>
-                            <h:outputText id="sig4" value="#{facesUser.phoneCell}"/><br/>
-                            <h:outputText id="sig5" value="#{facesUser.email}"/>
-                        </p>
-
-                        <p:spacer height="15px"/>
-
-                        <p:commandButton ajax="false" value="Assemble and edit draft notice" 
-                                         action="#{noticeOfViolationBB.assembleNotice}"
-                                         icon="fa fa-tasks"/>
+                                        <div style="width: 400px">
 
 
+                                            <h2>Search for persons:</h2>
+                                            <p>Search Hints: 1) Capitalization doesn't matter. 2) System searches for a match in any part of the Person's name in the database:
+                                                You can find a person named "Rodney Readman" by searching for "rod" and "read" OR searching for "ney" and "man" OR etc.</p>
+
+                                            <h:panelGrid columns="3" cellpadding="5" border="0" frame="true">
+
+                                                <h:panelGroup id="fname">
+
+                                                    <p:outputLabel for="formFirstName">
+                                                        <h:outputText value="First Name"/>
+                                                    </p:outputLabel>
+                                                    <p:inputText id="formFirstName" value="#{personBB.formFName}" 
+                                                                 style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                                    <h:message for="formFirstName" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup id="lname">
+
+                                                    <p:outputLabel for="formLastName">
+                                                        <h:outputText value="Last Name"/>
+                                                    </p:outputLabel>
+                                                    <p:inputText id="formLastName" value="#{personBB.formLName}" 
+                                                                 style="width: 200px;" tabindex="2" required="false" styleClass="inputText"/>
+                                                    <h:message for="formLastName" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup id="nameSearch"> 
+                                                    <p:commandButton ajax="false" value="Search by Name" tabindex="3"
+                                                                     actionListener="#{personBB.searchForPersonByName}"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup id="personID">
+
+                                                    <p:outputLabel for="formPersonID">
+                                                        <h:outputText value="Person ID number"/>
+                                                    </p:outputLabel>
+                                                    <p:inputText id="formPersonID" value="#{personBB.formPersonID}" 
+                                                                 style="width: 25%;" tabindex="3" required="true" styleClass="inputText"/>
+                                                    <h:message for="formPersonID" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+
+                                                </h:panelGroup>
+                                                <h:panelGroup id="spacer">
+                                                    <!--spacer-->
+                                                </h:panelGroup>
+
+                                                <h:panelGroup id="searchByID">
+
+                                                    <p:commandButton ajax="false" value="Search by ID Number" 
+                                                                     disabled="true" actionListener="#{personBB.searchForPersonByID}"/>
+
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+
+
+                                            <p:spacer height="15"/>
+                                            <hr/>
+                                            <p:spacer height="15"/>
+
+                                            <h2>Search Results</h2>
+
+                                            <p:dataTable
+                                                id="personTable"
+                                                var="p"
+                                                value="#{personBB.personList}"
+                                                selectionMode="single"
+                                                selection="#{personBB.selectedPerson}"
+                                                rowKey="#{p.personID}"
+                                                tableStyleClass="primeDataTable"
+                                                scrollable="true"
+                                                scrollHeight="300"
+                                                rowExpandMode="single"
+                                                expandedRow="false"
+                                                filteredValue="#{personBB.filteredPersonList}"
+                                                widgetVar="personSelectListTable">
+                                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                                <p:column width="3%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Exp"/>
+                                                    </f:facet>
+                                                    <p:rowToggler/>
+                                                </p:column>
+                                                <p:column width="8%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="ID" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{p.personID}"/>
+                                                </p:column>
+
+                                                <p:column width="10%" sortBy="#{p.personType.label}"
+                                                          filterBy="#{p.personType.label}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Person Type" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{p.personType.label}"/>
+                                                </p:column>
+
+                                                <p:column width="10%" sortBy="#{p.muni.muniName}"
+                                                          filterBy="#{p.muni.muniName}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Municipality" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{p.muni.muniName}"/>
+                                                </p:column>
+
+                                                <p:column width="10%" sortBy="#{p.firstName}"
+                                                          filterBy="#{p.firstName}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="First" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{p.firstName}"/>
+                                                </p:column>
+
+                                                <p:column width="15%" filterBy="#{p.lastName}"
+                                                          sortBy="#{p.lastName}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Last" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{p.lastName}"/>
+                                                </p:column>
+
+                                                <p:column sortBy="#{p.address_street}"
+                                                          filterBy="#{p.address_street}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Address" />
+                                                    </f:facet>
+                                                    <h:outputText escape="false" value="#{p.address_street}"/>
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
+                                                </p:column>
+
+
+                                                <p:rowExpansion>
+                                                    <div class="outlinedBox">
+
+                                                        <h2>Full person listing for <h:outputText value="#{p.firstName} #{p.lastName}"/> </h2>
+                                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="First Name"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.firstName}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Last Name"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.lastName}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Muni"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.muni.muniName}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Type"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.personType.label}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Job Title"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.jobTitle}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Email"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.email}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Address"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="#{p.address_street}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Under 19"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.isUnder18}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Active?"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.isActive}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Last Updated"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.lastUpdated}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Expires"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.expiryDate.toString}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Phone home"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.phoneHome}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Phone work"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.phoneWork}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Phone cell"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{p.phoneCell}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <f:facet name="footer">
+                                                                <h:outputLabel styleClass="bold" value="Person notes"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="#{p.notes}"/>
+                                                                </div>
+                                                            </f:facet>
+                                                        </h:panelGrid>
+                                                    </div>
+                                                </p:rowExpansion>
+                                            </p:dataTable>
+                                        </div>
+                                    </p:overlayPanel>
+                                </p:panel>
+                            </p:tab>
+
+                            <p:tab id="paragraphs">
+                                <p:panel header="Configure paragraphs">
+                                    <h2>Greeting</h2>
+                                    <p:selectOneListbox 
+                                        id="greeting"
+                                        tabindex="1"
+                                        value="#{noticeOfViolationBB.greetingBlock}">
+                                        <f:converter converterId="textBlockConverter"/>
+                                        <f:selectItems
+                                            value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                            var="block" 
+                                            itemValue="#{block}"
+                                            itemLabel="#{block.textBlockName}"/>
+                                    </p:selectOneListbox>
+                                    
+                                    <p:commandButton ajax="true" update="blockListOL" 
+                                                     actionListener="#{noticeOfViolationBB.addBlockToList}"/>
+                                    
+                                    <p:orderList id="blockListOL"
+                                        value="#{noticeOfViolationBB.selectedBlockList}" var="block"
+                                        itemLabel="#{block}" itemValue="#{block}" 
+                                        converter="textBlockConverter">
+                                       
+                                    </p:orderList>
+
+                                    <h4>Text preview:</h4>
+                                    <p><h:outputText id="greetingOT" value="#{noticeOfViolationBB.greetingBlock.textBlockText}" /> </p>
+
+                                    <h2>Introductory paragraph</h2>
+                                    <p:selectOneMenu 
+                                        id="intro"
+                                        tabindex="s"
+                                        value="#{noticeOfViolationBB.introBlock}">
+                                        <f:converter converterId="textBlockConverter"/>
+                                        <p:ajax update="introOT" immediate="true"/>
+                                        <f:selectItems
+                                            value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                            var="block" 
+                                            itemValue="#{block}"
+                                            itemLabel="#{block.textBlockName}"/>
+
+                                    </p:selectOneMenu>
+
+                                    <h4>Text preview:</h4>
+                                    <p><h:outputText id="introOT" value="#{noticeOfViolationBB.introBlock.textBlockText}" /> </p>
+
+
+                                    <p:fieldset legend="Add more paragraphs"
+                                                toggleable="true"
+                                                collapsed="true">
+
+                                        <h2>Optional text block 1</h2>
+                                        <p:inputSwitch id="useOptional1" value="#{noticeOfViolationBB.useTb1}" 
+                                                       onLabel="Use Block" offLabel="Don't use" />
+                                        <p:spacer height="5px"/>
+                                        <p:selectOneMenu 
+                                            id="optional1"
+                                            tabindex="7"
+                                            value="#{noticeOfViolationBB.tb1}">
+                                            <f:converter converterId="textBlockConverter"/>
+                                            <p:ajax update="optional1OT" immediate="true"/>
+                                            <f:selectItems
+                                                value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                                var="block" 
+                                                itemValue="#{block}"
+                                                itemLabel="#{block.textBlockName}"/>
+
+                                        </p:selectOneMenu>
+
+                                        <h4>Text preview:</h4>
+                                        <p><h:outputText id="optional1OT" value="#{noticeOfViolationBB.tb1.textBlockText}" /> </p>
+
+
+
+                                        <h2>Optional text block 2</h2>
+
+                                        <p:inputSwitch id="useOptional2" value="#{noticeOfViolationBB.useTb2}" 
+                                                       onLabel="Use Block" offLabel="Don't use" />
+                                        <p:spacer height="5px"/>
+                                        <p:selectOneMenu 
+                                            id="optional2"
+                                            tabindex="7"
+                                            value="#{noticeOfViolationBB.tb2}">
+                                            <f:converter converterId="textBlockConverter"/>
+                                            <p:ajax update="optional2OT" immediate="true"/>
+                                            <f:selectItems
+                                                value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                                var="block" 
+                                                itemValue="#{block}"
+                                                itemLabel="#{block.textBlockName}"/>
+
+                                        </p:selectOneMenu>
+
+                                        <h4>Text preview:</h4>
+                                        <p><h:outputText id="optional2OT" value="#{noticeOfViolationBB.tb2.textBlockText}" /> </p>
+
+                                    </p:fieldset>
+                                    <h2>Compliance instructions</h2>
+
+                                    <p:selectOneMenu 
+                                        id="compliance"
+                                        tabindex="7"
+                                        value="#{noticeOfViolationBB.complianceBlock}">
+                                        <f:converter converterId="textBlockConverter"/>
+                                        <p:ajax update="complianceOT" immediate="true"/>
+                                        <f:selectItems
+                                            value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                            var="block" 
+                                            itemValue="#{block}"
+                                            itemLabel="#{block.textBlockName}"/>
+
+                                    </p:selectOneMenu>
+
+                                    <h4>Text preview:</h4>
+                                    <p><h:outputText id="complianceOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
+
+                                    <h2>Penalty notice</h2>
+
+                                    <p:selectOneMenu 
+                                        id="penalty"
+                                        tabindex="7"
+                                        value="#{noticeOfViolationBB.penaltyBlock}">
+                                        <f:converter converterId="textBlockConverter"/>
+                                        <p:ajax update="penaltyOT" immediate="true"/>
+                                        <f:selectItems
+                                            value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                            var="block" 
+                                            itemValue="#{block}"
+                                            itemLabel="#{block.textBlockName}"/>
+
+                                    </p:selectOneMenu>
+
+                                    <h4>Text preview:</h4>
+                                    <p><h:outputText id="penaltyOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
+
+
+                                    <p:fieldset legend="Add more paragraphs" toggleable="true" collapsed="true">
+
+
+                                        <h2>Optional text block 3</h2>
+
+                                        <p:inputSwitch id="useOptional3" value="#{noticeOfViolationBB.useTb3}" 
+                                                       onLabel="Use Block" offLabel="Don't use" />
+                                        <p:spacer height="5px"/>
+
+                                        <p:selectOneMenu 
+                                            id="optional3"
+                                            tabindex="7"
+                                            value="#{noticeOfViolationBB.tb3}">
+                                            <f:converter converterId="textBlockConverter"/>
+                                            <p:ajax update="optional3OT" immediate="true"/>
+                                            <f:selectItems
+                                                value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                                var="block" 
+                                                itemValue="#{block}"
+                                                itemLabel="#{block.textBlockName}"/>
+
+                                        </p:selectOneMenu>
+
+                                        <h4>Text preview:</h4>
+                                        <p><h:outputText id="optional3OT" value="#{noticeOfViolationBB.tb3.textBlockText}" /> </p>
+
+
+                                        <h2>Optional text block 4</h2>
+
+
+                                        <p:inputSwitch id="useOptional4" value="#{noticeOfViolationBB.useTb4}" 
+                                                       onLabel="Use Block" offLabel="Don't use" />
+                                        <p:spacer height="5px"/>
+
+                                        <p:selectOneMenu 
+                                            id="optional4"
+                                            tabindex="7"
+                                            value="#{noticeOfViolationBB.tb4}">
+                                            <f:converter converterId="textBlockConverter"/>
+                                            <p:ajax update="optional4OT" immediate="true"/>
+                                            <f:selectItems
+                                                value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                                var="block" 
+                                                itemValue="#{block}"
+                                                itemLabel="#{block.textBlockName}"/>
+
+                                        </p:selectOneMenu>
+
+                                        <h4>Text preview:</h4>
+                                        <p><h:outputText id="optional4OT" value="#{noticeOfViolationBB.tb4.textBlockText}" /> </p>
+
+                                    </p:fieldset>
+                                </p:panel>
+                            </p:tab>
+
+                            <p:tab id="violations">
+                                <p:panel header="Select violations">
+
+                                    <h2>Violation List</h2>
+
+                                    <p>This is a fixed list of violations based on your choice on the previous page. 
+                                        If this list is incorrect, click cancel and return to the violations page</p>
+
+                                    <p:dataTable
+                                        id="violationTable"
+                                        value="#{noticeOfViolationBB.activeVList}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableColumns="true"
+                                        reflow="true"
+                                        var="v"
+                                        rowExpandMode="single"
+                                        expandedRow="false">
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Code Element" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Stipulated Comp. Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.stipulatedComplianceDate}"/>
+                                        </p:column>
+
+                                        <p:rowExpansion>
+                                            <div class="outlinedBox">
+
+                                                <h:outputLabel value="Violated Element Details: "/>
+                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                               #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                               #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                               #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                               #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel value="Penalty:"/>
+                                                <h:outputText value="#{v.penalty}"/>
+
+                                                <h:outputLabel value="Description: "/>
+                                                <h:outputText value="#{v.description}"/>
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel value="Violation Notes: "/>
+                                                <h:outputText value="#{v.notes}"/>
+
+                                            </div>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable> 
+
+                                    <p:spacer height="15px"/>
+
+                                </p:panel>
+
+
+                            </p:tab>
+
+                            <p:tab id="signature">
+                                <p:panel header="signature">
+                                </p:panel>
+                                <h2>Signature</h2>
+
+
+                                <p>
+                                    <h:outputText id="sig1" value="#{facesUser.FName} #{facesUser.LName}"/><br/>
+                                    <h:outputText id="sig2" value="#{facesUser.workTitle}"/><br/>
+                                    <h:outputText id="sig3" value="#{facesUser.muni.muniName}"/><br/>
+                                    <h:outputText id="sig4" value="#{facesUser.phoneCell}"/><br/>
+                                    <h:outputText id="sig5" value="#{facesUser.email}"/>
+                                </p>
+
+                                <p:spacer height="15px"/>
+                            </p:tab>
+                            <p:tab id="assembleNotice">
+
+
+                                <p:commandButton ajax="false" value="Assemble and edit draft notice" 
+                                                 action="#{noticeOfViolationBB.assembleNotice}"
+                                                 icon="fa fa-tasks"/>
+                            </p:tab>
+                        </p:wizard>
                     </h:form>
                 </div>
-                
-                
-                
             </ui:define>
         </ui:composition>
     </h:body>

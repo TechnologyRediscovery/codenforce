@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.Date;
@@ -61,8 +61,8 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
        
        EventCoordinator eventCoordinator = getEventCoordinator();
        currentViolation = getSessionBean().getActiveCodeViolation();
-       CECase ceCase = getSessionBean().getActiveCase();
-       EventCase event = new EventCase();
+       CECase ceCase = getSessionBean().getcECase();
+       EventCECase event = new EventCECase();
         
         currentViolation.setStipulatedComplianceDate(getStipulatedComplianceDate()
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
@@ -105,7 +105,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
                             ex.getMessage(), "Unable to generate automated event to log violation update"));
         }
         
-            return "caseViolations";
+            return "caseProfile";
     }
 
     /**

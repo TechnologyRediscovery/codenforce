@@ -17,13 +17,14 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class Municipality {
+public class Municipality implements Serializable{
     
     private int muniCode;
     private String muniName;
@@ -39,6 +40,7 @@ public class Municipality {
     private int population;
     private boolean activeInProgram;
     private int defaultCodeSetID;
+    private int issuingPermitCodeSourceID;
 
     /**
      * @return the muniCode
@@ -308,6 +310,20 @@ public class Municipality {
      */
     public void setDefaultCodeSetID(int defaultCodeSetID) {
         this.defaultCodeSetID = defaultCodeSetID;
+    }
+
+    /**
+     * @return the issuingPermitCodeSourceID
+     */
+    public int getIssuingPermitCodeSourceID() {
+        return issuingPermitCodeSourceID;
+    }
+
+    /**
+     * @param issuingPermitCodeSourceID the issuingPermitCodeSourceID to set
+     */
+    public void setIssuingPermitCodeSourceID(int issuingPermitCodeSourceID) {
+        this.issuingPermitCodeSourceID = issuingPermitCodeSourceID;
     }
 
     

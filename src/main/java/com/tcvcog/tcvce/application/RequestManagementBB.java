@@ -30,7 +30,7 @@ public class RequestManagementBB extends BackingBeanUtils implements Serializabl
     
     
     private CEActionRequest currentRequest;
-    private RequestStatus newStatus;
+    private CEActionRequestStatus newStatus;
     
     // bean utilities
     private CEActionRequestIntegrator integrator = new CEActionRequestIntegrator();
@@ -47,7 +47,7 @@ public class RequestManagementBB extends BackingBeanUtils implements Serializabl
      */
     public CEActionRequest getCurrentRequest() {
         if(currentRequest == null){
-            currentRequest = getSessionBean().getActionRequest();
+            currentRequest = getSessionBean().getcEActionRequest();
         }
         return currentRequest;
     }
@@ -62,14 +62,14 @@ public class RequestManagementBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the newStatus
      */
-    public RequestStatus getNewStatus() {
+    public CEActionRequestStatus getNewStatus() {
         return newStatus;
     }
 
     /**
      * @param newStatus the newStatus to set
      */
-    public void setNewStatus(RequestStatus newStatus) {
+    public void setNewStatus(CEActionRequestStatus newStatus) {
         this.newStatus = newStatus;
     }
     

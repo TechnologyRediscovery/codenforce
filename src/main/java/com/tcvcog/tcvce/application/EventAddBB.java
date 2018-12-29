@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.EventCase;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
@@ -66,7 +66,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     private EventType[] userAdminEventTypeList;
     
     private CECase ceCase;
-    private EventCase currentEvent;
+    private EventCECase currentEvent;
     
     private String formEventDesc;
     private Date formEventDate;
@@ -88,7 +88,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     public String startNewEvent(){
         System.out.println("EventAddBB.startNewEvent | category: " + selectedEventCategory.getEventCategoryTitle());
         
-        CECase c = getSessionBean().getActiveCase();
+        CECase c = getSessionBean().getcECase();
         EventCoordinator ec = getEventCoordinator();
         try {
             currentEvent = ec.getInitializedEvent(c, selectedEventCategory);
@@ -107,11 +107,11 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     public String addEvent() throws ViolationException{
         
         //Event e = getSessionBean().getActiveEvent();
-        EventCase e = currentEvent;
+        EventCECase e = currentEvent;
         CaseCoordinator cc = getCaseCoordinator();
         
         // category is already set from initialization sequence
-        e.setCaseID(getSessionBean().getActiveCase().getCaseID());
+        e.setCaseID(getSessionBean().getcECase().getCaseID());
         System.out.println("EventAddBB.addEvent | CaseID: " + e.getCaseID());
         e.setEventDescription(formEventDesc);
         e.setActiveEvent(activeEvent);
@@ -120,7 +120,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         e.setDiscloseToMunicipality(formDiscloseToMuni);
         e.setDiscloseToPublic(formDiscloseToPublic);
         e.setRequiresViewConfirmation(formRequireViewConfirmation);
-        e.setNotes(formEventDesc);
+        e.setNotes(formEventNotes);
 //        e.setEventPersons(formSelectedPersons);
         
         // now check for persons to connect
@@ -157,7 +157,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         // get user back to the most logical case page
         switch(e.getCategory().getEventType()){
             case Compliance:
-                return "caseViolations";
+                return "caseProfile";
             default:
                 return "caseProfile";
                 
@@ -239,7 +239,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         
         
         try {
-            candidatePersonList = pi.getPersonList(getSessionBean().getActiveCase().getProperty());
+            candidatePersonList = pi.getPersonList(getSessionBean().getcECase().getProperty());
         } catch (IntegrationException ex) {
             // do nothing
         }
@@ -303,7 +303,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
      */
     public CECase getCeCase() {
         
-        ceCase = getSessionBean().getActiveCase();
+        ceCase = getSessionBean().getcECase();
         return ceCase;
     }
 
@@ -354,9 +354,9 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the currentEvent
      */
-    public EventCase getCurrentEvent() {
+    public EventCECase getCurrentEvent() {
         
-        EventCase currentEvent = getSessionBean().getActiveEvent();
+        EventCECase currentEvent = getSessionBean().getActiveEvent();
         this.currentEvent = currentEvent;
         return this.currentEvent;
     }
@@ -364,7 +364,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     /**
      * @param currentEvent the currentEvent to set
      */
-    public void setCurrentEvent(EventCase currentEvent) {
+    public void setCurrentEvent(EventCECase currentEvent) {
         this.currentEvent = currentEvent;
     }
 

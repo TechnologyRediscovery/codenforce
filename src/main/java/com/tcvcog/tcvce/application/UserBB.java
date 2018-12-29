@@ -113,7 +113,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         u.setActivityStopDate(formActivityStopDate.toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        u.setAccessPermitted(formAccessPermitted);
+        u.setSystemAccessPermitted(formAccessPermitted);
 
         try {
             ui.insertUser(u);

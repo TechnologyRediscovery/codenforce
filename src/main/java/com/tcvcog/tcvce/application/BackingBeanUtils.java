@@ -19,11 +19,11 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
 import java.sql.Connection;
-import com.tcvcog.tcvce.integration.PostgresConnectionFactory;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.entities.User;
@@ -48,6 +48,8 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 // system integrators
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
+import com.tcvcog.tcvce.util.Constants;
+import java.sql.SQLException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -59,11 +61,18 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 
 /**
- *
- * @author cedba
+ * Collection of convenience methods for accessing application-level objects
+ * that beans of various scopes use, most notably Coordinators and Integrators
+ * 
+ * @author Xander Darsow
  */
 
 public class BackingBeanUtils implements Serializable{
@@ -89,6 +98,7 @@ public class BackingBeanUtils implements Serializable{
     
     private PropertyIntegrator propertyIntegrator;
     private CEActionRequestIntegrator cEActionRequestIntegrator;
+    private PublicInfoCoordinator publicInfoCoordinator;
     
     private ChecklistIntegrator checklistIntegrator;
     private OccupancyInspectionIntegrator occupancyInspectionIntegrator;
@@ -99,7 +109,12 @@ public class BackingBeanUtils implements Serializable{
     private SystemIntegrator systemIntegrator;
     private LogIntegrator logIntegrator;
     
+    private SearchCoordinator searchCoordinator;
+    
     private User facesUser;
+    
+    private DataSource dataSource;
+    private Connection connx;
     
     /**
      * Creates a new instance of BackingBeanUtils
@@ -138,6 +153,21 @@ public class BackingBeanUtils implements Serializable{
         return bundle;
     }
     
+    /**
+     * A hacky way of creating a temporary User object who only
+     * has an ID number and no access permissions or ID info. Used for inserting
+     * events by public folks who don't have an actual User in the system.
+     * The ID of this user is pulled from the message bundles.
+     * @return the system robot user with only an ID number
+     */
+    public User getSystemRobotUser(){
+        User u = new User();
+        u.setUserID(Integer.parseInt(
+                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("cogRobotUserID")));
+        
+        return u;
+    }
     
     
     public void setUserCoordinator(UserCoordinator userCoordinator){
@@ -146,31 +176,40 @@ public class BackingBeanUtils implements Serializable{
 
     /**
      * creates a PostgresConnectionFactory factory and calls getCon to get a handle on the
- database connection
+     * database connection
      * @return the postgresCon
      */
     public Connection getPostgresCon() {
-
-        // We definitely do not want to be creating a connection 
-        // factory in this location-- go get a bean!
-       // PostgresConnectionFactory factory = new PostgresConnectionFactory();
-       // return factory.getCon();
-       
-             
-         //System.out.println("BackingBeanUtils.getPostgresCon- Getting con through backing bean");
-         FacesContext context = getFacesContext();
-         PostgresConnectionFactory dbCon = context.getApplication()
-                 .evaluateExpressionGet(
-                         context, 
-                         "#{dBConnection}", 
-                         PostgresConnectionFactory.class);
-         return dbCon.getCon();
-         
-
+        String username = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("dbusername_readwrite");
+//        String username = getResourceBundle("dbconnection").getString("dbusername_readwrite");
+        String password = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("dbpassowrd_readwrite");
+        String jndi_name = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("jndi_name");
+//        String password = getResourceBundle("dbconnection").getString("dbpassowrd_readwrite");
+        
+Context initContext = null;
+        try {
+            initContext = new InitialContext();
+            Context envCtx = (Context) initContext.lookup("java:comp/env");
+            dataSource = (DataSource) envCtx.lookup(jndi_name);
+//            System.out.println(dataSource.toString());
+//            connx = dataSource.getConnection("sylvia", "c0d3");
+            connx = dataSource.getConnection();
+//            System.out.println("BackingBeanUtils.getConnx | connectionob" + connx.toString());
+        } catch (NamingException | SQLException ex) {
+            System.out.println(ex);
+        }
+        finally {
+//             removed to avoid a "connection closed error" when migrating to glassfish managed connection pool
+//            if (connx != null) { try { connx.close();} catch (SQLException e) { /* ignored */}}
+        } 
+        return connx;
+      
     }
 
-    // deleted setter
-    
+    /**
+     * Chops up the current time to get seven random digits
+     * @return 
+     */
     public int getControlCodeFromTime(){
          long dateInMs = new Date().getTime();
          
@@ -592,6 +631,17 @@ public class BackingBeanUtils implements Serializable{
         
         return logIntegrator;
     }
+    
+     /**
+     * @return the sessionBean
+     */
+    public SearchCoordinator getSearchCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{searchCoordinator}", SearchCoordinator.class);
+        searchCoordinator = (SearchCoordinator) ve.getValue(context.getELContext());
+        return searchCoordinator;
+    }
 
     /**
      * @return the sessionBean
@@ -626,5 +676,60 @@ public class BackingBeanUtils implements Serializable{
     public void setFacesUser(User facesUser) {
         this.facesUser = facesUser;
     }
+    
+    public String getSessionID(){
+        
+        FacesContext fc = getFacesContext();
+        HttpSession session = (HttpSession) fc.getExternalContext().getSession(false);
+        // prints out the current session attributes to standard out
+//        Enumeration e = session.getAttributeNames();
+//        System.out.println("SessionInitailzier.getSessionID | Dumping lots of attrs");
+//        while (e.hasMoreElements())
+//        {
+//          String attr = (String)e.nextElement();
+//          System.out.println("      attr  = "+ attr);
+//          Object value = session.getValue(attr);
+//          System.out.println("      value = "+ value);
+//        }
+        String sessionID = session.getId();
+        return sessionID;
+    }
+
+    /**
+     * @return the publicInfoCoordinator
+     */
+    public PublicInfoCoordinator getPublicInfoCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{publicInfoCoordinator}", PublicInfoCoordinator.class);
+        publicInfoCoordinator = (PublicInfoCoordinator) ve.getValue(context.getELContext());
+        
+        return publicInfoCoordinator;
+    }
+
+    /**
+     * @param publicInfoCoordinator the publicInfoCoordinator to set
+     */
+    public void setPublicInfoCoordinator(PublicInfoCoordinator publicInfoCoordinator) {
+        this.publicInfoCoordinator = publicInfoCoordinator;
+    }
+
+    /**
+     * @return the dataSource
+     */
+    public DataSource getDataSource() {
+        
+        return dataSource;
+    }
+
+    /**
+     * @param dataSource the dataSource to set
+     */
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+       
+
 
 }

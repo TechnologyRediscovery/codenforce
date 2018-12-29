@@ -1,0 +1,5 @@
+﻿SELECT citationid, citationno, origin_courtentity_entityid, cecase_caseid, 
+       citation.login_userid, dateofrecord, transtimestamp, isactive, citation.notes
+  FROM public.citation 	INNER JOIN public.cecase ON cecase.caseid = citation.cecase_caseid
+			INNER JOIN public.property ON cecase.property_propertyID = property.propertyID
+  WHERE propertyID=12222; 

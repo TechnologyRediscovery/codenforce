@@ -110,7 +110,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
             
                 getFacesContext().addMessage(null,
                      new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                         "Successfully added " + p.getFirstName() + " to the Database!"
+                         "Successfully added " + p.getFirstName() + " to the Database!" 
                              + " and connected to " + property.getAddress(), ""));
                 
             } else {

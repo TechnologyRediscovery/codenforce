@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ObjectNotFoundException;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
@@ -29,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  *
@@ -51,7 +53,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @throws ObjectNotFoundException
      * @throws IntegrationException 
      */
-    public User getAuthenticatedUser(String loginName, String loginPassword) throws ObjectNotFoundException, IntegrationException{
+    private User getAuthenticatedUser(String loginName, String loginPassword) throws ObjectNotFoundException, IntegrationException{
         System.out.println("UserIntegrator.getAuthenticatedUser | attempting to get user for " + loginName);
         
         String query = "SELECT username, password, userid FROM login"
@@ -147,7 +149,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setTimestamp(18, java.sql.Timestamp
                     .valueOf(userToInsert.getActivityStopDate()));
-            stmt.setBoolean(19, userToInsert.isAccessPermitted());
+            stmt.setBoolean(19, userToInsert.isSystemAccessPermitted());
             stmt.setInt(20, userToInsert.getUserID());
             
             System.out.println("UserIntegrator.insertUser | sql: " + stmt.toString());
@@ -202,7 +204,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                     .valueOf(userToUpdate.getActivityStartDate()));
             stmt.setTimestamp(18, java.sql.Timestamp
                     .valueOf(userToUpdate.getActivityStopDate()));
-            stmt.setBoolean(19, userToUpdate.isAccessPermitted());
+            stmt.setBoolean(19, userToUpdate.isSystemAccessPermitted());
             
             stmt.setInt(20, userToUpdate.getUserID());
             System.out.println("UserIntegrator.updateUser | sql: " + stmt.toString());
@@ -227,15 +229,21 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     private User generateUser(ResultSet rs) throws IntegrationException{
-        User user = new User();
+        User user = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
+        int userID;
         try {
+            userID = rs.getInt("userid");
+            // the central control mechanism for user access: only configurable
+            // upon User object construction!
+            user = new User(userID, RoleType.valueOf(rs.getString("userrole")));
+            user.setSystemAccessPermitted(rs.getBoolean("accesspermitted"));
             
-            user.setUserID(rs.getInt("userid"));
-            user.setRoleType(RoleType.valueOf(rs.getString("userrole")));
+            user.setAuthMuis(getUserAuthMunis(userID));
             user.setUsername(rs.getString("username"));
-            user.setPassword(rs.getString("password"));
+            // passwords managed by Glassfish
+            //user.setPassword(rs.getString("password"));
             user.setMuniCode(rs.getInt("muni_municode"));
             user.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_muniCode")));
             
@@ -262,7 +270,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 user.setActivityStopDate(rs.getTimestamp("activitystopdate").toLocalDateTime());
                 
             }
-            user.setAccessPermitted(rs.getBoolean("accesspermitted"));
             
         } catch (SQLException ex) {
             throw new IntegrationException("Cannot create user", ex);
@@ -281,11 +288,19 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     } 
     
+    /**
+     * Deprecated from auth version that didn't use Glassfish's authorization scheme
+     * @deprecated 
+     * @param userID
+     * @return
+     * @throws IntegrationException 
+     */
     public User getUser(int userID) throws IntegrationException{
         System.out.println("UserIntegrator.getUserByID");
         Connection con = getPostgresCon();
         ResultSet rs = null;
         User newUser = new User();
+        // broken query
         String query = "SELECT * from login where userid = ?;";
         
         PreparedStatement stmt = null;
@@ -299,6 +314,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 newUser = generateUser(rs);
             }
             
+            
+            
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error inserting new person", ex);
@@ -310,8 +327,16 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         return newUser;
     }
-    
+    /**
+     * Primary access point for the entire User system: Called during SessionInitializer actions
+     * to create a new session
+     * @param userName
+     * @return the Fully-baked user object ready to be passed to and fro
+     * @throws IntegrationException 
+     */
+   
     public User getUser(String userName) throws IntegrationException{
+        
         System.out.println("UserIntegrator.getUserByID");
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -331,7 +356,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error inserting new person", ex);
+            throw new IntegrationException("Error getting a new person", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
@@ -341,6 +366,49 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return newUser;
     }
     
+    /**
+     * Users are permitted access to a set of municipalities which are all dumped
+     * into a List by this method during the user lookup process.
+     * @param uid
+     * @return A liste of Municipalities to which the user should be granted data-related
+     * access within their user type domain
+     * @throws IntegrationException 
+     */
+    private ArrayList<Municipality> getUserAuthMunis(int uid) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT muni_municode FROM loginmuni WHERE userid = ?;";
+        ArrayList<Municipality>muniList = new ArrayList<>();
+        PreparedStatement stmt = null;
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, uid);
+            System.out.println("UserIntegrator.getUserAuthMunis | stmt: " + stmt.toString());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                muniList.add(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting new person", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return muniList;
+    }
+    
+    /**
+     * For use by system administrators to manage user data
+     * @return
+     * @throws IntegrationException 
+     */
     public ArrayList getCompleteUserList() throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
