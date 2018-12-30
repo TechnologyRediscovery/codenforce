@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
-import com.tcvcog.tcvce.entities.KeyCard;
+import com.tcvcog.tcvce.entities.AccessKeyCard;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
@@ -51,7 +51,7 @@ import javax.faces.bean.SessionScoped;
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
     // primary security authoriziation container 
-    private KeyCard accessKeyCard;
+    private AccessKeyCard accessKeyCard;
     
     
     /* *** System Core Objects Session Shelves ***  */
@@ -341,14 +341,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the accessKeyCard
      */
-    public KeyCard getAccessKeyCard() {
+    public AccessKeyCard getAccessKeyCard() {
         return accessKeyCard;
     }
 
     /**
      * @param accessKeyCard the accessKeyCard to set
      */
-    public void setAccessKeyCard(KeyCard accessKeyCard) {
+    public void setAccessKeyCard(AccessKeyCard accessKeyCard) {
         this.accessKeyCard = accessKeyCard;
     }
 

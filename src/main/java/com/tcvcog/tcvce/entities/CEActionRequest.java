@@ -42,6 +42,7 @@ public class CEActionRequest implements Serializable{
     
     private int requestID;
     private int requestPublicCC;
+    private boolean paccEnabled;
     private CEActionRequestStatus requestStatus;
 
     private Municipality muni;
@@ -54,7 +55,10 @@ public class CEActionRequest implements Serializable{
     private String issueTypeString; //populated from linked table
     
     private int muniCode;
+    
     private int caseID;
+    private java.time.LocalDateTime caseAttachmentTimeStamp;
+    private User caseAttachmentUser;
     
     private java.time.LocalDateTime submittedTimeStamp;
     private String formattedSubmittedTimeStamp;
@@ -556,6 +560,48 @@ public class CEActionRequest implements Serializable{
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the paccEnabled
+     */
+    public boolean isPaccEnabled() {
+        return paccEnabled;
+    }
+
+    /**
+     * @param paccEnabled the paccEnabled to set
+     */
+    public void setPaccEnabled(boolean paccEnabled) {
+        this.paccEnabled = paccEnabled;
+    }
+
+    /**
+     * @return the caseAttachmentUser
+     */
+    public User getCaseAttachmentUser() {
+        return caseAttachmentUser;
+    }
+
+    /**
+     * @param caseAttachmentUser the caseAttachmentUser to set
+     */
+    public void setCaseAttachmentUser(User caseAttachmentUser) {
+        this.caseAttachmentUser = caseAttachmentUser;
+    }
+
+    /**
+     * @return the caseAttachmentTimeStamp
+     */
+    public java.time.LocalDateTime getCaseAttachmentTimeStamp() {
+        return caseAttachmentTimeStamp;
+    }
+
+    /**
+     * @param caseAttachmentTimeStamp the caseAttachmentTimeStamp to set
+     */
+    public void setCaseAttachmentTimeStamp(java.time.LocalDateTime caseAttachmentTimeStamp) {
+        this.caseAttachmentTimeStamp = caseAttachmentTimeStamp;
     }
     
     

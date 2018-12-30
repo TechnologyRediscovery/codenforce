@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.domain.DataStoreException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
 import com.tcvcog.tcvce.domain.ObjectNotFoundException;
-import com.tcvcog.tcvce.entities.KeyCard;
+import com.tcvcog.tcvce.entities.AccessKeyCard;
 import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -123,12 +123,12 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param rt
      * @return a User object whose access controls switches are configured
      */
-    private KeyCard acquireAccessKeyCard(RoleType rt){
-        KeyCard card = null;
+    private AccessKeyCard acquireAccessKeyCard(RoleType rt){
+        AccessKeyCard card = null;
         
         switch(rt){
             case Developer:
-                card = new KeyCard( true,   //developer
+                card = new AccessKeyCard( true,   //developer
                                     true,   // sysadmin
                                     true,   // cogstaff
                                     true,   // enfOfficial
@@ -137,7 +137,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                break;
             
             case SysAdmin:
-                card = new KeyCard( false,   //developer
+                card = new AccessKeyCard( false,   //developer
                                     true,   // sysadmin
                                     true,   // cogstaff
                                     false,   // enfOfficial
@@ -147,7 +147,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                
                
             case CogStaff:
-                card = new KeyCard( false,   //developer
+                card = new AccessKeyCard( false,   //developer
                                     false,   // sysadmin
                                     true,   // cogstaff
                                     false,   // enfOfficial
@@ -157,7 +157,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                
                
             case EnforcementOfficial:
-                card = new KeyCard( false,   //developer
+                card = new AccessKeyCard( false,   //developer
                                     false,   // sysadmin
                                     false,   // cogstaff
                                     true,   // enfOfficial
@@ -166,7 +166,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                break;
                
             case MuniStaff:
-                card = new KeyCard( false,   //developer
+                card = new AccessKeyCard( false,   //developer
                                     false,   // sysadmin
                                     false,   // cogstaff
                                     false,   // enfOfficial
@@ -175,7 +175,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                break;
                
             case MuniReader:
-                card = new KeyCard( false,   //developer
+                card = new AccessKeyCard( false,   //developer
                                     false,   // sysadmin
                                     false,   // cogstaff
                                     false,   // enfOfficial

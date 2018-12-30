@@ -9,16 +9,11 @@ import java.io.Serializable;
 
 /**
  * Stores access data for a user
- * Note the switches are private and final--so they can't be tweaked on the fly
- * by changes in other classes. Watch git changes for those in here!
  *  
- * @author Ellen Bascomb
+ * @author sylvia
  */
 public class AccessKeyCard implements Serializable{
 
-    private final int userID;
-    private final Municipality muni;
-    private final RoleType authRole;
     private final boolean hasDeveloperPermissions;
     private final boolean hasSysAdminPermissions;
     private final boolean hasCOGStaffPermissions;
@@ -26,18 +21,13 @@ public class AccessKeyCard implements Serializable{
     private final boolean hasMuniStaffPermissions;
     private final boolean hasMuniReaderPermissions;
 
-    public AccessKeyCard(   int uid,
-                            Municipality m, 
-                            RoleType rt,
-                            boolean dev,
-                            boolean admin,
-                            boolean cogstaff,
-                            boolean ceo,
-                            boolean munistaff,
-                            boolean munireader){
-        userID = uid;
-        muni = m;
-        authRole = rt;
+    public AccessKeyCard( boolean dev,
+                    boolean admin,
+                    boolean cogstaff,
+                    boolean ceo,
+                    boolean munistaff,
+                    boolean munireader){
+        
         hasDeveloperPermissions = dev;
         hasSysAdminPermissions = admin;
         hasCOGStaffPermissions = cogstaff;
@@ -89,28 +79,6 @@ public class AccessKeyCard implements Serializable{
     public boolean isHasMuniReaderPermissions() {
         return hasMuniReaderPermissions;
     }
-
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
-    }
-
-    /**
-     * @return the authRole
-     */
-    public RoleType getAuthRole() {
-        return authRole;
-    }
-
-    /**
-     * @return the userID
-     */
-    public int getUserID() {
-        return userID;
-    }
-    
     
     
     

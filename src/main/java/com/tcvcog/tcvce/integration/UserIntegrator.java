@@ -290,7 +290,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      * Deprecated from auth version that didn't use Glassfish's authorization scheme
-     * @deprecated 
      * @param userID
      * @return
      * @throws IntegrationException 

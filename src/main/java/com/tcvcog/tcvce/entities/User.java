@@ -53,7 +53,7 @@ public class User implements Serializable{
     
     // permissions
     private boolean systemAccessPermitted;
-    private KeyCard keyCard;
+    private AccessKeyCard keyCard;
     
     
     
@@ -378,14 +378,14 @@ public class User implements Serializable{
     /**
      * @return the keyCard
      */
-    public KeyCard getKeyCard() {
+    public AccessKeyCard getKeyCard() {
         return keyCard;
     }
 
     /**
      * @param keyCard the keyCard to set
      */
-    public void setKeyCard(KeyCard keyCard) {
+    public void setKeyCard(AccessKeyCard keyCard) {
         this.keyCard = keyCard;
     }
 

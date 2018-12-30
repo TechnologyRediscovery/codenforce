@@ -210,8 +210,11 @@
                                                              req-details-form:selr-id
                                                              req-details-form:selr-issueType
                                                              req-details-form:selr-prop-address
+                                                             req-details-form:selr-attachedCase
                                                              req-details-form:selr-prop-muni
                                                              req-details-form:selr-pacc
+                                                             req-details-form:selr-access-sbcb
+                                                             req-details-form:selr-pacc-access-ot
                                                              req-details-form:selr-submitted-ts
                                                              req-details-form:selr-isurgent
                                                              req-details-form:selr-persontype
@@ -228,6 +231,14 @@
                                                              req-details-form:selr-notes-internal
                                                              req-details-form:selr-notes-muni
                                                              req-details-form:selr-notes-public
+                                                             req-details-form:open-new-case-cb
+                                                             req-details-form:attach-to-case-cb
+                                                             req-details-form:no-violation-found-cb
+                                                             req-details-form:invalid-request-cb
+                                                             req-details-form:header-id-ot
+                                                             req-details-form:header-type-ot
+                                                             req-details-form:header-addr-ot
+                                                             req-details-form:header-muni-ot
                                                              "/>
                                         </p:column>
                                     </p:dataTable>
@@ -245,9 +256,15 @@
                             <h:panelGroup>
                                 <h:form id="req-details-form">
 
-                                    <h2>Details: Request ID #<h:outputText value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </h2>
+                                    <h2>
+                                        Request ID #<h:outputText   id="header-id-ot" value="#{cEActionRequestsBB.selectedRequest.requestID}"/>: 
+                                        <h:outputText id="header-type-ot" value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
+                                        at <h:outputText id="header-addr-ot" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address} "/>  
+                                        <h:outputText id="header-muni-ot" value="(#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName})"/>)  
+                                    
+                                    </h2>
 
-                                    <h:outputLabel styleClass="bold" value="Processing Status:"/>
+                                    <h:outputLabel styleClass="bold" value="Status:"/>
                                     <p:spacer height="5px"/>
                                     
                                     <h:outputText id="selr-status-ot" value="#{cEActionRequestsBB.selectedRequest.requestStatus.statusTitle}"/>
@@ -255,56 +272,51 @@
                                     
                                     <p:spacer height="15px"/>
                                     
-                                    <ui:remove>
-                                        
-                                        <h3>After investigating this request:</h3>
-                                        
-                                    
-                                    <h:outputLabel styleClass="bold" for="ceactionrequeststatusmenu" value="Change status to:"/>
-                                    
-                                    <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{cEActionRequestsBB.selectedChangeToStatus}">
-                                        <f:converter converterId="ceActionRequestStatusConverter"/>
-                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                        <f:selectItems value="#{cEActionRequestsBB.statusList}"
-                                                       var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
-                                    </p:selectOneMenu>
-                                    
-                                    <p:commandButton ajax="true" value="Change request status" 
-                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                     actionListener="#{cEActionRequestsBB.updateActionRequestStatus}"
-                                                     update="actionRequestListForm:actionRequestTable
-                                                     req-details-form:selr-status-ot"/>
-                                    
-                                    <p:spacer height="10px"/>
-                                    </ui:remove>
-
                                     <h:outputLabel styleClass="bold" value="Available actions:"/>
+
                                     <p:spacer height="5px"/>
                                     
-                                    <p:commandButton ajax="false" value="Open new CE Case at this property"
-                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                     action="#{cEActionRequestsBB.createNewCaseAtProperty}"
-                                                     update="ceActionRequestsMessages" icon="fa fa-folder" 
-                                                     styleClass="cear-actions-button"/>
+                                    <p:commandButton    id="open-new-case-cb"
+                                                        ajax="false" value="Open new code enf case at this property" 
+                                                        disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                        action="#{cEActionRequestsBB.path1CreateNewCaseAtProperty}"
+                                                        update="ceActionRequestsMessages" icon="fa fa-folder" 
+                                                        styleClass="cear-actions-button"/>
                                     <p:spacer height="5px"/>
                                     
-                                    <p:commandButton value="Attach to existing code enforcement case"
-                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                     onclick="PF('attach-to-case-dialog').show()"
-                                                     update="attach-to-existing-case-form:cases-on-selected-request-property-DS"
-                                                     icon="fa fa-book" />
+                                    <p:commandButton    id="attach-to-case-cb"
+                                                        value="Attach to existing code enf case"
+                                                        disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                        onclick="PF('attach-to-case-dialog').show()"
+                                                        update="attach-to-existing-case-form:cases-on-selected-request-property-DS"
+                                                        icon="fa fa-book" />
                                     <p:spacer height="5px"/>
                                     
-                                    <p:commandButton value="Site visit: No violation found"
-                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                     onclick="PF('no-violation-found-dialog').show()"
-                                                     icon="fa fa-circle-o"/>
+                                    
+                                    <p:commandButton    id="no-violation-found-cb"
+                                                        value="No violation found on site"
+                                                        disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                        onclick="PF('no-violation-found-dialog').show()"
+                                                        icon="fa fa-circle-o"/>
                                     <p:spacer height="5px"/>
 
-                                    <p:commandButton value="Invalid request"
-                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                     onclick="PF('invalidDialog').show()"
-                                                     icon="fa fa-exclamation-circle"/>
+                                    <p:commandButton    id="invalid-request-cb"
+                                                        value="Invalid request"
+                                                        disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                        onclick="PF('invalid-dialog').show()"
+                                                        icon="fa fa-exclamation-circle"/>
+                                    
+                                    <p:spacer height="5px"/>
+
+                                    <p:commandButton    id="manually-override-status-cb"
+                                                        value="Manually override request status"
+                                                        rendered="#{sessionBean.accessKeyCard.hasSysAdminPermissions}"
+                                                        onclick="PF('override-request-status-dialog').show()"
+                                                        icon="fa fa-gears"/>
+                                    
+                                    <p:spacer height="5px"/>
+                                    
+                                    
 
                                 <div class="outlinedBox">
                                     <h3>Code Enforcement Action Request</h3>
@@ -328,6 +340,18 @@
                                         </h:panelGroup>
 
                                         <h:panelGroup>
+                                            <h:outputLabel class="bold" value="Attached Case" />
+                                            <p:spacer height="5px"/>
+                                            <div class="wrapText">
+                                                <h:outputText id="selr-attachedCase" value="#{cEActionRequestsBB.selectedRequest.caseID}"/>
+                                            </div>
+                                        </h:panelGroup>
+                                        
+                                        <h:panelGroup>
+                                            
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
                                             <h:outputLabel class="bold" value="Address" />
                                             <p:spacer height="5px"/>
                                             <div class="rowExpansion">
@@ -335,7 +359,7 @@
                                                 <h:outputText id="selr-prop-muni" value="#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
                                             </div>
                                             <p:spacer height="5px"/>
-                                            <p:commandButton onclick="PF('paccDialog').show()" 
+                                            <p:commandButton onclick="PF('change-property-dialog').show()" 
                                                              value="change property" 
                                                              styleClass="noFill button-size-small"
                                                              icon="fa fa-home"
@@ -343,18 +367,20 @@
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Public reference #" />
-                                            <p:spacer height="5px"/>
+                                            <h:outputLabel class="bold" value="Public access reference num" />
                                             <div class="rowExpansion">
                                                 <h:outputText id="selr-pacc" value="#{cEActionRequestsBB.selectedRequest.requestPublicCC}"/>
                                             </div>
                                             <p:spacer height="5px"/>
-                                            <p:commandButton onclick="PF('paccDialog').show()" 
-                                                             value="manage public access" 
-                                                             icon="fa fa-eye"
-                                                             styleClass="noFill button-size-small" 
-                                                             rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}"/>
+                                            <p:selectBooleanCheckbox id="selr-access-sbcb" value="#{cEActionRequestsBB.selectedRequest.paccEnabled}"
+                                                                     disabled="#{cEActionRequestsBB.disablePACCControl}">
+                                                <p:ajax listener="#{cEActionRequestsBB.changePACCAccess}" update="msgForm:ceActionRequestsMessages" />
+                                            </p:selectBooleanCheckbox>
+                                            <h:outputText value=" Allow access using ref num?"/>
+                                            <p:spacer height="5px"/>
+                                            
                                         </h:panelGroup>
+                                        
                                         <h:panelGroup>
                                             <h:outputLabel class="bold" value="Date Submitted" />
                                             <p:spacer height="5px"/>
@@ -416,46 +442,100 @@
                                             <div class="rowExpansion" style="leftalign">
                                                 <h:outputText id="selr-descr" escape="false" value="#{cEActionRequestsBB.selectedRequest.requestDescription}"/>
                                             </div>
-                                            <p:spacer height="15px"/>
-                                            <h:outputLabel styleClass="bold" value="Internal notes:"/>
+                                            
+                                            <p:spacer height="5px"/>
+                                            <hr />
+                                            <p:spacer height="5px"/>
+                                            
+                                            <h:outputLabel styleClass="bold" value="Internal notes: "/>
+                                            <p:commandButton onclick="PF('internal-message-dialog').show()" 
+                                                             icon="fa fa-pencil-square-o"
+                                                             value="new note" 
+                                                             styleClass="noFill button-size-small" 
+                                                             rendered="#{sessionBean.accessKeyCard.hasCOGStaffPermissions}" />
+                                                <p:spacer height="5px"/>
                                             <div class="rowExpansion" style="leftalign">
                                                 <h:outputText id="selr-notes-internal" escape="false" value="#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
-                                                <p:spacer height="5px"/>
-                                                <p:commandButton onclick="PF('internal-message-dialog').show()" 
-                                                                 icon="fa fa-pencil-square-o"
-                                                                 value="new" 
-                                                                 styleClass="noFill button-size-small" 
-                                                                 rendered="#{sessionBean.accessKeyCard.hasCOGStaffPermissions}" />
                                             </div>
-                                            <p:spacer height="15px"/>
-                                            <h:outputLabel styleClass="bold" value="Staff-only notes:"/>
+
+                                            <p:spacer height="5px"/>
+                                            <hr />
+                                            <p:spacer height="5px"/>
+                                            
+                                            <h:outputLabel styleClass="bold" value="Staff-only notes: "/>
+                                            <p:commandButton onclick="PF('muni-message-dialog').show()" 
+                                                             value="new note"
+                                                             icon="fa fa-pencil-square-o"
+                                                             styleClass="noFill button-size-small" 
+                                                             rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}" />
+                                            <p:spacer height="5px"/>
                                             <div class="rowExpansion" style="leftalign">
                                                 <h:outputText id="selr-notes-muni" escape="false" value="#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
-                                                <p:spacer height="5px"/>
-                                                <p:commandButton onclick="PF('muni-message-dialog').show()" 
-                                                                 value="new"
-                                                                 icon="fa fa-pencil-square-o"
-                                                                 styleClass="noFill button-size-small" 
-                                                                 rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}" />
                                             </div>
-                                            <p:spacer height="15px"/>
-                                            <h:outputLabel styleClass="bold" value="Public notes:"/>
-                                            <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selr-notes-public" escape="false" value="#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
+                                            
+                                            <p:spacer height="5px"/>
+                                            <hr />
+                                            <p:spacer height="5px"/>
+                                            
+                                            <h:outputLabel styleClass="bold" value="Public notes: "/>
+                                            <p:commandButton onclick="PF('public-message-dialog').show()" 
+                                                             value="new note" 
+                                                             icon="fa fa-pencil-square-o"
+                                                             styleClass="noFill button-size-small" 
+                                                             rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}" />
                                                 <p:spacer height="5px"/>
-                                                <p:commandButton onclick="PF('public-message-dialog').show()" 
-                                                                 value="new" 
-                                                                 icon="fa fa-pencil-square-o"
-                                                                 styleClass="noFill button-size-small" 
-                                                                 rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}" />
-                                            </div>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selr-notes-public" escape="false" value="#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
+                                                </div>
                                         </f:facet>
                                     </h:panelGrid>
                                 </div>
+                                    
+                                    <p:spacer height="5px"/>
+
+                                    
                                 </h:form>
                             </h:panelGroup>
                         </h:panelGrid>
 
+                        
+                        
+                        <p:confirmDialog message="Attach request to existing case" 
+                                         severity="alert" widgetVar="attach-to-case-dialog"
+                                         closable="true"
+                                         rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="attach-to-existing-case-form">
+                                
+                                <p>Choose an existing case on <h:outputLabel for="invalidMessageITA" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>:</p>
+                                <p:dataScroller
+                                    id="cases-on-selected-request-property-DS"
+                                    value="#{cEActionRequestsBB.caseListForSelectedProperty}"
+                                    var="c">
+                                    <p>Case ID: <h:outputText value="#{c.caseID}"/> <br/>
+                                        Name: <h:outputText value="#{c.caseName}" /> <br/>
+                                        Phase: <h:outputText value="#{c.casePhase.label}"/> <br/>
+                                        Opening date: <h:outputText value="#{c.originiationDatePretty}"/> <br/>
+                                        Closing date: <h:outputText value="#{c.closingDatePretty}"/> <br/>
+                                    </p>
+                                    <p:commandButton value="Assign request to this case"
+                                                     actionListener="#{cEActionRequestsBB.path2UseSelectedCaseForAttachment(c)}"
+                                                     update="msgForm:ceActionRequestsMessages
+                                                     req-details-form:selr-status-ot
+                                                     actionRequestListForm:actionRequestTable
+                                                     req-details-form:selr-notes-public
+                                                     req-details-form:selr-attachedCase
+                                                     "
+                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                     oncomplete="PF('attach-to-case-dialog').hide()"/>
+                                    <p:commandButton ajax="true" 
+                                                     value="Cancel" icon="fa fa-stop" 
+                                                     onclick="PF('attach-to-case-dialog').hide()"/>
+                                    <hr/>
+                                    
+                                </p:dataScroller>
+                            </h:form>
+                        </p:confirmDialog>
                         
                         <p:confirmDialog message="Mark request as invalid" 
                                          severity="alert" widgetVar="invalid-dialog"
@@ -471,43 +551,23 @@
                                     <h:outputText escape="false" value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </p>
 
                                 <p:spacer height="15px"/>
-                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachInvalidMessage}"
-                                                 value="Submit" icon="fa fa-link" oncomplete="PF('invalidDialog').hide()"
+                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.path3AttachInvalidMessage}"
+                                                 value="Submit" icon="fa fa-link" oncomplete="PF('invalid-dialog').hide()"
                                                  rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
                                                  update="req-details-form:selr-notes-public
                                                  msgForm:ceActionRequestsMessages
+                                                 req-details-form:selr-status-ot
                                                  actionRequestListForm:actionRequestTable"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('invalid-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
                         
-
-                        
-                        <p:confirmDialog message="Manage public access" 
-                                         severity="alert" widgetVar="manage-public-access-dialog"
-                                         closable="true"
-                                         rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
-
-                            <h:form id="manage-public-access-form">
-                                <h:outputLabel for="invalidMessageITA" value="What makes this an invalid request?"/>
-                                <p:spacer height="15px"/>
-                                <p:inputTextarea id="invalidMessageITA" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.invalidMessage}"/>
-                                <p:spacer height="15px"/>
-                                <p>This message, your name, and a timestamp will be appended <br/>to the public note section of request ID 
-                                    <h:outputText escape="false" value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </p>
-
-                                <p:spacer height="15px"/>
-                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachInvalidMessage}"
-                                                 value="Save" icon="fa fa-link" oncomplete="PF('paccDialog').hide()"
-                                                 rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                 update="req-details-form:selr-notes-public
-                                                 msgForm:ceActionRequestsMessages
-                                                 actionRequestListForm:actionRequestTable"/>
-                            </h:form>
-                        </p:confirmDialog>
                         
                         
                         <p:confirmDialog message="Mark request: No Violation Found" 
-                                         severity="alert" widgetVar="no-violation-dialog"
+                                         severity="alert" widgetVar="no-violation-found-dialog"
                                          closable="true"
                                          rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
 
@@ -520,12 +580,179 @@
                                     <h:outputText escape="false" value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </p>
 
                                 <p:spacer height="15px"/>
-                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachNoViolationFoundMessage}"
-                                                 value="Submit" icon="fa fa-link" oncomplete="PF('invalidDialog').hide()"
+                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.path4AttachNoViolationFoundMessage}"
+                                                 value="Submit" icon="fa fa-link" oncomplete="PF('no-violation-found-dialog').hide()"
                                                  rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
                                                  update="req-details-form:selr-notes-public
                                                  msgForm:ceActionRequestsMessages
+                                                 req-details-form:selr-status-ot
                                                  actionRequestListForm:actionRequestTable"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('no-violation-found-dialog').hide()"/>
+                            </h:form>
+                        </p:confirmDialog>
+                        
+                        <p:confirmDialog message="Override request status" 
+                                         severity="alert" widgetVar="override-request-status-dialog"
+                                         closable="true"
+                                         rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="override-request-status-form">
+                                    
+                                    <h:outputLabel styleClass="bold" for="ceactionrequeststatusmenu" value="Change status to:"/>
+                                    
+                                    <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{cEActionRequestsBB.selectedChangeToStatus}">
+                                        <f:converter converterId="ceActionRequestStatusConverter"/>
+                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems value="#{cEActionRequestsBB.statusList}"
+                                                       var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
+                                    </p:selectOneMenu>
+                                    
+                                    <p:commandButton    id="change-request-status-cb"
+                                                        ajax="true" value="Change request status" 
+                                                        actionListener="#{cEActionRequestsBB.updateActionRequestStatus}"
+                                                        update="actionRequestListForm:actionRequestTable
+                                                        req-details-form:selr-status-ot
+                                                        req-details-form:selr-notes-public"
+                                                        oncomplete="PF('override-request-status-dialog').hide()"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('manage-public-access-dialog').hide()"/>
+                            </h:form>
+                        </p:confirmDialog>
+
+                        
+                        <ui:remove>
+                            
+                        
+                        <p:confirmDialog message="Manage public access" 
+                                         severity="alert" widgetVar="manage-public-access-dialog"
+                                         closable="true"
+                                         rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+
+                            <h:form id="manage-public-access-form">
+                                
+                                
+                                <p:spacer height="15px"/>
+                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.changePACCAccess}"
+                                                 value="Save" icon="fa fa-link" oncomplete="PF('manage-public-access-dialog').hide()"
+                                                 rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                 update="req-details-form:selr-notes-public
+                                                 msgForm:ceActionRequestsMessages"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('manage-public-access-dialog').hide()"/>
+                            </h:form>
+                        </p:confirmDialog>
+                        
+                        </ui:remove>
+                        
+                        <p:confirmDialog message="Change property" 
+                                         severity="alert" widgetVar="change-property-dialog"
+                                         closable="true"
+                                         rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="change-property-form">
+                               
+                                    
+                                
+                            <p:selectOneMenu id="muniSelectMenu" 
+                                             tabindex="1" 
+                                             value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
+                                <f:converter converterId="muniConverter"/>
+                                <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
+                                <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                            </p:selectOneMenu>
+
+                                <p:panelGrid columns="3" layout="grid">
+
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchHouseNumIT">
+                                            <h:outputText value="House number"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="propSearchHouseNumIT" value="#{cEActionRequestsBB.houseNumSearch}" 
+                                                     style="width: 100px;" tabindex="3" required="false" styleClass="inputText">
+                                        </p:inputText>
+                                        <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchStreetIT">
+                                            <h:outputText value="Street name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="propSearchStreetIT" value="#{cEActionRequestsBB.streetNameSearch}" 
+                                                     style="width: 200px;" tabindex="4" required="false" styleClass="inputText">
+                                        </p:inputText>
+                                        <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:commandButton
+                                            value="Search in Selected Municipality" tabindex="4" ajax="true" icon="fa fa-search"
+                                            actionListener="#{cEActionRequestsBB.searchForProperties}" 
+                                            update=    "change-property-form:propSearchHouseNumIT
+                                                        change-property-form:propSearchStreetIT
+                                                        change-property-form:propertyResultTable"/>
+                                    </h:panelGroup>
+
+                                </p:panelGrid> 
+
+                                 <h3>Search Results:</h3>
+                                        <p>Click to select the desired property or try your search again</p>
+
+                                        <p:dataTable
+                                            id="propertyResultTable"
+                                            var="prop" 
+                                            value="#{cEActionRequestsBB.propertyList}"
+                                            selectionMode="single" tabindex="5"
+                                            scrollable="true" scrollHeight="150" 
+                                            selection="#{cEActionRequestsBB.propertyForPropSwitch}"
+                                            rowKey="#{prop.propertyID}">
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Address" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.address}"/>
+                                            </p:column>
+                                            <p:column>
+
+                                                <f:facet name="header">
+                                                    <h:outputText value="Municipality" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.muni.muniName}"/>
+
+                                            </p:column>
+
+                                            <p:column>
+
+                                                <f:facet name="header">
+                                                    <h:outputText value="Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.propertyUseType}"/>
+
+                                            </p:column>
+
+                                        </p:dataTable>
+
+                                        <p:spacer height="10px"/>
+
+                                    <p:commandButton value="Assign request to selected property"
+                                                     actionListener="#{cEActionRequestsBB.updateRequestProperty}"
+                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                     update="   msgForm:ceActionRequestsMessages
+                                                                req-details-form:selr-prop-address
+                                                                req-details-form:selr-prop-muni
+                                                                actionRequestListForm:actionRequestTable
+                                                                req-details-form:selr-status-ot"
+                                                     oncomplete="PF('change-property-dialog').hide()"/>
+                                    <p:commandButton ajax="true" 
+                                                     value="Cancel" icon="fa fa-stop" 
+                                                     onclick="PF('change-property-dialog').hide()"/>
+                                    <hr/>
+                                    
                             </h:form>
                         </p:confirmDialog>
                         
@@ -547,7 +774,11 @@
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachInternalMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('internal-message-dialog').hide()"
                                                  rendered="#{sessionBean.accessKeyCard.hasCOGStaffPermissions}"
-                                                 update="req-details-form:selr-notes-internal"/>
+                                                 update="req-details-form:selr-notes-internal
+                                                 msgForm:ceActionRequestsMessages"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('internal-message-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
                         
@@ -566,9 +797,12 @@
                                               and attached to #{cEActionRequestsBB.selectedRequest.requestID}"/>
                                 <p:spacer height="15px"/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachMuniMessage}"
-                                                 value="Submit" icon="fa fa-link" oncomplete="PF('internal-message-dialog').hide()"
+                                                 value="Submit" icon="fa fa-link" oncomplete="PF('muni-message-dialog').hide()"
                                                  rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}"
                                                  update="req-details-form:selr-notes-muni"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('muni-message-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
                         
@@ -591,36 +825,9 @@
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('public-message-dialog').hide()"
                                                  rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}"
                                                  update="req-details-form:selr-notes-public"/>
-                            </h:form>
-                        </p:confirmDialog>
-                        
-                        
-                        <p:confirmDialog message="Attach request to existing case" 
-                                         severity="alert" widgetVar="attach-to-case-dialog"
-                                         closable="true"
-                                         rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}">
-
-                            <h:form id="attach-to-existing-case-form">
-                                
-                                <p>Choose an existing case on <h:outputLabel for="invalidMessageITA" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>:</p>
-                                <p:dataScroller
-                                    id="cases-on-selected-request-property-DS"
-                                    value="#{cEActionRequestsBB.caseListForSelectedProperty}"
-                                    var="c">
-                                    <p>Case ID: <h:outputText value="#{c.caseID}"/> <br/>
-                                        Name: <h:outputText value="#{c.caseName}" /> <br/>
-                                        Phase: <h:outputText value="#{c.casePhase.label}"/> <br/>
-                                        Opening date: <h:outputText value="#{c.originiationDatePretty}"/> <br/>
-                                        Closing date: <h:outputText value="#{c.closingDatePretty}"/> <br/>
-                                    </p>
-                                    <p:commandButton value="Assign request to this case"
-                                                     actionListener="#{cEActionRequestsBB.useSelectedCaseForAttachment(c)}"
-                                                     update="msgForm:ceActionRequestsMessages"
-                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                     oncomplete="PF('attach-to-case-dialog').hide()"/>
-                                    <hr/>
-                                    
-                                </p:dataScroller>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('public-message-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
                         
