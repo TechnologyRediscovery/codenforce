@@ -28,7 +28,6 @@ import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -242,16 +241,16 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         PropertyIntegrator propI = getPropertyIntegrator();
+        UserIntegrator ui = getUserIntegrator();
         
         actionRequest.setRequestStatus(getRequestStatus(rs.getInt("status_id")));
+        actionRequest.setPaccEnabled(rs.getBoolean("paccenabled"));
 
         actionRequest.setRequestID(rs.getInt("requestid"));
         actionRequest.setRequestPublicCC(rs.getInt("requestPubliccc"));
         actionRequest.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
         actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
-//        if (!actionRequest.isIsAtKnownAddress()) {
         actionRequest.setRequestProperty(propI.getProperty(rs.getInt("property_propertyID")));
-//        }
         actionRequest.setActionRequestorPerson(pi.getPerson(rs.getInt("actrequestor_requestorid")));
 
         actionRequest.setIssueType_issueTypeID(rs.getInt("issuetype_issuetypeid"));
@@ -266,16 +265,21 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setRequestDescription(rs.getString("requestDescription"));
         actionRequest.setIsUrgent(rs.getBoolean("isurgent"));
 
-        System.out.println("CEActionRequestIntegrator.generateActinRequestFromRS | "
-                + "cecase_caseid from DB with null input: " + rs.getInt("cecase_caseid"));
         actionRequest.setCaseID(rs.getInt("cecase_caseid"));
+        
+        java.sql.Timestamp ts = rs.getTimestamp("caseattachmenttimestamp");
+        if(ts != null){
+            actionRequest.setCaseAttachmentTimeStamp(ts.toLocalDateTime());
+        }
+        actionRequest.setCaseAttachmentUser(ui.getUser(rs.getInt("caseattachment_userid")));
+        
+        
         actionRequest.setAnonymitiyRequested(rs.getBoolean("anonymityRequested"));
 
         actionRequest.setCogInternalNotes(rs.getString("coginternalnotes"));
 
         actionRequest.setMuniNotes(rs.getString("muniinternalnotes"));
         actionRequest.setPublicExternalNotes(rs.getString("publicexternalnotes"));
-        System.out.println("CEActionRequestIntegrator.generateActionRequestFromRS | Generated request: " + actionRequest.getRequestID());
         return actionRequest;
     }
 
@@ -323,20 +327,32 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         CEActionRequest newActionRequest = null;
         StringBuilder sb = new StringBuilder();
 
+        
         sb.append("SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, \n"
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
                 + "	dateofrecord, addressofconcern, status_id, \n"
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, \n"
                 + "	muniinternalnotes, publicexternalnotes,\n"
-                + "	actionRqstIssueType.typeName AS typename\n"
+                + "	actionRqstIssueType.typeName AS typename, paccenabled, caseattachmenttimestamp, caseattachment_userid \n"
                 + "	FROM public.ceactionrequest \n"
                 + "		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid");
         sb.append(" WHERE requestID = ?;");
 
+//        
+//        
+//        sb.append("SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, property_propertyid, \n" +
+//                "       issuetype_issuetypeid, actrequestor_requestorid, cecase_caseid, \n" +
+//                "       submittedtimestamp, dateofrecord, notataddress, addressofconcern, \n" +
+//                "       requestdescription, isurgent, anonymityrequested, coginternalnotes, \n" +
+//                "       muniinternalnotes, publicexternalnotes, status_id, caseattachmenttimestamp, \n" +
+//                "       paccenabled, caseattachment_userid\n"
+//                + "	FROM public.ceactionrequest INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid ");
+//        sb.append(" WHERE requestid = ?;");
+
         // for degugging
         // System.out.println("Select Statement: ");
-        // System.out.println(sb.toString());
+//         System.out.println(sb.toString());
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -390,7 +406,62 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to update action request", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
+    public void updatePACCAccess(CEActionRequest req) throws IntegrationException {
+
+        String q = "UPDATE ceactionrequest SET paccenabled = ? WHERE requestid = ?;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(q);
+            stmt.setBoolean(1, req.isPaccEnabled());
+            stmt.setInt(2, req.getRequestID());
+            // Retrieve action data from postgres
+            stmt.executeUpdate();
+
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to update action request", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
+    
+    
+    public void updateActionRequestProperty(CEActionRequest req) throws IntegrationException {
+
+        String q = "UPDATE ceactionrequest SET property_propertyid = ? WHERE requestid = ?;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(q);
+            stmt.setInt(1, req.getRequestProperty().getPropertyID());
+            stmt.setInt(2, req.getRequestID());
+            System.out.println("CEActionRequestorIntegrator.updateActionRequestProperty | statement: " + stmt.toString());
+            // Retrieve action data from postgres
+            stmt.executeUpdate();
+
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Integration Error: Unable to update action request", ex);
         } finally {
             
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

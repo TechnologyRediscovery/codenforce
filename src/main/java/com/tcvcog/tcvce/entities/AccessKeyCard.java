@@ -12,7 +12,7 @@ import java.io.Serializable;
  *  
  * @author sylvia
  */
-public class KeyCard implements Serializable{
+public class AccessKeyCard implements Serializable{
 
     private final boolean hasDeveloperPermissions;
     private final boolean hasSysAdminPermissions;
@@ -21,7 +21,7 @@ public class KeyCard implements Serializable{
     private final boolean hasMuniStaffPermissions;
     private final boolean hasMuniReaderPermissions;
 
-    public KeyCard( boolean dev,
+    public AccessKeyCard( boolean dev,
                     boolean admin,
                     boolean cogstaff,
                     boolean ceo,

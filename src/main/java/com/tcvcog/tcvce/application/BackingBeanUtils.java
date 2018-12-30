@@ -49,6 +49,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
@@ -186,7 +187,7 @@ public class BackingBeanUtils implements Serializable{
         String jndi_name = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("jndi_name");
 //        String password = getResourceBundle("dbconnection").getString("dbpassowrd_readwrite");
         
-Context initContext = null;
+        Context initContext = null;
         try {
             initContext = new InitialContext();
             Context envCtx = (Context) initContext.lookup("java:comp/env");
@@ -205,6 +206,29 @@ Context initContext = null;
         return connx;
       
     }
+    
+    public String appendNoteBlock(MessageBuilderParams mcc){
+        StringBuilder sb = new StringBuilder();
+        sb.append(mcc.existingContent);
+        sb.append("<br/><br/>**************************************<br/>");
+        sb.append(mcc.header);
+        sb.append("<br/>");
+        sb.append(mcc.explanation);
+        sb.append("<br/>");
+        sb.append(mcc.newMessageContent);
+        sb.append("<br/>");
+        sb.append("--------------------------------------<br/>");
+        sb.append(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("signatureLeader"));
+        sb.append(getFacesUser().getFName());
+        sb.append(" ");
+        sb.append(getFacesUser().getLName());
+        sb.append(" at ");
+        sb.append(getPrettyDate(LocalDateTime.now()));
+        sb.append("<br/>");
+        sb.append("<<<<<<<<<<<<<<<<<<<<<<<<<<<<br/>");
+        return sb.toString();
+    }
+    
 
     /**
      * Chops up the current time to get seven random digits

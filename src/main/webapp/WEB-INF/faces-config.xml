@@ -6,8 +6,8 @@
     <application>
        
         <resource-bundle>
-            <base-name>messages</base-name>
-            <var>msgs</var>
+            <base-name>messagetext</base-name>
+            <var>messagetext</var>
         </resource-bundle>
         
        

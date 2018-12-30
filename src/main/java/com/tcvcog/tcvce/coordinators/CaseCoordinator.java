@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.AccessKeyCard;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
@@ -633,4 +634,22 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        
    }
    
+   public boolean determineCEActionRequestRoutingActionEnabledStatus(
+                                                        CEActionRequest req,
+                                                        AccessKeyCard keyCard ){
+       if(req != null && keyCard != null){
+            System.out.println("CaseCoordinator.determineCEACtionRequestRoutingACtionEnabledStatus | income request ID: " + req.getRequestID());
+            if((
+                    req.getRequestStatus().getStatusID() == 
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("actionRequestInitialStatusCode")))
+                    && 
+                    getSessionBean().getAccessKeyCard().isHasEnfOfficialPermissions()
+                ){
+                System.out.println("Routing enabled!");
+                return true;
+            }
+        }
+       return false;
+   }
 }
