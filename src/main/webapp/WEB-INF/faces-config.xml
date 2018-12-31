@@ -31,6 +31,7 @@
             <base-name>dbconnection</base-name>
             <var>dbConnectionParams</var>
         </resource-bundle>
+
         
     </application>
     
@@ -1344,6 +1345,17 @@
     <managed-bean>
         <managed-bean-name>cENoticeAcknowledgementsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CENoticeAcknowledgementsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Utility application-scoped bean for handling image upload and download	</description>
+        <managed-bean-name>imageServices</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ImageServices</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>photoBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PhotoBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

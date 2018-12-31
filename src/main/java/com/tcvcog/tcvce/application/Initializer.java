@@ -161,6 +161,9 @@ public class Initializer implements ServletContextListener{
         SearchCoordinator sc = new SearchCoordinator();
         servletContext.setAttribute("searchCoordinator", sc);
          
+        ImageServices imageServicesBean = new ImageServices();
+        servletContext.setAttribute("imageServices", imageServicesBean);
+         
         
 //        SessionBean sb = new SessionBean();
 //        servletContext.setAttribute("sessionBean", sb);

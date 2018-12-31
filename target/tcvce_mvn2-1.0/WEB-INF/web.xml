@@ -23,6 +23,10 @@
     <context-param>
         <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
         <param-value>.xhtml</param-value>
+    </context-param>           
+    <context-param>
+        <param-name>primefaces.UPLOADER</param-name>
+        <param-value>auto</param-value>
     </context-param>
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
