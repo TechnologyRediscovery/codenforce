@@ -214,7 +214,6 @@
                                                              req-details-form:selr-prop-muni
                                                              req-details-form:selr-pacc
                                                              req-details-form:selr-access-sbcb
-                                                             req-details-form:selr-pacc-access-ot
                                                              req-details-form:selr-submitted-ts
                                                              req-details-form:selr-isurgent
                                                              req-details-form:selr-persontype
@@ -235,6 +234,9 @@
                                                              req-details-form:attach-to-case-cb
                                                              req-details-form:no-violation-found-cb
                                                              req-details-form:invalid-request-cb
+                                                             req-details-form:change-person-cb
+                                                             req-details-form:change-property-cb
+                                                             req-details-form:manually-override-status-cb
                                                              req-details-form:header-id-ot
                                                              req-details-form:header-type-ot
                                                              req-details-form:header-addr-ot
@@ -260,7 +262,7 @@
                                         Request ID #<h:outputText   id="header-id-ot" value="#{cEActionRequestsBB.selectedRequest.requestID}"/>: 
                                         <h:outputText id="header-type-ot" value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
                                         at <h:outputText id="header-addr-ot" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address} "/>  
-                                        <h:outputText id="header-muni-ot" value="(#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName})"/>)  
+                                        <h:outputText id="header-muni-ot" value="(#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName})"/>  
                                     
                                     </h2>
 
@@ -308,14 +310,6 @@
                                     
                                     <p:spacer height="5px"/>
 
-                                    <p:commandButton    id="manually-override-status-cb"
-                                                        value="Manually override request status"
-                                                        rendered="#{sessionBean.accessKeyCard.hasSysAdminPermissions}"
-                                                        onclick="PF('override-request-status-dialog').show()"
-                                                        icon="fa fa-gears"/>
-                                    
-                                    <p:spacer height="5px"/>
-                                    
                                     
 
                                 <div class="outlinedBox">
@@ -340,10 +334,11 @@
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Attached Case" />
+                                            <h:outputLabel class="bold" value="Attached to CE case?" />
                                             <p:spacer height="5px"/>
                                             <div class="wrapText">
-                                                <h:outputText id="selr-attachedCase" value="#{cEActionRequestsBB.selectedRequest.caseID}"/>
+                                                <h:outputText id="selr-attachedCase" 
+                                                              value="ID: #{cEActionRequestsBB.selectedRequest.caseID == 0 ? null : cEActionRequestsBB.selectedRequest.caseID}"/>
                                             </div>
                                         </h:panelGroup>
                                         
@@ -359,11 +354,14 @@
                                                 <h:outputText id="selr-prop-muni" value="#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
                                             </div>
                                             <p:spacer height="5px"/>
-                                            <p:commandButton onclick="PF('change-property-dialog').show()" 
-                                                             value="change property" 
-                                                             styleClass="noFill button-size-small"
-                                                             icon="fa fa-home"
-                                                             rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}"/>
+                                            
+                                            <p:commandButton    id="change-property-cb" 
+                                                                onclick="PF('change-property-dialog').show()" 
+                                                                 value="change property" 
+                                                                 styleClass="noFill button-size-small"
+                                                                 disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                                 icon="fa fa-home"
+                                                                 rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}"/>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
@@ -413,11 +411,13 @@
                                             </div>
                                             
                                             <p:spacer height="5px"/>
-                                            <p:commandButton onclick="PF('muni-message-dialog').show()" 
-                                                                 value="change person" 
-                                                                 styleClass="noFill button-size-small" 
-                                                                 icon="fa fa-child"
-                                                                 rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}" />
+                                            <p:commandButton    id="change-person-cb"
+                                                                onclick="PF('change-person-dialog').show()" 
+                                                                value="change person" 
+                                                                styleClass="noFill button-size-small" 
+                                                                icon="fa fa-child"
+                                                                disabled="#{empty cEActionRequestsBB.selectedRequest}"
+                                                                rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}" />
                                         </h:panelGroup>
 
                                         <h:panelGroup>
@@ -494,9 +494,21 @@
                                     <p:spacer height="5px"/>
 
                                     
+                                    <p:commandButton    id="manually-override-status-cb"
+                                                        value="Manually override request status"
+                                                        rendered="#{sessionBean.accessKeyCard.hasSysAdminPermissions}"
+                                                        disabled="#{empty cEActionRequestsBB.selectedRequest}"
+                                                        onclick="PF('override-request-status-dialog').show()"
+                                                        icon="fa fa-gears"/>
+                                    
+                                    <p:spacer height="5px"/>
+                                    
+                                    
                                 </h:form>
                             </h:panelGroup>
                         </h:panelGrid>
+                        
+                        
 
                         
                         
@@ -656,6 +668,113 @@
                             <h:form id="change-property-form">
                                
                                     
+                                
+                            <p:selectOneMenu id="muniSelectMenu" 
+                                             tabindex="1" 
+                                             value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
+                                <f:converter converterId="muniConverter"/>
+                                <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
+                                <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                            </p:selectOneMenu>
+
+                                <p:panelGrid columns="3" layout="grid">
+
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchHouseNumIT">
+                                            <h:outputText value="House number"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="propSearchHouseNumIT" value="#{cEActionRequestsBB.houseNumSearch}" 
+                                                     style="width: 100px;" tabindex="3" required="false" styleClass="inputText">
+                                        </p:inputText>
+                                        <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchStreetIT">
+                                            <h:outputText value="Street name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="propSearchStreetIT" value="#{cEActionRequestsBB.streetNameSearch}" 
+                                                     style="width: 200px;" tabindex="4" required="false" styleClass="inputText">
+                                        </p:inputText>
+                                        <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:commandButton
+                                            value="Search in Selected Municipality" tabindex="4" ajax="true" icon="fa fa-search"
+                                            actionListener="#{cEActionRequestsBB.searchForProperties}" 
+                                            update=    "change-property-form:propSearchHouseNumIT
+                                                        change-property-form:propSearchStreetIT
+                                                        change-property-form:propertyResultTable"/>
+                                    </h:panelGroup>
+
+                                </p:panelGrid> 
+
+                                 <h3>Search Results:</h3>
+                                        <p>Click to select the desired property or try your search again</p>
+
+                                        <p:dataTable
+                                            id="propertyResultTable"
+                                            var="prop" 
+                                            value="#{cEActionRequestsBB.propertyList}"
+                                            selectionMode="single" tabindex="5"
+                                            scrollable="true" scrollHeight="150" 
+                                            selection="#{cEActionRequestsBB.propertyForPropSwitch}"
+                                            rowKey="#{prop.propertyID}">
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Address" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.address}"/>
+                                            </p:column>
+                                            <p:column>
+
+                                                <f:facet name="header">
+                                                    <h:outputText value="Municipality" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.muni.muniName}"/>
+
+                                            </p:column>
+
+                                            <p:column>
+
+                                                <f:facet name="header">
+                                                    <h:outputText value="Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.propertyUseType}"/>
+
+                                            </p:column>
+
+                                        </p:dataTable>
+
+                                        <p:spacer height="10px"/>
+
+                                    <p:commandButton value="Assign request to selected property"
+                                                     actionListener="#{cEActionRequestsBB.updateRequestProperty}"
+                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                     update="   msgForm:ceActionRequestsMessages
+                                                                req-details-form:selr-prop-address
+                                                                req-details-form:selr-prop-muni
+                                                                actionRequestListForm:actionRequestTable
+                                                                req-details-form:selr-status-ot"
+                                                     oncomplete="PF('change-property-dialog').hide()"/>
+                                    <p:commandButton ajax="true" 
+                                                     value="Cancel" icon="fa fa-stop" 
+                                                     onclick="PF('change-property-dialog').hide()"/>
+                                    <hr/>
+                                    
+                            </h:form>
+                        </p:confirmDialog>
+                        
+                        
+                        <p:confirmDialog message="Change requestor person" 
+                                         severity="alert" widgetVar="change-person-dialog"
+                                         closable="true"
+                                         rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+
+                            <h:form id="change-person-form">
                                 
                             <p:selectOneMenu id="muniSelectMenu" 
                                              tabindex="1" 

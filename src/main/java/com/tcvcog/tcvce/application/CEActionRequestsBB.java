@@ -45,11 +45,12 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     private List<CEActionRequestStatus> statusList;
     private CEActionRequestStatus selectedStatus;
-    
+    private SearchParamsCEActionRequests searchParams;
     
     private CEActionRequestStatus selectedChangeToStatus;
     private String invalidMessage;
     private String noViolationFoundMessage;
+
     private String internalMessageText;
     private String muniMessageText;
     private String publicMessageText;
@@ -65,21 +66,35 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     private List<Property> propertyList;
     
     private int ceCaseIDForConnection;
-    
     private boolean disablePACCControl;
-    
     private boolean disabledDueToRoutingNotAllowed;
-    
-    private SearchParamsCEActionRequests searchParams;
-    
-    // search stuff
-    
     
     
     public String path1CreateNewCaseAtProperty(){
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+
         if(selectedRequest != null){
             if(selectedRequest.getRequestProperty() != null){
                 getSessionBean().setActiveProp(selectedRequest.getRequestProperty());
+            }
+            
+            MessageBuilderParams mbp = new MessageBuilderParams();
+            mbp.user = getFacesUser();
+            mbp.existingContent = selectedRequest.getPublicExternalNotes();
+            mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("attachedToCaseHeader");
+            mbp.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("attachedToCaseExplanation");
+            mbp.newMessageContent = "";
+            
+            selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
+            
+            // force the bean to go to the integrator and fetch a fresh, updated
+            // list of action requests
+            try {
+                ceari.updateActionRequestNotes(selectedRequest);
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR
+                            ,"Unable to update action request with case attachment notes" , ""));
             }
         } else {
             getFacesContext().addMessage(null,
@@ -87,7 +102,12 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                         ,"Please select an action request from the table to open a new case" , ""));
             return "";
         }
-        updateRequestStatusWithBundleKey("actionRequestNewCaseStatusCode");
+        
+        updateSelectedRequestStatusWithBundleKey("actionRequestNewCaseStatusCode");
+        
+// This shelf will be checked by the case creation coordinator
+        // and link the request to the new case so we don't lose track of it
+        getSessionBean().setCeactionRequestForNewCaseAttachment(selectedRequest);
         
         return "addNewCase";
     }
@@ -106,8 +126,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                         "Unable to connect request to case.", 
                         getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
         }
-        
-        updateRequestStatusWithBundleKey("actionRequestExistingCaseStatusCode");
+        selectedRequest.setCaseID(selectedCaseForAttachment.getCaseID());
+        updateSelectedRequestStatusWithBundleKey("actionRequestExistingCaseStatusCode");
         // force a reload of request list
         requestList = null;
     }
@@ -115,7 +135,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void path3AttachInvalidMessage(ActionEvent ev){
         if(selectedRequest != null){ 
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-            updateRequestStatusWithBundleKey("actionRequestInvalidStatusCode");
+            updateSelectedRequestStatusWithBundleKey("actionRequestInvalidStatusCode");
 
             // build message to document change
             MessageBuilderParams mcc = new MessageBuilderParams();
@@ -150,7 +170,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
             
-            updateRequestStatusWithBundleKey("actionRequestNoViolationStatusCode");
+            updateSelectedRequestStatusWithBundleKey("actionRequestNoViolationStatusCode");
             
             // build message to document change
             MessageBuilderParams mbp = new MessageBuilderParams();
@@ -186,7 +206,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
     }
     
-    private void updateRequestStatusWithBundleKey(String newStatusKey){
+    private void updateSelectedRequestStatusWithBundleKey(String newStatusKey){
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
             
             try {

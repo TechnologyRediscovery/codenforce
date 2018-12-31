@@ -18,7 +18,7 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Describe your concern at <h:outputText value="#{sessionBean.workingActionRequest.requestProperty.address}"/> in <h:outputText value="#{sessionBean.workingActionRequest.muni.muniName}"/></h1>
+                        <h1>Describe your concern at <h:outputText value="#{sessionBean.ceactionRequestForNewCaseAttachment.requestProperty.address}"/> in <h:outputText value="#{sessionBean.ceactionRequestForNewCaseAttachment.muni.muniName}"/></h1>
                         
 
                         <h:form id="requestCEActionFlowFormDescribeConcern">
@@ -31,7 +31,7 @@
                                     <p:selectOneListbox 
                                         id="violationSOLB" tabindex="8"
                                         style="width: 100%;"
-                                        value="#{sessionBean.workingActionRequest.issueType_issueTypeID}">
+                               ceactionRequestForNewCaseAttachmentssionBean.workingActionRequest.issueType_issueTypeID}">
 
                                         <f:selectItems value="#{cEActionRequestSubmitBB.violationTypeMap}"/>
                                     </p:selectOneListbox>
@@ -48,7 +48,7 @@
                                         rows="6" tabindex="9"
                                         required="true" 
                                         style="width: 100%;"
-                                        value="#{sessionBean.workingActionRequest.requestDescription}"
+                                        value=ceactionRequestForNewCaseAttachmentngActionRequest.requestDescription}"
                                         />
                                     <h:message for="requestDescription" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -59,7 +59,7 @@
                                         <h:outputText styleClass="uiLabel" value="If different from today, select the date of the incident or condition you are reporting" />
                                     </h:outputLabel>
 
-                                    <p:calendar value="#{sessionBean.workingActionRequest.dateOfRecordUtilDate}" 
+         ceactionRequestForNewCaseAttachment       <p:calendar value="#{sessionBean.workingActionRequest.dateOfRecordUtilDate}" 
                                                 mode="popup" tabindex="10"
                                                 id="dateOfRecord"
                                                 showOn="button"
@@ -78,7 +78,7 @@
                                     </p:outputLabel>
 
 
-                                    <p:inputSwitch tabindex="11" id="isIUrgentSwitch" value="#{sessionBean.workingActionRequest.isUrgent}" 
+                                    <p:inputSwitch tabindex="11" id="isIUrgenceactionRequestForNewCaseAttachmentssionBean.workingActionRequest.isUrgent}" 
                                                    onLabel="Yes" offLabel="No" />
 
                                     <p:spacer height="10px"/>

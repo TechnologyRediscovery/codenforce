@@ -71,7 +71,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Code Enf Action Request Session Shelves ***  */
     private CEActionRequest cEActionRequest;
     // temporary
-    private CEActionRequest workingActionRequest;
+    private CEActionRequest ceactionRequestForNewCaseAttachment;
     private List<CEActionRequest> cEActionRequestList;
     
     private EventCECase complianceTimeframeClosingEvent;
@@ -465,17 +465,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the workingActionRequest
+     * @return the ceactionRequestForNewCaseAttachment
      */
-    public CEActionRequest getWorkingActionRequest() {
-        return workingActionRequest;
+    public CEActionRequest getCeactionRequestForNewCaseAttachment() {
+        return ceactionRequestForNewCaseAttachment;
     }
 
     /**
-     * @param workingActionRequest the workingActionRequest to set
+     * @param ceactionRequestForNewCaseAttachment the ceactionRequestForNewCaseAttachment to set
      */
-    public void setWorkingActionRequest(CEActionRequest workingActionRequest) {
-        this.workingActionRequest = workingActionRequest;
+    public void setCeactionRequestForNewCaseAttachment(CEActionRequest ceactionRequestForNewCaseAttachment) {
+        this.ceactionRequestForNewCaseAttachment = ceactionRequestForNewCaseAttachment;
     }
     
 }
