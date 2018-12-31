@@ -30,6 +30,31 @@
 
                         </h:form>
                         
+                        <h2>image testing</h2>
+                        
+                        <h:form id="img-test-form"
+                                enctype="multipart/form-data">
+                            
+                            <h3>Store photo</h3>
+                            <p:fileUpload   fileUploadListener="#{photoBB.handleFileUpload}"
+                                            mode="advanced"
+                                            sizeLimit="100000"
+                                            allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                            
+                            <h3>See photo</h3>
+                            <ui:remove>
+                                
+                            <p:graphicImage value="#{imageServices.image}">
+                                <f:param name="photoID" value="#{photoBB.photoID}" />
+                            </p:graphicImage>
+                            </ui:remove>
+                            
+                            
+                            
+                        </h:form>
+                        
+                        
+                        
                     </div>
                 </f:view>
                 
