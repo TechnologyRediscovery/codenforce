@@ -287,22 +287,17 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
         
         return caseList;
-        
-        
-        
-        
     }
-    
 
     public CECase insertNewCECase(CECase ceCase) throws IntegrationException{
         
         String query = "INSERT INTO public.cecase(\n" +
-"            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-"            login_userid, casename, casephase, originationdate, closingdate, \n" +
-"            notes, creationTimestamp) \n" +
-"    VALUES (DEFAULT, ?, ?, ?, \n" +
-"            ?, ?, CAST (? as casephase), ?, ?, \n" +
-"            ?, now());";
+                        "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
+                        "            login_userid, casename, casephase, originationdate, closingdate, \n" +
+                        "            notes, creationTimestamp) \n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "            ?, ?, CAST (? as casephase), ?, ?, \n" +
+                        "            ?, now());";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int insertedCaseID = 0;

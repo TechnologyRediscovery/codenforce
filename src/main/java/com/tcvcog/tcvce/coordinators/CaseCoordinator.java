@@ -33,6 +33,9 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
@@ -51,24 +54,100 @@ import javax.faces.application.FacesMessage;
  */
 public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 
+    final CasePhase initialCECasePphase = CasePhase.PrelimInvestigationPending;
+    
     /**
      * Creates a new instance of CaseCoordinator
      */
     public CaseCoordinator() {
+        
+        
     
     }
     
-    public void createNewCECase(CECase newCase) throws IntegrationException{
+    public CECase getInitializedCECase(Property p, User u){
+        CECase newCase = new CECase();
+        
+        int casePCC = getControlCodeFromTime();
+        // caseID set by postgres sequence
+        // timestamp set by postgres
+        // no closing date, by design of case flow
+        newCase.setPublicControlCode(casePCC);
+        newCase.setProperty(p);
+        newCase.setUser(u);
+        
+        return newCase;
+    }
+    
+    /**
+     * Primary entry point for code enf cases. Two major pathways exist through this method:
+     * - creating cases as a result of an action request submission
+     * - creating cases from some other source than an action request
+     * Depending on the source, an appropriately note-ified case originiation event
+     * is built and attached to the case that was just created.
+     * 
+     * @param newCase
+     * @param u
+     * @param cear
+     * @throws IntegrationException
+     * @throws CaseLifecyleException
+     * @throws ViolationException 
+     */
+    public void insertNewCECase(CECase newCase, User u, CEActionRequest cear) throws IntegrationException, CaseLifecyleException, ViolationException{
+        
+        CECase insertedCase;
         
         CaseIntegrator ci = getCaseIntegrator();
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        EventCategory originationCategory;
+        EventCECase originationEvent;
         
         // set default status to prelim investigation pending
-        newCase.setCasePhase(CasePhase.PrelimInvestigationPending);
+        newCase.setCasePhase(initialCECasePphase);
         
-        CECase newlyAddedCase = ci.insertNewCECase(newCase);
-        
-        getSessionBean().setcECase(newlyAddedCase);
-        
+        // the integrator returns to us a CECase with the correct ID after it has
+        // been written into the DB
+        insertedCase = ci.insertNewCECase(newCase);
+
+        // If we were passed in an action request, connect it to the new case we just made
+        if(cear != null){
+            ceari.connectActionRequestToCECase(cear.getRequestID(), insertedCase.getCaseID(), u.getUserID());
+            originationCategory = ec.getInitiatlizedEventCategory(
+                    Integer.parseInt(getResourceBundle(
+                    Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByActionRequest")));
+            originationEvent = ec.getInitializedEvent(newCase, originationCategory);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Case generated from the submission of a Code Enforcement Action Request");
+            sb.append("<br/>");
+            sb.append("ID#:");
+            sb.append(cear.getRequestID());
+            sb.append(" submitted by ");
+            sb.append(cear.getActionRequestorPerson().getFirstName());
+            sb.append(" ");
+            sb.append(cear.getActionRequestorPerson().getLastName());
+            sb.append(" on ");
+            sb.append(getPrettyDate(cear.getDateOfRecord()));
+            sb.append(" with a database timestamp of ");
+            sb.append(getPrettyDate(cear.getSubmittedTimeStamp()));
+            originationEvent.setNotes(sb.toString());
+            
+            
+        } else {
+            originationCategory = ec.getInitiatlizedEventCategory(
+                    Integer.parseInt(getResourceBundle(
+                    Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByObservation")));
+            originationEvent = ec.getInitializedEvent(newCase, originationCategory);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Case opened directly on property by code officer assigned to this event");
+            originationEvent.setNotes(sb.toString());
+            
+        }
+            System.out.println("CaseCoordinator.createNewCECase | origination event: " + originationEvent.getCategory().getEventCategoryTitle());
+            originationEvent.setEventOwnerUser(u);
+            originationEvent.setCaseID(insertedCase.getCaseID());
+            originationEvent.setDateOfRecord(LocalDateTime.now());
+            processCEEvent(newCase, originationEvent);
     }
     
     /**
@@ -373,7 +452,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * A catch-the-rest method that simple adds the event to the case without
      * any additional logic or processing. Called by the default case in the
-     * event delegator method. Passes the duty of calling the integrator
+     * event delegator's switch method. Passes the duty of calling the integrator
      * to the insertEvent on the EventCoordinator
      * @param c the case to which the event should be attached
      * @param e the event to be attached

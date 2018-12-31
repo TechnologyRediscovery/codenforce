@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +97,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public CEActionRequestSubmitBB(){
         // set date of record to current date
-        form_dateOfRecord = new Date();
+        form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
+                .atZone(ZoneId.systemDefault()).toInstant());
         currentTabIndex = 0;
         System.out.println("ActionRequestBean.ActionRequestBean");
     }
@@ -120,12 +122,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CaseCoordinator cc = getCaseCoordinator();
         cear = cc.getNewActionRequest();
         cear.setMuni(selectedMuni);
-        getSessionBean().setWorkingActionRequest(cear);
+        getSessionBean().setCeactionRequestForNewCaseAttachment(cear);
         return "chooseProperty";
     }
     
     public String storePropertyInfo(){
-        if(getSessionBean().getWorkingActionRequest().getRequestProperty() == null){
+        if(getSessionBean().getCeactionRequestForNewCaseAttachment().getRequestProperty() == null){
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                        "Please select a property from the list of search results to continue.", ""));
@@ -154,7 +156,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public String submitActionRequest() {
         
-        CEActionRequest req = getSessionBean().getWorkingActionRequest();
+        CEActionRequest req = getSessionBean().getCeactionRequestForNewCaseAttachment();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         
         int submittedActionRequestID;
@@ -165,7 +167,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-        int personID = storeActionRequestorPerson(getSessionBean().getWorkingActionRequest().getActionRequestorPerson());
+        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForNewCaseAttachment().getActionRequestorPerson());
         
         req.setPersonID(personID);
         
@@ -255,7 +257,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         currentPerson = new Person();
         currentPerson.setPersonType(submittingPersonType);
-        currentPerson.setMuniCode(getSessionBean().getWorkingActionRequest().getMuni().getMuniCode());
+        currentPerson.setMuniCode(getSessionBean().getCeactionRequestForNewCaseAttachment().getMuni().getMuniCode());
         
         currentPerson.setFirstName(form_requestorFName);
         currentPerson.setLastName(form_requestorLName);
@@ -280,7 +282,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // the insertion of this person will be timestamped
         // by the integrator class
         
-        getSessionBean().getWorkingActionRequest().setActionRequestorPerson(currentPerson);
+        getSessionBean().getCeactionRequestForNewCaseAttachment().setActionRequestorPerson(currentPerson);
         
         return "reviewAndSubmit";
         
@@ -337,7 +339,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
-            propList = pi.searchForProperties(houseNum, streetName, getSessionBean().getWorkingActionRequest().getMuni().getMuniCode());
+            propList = pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForNewCaseAttachment().getMuni().getMuniCode());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));

@@ -131,7 +131,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Factory method for event categories.
      * Whoever calls this method will still need to do basic setup of the event 
-     * before sending to integrator
+     * before sending to the CaseCoordinator processEvent(CEEvent e) method
      * @return an EventCategory container with basic properties set
      */
     public EventCategory getInitializedEventCateogry(){
@@ -149,9 +149,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param catID the categoryID of the EventCategory you want
      * @return an instantiated EventCategory object
      */
-    public EventCategory getInitiatlizedEventCategory(int catID){
-        EventCategory ec =  new EventCategory();
-        ec.setCategoryID(catID);
+    public EventCategory getInitiatlizedEventCategory(int catID) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        EventCategory ec =  ei.getEventCategory(catID);
         return ec;
     }
     
