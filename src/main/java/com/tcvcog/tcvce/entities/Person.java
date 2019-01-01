@@ -30,12 +30,23 @@ import java.time.LocalDateTime;
 public class Person implements Serializable{
     
     private int personID;
+    
     private PersonType personType;
+    private int sourceID;
+    private String sourceTitle;
+    private User creator;
+    
     private Municipality muni;
+    // for backwards compatability
     private int muniCode;
     
     private String firstName;
     private String lastName;
+    
+    // frist, middle initial, and last all in lastName
+    private boolean nameBlob;
+    private boolean businessEntity;
+    
     private String jobTitle;
     
     private String phoneCell;
@@ -48,13 +59,38 @@ public class Person implements Serializable{
     
     private String address_zip;
     private String address_state;
+    private boolean addressOfResidence;
+    
+    private String mailing_address_street;
+    private String mailing_address_city;
+    
+    private String mailing_address_zip;
+    private String mailing_address_state;
+    // postgres defaults this to true
+    private boolean mailingSameAsResidence;
+    
     private String notes;
     
     private LocalDateTime lastUpdated;
-    private LocalDateTime expiryDate;
-    private boolean isActive;
     
-    private boolean isUnder18;
+    /**
+     * Tenancy tracking
+     */
+    private LocalDateTime expiryDate;
+    private String expiryNotes;
+    
+    /**
+     * An inactive Person would be a tenant who no longer lives at an
+     * address in the municipality to which the Person is connected
+     */
+    private boolean active;
+    
+    /**
+     * Tenancy tracking
+     */
+    private boolean under18;
+    private boolean verified;
+    private boolean containsMergedData;
 
     /**
      * @return the personID
@@ -254,31 +290,31 @@ public class Person implements Serializable{
     }
 
     /**
-     * @return the isActive
+     * @return the active
      */
-    public boolean isIsActive() {
-        return isActive;
+    public boolean isActive() {
+        return active;
     }
 
     /**
-     * @param isActive the isActive to set
+     * @param active the active to set
      */
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     /**
-     * @return the isUnder18
+     * @return the under18
      */
-    public boolean isIsUnder18() {
-        return isUnder18;
+    public boolean isUnder18() {
+        return under18;
     }
 
     /**
-     * @param isUnder18 the isUnder18 to set
+     * @param under18 the under18 to set
      */
-    public void setIsUnder18(boolean isUnder18) {
-        this.isUnder18 = isUnder18;
+    public void setUnder18(boolean under18) {
+        this.under18 = under18;
     }
 
     /**

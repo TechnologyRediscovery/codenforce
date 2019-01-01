@@ -142,9 +142,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 newPerson.setExpiryDate(null);
             }
-            newPerson.setIsActive(rs.getBoolean("isactive"));
+            newPerson.setActive(rs.getBoolean("isactive"));
 
-            newPerson.setIsUnder18(rs.getBoolean("isunder18"));
+            newPerson.setUnder18(rs.getBoolean("isunder18"));
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -305,9 +305,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(15, java.sql.Types.NULL);
             }
 
-            stmt.setBoolean(16, personToStore.isIsActive());
+            stmt.setBoolean(16, personToStore.isActive());
 
-            stmt.setBoolean(17, personToStore.isIsUnder18());
+            stmt.setBoolean(17, personToStore.isUnder18());
 
             System.out.println("PersonIntegrator.insertPerson | sql: " + stmt.toString());
 
@@ -457,8 +457,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setTimestamp(15, java.sql.Timestamp.valueOf(personToUpdate.getExpiryDate()));
             }
 
-            stmt.setBoolean(16, personToUpdate.isIsActive());
-            stmt.setBoolean(17, personToUpdate.isIsUnder18());
+            stmt.setBoolean(16, personToUpdate.isActive());
+            stmt.setBoolean(17, personToUpdate.isUnder18());
 
             stmt.setInt(18, personToUpdate.getPersonID());
             System.out.println("PersonIntegrator.updatePerson | sql: " + stmt.toString());

@@ -59,102 +59,16 @@ We have data in our table that is there to stay which will drive our database up
 
 1. create the `personsource` utility table
 2. populate `personsource` with at least the default value that we'll store in the corresponding field in `person`
-3. add new columns to `person` table
+3. add new columns to `person` table -- leaving out two constraints: foreign keys and required flags
 4. update existing `person` records with default values for any of our new fields. 
-5. check our work on the test postgres db
-6. run scripts on the deployed postgres db
+5. add the constraints on our new fields:
+	* foreign key declaration on `personsource` field
+	* required flag on `personsource`
+6. check our work on the test postgres db
+7. run scripts on the deployed postgres db
 
-### utility table
-Our lil' utility table only has two columns. We create a sequence to auto-fill the primary key field.
 
-	BEGIN;
-	CREATE SEQUENCE IF NOT EXISTS personSource_sourceID_seq
-		START WITH 10
-		INCREMENT BY 1
-		MINVALUE 10
-		NO MAXVALUE
-		CACHE 1;
 
-	CREATE TABLE personsource
-	(
-		sourceid    INTEGER DEFAULT nextval('personSource_sourceID_seq') CONSTRAINT personSource_sourceIDID_pk PRIMARY KEY,
-		title       text NOT NULL
-	) ;
 
-### populating utility table
-Most database management packages will create a template INSERT script for you. In pgadminIII I `right-click the table name -- scripts -- INSERT script`
 
-The sql:
-
-	INSERT INTO public.personsource(
-	            sourceid, title)
-	    VALUES (9, 'unknown');
-
-	INSERT INTO public.personsource(
-	            sourceid, title)
-	    VALUES (DEFAULT, 'Staff');
-
-	INSERT INTO public.personsource(
-	            sourceid, title)
-	    VALUES (DEFAULT, 'Public user');
-
-	INSERT INTO public.personsource(
-	            sourceid, title)
-	    VALUES (DEFAULT, 'County');
-
-Note that I created the unknown source with a hard-coded id of 9, which is under my auto-generating sequence. The next three are actual sources whose ids are auto-generated. By hard-coding the 9 into the script, I can confidently also hard code the value into a `.properties` file which my java can read from when it needs to know a default row identifier to use when inserting a person whose source is unknown. The actual users I assume the customizer of the entire system will address and will need to look up those IDs on their own.
-
-This kind of scheme is somewhat tinkery in finding the balance between writing db scripts that are too brittle and writing ones that we can confidently run and wire up to stuff in JSF without getting a bunch of key errors on db writes.
-
-### adding columns to `person`
-After reviewing the [postgres documentation on data manipulation](https://www.postgresql.org/docs/10/ddl-alter.html#DDL-ALTER-ADDING-A-COLUMN), these column additions were written and tested. 
-
-	ALTER TABLE person ADD COLUMN sourceid INTEGER CONSTRAINT person_source_sourceid_fk REFERENCES personsource (sourceid);
-	ALTER TABLE person ADD COLUMN creator  INTEGER CONSTRAINT person_creator_fk REFERENCES login (userid);
-	ALTER TABLE person ADD COLUMN businessentity BOOLEAN DEFAULT FALSE;
-	ALTER TABLE person ADD COLUMN addressofresidence BOOLEAN DEFAULT TRUE;
-	ALTER TABLE person ADD COLUMN mailing_address_street TEXT;
-	ALTER TABLE person ADD COLUMN mailing_address_city TEXT; 
-	ALTER TABLE person ADD COLUMN mailing_address_zip TEXT;
-	ALTER TABLE person ADD COLUMN mailing_address_state TEXT;
-	ALTER TABLE person ADD COLUMN mailingsameasresidence BOOLEAN default TRUE;
-	ALTER TABLE person ADD COLUMN expirynotes TEXT;
-
-Note the syntax for foreign keys: when declared along with the `ADD COLUMN` the foreign key command is implied with `REFERENCES`.
-
-### committing your work
-It's good practice to not auto-commit your SQL commands. It will only take one unintended auto-commit when you're working on the production system to burn into your mind the value of being able to check your work before making it permanent. 
-
-In this tutorial, the "auto-commit" option in pgadminIII was unchecked and I gave the 
-
-	BEGIN;
-
-and the 
-
-	COMMIT;
-
-commands on my own. If I had made a mistake, I could always 
-
-	ROLLBACK;
-
-This is [called working in transactions](https://www.postgresql.org/docs/8.3/tutorial-transactions.html), and, in postgres, the documentation notes that this process is always underway even if we don't tinker with it ourselves.
-
-### checking and running on deployed database
-All is well in the `person` table, and the scripts are declared correct. To make these changes on the deployed database, I first need to tunnel into the admin port with this shell command:
-
-	$ ssh -f edarsow@cogdrop -L 20000:localhost:5432 -N
-
-This connects my local port `20000` to my VPS's port `5432` which is what the postgres daemon listens on for admin commands. To the deployed postgres system, these commands appear to be coming from localhost, not remotely. I'm relying on ssh to do the authentication and encrypting for me--which assumes that the VPS has not been compromised.
-
-If you've never used ssh for port forwarding, read the manual page first with:
-
-	$ man ssh
-
-Using the default man viewer in Ubuntu 16.04, search for the `-f` flag in the documentation by entering `/` followed by the search key `-f` and then `enter`. You can repeat the search for the same term with only the `/`. This is all documented in the manual's manual accessed with:
-
-	$ man man
-
-## Updating `Person` POJO and `PersonIntegrator`
-With new columns in the database, we need member variables on the plain-old-java-object (aka "business objects") to store the data in the database for use by our java code. This requires an [integration class][1] method that extracts the data from the db and injects it into our `Person` objects.
-
-[1]: https://github.com/TechnologyRediscovery/codeconnect/blob/master/src/main/java/com/tcvcog/tcvce/integration/PersonIntegrator.java "Person Integrator"
+If we require a value in a field that is also a foreign key (a good practice), we'll need to have that value in the utility talbe
