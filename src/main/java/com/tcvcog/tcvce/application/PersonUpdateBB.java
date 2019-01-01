@@ -110,9 +110,9 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
         p.setExpiryDate(formExpiryDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        p.setIsActive(formIsActive);
+        p.setActive(formIsActive);
         
-        p.setIsUnder18(formIsUnder18);
+        p.setUnder18(formIsUnder18);
         
         try {
             pi.updatePerson(p);
@@ -267,7 +267,7 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formIsActive
      */
     public boolean isFormIsActive() {
-        formIsActive = currentPerson.isIsActive();
+        formIsActive = currentPerson.isActive();
         return formIsActive;
     }
 
@@ -275,7 +275,7 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formIsUnder18
      */
     public boolean isFormIsUnder18() {
-        formIsUnder18 = currentPerson.isIsUnder18();
+        formIsUnder18 = currentPerson.isUnder18();
         return formIsUnder18;
     }
 

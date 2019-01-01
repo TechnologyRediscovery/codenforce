@@ -26,7 +26,7 @@ Their [official PDF guide](https://www.primefaces.org/documentation.html) is ind
 
 The PF [Javadoc smells bad](https://www.primefaces.org/docs/api/6.0/), but is linked here in case it gets fleshed out.
 
-## Glassfish
+## WildFly/JBOSS
 The [big cheeze tutorial on installing glassfish on ubuntu](https://www.nabisoft.com/tutorials/glassfish/installing-glassfish-41-on-ubuntu) with actual security explanations. Created by Nabi Zamani.
 
 Official admin guide: the [365-page pdf on all things glassfish](https://javaee.github.io/glassfish/doc/5.0/administration-guide.pdf) is a must-open doc when working with server config

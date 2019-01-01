@@ -32,14 +32,20 @@
                         
                         <h2>image testing</h2>
                         
-                        <h:form id="img-test-form"
-                                enctype="multipart/form-data">
+                        <h:form enctype="multipart/form-data">
+                            <p:fileUpload value="#{photoBB.file}" mode="simple" />
+                            <p:commandButton value="Submit" ajax="false"/>
+                        </h:form>
+                        
+                        
+                        <h:form enctype="multipart/form-data">
                             
                             <h3>Store photo</h3>
-                            <p:fileUpload   fileUploadListener="#{photoBB.handleFileUpload}"
+                            <p:fileUpload   fileUploadListener="#{photoBB.handleFileUpload(event)}"
                                             mode="advanced"
                                             sizeLimit="100000"
-                                            allowTypes="/(\.|\/)(gif|jpe?g|png)$/"/>
+                                            allowTypes="/(\.|\/)(jpe?g|png)$/"/>
+                            
                             
                             <h3>See photo</h3>
                             <ui:remove>

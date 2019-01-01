@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
+import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -53,5 +54,22 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             sps.setUseRequestStatus(false);
         
         return sps;
+    }
+    
+    public SearchParamsPersons getDefaultSearchParamsPersons(){
+        SearchParamsPersons spp = new SearchParamsPersons();
+        spp.setMuni(getSessionBean().getActiveMuni());
+        spp.setFilterByStartEndDate(false);
+        spp.setFilterByFirstName(false);
+        spp.setFilterByLastName(true);
+        spp.setOnlySearchBlobs(false);
+        spp.setFilterByPersonTypes(false);
+        spp.setFilterByEmail(false);
+        spp.setFilterByAddressStreet(false);
+        spp.setFilterByActiveSwitch(false);
+        spp.setFilterByVerifiedSwitch(false);
+       
+        return spp;
+        
     }
 }

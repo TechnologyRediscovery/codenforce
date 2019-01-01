@@ -98,9 +98,9 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         p.setExpiryDate(formExpiryDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        p.setIsActive(formIsActive);
+        p.setActive(formIsActive);
         
-        p.setIsUnder18(formIsUnder18);
+        p.setUnder18(formIsUnder18);
         
         try {
             if(formConnectToActiveProperty){

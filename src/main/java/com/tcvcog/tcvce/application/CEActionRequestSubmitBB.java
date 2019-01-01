@@ -276,8 +276,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         currentPerson.setNotes("[System-Generated] This person was created "
                 + "from the code enforcement action request form");
         
-        currentPerson.setIsActive(true);
-        currentPerson.setIsUnder18(false);
+        currentPerson.setActive(true);
+        currentPerson.setUnder18(false);
         
         // the insertion of this person will be timestamped
         // by the integrator class

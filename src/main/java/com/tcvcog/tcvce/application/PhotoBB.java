@@ -74,6 +74,7 @@ public class PhotoBB extends BackingBeanUtils implements Serializable {
      * @param file the file to set
      */
     public void setFile(UploadedFile file) {
+        System.out.println("PhotoBB.setFile");
         this.file = file;
     }
     
