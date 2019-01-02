@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
@@ -163,6 +164,9 @@ public class Initializer implements ServletContextListener{
          
         ImageServices imageServicesBean = new ImageServices();
         servletContext.setAttribute("imageServices", imageServicesBean);
+        
+        PersonCoordinator pc = new PersonCoordinator();
+        servletContext.setAttribute("personCoordinator", pc);
          
         
 //        SessionBean sb = new SessionBean();

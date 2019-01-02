@@ -469,6 +469,34 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
 
     }
+    
+    
+    public void updateActionRequestor(CEActionRequest req) throws IntegrationException {
+
+        String q = "UPDATE ceactionrequest SET actrequestor_requestorid = ? WHERE requestid = ?;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(q);
+            stmt.setInt(1, req.getActionRequestorPerson().getPersonID());
+            stmt.setInt(2, req.getRequestID());
+            System.out.println("CEActionRequestorIntegrator.updateActionRequestor| statement: " + stmt.toString());
+            // Retrieve action data from postgres
+            stmt.executeUpdate();
+
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Integration Error: Unable to update action request", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
 
     public CEActionRequestStatus generateCEActionRequestStatus(ResultSet rs) throws IntegrationException {
         CEActionRequestStatus arqs = new CEActionRequestStatus();

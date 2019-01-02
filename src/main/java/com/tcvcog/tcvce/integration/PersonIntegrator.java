@@ -19,9 +19,12 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCECase;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -64,14 +67,49 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         Person person = null;
 
         try {
-            String s = "SELECT personid, personType, muni_municode, fName, lName, "
-                    + "jobtitle, phoneCell, phoneHome, phoneWork, "
-                    + "email, address_street, address_city, "
-                    + "address_zip, address_state, notes, lastUpdated, \n"
-                    + "expirydate, isactive, isunder18 FROM public.person \n"
-                    + "WHERE personid = "
-                    + personId + ";";
+            
+            String s = "SELECT \n" +
+                    "  person.personid, \n" +
+                    "  person.persontype, \n" +
+                    "  person.muni_municode, \n" +
+                    "  person.fname, \n" +
+                    "  person.lname, \n" +
+                    "  person.jobtitle, \n" +
+                    "  person.phonecell, \n" +
+                    "  person.phonework, \n" +
+                    "  person.phonehome, \n" +
+                    "  person.email, \n" +
+                    "  person.address_street, \n" +
+                    "  person.address_city, \n" +
+                    "  person.address_state, \n" +
+                    "  person.address_zip, \n" +
+                    "  person.notes, \n" +
+                    "  person.lastupdated, \n" +
+                    "  person.expirydate, \n" +
+                    "  person.isactive, \n" +
+                    "  person.isunder18, \n" +
+                    "  person.humanverifiedby, \n" +
+                    "  person.compositelname, \n" +
+                    "  person.creator, \n" +
+                    "  person.businessentity, \n" +
+                    "  person.addressofresidence, \n" +
+                    "  person.mailing_address_street, \n" +
+                    "  person.mailing_address_city, \n" +
+                    "  person.mailing_address_zip, \n" +
+                    "  person.mailing_address_state, \n" +
+                    "  person.mailingsameasresidence, \n" +
+                    "  person.expirynotes, \n" +
+                    "  personsource.sourceid, \n" +
+                    "  personsource.title\n" +
+                    "FROM \n" +
+                    "  public.person, \n" +
+                    "  public.personsource\n" +
+                    "WHERE \n" +
+                    "  person.sourceid = personsource.sourceid \n"+
+                    "  AND personid = ?;";
+            
             stmt = con.prepareStatement(s);
+            stmt.setInt(1, personId);
             System.out.println("PersonIntegrator.getPerson | sql: " + s);
 
             rs = stmt.executeQuery();
@@ -110,15 +148,24 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         // Instantiates the new person object
         Person newPerson = new Person();
         MunicipalityIntegrator muniIntegrator = getMunicipalityIntegrator();
-
+        UserIntegrator ui = getUserIntegrator();
+        
         try {
             newPerson.setPersonID(rs.getInt("personid"));
             System.out.println("PersonIntegrator.generatePersonFromResultSet | person Type from db: " + rs.getString("personType"));
             newPerson.setPersonType(PersonType.valueOf(rs.getString("personType")));
-            newPerson.setMuni(muniIntegrator.getMuniFromMuniCode(rs.getInt("muni_muniCode")));
-
+            Municipality m = muniIntegrator.getMuniFromMuniCode(rs.getInt("muni_muniCode"));
+            newPerson.setMuni(m);
+            
+            newPerson.setSourceID(rs.getInt("sourceid"));
+            newPerson.setSourceTitle(rs.getString("title"));
+            newPerson.setCreator(ui.getUser(rs.getInt("creator")));
+            
             newPerson.setFirstName(rs.getString("fName"));
             newPerson.setLastName(rs.getString("lName"));
+            newPerson.setCompositeLastName(rs.getBoolean("compositelname"));
+            newPerson.setBusinessEntity(rs.getBoolean("businessentity"));
+            
             newPerson.setJobTitle(rs.getString("jobtitle"));
 
             newPerson.setPhoneCell(rs.getString("phoneCell"));
@@ -131,6 +178,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
             newPerson.setAddress_state(rs.getString("address_state"));
             newPerson.setAddress_zip(rs.getString("address_zip"));
+            newPerson.setAddressOfResidence(rs.getBoolean("addressofresidence"));
+            
+            newPerson.setMailing_address_street(rs.getString("mailing_address_street"));
+            newPerson.setMailing_address_city(rs.getString("mailing_address_city"));
+            newPerson.setMailing_address_zip(rs.getString("mailing_address_zip"));
+            
+            newPerson.setMailing_address_state(rs.getString("mailing_address_state"));
+            newPerson.setMailingSameAsResidence(rs.getBoolean("mailingsameasresidence"));
             newPerson.setNotes(rs.getString("notes"));
 
             newPerson.setLastUpdated(rs.getTimestamp("lastupdated").toLocalDateTime());
@@ -142,9 +197,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 newPerson.setExpiryDate(null);
             }
+            newPerson.setExpiryNotes(rs.getString("expirynotes"));
             newPerson.setActive(rs.getBoolean("isactive"));
 
             newPerson.setUnder18(rs.getBoolean("isunder18"));
+            newPerson.setVerifiedBy(ui.getUser(rs.getInt("humanverifiedby")));
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -160,32 +217,86 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * only moved to the first row when passed to the
      * createPersonFromResultSet() method
      *
-     * @param fname a first name fragment to use in the query
-     * @param lname a last name fragment to use in the query
+     * @param params
      * @return the new Person() object generated from the query
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public ArrayList searchForPerson(String fname, String lname) throws IntegrationException {
+    public ArrayList<Person> getPersonList(SearchParamsPersons params) throws IntegrationException {
         Connection con = getPostgresCon();
-        ArrayList ll = new ArrayList();
+        ArrayList<Person> ll = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-
+        StringBuilder sb = new StringBuilder();
+        
+        
+        sb.append("SELECT personid FROM public.person ");   // < -- don't for get
+        
+        if(!params.isFilterByObjectID()){
+            sb.append("WHERE muni_municode = ? ");              // < -- trailing spaces!
+            if(params.isFilterByFirstName()){
+                sb.append("AND fname ILIKE ");
+                sb.append("'%");
+                sb.append(params.getFirstNameSS());
+                sb.append("%'");
+            }
+            if(params.isFilterByLastName()){
+                sb.append("AND lname ILIKE ");
+                sb.append("'%");
+                sb.append(params.getLastNameSS());
+                sb.append("%'");
+            }
+            if(params.isFilterByEmail()){
+                sb.append("AND email ILIKE ");
+                sb.append("'%");
+                sb.append(params.getEmailSS());
+                sb.append("%'");
+            }
+            if(params.isFilterByAddressStreet()){
+                sb.append("AND address_streetILIKE ");
+                sb.append("'%");
+                sb.append(params.getAddrStreetSS());
+                sb.append("%'");
+            }
+            if(params.isFilterByActiveSwitch()){
+                if(params.isActiveSwitch()){
+                    sb.append("AND isactive = TRUE ");
+                } else {
+                    sb.append("AND isactive = FALSE ");
+                }
+            }
+            if(params.isFilterByVerifiedSwitch()){
+                if(params.isVerifiedSwitch()){
+                    sb.append("AND humanverifiedby IS NOT NULL");
+                } else {
+                    sb.append("AND humanverifiedby IS NULL");
+                }
+            }
+        } else { // if we're searching by personID, ignore all other criteria
+            sb.append("WHERE personid = ?;"); // param 2 with key search
+        }
+        
         try {
-            String s = "SELECT personid, personType, muni_municode, fName, lName, "
-                    + "jobtitle, phoneCell, phoneHome, phoneWork, "
-                    + "email, address_street, address_city, "
-                    + "address_state, address_zip, notes, lastupdated, expirydate, "
-                    + "isactive, isunder18 \n"
-                    + "FROM public.person "
-                    + "WHERE fname ILIKE '%"
-                    + fname + "%' AND lname ILIKE '%"
-                    + lname + "%';";
-            stmt = con.prepareStatement(s);
+            stmt = con.prepareStatement(sb.toString());
+            
+            if(!params.isFilterByObjectID()){
+                stmt.setInt(1, params.getMuni().getMuniCode());
+            } else {
+                stmt.setInt(1, params.getObjectID()); // and this is the only param after muni!
+            }
+            
             System.out.println("PersonIntegrator.searchForPerson | sql: " + stmt.toString());
             rs = stmt.executeQuery();
-
-            while (rs.next()) {
+            
+            int counter = 0;
+            int maxResults;
+            if(params.isLimitResultCountTo100()){
+                 maxResults = Integer.parseInt(getResourceBundle(
+                        Constants.DB_FIXED_VALUE_BUNDLE).getString("defaultMaxQueryResults"));
+            } else {
+                maxResults = Integer.MAX_VALUE;
+            }
+            
+            while (rs.next() && counter < maxResults ) {
 
                 // note that rs.next() is called and the cursor
                 // is advanced to the first row in the rs

@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -54,6 +55,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     private String internalMessageText;
     private String muniMessageText;
     private String publicMessageText;
+    
+    private Person selectedPersonForAttachment;
     
     private ArrayList<CECase> caseListForSelectedProperty;
     private String houseNumSearch;
@@ -299,6 +302,32 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
         // force table reload to show changes
         requestList = null;
+    }
+    
+    public void selectNewRequestPerson(Person p){
+        selectedPersonForAttachment = p;
+        
+    }
+    
+    public void updateRequestor(ActionEvent ev){
+        System.out.println("CEActionRequestsBB.updateRequestor");
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        selectedRequest.setActionRequestorPerson(selectedPersonForAttachment);
+        
+        try {
+            ceari.updateActionRequestor(selectedRequest);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Done! Requestor is now: " 
+                                + String.valueOf(selectedRequest.getActionRequestorPerson().getFirstName()) 
+                                + String.valueOf(selectedRequest.getActionRequestorPerson().getLastName())
+                    + " for action request ID: " + selectedRequest.getRequestID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
+                    , "Unable to change requestor person"
+                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+        }
+        
     }
     
     public void changePACCAccess(){
@@ -801,6 +830,20 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public void setDisablePACCControl(boolean disablePACCControl) {
         this.disablePACCControl = disablePACCControl;
+    }
+
+    /**
+     * @return the selectedPersonForAttachment
+     */
+    public Person getSelectedPersonForAttachment() {
+        return selectedPersonForAttachment;
+    }
+
+    /**
+     * @param selectedPersonForAttachment the selectedPersonForAttachment to set
+     */
+    public void setSelectedPersonForAttachment(Person selectedPersonForAttachment) {
+        this.selectedPersonForAttachment = selectedPersonForAttachment;
     }
 
    

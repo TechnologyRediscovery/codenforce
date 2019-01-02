@@ -32,19 +32,20 @@ public class Person implements Serializable{
     private int personID;
     
     private PersonType personType;
+    private Municipality muni;
+    private int muniCode;
+    
     private int sourceID;
     private String sourceTitle;
     private User creator;
     
-    private Municipality muni;
     // for backwards compatability
-    private int muniCode;
     
     private String firstName;
     private String lastName;
     
     // frist, middle initial, and last all in lastName
-    private boolean nameBlob;
+    private boolean compositeLastName;
     private boolean businessEntity;
     
     private String jobTitle;
@@ -63,34 +64,25 @@ public class Person implements Serializable{
     
     private String mailing_address_street;
     private String mailing_address_city;
-    
     private String mailing_address_zip;
+    
     private String mailing_address_state;
     // postgres defaults this to true
     private boolean mailingSameAsResidence;
-    
     private String notes;
     
     private LocalDateTime lastUpdated;
     
-    /**
-     * Tenancy tracking
-     */
     private LocalDateTime expiryDate;
     private String expiryNotes;
-    
-    /**
-     * An inactive Person would be a tenant who no longer lives at an
-     * address in the municipality to which the Person is connected
-     */
     private boolean active;
     
     /**
      * Tenancy tracking
      */
     private boolean under18;
-    private boolean verified;
-    private boolean containsMergedData;
+    private User verifiedBy;
+    
 
     /**
      * @return the personID
@@ -363,6 +355,7 @@ public class Person implements Serializable{
      * @return the muniCode
      */
     public int getMuniCode() {
+        muniCode = muni.getMuniCode();
         return muniCode;
     }
 
@@ -376,6 +369,190 @@ public class Person implements Serializable{
     @Override
     public String toString(){
         return this.firstName + this.lastName;
+    }
+
+    /**
+     * @return the sourceID
+     */
+    public int getSourceID() {
+        return sourceID;
+    }
+
+    /**
+     * @return the sourceTitle
+     */
+    public String getSourceTitle() {
+        return sourceTitle;
+    }
+
+    /**
+     * @return the creator
+     */
+    public User getCreator() {
+        return creator;
+    }
+
+    /**
+     * @return the businessEntity
+     */
+    public boolean isBusinessEntity() {
+        return businessEntity;
+    }
+
+    /**
+     * @return the addressOfResidence
+     */
+    public boolean isAddressOfResidence() {
+        return addressOfResidence;
+    }
+
+    /**
+     * @return the mailing_address_street
+     */
+    public String getMailing_address_street() {
+        return mailing_address_street;
+    }
+
+    /**
+     * @return the mailing_address_city
+     */
+    public String getMailing_address_city() {
+        return mailing_address_city;
+    }
+
+    /**
+     * @return the mailing_address_zip
+     */
+    public String getMailing_address_zip() {
+        return mailing_address_zip;
+    }
+
+    /**
+     * @return the mailing_address_state
+     */
+    public String getMailing_address_state() {
+        return mailing_address_state;
+    }
+
+    /**
+     * @return the mailingSameAsResidence
+     */
+    public boolean isMailingSameAsResidence() {
+        return mailingSameAsResidence;
+    }
+
+    /**
+     * @return the expiryNotes
+     */
+    public String getExpiryNotes() {
+        return expiryNotes;
+    }
+
+    
+
+    /**
+     * @param sourceID the sourceID to set
+     */
+    public void setSourceID(int sourceID) {
+        this.sourceID = sourceID;
+    }
+
+    /**
+     * @param sourceTitle the sourceTitle to set
+     */
+    public void setSourceTitle(String sourceTitle) {
+        this.sourceTitle = sourceTitle;
+    }
+
+    /**
+     * @param creator the creator to set
+     */
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * @param businessEntity the businessEntity to set
+     */
+    public void setBusinessEntity(boolean businessEntity) {
+        this.businessEntity = businessEntity;
+    }
+
+    /**
+     * @param addressOfResidence the addressOfResidence to set
+     */
+    public void setAddressOfResidence(boolean addressOfResidence) {
+        this.addressOfResidence = addressOfResidence;
+    }
+
+    /**
+     * @param mailing_address_street the mailing_address_street to set
+     */
+    public void setMailing_address_street(String mailing_address_street) {
+        this.mailing_address_street = mailing_address_street;
+    }
+
+    /**
+     * @param mailing_address_city the mailing_address_city to set
+     */
+    public void setMailing_address_city(String mailing_address_city) {
+        this.mailing_address_city = mailing_address_city;
+    }
+
+    /**
+     * @param mailing_address_zip the mailing_address_zip to set
+     */
+    public void setMailing_address_zip(String mailing_address_zip) {
+        this.mailing_address_zip = mailing_address_zip;
+    }
+
+    /**
+     * @param mailing_address_state the mailing_address_state to set
+     */
+    public void setMailing_address_state(String mailing_address_state) {
+        this.mailing_address_state = mailing_address_state;
+    }
+
+    /**
+     * @param mailingSameAsResidence the mailingSameAsResidence to set
+     */
+    public void setMailingSameAsResidence(boolean mailingSameAsResidence) {
+        this.mailingSameAsResidence = mailingSameAsResidence;
+    }
+
+    /**
+     * @param expiryNotes the expiryNotes to set
+     */
+    public void setExpiryNotes(String expiryNotes) {
+        this.expiryNotes = expiryNotes;
+    }
+
+    /**
+     * @return the compositeLastName
+     */
+    public boolean isCompositeLastName() {
+        return compositeLastName;
+    }
+
+    /**
+     * @param compositeLastName the compositeLastName to set
+     */
+    public void setCompositeLastName(boolean compositeLastName) {
+        this.compositeLastName = compositeLastName;
+    }
+
+    /**
+     * @return the verifiedBy
+     */
+    public User getVerifiedBy() {
+        return verifiedBy;
+    }
+
+    /**
+     * @param verifiedBy the verifiedBy to set
+     */
+    public void setVerifiedBy(User verifiedBy) {
+        this.verifiedBy = verifiedBy;
     }
 
 }

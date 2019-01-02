@@ -142,10 +142,14 @@ This is [called working in transactions](https://www.postgresql.org/docs/8.3/tut
 ### checking and running on deployed database
 All is well in the `person` table, and the scripts are declared correct. To make these changes on the deployed database, I first need to tunnel into the admin port with this shell command:
 
-	ssh -f edarsow@cogdrop -L 20000:localhost:5432 -N
+	$ ssh -f edarsow@cogdrop -L 20000:localhost:5432 -N
 
 This connects my local port `20000` to my VPS's port `5432` which is what the postgres daemon listens on for admin commands. To the deployed postgres system, these commands appear to be coming from localhost, not remotely. I'm relying on ssh to do the authentication and encrypting for me--which assumes that the VPS has not been compromised.
 
-If you've never used ssh for port forwarding, read the man page first with:
+If you've never used ssh for port forwarding, read the manual page first with:
 
-	man ssh
+	$ man ssh
+
+Using the default man viewer in Ubuntu 16.04, search for the `-f` flag in the documentation by entering `/` followed by the search key `-f` and then `enter`. You can repeat the search for the same term with only the `/`. This is all documented in the manual's manual accessed with:
+
+	$ man man

@@ -17,16 +17,48 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.SearchCoordinator;
+import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import java.io.Serializable;
+
 /**
  *
  * @author Eric C. Darsow
  */
-public class PersonCoordinator {
+public class PersonCoordinator extends BackingBeanUtils implements Serializable{
 
     /**
      * Creates a new instance of PersonCoordinator
      */
     public PersonCoordinator() {
+    }
+
+    /**
+     * Hard-coded default values for person searches
+     * @return 
+     */
+    public SearchParamsPersons getDefaultSearchParamsPersons() {
+        SearchParamsPersons spp = new SearchParamsPersons();
+        // on the parent class SearchParams
+        spp.setMuni(getSessionBean().getActiveMuni());
+        spp.setFilterByStartEndDate(false);
+        spp.setLimitResultCountTo100(true);
+        
+        // on the subclass SearchParamsPersons
+        spp.setFilterByFirstName(false);
+        spp.setFilterByLastName(true);
+        spp.setOnlySearchCompositeLastNames(false);
+        
+        spp.setFilterByPersonTypes(false);
+        spp.setFilterByEmail(false);
+        spp.setFilterByAddressStreet(false);
+        
+        spp.setFilterByActiveSwitch(false);
+        spp.setFilterByVerifiedSwitch(false);
+        spp.setFilterByPropertySwitch(false);
+        
+        return spp;
     }
     
 }

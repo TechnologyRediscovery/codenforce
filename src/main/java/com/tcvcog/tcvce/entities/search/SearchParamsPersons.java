@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,25 +25,23 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
     
         private String firstNameSS;
         private boolean filterByFirstName;
-
         private String lastNameSS;
         private boolean filterByLastName;
-        private boolean onlySearchBlobs;
+        private boolean onlySearchCompositeLastNames;
     
         private List<PersonType> personTypes; 
         private boolean filterByPersonTypes;
-        
         private String emailSS;
         private boolean filterByEmail;
-        
         private String addrStreetSS;
         private boolean filterByAddressStreet;
         
         private boolean activeSwitch;
         private boolean filterByActiveSwitch;
-        
         private boolean verifiedSwitch;
         private boolean filterByVerifiedSwitch;
+        private Property propertySA;
+        private boolean filterByPropertySwitch;
         
         
         
@@ -79,10 +78,10 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
     }
 
     /**
-     * @return the onlySearchBlobs
+     * @return the onlySearchCompositeLastNames
      */
-    public boolean isOnlySearchBlobs() {
-        return onlySearchBlobs;
+    public boolean isOnlySearchCompositeLastNames() {
+        return onlySearchCompositeLastNames;
     }
 
     /**
@@ -184,10 +183,10 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
     }
 
     /**
-     * @param onlySearchBlobs the onlySearchBlobs to set
+     * @param onlySearchCompositeLastNames the onlySearchCompositeLastNames to set
      */
-    public void setOnlySearchBlobs(boolean onlySearchBlobs) {
-        this.onlySearchBlobs = onlySearchBlobs;
+    public void setOnlySearchCompositeLastNames(boolean onlySearchCompositeLastNames) {
+        this.onlySearchCompositeLastNames = onlySearchCompositeLastNames;
     }
 
     /**
@@ -258,6 +257,34 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
      */
     public void setFilterByVerifiedSwitch(boolean filterByVerifiedSwitch) {
         this.filterByVerifiedSwitch = filterByVerifiedSwitch;
+    }
+
+    /**
+     * @return the propertySA
+     */
+    public Property getPropertySA() {
+        return propertySA;
+    }
+
+    /**
+     * @param propertySA the propertySA to set
+     */
+    public void setPropertySA(Property propertySA) {
+        this.propertySA = propertySA;
+    }
+
+    /**
+     * @return the filterByPropertySwitch
+     */
+    public boolean isFilterByPropertySwitch() {
+        return filterByPropertySwitch;
+    }
+
+    /**
+     * @param filterByPropertySwitch the filterByPropertySwitch to set
+     */
+    public void setFilterByPropertySwitch(boolean filterByPropertySwitch) {
+        this.filterByPropertySwitch = filterByPropertySwitch;
     }
    
    
