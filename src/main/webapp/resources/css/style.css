@@ -661,6 +661,12 @@ td.gridTd {
     border: none;
 }
 
+.gridTd-solid-back{
+    border:none;
+    background-color: green;
+    z-index: 100;
+}
+
 .panelGridData{
     border-collapse: collapse;
     margin: 0px;

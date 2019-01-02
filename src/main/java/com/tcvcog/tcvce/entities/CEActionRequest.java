@@ -46,6 +46,7 @@ public class CEActionRequest implements Serializable{
     private CEActionRequestStatus requestStatus;
 
     private Municipality muni;
+    // for legacy compatability
     private int personID;
     private Person actionRequestorPerson;
 

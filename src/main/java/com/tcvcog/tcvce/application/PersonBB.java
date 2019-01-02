@@ -18,8 +18,10 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import javax.faces.event.ActionEvent;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author Ellen Baskem
  */
 public class PersonBB extends BackingBeanUtils implements Serializable{
 
@@ -36,48 +38,20 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
     private Person selectedPerson;
     private ArrayList<Person> filteredPersonList;
     
-    private String formFName;
-    private String formLName;
-    private int formPersonID;
+    private SearchParamsPersons searchParams;
     
     
     /**
      * Creates a new instance of PersonBB
      */
     public PersonBB() {
+        personList = new ArrayList<>();
     }
     
-    public void searchForPersonByName(ActionEvent event){
+    public void searchForPersons(ActionEvent event){
         // clear past search results
         personList = null;
         
-        PersonIntegrator integrator = getPersonIntegrator();
-        
-        try {
-            personList = integrator.searchForPerson(formFName, formLName);
-            if(personList.isEmpty()){
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Database search returned 0 Persons", 
-                            "Please try again, perhaps by removing some letters from your name text"));
-                
-            } else {
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Database search returned "+ personList.size() + " Persons", 
-                                "Please try again, perhaps by removing some letters from your name text"));
-            }
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "System-related search error", "This issue requires administrator attention, sorry"));
-            
-        }
-        
-        
-    }
-    
-    public void searchForPersonByID(ActionEvent event){
         
         
     }
@@ -121,29 +95,32 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
      * @return the personList
      */
     public ArrayList<Person> getPersonList() {
+        PersonIntegrator integrator = getPersonIntegrator();
+        if(personList == null){
+
+            try {
+                personList = integrator.getPersonList(searchParams);
+                if(personList.isEmpty()){
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                                "Database search returned 0 Persons", 
+                                "Please try again, perhaps by removing some letters from your name text"));
+
+                } else {
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                                "Database search returned "+ personList.size() + " Persons", ""));
+                }
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "System-related search error", "This issue requires administrator attention, sorry"));
+            }
+        }
         return personList;
     }
-
-    /**
-     * @return the formFName
-     */
-    public String getFormFName() {
-        return formFName;
-    }
-
-    /**
-     * @return the formLName
-     */
-    public String getFormLName() {
-        return formLName;
-    }
-
-    /**
-     * @return the formPersonID
-     */
-    public int getFormPersonID() {
-        return formPersonID;
-    }
+    
 
     /**
      * @param personList the personList to set
@@ -152,27 +129,7 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
         this.personList = personList;
     }
 
-    /**
-     * @param formFName the formFName to set
-     */
-    public void setFormFName(String formFName) {
-        this.formFName = formFName;
-    }
-
-    /**
-     * @param formLName the formLName to set
-     */
-    public void setFormLName(String formLName) {
-        this.formLName = formLName;
-    }
-
-    /**
-     * @param formPersonID the formPersonID to set
-     */
-    public void setFormPersonID(int formPersonID) {
-        this.formPersonID = formPersonID;
-    }
-
+   
     /**
      * @return the selectedPerson
      */
@@ -199,6 +156,24 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
      */
     public void setFilteredPersonList(ArrayList<Person> filteredPersonList) {
         this.filteredPersonList = filteredPersonList;
+    }
+
+    /**
+     * @return the searchParams
+     */
+    public SearchParamsPersons getSearchParams() {
+        PersonCoordinator pc = getPersonCoordinator();
+        if(searchParams == null){
+            searchParams = pc.getDefaultSearchParamsPersons();
+        }
+        return searchParams;
+    }
+
+    /**
+     * @param searchParams the searchParams to set
+     */
+    public void setSearchParams(SearchParamsPersons searchParams) {
+        this.searchParams = searchParams;
     }
     
 }

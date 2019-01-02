@@ -56,20 +56,4 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return sps;
     }
     
-    public SearchParamsPersons getDefaultSearchParamsPersons(){
-        SearchParamsPersons spp = new SearchParamsPersons();
-        spp.setMuni(getSessionBean().getActiveMuni());
-        spp.setFilterByStartEndDate(false);
-        spp.setFilterByFirstName(false);
-        spp.setFilterByLastName(true);
-        spp.setOnlySearchBlobs(false);
-        spp.setFilterByPersonTypes(false);
-        spp.setFilterByEmail(false);
-        spp.setFilterByAddressStreet(false);
-        spp.setFilterByActiveSwitch(false);
-        spp.setFilterByVerifiedSwitch(false);
-       
-        return spp;
-        
-    }
 }
