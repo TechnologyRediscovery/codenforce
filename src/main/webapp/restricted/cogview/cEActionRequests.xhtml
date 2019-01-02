@@ -739,14 +739,11 @@
                                             </p:column>
 
                                             <p:column>
-
                                                 <f:facet name="header">
                                                     <h:outputText value="Type" />
                                                 </f:facet>
                                                 <h:outputText value="#{prop.propertyUseType}"/>
-
                                             </p:column>
-
                                         </p:dataTable>
 
                                         <p:spacer height="10px"/>
@@ -769,15 +766,19 @@
                         </p:confirmDialog>
                         
                         
-                        <p:confirmDialog message="Change requestor person" 
-                                         severity="alert" widgetVar="change-person-dialog"
-                                         closable="true"
-                                         rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
-
+                        <p:dialog       height="650" width="700"
+                                        widgetVar="change-person-dialog"
+                                        closable="true" 
+                                        rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
                             
                             <h3>Search for a different person</h3>
                             
                             <h:form id="change-person-form">
+                                  
+                                <h:messages id="person-search-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                                
                                 
                                 <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd-solid-back, gridTd-solid-back">
@@ -854,7 +855,7 @@
                                 
                                 <p:commandButton
                                             value="Search for Persons" tabindex="4" ajax="true" icon="fa fa-search"
-                                            actionListener="#{cEActionRequestsBB.searchForProperties}" 
+                                            actionListener="#{personBB.searchForPersons}" 
                                             update=    "change-person-form:filter-by-personid-cb
                                                         change-person-form:formPersonID
                                                         change-person-form:filter-by-fname-cb
@@ -863,11 +864,36 @@
                                                         change-person-form:formLastName-person
                                                         change-person-form:muniSelectMenu-person
                                                         change-person-form:personTable
+                                                        change-person-form:person-search-messages
                                                         "/>
+                                <h3>Chosen Person:</h3>
+                                <h:outputText id="confirm-person-ot" value="ID #{cEActionRequestsBB.selectedPersonForAttachment.personID}: 
+                                              #{cEActionRequestsBB.selectedPersonForAttachment.lastName} "/>
 
-                                <p:spacer height="15"/>
+
+
+                                <p:commandButton value="Assign request to selected person"
+                                                 actionListener="#{cEActionRequestsBB.updateRequestor}"
+                                                 disabled="#{!sessionBean.accessKeyCard.hasCOGStaffPermissions}"
+                                                 update="   msgForm:ceActionRequestsMessages
+                                                            req-details-form:selr-persontype
+                                                            req-details-form:selr-pers-fn
+                                                            req-details-form:selr-pers-ln
+                                                            req-details-form:selr-pers-str
+                                                            req-details-form:selr-pers-city
+                                                            req-details-form:selr-pers-state
+                                                            req-details-form:selr-pers-zip
+                                                            req-details-form:selr-pers-phone-cell
+                                                            req-details-form:selr-pers-phone-work
+                                                            req-details-form:selr-pers-phone-home
+                                                            req-details-form:selr-pers-email"
+                                                 oncomplete="PF('change-person-dialog').hide()"/>
+                                
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('change-person-dialog').hide()"/>
                                 <hr/>
-                                <p:spacer height="15"/>
+
 
                                 <h2>Search Results</h2>
 
@@ -940,7 +966,7 @@
                                         <p:commandButton actionListener="#{cEActionRequestsBB.selectNewRequestPerson(p)}"
                                                          ajax="true"
                                                          value="select"
-                                                         update="change-person-form:confirm-person-ot"
+                                                         update="change-person-form:confirm-person-ot"/>
                                     </p:column>
 
 
@@ -1078,34 +1104,13 @@
                                     </p:rowExpansion>
                                 </p:dataTable>
 
-                                <h3>Chosen Person:</h3>
-                                <h:outputText id="confirm-person-ot" value="ID #{cEActionRequestsBB.selectedPersonForAttachment.personID}: 
-                                              #{cEActionRequestsBB.selectedPersonForAttachment.lastName} "/>
-
-
-
-                                <p:commandButton value="Assign request to selected person"
-                                                 actionListener="#{cEActionRequestsBB.updateRequestor}"
-                                                 disabled="#{!sessionBean.accessKeyCard.hasCOGStaffPermissions}"
-                                                 update="   msgForm:ceActionRequestsMessages
-                                                            req-details-form:selr-prop-address
-                                                            req-details-form:selr-prop-muni
-                                                            actionRequestListForm:actionRequestTable
-                                                            req-details-form:selr-status-ot"
-                                                 oncomplete="PF('change-person-dialog').hide()"/>
-                                
-                                <p:commandButton ajax="true" 
-                                                 value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('change-person-dialog').hide()"/>
-                                <hr/>
-
                             </h:form>
-                        </p:confirmDialog>
+                        </p:dialog>
                         
                         
                         <p:confirmDialog message="Attach internal message" 
                                          severity="alert" widgetVar="internal-message-dialog"
-                                         closable="true"
+                                         closable="true" responsive="true"
                                          rendered="#{sessionBean.accessKeyCard.hasCOGStaffPermissions}">
 
                             <h:form id="internal-message-form">

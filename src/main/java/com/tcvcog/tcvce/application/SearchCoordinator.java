@@ -46,8 +46,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             
             // action requests cannot have a time stamp past the current datetime
             sps.setEndDate(LocalDateTime.now());
-            
-            sps.setUseAttachedToCase(true);
+
+            // for testing only
+            sps.setUseAttachedToCase(false);
             sps.setAttachedToCase(false);
             sps.setUseMarkedUrgent(false);
             sps.setUseNotAtAddress(false);
