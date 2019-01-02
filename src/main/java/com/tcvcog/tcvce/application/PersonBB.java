@@ -67,6 +67,10 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
             
         }
     }
+    
+    public void selectPerson(Person p){
+        selectedPerson = p;
+    }
 
     public String deletePerson(){
         System.out.println("PersonBB.deletePerson | in method");

@@ -143,41 +143,50 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         
         pib.setRequestID(req.getRequestID());
         pib.setPacc(req.getRequestPublicCC());
+        pib.setDateOfRecord(getPrettyDate(req.getDateOfRecord()));
 
-        pib.setPaccStatusMessage("Public access enabled");
-        pib.setAddressAssociated(!req.getNotAtAddress());
-        if(!req.getNotAtAddress()){
-            pib.setPropertyAddress(req.getRequestProperty().getAddress());
+        if(req.isPaccEnabled()){
+            
+            pib.setPaccStatusMessage("Public access enabled");
+            pib.setAddressAssociated(!req.getNotAtAddress());
+            if(!req.getNotAtAddress()){
+                pib.setPropertyAddress(req.getRequestProperty().getAddress());
+            }
+
+            pib.setMuni(req.getMuni());
+
+            // there's no case manager to attach to an unlinked action request
+
+
+            // TODO: populate from text file
+            pib.setTypeName("Code enforcement action request");
+
+            pib.setActionRequestorFLname(req.getActionRequestorPerson().getFirstName() 
+                                        + " " + req.getActionRequestorPerson().getLastName());
+
+            pib.setIssueTypeString(req.getIssueTypeString());
+
+            if(req.getCaseID() == 0){
+                pib.setCaseLinkStatus("Request not linked to a code enforcement case");
+                pib.setLinkedToCase(false);
+            }
+            else{
+                pib.setCaseLinkStatus("Connected to case ID " + String.valueOf(req.getCaseID()));
+                pib.setLinkedToCase(true);
+            }
+
+            pib.setFormattedSubmittedTimeStamp(req.getFormattedSubmittedTimeStamp());
+            pib.setRequestDescription(req.getRequestDescription());
+            pib.setPublicExternalNotes(req.getPublicExternalNotes());
+            pib.setRequestStatus(req.getRequestStatus());
+
+            pib.setShowAddMessageButton(true);
+            pib.setShowDetailsPageButton(false);
+        } else {
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office at " + req.getMuni().getPhone());
+            
         }
-        
-        pib.setMuni(req.getMuni());
-        
-        // there's no case manager to attach to an unlinked action request
-        
-        
-        // TODO: populate from text file
-        pib.setTypeName("CEAR");
-        
-        pib.setActionRequestorFLname(req.getActionRequestorPerson().getFirstName() 
-                                    + " " + req.getActionRequestorPerson().getLastName());
-        
-        pib.setIssueTypeString(req.getIssueTypeString());
-        
-        if(req.getCaseID() == 0){
-            pib.setCaseLinkStatus("Request not linked to a code enforcement case");
-            pib.setLinkedToCase(false);
-        }
-        else{
-            pib.setCaseLinkStatus("Connected to case ID " + String.valueOf(req.getCaseID()));
-            pib.setLinkedToCase(true);
-        }
-        
-        pib.setFormattedSubmittedTimeStamp(req.getFormattedSubmittedTimeStamp());
-        pib.setRequestDescription(req.getRequestDescription());
-        pib.setPublicExternalNotes(req.getPublicExternalNotes());
-        
-        pib.setShowAddMessageButton(true);
-        pib.setShowDetailsPageButton(false);
         
         return pib;
         

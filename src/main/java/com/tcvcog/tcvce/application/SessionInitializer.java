@@ -69,7 +69,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         UserCoordinator uc = getUserCoordinator();
         
         try {
-            User extractedUser = uc.getUser(getGlassfishUser());
+            User extractedUser = uc.getUser(getContainerAuthenticatedUser());
             if(extractedUser != null){
                 ExternalContext ec = facesContext.getExternalContext();
                 ec.getSessionMap().put("facesUser", extractedUser);
@@ -111,7 +111,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     /**
      * @return the glassfishUser
      */
-    private String getGlassfishUser() {
+    private String getContainerAuthenticatedUser() {
         
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();

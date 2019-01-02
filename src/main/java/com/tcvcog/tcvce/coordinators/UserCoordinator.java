@@ -46,41 +46,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
-    /**
-     * DEPRECATED with move to glassfish servlet authentication
-     * Responds to login requests by taking the loginName and loginPassword
-     * and searching the database for a registered user. If a user is found
-     * in the DB, a User object is created and returned, allow the user to progress 
-     * pass the authentication screen.
-     * 
-     * @deprecated due to the switch to glassfish container security. getUser(Stringloginname) instead
-     * @param loginName the login name entered by the user
-     * @param loginPassword the password entered by the user
-     * 
-     * @return a User object loaded up with various attributes of the user, 
-     * including the user's role in the system.
-     * 
-     * @throws com.tcvcog.tcvce.domain.ObjectNotFoundException
-     * @throws com.tcvcog.tcvce.domain.DataStoreException
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    private User getUser(String loginName, String loginPassword) 
-            throws ObjectNotFoundException, DataStoreException, IntegrationException {
-        System.out.println("UserCoordinator.geUser | given: " + loginName + " " + loginPassword);
-        User authenticatedUser = null;
-        UserIntegrator ui = getUserIntegrator();
-        
-//        authenticatedUser = ui.getAuthenticatedUser(loginName, loginPassword);
-        if (authenticatedUser != null){
-            
-            // session bean doesn't store user--it's in the context map
-            //getSessionBean().setActiveUser(authenticatedUser);
-        }
-         
-        return authenticatedUser;
-        
-    } // close getUser()
-    
+   
     /**
      * Primary user retrieval method: Note that there aren't as many checks here
      * since the glassfish container is managing the lookup of authenticated uers. 
@@ -140,7 +106,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                 card = new AccessKeyCard( false,   //developer
                                     true,   // sysadmin
                                     true,   // cogstaff
-                                    false,   // enfOfficial
+                                    true,   // enfOfficial
                                     true,   // muniStaff
                                     true);  // muniReader
                break;

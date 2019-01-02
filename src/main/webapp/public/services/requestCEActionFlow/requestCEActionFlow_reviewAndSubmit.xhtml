@@ -24,15 +24,81 @@
 
                         <h:form id="requestCEActionFlowFormReviewAndSubmit">
                             
+                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                 columnClasses="gridTd, gridTd" id="selectedRequestDetails">
+                                       
+                                        <h:panelGroup>
+                                            <h:outputLabel class="bold" value="Address" />
+                                            <p:spacer height="5px"/>
+                                            <div class="rowExpansion">
+                                                <h:outputText id="selr-prop-address" value="#{sessionBean.ceactionRequestForSubmission.requestProperty.address}"/><br/>
+                                                <h:outputText id="selr-prop-muni" value="#{sessionBean.ceactionRequestForSubmission.requestProperty.muni.muniName}"/>
+                                            </div>
+                                           
+                                        </h:panelGroup>
+
+                                        
+                                        
+                                        <h:panelGroup>
+                                            <h:outputLabel class="bold" value="Date Submitted" />
+                                            <p:spacer height="5px"/>
+                                            <div class="wrapText">
+                                                <h:outputText id="selr-submitted-ts"  value="#{sessionBean.ceactionRequestForSubmission.dateOfRecord}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <div class="wrapText">
+                                                <h:outputLabel styleClass="bold" value="Human safety issue?"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText id="selr-isurgent"  value="#{sessionBean.ceactionRequestForSubmission.isUrgent}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+
+                                            <div class="wrapText">
+                                                <h:outputLabel id="selr-persontype" styleClass="bold" value="Requestor ID:#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.personID} 
+                                                                (#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.personType.label}): "/>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputText id="selr-pers-fn" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.firstName} "/> 
+                                                <h:outputText id="selr-pers-ln" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.lastName}"/><br/> 
+                                                <h:outputText id="selr-pers-str" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.address_street}"/> <br/>
+                                                <h:outputText id="selr-pers-city" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.address_city}, "/> 
+                                                <h:outputText id="selr-pers-state" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.address_state} "/> 
+                                                <h:outputText id="selr-pers-zip" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.address_zip}"/> 
+                                            </div>
+                                            
+                                           
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Contact: "/>
+                                            <p:spacer height="5px"/>
+                                            <div class="wrapText"> 
+                                                <h:outputText value="Phone (cell): "/>
+                                                <h:outputText id="selr-pers-phone-cell" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.phoneCell}"/> <br/>
+                                                <h:outputText  value="Phone (work): "/>
+                                                <h:outputText id="selr-pers-phone-work" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.phoneWork}"/> <br/>
+                                                <h:outputText value="Phone (home): "/>
+                                                <h:outputText id="selr-pers-phone-home" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.phoneHome}"/> <br/>
+                                                <h:outputText value="Email: "/>
+                                                <h:outputText id="selr-pers-email" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.email}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+
+
+                                        <f:facet name="footer" class="leftalign">
+                                            <h:outputLabel styleClass="bold" value="Request description:"/>
+                                            <div class="rowExpansion" style="leftalign">
+                                                <h:outputText id="selr-descr" escape="false" value="#{sessionBean.ceactionRequestForSubmission.requestDescription}"/>
+                                            </div>
+                                            
+                                        </f:facet>
+                                    </h:panelGrid>
                             
-                            <p>
-                                <h:outputText value="#{sessionBean.ceactionRequestForNewCaseAttachment.actionRequestorPerson.firstName}"/>
-                                <h:outputText value=ceactionRequestForNewCaseAttachmentngActionRequest.muni.muniName}"/>
-                                <h:outputText value="workingActionRequest.actionRequest.requestProperty.address}"/>
-                                <h:outputText value="workingActionRequest.actionRequest.requestDescription}"/>
-                                
-                                
-                            </p>
                             <h2>Submit to code enforcement officers</h2>
                             <p:commandButton 
                                 id="submitRequest" ajax="false"

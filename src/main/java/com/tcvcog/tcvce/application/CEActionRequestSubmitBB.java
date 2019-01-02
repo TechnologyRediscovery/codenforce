@@ -122,12 +122,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CaseCoordinator cc = getCaseCoordinator();
         cear = cc.getNewActionRequest();
         cear.setMuni(selectedMuni);
-        getSessionBean().setCeactionRequestForNewCaseAttachment(cear);
+        getSessionBean().setCeactionRequestForSubmission(cear);
         return "chooseProperty";
     }
     
     public String storePropertyInfo(){
-        if(getSessionBean().getCeactionRequestForNewCaseAttachment().getRequestProperty() == null){
+        if(getSessionBean().getCeactionRequestForSubmission().getRequestProperty() == null){
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                        "Please select a property from the list of search results to continue.", ""));
@@ -156,7 +156,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public String submitActionRequest() {
         
-        CEActionRequest req = getSessionBean().getCeactionRequestForNewCaseAttachment();
+        CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         
         int submittedActionRequestID;
@@ -167,7 +167,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForNewCaseAttachment().getActionRequestorPerson());
+        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForSubmission().getActionRequestorPerson());
         
         req.setPersonID(personID);
         
@@ -257,7 +257,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         currentPerson = new Person();
         currentPerson.setPersonType(submittingPersonType);
-        currentPerson.setMuniCode(getSessionBean().getCeactionRequestForNewCaseAttachment().getMuni().getMuniCode());
+        currentPerson.setMuniCode(getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
         
         currentPerson.setFirstName(form_requestorFName);
         currentPerson.setLastName(form_requestorLName);
@@ -282,7 +282,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // the insertion of this person will be timestamped
         // by the integrator class
         
-        getSessionBean().getCeactionRequestForNewCaseAttachment().setActionRequestorPerson(currentPerson);
+        getSessionBean().getCeactionRequestForSubmission().setActionRequestorPerson(currentPerson);
         
         return "reviewAndSubmit";
         
@@ -339,7 +339,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
-            propList = pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForNewCaseAttachment().getMuni().getMuniCode());
+            propList = pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));

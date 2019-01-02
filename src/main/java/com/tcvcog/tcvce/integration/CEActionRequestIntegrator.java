@@ -117,8 +117,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
                 + "	dateofrecord, addressofconcern, \n"
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
-                + "	cecase_caseid, coginternalnotes, status_id, \n"
-                + "	muniinternalnotes, publicexternalnotes,\n"
+                + "	cecase_caseid, coginternalnotes, status_id, caseattachmenttimestamp, \n"
+                + "	muniinternalnotes, publicexternalnotes, paccenabled, caseattachment_userid, \n"
                 + "	actionRqstIssueType.typeName AS typename\n"
                 + "	FROM public.ceactionrequest \n"
                 + "		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid"
@@ -270,9 +270,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         java.sql.Timestamp ts = rs.getTimestamp("caseattachmenttimestamp");
         if(ts != null){
             actionRequest.setCaseAttachmentTimeStamp(ts.toLocalDateTime());
+            actionRequest.setCaseAttachmentUser(ui.getUser(rs.getInt("caseattachment_userid")));
         }
-        actionRequest.setCaseAttachmentUser(ui.getUser(rs.getInt("caseattachment_userid")));
-        
         
         actionRequest.setAnonymitiyRequested(rs.getBoolean("anonymityRequested"));
 
