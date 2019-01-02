@@ -49,11 +49,9 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
     }
     
     public void searchForPersons(ActionEvent event){
+        System.out.println("PersonBB.searchForPersons");
         // clear past search results
         personList = null;
-        
-        
-        
     }
     
     public String viewPersonProfile(){
@@ -95,18 +93,23 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
      * @return the personList
      */
     public ArrayList<Person> getPersonList() {
+        
+        System.out.println("PersonBB.getPersonList");
         PersonIntegrator integrator = getPersonIntegrator();
         if(personList == null){
+            System.out.println("PersonBB.getPersonList | found Null person List");
 
             try {
                 personList = integrator.getPersonList(searchParams);
                 if(personList.isEmpty()){
+                    System.out.println("PersonBB.getPersonList | Emtpy list");
                     getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
                                 "Database search returned 0 Persons", 
                                 "Please try again, perhaps by removing some letters from your name text"));
 
                 } else {
+                    System.out.println("PersonBB.getPersonList | at least 1 in list");
                     getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
                                 "Database search returned "+ personList.size() + " Persons", ""));

@@ -70,7 +70,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             String s = "SELECT \n" +
                     "  person.personid, \n" +
-                    "  person.persontype, \n" +
+                    "  person.persontype AS persontype, \n" +
                     "  person.muni_municode, \n" +
                     "  person.fname, \n" +
                     "  person.lname, \n" +
@@ -110,7 +110,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, personId);
-            System.out.println("PersonIntegrator.getPerson | sql: " + s);
+//            System.out.println("PersonIntegrator.getPerson | sql: " + s);
 
             rs = stmt.executeQuery();
 
@@ -152,8 +152,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             newPerson.setPersonID(rs.getInt("personid"));
-            System.out.println("PersonIntegrator.generatePersonFromResultSet | person Type from db: " + rs.getString("personType"));
-            newPerson.setPersonType(PersonType.valueOf(rs.getString("personType")));
+//            System.out.println("PersonIntegrator.generatePersonFromResultSet | person Type from db: " + rs.getString("persontype"));
+            newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
             Municipality m = muniIntegrator.getMuniFromMuniCode(rs.getInt("muni_muniCode"));
             newPerson.setMuni(m);
             
@@ -207,6 +207,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generating person from ResultSet", ex);
         }
+        System.out.println("PersonIntegrator.generateNewPerson | generated person ID: " + newPerson.getPersonID());
         return newPerson;
     } // close method
 
@@ -223,7 +224,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      */
     public ArrayList<Person> getPersonList(SearchParamsPersons params) throws IntegrationException {
         Connection con = getPostgresCon();
-        ArrayList<Person> ll = new ArrayList<>();
+        ArrayList<Person> personAL = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
@@ -284,7 +285,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(1, params.getObjectID()); // and this is the only param after muni!
             }
             
-            System.out.println("PersonIntegrator.searchForPerson | sql: " + stmt.toString());
+            System.out.println("PersonIntegrator.getPersonList | search-logic-built sql: " + stmt.getParameterMetaData().toString());
             rs = stmt.executeQuery();
             
             int counter = 0;
@@ -300,7 +301,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
                 // note that rs.next() is called and the cursor
                 // is advanced to the first row in the rs
-                ll.add(generatePersonFromResultSet(rs));
+                personAL.add(getPerson(rs.getInt("personid")));
             }
 
         } catch (SQLException ex) {
@@ -313,7 +314,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return ll;
+        return personAL;
 
     } // close method
 
