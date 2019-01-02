@@ -148,6 +148,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * really only needs the categoryID for storing in the database
      * @param catID the categoryID of the EventCategory you want
      * @return an instantiated EventCategory object
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public EventCategory getInitiatlizedEventCategory(int catID) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();

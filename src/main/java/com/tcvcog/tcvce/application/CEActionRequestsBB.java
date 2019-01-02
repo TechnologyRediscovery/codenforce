@@ -110,7 +110,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         
 // This shelf will be checked by the case creation coordinator
         // and link the request to the new case so we don't lose track of it
-        getSessionBean().setCeactionRequestForNewCaseAttachment(selectedRequest);
+        getSessionBean().setCeactionRequestForSubmission(selectedRequest);
         
         return "addNewCase";
     }

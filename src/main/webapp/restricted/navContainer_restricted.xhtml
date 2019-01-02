@@ -225,7 +225,7 @@
                                     <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
                                         <f:converter converterId="muniConverter"/>
                                         <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                        <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                        <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                     </p:selectOneMenu>
                                     <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />

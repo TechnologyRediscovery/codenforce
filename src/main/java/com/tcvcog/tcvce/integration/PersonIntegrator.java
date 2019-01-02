@@ -114,7 +114,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
             rs = stmt.executeQuery();
 
-            if (rs.next()) {
+            while (rs.next()) {
                 // note that rs.next() is called and the cursor
                 // is advanced to the first row in the rs
                 person = generatePersonFromResultSet(rs);
@@ -128,6 +128,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
+        if(person!= null){
+            System.out.println("PersonIntegrator.getPerson | returned from getPerson: " + person.getPersonID());
+        } else {
+            System.out.println("PersonIntegrator.getPerson | null person sent back");
+        }
         return person;
     }
 
@@ -152,7 +157,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             newPerson.setPersonID(rs.getInt("personid"));
-//            System.out.println("PersonIntegrator.generatePersonFromResultSet | person Type from db: " + rs.getString("persontype"));
+            System.out.println("PersonIntegrator.generatePersonFromResultSet | person Type from db: " + rs.getString("persontype"));
             newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
             Municipality m = muniIntegrator.getMuniFromMuniCode(rs.getInt("muni_muniCode"));
             newPerson.setMuni(m);
@@ -296,12 +301,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 maxResults = Integer.MAX_VALUE;
             }
+            Person p;
+            int id;
             
             while (rs.next() && counter < maxResults ) {
-
-                // note that rs.next() is called and the cursor
-                // is advanced to the first row in the rs
-                personAL.add(getPerson(rs.getInt("personid")));
+                id=rs.getInt("personid");
+                System.out.println("PersonIntegrator.getPersonList | generated person: " + id);
+                p = getPerson(id);
+                personAL.add(p);
             }
 
         } catch (SQLException ex) {
@@ -382,11 +389,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 + "            personid, persontype, muni_municode, fname, lname, jobtitle, \n"
                 + "            phonecell, phonehome, phonework, email, address_street, address_city, \n"
                 + "            address_zip, address_state, notes, lastupdated, expirydate, isactive, \n"
-                + "            isunder18)\n"
+                + "            isunder18, sourceid)\n"
                 + "    VALUES (DEFAULT, CAST (? AS persontype), ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, now(), ?, ?, \n"
-                + "            ?);");
+                + "            ?, 9);");
 
         PreparedStatement stmt = null;
         try {
@@ -442,6 +449,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
+        System.out.println("PersonIntegrator.insertPerson  | returned ID " + lastID);
         return lastID;
 
     } // close insertPerson()
