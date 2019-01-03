@@ -5,4 +5,4 @@ postgres=#  CREATE DATABASE cogdb ENCODING 'UTF8'  LC_COLLATE = 'en_US.UTF-8'
 CREATE DATABASE
 
 -- Grant privileges to user:
-GRANT ALL PRIVILEGES ON DATABASE cogdb to sylvia;
+GRANT ALL PRIVILEGES ON DATABASE codb to sylvia;
