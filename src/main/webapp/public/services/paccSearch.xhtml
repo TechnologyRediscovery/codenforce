@@ -84,11 +84,12 @@
                                         <h:outputText value="You are attaching a note to bundle with a type: #{publicInfoBB.selectedBundle.typeName}"/>
                                         
                                         <p:spacer height="15px"/>
-                                        <p:inputTextarea style="width: 300px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                        <p:inputTextarea id="message-ita" style="width: 300px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
                                         <p:spacer height="15px"/>
                                         <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage}"
                                                          value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
-                                                         update="paccSearchMessages"/>
+                                                         update="paccSearchMessages
+                                                                messageForm:message-ita"/>
                                         <p>Please note that all messages submitted through this portal become part of the permanent case record
                                         and may be included in documents prepare for town councils and magistrates. </p>
                                     </h:form>

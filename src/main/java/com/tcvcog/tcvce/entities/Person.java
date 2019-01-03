@@ -55,18 +55,18 @@ public class Person implements Serializable{
     private String phoneWork;
     
     private String email;
-    private String address_street;
-    private String address_city;
+    private String addressStreet;
+    private String addressCity;
     
-    private String address_zip;
-    private String address_state;
+    private String addressZip;
+    private String addressState;
     private boolean addressOfResidence;
     
-    private String mailing_address_street;
-    private String mailing_address_city;
-    private String mailing_address_zip;
+    private String mailingAddressStreet;
+    private String mailingAddressCity;
+    private String mailingAddressZip;
     
-    private String mailing_address_state;
+    private String mailingAddressState;
     // postgres defaults this to true
     private boolean mailingSameAsResidence;
     private String notes;
@@ -156,45 +156,45 @@ public class Person implements Serializable{
     }
 
     /**
-     * @return the address_street
+     * @return the addressStreet
      */
-    public String getAddress_street() {
-        return address_street;
+    public String getAddressStreet() {
+        return addressStreet;
     }
 
     /**
-     * @param address_street the address_street to set
+     * @param addressStreet the addressStreet to set
      */
-    public void setAddress_street(String address_street) {
-        this.address_street = address_street;
+    public void setAddressStreet(String addressStreet) {
+        this.addressStreet = addressStreet;
     }
 
     /**
-     * @return the address_city
+     * @return the addressCity
      */
-    public String getAddress_city() {
-        return address_city;
+    public String getAddressCity() {
+        return addressCity;
     }
 
     /**
-     * @param address_city the address_city to set
+     * @param addressCity the addressCity to set
      */
-    public void setAddress_city(String address_city) {
-        this.address_city = address_city;
+    public void setAddressCity(String addressCity) {
+        this.addressCity = addressCity;
     }
 
     /**
-     * @return the address_zip
+     * @return the addressZip
      */
-    public String getAddress_zip() {
-        return address_zip;
+    public String getAddressZip() {
+        return addressZip;
     }
 
     /**
-     * @param address_zip the address_zip to set
+     * @param addressZip the addressZip to set
      */
-    public void setAddress_zip(String address_zip) {
-        this.address_zip = address_zip;
+    public void setAddressZip(String addressZip) {
+        this.addressZip = addressZip;
     }
 
     /**
@@ -240,17 +240,17 @@ public class Person implements Serializable{
     }
 
     /**
-     * @return the address_state
+     * @return the addressState
      */
-    public String getAddress_state() {
-        return address_state;
+    public String getAddressState() {
+        return addressState;
     }
 
     /**
-     * @param address_state the address_state to set
+     * @param addressState the addressState to set
      */
-    public void setAddress_state(String address_state) {
-        this.address_state = address_state;
+    public void setAddressState(String addressState) {
+        this.addressState = addressState;
     }
 
     /**
@@ -407,31 +407,31 @@ public class Person implements Serializable{
     }
 
     /**
-     * @return the mailing_address_street
+     * @return the mailingAddressStreet
      */
-    public String getMailing_address_street() {
-        return mailing_address_street;
+    public String getMailingAddressStreet() {
+        return mailingAddressStreet;
     }
 
     /**
-     * @return the mailing_address_city
+     * @return the mailingAddressCity
      */
-    public String getMailing_address_city() {
-        return mailing_address_city;
+    public String getMailingAddressCity() {
+        return mailingAddressCity;
     }
 
     /**
-     * @return the mailing_address_zip
+     * @return the mailingAddressZip
      */
-    public String getMailing_address_zip() {
-        return mailing_address_zip;
+    public String getMailingAddressZip() {
+        return mailingAddressZip;
     }
 
     /**
-     * @return the mailing_address_state
+     * @return the mailingAddressState
      */
-    public String getMailing_address_state() {
-        return mailing_address_state;
+    public String getMailingAddressState() {
+        return mailingAddressState;
     }
 
     /**
@@ -486,31 +486,31 @@ public class Person implements Serializable{
     }
 
     /**
-     * @param mailing_address_street the mailing_address_street to set
+     * @param mailingAddressStreet the mailingAddressStreet to set
      */
-    public void setMailing_address_street(String mailing_address_street) {
-        this.mailing_address_street = mailing_address_street;
+    public void setMailingAddressStreet(String mailingAddressStreet) {
+        this.mailingAddressStreet = mailingAddressStreet;
     }
 
     /**
-     * @param mailing_address_city the mailing_address_city to set
+     * @param mailingAddressCity the mailingAddressCity to set
      */
-    public void setMailing_address_city(String mailing_address_city) {
-        this.mailing_address_city = mailing_address_city;
+    public void setMailingAddressCity(String mailingAddressCity) {
+        this.mailingAddressCity = mailingAddressCity;
     }
 
     /**
-     * @param mailing_address_zip the mailing_address_zip to set
+     * @param mailingAddressZip the mailingAddressZip to set
      */
-    public void setMailing_address_zip(String mailing_address_zip) {
-        this.mailing_address_zip = mailing_address_zip;
+    public void setMailingAddressZip(String mailingAddressZip) {
+        this.mailingAddressZip = mailingAddressZip;
     }
 
     /**
-     * @param mailing_address_state the mailing_address_state to set
+     * @param mailingAddressState the mailingAddressState to set
      */
-    public void setMailing_address_state(String mailing_address_state) {
-        this.mailing_address_state = mailing_address_state;
+    public void setMailingAddressState(String mailingAddressState) {
+        this.mailingAddressState = mailingAddressState;
     }
 
     /**

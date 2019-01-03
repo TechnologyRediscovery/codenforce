@@ -70,9 +70,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeElement activeCodeElement;
     
     /* *** Code Enf Action Request Session Shelves ***  */
-    private CEActionRequest cEActionRequest;
+    
     // temporary
     private CEActionRequest ceactionRequestForSubmission;
+    private CEActionRequest activeRequest;
     private List<CEActionRequest> cEActionRequestList;
     
     private EventCECase complianceTimeframeClosingEvent;
@@ -148,12 +149,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         return activeNotice;
     }
 
-    /**
-     * @return the cEActionRequest
-     */
-    public CEActionRequest getcEActionRequest() {
-        return cEActionRequest;
-    }
+    
 
     /**
      * @return the activeCodeSet
@@ -233,12 +229,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.activeNotice = activeNotice;
     }
 
-    /**
-     * @param cEActionRequest the cEActionRequest to set
-     */
-    public void setcEActionRequest(CEActionRequest cEActionRequest) {
-        this.cEActionRequest = cEActionRequest;
-    }
+ 
 
     /**
      * @param activeCodeSet the activeCodeSet to set
@@ -491,6 +482,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setAvailableMuniList(List<Municipality> availableMuniList) {
         this.availableMuniList = availableMuniList;
+    }
+
+    /**
+     * @return the activeRequest
+     */
+    public CEActionRequest getActiveRequest() {
+        return activeRequest;
+    }
+
+    /**
+     * @param activeRequest the activeRequest to set
+     */
+    public void setActiveRequest(CEActionRequest activeRequest) {
+        this.activeRequest = activeRequest;
     }
     
 }

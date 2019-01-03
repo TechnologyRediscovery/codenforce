@@ -68,7 +68,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.attachMessageToCEActionRequest | Integration Error: Unable to retrieve action request", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

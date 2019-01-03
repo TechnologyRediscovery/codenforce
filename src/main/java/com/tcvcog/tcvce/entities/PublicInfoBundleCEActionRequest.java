@@ -47,6 +47,12 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         sb.append("<br/>");
         
         sb.append("<span class=\"bold\">");
+        sb.append("PACC status message: ");
+        sb.append("</span>");
+        sb.append(getPaccStatusMessage());
+        sb.append("<br/>");
+        
+        sb.append("<span class=\"bold\">");
         sb.append("Municipality: ");
         sb.append("</span>");
         sb.append(getMuni().getMuniName());
@@ -61,6 +67,13 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         sb.append("<br/>");
         sb.append(getMuni().getPhone());
         sb.append("<br/>");
+        
+        sb.append("<span class=\"bold\">");
+        sb.append("Action Request Status: ");
+        sb.append("</span>");
+        sb.append(requestStatus.statusTitle);
+        sb.append("<br/>");
+        
         
         
         sb.append("<span class=\"bold\">");
@@ -108,11 +121,6 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         sb.append(formattedSubmittedTimeStamp);
         sb.append("<br/>");
         
-        sb.append("<span class=\"bold\">");
-        sb.append("Action Request Status: ");
-        sb.append("</span>");
-        sb.append(requestStatus);
-        sb.append("<br/>");
         
         sb.append("<span class=\"bold\">");
         sb.append("Requestor name: ");
