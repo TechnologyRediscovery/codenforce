@@ -143,41 +143,50 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         
         pib.setRequestID(req.getRequestID());
         pib.setPacc(req.getRequestPublicCC());
-
-        pib.setPaccStatusMessage("Public access enabled");
-        pib.setAddressAssociated(!req.getNotAtAddress());
-        if(!req.getNotAtAddress()){
-            pib.setPropertyAddress(req.getRequestProperty().getAddress());
-        }
-        
+        pib.setDateOfRecord(getPrettyDate(req.getDateOfRecord()));
         pib.setMuni(req.getMuni());
-        
-        // there's no case manager to attach to an unlinked action request
-        
-        
-        // TODO: populate from text file
-        pib.setTypeName("CEAR");
-        
-        pib.setActionRequestorFLname(req.getActionRequestorPerson().getFirstName() 
-                                    + " " + req.getActionRequestorPerson().getLastName());
-        
-        pib.setIssueTypeString(req.getIssueTypeString());
-        
-        if(req.getCaseID() == 0){
-            pib.setCaseLinkStatus("Request not linked to a code enforcement case");
-            pib.setLinkedToCase(false);
+
+        if(req.isPaccEnabled()){
+            
+            pib.setPaccStatusMessage("Public access enabled");
+            pib.setAddressAssociated(!req.getNotAtAddress());
+            if(!req.getNotAtAddress()){
+                pib.setPropertyAddress(req.getRequestProperty().getAddress());
+            }
+
+
+            // there's no case manager to attach to an unlinked action request
+
+
+            // TODO: populate from text file
+            pib.setTypeName("Code enforcement action request");
+
+            pib.setActionRequestorFLname(req.getActionRequestorPerson().getFirstName() 
+                                        + " " + req.getActionRequestorPerson().getLastName());
+
+            pib.setIssueTypeString(req.getIssueTypeString());
+
+            if(req.getCaseID() == 0){
+                pib.setCaseLinkStatus("Request not linked to a code enforcement case");
+                pib.setLinkedToCase(false);
+            }
+            else{
+                pib.setCaseLinkStatus("Connected to case ID " + String.valueOf(req.getCaseID()));
+                pib.setLinkedToCase(true);
+            }
+
+            pib.setFormattedSubmittedTimeStamp(req.getFormattedSubmittedTimeStamp());
+            pib.setRequestDescription(req.getRequestDescription());
+            pib.setPublicExternalNotes(req.getPublicExternalNotes());
+            pib.setRequestStatus(req.getRequestStatus());
+
+            pib.setShowAddMessageButton(true);
+            pib.setShowDetailsPageButton(false);
+        } else {
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office at " + req.getMuni().getPhone());
+            
         }
-        else{
-            pib.setCaseLinkStatus("Connected to case ID " + String.valueOf(req.getCaseID()));
-            pib.setLinkedToCase(true);
-        }
-        
-        pib.setFormattedSubmittedTimeStamp(req.getFormattedSubmittedTimeStamp());
-        pib.setRequestDescription(req.getRequestDescription());
-        pib.setPublicExternalNotes(req.getPublicExternalNotes());
-        
-        pib.setShowAddMessageButton(true);
-        pib.setShowDetailsPageButton(false);
         
         return pib;
         
@@ -190,16 +199,18 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         System.out.println("PublicInfoCoordinator.attachmessagToBundle: In coordinator");
         
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        if(bundle.getTypeName().equals("CEAR")){
+        if(bundle.getTypeName().equals("Code enforcement action request")){
             requestBundle = (PublicInfoBundleCEActionRequest) bundle;
             StringBuilder sb = new StringBuilder();
             sb.append(requestBundle.getPublicExternalNotes());
             sb.append("<br/><br/>");
-            sb.append("PUBLIC CASE NOTE ADDED AT ");
+            sb.append("CASE NOTE ADDED AT ");
             sb.append(current.toString());
-            sb.append("<br/><br/>");
+            sb.append("by public user: <br/>");
             sb.append(message);
-            sb.append("<br/><br/>");
+            sb.append("<br/>");
+            sb.append("***********************");
+            
             System.out.println("PublicInfoCoordinator.attachmessagToBundle | message: " + sb.toString());
             ceari.attachMessageToCEActionRequest(requestBundle, sb.toString());
         } else if(bundle.getTypeName().equals("CECASE")){

@@ -87,11 +87,11 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         p.setPhoneWork(formPhoneWork);
         
         p.setEmail(formEmail);
-        p.setAddress_street(formAddress_street);
-        p.setAddress_city(formAddress_city);
+        p.setAddressStreet(formAddress_street);
+        p.setAddressCity(formAddress_city);
         
-        p.setAddress_state(formAddress_state);
-        p.setAddress_zip(formAddress_zip);
+        p.setAddressState(formAddress_state);
+        p.setAddressZip(formAddress_zip);
         p.setNotes(formNotes);
         
         // placeholder for lastupdated

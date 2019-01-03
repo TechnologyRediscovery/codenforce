@@ -99,11 +99,11 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
         p.setPhoneWork(formPhoneWork);
         
         p.setEmail(formEmail);
-        p.setAddress_street(formAddress_street);
-        p.setAddress_city(formAddress_city);
+        p.setAddressStreet(formAddress_street);
+        p.setAddressCity(formAddress_city);
         
-        p.setAddress_zip(formAddress_zip);
-        p.setAddress_state(formAddress_state);
+        p.setAddressZip(formAddress_zip);
+        p.setAddressState(formAddress_state);
         p.setNotes(formNotes);
         
         //integrator sets lastUpdated
@@ -218,7 +218,7 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formAddress_street
      */
     public String getFormAddress_street() {
-        formAddress_street = currentPerson.getAddress_street();
+        formAddress_street = currentPerson.getAddressStreet();
         return formAddress_street;
     }
 
@@ -226,7 +226,7 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formAddress_city
      */
     public String getFormAddress_city() {
-        formAddress_city = currentPerson.getAddress_city();
+        formAddress_city = currentPerson.getAddressCity();
         return formAddress_city;
     }
 
@@ -234,7 +234,7 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formAddress_state
      */
     public String getFormAddress_state() {
-        formAddress_state = currentPerson.getAddress_state();
+        formAddress_state = currentPerson.getAddressState();
         return formAddress_state;
     }
 
@@ -242,7 +242,7 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formAddress_zip
      */
     public String getFormAddress_zip() {
-        formAddress_zip = currentPerson.getAddress_zip();
+        formAddress_zip = currentPerson.getAddressZip();
         return formAddress_zip;
     }
 

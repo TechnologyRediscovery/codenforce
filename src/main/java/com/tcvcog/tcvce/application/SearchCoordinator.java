@@ -46,7 +46,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             
             // action requests cannot have a time stamp past the current datetime
             sps.setEndDate(LocalDateTime.now());
-            
+
             sps.setUseAttachedToCase(true);
             sps.setAttachedToCase(false);
             sps.setUseMarkedUrgent(false);
@@ -56,20 +56,4 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return sps;
     }
     
-    public SearchParamsPersons getDefaultSearchParamsPersons(){
-        SearchParamsPersons spp = new SearchParamsPersons();
-        spp.setMuni(getSessionBean().getActiveMuni());
-        spp.setFilterByStartEndDate(false);
-        spp.setFilterByFirstName(false);
-        spp.setFilterByLastName(true);
-        spp.setOnlySearchBlobs(false);
-        spp.setFilterByPersonTypes(false);
-        spp.setFilterByEmail(false);
-        spp.setFilterByAddressStreet(false);
-        spp.setFilterByActiveSwitch(false);
-        spp.setFilterByVerifiedSwitch(false);
-       
-        return spp;
-        
-    }
 }

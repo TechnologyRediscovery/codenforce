@@ -32,8 +32,8 @@ public class SearchParams implements Serializable{
     private java.sql.Timestamp startDateSQLDate;
     private java.sql.Timestamp endDateSQLDate;
     
-    private int keySearch;
-    private boolean useKeySearch;
+    private int objectID;
+    private boolean filterByObjectID;
     
     private boolean limitResultCountTo100;
     
@@ -179,31 +179,31 @@ public class SearchParams implements Serializable{
     }
 
     /**
-     * @return the keySearch
+     * @return the objectID
      */
-    public int getKeySearch() {
-        return keySearch;
+    public int getObjectID() {
+        return objectID;
     }
 
     /**
-     * @param keySearch the keySearch to set
+     * @param objectID the objectID to set
      */
-    public void setKeySearch(int keySearch) {
-        this.keySearch = keySearch;
+    public void setObjectID(int objectID) {
+        this.objectID = objectID;
     }
 
     /**
-     * @return the useKeySearch
+     * @return the filterByObjectID
      */
-    public boolean isUseKeySearch() {
-        return useKeySearch;
+    public boolean isFilterByObjectID() {
+        return filterByObjectID;
     }
 
     /**
-     * @param useKeySearch the useKeySearch to set
+     * @param filterByObjectID the filterByObjectID to set
      */
-    public void setUseKeySearch(boolean useKeySearch) {
-        this.useKeySearch = useKeySearch;
+    public void setFilterByObjectID(boolean filterByObjectID) {
+        this.filterByObjectID = filterByObjectID;
     }
 
     

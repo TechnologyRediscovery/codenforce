@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
@@ -100,6 +101,7 @@ public class BackingBeanUtils implements Serializable{
     private PropertyIntegrator propertyIntegrator;
     private CEActionRequestIntegrator cEActionRequestIntegrator;
     private PublicInfoCoordinator publicInfoCoordinator;
+    private PersonCoordinator personCoordinator;
     
     private ChecklistIntegrator checklistIntegrator;
     private OccupancyInspectionIntegrator occupancyInspectionIntegrator;
@@ -226,7 +228,7 @@ public class BackingBeanUtils implements Serializable{
         sb.append(" at ");
         sb.append(getPrettyDate(LocalDateTime.now()));
         sb.append("<br/>");
-        sb.append("<<<<<<<<<<<<<<<<<<<<<<<<<<<<br/>");
+        sb.append("**************************************<br/>");
         return sb.toString();
     }
     
@@ -771,6 +773,25 @@ public class BackingBeanUtils implements Serializable{
      */
     public void setImageServices(ImageServices imageServices) {
         this.imageServices = imageServices;
+    }
+
+    /**
+     * @return the personCoordinator
+     */
+    public PersonCoordinator getPersonCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{personCoordinator}", PersonCoordinator.class);
+        personCoordinator = (PersonCoordinator) ve.getValue(context.getELContext());
+        
+        return personCoordinator;
+    }
+
+    /**
+     * @param personCoordinator the personCoordinator to set
+     */
+    public void setPersonCoordinator(PersonCoordinator personCoordinator) {
+        this.personCoordinator = personCoordinator;
     }
 
        

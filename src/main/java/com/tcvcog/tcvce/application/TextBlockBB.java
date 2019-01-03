@@ -42,7 +42,6 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     
     private HashMap<String, Integer> categoryList;
     
-    private ArrayList<Municipality> muniListObj;
     private Municipality formMuni;
     
     private String formBlockName;
@@ -257,25 +256,6 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
         this.formMuni = formMuni;
     }
 
-    /**
-     * @return the muniListObj
-     */
-    public ArrayList<Municipality> getMuniListObj() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            muniListObj = mi.getCompleteMuniList();
-            System.out.println("TextBlockBB.getMuniListObj | list size: " + muniListObj.size());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return muniListObj;
-    }
-
-    /**
-     * @param muniListObj the muniListObj to set
-     */
-    public void setMuniListObj(ArrayList<Municipality> muniListObj) {
-        this.muniListObj = muniListObj;
-    }
+ 
     
 }

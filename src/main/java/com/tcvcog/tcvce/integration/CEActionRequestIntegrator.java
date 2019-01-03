@@ -68,7 +68,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve action request", ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.attachMessageToCEActionRequest | Integration Error: Unable to retrieve action request", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -117,8 +117,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
                 + "	dateofrecord, addressofconcern, \n"
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
-                + "	cecase_caseid, coginternalnotes, status_id, \n"
-                + "	muniinternalnotes, publicexternalnotes,\n"
+                + "	cecase_caseid, coginternalnotes, status_id, caseattachmenttimestamp, \n"
+                + "	muniinternalnotes, publicexternalnotes, paccenabled, caseattachment_userid, \n"
                 + "	actionRqstIssueType.typeName AS typename\n"
                 + "	FROM public.ceactionrequest \n"
                 + "		INNER JOIN actionrqstissuetype ON ceactionrequest.issuetype_issuetypeid = actionRqstIssueType.issuetypeid"
@@ -270,9 +270,8 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         java.sql.Timestamp ts = rs.getTimestamp("caseattachmenttimestamp");
         if(ts != null){
             actionRequest.setCaseAttachmentTimeStamp(ts.toLocalDateTime());
+            actionRequest.setCaseAttachmentUser(ui.getUser(rs.getInt("caseattachment_userid")));
         }
-        actionRequest.setCaseAttachmentUser(ui.getUser(rs.getInt("caseattachment_userid")));
-        
         
         actionRequest.setAnonymitiyRequested(rs.getBoolean("anonymityRequested"));
 
@@ -455,6 +454,34 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setInt(1, req.getRequestProperty().getPropertyID());
             stmt.setInt(2, req.getRequestID());
             System.out.println("CEActionRequestorIntegrator.updateActionRequestProperty | statement: " + stmt.toString());
+            // Retrieve action data from postgres
+            stmt.executeUpdate();
+
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Integration Error: Unable to update action request", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
+    
+    public void updateActionRequestor(CEActionRequest req) throws IntegrationException {
+
+        String q = "UPDATE ceactionrequest SET actrequestor_requestorid = ? WHERE requestid = ?;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(q);
+            stmt.setInt(1, req.getActionRequestorPerson().getPersonID());
+            stmt.setInt(2, req.getRequestID());
+            System.out.println("CEActionRequestorIntegrator.updateActionRequestor| statement: " + stmt.toString());
             // Retrieve action data from postgres
             stmt.executeUpdate();
 

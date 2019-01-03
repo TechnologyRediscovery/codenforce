@@ -57,6 +57,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** System Core Objects Session Shelves ***  */
     private User utilityUserToUpdate;
     private Municipality activeMuni;
+    private List<Municipality> availableMuniList;
     
     private Property activeProp;
     private Person activePerson;
@@ -69,9 +70,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeElement activeCodeElement;
     
     /* *** Code Enf Action Request Session Shelves ***  */
-    private CEActionRequest cEActionRequest;
+    
     // temporary
-    private CEActionRequest ceactionRequestForNewCaseAttachment;
+    private CEActionRequest ceactionRequestForSubmission;
+    private CEActionRequest activeRequest;
     private List<CEActionRequest> cEActionRequestList;
     
     private EventCECase complianceTimeframeClosingEvent;
@@ -147,12 +149,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         return activeNotice;
     }
 
-    /**
-     * @return the cEActionRequest
-     */
-    public CEActionRequest getcEActionRequest() {
-        return cEActionRequest;
-    }
+    
 
     /**
      * @return the activeCodeSet
@@ -232,12 +229,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.activeNotice = activeNotice;
     }
 
-    /**
-     * @param cEActionRequest the cEActionRequest to set
-     */
-    public void setcEActionRequest(CEActionRequest cEActionRequest) {
-        this.cEActionRequest = cEActionRequest;
-    }
+ 
 
     /**
      * @param activeCodeSet the activeCodeSet to set
@@ -465,17 +457,45 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the ceactionRequestForNewCaseAttachment
+     * @return the ceactionRequestForSubmission
      */
-    public CEActionRequest getCeactionRequestForNewCaseAttachment() {
-        return ceactionRequestForNewCaseAttachment;
+    public CEActionRequest getCeactionRequestForSubmission() {
+        return ceactionRequestForSubmission;
     }
 
     /**
-     * @param ceactionRequestForNewCaseAttachment the ceactionRequestForNewCaseAttachment to set
+     * @param ceactionRequestForSubmission the ceactionRequestForSubmission to set
      */
-    public void setCeactionRequestForNewCaseAttachment(CEActionRequest ceactionRequestForNewCaseAttachment) {
-        this.ceactionRequestForNewCaseAttachment = ceactionRequestForNewCaseAttachment;
+    public void setCeactionRequestForSubmission(CEActionRequest ceactionRequestForSubmission) {
+        this.ceactionRequestForSubmission = ceactionRequestForSubmission;
+    }
+
+    /**
+     * @return the availableMuniList
+     */
+    public List<Municipality> getAvailableMuniList() {
+        return availableMuniList;
+    }
+
+    /**
+     * @param availableMuniList the availableMuniList to set
+     */
+    public void setAvailableMuniList(List<Municipality> availableMuniList) {
+        this.availableMuniList = availableMuniList;
+    }
+
+    /**
+     * @return the activeRequest
+     */
+    public CEActionRequest getActiveRequest() {
+        return activeRequest;
+    }
+
+    /**
+     * @param activeRequest the activeRequest to set
+     */
+    public void setActiveRequest(CEActionRequest activeRequest) {
+        this.activeRequest = activeRequest;
     }
     
 }

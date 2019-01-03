@@ -34,9 +34,9 @@
                                     <h3>Results below show all unattached action requests. Use advanced search options to specify a different result set.</h3>
 
                                     <p:fieldset legend="Advanced search options"
-                                                toggleable="true" collapsed="true" style="background-color: white;">
+                                                toggleable="true" collapsed="true" style="background-color: white; back">
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd, gridTd">
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back">
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query start date "/>
@@ -404,10 +404,10 @@
 
                                                 <h:outputText id="selr-pers-fn" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.firstName} "/> 
                                                 <h:outputText id="selr-pers-ln" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.lastName}"/><br/> 
-                                                <h:outputText id="selr-pers-str" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.address_street}"/> <br/>
-                                                <h:outputText id="selr-pers-city" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.address_city}, "/> 
-                                                <h:outputText id="selr-pers-state" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.address_state} "/> 
-                                                <h:outputText id="selr-pers-zip" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.address_zip}"/> 
+                                                <h:outputText id="selr-pers-str" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.addressStreet}"/> <br/>
+                                                <h:outputText id="selr-pers-city" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.addressCity}, "/> 
+                                                <h:outputText id="selr-pers-state" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.addressState} "/> 
+                                                <h:outputText id="selr-pers-zip" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.addressZip}"/> 
                                             </div>
                                             
                                             <p:spacer height="5px"/>
@@ -674,7 +674,7 @@
                                              value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
                                 <f:converter converterId="muniConverter"/>
                                 <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
-                                <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                             </p:selectOneMenu>
 
                                 <p:panelGrid columns="3" layout="grid">
@@ -739,14 +739,11 @@
                                             </p:column>
 
                                             <p:column>
-
                                                 <f:facet name="header">
                                                     <h:outputText value="Type" />
                                                 </f:facet>
                                                 <h:outputText value="#{prop.propertyUseType}"/>
-
                                             </p:column>
-
                                         </p:dataTable>
 
                                         <p:spacer height="10px"/>
@@ -769,390 +766,351 @@
                         </p:confirmDialog>
                         
                         
-                        <p:confirmDialog message="Change requestor person" 
-                                         severity="alert" widgetVar="change-person-dialog"
-                                         closable="true"
-                                         rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
-
+                        <p:dialog       height="650" width="700"
+                                        widgetVar="change-person-dialog"
+                                        closable="true" 
+                                        rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
                             
                             <h3>Search for a different person</h3>
                             
                             <h:form id="change-person-form">
+                                  
+                                <h:messages id="person-search-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
                                 
-                                 
-                            <h:panelGrid columns="3" cellpadding="5" border="0" frame="false">
                                 
-                                    <h:panelGroup id="fname">
+                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back">
 
-                                        <p:outputLabel for="formFirstName">
+                                    <h:panelGroup>
+                                        <p:outputLabel for="muniSelectMenu-person">
+                                            <h:outputText value="Municipality:"/>
+                                        </p:outputLabel>
+
+                                            <p:selectOneMenu id="muniSelectMenu-person" 
+                                                             tabindex="1" 
+                                                             value="#{personBB.searchParams.muni}">
+                                                <f:converter converterId="muniConverter"/>
+                                                <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
+                                                <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                            </p:selectOneMenu>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup class="spacer"></h:panelGroup>    
+                                    
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="filter-by-fname-ol" for="filter-by-fname-cb" value="Filter by first name?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="filter-by-fname-cb" value="#{personBB.searchParams.filterByFirstName}" />
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <p:outputLabel for="formFirstName-person">
                                             <h:outputText value="First Name"/>
                                         </p:outputLabel>
-                                        <p:inputText id="formFirstName" value="#{personBB.formFName}" 
+                                        <p:inputText id="formFirstName-person" value="#{personBB.searchParams.firstNameSS}" 
                                               style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
-                                        <h:message for="formFirstName" showDetail="false" showSummary="true" 
+                                        <h:message for="formFirstName-person" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
 
-                                    <h:panelGroup id="lname">
-
-                                        <p:outputLabel for="formLastName">
+                                    <h:panelGroup>
+                                        <p:outputLabel id="filter-by-lname-ol" for="filter-by-lname-cb" value="Filter by last name?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="filter-by-lname-cb" value="#{personBB.searchParams.filterByLastName}" />
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup id="lname-person-person">
+                                        <p:outputLabel for="formLastName-person">
                                             <h:outputText value="Last Name"/>
                                         </p:outputLabel>
-                                        <p:inputText id="formLastName" value="#{personBB.formLName}" 
-                                              style="width: 200px;" tabindex="2" required="false" styleClass="inputText"/>
-                                        <h:message for="formLastName" showDetail="false" showSummary="true" 
+                                        <p:inputText id="formLastName-person" value="#{personBB.searchParams.lastNameSS}" 
+                                              style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
+                                        <h:message for="formLastName-person" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
                                     </h:panelGroup>
 
-                                    <h:panelGroup id="nameSearch"> 
-                                        <p:commandButton ajax="false" value="Search by Name" tabindex="3"
-                                                         actionListener="#{personBB.searchForPersonByName}"/>
-                                    </h:panelGroup>
 
+                                    <h:panelGroup>
+                                        <p:outputLabel id="filter-by-personid-ol" for="filter-by-personid-cb" value="Filter by person ID?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="filter-by-personid-cb" value="#{personBB.searchParams.filterByObjectID}" />
+                                    </h:panelGroup>
+                                    
+                                    
+                                    
                                     <h:panelGroup id="personID">
-
                                         <p:outputLabel for="formPersonID">
                                             <h:outputText value="Person ID number"/>
                                         </p:outputLabel>
-                                        <p:inputText id="formPersonID" value="#{personBB.formPersonID}" 
+                                        <p:inputText id="formPersonID" value="#{personBB.searchParams.objectID}" 
                                               style="width: 25%;" tabindex="3" required="true" styleClass="inputText"/>
                                         <h:message for="formPersonID" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-
                                     </h:panelGroup>
-                                    <h:panelGroup id="spacer">
-                                        <!--spacer-->
-                                    </h:panelGroup>
-
-                                    <h:panelGroup id="searchByID">
-
-                                        <p:commandButton ajax="false" value="Search by ID Number" 
-                                                         disabled="true" actionListener="#{personBB.searchForPersonByID}"/>
-
-                                </h:panelGroup>
-                            </h:panelGrid>
-
-
-                            <p:spacer height="15"/>
-                            <hr/>
-                            <p:spacer height="15"/>
-
-                            <h2>Search Results</h2>
-                            
-                            <p:dataTable
-                            id="personTable"
-                            var="p"
-                            value="#{personBB.personList}"
-                            selectionMode="single"
-                            selection="#{personBB.selectedPerson}"
-                            rowKey="#{p.personID}"
-                            tableStyleClass="primeDataTable"
-                            scrollable="true"
-                            scrollHeight="300"
-                            rowExpandMode="single"
-                            expandedRow="false"
-                            filteredValue="#{personBB.filteredPersonList}"
-                            widgetVar="personSelectListTable">
-                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+                                </h:panelGrid>
                                 
-                                <p:column width="3%">
+                                <p:commandButton
+                                            value="Search for Persons" tabindex="4" ajax="true" icon="fa fa-search"
+                                            actionListener="#{personBB.searchForPersons}" 
+                                            update=    "change-person-form:filter-by-personid-cb
+                                                        change-person-form:formPersonID
+                                                        change-person-form:filter-by-fname-cb
+                                                        change-person-form:formFirstName-person
+                                                        change-person-form:filter-by-lname-cb
+                                                        change-person-form:formLastName-person
+                                                        change-person-form:muniSelectMenu-person
+                                                        change-person-form:personTable
+                                                        change-person-form:person-search-messages
+                                                        "/>
+                                <h3>Chosen Person:</h3>
+                                <h:outputText id="confirm-person-ot" value="ID #{cEActionRequestsBB.selectedPersonForAttachment.personID}: 
+                                              #{cEActionRequestsBB.selectedPersonForAttachment.lastName} "/>
+
+
+
+                                <p:commandButton value="Assign request to selected person"
+                                                 actionListener="#{cEActionRequestsBB.updateRequestor}"
+                                                 disabled="#{!sessionBean.accessKeyCard.hasCOGStaffPermissions}"
+                                                 update="   msgForm:ceActionRequestsMessages
+                                                            req-details-form:selr-persontype
+                                                            req-details-form:selr-pers-fn
+                                                            req-details-form:selr-pers-ln
+                                                            req-details-form:selr-pers-str
+                                                            req-details-form:selr-pers-city
+                                                            req-details-form:selr-pers-state
+                                                            req-details-form:selr-pers-zip
+                                                            req-details-form:selr-pers-phone-cell
+                                                            req-details-form:selr-pers-phone-work
+                                                            req-details-form:selr-pers-phone-home
+                                                            req-details-form:selr-pers-email"
+                                                 oncomplete="PF('change-person-dialog').hide()"/>
+                                
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('change-person-dialog').hide()"/>
+                                <hr/>
+
+
+                                <h2>Search Results</h2>
+
+                                <p:dataTable
+                                id="personTable"
+                                var="p"
+                                value="#{personBB.personList}"
+                                rowKey="#{p.personID}"
+                                tableStyleClass="primeDataTable"
+                                scrollable="true"
+                                scrollHeight="300"
+                                rowExpandMode="single"
+                                expandedRow="false"
+                                filteredValue="#{personBB.filteredPersonList}"
+                                widgetVar="personSelectListTable">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="3%">
                                         <f:facet name="header">
                                             <h:outputText value="Exp"/>
                                         </f:facet>
                                         <p:rowToggler/>
                                     </p:column>
                                     <p:column width="8%">
-                                    <f:facet name="header">
-                                        <h:outputText value="ID" />
-                                    </f:facet>
-                                    <h:outputText value="#{p.personID}"/>
-                                </p:column>
-                                
-                                <p:column width="10%" sortBy="#{p.personType.label}"
-                                          filterBy="#{p.personType.label}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Person Type" />
-                                    </f:facet>
-                                    <h:outputText value="#{p.personType.label}"/>
-                                </p:column>
-                                
-                                <p:column width="10%" sortBy="#{p.muni.muniName}"
-                                          filterBy="#{p.muni.muniName}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Municipality" />
-                                    </f:facet>
-                                    <h:outputText value="#{p.muni.muniName}"/>
-                                </p:column>
-                                
-                                <p:column width="10%" sortBy="#{p.firstName}"
-                                          filterBy="#{p.firstName}">
-                                    <f:facet name="header">
-                                        <h:outputText value="First" />
-                                    </f:facet>
-                                    <h:outputText value="#{p.firstName}"/>
-                                </p:column>
-                                
-                                <p:column width="15%" filterBy="#{p.lastName}"
-                                          sortBy="#{p.lastName}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Last" />
-                                    </f:facet>
-                                    <h:outputText value="#{p.lastName}"/>
-                                </p:column>
-                                
-                                <p:column sortBy="#{p.address_street}"
-                                          filterBy="#{p.address_street}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Address" />
-                                    </f:facet>
-                                    <h:outputText escape="false" value="#{p.address_street}"/>
-                                    <p:spacer height="5px"/>
-                                    <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
-                                </p:column>
-                                
-                                
-                                <p:rowExpansion>
-                                    <div class="outlinedBox">
-                                        
-                                    <h2>Full person listing for <h:outputText value="#{p.firstName} #{p.lastName}"/> </h2>
-                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="First Name"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.firstName}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Last Name"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.lastName}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Muni"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.muni.muniName}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Type"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.personType.label}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Job Title"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.jobTitle}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Email"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.email}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Address"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText escape="false" value="#{p.address_street}"/>
-                                                <p:spacer height="5px"/>
-                                                <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Under 19"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.under18}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Active?"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.active}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Last Updated"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.lastUpdated}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Expires"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.expiryDate.toString}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Phone home"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.phoneHome}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Phone work"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.phoneWork}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Phone cell"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{p.phoneCell}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <f:facet name="footer">
-                                            <h:outputLabel styleClass="bold" value="Person notes"/>
-                                            <p:spacer height="15px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText escape="false" value="#{p.notes}"/>
-                                            </div>
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
                                         </f:facet>
-                                    </h:panelGrid>
-                                    </div>
-                                </p:rowExpansion>
-                            </p:dataTable>
-                            
-                                
-                                
-                                
-                            <p:selectOneMenu id="muniSelectMenu" 
-                                             tabindex="1" 
-                                             value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
-                                <f:converter converterId="muniConverter"/>
-                                <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
-                                <f:selectItems id="muniNameList" value="#{missionControlBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                            </p:selectOneMenu>
+                                        <h:outputText value="#{p.personID}"/>
+                                    </p:column>
 
-                                <p:panelGrid columns="3" layout="grid">
+                                    <p:column width="10%" sortBy="#{p.personType.label}"
+                                              filterBy="#{p.personType.label}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Person Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.personType.label}"/>
+                                    </p:column>
 
-                                    <h:panelGroup>
-                                        <p:outputLabel for="propSearchHouseNumIT">
-                                            <h:outputText value="House number"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="propSearchHouseNumIT" value="#{cEActionRequestsBB.houseNumSearch}" 
-                                                     style="width: 100px;" tabindex="3" required="false" styleClass="inputText">
-                                        </p:inputText>
-                                        <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <p:outputLabel for="propSearchStreetIT">
-                                            <h:outputText value="Street name"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="propSearchStreetIT" value="#{cEActionRequestsBB.streetNameSearch}" 
-                                                     style="width: 200px;" tabindex="4" required="false" styleClass="inputText">
-                                        </p:inputText>
-                                        <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
+                                    <p:column width="10%" sortBy="#{p.firstName}"
+                                              filterBy="#{p.firstName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="First" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.firstName}"/>
+                                    </p:column>
 
-                                    <h:panelGroup>
-                                        <p:commandButton
-                                            value="Search in Selected Municipality" tabindex="4" ajax="true" icon="fa fa-search"
-                                            actionListener="#{cEActionRequestsBB.searchForProperties}" 
-                                            update=    "change-property-form:propSearchHouseNumIT
-                                                        change-property-form:propSearchStreetIT
-                                                        change-property-form:propertyResultTable"/>
-                                    </h:panelGroup>
+                                    <p:column width="15%" filterBy="#{p.lastName}"
+                                              sortBy="#{p.lastName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Last" />
+                                        </f:facet>
+                                        <h:outputText value="#{p.lastName}"/>
+                                    </p:column>
 
-                                </p:panelGrid> 
+                                    <p:column sortBy="#{p.addressStreet}"
+                                              filterBy="#{p.addressStreet}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{p.addressStreet}"/>
+                                        <p:spacer height="5px"/>
+                                        <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
+                                    </p:column>
 
-                                 <h3>Search Results:</h3>
-                                        <p>Click to select the desired property or try your search again</p>
+                                    <p:column width="10%" >
+                                        <f:facet name="header">
+                                            <h:outputText value="Select" />
+                                        </f:facet>
+                                        <p:commandButton actionListener="#{cEActionRequestsBB.selectNewRequestPerson(p)}"
+                                                         ajax="true"
+                                                         value="select"
+                                                         update="change-person-form:confirm-person-ot"/>
+                                    </p:column>
 
-                                        <p:dataTable
-                                            id="propertyResultTable"
-                                            var="prop" 
-                                            value="#{cEActionRequestsBB.propertyList}"
-                                            selectionMode="single" tabindex="5"
-                                            scrollable="true" scrollHeight="150" 
-                                            selection="#{cEActionRequestsBB.propertyForPropSwitch}"
-                                            rowKey="#{prop.propertyID}">
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Address" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.address}"/>
-                                            </p:column>
-                                            <p:column>
 
-                                                <f:facet name="header">
-                                                    <h:outputText value="Municipality" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.muni.muniName}"/>
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
 
-                                            </p:column>
+                                        <h2>Full person listing for <h:outputText value="#{p.firstName} #{p.lastName}"/> </h2>
+                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
 
-                                            <p:column>
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="First Name"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.firstName}"/>
+                                                </div>
+                                            </h:panelGroup>
 
-                                                <f:facet name="header">
-                                                    <h:outputText value="Type" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.propertyUseType}"/>
 
-                                            </p:column>
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Last Name"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.lastName}"/>
+                                                </div>
+                                            </h:panelGroup>
 
-                                        </p:dataTable>
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Muni"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.muni.muniName}"/>
+                                                </div>
+                                            </h:panelGroup>
 
-                                        <p:spacer height="10px"/>
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Type"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.personType.label}"/>
+                                                </div>
+                                            </h:panelGroup>
 
-                                    <p:commandButton value="Assign request to selected property"
-                                                     actionListener="#{cEActionRequestsBB.updateRequestProperty}"
-                                                     rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                     update="   msgForm:ceActionRequestsMessages
-                                                                req-details-form:selr-prop-address
-                                                                req-details-form:selr-prop-muni
-                                                                actionRequestListForm:actionRequestTable
-                                                                req-details-form:selr-status-ot"
-                                                     oncomplete="PF('change-property-dialog').hide()"/>
-                                    <p:commandButton ajax="true" 
-                                                     value="Cancel" icon="fa fa-stop" 
-                                                     onclick="PF('change-property-dialog').hide()"/>
-                                    <hr/>
-                                    
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Job Title"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.jobTitle}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Email"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.email}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Address"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{p.addressStreet}"/>
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Under 19"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.under18}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Active?"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.active}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Last Updated"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.lastUpdated}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Expires"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.expiryDate.toString}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Phone home"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.phoneHome}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Phone work"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.phoneWork}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Phone cell"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{p.phoneCell}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer">
+                                                <h:outputLabel styleClass="bold" value="Person notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{p.notes}"/>
+                                                </div>
+                                            </f:facet>
+                                        </h:panelGrid>
+                                        </div>
+                                    </p:rowExpansion>
+                                </p:dataTable>
+
                             </h:form>
-                        </p:confirmDialog>
+                        </p:dialog>
                         
                         
                         <p:confirmDialog message="Attach internal message" 
                                          severity="alert" widgetVar="internal-message-dialog"
-                                         closable="true"
+                                         closable="true" responsive="true"
                                          rendered="#{sessionBean.accessKeyCard.hasCOGStaffPermissions}">
 
                             <h:form id="internal-message-form">

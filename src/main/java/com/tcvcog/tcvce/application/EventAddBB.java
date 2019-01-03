@@ -58,7 +58,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     private ArrayList catMeetingList;
     private ArrayList catCustomList;
     
-    private EventCategory selectedEventCategory;
+    private EventCategory selectedEventCategory ;
     private String selectedEventCateogryDescription;
     private boolean selectedEventRequiresViewConfirmation;
     private boolean selectedEventNotifiesCaseMonitors;

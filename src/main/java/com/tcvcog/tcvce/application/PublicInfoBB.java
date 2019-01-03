@@ -76,12 +76,14 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
                           "Public case note added", ""));
 
         } catch (IntegrationException ex) {
+            System.out.println(ex);
               getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to attach messages at this time.", 
+                            "Unable to attach messages at this time, sorry!", 
                             "This is a system error and has been logged for debugging."));
         
         }
+        publicMessage = null;
         
         
     }
