@@ -183,14 +183,14 @@
                                         <h:outputText value="#{p.lastName}"/>
                                     </p:column>
 
-                                    <p:column sortBy="#{p.address_street}"
-                                              filterBy="#{p.address_street}">
+                                    <p:column sortBy="#{p.addressStreet}"
+                                              filterBy="#{p.addressStreet}">
                                         <f:facet name="header">
                                             <h:outputText value="Address" />
                                         </f:facet>
-                                        <h:outputText escape="false" value="#{p.address_street}"/>
+                                        <h:outputText escape="false" value="#{p.addressStreet}"/>
                                         <p:spacer height="5px"/>
-                                        <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
+                                        <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
                                     </p:column>
 
                                     <p:column width="10%" >
@@ -264,9 +264,9 @@
                                                 <h:outputLabel styleClass="bold" value="Address"/>
                                                 <p:spacer height="15px"/>
                                                 <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{p.address_street}"/>
+                                                    <h:outputText escape="false" value="#{p.addressStreet}"/>
                                                     <p:spacer height="5px"/>
-                                                    <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
+                                                    <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
                                                 </div>
                                             </h:panelGroup>
 

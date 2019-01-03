@@ -30,6 +30,9 @@
 
                         </h:form>
                         
+                        <ui:remove>
+                            
+                        
                         <h2>image testing</h2>
                         
                         <h:form enctype="multipart/form-data">
@@ -48,17 +51,16 @@
                             
                             
                             <h3>See photo</h3>
-                            <ui:remove>
                                 
                             <p:graphicImage value="#{imageServices.image}">
                                 <f:param name="photoID" value="#{photoBB.photoID}" />
                             </p:graphicImage>
-                            </ui:remove>
                             
                             
                             
                         </h:form>
                         
+                        </ui:remove>
                         
                         
                     </div>

@@ -228,7 +228,7 @@ public class BackingBeanUtils implements Serializable{
         sb.append(" at ");
         sb.append(getPrettyDate(LocalDateTime.now()));
         sb.append("<br/>");
-        sb.append("<<<<<<<<<<<<<<<<<<<<<<<<<<<<br/>");
+        sb.append("**************************************<br/>");
         return sb.toString();
     }
     

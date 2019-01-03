@@ -144,6 +144,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         pib.setRequestID(req.getRequestID());
         pib.setPacc(req.getRequestPublicCC());
         pib.setDateOfRecord(getPrettyDate(req.getDateOfRecord()));
+        pib.setMuni(req.getMuni());
 
         if(req.isPaccEnabled()){
             
@@ -153,7 +154,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 pib.setPropertyAddress(req.getRequestProperty().getAddress());
             }
 
-            pib.setMuni(req.getMuni());
 
             // there's no case manager to attach to an unlinked action request
 
@@ -199,16 +199,18 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         System.out.println("PublicInfoCoordinator.attachmessagToBundle: In coordinator");
         
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        if(bundle.getTypeName().equals("CEAR")){
+        if(bundle.getTypeName().equals("Code enforcement action request")){
             requestBundle = (PublicInfoBundleCEActionRequest) bundle;
             StringBuilder sb = new StringBuilder();
             sb.append(requestBundle.getPublicExternalNotes());
             sb.append("<br/><br/>");
-            sb.append("PUBLIC CASE NOTE ADDED AT ");
+            sb.append("CASE NOTE ADDED AT ");
             sb.append(current.toString());
-            sb.append("<br/><br/>");
+            sb.append("by public user: <br/>");
             sb.append(message);
-            sb.append("<br/><br/>");
+            sb.append("<br/>");
+            sb.append("***********************");
+            
             System.out.println("PublicInfoCoordinator.attachmessagToBundle | message: " + sb.toString());
             ceari.attachMessageToCEActionRequest(requestBundle, sb.toString());
         } else if(bundle.getTypeName().equals("CECASE")){

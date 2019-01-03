@@ -360,11 +360,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>actionRequestConfirmation</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ActionRequestConfirmation</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>ceCasesBB</managed-bean-name>

@@ -210,13 +210,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         sb.append(" ");
         sb.append(p.getLastName());
         sb.append("<br>");
-        sb.append(p.getAddress_street());
+        sb.append(p.getAddressStreet());
         sb.append("<br>");
-        sb.append(p.getAddress_city());
+        sb.append(p.getAddressCity());
         sb.append(", ");
-        sb.append(p.getAddress_state());
+        sb.append(p.getAddressState());
         sb.append(" ");
-        sb.append(p.getAddress_zip());
+        sb.append(p.getAddressZip());
         sb.append("<br>");
         
         return sb;

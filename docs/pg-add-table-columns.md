@@ -153,3 +153,8 @@ If you've never used ssh for port forwarding, read the manual page first with:
 Using the default man viewer in Ubuntu 16.04, search for the `-f` flag in the documentation by entering `/` followed by the search key `-f` and then `enter`. You can repeat the search for the same term with only the `/`. This is all documented in the manual's manual accessed with:
 
 	$ man man
+
+## Updating `Person` POJO and `PersonIntegrator`
+With new columns in the database, we need member variables on the plain-old-java-object (aka "business objects") to store the data in the database for use by our java code. This requires an [integration class][1] method that extracts the data from the db and injects it into our `Person` objects.
+
+[1]: https://github.com/TechnologyRediscovery/codeconnect/blob/master/src/main/java/com/tcvcog/tcvce/integration/PersonIntegrator.java "Person Integrator"

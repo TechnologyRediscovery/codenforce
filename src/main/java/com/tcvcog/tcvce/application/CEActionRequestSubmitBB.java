@@ -167,9 +167,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForSubmission().getActionRequestorPerson());
+//        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForSubmission().getActionRequestorPerson());
         
-        req.setPersonID(personID);
+//        req.setPersonID(personID);
+// hard coded
+req.setPersonID(100);
         
         int controlCode = getControlCodeFromTime();
         req.setRequestPublicCC(controlCode);
@@ -196,7 +198,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         try { 
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(req);
-            getSessionBean().setcEActionRequest(ceari.getActionRequestByRequestID(submittedActionRequestID));
+            getSessionBean().setActiveRequest(ceari.getActionRequestByRequestID(submittedActionRequestID));
             
             // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             getFacesContext().addMessage(null,
@@ -268,19 +270,16 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         currentPerson.setPhoneWork(form_requestor_phoneWork);
         
         currentPerson.setEmail(form_requestor_email);
-        currentPerson.setAddress_street(form_requestor_addressStreet);
-        currentPerson.setAddress_city(form_requestor_addressCity);
-        currentPerson.setAddress_zip(form_requestor_addressZip);
-        currentPerson.setAddress_state(form_requestor_addressState);
+        currentPerson.setAddressStreet(form_requestor_addressStreet);
+        currentPerson.setAddressCity(form_requestor_addressCity);
+        currentPerson.setAddressZip(form_requestor_addressZip);
+        currentPerson.setAddressState(form_requestor_addressState);
         
         currentPerson.setNotes("[System-Generated] This person was created "
                 + "from the code enforcement action request form");
         
         currentPerson.setActive(true);
         currentPerson.setUnder18(false);
-        
-        // the insertion of this person will be timestamped
-        // by the integrator class
         
         getSessionBean().getCeactionRequestForSubmission().setActionRequestorPerson(currentPerson);
         
@@ -296,23 +295,17 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         try {
             insertedPersonID = personIntegrator.insertPerson(p);
         } catch (IntegrationException ex) {
-             System.out.println(ex.toString());
-               getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
-                            "You might call your municipal office to report this error and make a request over the phone. "
-                                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
-            
+            System.out.println(ex.toString());
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
+                    "You might call your municipal office to report this error and make a request over the phone. "
+                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
+
             
         } catch (NullPointerException ex){
              System.out.println(ex.toString());
-//               getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-//                            "NULL POINTER ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
-//                            "You might call your municipal office to report this error and make a request over the phone. "
-//                                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
         }
-//        manageTabs();
         
         return insertedPersonID;
         
@@ -320,7 +313,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
     public void storePropertyLocationInfo(ActionEvent event){
         manageTabs();
-//        System.out.println("CEActionRequestSubmitBB.storePropertyLocationInfo | selectedProp: " + selectedProperty.getAddress());
         
     }
     

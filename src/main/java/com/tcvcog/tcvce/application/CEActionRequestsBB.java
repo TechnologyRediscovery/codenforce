@@ -354,7 +354,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getCogInternalNotes();
-        mbp.header = getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("internalNote");
+        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("internalNote");
         mbp.explanation = "";
         mbp.newMessageContent = internalMessageText;
         String newNotes = appendNoteBlock(mbp);
