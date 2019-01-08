@@ -11,5 +11,5 @@ CodeConnect is a JavaEE-based, open source web database application for managing
 
 [Managing user-muni connections mini-project](muni-user-project.md)
 
-[testing blob links](/blob/src/main/webapp/restricted/navContainer_restricted.xhtml "nav conatiner")
+[testing blob links](/blob/master/src/main/webapp/restricted/navContainer_restricted.xhtml "nav conatiner")
 
