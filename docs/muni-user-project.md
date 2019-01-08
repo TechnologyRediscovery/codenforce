@@ -8,7 +8,7 @@ Create a faces page that allows the user to assign system users to municipalitie
 
 2. Familairize yourself with the two methods which return a ArrayList<Municipality> objects. These lists of Municipality objects are passed into all sorts of select one UI elements. For example, the main muni list which we can see in missionControl.xhtml is wired up in the template facelets page called [navContainer_restricted.xhtml][1]
 
-[1]: ../blob/master/src/main/webapp/restricted/navContainer_restricted.xhtml
+    [1]: ../blob/master/src/main/webapp/restricted/navContainer_restricted.xhtml
 
         <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
             <f:converter converterId="muniConverter"/>
