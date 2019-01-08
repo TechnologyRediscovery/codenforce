@@ -6,7 +6,7 @@ Create a faces page that allows the user to assign system users to municipalitie
 ## Work process
 1. Studying the tables and classses associated with user authentication: find any references to these tables in the integrators. Using full-project find tool in NetBeans is handy (control + shift + f). There currently is an integration method called getUserAuthMunis() which returns the listing of muni-user mappings. Building interaction with this data is the project.
 
-2. Familairize yourself with the two methods which return a ArrayList<Municipality> objects. These lists of Municipality objects are passed into all sorts of select one UI elements. For example, the main muni list which we can see in missionControl.xhtml is wired up in the template facelets page called [navContainer_restricted.xhtml](/blob/master/src/main/webapp/restricted/navContainer_restricted.xhtml)
+2. Familairize yourself with the two methods which return a ArrayList<Municipality> objects. These lists of Municipality objects are passed into all sorts of select one UI elements. For example, the main muni list which we can see in missionControl.xhtml is wired up in the template facelets page called [navContainer_restricted.xhtml](/blob/src/main/webapp/restricted/navContainer_restricted.xhtml "nav conatiner")
 
         <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
             <f:converter converterId="muniConverter"/>
