@@ -1,6 +1,10 @@
 # codeconnect documentation
 CodeConnect is a JavaEE-based, open source web database application for managing municpal government code enforcement and occupancy permitting workflows. Individual properties/parcels form the basis of the data hierarchy in CodeConect. Properties  
 
+![CodeConnect system components](img/ccoverview.jpg)
+
+## Subsystem A) Property database
+A property exist as a record in the `property` table. 
 
 
 [Essential documentation links and topic references](references.md)
