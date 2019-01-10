@@ -91,6 +91,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private String form_requestor_addressCity;
     private String form_requestor_addressZip;
     private String form_requestor_addressState;
+    private java.util.Date currentDate;
 
     /**
      * Creates a new instance of ActionRequestBean
@@ -121,6 +122,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CEActionRequest cear;
         CaseCoordinator cc = getCaseCoordinator();
         cear = cc.getNewActionRequest();
+        cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
         getSessionBean().setCeactionRequestForSubmission(cear);
         return "chooseProperty";
@@ -791,5 +793,21 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public void setViolationTypeMap(Map<String, Integer> violationTypeMap) {
         this.violationTypeMap = violationTypeMap;
+    }
+
+    /**
+     * @return the currentDate
+     */
+    public java.util.Date getCurrentDate() {
+        currentDate = java.util.Date.from(java.time.LocalDateTime.now()
+                .atZone(ZoneId.systemDefault()).toInstant());
+        return currentDate;
+    }
+
+    /**
+     * @param currentDate the currentDate to set
+     */
+    public void setCurrentDate(java.util.Date currentDate) {
+        this.currentDate = currentDate;
     }
 }
