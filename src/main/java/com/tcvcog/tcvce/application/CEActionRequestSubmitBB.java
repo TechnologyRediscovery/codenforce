@@ -167,11 +167,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-//        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForSubmission().getActionRequestorPerson());
+        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForSubmission().getActionRequestorPerson());
         
-//        req.setPersonID(personID);
-// hard coded
-req.setPersonID(100);
+        req.setPersonID(personID);
         
         int controlCode = getControlCodeFromTime();
         req.setRequestPublicCC(controlCode);
@@ -259,7 +257,7 @@ req.setPersonID(100);
         
         currentPerson = new Person();
         currentPerson.setPersonType(submittingPersonType);
-        currentPerson.setMuniCode(getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
+        currentPerson.setMuni(getSessionBean().getCeactionRequestForSubmission().getMuni());
         
         currentPerson.setFirstName(form_requestorFName);
         currentPerson.setLastName(form_requestorLName);
@@ -280,6 +278,7 @@ req.setPersonID(100);
         
         currentPerson.setActive(true);
         currentPerson.setUnder18(false);
+        currentPerson.setVerifiedBy(null);
         
         getSessionBean().getCeactionRequestForSubmission().setActionRequestorPerson(currentPerson);
         
