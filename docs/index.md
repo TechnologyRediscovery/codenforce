@@ -15,5 +15,5 @@ A property exist as a record in the `property` table.
 
 [Managing user-muni connections mini-project](muni-user-project.md)
 
-[testing blob links](/blob/master/src/main/webapp/restricted/navContainer_restricted.xhtml "nav conatiner")
+[Property unit management mini-project](property-unit-mini-project.md)
 
