@@ -33,7 +33,6 @@ public class Person implements Serializable{
     
     private PersonType personType;
     private Municipality muni;
-    private int muniCode;
     
     private int sourceID;
     private String sourceTitle;
@@ -351,20 +350,7 @@ public class Person implements Serializable{
         this.lastName = lastName;
     }
 
-    /**
-     * @return the muniCode
-     */
-    public int getMuniCode() {
-        muniCode = muni.getMuniCode();
-        return muniCode;
-    }
-
-    /**
-     * @param muniCode the muniCode to set
-     */
-    public void setMuniCode(int muniCode) {
-        this.muniCode = muniCode;
-    }
+   
     
     @Override
     public String toString(){

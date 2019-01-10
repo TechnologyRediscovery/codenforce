@@ -43,6 +43,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -709,6 +710,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    
    public CEActionRequest getNewActionRequest(){
        System.out.println("CaseCoordinator.getNewActionRequest");
+       CEActionRequest cear = new CEActionRequest();
+       cear.setDateOfRecordUtilDate(java.util.Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
+       
        return new CEActionRequest();
        
    }
