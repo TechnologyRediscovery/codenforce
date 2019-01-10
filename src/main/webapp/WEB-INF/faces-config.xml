@@ -535,8 +535,8 @@
     </navigation-rule>
 
 
-    <navigation-rule>
-        <from-view-id>/restricted/initiateInternalSession.xhtml</from-view-id>
+    <navigation-rule> 
+       <from-view-id>/restricted/initiateInternalSession.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>success</from-outcome>
             <to-view-id>/restricted/missionControl.xhtml</to-view-id>
