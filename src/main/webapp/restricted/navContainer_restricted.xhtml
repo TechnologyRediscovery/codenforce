@@ -222,6 +222,7 @@
                                     <h:outputText styleClass="infoBarDataLabel" value="muni: "/>
                                     <h:outputText styleClass="infoBarData" value="#{sessionBean.activeMuni.muniName} "/> 
                                     <p:commandButton value="switch" styleClass="sessionInfoButton" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
+                                    
                                     <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
                                         <f:converter converterId="muniConverter"/>
                                         <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
