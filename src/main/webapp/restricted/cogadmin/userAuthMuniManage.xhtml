@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">    
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="userAuthMuniManageView">
+                    <h:form id="userAuthMuniForm">        
+                        <h:messages id="updateMsg" globalOnly="true" showDetail="true" showSummary="true"
+                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <p:selectOneMenu id="userList" value="#{userAuthMuniManageBB.selectedUser}">
+                            <p:ajax listener="#{userAuthMuniManageBB.onSelectedUserChange()}" update="unauthorizedMuniList authMuniTable" />
+                            <f:selectItem itemLabel="Select a user" noSelectionOption="true" />
+                            <f:selectItems value="#{userAuthMuniManageBB.userList}"  var="u" itemValue="#{u}" itemLabel="#{u.username}"/>
+                            <f:converter converterId="userConverter"/>
+                        </p:selectOneMenu>   
+                        
+                        <p:dataTable id="authMuniTable" var="municipality" value="#{userAuthMuniManageBB.authMuniList}" style="width:500px">
+                            <p:column headerText="Authorized Municipalities">
+                                <h:outputText value="#{municipality.muniName}"/>
+                            </p:column>
+                            <p:column headerText="Remove Municipality?">
+                                <p:commandButton value="Remove" actionListener="#{userAuthMuniManageBB.removeAuthMuni(municipality)}" 
+                                                 update="authMuniTable"> </p:commandButton>  
+                            </p:column>
+                        </p:dataTable>                        
+
+                        <p:selectOneMenu id="unauthorizedMuniList" value="#{userAuthMuniManageBB.selectedMuni}">
+                            <f:selectItem itemLabel="Select a municipality" noSelectionOption="true" />
+                            <f:selectItems value="#{userAuthMuniManageBB.unauthorizedMuniList}"  var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                            <f:converter converterId="muniConverter"/>
+                        </p:selectOneMenu>                       
+                        
+                        <br></br>
+                        <p:commandButton ajax="true" action="#{userAuthMuniManageBB.addAuthMuni}"
+                                         value="Add muni" update="addedMunisTable"/> 
+
+                        <p:dataTable id="addedMunisTable" var="municipality" value="#{userAuthMuniManageBB.selectedMunis}" style="width:500px">
+                            <p:column headerText="Selected Municipality">
+                                <h:outputText value="#{municipality.muniName}"/>
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <p:commandButton ajax="false" action="#{userAuthMuniManageBB.updateAuthMunis}"
+                             value="Update DB" update="userAuthMuniForm:updateMsg">
+                        </p:commandButton>
+                        
+                    </h:form>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
