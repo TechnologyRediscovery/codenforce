@@ -18,16 +18,21 @@
                         <h:messages id="missionControlMessages" globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h:form enctype="multipart/form-data">
-                            
-                           <p:fileUpload   fileUploadListener="#{photoBB.handleFileUpload(event)}"
-                                            mode="advanced"
-                                            sizeLimit="100000"
-                                            allowTypes="/(\.|\/)(jpe?g|png)$/"/>
-                        </h:form>
-                        
+                       
                         <h:form id="missionControlForm">
                             
+                        <h3>Switch municipality</h3>
+                            
+
+                        <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
+                            <f:converter converterId="muniConverter"/>
+                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                            <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                        </p:selectOneMenu>
+                        <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
+                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                        <p:commandButton value="switch" styleClass="button" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
+                        
                         <h1><h:outputText value="#{sessionBean.activeMuni.muniName}"/> Dashboard</h1>
 
                         <p:panelGrid columns="2" layout="tabular"
@@ -142,6 +147,15 @@
                         </h:form>
 
 
+                        
+                         <h:form enctype="multipart/form-data">
+                            
+                           <p:fileUpload   fileUploadListener="#{photoBB.handleFileUpload(event)}"
+                                            mode="advanced"
+                                            sizeLimit="100000"
+                                            allowTypes="/(\.|\/)(jpe?g|png)$/"/>
+                        </h:form>
+                        
 
 
 
