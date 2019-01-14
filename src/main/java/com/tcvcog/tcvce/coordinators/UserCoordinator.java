@@ -23,11 +23,14 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
 import com.tcvcog.tcvce.domain.ObjectNotFoundException;
 import com.tcvcog.tcvce.entities.AccessKeyCard;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
+import java.util.ArrayList;
 
 /**
  *
@@ -155,6 +158,23 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         return card;
+    }    
+        
+    public ArrayList<Municipality> getUnauthorizedMunis(User u) throws IntegrationException{
+        System.out.println("UserAuthMuniCoordinator.getUnauthorizedMunis for " + u);
+        UserIntegrator ui = getUserIntegrator();
+        ArrayList<Municipality> authMunis = ui.getUserAuthMunis(u.getUserID());
+        
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        ArrayList<Municipality> munis = mi.getCompleteMuniList();        
+        
+        if(authMunis != null){
+            for(Municipality authMuni:authMunis){
+                munis.remove(authMuni);
+            }
+        }
+        
+        return munis;
     }
     
 } // close class

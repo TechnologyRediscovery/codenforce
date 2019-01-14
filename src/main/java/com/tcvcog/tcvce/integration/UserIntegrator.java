@@ -373,7 +373,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * access within their user type domain
      * @throws IntegrationException 
      */
-    private ArrayList<Municipality> getUserAuthMunis(int uid) throws IntegrationException{
+    public ArrayList<Municipality> getUserAuthMunis(int uid) throws IntegrationException{
+        System.out.println("UserIntegrator.getUserAuthMunis " + uid);
         Connection con = getPostgresCon();
         ResultSet rs = null;
         String query = "SELECT muni_municode FROM loginmuni WHERE userid = ?;";
@@ -402,6 +403,57 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         return muniList;
     }
+    
+    public void setUserAuthMunis(User u, ArrayList<Municipality> munilist) throws IntegrationException{       
+        Connection con = getPostgresCon();
+        String query = "INSERT INTO loginmuni (\n" + 
+                "userid, muni_municode)\n" +  "VALUES (?,?)";        
+        int userId = u.getUserID();
+        PreparedStatement stmt = null;
+        
+        // could try go inside the for loop? What are the ramifications?
+        try {                   
+                stmt = con.prepareStatement(query);
+                stmt.setInt(1,userId);
+                for(Municipality muni: munilist){
+                    System.out.println("UserIntegrator.setUserAuthMunis: " + muni.getMuniCode());
+                    int municode = muni.getMuniCode();
+                    stmt.setInt(2,municode);
+                    stmt.execute();
+                }
+                
+        } catch (SQLException ex) {
+            System.out.println("UserIntegrator.setUserAuthMunis exception encountered." + ex);
+            throw new IntegrationException("Error in mapping authorized municipality to user", ex);
+        } finally {
+            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void deleteUserAuthMuni(User u, Municipality muni) throws IntegrationException{
+        Connection con = getPostgresCon();
+        String query = "DELETE FROM loginmuni WHERE (userid, muni_municode) = (?,?)";
+        
+        int userId = u.getUserID();
+        int municode = muni.getMuniCode();
+        PreparedStatement stmt = null;
+        
+        try { 
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, userId);
+            stmt.setInt(2,municode);
+            stmt.execute();
+        }
+        catch (SQLException ex) {
+            System.out.println("UserIntegrator.deleteUserAuthMuni: Error deleting row from loginmuni");
+            throw new IntegrationException();
+        } finally {
+            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }        
     
     /**
      * For use by system administrators to manage user data

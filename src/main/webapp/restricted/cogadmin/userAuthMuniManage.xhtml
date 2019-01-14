@@ -9,89 +9,45 @@
         <ui:composition template="../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view id="userAuthMuniManageView">
-                    <h1>Change user's municipality permissions</h1>
                     <h:form id="userAuthMuniForm">        
                         <h:messages id="updateMsg" globalOnly="true" showDetail="true" showSummary="true"
                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        
-                        <p:outputLabel value="Step 1: Select a user."/>
-                        
-                        <p:spacer height="5"/>                   
-                        
                         <p:selectOneMenu id="userList" value="#{userAuthMuniManageBB.selectedUser}">
-                            <p:ajax listener="#{userAuthMuniManageBB.onSelectedUserChange()}" 
-                                    update="unauthorizedMuniList 
-                                    authMuniTable selectedMunisTable" />
+                            <p:ajax listener="#{userAuthMuniManageBB.onSelectedUserChange()}" update="unauthorizedMuniList authMuniTable" />
                             <f:selectItem itemLabel="Select a user" noSelectionOption="true" />
-                            <f:selectItems value="#{userAuthMuniManageBB.userList}"  var="u" itemValue="#{u}" 
-                                           itemLabel="#{u.username}"/>
+                            <f:selectItems value="#{userAuthMuniManageBB.userList}"  var="u" itemValue="#{u}" itemLabel="#{u.username}"/>
                             <f:converter converterId="userConverter"/>
-                        </p:selectOneMenu>
-                                                
-                        <p:spacer height="20"/>
-
-                        <p:outputLabel value="Step 2: Remove authorized municipalities, if necessary."/>                        
+                        </p:selectOneMenu>   
                         
-                        <p:spacer height="5"/>
-                        
-                        <p:dataTable id="authMuniTable" var="municipality" 
-                                     value="#{userAuthMuniManageBB.authMuniList}" style="width:500px;">
-                            <p:column headerText="Authorized Municipalities" styleClass="centeredColumnContent">
+                        <p:dataTable id="authMuniTable" var="municipality" value="#{userAuthMuniManageBB.authMuniList}" style="width:500px">
+                            <p:column headerText="Authorized Municipalities">
                                 <h:outputText value="#{municipality.muniName}"/>
                             </p:column>
-                            <p:column headerText="Remove?" styleClass="centeredColumnContent">
-                                <p:commandButton ajax="false" value="Remove" 
-                                                 action="#{userAuthMuniManageBB.removeAuthMuni(municipality)}" 
-                                                 update="authMuniTable userAuthMuniForm unauthorizedMuniList"> </p:commandButton>  
+                            <p:column headerText="Remove Municipality?">
+                                <p:commandButton value="Remove" actionListener="#{userAuthMuniManageBB.removeAuthMuni(municipality)}" 
+                                                 update="authMuniTable"> </p:commandButton>  
                             </p:column>
-                        </p:dataTable> 
-                        
-                        <p:spacer height="20"/>
-                        
-                        <p:outputLabel value="Step 3: Assign permissions. Select and add one or more municipalities."/>                        
-                        
-                        <p:spacer height="5"/>                     
-                                              
+                        </p:dataTable>                        
+
                         <p:selectOneMenu id="unauthorizedMuniList" value="#{userAuthMuniManageBB.selectedMuni}">
                             <f:selectItem itemLabel="Select a municipality" noSelectionOption="true" />
-                            <f:selectItems value="#{userAuthMuniManageBB.unauthorizedMuniList}"  var="m" itemValue="#{m}" 
-                                           itemLabel="#{m.muniName}" />
+                            <f:selectItems value="#{userAuthMuniManageBB.unauthorizedMuniList}"  var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                             <f:converter converterId="muniConverter"/>
-                        </p:selectOneMenu>
+                        </p:selectOneMenu>                       
                         
-                        <p:spacer height="5"/>
-                        
-                        <p:commandButton ajax="false" action="#{userAuthMuniManageBB.addAuthMuni}"
-                                         value="Add Municipality" update="selectedMunisTable unauthorizedMuniList"/>
-                        
-                        <p:spacer height="20"/>
+                        <br></br>
+                        <p:commandButton ajax="true" action="#{userAuthMuniManageBB.addAuthMuni}"
+                                         value="Add muni" update="addedMunisTable"/> 
 
-                        <p:outputLabel value="Step 4: Edit selected municipalities, if necessary."/>                        
-                        
-                        <p:spacer height="5"/>                          
-                        
-                        <p:dataTable id="selectedMunisTable" var="municipality" value="#{userAuthMuniManageBB.selectedMunis}" 
-                                     style="width:500px">   
-                            <p:column headerText="Selected Municipalities" styleClass="centeredColumnContent">
+                        <p:dataTable id="addedMunisTable" var="municipality" value="#{userAuthMuniManageBB.selectedMunis}" style="width:500px">
+                            <p:column headerText="Selected Municipality">
                                 <h:outputText value="#{municipality.muniName}"/>
                             </p:column>
-                            <p:column headerText="Remove?" styleClass="centeredColumnContent">
-                                <p:commandButton ajax="false" value="Remove" 
-                                                     action="#{userAuthMuniManageBB.removeSelectedMuni(municipality)}" 
-                                                     update="selectedMunisTable selectedMunisTable:unauthorizedMuniList">
-                                </p:commandButton> 
-                            </p:column>
-                        </p:dataTable>   
-                        
-                        <p:spacer height="20"/>
-                        
-                        <p:outputLabel value="Step 5: Submit changes."/>                        
-                        
-                        <p:spacer height="5"/>                                               
+                        </p:dataTable>
                         
                         <p:commandButton ajax="false" action="#{userAuthMuniManageBB.updateAuthMunis}"
-                             value="Submit" update="userAuthMuniForm:updateMsg">
+                             value="Update DB" update="userAuthMuniForm:updateMsg">
                         </p:commandButton>
                         
                     </h:form>
