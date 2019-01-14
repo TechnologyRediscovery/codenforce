@@ -14,37 +14,23 @@ import java.time.ZoneId;
 import java.util.List;
 
 /**
- * Encapsulates municipality restrictions and start/end
- * dates for searching. Types for all three commonly used date
- * formats system wide are included in the params object
- * and the conversions are made automatically based on the
- * LocalDateTime value, allowing objects on the front end and 
- * integration end to just grab the date Type they need and go!
+ *
  * @author Sylvia Garland
  */
 public class SearchParamsCECase extends SearchParams implements Serializable{
     
     private boolean useIsOpen;
     private boolean isOpen;
-    
+       
     private boolean useCaseCloseDateRange;
     private LocalDateTime caseCloseStartDate;
     private LocalDateTime caseCloseEndDate;
     
-    private boolean useCasePhases;
-    // this list will contain an empty case whose
-    // phase we want to select in the search
-    // kinda hackey, I know.
-    private List<CECase> casePhasesList;
-    
     private boolean useCaseManagerID;
     private int caseManagerID;
     
-    
-    
-    
-    
-   
+    private boolean useLegacy;
+     private boolean legacyCase;
     
     
    public SearchParamsCECase(){
@@ -86,19 +72,7 @@ public class SearchParamsCECase extends SearchParams implements Serializable{
         return caseCloseEndDate;
     }
 
-    /**
-     * @return the useCasePhases
-     */
-    public boolean isUseCasePhases() {
-        return useCasePhases;
-    }
-
-    /**
-     * @return the casePhasesList
-     */
-    public List<CECase> getCasePhasesList() {
-        return casePhasesList;
-    }
+   
 
     /**
      * @return the useCaseManagerID
@@ -149,20 +123,7 @@ public class SearchParamsCECase extends SearchParams implements Serializable{
         this.caseCloseEndDate = caseCloseEndDate;
     }
 
-    /**
-     * @param useCasePhases the useCasePhases to set
-     */
-    public void setUseCasePhases(boolean useCasePhases) {
-        this.useCasePhases = useCasePhases;
-    }
-
-    /**
-     * @param casePhasesList the casePhasesList to set
-     */
-    public void setCasePhasesList(List<CECase> casePhasesList) {
-        this.casePhasesList = casePhasesList;
-    }
-
+   
     /**
      * @param useCaseManagerID the useCaseManagerID to set
      */
@@ -175,6 +136,34 @@ public class SearchParamsCECase extends SearchParams implements Serializable{
      */
     public void setCaseManagerID(int caseManagerID) {
         this.caseManagerID = caseManagerID;
+    }
+
+    /**
+     * @return the useLegacy
+     */
+    public boolean isUseLegacy() {
+        return useLegacy;
+    }
+
+    /**
+     * @return the legacyCase
+     */
+    public boolean isLegacyCase() {
+        return legacyCase;
+    }
+
+    /**
+     * @param useLegacy the useLegacy to set
+     */
+    public void setUseLegacy(boolean useLegacy) {
+        this.useLegacy = useLegacy;
+    }
+
+    /**
+     * @param legacyCase the legacyCase to set
+     */
+    public void setLegacyCase(boolean legacyCase) {
+        this.legacyCase = legacyCase;
     }
    
    

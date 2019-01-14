@@ -23,17 +23,17 @@ public class SearchParams implements Serializable{
     
     
     private Municipality muni;
+    private boolean filterByStartEndDate;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private boolean filterByStartEndDate;
     
     private java.util.Date startDateUtilDate;
     private java.util.Date endDateUtilDate;
     private java.sql.Timestamp startDateSQLDate;
     private java.sql.Timestamp endDateSQLDate;
     
-    private int objectID;
     private boolean filterByObjectID;
+    private int objectID;
     
     private boolean limitResultCountTo100;
     

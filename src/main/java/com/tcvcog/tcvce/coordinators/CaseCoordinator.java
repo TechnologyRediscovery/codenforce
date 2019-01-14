@@ -687,7 +687,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 throw new CaseLifecyleException("You cannot update a case's origination date to be after its closing date");
             }
        }
-       ci.updateCECase(c);
+       ci.updateCECaseMetadata(c);
    }
    
    public void deleteCitation(Citation c) throws IntegrationException{
