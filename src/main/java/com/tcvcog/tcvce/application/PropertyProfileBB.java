@@ -10,9 +10,14 @@ import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIInput;
+import javax.faces.event.ActionEvent;
 
 /*
  * Copyright (C) 2018 Turtle Creek Valley
@@ -46,12 +51,197 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private CECase selectedCECase;
     
     private ArrayList<CEActionRequest> ceActionRequestList;
+    
+    private String parid;
+    private String address;
+    private String houseNum;
+    private String streetName;
+    private String addrPartAllMunis;
+    private boolean allMunis;
+    
+    private ArrayList<Property> propList;
+    private List<Property> filteredPropList;
+    private UIInput addressInput;
+    
+    private int selectedMuniCode;
+
+    /**
+     * @return the parid
+     */
+    public String getParid() {
+        return parid;
+    }
+
+    /**
+     * @return the address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * @return the houseNum
+     */
+    public String getHouseNum() {
+        return houseNum;
+    }
+
+    /**
+     * @return the streetName
+     */
+    public String getStreetName() {
+        return streetName;
+    }
+
+    /**
+     * @return the addrPartAllMunis
+     */
+    public String getAddrPartAllMunis() {
+        return addrPartAllMunis;
+    }
+
+    /**
+     * @return the allMunis
+     */
+    public boolean isAllMunis() {
+        return allMunis;
+    }
+
+    /**
+     * @return the propList
+     */
+    public ArrayList<Property> getPropList() {
+        return propList;
+    }
+
+    /**
+     * @return the filteredPropList
+     */
+    public List<Property> getFilteredPropList() {
+        return filteredPropList;
+    }
+
+    /**
+     * @return the addressInput
+     */
+    public UIInput getAddressInput() {
+        return addressInput;
+    }
+
+    /**
+     * @return the selectedMuniCode
+     */
+    public int getSelectedMuniCode() {
+        return selectedMuniCode;
+    }
+
+    /**
+     * @param parid the parid to set
+     */
+    public void setParid(String parid) {
+        this.parid = parid;
+    }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    /**
+     * @param houseNum the houseNum to set
+     */
+    public void setHouseNum(String houseNum) {
+        this.houseNum = houseNum;
+    }
+
+    /**
+     * @param streetName the streetName to set
+     */
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
+    /**
+     * @param addrPartAllMunis the addrPartAllMunis to set
+     */
+    public void setAddrPartAllMunis(String addrPartAllMunis) {
+        this.addrPartAllMunis = addrPartAllMunis;
+    }
+
+    /**
+     * @param allMunis the allMunis to set
+     */
+    public void setAllMunis(boolean allMunis) {
+        this.allMunis = allMunis;
+    }
+
+    /**
+     * @param propList the propList to set
+     */
+    public void setPropList(ArrayList<Property> propList) {
+        this.propList = propList;
+    }
+
+    /**
+     * @param filteredPropList the filteredPropList to set
+     */
+    public void setFilteredPropList(List<Property> filteredPropList) {
+        this.filteredPropList = filteredPropList;
+    }
+
+    /**
+     * @param addressInput the addressInput to set
+     */
+    public void setAddressInput(UIInput addressInput) {
+        this.addressInput = addressInput;
+    }
+
+    /**
+     * @param selectedMuniCode the selectedMuniCode to set
+     */
+    public void setSelectedMuniCode(int selectedMuniCode) {
+        this.selectedMuniCode = selectedMuniCode;
+    }
 
     /**
      * Creates a new instance of PropertyProfileBB
      */
     public PropertyProfileBB() {
     }
+    
+     public void searchForProperties(ActionEvent event){
+        System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
+        PropertyIntegrator pi = new PropertyIntegrator();
+        
+        try {
+            if(isAllMunis()){
+                setPropList(pi.searchForProperties(getHouseNum(), getStreetName()));
+            } else {
+                setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSelectedMuniCode()));
+            }
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Your search completed with " + getPropList().size() + " results", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to complete search! ", ""));
+        }
+    }
+    
+    public String viewProperty(Property prop){
+        getSessionBean().setActiveProp(prop);
+        return "propertyProfile";
+    }
+    
+    public String openCECase(Property prop){
+        getSessionBean().setActiveProp(prop);
+        return "addNewCase";
+    }
+    
     
     
     public String createCase(){

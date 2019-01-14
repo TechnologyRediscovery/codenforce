@@ -12,85 +12,72 @@
     <h:body>
         <ui:composition template="../navContainer_restricted.xhtml">
             <ui:define name="content">
+                <f:view id="cases-view">
+                    <div class="mainContainer">
 
-                <f:view id="properties-view">
-                    <div class="two-column-page-flex-container">
-                        <div class="list-column">
-                            <h:form id="messages-left-form">
-                                <h:messages id="properties-messages-global"
-                                            globalOnly="true" showDetail="true" showSummary="true"
-                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                </h:messages>
-                            </h:form>
+                        <h:form id="properties-messages-form">
 
-                            <p:commandButton id="goToUnitChangesButton"
-                                             value="Go to unit changes"
-                                             action="#{propertyProfileBB.goToChanges()}"
-                                             />
-
-                            <h1 class="property-blue">Properties</h1>
-
-                            <h:form id="propertySearchForm">
-
-                                <p:commandButton id="propertyAddButton"
-                                                 value="Add new property in #{sessionBean.sessionMuni.muniName}" icon="fa fa-plus"
-                                                 action="#{propertyProfileBB.addProperty()}"
-                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"
-
-                                                 />
-                                <p:spacer height="10px"/>
-
-                                <p:panelGrid columns="2" >
-
-                                    <h:panelGroup>
-                                        <p:outputLabel for="propSearchITwMuni">
-                                            <h:outputText value="House number"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="propSearchITwMuni" value="#{propertyProfileBB.houseNum}" 
-                                                     style="width: 100px;" tabindex="1" required="false" styleClass="inputText"/>
-                                        <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:outputLabel for="propSearchITStreet">
-                                            <h:outputText value="Street name"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="propSearchITStreet" value="#{propertyProfileBB.streetName}" 
-                                                     style="width: 200px;" tabindex="2" required="false" styleClass="inputText"/>
-
-                                        <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
+                            <h:messages id="properties-messages-global"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
 
 
-                                    <ui:remove>
+                        <h1><h:outputText value="Property manager"/></h1>
+                        <h3>List builder:</h3>
+                        <h:outputText value="Filer#{caseProfileBB.ceCaseSearchParams.useIsOpen}"/>
+                        <h:outputText value="#{caseProfileBB.ceCaseSearchParams.isOpen}"/>
+
+
+                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter" styleClass="split-page-panelgrid"
+                                     columnClasses="gridTd-splitPage, gridTd-splitPage">
+
+                            <h:panelGroup styleClass="split-page-list-side">
+                                <h2>Property list</h2>
+
+                                <h:form id="propertySearchForm">
+
+                                    <p:panelGrid columns="5">
 
                                         <h:panelGroup>
-                                            <p:outputLabel for="propSearchSelectMuni">
-                                                <h:outputText value="Municipality"/>
+                                            <p:outputLabel for="propSearchITwMuni">
+                                                <h:outputText value="House number"/>
                                             </p:outputLabel>
-                                            <p:spacer height="5px"/>
-                                            <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuni}">
-                                                <f:selectItems value="#{sessionBeasessionUserer.authMunis}"/>
-                                            </p:selectOneMenu>
-                                            <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
+                                            <p:inputText id="propSearchITwMuni" value="#{propertyProfileBB.houseNum}" 
+                                                         style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
+                                            <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                         </h:panelGroup>
 
-                                    </ui:remove>
+                                        <h:panelGroup>
+                                            <p:outputLabel for="propSearchITStreet">
+                                                <h:outputText value="Street name"/>
+                                            </p:outputLabel>
+                                            <p:inputText id="propSearchITStreet" value="#{propertyProfileBB.streetName}" 
+                                                         style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
 
-                                    <h:panelGroup>
-                                        <p:commandButton
-                                            value="Search in #{sessionBean.sessionMuni.muniName}" 
-                                            tabindex="3" 
-                                            ajax="true"
-                                            icon="fa fa-search"  
-                                            actionListener="#{propertyProfileBB.searchForProperties}" 
-                                            update="propSearchTable"/>
-                                    </h:panelGroup>
+                                            <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
 
-                                    <ui:remove>
+                                        <h:panelGroup>
+                                            <p:outputLabel for="personMuniSelectMenu">
+                                                <h:outputText value="Municipality"/>
+                                            </p:outputLabel>
+                                            <p:spacer height="5px"/>
+                                            <p:selectOneMenu id="personMuniSelectMenu" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuniCode}">
+                                                <f:selectItems value="#{muniBB.muniMap}"/>
+                                            </p:selectOneMenu>
+                                            <h:message for="personMuniSelectMenu" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton
+                                                value="Search" tabindex="6" ajax="false"
+                                                icon="fa fa-search"  actionListener="#{propertyProfileBB.searchForProperties}" />
+                                        </h:panelGroup>
 
                                         <h:panelGroup>
                                             <p:outputLabel for="searchAllCB">
@@ -100,823 +87,376 @@
                                             <p:selectBooleanCheckbox id="searchAllCB" value="#{propertyProfileBB.allMunis}" tabindex="7"
                                                                      widgetVar="allMuniCB" onchange="PF('muniSelectMenu').disable()"/>
                                         </h:panelGroup>
-                                    </ui:remove>
 
-                                    <h:panelGroup>
+                                    </p:panelGrid>
 
-                                        <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" tabindex="4" styleClass="noFill" icon="fa fa-question-circle"/>
-                                    </h:panelGroup>
+                                    <p:dialog header="Search Tips" 
+                                              widgetVar="helpdlg" 
+                                              responsive="true" 
+                                              width="400"
+                                              modal="false"
+                                              height="600">
+                                        <h2>Search tips</h2>
 
-                                </p:panelGrid>
+                                        <p>You may enter all or only part of an address for searching in either search field:</p> 
 
-                                <p:dialog header="Search Tips" 
-                                          widgetVar="helpdlg" 
-                                          responsive="true" 
-                                          width="400"
-                                          modal="false"
-                                          height="600">
-                                    <h2>Search tips</h2>
+                                        <p>The property "398 HOMER DR" can be found by searching for "39" in House number and "hom" in street name.</p>
 
-                                    <p>You may enter all or only part of an address for searching in either search field:</p> 
+                                        <p>Searches are case inSensitIVe!</p>
 
-                                    <p>The property "398 HOMER DR" can be found by searching for "39" in House number and "hom" in street name.</p>
+                                        <p>You cannot "chop" characters from the middle of an address: 
+                                            So you cannot find our example 398 HOMER DR by searching for "38" and "her dr".</p>
 
-                                    <p>Searches are case inSensitIVe!</p>
+                                        <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
 
-                                    <p>You cannot "chop" characters from the middle of an address: 
-                                        So you cannot find our example 398 HOMER DR by searching for "38" and "her dr".</p>
+                                    </p:dialog>
+                                    <p:spacer height="5px"/>
+                                    <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                                    <p:spacer height="5px"/>
 
-                                    <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
-
-                                </p:dialog>
-
-                                <p:spacer height="5px"/>
-                                <p:spacer height="5px"/>
-
-                                <h2>Search Results:</h2>
-
-                                <p:spacer height="5px"/>
-
-                                <p:dataTable
-                                    id="propSearchTable"
-                                    var="prop"
-                                    value="#{propertyProfileBB.propList}"
-                                    rowKey="#{prop.propertyID}"
-                                    filteredValue="#{propertyProfileBB.filteredPropList}"
-                                    tableStyleClass="primeDataTable"
-                                    draggableRows="false" tabindex="6"
-                                    >
-                                    <p:column width="8%">
-                                        <f:facet name="header">
-                                            <h:outputText value="ID"/>
-                                        </f:facet>
-                                        <h:outputText value="#{prop.propertyID}" />
-                                    </p:column>
-                                    <p:column width="15%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Address"/>
-                                        </f:facet>
-                                        <h:outputText value="#{prop.address}" />
-                                    </p:column>
-
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Muni" />
-                                        </f:facet>
-                                        <h:outputText value="#{prop.muni.muniName}"/>
-                                    </p:column>
-
-                                    <p:column width="12%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Use Type"/>
-                                        </f:facet>
-                                        <h:outputText value="#{prop.useTypeString}" />
-                                    </p:column>
-
-                                    <p:column width="5%">
-                                        <f:facet name="header">
-                                            <h:outputText value=""/>
-                                        </f:facet>
-                                        <p:commandButton icon="fa fa-hand-o-right"
-                                                         actionListener="#{propertyProfileBB.manageProperty(prop)}" 
-                                                         ajax="true"
-                                                         update="
-                                                         property-info-form
-                                                         property-lists-form
-                                                         form-propunits
-                                                         "/>
-                                    </p:column>
-                                </p:dataTable>
-                            </h:form>
-                        </div>
+                                    <h2>Search Results:</h2>
 
 
-                        <div class="object-column">
+                                    <p:spacer height="10px"/>
 
-                            <h:form id="form-propertyobject-messages">
+                                    <p:dataTable
+                                        id="propSearchTable"
+                                        var="prop"
+                                        value="#{propertyProfileBB.propList}"
+                                        rowKey="#{prop.propertyID}"
+                                        filteredValue="#{propertyProfileBB.filteredPropList}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="false" tabindex="6"
+                                        >
 
-                                <h:messages id="messages-properties-object"
-                                            globalOnly="true" showDetail="true" showSummary="true"
-                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                </h:messages>
-                            </h:form>
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="New Case"/>
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-legal"
+                                                             action="#{propertyProfileBB.openCECase(prop)}" 
+                                                             ajax="false"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Address"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.address}" />
+                                        </p:column>
 
-                            <p:spacer height="6px;"/>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Municipality" />
+                                            </f:facet>
+                                            <h:outputText value="#{prop.muni.muniName}"/>
+                                        </p:column>
 
-                            <h:form id="property-info-form">
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Parcel ID"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.parID}" />
+                                        </p:column>
 
-
-                                <h1 class="property-blue">
-                                    <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address}" />
-                                    <h:outputText value=" | " />
-                                    <h:outputText value="#{propertyProfileBB.currProp.muni.muniName}" />
-                                    <h:outputText value=" | " />
-                                    <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currProp.lotAndBlock}"/>  
-                                    <h:outputText value=" | " />
-                                    <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currProp.propertyID}"/>  
-                                </h1>
-
-                                <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
-                                             columnClasses="gridTd, gridTd">
-
-                                    <h:panelGroup>
-                                        <div class="datum">
-                                        
-                                            
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address}" />
-                                            <p:spacer height="0px" />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_city}" />
-                                            <h:outputText value=", " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_state}" />
-                                            <h:outputText value=" " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_zip}" />
-                                            
-                                        </div>
-                                        
-                                        <div class="datum">
-                                            <h:outputText styleClass="ui-label-inline" value="Lot and block: " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.lotAndBlock}" />
-                                            <p:spacer height="0px" />
-                                            <h:outputText styleClass="ui-label-inline" value="Parcel ID: " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.parID}" />
-                                        </div>
-                                        
-                                    </h:panelGroup>
-
-                                  
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-usegroup-ot" >
-                                            <h:outputText styleClass="uiLabel" value="Use Group:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.useGroup}"/>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-consttype-ot" >
-                                            <h:outputText styleClass="uiLabel" value="Construction Type:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-consttype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.constructionType}"/>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-countycode-ot" >
-                                            <h:outputText styleClass="uiLabel" value="County Code:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.countyCode}"/>
-                                    </h:panelGroup>
-
-                                  
-                                    <h:panelGroup>
-                                            <h:outputText styleClass="uiLabel" value="Notes:" />
-                                        <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.notes}"/>
-                                    </h:panelGroup>
-                                </h:panelGrid>
-
-                                <p:commandButton ajax="false" value="Update Selected Property Info" 
-                                                 action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
-                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"/>
-                            </h:form>
-
-                            <h:form id="form-propunits-editunits">
-                                
-
-                                <h2>Property units and occupancy periods</h2>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Lot and Block"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.lotAndBlock}" />
+                                        </p:column>
 
 
-                                <p:commandButton       id="button-editunits"
-                                                       ajax="true" 
-                                                       actionListener="#{propertyProfileBB.beginPropertyUnitChanges}"
-                                                       oncomplete="PF('dialog-widvar-unitedit').show()"
-                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                       value="Edit unit list"  
-                                                       icon="fa fa-edit"
-                                                       update="form-unitedit"/>
-                            </h:form>
-                            
-                            <h:form id="form-propunits" >
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Use Type"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.propertyUseType}" />
+                                        </p:column>
 
-                                <p:spacer height="5px" />
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value=""/>
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-hand-o-right"
+                                                             actionListener="#{caseProfileBB.manageCECase(c)}" 
+                                                             ajax="true"
+                                                             update="
+                                                             case-details-form:header-id-ot
+                                                             case-details-form:header-type-ot
+                                                             case-details-form:header-addr-ot
+                                                             case-details-form:header-muni-ot
+                                                             case-details-form:selcase-id-ot
+                                                             case-details-form:selcase-addr-ot
+                                                             case-details-form:selcase-muni-ot
+                                                             case-details-form:selcase-stage-ot
+                                                             case-details-form:selcase-odate-it
+                                                             case-details-form:selcase-cdate-it
+                                                             case-details-form:selcase-age-it
+                                                             case-details-form:selcase-manager-it
+                                                             case-details-form:selcase-pacc
+                                                             case-details-form:selcase-access-sbcb
+                                                             case-details-form:selcase-forwardlinking-sbcb
+                                                             case-details-form:violationTable
+                                                             "/>
+                                        </p:column>
 
-                                <p:dataScroller
-                                    id="datascroller-propunits"
-                                    var="unit"
-                                    rowIndexVar="#{unit.unitID}"
-                                    value="#{propertyProfileBB.currProp.unitWithListsList}"
-                                    widgetVar="events-requiredactions-ds"
-                                    >
+                                    </p:dataTable>
+                                </h:form>
 
-                                    <div class="outlinedBox event-ds-box"> 
-                                        <h3>
-                                            <h:outputText value="Unit Number: " />
-                                            <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
-                                        </h3>
 
-                                        <p:spacer height="5px" />
+                            </h:panelGroup>  
 
-                                        <h:outputText value="Rental intent:" />
-                                        <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
 
-                                        <p:spacer height="5px" />
+                            <h:panelGroup styleClass="split-page-manage-side">
+                                <h:form id="case-details-form">
 
-                                        <h:outputText value="Unit Description:" />
-                                        <h:outputText value="#{unit.notes}" />
+                                    <h2>
+                                        Code Enforcement Case #<h:outputText id="header-id-ot" value="#{caseProfileBB.selectedCase.caseID}"/><br/> 
+                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.selectedCase.caseName}"/>
+                                        at <h:outputText id="header-addr-ot" value="#{caseProfileBB.selectedCase.property.address} "/>  
+                                        <h:outputText id="header-muni-ot" value="(#{caseProfileBB.selectedCase.property.muni.muniName})"/>  
 
-                                        <h4>Occupancy periods</h4>
-                                        
-                                        <p:commandButton       id="properties-occperiods-button-addnewperiod"
-                                                               ajax="true" 
-                                                               actionListener="#{propertyProfileBB.initiateNewOccPeriodCreation(unit)}"
-                                                               rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                               disabled="#{!propertyProfileBB.currProp.active}"
-                                                               oncomplete="PF('dialog-addoccperiod-var').show()"
-                                                               value="Add new occupancy period" 
-                                                               update="dialog-addoccperiod-form"
-                                                               icon="fa fa-plus"/>
+                                    </h2>
 
-                                        <p:spacer height="5px" />
+                                    <div class="outlinedBox">
 
-                                        <p:dataTable
-                                            id="propunits-occperiod-table"
-                                            widgetVar="propunits-occperiod-table-var"
-                                            rowIndexVar="#{period.periodID}"
-                                            var="period"
-                                            value="#{unit.periodList}"
-                                            tableStyleClass="primeDataTable"
-                                            draggableColumns="true"
-                                            expandedRow="false"
-                                            rowExpandMode="multiple"
-                                            resizableColumns="true"
-                                            >                                         
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd">
 
-                                            <p:column width="5%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Period ID: " 
-                                                                  styleClass="ui-label-inline" />
-                                                </f:facet>
-                                                <h:outputText value="#{period.periodID}" 
-                                                              styleClass="data-text"/>
-                                            </p:column>
-                                            
-                                            <p:column width="15%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Start Date: " 
-                                                                  styleClass="ui-label-inline" />
-                                                </f:facet>
-                                                    <h:outputText value="#{propertyProfileBB.getPrettyDate(period.startDate)}" 
-                                                                  styleClass="data-text"/>
-                                            </p:column>
-                                            
-                                            <p:column width="15%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="End Date: " 
-                                                              styleClass="ui-label-inline" />
-                                                </f:facet>
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.endDate)}" 
-                                                              styleClass="data-text"/>
-                                            </p:column>
-                                            
-                                            <p:column width="15%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Type: " 
-                                                              styleClass="ui-label-inline" />
-                                                </f:facet>
-                                                <h:outputText value="#{period.type.title} (ID: #{period.type.typeID})" 
-                                                              styleClass="data-text"/>
-                                            </p:column>
-                                            
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Authorization" 
-                                                              styleClass="ui-label-inline" />
-                                                </f:facet>
-                                                <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : propertyProfileBB.getPrettyDate(period.authorizedTS)}" />
-                                            </p:column>
-                                            <p:column width="5%">
-                                                
-                                                <f:facet name="header">
-                                                    <h:outputText value="Manage" 
-                                                              styleClass="ui-label-inline" />
-                                                </f:facet>
-                                            
-                                                <p:commandButton       id="button-occperiodtable-editperiod"
-                                                                       ajax="false" 
-                                                                       action="#{propertyProfileBB.manageOccPeriod(period)}"
-                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                       value="manage occupancy period"  
-                                                                       icon="fa fa-edit"/>
-                                            </p:column>
-                                        </p:dataTable>
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Case ID:" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selcase-id-ot"  value="#{caseProfileBB.selectedCase.caseID}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Property:"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selcase-addr-ot" value="#{caseProfileBB.selectedCase.property.address}"/><br/>
+                                                    <h:outputText id="selcase-muni-ot" value="#{caseProfileBB.selectedCase.property.muni.muniName} (#{caseProfileBB.selectedCase.property.propertyUseType})"/><br/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Stage and Phase:" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selcase-stage-ot" value="#{caseProfileBB.selectedCase.caseStage}: #{caseProfileBB.selectedCase.casePhase.label} "/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Opening Date:"/>
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selcase-odate-it" value="#{caseProfileBB.selectedCase.originiationDatePretty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Closing Date:"/>
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.selectedCase.closingDatePretty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Age (Days)" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selcase-age-it" value="#{caseProfileBB.selectedCase.caseAge}" rendered="" />
+                                                </div>
+                                            </h:panelGroup>
+
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Manager:"/>
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selcase-manager-it" value="#{caseProfileBB.selectedCase.user.FName} #{caseProfileBB.selectedCase.user.LName}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+
+
+                                            <h:panelGroup>
+
+                                                <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
+                                                <h:outputText id="selcase-pacc" value="#{caseProfileBB.selectedCase.publicControlCode}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
+                                                <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.selectedCase.paccEnabled}"
+                                                                         disabled="#{!sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+                                                    <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                                </p:selectBooleanCheckbox>
+                                                <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
+                                                <h:outputText value=" "/>
+                                                <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.selectedCase.paccEnabled}"
+                                                                         disabled="#{!sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+                                                    <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                                </p:selectBooleanCheckbox>
+                                                <p:spacer height="5px"/>
+
+                                            </h:panelGroup>
+
+                                        </h:panelGrid>
+
                                     </div>
-                                </p:dataScroller>
-                            </h:form>
+
+                                    <h3>code violations:  </h3>
 
 
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
+                                                     value="Add new code violation to case"
+                                                     icon="fa fa-plus"/>
+                                    <p:spacer height="15px"/>
 
-                            <h2 class="property-blue">Code enforcement cases</h2>
-
-                            <h:form id="property-lists-form">
-
-                                <p:commandButton ajax="false"  icon="fa fa-plus"
-                                                 value="Open a new code enforcement case" 
-                                                 action="#{propertyProfileBB.openCECase}"
-                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions)}"/>
-                                <p:spacer height="10px"/>
-                                <p:dataTable
-                                    id="prop-cases-datatable"
-                                    var="c"
-                                    rowKey="#{c.caseID}"
-                                    widgetVar="propProfileCaseTable"
-                                    rowExpandMode="multiple"
-                                    value="#{propertyProfileBB.currProp.ceCaseList}"
-                                    tableStyleClass="primeDataTable">
-                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
-
-                                    <p:column width="8%">
-                                        <f:facet name="header">
-                                            <h:outputText value="ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{c.caseID}"/>
-                                    </p:column>
-                                    <p:column width="15%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Property" />
-                                        </f:facet>
-                                        <h:outputText value="#{c.property.address}"/>
-                                    </p:column>
-                                    <p:column width="15%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Name" />
-                                        </f:facet>
-                                        <h:outputText value="#{c.caseName}"/>
-                                    </p:column>
-                                    <p:column width="15%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Phase" />
-                                        </f:facet>
-                                        <div class="wrapText">
-
-                                            <h:outputText value="#{c.casePhase}"/>
-                                        </div>
-                                    </p:column>
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Date Opened" />
-                                        </f:facet>
-                                        <h:outputText value="#{c.originiationDatePretty}"/>
-                                    </p:column>
-                                    <p:column width="8%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Manager" />
-                                        </f:facet>
-                                        <h:outputText value="#{c.caseManager.person.lastName}"/>
-                                    </p:column>
-                                    <p:column width="5%" exportable="false">
-                                        <f:facet name="header">
-                                            <h:outputText value="view" />
-                                        </f:facet>
-                                        <p:commandButton icon="fa fa-clipboard"
-                                                         action="#{propertyProfileBB.viewCase(c)}" 
-                                                         ajax="false"/>
-                                    </p:column>
-                                </p:dataTable>
-
-                                <p:spacer height="10px"/>
-                                <hr/>
-                                <p:spacer height="10px"/>
-
-                                <h2 class="property-blue">Property Persons</h2>
-
-                                <p:dataTable
-                                    id="prop-persons-datatable"
-                                    var="person"
-                                    value="#{propertyProfileBB.currProp.personList}"
-                                    rowKey="#{person.personID}"
-                                    tableStyleClass="primeDataTable"
-                                    rowExpandMode="single"
-                                    expandedRow="false"
-                                    filteredValue="#{propertyProfileBB.filteredPersonList}"
-                                    >
-
-                                    <p:column width="3%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Exp"/>
-                                        </f:facet>
-                                        <p:rowToggler/>
-                                    </p:column>
-                                    <p:column width="8%">
-                                        <f:facet name="header">
-                                            <h:outputText value="ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{person.personID}"/>
-                                    </p:column>
+                                    <p:dataTable
+                                        id="violationTable"
+                                        var="v"
+                                        selectionMode="mulitiple"
+                                        selection="#{caseProfileBB.selectedViolations}"
+                                        rowKey="#{v.violationID}"
+                                        value="#{caseProfileBB.selectedCase.violationList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true">
 
 
-                                    <p:column width="10%" sortBy="#{person.personType.label}"
-                                              filterBy="#{person.personType.label}">
-                                        <f:facet name="header">
-                                            <h:outputText value="Person Type" />
-                                        </f:facet>
-                                        <h:outputText value="#{person.personType.label}"/>
-                                    </p:column>
+                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                                    <p:column width="10%" sortBy="#{person.muniName}"
-                                              filterBy="#{person.muniName}">
-                                        <f:facet name="header">
-                                            <h:outputText value="Municipality" />
-                                        </f:facet>
-                                        <h:outputText value="#{person.muniName}"/>
-                                    </p:column>
+                                        <p:column width="4%">
+                                            <p:rowToggler />
+                                        </p:column>
+                                        <p:column width="20%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Ordinance" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                        </p:column>
 
-                                    <p:column width="10%" sortBy="#{person.firstName}"
-                                              filterBy="#{person.firstName}">
-                                        <f:facet name="header">
-                                            <h:outputText value="First" />
-                                        </f:facet>
-                                        <h:outputText value="#{person.firstName}"/>
-                                    </p:column>
+                                        <p:column width="20">
+                                            <f:facet name="header">
+                                                <h:outputText value="Stip Comp Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                        </p:column>
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Days left" />
+                                            </f:facet>
+                                            <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
 
-                                    <p:column width="15%" filterBy="#{person.lastName}"
-                                              sortBy="#{person.lastName}">
-                                        <f:facet name="header">
-                                            <h:outputText value="Last" />
-                                        </f:facet>
-                                        <h:outputText value="#{person.lastName}"/>
-                                    </p:column>
+                                        </p:column>
 
-                                    <p:column width="8%" exportable="false">
-                                        <f:facet name="header">
-                                            <h:outputText value="Edit" />
-                                        </f:facet>
-                                        <p:commandButton icon="fa fa-clipboard"
-                                                         action="#{propertyProfileBB.viewPersonProfile(p)}" 
-                                                         ajax="false" disabled="false"/>
-                                    </p:column>
-                                    <p:rowExpansion>
-                                        <div class="outlinedBox">
-                                            <h2>Full person listing for <h:outputText value="#{person.firstName} #{person.lastName}"/> </h2>
-                                            <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                         columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Actual Comp Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.actualComplianceDate}"/>
+                                        </p:column>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="First Name"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.firstName}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                        <p:column width="5%">
+                                            <p:commandButton ajax="false" action="#{caseProfileBB.recordCompliance(v)}"
+                                                             icon="fa fa-check" />
+                                        </p:column>
 
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Last Name"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.lastName}"/>
-                                                    </div>
-                                                </h:panelGroup>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Muni"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.muniName}"/>
-                                                    </div>
-                                                </h:panelGroup>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Type"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.personType.label}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                        <p:rowExpansion>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Job Title"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.jobTitle}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                            <div class="outlinedBox">
+                                                <h3>Violation details</h3>
+                                                <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
+                                                                 value="Edit violation details"
+                                                                 icon="fa fa-edit"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Email"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.email}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <h:outputText value="ID: " />
+                                                <h:outputText value="#{v.violationID}"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Address"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{person.addressStreet}"/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <h:outputText value="Citations: " />
+                                                <h:outputText value="#{v.citationsStringList}"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Under 19"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.under18}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <h:outputText value="re-link" />
+                                                <p:commandButton icon="fa fa-link"
+                                                                 actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
+                                                                 ajax="true" oncomplete="PF('linkDialog').show()"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Active?"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.active}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
+                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                               #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                               #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                               #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                               #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                <p:spacer height="5px"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Last Updated"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.lastUpdated}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Expires"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.expiryDate.toString}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <p:spacer height="5px"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone home"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.phoneHome}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Penalty:"/>
+                                                <h:outputText value="#{v.penalty}"/>
+                                                <p:spacer height="5px"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone work"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.phoneWork}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Description: "/>
+                                                <h:outputText value="#{v.description}"/>
 
-                                                <h:panelGroup>
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone cell"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{person.phoneCell}"/>
-                                                    </div>
-                                                </h:panelGroup>
+                                                <p:spacer height="5px"/>
 
-                                                <f:facet name="footer">
-                                                    <h:outputLabel styleClass="ui-label-inline" value="Person notes"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{person.notes}"/>
-                                                    </div>
-                                                </f:facet>
-                                            </h:panelGrid>
-                                        </div>
-                                    </p:rowExpansion>
-                                </p:dataTable>
+                                                <h:outputLabel styleClass="bold" value="Violation Notes: "/>
+                                                <h:outputText value="#{v.notes}" escape="false"/>
+                                            </div>
+                                        </p:rowExpansion>
 
-                                <hr/>
+                                    </p:dataTable> 
 
-                                <h2>Existing Occupancy Inspection Cases</h2>
-                                <p>A really cool blank data table--More useful functionality coming soon!</p>
 
-                                <!--Insert occupancy inspection cases here-->
+                                    <h3>Notice letters</h3>
 
-                                <p:commandButton ajax="false" value="View " action="personProfile" disabled="true"/>
 
-                                <p:spacer height="10px"/>
-                                <hr/>
-                                <p:spacer height="10px"/>
-                            </h:form>
+                                    <h3>Citations</h3>
 
-                        </div>
+
+                                    <h3>Events</h3>
+
+
+
+                                    <h:outputLabel styleClass="bold" value="Available actions:"/>
+
+                                    <p:spacer height="5px"/>
+
+
+
+
+
+
+                                    <p:commandButton    id="manually-override-status-cb"
+                                                        value="Manually override case phase"
+                                                        rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                        disabled="#{empty caseProfileBB.selectedCase}"
+                                                        icon="fa fa-gears"/>
+
+
+
+                                </h:form>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+
+
+                        <p:dialog       id="unknown_id"
+                                        height="650" width="700"
+                                        widgetVar="unknown-dialog-var"
+                                        closable="true" 
+                                        rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+
+                        </p:dialog>
+
                     </div>
-
-                    <p:dialog    id="dialog-addoccperiod"
-                                 height="400" width="600"
-                                 widgetVar="dialog-addoccperiod-var"
-                                 closable="true" >
-                        
-                        <h2>Create new occupancy period</h2>
-
-                        <h:form id="dialog-addoccperiod-form">
-                            <h:messages id="messages-properties-editunit"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-                            <h:outputLabel styleClass="ui-label" for="som-occperiodtype" value="Occupancy type" />
-                            
-                                <p:selectOneMenu
-                                    id="som-occperiodtype" tabindex="1" required="true"
-                                        value="#{propertyProfileBB.selectedOccPeriodType}">
-                                            <f:converter converterId="occPeriodTypeConverter"/>
-                                            <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
-                                            <f:selectItems id="si-typelist" 
-                                                           value="#{propertyProfileBB.occPeriodTypeList}" 
-                                                           var ="opt" 
-                                                           itemValue="#{opt}" 
-                                                           itemLabel="#{opt.title}" />
-                                </p:selectOneMenu>
-                             <p:commandButton ajax="true" 
-                                             value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('dialog-addoccperiod-var').hide()"
-                                             tabindex="4"/>
-
-
-                            <p:commandButton ajax="true"
-                                             action="#{propertyProfileBB.addNewOccPeriod}"
-                                             icon="fa fa-thumbs-o-up"
-                                             value="Create new period" 
-                                             tabindex="3"/>
-                        </h:form>
-                    </p:dialog>
-                            
-                    <p:dialog    id="dialog-unitedit"
-                                 height="650" width="900"
-                                 widgetVar="dialog-widvar-unitedit"
-                                 closable="true" >
-                        <h2>Edit property units</h2>
-
-                        <h:form id="form-unitedit">
-                            <h:messages id="messages-properties-editunit"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-
-                            <p:commandButton ajax="true"                                                   
-                                             actionListener="#{propertyProfileBB.addUnitToNewPropUnits}" 
-                                             update="table-unitedit"
-                                             icon="fa fa-plus"
-                                             tabindex="1"
-                                             value="Add unit"/>
-
-
-                            <p:spacer height="5px" />
-                            <p:dataTable
-                                id="table-unitedit"
-                                widgetVar="datatable"
-                                rowIndexVar="rowIndex"
-                                var="unit"
-                                value="#{propertyProfileBB.currProp.unitList}"
-                                tabindex="2"
-                                rowKey="#{unit.unitID}"
-                                editable="true">                                         
-
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Unit Number" />
-                                    </f:facet>
-                                    <p:cellEditor>
-                                        <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{unit.unitNumber}"
-                                                         onkeydown="PF('datatable').onKeyDown(event)"
-                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Rental?" />
-                                    </f:facet>
-
-                                    <ui:remove>
-
-                                        <p:cellEditor>
-                                            <f:facet name="output">
-                                                <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
-                                            </f:facet>
-                                            <f:facet name="input"> 
-                                                <h:selectBooleanCheckbox value="#{unit.rental}"/> 
-                                            </f:facet>
-                                        </p:cellEditor>
-
-                                    </ui:remove>
-                                </p:column>
-
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Unit Description" />
-                                    </f:facet>
-                                    <p:cellEditor>
-                                        <f:facet name="output">
-                                            <h:outputText value="#{unit.notes}" />
-                                        </f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{unit.notes}" 
-                                                         onkeydown="PF('datatable').onKeyDown(event)"
-                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-
-                                <p:column style="width:40px">
-                                    <f:facet name="header">
-                                        <h:outputText value="Edit?" />
-                                    </f:facet>
-                                    <p:rowEditor/>
-                                </p:column>
-
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Remove?" />
-                                    </f:facet>
-                                    <p:commandButton    id="button-editunits-removeunit"
-                                                        ajax="true" 
-                                                        value="Remove" 
-                                                        disabled="#{!(unit.unitID==0)}"
-                                                        action="#{propertyProfileBB.removePropertyUnitFromEditTable(unit)}"
-                                                        update="#{p:component('table-unitedit')}
-                                                        form-unitedit:messages-properties-editunit"/>                                      
-
-                                    <p:commandButton    id="button-editunits-deactivateunit" 
-                                                        ajax="true" 
-                                                        value="Deactivate" 
-                                                        disabled="#{unit.unitID==0}"
-                                                        action="#{propertyProfileBB.deactivatePropertyUnit(unit)}"
-                                                        update="#{p:component('table-unitedit')}
-                                                        form-unitedit:messages-properties-editunit"/>                                      
-                                </p:column>
-
-                            </p:dataTable>
-
-                            <script type="text/javascript">
-
-                                $(function () {
-                                    $.extend(PF("datatable"), {
-                                        onKeyDown: function (e) {
-                                            var key = e.which,
-                                                    keyCode = $.ui.keyCode;
-
-                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                                                e.preventDefault();
-                                            }
-                                        },
-
-                                        onKeyUp: function (e, rowIndex) {
-                                            var key = e.which,
-                                                    keyCode = $.ui.keyCode;
-                                            //.ui-row-editor-check .ui-icon-check .ui-c
-                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                                                this.tbody
-                                                        .find('.ui-row-editor .ui-icon-check')
-                                                        .eq(rowIndex)
-                                                        .click();
-                                            }
-
-                                            if (key === keyCode.ESCAPE) {
-                                                this.tbody
-                                                        .find('.ui-row-editor .ui-icon-close')
-                                                        .eq(rowIndex)
-                                                        .click();
-                                            }
-                                        }
-                                    });
-                                });
-
-                            </script>
-
-                            <p:spacer height="5px"/>
-
-
-                            <p:spacer height="5px"/>
-
-                            <p:commandButton ajax="true" 
-                                             value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('dialog-widvar-unitedit').hide()"
-                                             tabindex="4"/>
-
-
-                            <p:commandButton ajax="true"
-                                             actionListener="#{propertyProfileBB.finalizeUnitList}"
-                                             oncomplete="PF('dialog-widvar-unitedit').hide()"
-                                             icon="fa fa-thumbs-o-up"
-                                             update="
-                                             form-unitedit:messages-properties-editunit
-                                             form-propunits:datascroller-propunits
-                                             form-propertyobject-messages:messages-properties-object"
-                                             value="Save unit list" 
-                                             tabindex="3"/>
-                        </h:form>
-                    </p:dialog>
-
-                 
                 </f:view>
             </ui:define>
         </ui:composition>
