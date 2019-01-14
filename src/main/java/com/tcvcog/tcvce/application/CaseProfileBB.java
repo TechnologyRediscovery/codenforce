@@ -32,13 +32,16 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ArrayList;
@@ -56,10 +59,22 @@ import javax.faces.event.ActionEvent;
  */
 public class CaseProfileBB extends BackingBeanUtils implements Serializable{
 
+    // deprecated member for use by CaseProfile.xhtml
     private CECase currentCase;
     private CasePhase nextPhase;
     private CasePhase[] casePhaseList;
     private CasePhase selectedCasePhase; 
+    
+    private List<CECase> caseList;
+    private ArrayList<CECase> filteredCaseList;    
+    private SearchParamsCECase ceCaseSearchParams;
+    
+    
+    private ArrayList<CECase> filteredCaseHistoryList;
+    private CECase selectedCase;
+    private ArrayList<EventCECase> recentEventList;
+    private ArrayList<Person> muniPeopleList;
+    
     
     private EventCECase eventForTriggeringCasePhaseAdvancement;
     
@@ -77,9 +92,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     private List<Citation> citationList;
     private Citation selectedCitation;
-    
-    private List<CEActionRequest> actionRequestList;
-    private CEActionRequest selectedActionRequest;
     
     private HashMap<CasePhase, String> imageFilenameMap;
     private String phaseDiagramImageFilename;
@@ -101,6 +113,35 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         imageFilenameMap.put(CasePhase.SecondaryPostHearingComplianceTimeframe, "stage3_postHearing.svg");
         imageFilenameMap.put(CasePhase.Closed, "stage3_closed.svg");
     }
+    
+    public void manageCECase(CECase c){
+        // replace any session case with this one
+        getSessionBean().setcECase(null);
+        selectedCase = c;
+    }
+    
+    
+    
+    
+    public void changePACCAccess(){
+        System.out.println("CEActionRequestsBB.changePACCAccess");
+        CaseIntegrator ci = getCaseIntegrator();
+        
+        try {
+            
+            ci.updateCECaseMetadata(currentCase);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Done! Public access status is now: " + String.valueOf(selectedCase.isPaccEnabled()) +
+                                " and action request forward linking is statusnow: " + String.valueOf(selectedCase.isAllowForwardLinkedPublicAccess())
+                    + " for case ID: " + selectedCase.getCaseID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
+                    , "Unable to add change public access code status"
+                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+        }
+    }
+    
     
     public String editEvent(EventCECase ev){
         getSessionBean().setActiveEvent(ev);
@@ -136,12 +177,13 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         return "";
     }
     
+    
+    
     public String recordCompliance() throws IntegrationException{
         CaseCoordinator cc = getCaseCoordinator();
         RoleType u = getFacesUser().getRoleType(); 
         
         EventCoordinator ec = getEventCoordinator();
-        System.out.println("CaseManageBB.recordCompliance | selectedViolations size: " + selectedViolations.size());
         if(!selectedViolations.isEmpty()){
 
             // generate event for compliance with selected violations
@@ -157,6 +199,22 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
                             "Please select a violation and try again", ""));
             return "";
         }
+    }
+    public String recordCompliance(CodeViolation cv) throws IntegrationException{
+        CaseCoordinator cc = getCaseCoordinator();
+        RoleType u = getFacesUser().getRoleType(); 
+        
+        EventCoordinator ec = getEventCoordinator();
+            // generate event for compliance with selected violations
+            EventCECase e = ec.generateViolationComplianceEvent(selectedViolations);
+
+            // when event is submitted, send violation list to c
+            getSessionBean().setActiveEvent(e);
+            getSessionBean().setActiveViolationList(selectedViolations);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Please select a violation and try again", ""));
+            return "eventAdd";
     }
     
     public String editViolation(){
@@ -339,8 +397,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String addViolation(){
-        // no logic needed in the backing bean
-        // since we just forward to the selectElement page
+        getSessionBean().setcECase(selectedCase);
+        
         
         return "violationSelectElement";
     }
@@ -477,6 +535,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * @deprecated leftover from previous heavy case profile page
      * @return the currentCase
      */
     public CECase getCurrentCase() {
@@ -537,7 +596,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @return the eventList
      */
     public List<EventCECase> getEventList() {
-        eventList = currentCase.getEventList();
+        setEventList(currentCase.getEventList());
         return eventList;
     }
 
@@ -554,7 +613,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     public List<CodeViolation> getFullCaseViolationList() {
         ViolationCoordinator vc = getViolationCoordinator();
         try {
-            fullCaseViolationList = vc.getCodeViolations(currentCase);
+            setFullCaseViolationList((List<CodeViolation>) vc.getCodeViolations(currentCase));
         } catch (IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -577,7 +636,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @param eventList the eventList to set
      */
     public void setEventList(ArrayList<EventCECase> eventList) {
-        this.eventList = eventList;
+        this.setEventList(eventList);
     }
 
     /**
@@ -591,14 +650,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @param fullCaseViolationList the fullCaseViolationList to set
      */
     public void setFullCaseViolationList(ArrayList<CodeViolation> fullCaseViolationList) {
-        this.fullCaseViolationList = fullCaseViolationList;
+        this.setFullCaseViolationList(fullCaseViolationList);
     }
 
     /**
      * @param selectedViolation the selectedViolation to set
      */
     public void setSelectedViolations(ArrayList<CodeViolation> selectedViolation) {
-        this.selectedViolations = selectedViolation;
+        this.setSelectedViolations(selectedViolation);
     }
 
     /**
@@ -619,7 +678,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @return the noticeList
      */
     public List<NoticeOfViolation> getNoticeList() {
-        noticeList = getSessionBean().getcECase().getNoticeList();
+        setNoticeList(getSessionBean().getcECase().getNoticeList());
         return noticeList;
     }
 
@@ -627,7 +686,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @param noticeList the noticeList to set
      */
     public void setNoticeList(ArrayList<NoticeOfViolation> noticeList) {
-        this.noticeList = noticeList;
+        this.setNoticeList(noticeList);
     }
 
     /**
@@ -635,7 +694,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      */
     public List<Citation> getCitationList() {
         
-        citationList = getSessionBean().getcECase().getCitationList();
+        setCitationList(getSessionBean().getcECase().getCitationList());
         return citationList;
     }
 
@@ -650,7 +709,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @param citationList the citationList to set
      */
     public void setCitationList(ArrayList<Citation> citationList) {
-        this.citationList = citationList;
+        this.setCitationList(citationList);
     }
 
     /**
@@ -728,7 +787,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @return the casePhaseList
      */
     public CasePhase[] getCasePhaseList() {
-        casePhaseList = CasePhase.values();
+        setCasePhaseList(CasePhase.values());
         return casePhaseList;
     }
 
@@ -736,7 +795,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @param casePhaseList the casePhaseList to set
      */
     public void setCasePhaseList(CasePhase[] casePhaseList) {
-        this.casePhaseList = casePhaseList;
+        this.setCasePhaseList(casePhaseList);
     }
 
     /**
@@ -764,7 +823,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @param filteredEventList the filteredEventList to set
      */
     public void setFilteredEventList(ArrayList<EventCECase> filteredEventList) {
-        this.filteredEventList = filteredEventList;
+        this.setFilteredEventList(filteredEventList);
     }
 
     /**
@@ -799,7 +858,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
      * @return the phaseDiagramImageFilename
      */
     public String getPhaseDiagramImageFilename() {
-        phaseDiagramImageFilename = imageFilenameMap.get(currentCase.getCasePhase());
+        phaseDiagramImageFilename = getImageFilenameMap().get(currentCase.getCasePhase());
         return phaseDiagramImageFilename;
     }
 
@@ -810,39 +869,184 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
         this.phaseDiagramImageFilename = phaseDiagramImageFilename;
     }
 
+   
     /**
-     * @return the actionRequestList
+     * @return the caseList
      */
-    public List<CEActionRequest> getActionRequestList() {
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        try {
-            actionRequestList = ceari.getCEActionRequestListByCase(currentCase.getCaseID());
-        } catch (IntegrationException ex) {
-            System.out.println("CaseProfileBB.getActionRequestList | "
-                    + "unable to generate action request list by case");
+    public List<CECase> getCaseList() {
+//        List<CECase> sessionList = getSessionBean().getcECaseList();
+        CaseIntegrator ci = getCaseIntegrator();
+        if(caseList == null){
+            ceCaseSearchParams.setMuni(getSessionBean().getActiveMuni());
+            try {
+                System.out.println("CaseProfileBB.getCaseList | getting list for : " + getSessionBean().getActiveMuni().getMuniName());
+                caseList = ci.getCECases(ceCaseSearchParams);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
         }
         
-        return actionRequestList;
+        if(caseList == null){
+            caseList = new ArrayList<>();
+        }
+        
+        return caseList;
     }
 
     /**
-     * @return the selectedActionRequest
+     * @return the filteredCaseList
      */
-    public CEActionRequest getSelectedActionRequest() {
-        return selectedActionRequest;
+    public ArrayList<CECase> getFilteredCaseList() {
+        return filteredCaseList;
     }
 
     /**
-     * @param actionRequestList the actionRequestList to set
+     * @return the filteredCaseHistoryList
      */
-    public void setActionRequestList(List<CEActionRequest> actionRequestList) {
-        this.actionRequestList = actionRequestList;
+    public ArrayList<CECase> getFilteredCaseHistoryList() {
+        return filteredCaseHistoryList;
     }
 
     /**
-     * @param selectedActionRequest the selectedActionRequest to set
+     * @return the selectedCase
      */
-    public void setSelectedActionRequest(CEActionRequest selectedActionRequest) {
-        this.selectedActionRequest = selectedActionRequest;
+    public CECase getSelectedCase() {
+        CECase sessionCase = getSessionBean().getcECase();
+        if(sessionCase != null){
+            selectedCase = sessionCase;
+        }
+        
+        return selectedCase;
+    }
+
+    /**
+     * @return the recentEventList
+     */
+    public ArrayList<EventCECase> getRecentEventList() {
+        return recentEventList;
+    }
+
+    /**
+     * @return the muniPeopleList
+     */
+    public ArrayList<Person> getMuniPeopleList() {
+        return muniPeopleList;
+    }
+
+    /**
+     * @return the imageFilenameMap
+     */
+    public HashMap<CasePhase, String> getImageFilenameMap() {
+        return imageFilenameMap;
+    }
+
+
+    /**
+     * @param caseList the caseList to set
+     */
+    public void setCaseList(ArrayList<CECase> caseList) {
+        this.caseList = caseList;
+    }
+
+    /**
+     * @param filteredCaseList the filteredCaseList to set
+     */
+    public void setFilteredCaseList(ArrayList<CECase> filteredCaseList) {
+        this.filteredCaseList = filteredCaseList;
+    }
+
+    /**
+     * @param filteredCaseHistoryList the filteredCaseHistoryList to set
+     */
+    public void setFilteredCaseHistoryList(ArrayList<CECase> filteredCaseHistoryList) {
+        this.filteredCaseHistoryList = filteredCaseHistoryList;
+    }
+
+    /**
+     * @param selectedCase the selectedCase to set
+     */
+    public void setSelectedCase(CECase selectedCase) {
+        this.selectedCase = selectedCase;
+    }
+
+    /**
+     * @param recentEventList the recentEventList to set
+     */
+    public void setRecentEventList(ArrayList<EventCECase> recentEventList) {
+        this.recentEventList = recentEventList;
+    }
+
+    /**
+     * @param muniPeopleList the muniPeopleList to set
+     */
+    public void setMuniPeopleList(ArrayList<Person> muniPeopleList) {
+        this.muniPeopleList = muniPeopleList;
+    }
+
+    /**
+     * @param eventList the eventList to set
+     */
+    public void setEventList(List<EventCECase> eventList) {
+        this.eventList = eventList;
+    }
+
+    /**
+     * @param filteredEventList the filteredEventList to set
+     */
+    public void setFilteredEventList(List<EventCECase> filteredEventList) {
+        this.filteredEventList = filteredEventList;
+    }
+
+    /**
+     * @param fullCaseViolationList the fullCaseViolationList to set
+     */
+    public void setFullCaseViolationList(List<CodeViolation> fullCaseViolationList) {
+        this.fullCaseViolationList = fullCaseViolationList;
+    }
+
+    /**
+     * @param selectedViolations the selectedViolations to set
+     */
+    public void setSelectedViolations(List<CodeViolation> selectedViolations) {
+        this.selectedViolations = selectedViolations;
+    }
+
+    /**
+     * @param noticeList the noticeList to set
+     */
+    public void setNoticeList(List<NoticeOfViolation> noticeList) {
+        this.noticeList = noticeList;
+    }
+
+    /**
+     * @param citationList the citationList to set
+     */
+    public void setCitationList(List<Citation> citationList) {
+        this.citationList = citationList;
+    }
+
+    /**
+     * @param imageFilenameMap the imageFilenameMap to set
+     */
+    public void setImageFilenameMap(HashMap<CasePhase, String> imageFilenameMap) {
+        this.imageFilenameMap = imageFilenameMap;
+    }
+
+    /**
+     * @return the ceCaseSearchParams
+     */
+    public SearchParamsCECase getCeCaseSearchParams() {
+        SearchCoordinator sc = getSearchCoordinator();
+        if(ceCaseSearchParams == null){
+            ceCaseSearchParams = sc.getDefaultSearchParamsCECase();
+        }
+        return ceCaseSearchParams;
+    }
+
+    /**
+     * @param ceCaseSearchParams the ceCaseSearchParams to set
+     */
+    public void setCeCaseSearchParams(SearchParamsCECase ceCaseSearchParams) {
+        this.ceCaseSearchParams = ceCaseSearchParams;
     }
 }

@@ -23,4 +23,7 @@ package com.tcvcog.tcvce.occupancy.entities;
  */
 public class OccPermitApplicationReason {
     
+    
+    
+    
 }

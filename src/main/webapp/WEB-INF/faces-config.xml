@@ -671,16 +671,7 @@
 
 
     
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
-        
-        <navigation-case>
-            <from-action>#{ceCasesBB.viewCase}</from-action>
-            <from-outcome>caseProfile</from-outcome>
-            <to-view-id>/restricted/cogview/caseProfile.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
-
+  
 
     <navigation-rule>
         <from-view-id>*</from-view-id>
@@ -901,7 +892,7 @@
 
         <navigation-case>
             <from-outcome>caseProfile</from-outcome>
-            <to-view-id>/restricted/cogview/caseProfile.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
 
@@ -962,6 +953,15 @@
     </navigation-rule>
     
     <navigation-rule>
+        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>violationSelectElement</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
         <from-view-id>/restricted/cogstaff/ce/requestManagement.xhtml</from-view-id>
         <navigation-case>
             <from-action>#{requestManagementBean.manage}</from-action>
@@ -996,7 +996,7 @@
         <navigation-case>
             <from-action>#{violationEditBB.backTocaseProfiler}</from-action>
             <from-outcome>caseProfile</from-outcome>
-            <to-view-id>/restricted/cogview/caseProfile.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>

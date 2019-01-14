@@ -35,8 +35,9 @@
 
                                     <p:fieldset legend="Advanced search options"
                                                 toggleable="true" collapsed="true" style="background-color: white; back">
+                                        
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd-solid-back, gridTd-solid-back">
+                                                      columnClasses="gridTd-solid-back, gridTd-solid-back">
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query start date "/>
@@ -562,7 +563,7 @@
                                 <p>This message, your name, and a timestamp will be appended <br/>to the public note section of request ID 
                                     <h:outputText escape="false" value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </p>
 
-                                <p:spacer height="15px"/>
+                                <p:spacer height="15px "/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.path3AttachInvalidMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('invalid-dialog').hide()"
                                                  rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"

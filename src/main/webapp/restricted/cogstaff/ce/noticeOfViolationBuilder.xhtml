@@ -253,13 +253,15 @@
                                                     </f:facet>
                                                     <h:outputText value="#{p.lastName}"/>
                                                 </p:column>
+                                                
+                                                
 
-                                                <p:column sortBy="#{p.aaddressStreet"
-                                                          filterBy="#{p.adaddressStreet>
+                                                <p:column sortBy="#{p.aaddressStreet}"
+                                                          filterBy="#{p.adaddressStreet}">
                                                     <f:facet name="header">
                                                         <h:outputText value="Address" />
                                                     </f:facet>
-                                                    <h:outputText escape="false" value="#{p.addaddressStreet>
+                                                    <h:outputText escape="false" value="#{p.addaddressStreet}">
                                                     <p:spacer height="5px"/>
                                                     <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
                                                 </p:column>
@@ -325,7 +327,7 @@
                                                                 <h:outputLabel styleClass="bold" value="Address"/>
                                                                 <p:spacer height="15px"/>
                                                                 <div class="rowExpansion">
-                                                                    <h:outputText escape="false" value="#{p.addraddressStreet
+                                                                    <h:outputText escape="false" value="#{p.addraddressStreet}"
                                                                     <p:spacer height="5px"/>
                                                                     <h:outputText value="#{p.address_city}, #{p.address_state} #{p.address_zip}"/>
                                                                 </div>

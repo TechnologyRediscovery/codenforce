@@ -8,8 +8,6 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Superlcass of entity objects: a Hodgepodge set of methods for use by 
@@ -21,61 +19,24 @@ public class EntityUtils {
     
     private final int DAYS_IN_YEAR = 365;
     
-    protected String getPrettyDate(LocalDateTime ldtDate){
-        String formattedDateTime = "";
-        if(ldtDate != null){
+    public String getPrettyDate(LocalDateTime ldt){
+        String formattedDateTime = null;
+        if(ldt != null){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-            formattedDateTime = ldtDate.format(formatter); 
+            formattedDateTime = ldt.format(formatter); 
             
         }
         return formattedDateTime;
     }
-   
     
-    /**
-     * Counts days between two LocalDateTimes and returns the primitive
-     * @param from
-     * @param to
-     * @return 
-     */
-    public long getTimePeriodAsDays(LocalDateTime from, LocalDateTime to){
-        LocalDate dStart = from.toLocalDate();
-        LocalDate dEnd = to.toLocalDate();
-        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(dStart, dEnd);
-        
-//        
-//        days = java.time.Period.between(from.toLocalDate(), to.toLocalDate()).getDays();
-//        java.time.Period.between(LocalDate.MIN, LocalDate.MAX)
-//        years = java.time.Period.between(from.toLocalDate(), to.toLocalDate()).getYears();
-//        totalDays = days + (years * DAYS_IN_YEAR);
-        return daysBetween ;
+    public int getTimePeriodAsDays(LocalDateTime from, LocalDateTime to){
+        int totalDays;
+        int days;
+        int years;
+        days = java.time.Period.between(from.toLocalDate(), to.toLocalDate()).getDays();
+        years = java.time.Period.between(from.toLocalDate(), to.toLocalDate()).getYears();
+        totalDays = days + (years * DAYS_IN_YEAR);
+        return totalDays;
     }
     
-    /**
-     * Pretty prints a List of Integers
-     * Used by CodeViolations to list their citations and notices
-     * @param intList
-     * @return 
-     */
-    public String fomatIDListAsString(List<Integer> intList){
-        
-        String listString;
-        StringBuilder sb = new StringBuilder();
-        Iterator<Integer> it;
-        
-        if(!intList.isEmpty()){
-            sb.append("ID #s: ");
-            it = intList.iterator();
-            while(it.hasNext()){
-                Integer i = it.next();
-                sb.append(String.valueOf(i));
-                if(it.hasNext()){
-                    sb.append(", ");
-                }
-            }
-             listString = sb.toString();
-        } else listString = "";
-        
-        return listString;
-    }
 }
