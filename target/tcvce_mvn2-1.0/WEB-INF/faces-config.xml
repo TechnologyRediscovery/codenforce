@@ -461,6 +461,12 @@
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationEditBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>userAuthMuniManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UserAuthMuniManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
  
     <!--request-scoped beans-->
     
@@ -1251,9 +1257,15 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
+       
+    <navigation-rule>
+        <navigation-case>
+            <from-outcome>userAuthMuniManage</from-outcome>
+            <to-view-id>/restricted/cogadmin/userAuthMuniManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
-
-        
     <navigation-rule>
         <from-view-id>*</from-view-id>
     

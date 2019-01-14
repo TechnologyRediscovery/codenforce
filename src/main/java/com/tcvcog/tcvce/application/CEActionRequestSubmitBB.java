@@ -301,7 +301,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                  new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
                     "You might call your municipal office to report this error and make a request over the phone. "
-                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
+                    + "You can also phone the Turtle Creek COG's technical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
 
             
         } catch (NullPointerException ex){
