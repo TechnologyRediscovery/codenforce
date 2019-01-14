@@ -291,7 +291,7 @@ div.headerLink a:before, a:visited{
     flex-basis: 100%;
     flex-shrink: 1;
     
-    height: 90px;
+    height: 65px;
     background-color: #2C5F90;
     
 }
@@ -329,7 +329,7 @@ div.headerLink a:before, a:visited{
     
     
     flex-grow: 1;
-    flex-basis: 80%;
+    flex-basis: max-content;
     flex-shrink: 1;
     
     
@@ -357,6 +357,18 @@ div.headerLink a:before, a:visited{
     flex-shrink: 3;
     
     
+}
+
+.split-page-panelgrid{
+    width: 100%;
+}
+
+.split-page-list-side{
+    width: 40%;
+}
+
+.split-page-manage-side{
+    width: 60%;
 }
 
 

@@ -24,10 +24,10 @@
                         <h1>Code Enforcement Action Requests in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
 
 
-                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter" styleClass="split-page-panelgrid"
                                      columnClasses="gridTd-splitPage, gridTd-splitPage">
 
-                            <h:panelGroup style="width:50%;">
+                            <h:panelGroup styleClass="split-page-list-side">
                                 <h:form id="actionRequestListForm">
 
                                     <h2>Current Request List</h2>
@@ -256,7 +256,7 @@
 
                             </h:panelGroup>
 
-                            <h:panelGroup>
+                            <h:panelGroup styleClass="split-page-manage-side">
                                 <h:form id="req-details-form">
 
                                     <h2>
