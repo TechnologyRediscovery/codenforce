@@ -1250,6 +1250,15 @@
     </navigation-rule>
 
     <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>userMuniMapping</from-outcome>
+            <to-view-id>/restricted/cogadmin/userAuthMuniManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
         <from-view-id>/restricted/cogadmin/userAdd.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>userManage</from-outcome>
