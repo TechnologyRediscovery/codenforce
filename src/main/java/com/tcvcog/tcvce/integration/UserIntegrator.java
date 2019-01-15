@@ -223,7 +223,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      * Note that the client method is responsible for moving the cursor on the 
-     * result set object before passing it into this method
+     * result set object before passing it into this method     * 
      * @param rs
      * @return
      * @throws IntegrationException 
@@ -289,7 +289,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     } 
     
     /**
-     * Deprecated from auth version that didn't use Glassfish's authorization scheme
+     * Deprecated from auth version that didn't use Glassfish's authorization scheme     * 
      * @param userID
      * @return
      * @throws IntegrationException 
@@ -326,14 +326,14 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         return newUser;
     }
+    
     /**
      * Primary access point for the entire User system: Called during SessionInitializer actions
      * to create a new session
      * @param userName
      * @return the Fully-baked user object ready to be passed to and fro
      * @throws IntegrationException 
-     */
-   
+     */   
     public User getUser(String userName) throws IntegrationException{
         
         System.out.println("UserIntegrator.getUserByID");
@@ -369,7 +369,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * Users are permitted access to a set of municipalities which are all dumped
      * into a List by this method during the user lookup process.
      * @param uid
-     * @return A liste of Municipalities to which the user should be granted data-related
+     * @return A list of Municipalities to which the user should be granted data-related
      * access within their user type domain
      * @throws IntegrationException 
      */
@@ -404,6 +404,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return muniList;
     }
     
+    /** 
+     * Inserts user-municipality mappings into the loginmuni table. This effectively gives the user
+     * "permissions" to view the data for the municipalities that are linked to their userid.     * 
+     * @param u - A User
+     * @param munilist - A list of municipalities to be mapped to User u
+     * @throws IntegrationException 
+     */
     public void setUserAuthMunis(User u, ArrayList<Municipality> munilist) throws IntegrationException{       
         Connection con = getPostgresCon();
         String query = "INSERT INTO loginmuni (\n" + 
@@ -411,7 +418,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         int userId = u.getUserID();
         PreparedStatement stmt = null;
         
-        // could try go inside the for loop? What are the ramifications?
         try {                   
                 stmt = con.prepareStatement(query);
                 stmt.setInt(1,userId);
@@ -428,10 +434,16 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } finally {
             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
+        }
         
     }
     
+    /**
+     * Removes a user-municipality mapping from the loginmuni table.     * 
+     * @param u - A User
+     * @param muni - A Municipality
+     * @throws IntegrationException 
+     */
     public void deleteUserAuthMuni(User u, Municipality muni) throws IntegrationException{
         Connection con = getPostgresCon();
         String query = "DELETE FROM loginmuni WHERE (userid, muni_municode) = (?,?)";
