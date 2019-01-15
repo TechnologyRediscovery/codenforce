@@ -172,6 +172,7 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
         SearchCoordinator sc = getSearchCoordinator();
         if(searchParams == null){
             searchParams = sc.getDeafaultSearchParamsPersons();
+            searchParams.setMuni(getSessionBean().getActiveMuni());
         }
         return searchParams;
     }

@@ -102,7 +102,14 @@ h4{
     color: black;
 }
 
+.bold-menu-item{
+    color:green;
+}
 
+.ui-menu .ui-menuitem-text{
+    font-weight: bold;
+    
+}
 
 
 
@@ -130,6 +137,10 @@ i.material-icons{
     text-indent: 0px;
 }
 
+.ui-menu .ui-menuitem-link .ui-menuitem-icon, .ui-menu .ui-submenu-icon{
+    padding-right: 8px;
+    
+}
 
 /*
 .icon-box-centered{
@@ -295,6 +306,8 @@ div.headerLink a:before, a:visited{
     background-color: #2C5F90;
     
 }
+
+
 
 .flexing-box-sidebar{
     

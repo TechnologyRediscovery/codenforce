@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -85,7 +85,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return caseList;
     }
     
-    public List<CECase> getCECases(SearchParamsCECase params) throws IntegrationException{
+    public List<CECase> getCECases(SearchParamsCECases params) throws IntegrationException{
         ArrayList<CECase> caseList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;

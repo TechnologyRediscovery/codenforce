@@ -8,18 +8,9 @@
 
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <h:outputStylesheet name="style.css" library="css"/>
-
+        <h:outputStylesheet name="css/style.css"/>
         <title>Code Enforcement</title>
-        <script>
-            function setSideBarHeight() {
-                var height = $('.contentContainer').height();
-                $('.flexing-box-sidebar').height(height);
-            }
-            window.onload = setSideBarHeight;
-        </script>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-
 
     </h:head>
     <h:body>
@@ -45,12 +36,23 @@
                                 
                             <p:menubar>
                                 
-                                    <p:menuitem value="Control" action="missionControl" ajax="false" icon="ui-icon-disk" />
-                                    <p:menuitem value="Properties" action="propertySearch" ajax="false" icon="ui-icon-disk" />
-                                    <p:menuitem value="Persons" action="personSearch"  ajax="false" icon="ui-icon-close"/>
-                                    <p:menuitem value="CE Requests" action="cEActionRequests"  ajax="false" icon="ui-icon-close"/>
-                                    <p:menuitem value="CE Cases" action="ceCases"  ajax="false" icon="ui-icon-close"/>
-                                    <p:menuitem value="CE Events" action="ceCases"  ajax="false" icon="ui-icon-close"/>
+                                <p:submenu icon="fa fa-home" label="Main">
+                                    <p:menuitem value="Mission control" action="missionControl" ajax="false" icon="fa fa-refresh" styleClass="bold-menu-item" />
+                                    <p:menuitem value="Properties" action="properties" ajax="false" icon="fa fa-refresh" />
+                                    <p:menuitem value="Persons" action="persons"  ajax="false" icon="fa fa-users"/>
+                                </p:submenu>
+                                <p:submenu label="Code Enforcement" icon="fa fa-bullhorn">
+                                    <p:menuitem value="CE Requests" action="cEActionRequests"  ajax="false" icon="fa fa-sign-in"/>
+                                    <p:menuitem value="CE Cases" action="ceCases"  ajax="false" icon="fa fa-suitcase"/>
+                                    <p:menuitem value="CE Events" action="ceCases"  ajax="false" icon="fa fa-calendar"/>
+                                    
+                                    <p:submenu label="CE Configuration">
+                                        <p:menuitem value="CE event config" action="eventManage" ajax="false" icon="fa fa-sliders" />
+                                        <p:menuitem value="Court entities" action="litigationManage"  ajax="false" icon="fa fa-university"/>
+                                        <p:menuitem value="Notice text blocks" action="textBlockManage"  ajax="false" icon="fa fa-edit"/>
+                                        
+                                    </p:submenu>
+                                </p:submenu>
 
                             <ui:remove>
                                     
@@ -66,15 +68,8 @@
 
                             </ui:remove>
 
-                                <p:submenu label="CE">
-                                    <p:menuitem value="CE event config" action="eventManage" ajax="false" icon="ui-icon-arrowthick-1-s" />
-                                    <p:menuitem value="Court entities" action="litigationManage"  ajax="false" icon="ui-icon-close"/>
-                                    <p:menuitem value="Notice text blocks" action="textBlockManage"  ajax="false" icon="ui-icon-close"/>
-                                </p:submenu>
 
-
-
-                                <p:submenu label="Occ">
+                                <p:submenu label="Occupancy" icon="fa fa-list-alt" >
                                     <p:menuitem value="Applications" action="occPermitApplications" ajax="false" icon="ui-icon-document" disabled="true"/>
                                     <p:menuitem value="Open inspections" action="occInspections" ajax="false" icon="ui-icon-home" disabled="true" />
                                     <p:menuitem value="New inspection" action="occInspectionAdd" ajax="false" icon="ui-icon-document" disabled="true"/>
@@ -84,8 +79,15 @@
                                     <p:menuitem value="Fee config" action="feeManage" ajax="false" icon="ui-icon-wrench" disabled="true"/>
                                     <p:menuitem value="Permits config"  action="occPermitTypeManage" ajax="false" icon="ui-icon-wrench" disabled="true"/>
                                 </p:submenu>
+                                 
+                                <p:submenu label="Reports" icon="fa fa-book" >
+                                    <p:menuitem value="User activity summary" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-users" />
+                                    <p:menuitem value="Public access metrics" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-heartbeat" />
+                                    <p:menuitem value="Property database stats" action="codeGuideView" disabled="true" ajax="false" icon="fa fa-home" />
+                                    
+                                </p:submenu>
 
-                                <p:submenu label="Code">
+                                <p:submenu label="The Code" icon="fa fa-balance-scale">
                                     <p:menuitem value="Code guide" action="codeGuideView" ajax="false" icon="ui-icon-arrowthick-1-s" />
                                     <p:menuitem value="Active CodeBook" action="codeSetElementList" ajax="false" icon="ui-icon-arrowthick-1-s" />
                                     <p:menuitem value="Code Books" action="codeSetManage" ajax="false" icon="ui-icon-home" />
@@ -94,20 +96,20 @@
                                                 disabled="#{navigationBB.noActiveSource}"/>
                                 </p:submenu>
 
-                                <p:submenu label="Public">
+                                <p:submenu label="Public" icon="fa fa-universal-access">
 
-                                    <p:menuitem value="Public Dashboard" action="systemHome" ajax="false" icon="ui-icon-document" />
-                                    <p:menuitem value="Submit CE Action Request" action="requestCEActionFlow" ajax="false" icon="ui-icon-document"/>
-                                    <p:menuitem value="PACC Search" action="paccSearch" ajax="false" icon="ui-icon-document"/>
+                                    <p:menuitem value="Public Dashboard" action="systemHome" ajax="false" icon="fa fa-sitemap" />
+                                    <p:menuitem value="Submit CE Action Request" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard"/>
+                                    <p:menuitem value="PACC Search" action="paccSearch" ajax="false" icon="fa fa-tag"/>
                                 </p:submenu>
 
-                                <p:submenu label="Settings">
-                                    <p:menuitem value="Users" action="userManage" ajax="false" icon="ui-icon-document" />
-                                    <p:menuitem value="User-Munis" action="userMuniMapping" ajax="false" icon="ui-icon-document" />
-                                    <p:menuitem value="Muni info" action="muniManage" ajax="false" icon="ui-icon-arrowthick-1-s" disabled="false"/>
-                                    <p:menuitem value="Request list changes" action="selectItemListChange" ajax="false" icon="ui-icon-home" />
+                                <p:submenu label="Settings" icon="fa fa-cogs">
+                                    <p:menuitem value="Users" action="userManage" ajax="false" icon="fa fa-user" />
+                                    <p:menuitem value="User-Munis" action="userMuniMapping" ajax="false" icon="fa fa-id-card" />
+                                    <p:menuitem value="Muni info" action="muniManage" ajax="false" icon="fa fa-univsity" disabled="false"/>
+                                    <p:menuitem value="Request list changes" action="selectItemListChange" ajax="false" icon="fa fa-list" />
                                 </p:submenu>
-                                <p:submenu label="Help">
+                                <p:submenu label="Help" icon="fa fa-question-circle">
                                     <p:menuitem value="Report a bug" action="bugReporting" ajax="false" icon="ui-icon-arrowthick-1-s" />
                                     <p:menuitem value="View bug list" action="ticketListing" ajax="false" icon="ui-icon-arrowthick-1-s" />
                                         

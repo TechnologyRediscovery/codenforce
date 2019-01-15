@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Open code enforcement cases</title>
+        <title>Properties</title>
     </h:head>
     <h:body>
         <ui:composition template="../navContainer_restricted.xhtml">
@@ -15,16 +15,16 @@
                 <f:view id="cases-view">
                     <div class="mainContainer">
 
-                        <h:form id="cecases-messages-form">
+                        <h:form id="properties-messages-form">
 
-                            <h:messages id="cecases-messages-global"
+                            <h:messages id="properties-messages-global"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
 
 
-                        <h1><h:outputText value="Open cases in #{sessionBean.activeMuni.muniName}"/></h1>
+                        <h1><h:outputText value="Property manager"/></h1>
                         <h3>List builder:</h3>
                         <h:outputText value="Filer#{caseProfileBB.ceCaseSearchParams.useIsOpen}"/>
                         <h:outputText value="#{caseProfileBB.ceCaseSearchParams.isOpen}"/>
@@ -34,100 +34,176 @@
                                      columnClasses="gridTd-splitPage, gridTd-splitPage">
 
                             <h:panelGroup styleClass="split-page-list-side">
-                                <h2>CE Case docket</h2>
+                                <h2>Property list</h2>
 
-                                <h:form id="caseListForm">
+                                <h:form id="propertySearchForm">
+
+                                    <p:panelGrid columns="5">
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="propSearchITwMuni">
+                                                <h:outputText value="House number"/>
+                                            </p:outputLabel>
+                                            <p:inputText id="propSearchITwMuni" value="#{propertyProfileBB.houseNum}" 
+                                                         style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
+                                            <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="propSearchITStreet">
+                                                <h:outputText value="Street name"/>
+                                            </p:outputLabel>
+                                            <p:inputText id="propSearchITStreet" value="#{propertyProfileBB.streetName}" 
+                                                         style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
+
+                                            <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="personMuniSelectMenu">
+                                                <h:outputText value="Municipality"/>
+                                            </p:outputLabel>
+                                            <p:spacer height="5px"/>
+                                            <p:selectOneMenu id="personMuniSelectMenu" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuniCode}">
+                                                <f:selectItems value="#{muniBB.muniMap}"/>
+                                            </p:selectOneMenu>
+                                            <h:message for="personMuniSelectMenu" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton
+                                                value="Search" tabindex="6" ajax="false"
+                                                icon="fa fa-search"  actionListener="#{propertyProfileBB.searchForProperties}" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="searchAllCB">
+                                                <h:outputText value="Search all municipalities"/>
+                                            </p:outputLabel>
+                                            <p:spacer height="5px"/>
+                                            <p:selectBooleanCheckbox id="searchAllCB" value="#{propertyProfileBB.allMunis}" tabindex="7"
+                                                                     widgetVar="allMuniCB" onchange="PF('muniSelectMenu').disable()"/>
+                                        </h:panelGroup>
+
+                                    </p:panelGrid>
+
+                                    <p:dialog header="Search Tips" 
+                                              widgetVar="helpdlg" 
+                                              responsive="true" 
+                                              width="400"
+                                              modal="false"
+                                              height="600">
+                                        <h2>Search tips</h2>
+
+                                        <p>You may enter all or only part of an address for searching in either search field:</p> 
+
+                                        <p>The property "398 HOMER DR" can be found by searching for "39" in House number and "hom" in street name.</p>
+
+                                        <p>Searches are case inSensitIVe!</p>
+
+                                        <p>You cannot "chop" characters from the middle of an address: 
+                                            So you cannot find our example 398 HOMER DR by searching for "38" and "her dr".</p>
+
+                                        <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+
+                                    </p:dialog>
+                                    <p:spacer height="5px"/>
+                                    <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                                    <p:spacer height="5px"/>
+
+                                    <h2>Search Results:</h2>
 
 
+                                    <p:spacer height="10px"/>
 
-                                    <p:spacer height="15px"/>
                                     <p:dataTable
-                                        id="caseTable"
-                                        var="c"
-                                        filteredValue="#{caseProfileBB.filteredCaseList}"
-                                        rowKey="#{c.caseID}"
-                                        rowExpandMode="multiple"
-                                        widgetVar="ceViewTable"
-                                        value="#{caseProfileBB.caseList}"
-                                        tableStyleClass="primeDataTable">
+                                        id="propSearchTable"
+                                        var="prop"
+                                        value="#{propertyProfileBB.propList}"
+                                        rowKey="#{prop.propertyID}"
+                                        filteredValue="#{propertyProfileBB.filteredPropList}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="false" tabindex="6"
+                                        >
 
-                                        <p:column width="8%">
+                                        <p:column width="5%">
                                             <f:facet name="header">
-                                                <h:outputText value="ID" />
+                                                <h:outputText value="New Case"/>
                                             </f:facet>
-                                            <h:outputText value="#{c.caseID}"/>
+                                            <p:commandButton icon="fa fa-legal"
+                                                             action="#{propertyProfileBB.openCECase(prop)}" 
+                                                             ajax="false"/>
                                         </p:column>
-                                        <p:column width="15%" sortBy="#{c.property.address}">
+                                        <p:column>
                                             <f:facet name="header">
-                                                <h:outputText value="Property" />
+                                                <h:outputText value="Address"/>
                                             </f:facet>
-                                            <h:outputText value="#{c.property.address}"/>
-                                        </p:column>
-                                        <p:column width="15%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Name" />
-                                            </f:facet>
-                                            <h:outputText value="#{c.caseName}"/>
-                                        </p:column>
-                                        <p:column width="8%" sortBy="#{c.caseStage}"
-                                                  filterBy="#{c.caseStage}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Stage" />
-                                            </f:facet>
-                                            <h:outputText value="#{c.caseStage}"/>
+                                            <h:outputText value="#{prop.address}" />
                                         </p:column>
 
-                                        <p:column width="20%"
-                                                  sortBy="#{c.casePhase.label}"
-                                                  filterBy="#{c.casePhase.label}">
+                                        <p:column>
                                             <f:facet name="header">
-                                                <h:outputText value="Phase" />
+                                                <h:outputText value="Municipality" />
                                             </f:facet>
-                                            <h:outputText value="#{c.casePhase.label}"/>
+                                            <h:outputText value="#{prop.muni.muniName}"/>
                                         </p:column>
 
-                                        <p:column width="8%" sortBy="#{c.caseAge}">
+                                        <p:column>
                                             <f:facet name="header">
-                                                <h:outputText value="Age" />
+                                                <h:outputText value="Parcel ID"/>
                                             </f:facet>
-                                            <h:outputText value="#{c.caseAge}"/>
+                                            <h:outputText value="#{prop.parID}" />
                                         </p:column>
-                                        <p:column width="8%" exportable="false">
+
+                                        <p:column>
                                             <f:facet name="header">
-                                                <h:outputText value="manage" />
+                                                <h:outputText value="Lot and Block"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.lotAndBlock}" />
+                                        </p:column>
+
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Use Type"/>
+                                            </f:facet>
+                                            <h:outputText value="#{prop.propertyUseType}" />
+                                        </p:column>
+
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value=""/>
                                             </f:facet>
                                             <p:commandButton icon="fa fa-hand-o-right"
                                                              actionListener="#{caseProfileBB.manageCECase(c)}" 
                                                              ajax="true"
                                                              update="
-                                                                case-details-form:header-id-ot
-                                                                case-details-form:header-type-ot
-                                                                case-details-form:header-addr-ot
-                                                                case-details-form:header-muni-ot
-                                                                case-details-form:selcase-id-ot
-                                                                case-details-form:selcase-addr-ot
-                                                                case-details-form:selcase-muni-ot
-                                                                case-details-form:selcase-stage-ot
-                                                                case-details-form:selcase-odate-it
-                                                                case-details-form:selcase-cdate-it
-                                                                case-details-form:selcase-age-it
-                                                                case-details-form:selcase-manager-it
-                                                                case-details-form:selcase-pacc
-                                                                case-details-form:selcase-access-sbcb
-                                                                case-details-form:selcase-forwardlinking-sbcb
-                                                                case-details-form:violationTable
+                                                             case-details-form:header-id-ot
+                                                             case-details-form:header-type-ot
+                                                             case-details-form:header-addr-ot
+                                                             case-details-form:header-muni-ot
+                                                             case-details-form:selcase-id-ot
+                                                             case-details-form:selcase-addr-ot
+                                                             case-details-form:selcase-muni-ot
+                                                             case-details-form:selcase-stage-ot
+                                                             case-details-form:selcase-odate-it
+                                                             case-details-form:selcase-cdate-it
+                                                             case-details-form:selcase-age-it
+                                                             case-details-form:selcase-manager-it
+                                                             case-details-form:selcase-pacc
+                                                             case-details-form:selcase-access-sbcb
+                                                             case-details-form:selcase-forwardlinking-sbcb
+                                                             case-details-form:violationTable
                                                              "/>
                                         </p:column>
+
                                     </p:dataTable>
-
-
-
-                                    <p:commandLink value="Export case docket as pdf" ajax="false">
-                                        <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
-                                    </p:commandLink>
-
-                                    <p:spacer height="10px"/>
                                 </h:form>
+
+
                             </h:panelGroup>  
 
 
@@ -204,7 +280,7 @@
 
 
                                             <h:panelGroup>
-                                                
+
                                                 <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
                                                 <h:outputText id="selcase-pacc" value="#{caseProfileBB.selectedCase.publicControlCode}"/>
                                                 <p:spacer height="5px"/>
@@ -227,10 +303,10 @@
                                         </h:panelGrid>
 
                                     </div>
-                                    
+
                                     <h3>code violations:  </h3>
-                                    
-                                        
+
+
                                     <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
                                                      value="Add new code violation to case"
                                                      icon="fa fa-plus"/>
@@ -273,7 +349,7 @@
                                                 <h:outputText value="Days left" />
                                             </f:facet>
                                             <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
-                                            
+
                                         </p:column>
 
                                         <p:column width="15%">
@@ -287,12 +363,12 @@
                                             <p:commandButton ajax="false" action="#{caseProfileBB.recordCompliance(v)}"
                                                              icon="fa fa-check" />
                                         </p:column>
-                                        
-                                        
+
+
 
 
                                         <p:rowExpansion>
-                                            
+
                                             <div class="outlinedBox">
                                                 <h3>Violation details</h3>
                                                 <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
@@ -301,7 +377,7 @@
 
                                                 <h:outputText value="ID: " />
                                                 <h:outputText value="#{v.violationID}"/>
-                                                
+
                                                 <h:outputText value="Citations: " />
                                                 <h:outputText value="#{v.citationsStringList}"/>
 
@@ -312,10 +388,10 @@
 
                                                 <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
                                                 <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                               #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                               #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                               #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                               #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
@@ -337,27 +413,27 @@
                                         </p:rowExpansion>
 
                                     </p:dataTable> 
-                                    
-                                    
+
+
                                     <h3>Notice letters</h3>
-                                    
-                                    
+
+
                                     <h3>Citations</h3>
-                                    
-                                    
+
+
                                     <h3>Events</h3>
-                                        
+
 
 
                                     <h:outputLabel styleClass="bold" value="Available actions:"/>
 
                                     <p:spacer height="5px"/>
 
-                                  
 
 
 
-                                        
+
+
                                     <p:commandButton    id="manually-override-status-cb"
                                                         value="Manually override case phase"
                                                         rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
@@ -368,17 +444,17 @@
 
                                 </h:form>
                             </h:panelGroup>
-                            </h:panelGrid>
+                        </h:panelGrid>
 
 
 
-                            <p:dialog       id="unknown_id"
-                                            height="650" width="700"
-                                            widgetVar="unknown-dialog-var"
-                                            closable="true" 
-                                            rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+                        <p:dialog       id="unknown_id"
+                                        height="650" width="700"
+                                        widgetVar="unknown-dialog-var"
+                                        closable="true" 
+                                        rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
 
-                            </p:dialog>
+                        </p:dialog>
 
                     </div>
                 </f:view>

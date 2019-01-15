@@ -342,17 +342,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>propertyProfileBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>propertySearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertySearchBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>propertyUpdateBB</managed-bean-name>
@@ -364,8 +353,8 @@
     <managed-bean>
         <managed-bean-name>ceCasesBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECasesBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>caseProfileBB</managed-bean-name>
@@ -793,12 +782,7 @@
     </navigation-rule>
     
     <navigation-rule>
-        <from-view-id>/restricted/cogview/propertySearch.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/propertyProfile.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
+        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>propertyUpdate</from-outcome>
             <to-view-id>/restricted/cogstaff/propertyUpdate.xhtml</to-view-id>
@@ -809,7 +793,7 @@
         <from-view-id>/restricted/cogstaff/propertyUpdate.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/propertyProfile.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/propertoes.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -837,20 +821,20 @@
         <from-view-id>*</from-view-id>
         
         <navigation-case>
-            <from-outcome>propertySearch</from-outcome>
-            <to-view-id>/restricted/cogview/propertySearch.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/propertyProfile.xhtml</to-view-id>
+            <from-outcome>properties</from-outcome>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
             <from-outcome>propertySearch</from-outcome>
-            <to-view-id>/restricted/cogview/propertySearch.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+
+        <navigation-case>
+            <from-outcome>propertyProfile</from-outcome>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>    
