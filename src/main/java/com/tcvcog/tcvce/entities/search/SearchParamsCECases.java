@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Sylvia Garland
  */
-public class SearchParamsCECase extends SearchParams implements Serializable{
+public class SearchParamsCECases extends SearchParams implements Serializable{
     
     private boolean useIsOpen;
     private boolean isOpen;
@@ -33,7 +33,7 @@ public class SearchParamsCECase extends SearchParams implements Serializable{
      private boolean legacyCase;
     
     
-   public SearchParamsCECase(){
+   public SearchParamsCECases(){
        
    }
 

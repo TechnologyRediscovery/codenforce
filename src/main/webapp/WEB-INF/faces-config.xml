@@ -821,6 +821,12 @@
         <from-view-id>*</from-view-id>
         
         <navigation-case>
+            <from-outcome>properties</from-outcome>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
             <from-outcome>propertySearch</from-outcome>
             <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
