@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 Eric C. Darsow
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.tcvcog.tcvce.util;
 
 import com.tcvcog.tcvce.entities.User;
@@ -6,17 +23,11 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author Dominic Pimpinella
  */
-@FacesConverter(forClass=User.class, value="userConverter")
+@FacesConverter(value="userConverter")
 public class UserConverter extends EntityConverter implements Converter {
     
     @Override
