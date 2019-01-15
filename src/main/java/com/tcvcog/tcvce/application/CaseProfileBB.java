@@ -35,7 +35,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
@@ -67,7 +67,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     private List<CECase> caseList;
     private ArrayList<CECase> filteredCaseList;    
-    private SearchParamsCECase ceCaseSearchParams;
+    private SearchParamsCECases ceCaseSearchParams;
     
     
     private ArrayList<CECase> filteredCaseHistoryList;
@@ -1035,7 +1035,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the ceCaseSearchParams
      */
-    public SearchParamsCECase getCeCaseSearchParams() {
+    public SearchParamsCECases getCeCaseSearchParams() {
         SearchCoordinator sc = getSearchCoordinator();
         if(ceCaseSearchParams == null){
             ceCaseSearchParams = sc.getDefaultSearchParamsCECase();
@@ -1046,7 +1046,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @param ceCaseSearchParams the ceCaseSearchParams to set
      */
-    public void setCeCaseSearchParams(SearchParamsCECase ceCaseSearchParams) {
+    public void setCeCaseSearchParams(SearchParamsCECases ceCaseSearchParams) {
         this.ceCaseSearchParams = ceCaseSearchParams;
     }
 }

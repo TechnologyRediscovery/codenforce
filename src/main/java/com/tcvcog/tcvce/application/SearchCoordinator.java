@@ -5,10 +5,15 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperties;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -40,7 +45,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     + "| found actionrequest param object");
             
             SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
-            sps.setMuni(getSessionBean().getActiveMuni());
 
             LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
             sps.setStartDate(pastTenYears);
@@ -64,8 +68,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECase getDefaultSearchParamsCECase(){
-        SearchParamsCECase spcecase = new SearchParamsCECase();
+    public SearchParamsCECases getDefaultSearchParamsCECase(){
+        SearchParamsCECases spcecase = new SearchParamsCECases();
         
         // superclass 
         spcecase.setFilterByStartEndDate(false);
@@ -85,7 +89,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsPersons getDeafaultSearchParamsPersons(){
         SearchParamsPersons spp = new SearchParamsPersons();
         // on the parent class SearchParams
-        spp.setMuni(getSessionBean().getActiveMuni());
         spp.setFilterByStartEndDate(false);
         spp.setLimitResultCountTo100(true);
         
@@ -106,4 +109,67 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    public SearchParamsProperties getDefaultSearchParamsProperties(){
+        SearchParamsProperties propParams = new SearchParamsProperties();
+        // superclass
+        propParams.setFilterByStartEndDate(false);
+        propParams.setFilterByObjectID(false);
+        propParams.setLimitResultCountTo100(true);
+        
+        // subclass SearchParamsProperties
+        propParams.setFilterByLotAndBlock(false);
+        propParams.setFilterByParcelID(false);
+        propParams.setFilterByAddressPart(true);
+        propParams.setFilterByStreetPart(true);
+        propParams.setFilterByCECaseStartEndDate(false);
+        propParams.setFilterByRental(false);
+        propParams.setFilterByVacant(false);
+        propParams.setFilterByUnits(false);
+        propParams.setFilterBySource(false);
+        propParams.setFilterByPropertyUseType(false);
+        propParams.setFilterByPerson(false);
+        
+        return propParams;
+    }
+    
+    public SearchParamsCEEvents getSearchParamsEventsRequiringView(int ownerID){
+        EventCoordinator ec = getEventCoordinator();
+        
+        // event types are always bundled in an EventCategory
+        // so in this case of this query, we don't care about the Category title,
+        // only the type
+        EventCategory timelineEventTypeCategory = ec.getInitializedEventCateogry();
+        timelineEventTypeCategory.setEventType(EventType.Timeline);
+        
+        SearchParamsCEEvents eventParams = new SearchParamsCEEvents();
+        
+        eventParams.setFilterByStartEndDate(false);
+        eventParams.setFilterByObjectID(false);
+        eventParams.setLimitResultCountTo100(true);
+        
+        eventParams.setFilterByEventCategory(false);
+        eventParams.setFilterByEventType(true);
+        eventParams.setEventCategory(timelineEventTypeCategory);
+        
+        eventParams.setFilterByCaseID(false);
+        
+        eventParams.setFilterByEventOwner(true);
+        eventParams.setOwnerUserID(ownerID);
+        
+        eventParams.setFilterByActive(true);
+        eventParams.setIsActive(true);
+        
+        eventParams.setFilterByRequiresViewConfirmation(true);
+        eventParams.setIsViewConfirmationRequired(true);
+        
+        eventParams.setFilterByViewed(true);
+        eventParams.setIsViewed(false);
+        
+        eventParams.setFilterByViewConfirmedBy(false);
+        eventParams.setFilterByViewConfirmedAtDateRange(false);
+        
+        eventParams.setFilterByHidden(false);
+        
+        return eventParams;
+    }
 }
