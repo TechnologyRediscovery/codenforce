@@ -41,7 +41,7 @@
                                     <p:menuitem value="Properties" action="properties" ajax="false" icon="fa fa-refresh" />
                                     <p:menuitem value="Persons" action="persons"  ajax="false" icon="fa fa-users"/>
                                 </p:submenu>
-                                <p:submenu label="Code Enforcement" icon="fa fa-bullhorn">
+                                <p:submenu label="Code Enf" icon="fa fa-bullhorn">
                                     <p:menuitem value="CE Requests" action="cEActionRequests"  ajax="false" icon="fa fa-sign-in"/>
                                     <p:menuitem value="CE Cases" action="ceCases"  ajax="false" icon="fa fa-suitcase"/>
                                     <p:menuitem value="CE Events" action="ceCases"  ajax="false" icon="fa fa-calendar"/>
@@ -87,7 +87,7 @@
                                     
                                 </p:submenu>
 
-                                <p:submenu label="The Code" icon="fa fa-balance-scale">
+                                <p:submenu label="Code" icon="fa fa-balance-scale">
                                     <p:menuitem value="Code guide" action="codeGuideView" ajax="false" icon="ui-icon-arrowthick-1-s" />
                                     <p:menuitem value="Active CodeBook" action="codeSetElementList" ajax="false" icon="ui-icon-arrowthick-1-s" />
                                     <p:menuitem value="Code Books" action="codeSetManage" ajax="false" icon="ui-icon-home" />
@@ -99,7 +99,7 @@
                                 <p:submenu label="Public" icon="fa fa-universal-access">
 
                                     <p:menuitem value="Public Dashboard" action="systemHome" ajax="false" icon="fa fa-sitemap" />
-                                    <p:menuitem value="Submit CE Action Request" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard"/>
+                                    <p:menuitem value="New CE Request" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard"/>
                                     <p:menuitem value="PACC Search" action="paccSearch" ajax="false" icon="fa fa-tag"/>
                                 </p:submenu>
 
@@ -116,7 +116,10 @@
                                 </p:submenu>
 
                                 <f:facet name="options">
-                                    <p:commandButton type="button" action="#{missionControlBB.logout}" value="Logout: #{facesUser.FName} #{facesUser.LName} (#{facesUser.roleType.label})"/>
+                                    <p:commandButton 
+                                                     action="#{missionControlBB.logout}" 
+                                                     value="Logout: #{facesUser.FName} #{facesUser.LName} (#{facesUser.roleType.label})"
+                                                     ajax="false"/>
                                 </f:facet>
                             </p:menubar>
                             </h:form>

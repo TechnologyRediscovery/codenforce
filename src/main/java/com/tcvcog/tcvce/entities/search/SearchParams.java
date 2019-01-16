@@ -22,6 +22,8 @@ import java.time.ZoneId;
 public class SearchParams implements Serializable{
     
     
+    private String searchName;
+    private String searchDescription;
     private Municipality muni;
     private boolean filterByStartEndDate;
     private LocalDateTime startDate;
@@ -38,12 +40,9 @@ public class SearchParams implements Serializable{
     private boolean limitResultCountTo100;
     
     
-    
-    
    public SearchParams(){
        
    }
-   
    
     /**
      * @return the muni
@@ -204,6 +203,34 @@ public class SearchParams implements Serializable{
      */
     public void setFilterByObjectID(boolean filterByObjectID) {
         this.filterByObjectID = filterByObjectID;
+    }
+
+    /**
+     * @return the searchName
+     */
+    public String getSearchName() {
+        return searchName;
+    }
+
+    /**
+     * @param searchName the searchName to set
+     */
+    public void setSearchName(String searchName) {
+        this.searchName = searchName;
+    }
+
+    /**
+     * @return the searchDescription
+     */
+    public String getSearchDescription() {
+        return searchDescription;
+    }
+
+    /**
+     * @param searchDescription the searchDescription to set
+     */
+    public void setSearchDescription(String searchDescription) {
+        this.searchDescription = searchDescription;
     }
 
     

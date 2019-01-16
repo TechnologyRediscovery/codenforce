@@ -22,12 +22,7 @@
 
                     <h:form id="noticeBuilderForm">
 
-                        <p:wizard
-                            nextLabel="Next"
-                            backLabel="Back"
-                            showStepStatus="true"
-                            >
-
+                        
                             <p:tab id="recipeint">
                                 <p:panel header="Select recipient">
                                     <h:messages errorClass="msgError"/>
@@ -689,7 +684,6 @@
                                                  action="#{noticeOfViolationBB.assembleNotice}"
                                                  icon="fa fa-tasks"/>
                             </p:tab>
-                        </p:wizard>
                     </h:form>
                 </div>
             </ui:define>

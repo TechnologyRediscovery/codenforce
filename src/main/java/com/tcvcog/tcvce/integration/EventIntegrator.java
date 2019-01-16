@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.EventExceptionDeprecated;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -29,6 +30,7 @@ import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -456,8 +458,26 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private EventCECase generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException{
-        EventCECase ev = new EventCECase();
+        
+    private EventWithCasePropInfo generateSuperEvent(ResultSet rs) throws SQLException, IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
+        EventWithCasePropInfo ev = new EventWithCasePropInfo();
+        ev = (EventWithCasePropInfo) generateEventFromRS(rs, ev);
+        ev.setEventProp(pi.getProperty(rs.getInt("propertyid")));
+        ev.setEventCase(ci.getCECase(rs.getInt("caseid")));
+        return ev;
+
+    }
+    
+    
+    private EventCECase generateEventFromRS(ResultSet rs, EventCECase premadeEvent) throws SQLException, IntegrationException{
+        EventCECase ev;
+        if(premadeEvent != null){
+            ev = premadeEvent; 
+        } else {
+            ev = new EventCECase();
+        }
         UserIntegrator ui = getUserIntegrator();
         
         ev.setEventID(rs.getInt("eventid"));
@@ -492,6 +512,162 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;
     }
     
+      /*
+        
+        sb.append("SELECT ceevent.eventid, ");
+        sb.append("ceevent.notes, ");
+        sb.append("ceevent.hidden, ");
+        sb.append("ceevent.ceeventcategory_catid, ");
+        sb.append("ceevent.requiresviewconfirmation, ");
+        sb.append("ceevent.activeevent, ");
+        sb.append("ceevent.disclosetopublic, ");
+        sb.append("ceevent.disclosetomunicipality, ");
+        sb.append("ceevent.login_userid, ");
+        sb.append("ceevent.eventdescription, ");
+        sb.append("ceevent.eventtimestamp, ");
+        sb.append("ceevent.dateofrecord, ");
+        sb.append("ceevent.viewconfirmedby, ");
+        sb.append("ceevent.viewconfirmedat, ");
+        sb.append("property.propertyid, ");
+        sb.append("cecase.caseid, ");
+        sb.append("ceeventcategory.categoryid ");
+        sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
+        sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
+        sb.append("INNER JOIN property on (property_propertyid = propertyid) ");
+        sb.append("WHERE categorytype = CAST ('Timeline' AS ceeventtype) ");
+        sb.append("AND municipality_municode = ?");
+        */
+    
+    public List<EventWithCasePropInfo> getEvents(SearchParamsCEEvents params) throws IntegrationException, IntegrationException{
+        List<EventWithCasePropInfo> eventList = new ArrayList<>();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        Connection con = getPostgresCon();
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ceevent.eventid, ");
+        sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
+        sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
+        sb.append("INNER JOIN property on (property_propertyid = propertyid) ");
+        sb.append("WHERE ");
+        // as long as this isn't an ID only search, do the normal SQL building process
+         if (!params.isFilterByObjectID()) {
+            sb.append("municipality_municode = ? ");
+            if(params.isFilterByStartEndDate() || params.isFilterByViewConfirmedAtDateRange()){
+                sb.append("AND dateofrecord BETWEEN ? AND ? "); // parm 2 and 3 without ID
+            } 
+            
+            if(params.isFilterByEventCategory()){
+                sb.append("AND ceeventcategory_catid = ? ");
+            }
+            
+            if(params.isFilterByEventType()){
+                sb.append("AND categorytype = CAST ('?' AS ceeventtype) ");
+            }
+            
+            if(params.isFilterByCaseID()){
+                sb.append("AND cecase_caseid = ?");
+            }
+            
+            if(params.isFilterByEventOwner()){
+                sb.append("AND login_userid = ?");
+            }
+            
+            if(params.isFilterByActive()){
+                if(params.isIsActive()){
+                    sb.append("AND activeevent = TRUE ");
+                } else {
+                    sb.append("AND activeevent = FALSE ");
+                }
+            }
+            
+            if(params.isFilterByRequiresViewConfirmation()){
+                if(params.isIsViewConfirmationRequired()){
+                    sb.append("AND requiresviewconfirmation = TRUE ");
+                } else {
+                    sb.append("AND requiresviewconfirmation = FALSE ");
+                }
+            }
+            
+            if(params.isFilterByHidden()){
+                if(params.isIsHidden()){
+                    sb.append("AND hidden = TRUE ");
+                } else {
+                    sb.append("AND hidden = FALSE ");
+                }
+            }
+            
+            if(params.isFilterByViewed()){
+                if(params.isIsViewed()){
+                    sb.append("AND viewconfirmedby IS NOT NULL ");
+                } else {
+                    sb.append("AND viewconfirmedby IS NULL ");
+                }
+            }
+            
+            if(params.isFilterByViewConfirmedBy()){    
+                sb.append("AND viewconfirmedby = ? ");
+            }
+            
+        } else {
+            sb.append("AND eventid = ? "); // will be param 2 with ID search
+        }
+        sb.append(";");
+
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            
+            if(!params.isFilterByObjectID()){
+                stmt.setInt(1, params.getMuni().getMuniCode());
+                if(params.isFilterByStartEndDate()){
+                    stmt.setTimestamp(2, params.getStartDateSQLDate());
+                    stmt.setTimestamp(3, params.getEndDateSQLDate());
+                }
+            } else {
+                stmt.setInt(1, params.getObjectID());
+            }
+            
+            rs = stmt.executeQuery();
+            
+            int counter = 0;
+            int maxResults;
+            if(params.isLimitResultCountTo100()){
+                maxResults = 100;
+            } else {
+                maxResults = Integer.MAX_VALUE;
+            }
+            while(rs.next() && counter < maxResults){
+                eventList.add(generateSuperEvent(rs));
+                counter++;
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+
+        }// close try/catch
+
+        return eventList;
+    }
+
+    
+    /**
+     * First gen query for a single purpose: introducing SearchParams objects with SQL assembly logic
+     * in the integration methods
+     * 
+     * @deprecated 
+     * @param m
+     * @param start
+     * @param end
+     * @return
+     * @throws IntegrationException 
+     */
     public List<EventWithCasePropInfo> getUpcomingTimelineEvents(Municipality m, LocalDateTime start, LocalDateTime end) throws IntegrationException{
         
         ArrayList<EventWithCasePropInfo> eventList = new ArrayList<>();
