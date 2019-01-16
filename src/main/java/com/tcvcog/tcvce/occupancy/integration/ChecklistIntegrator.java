@@ -133,7 +133,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
     }
     
-    public void insertSpaceMetatData(Space s) throws IntegrationException{
+    public void insertSpaceMetaData(Space s) throws IntegrationException{
         
         String query = "INSERT INTO public.space(\n" +
                         " spaceid, name, spacetype)\n" +
