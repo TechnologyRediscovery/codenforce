@@ -639,6 +639,11 @@ img.headerImg{
     
 }
 
+.spacier-rows{
+    height: 150%;
+    
+}
+
 
 table.primeDataTable td{
     font-size: small;
