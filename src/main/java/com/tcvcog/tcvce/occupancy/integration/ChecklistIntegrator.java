@@ -46,14 +46,14 @@ import java.util.ListIterator;
 public class ChecklistIntegrator extends BackingBeanUtils implements Serializable {
 
     /**
-     * Creates a new instance of InspectionChecklistIntegrator
+     * Creates a new instance of ChecklistIntegrator
      */
     public ChecklistIntegrator() {
     }
     
     public void createChecklistBlueprintMetadata(ChecklistBlueprint bpMetaData) throws IntegrationException{
         
-        String query = "INSERT INTO public.inspectionchecklist(\n" +
+        String query = "INSERT INTO public.checklist(\n" +
                         " checklistid, title, description, muni_municode, active)\n" +
                         " VALUES (DEFAULT, ?, ?, ?, ?);";
         Connection con = getPostgresCon();
@@ -81,7 +81,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     
     public void updateChecklistBlueprintMetadata(ChecklistBlueprint blueprint) throws IntegrationException{
         
-        String query = "UPDATE public.inspectionchecklist\n" +
+        String query = "UPDATE public.checklist\n" +
                         " SET title=?, description=?, muni_municode=?, active=?\n" +
                         " WHERE checklistid=?;";
         Connection con = getPostgresCon();
@@ -186,7 +186,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     
     public Space getSpaceWithElements(int spaceID) throws IntegrationException{
         
-        String query =  "SELECT name, spacetype\n" +
+        String query =  "SELECT name, spacetype_id\n" +
                         "  FROM public.space WHERE spaceid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -221,7 +221,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     
      public InspectedSpace populateInspectedSpaceMetadata(InspectedSpace is) throws IntegrationException{
         
-        String query =  "SELECT name, spacetype\n" +
+        String query =  "SELECT name, spacetype_id\n" +
                         "  FROM public.space WHERE spaceid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -257,12 +257,12 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * blueprint which can be converted into an implemented checklist
      * @param s the space Object to load up with elements. When passed in, only the ID
      * needs to be held in the object
-     * @return a Spcae object populated with CodeElement objects
+     * @return a Space object populated with CodeElement objects
      * @throws IntegrationException 
      */
     private Space populateSpaceWithCodeElements(Space s) throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
-        String query =  "SELECT spaceelementid, spaceid, codeelement_eleid\n" +
+        String query =  "SELECT spaceelementid, space_id, codeelement_id\n" +
                         " FROM public.spaceelement WHERE spaceid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -275,7 +275,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(1, s.getSpaceid());
             rs = stmt.executeQuery();
             while(rs.next()){
-                eleList.add(ci.getCodeElement(rs.getInt("codeelement_eleid")));
+                eleList.add(ci.getCodeElement(rs.getInt("codeelement_id")));
             }
             
             s.setElementList(eleList);
@@ -302,7 +302,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     public void attachCodeElementsToSpace(Space s, ArrayList<CodeElement> elementsToAttach) throws IntegrationException{
         
         String query =  "INSERT INTO public.spaceelement(\n" +
-                        " spaceelementid, spaceid, codeelement_eleid)\n" +
+                        " spaceelementid, space_id, codeelement_id)\n" +
                         " VALUES (DEFAULT, ?, ?);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -340,7 +340,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     public void detachCodeElementFromSpace(Space s, CodeElement elementToDetach) throws IntegrationException{
         
         String query = "DELETE FROM public.spaceelement\n" +
-                        " WHERE spaceid = ? AND spaceelementid = ?;";
+                        " WHERE space_id = ? AND spaceelementid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
