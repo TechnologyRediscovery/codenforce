@@ -158,7 +158,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
     }
     
-    public void updateSpaceMetatData(Space s) throws IntegrationException{
+    public void updateSpaceMetaData(Space s) throws IntegrationException{
         
         String query =  "UPDATE public.space\n" +
                         " SET name=?, spacetype=?\n" +
