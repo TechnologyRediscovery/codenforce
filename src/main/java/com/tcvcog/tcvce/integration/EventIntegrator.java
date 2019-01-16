@@ -538,7 +538,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("AND municipality_municode = ?");
         */
     
-    public List<EventWithCasePropInfo> getEvents(SearchParamsCEEvents params) throws IntegrationException, IntegrationException{
+    public List<EventWithCasePropInfo> getEvents(SearchParamsCEEvents params) throws IntegrationException{
         List<EventWithCasePropInfo> eventList = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -552,9 +552,16 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("WHERE ");
         // as long as this isn't an ID only search, do the normal SQL building process
          if (!params.isFilterByObjectID()) {
-            sb.append("municipality_municode = ? ");
-            if(params.isFilterByStartEndDate() || params.isFilterByViewConfirmedAtDateRange()){
+            sb.append("municipality_municode = ? "); // param 1
+            
+            if(params.isFilterByStartEndDate()){
                 sb.append("AND dateofrecord BETWEEN ? AND ? "); // parm 2 and 3 without ID
+            } 
+            // if both date range searches are speified, only include start/end date
+            if( params.isFilterByViewConfirmedAtDateRange() 
+                    &&
+                (!params.isFilterByViewConfirmedAtDateRange())){
+                sb.append("AND viewconfirmedat BETWEEN ? AND ? "); // parm 2 and 3 without ID
             } 
             
             if(params.isFilterByEventCategory()){
@@ -624,11 +631,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setTimestamp(2, params.getStartDateSQLDate());
                     stmt.setTimestamp(3, params.getEndDateSQLDate());
                 }
+            
+            // ignore all other criteria and just search by ID
             } else {
                 stmt.setInt(1, params.getObjectID());
             }
             
             rs = stmt.executeQuery();
+            
+            java.sql.Statement st = con.createStatement();
             
             int counter = 0;
             int maxResults;
@@ -644,7 +655,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
+//            throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
         } finally {
             
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -757,7 +768,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public List<EventCECase> getEventsRequiringViewConfirmation(User u){
+    /**
+     * 
+     * @param u
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventCECase> getEventsRequiringViewConfirmation(User u) throws IntegrationException{
         EventCECase ev = null;
         ArrayList<EventCECase> eventList = new ArrayList<>();
         
@@ -832,7 +849,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while(rs.next()){
-                ev = generateEventFromRS(rs);
+                ev = generateEventFromRS(rs, null);
             }
 
         } catch (SQLException ex) {
@@ -863,7 +880,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while(rs.next()){
-                eventList.add(generateEventFromRS(rs));
+                eventList.add(generateEventFromRS(rs, null));
             }
 
         } catch (SQLException ex) {

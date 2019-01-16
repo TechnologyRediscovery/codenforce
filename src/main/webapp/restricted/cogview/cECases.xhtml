@@ -115,7 +115,11 @@
                                                              case-details-form:selcase-pacc
                                                              case-details-form:selcase-access-sbcb
                                                              case-details-form:selcase-forwardlinking-sbcb
-                                                             case-details-form:violationTable
+                                                             violation-form:violation-table
+                                                             notices-form:notices-datascroller
+                                                             citation-form:citation-table
+                                                             action-requests-form:actionRequestTable
+                                                             events-form:caseEventTable
                                                              "/>
                                         </p:column>
                                     </p:dataTable>
@@ -135,10 +139,10 @@
                                 <h:form id="case-details-form">
 
                                     <h2>
-                                        Code Enforcement Case #<h:outputText id="header-id-ot" value="#{caseProfileBB.selectedCase.caseID}"/><br/> 
-                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.selectedCase.caseName}"/>
-                                        at <h:outputText id="header-addr-ot" value="#{caseProfileBB.selectedCase.property.address} "/>  
-                                        <h:outputText id="header-muni-ot" value="(#{caseProfileBB.selectedCase.property.muni.muniName})"/>  
+                                        Code Enforcement Case #<h:outputText id="header-id-ot" value="#{caseProfileBB.currentCase.caseID}"/><br/> 
+                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName}"/>
+                                        at <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
+                                        <h:outputText id="header-muni-ot" value="(#{caseProfileBB.currentCase.property.muni.muniName})"/>  
 
                                     </h2>
 
@@ -150,22 +154,22 @@
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Case ID:" />
                                                 <div class="rowExpansion">
-                                                    <h:outputText id="selcase-id-ot"  value="#{caseProfileBB.selectedCase.caseID}"/>
+                                                    <h:outputText id="selcase-id-ot"  value="#{caseProfileBB.currentCase.caseID}"/>
                                                 </div>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Property:"/>
                                                 <div class="rowExpansion">
-                                                    <h:outputText id="selcase-addr-ot" value="#{caseProfileBB.selectedCase.property.address}"/><br/>
-                                                    <h:outputText id="selcase-muni-ot" value="#{caseProfileBB.selectedCase.property.muni.muniName} (#{caseProfileBB.selectedCase.property.propertyUseType})"/><br/>
+                                                    <h:outputText id="selcase-addr-ot" value="#{caseProfileBB.currentCase.property.address}"/><br/>
+                                                    <h:outputText id="selcase-muni-ot" value="#{caseProfileBB.currentCase.property.muni.muniName} (#{caseProfileBB.currentCase.property.propertyUseType})"/><br/>
                                                 </div>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Stage and Phase:" />
                                                 <div class="rowExpansion">
-                                                    <h:outputText id="selcase-stage-ot" value="#{caseProfileBB.selectedCase.caseStage}: #{caseProfileBB.selectedCase.casePhase.label} "/>
+                                                    <h:outputText id="selcase-stage-ot" value="#{caseProfileBB.currentCase.caseStage}: #{caseProfileBB.currentCase.casePhase.label} "/>
                                                 </div>
                                             </h:panelGroup>
 
@@ -173,7 +177,7 @@
                                                 <h:outputLabel styleClass="bold" value="Opening Date:"/>
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
-                                                    <h:outputText id="selcase-odate-it" value="#{caseProfileBB.selectedCase.originiationDatePretty}"/>
+                                                    <h:outputText id="selcase-odate-it" value="#{caseProfileBB.currentCase.originiationDatePretty}"/>
                                                 </div>
                                             </h:panelGroup>
 
@@ -181,14 +185,14 @@
                                                 <h:outputLabel styleClass="bold" value="Closing Date:"/>
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
-                                                    <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.selectedCase.closingDatePretty}"/>
+                                                    <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.currentCase.closingDatePretty}"/>
                                                 </div>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Age (Days)" />
                                                 <div class="rowExpansion">
-                                                    <h:outputText id="selcase-age-it" value="#{caseProfileBB.selectedCase.caseAge}" rendered="" />
+                                                    <h:outputText id="selcase-age-it" value="#{caseProfileBB.currentCase.caseAge}" rendered="" />
                                                 </div>
                                             </h:panelGroup>
 
@@ -197,7 +201,7 @@
                                                 <h:outputLabel styleClass="bold" value="Manager:"/>
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
-                                                    <h:outputText id="selcase-manager-it" value="#{caseProfileBB.selectedCase.user.FName} #{caseProfileBB.selectedCase.user.LName}"/>
+                                                    <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.user.FName} #{caseProfileBB.currentCase.user.LName}"/>
                                                 </div>
                                             </h:panelGroup>
 
@@ -206,17 +210,17 @@
                                             <h:panelGroup>
 
                                                 <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
-                                                <h:outputText id="selcase-pacc" value="#{caseProfileBB.selectedCase.publicControlCode}"/>
+                                                <h:outputText id="selcase-pacc" value="#{caseProfileBB.currentCase.publicControlCode}"/>
                                                 <p:spacer height="5px"/>
                                                 <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
-                                                <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.selectedCase.paccEnabled}"
+                                                <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
                                                                          disabled="#{!sessionBean.accessKeyCard.hasMuniStaffPermissions}">
                                                     <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
                                                 </p:selectBooleanCheckbox>
                                                 <p:spacer height="5px"/>
                                                 <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
                                                 <h:outputText value=" "/>
-                                                <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.selectedCase.paccEnabled}"
+                                                <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
                                                                          disabled="#{!sessionBean.accessKeyCard.hasMuniStaffPermissions}">
                                                     <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
                                                 </p:selectBooleanCheckbox>
@@ -228,6 +232,13 @@
 
                                     </div>
 
+                                </h:form>
+
+                             
+
+                                <h:form id="violation-form">
+
+
                                     <h3>code violations:  </h3>
 
 
@@ -237,12 +248,10 @@
                                     <p:spacer height="15px"/>
 
                                     <p:dataTable
-                                        id="violationTable"
+                                        id="violation-table"
                                         var="v"
-                                        selectionMode="mulitiple"
-                                        selection="#{caseProfileBB.selectedViolations}"
                                         rowKey="#{v.violationID}"
-                                        value="#{caseProfileBB.selectedCase.violationList}"
+                                        value="#{caseProfileBB.currentCase.violationList}"
                                         tableStyleClass="primeDataTable"
                                         expandedRow="false"
                                         rowExpandMode="multiple"
@@ -338,22 +347,19 @@
 
                                     </p:dataTable> 
 
+                                </h:form>
+
+                                <h:form id="notices-form">
+
 
                                     <h3>Notices of violation</h3>
 
-                                    <p:commandButton ajax="false" action="#{caseProfileBB.createNewNoticeForAllViolations}"
-                                                     value="Generate Notice Letter for all Violations"/>
-
-                                    <p:commandButton disabled="false" ajax="false" 
-                                                     action="#{caseProfileBB.createNewNoticeForSelectedViolations()}"
-                                                     value="Generate Notice Letter for selected violations"
-                                                     icon="fa fa-list"/>
-
-
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.createNewNotice}"
+                                                     value="Build notice of violation letter"/>
 
                                     <p:dataScroller
                                         id="notices-datascroller"
-                                        value="#{caseProfileBB.selectedCase.noticeList}"
+                                        value="#{caseProfileBB.currentCase.noticeList}"
                                         var="notice">
                                         <div class="outlinedBox">
 
@@ -379,52 +385,59 @@
                                                     <h:outputText value="#{notice.letterReturnedDatePretty}"/>
                                                 </h:panelGroup>
 
-                                                <h:panelGroup>
-                                                    <p:commandButton ajax="false" action="#{caseProfileBB.printNotice(notice)}"
-                                                                     value="Edit notice or queue for mailing"
-                                                                     icon="fa fa-edit "/>
-                                                </h:panelGroup>
+                                                <ui:remove>
 
-                                                <h:panelGroup>
-                                                    <p:commandButton ajax="false" action="#{caseProfileBB.editNoticeOfViolation(notice)}"
-                                                                     value="Edit notice or queue for mailing"
-                                                                     icon="fa fa-edit "/>
-                                                </h:panelGroup>
 
-                                                <h:panelGroup>
-                                                    <p:commandButton ajax="false" action="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
-                                                                     value="Mark as sent"
-                                                                     icon="fa fa-send"/>
-                                                </h:panelGroup>
-                                                
-                                                <h:panelGroup>
-                                                    <p:commandButton ajax="false" action="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
-                                                                     value="Mark as returned"
-                                                                     icon="fa fa-mail-reply"/>
-                                                </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <p:commandButton ajax="false" action="#{caseProfileBB.printNotice(notice)}"
+                                                                         value="Edit notice"
+                                                                         icon="fa fa-edit "/>
+                                                    </h:panelGroup>
 
-                                                <h:panelGroup>
-                                                    <p:commandButton ajax="false" action="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
-                                                                     value="Nuke notice"
-                                                                     icon="fa fa-bomb"/>
-                                                </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <p:commandButton ajax="false" action="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
+                                                                         value="Print notice and mark as sent"
+                                                                         icon="fa fa-bomb"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:commandButton ajax="false" action="#{caseProfileBB.editNoticeOfViolation(notice)}"
+                                                                         value="Edit notice or queue for mailing"
+                                                                         icon="fa fa-edit "/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:commandButton ajax="false" action="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
+                                                                         value="Mark as sent"
+                                                                         icon="fa fa-send"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:commandButton ajax="false" action="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
+                                                                         value="Mark as returned"
+                                                                         icon="fa fa-mail-reply"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:commandButton ajax="false" action="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
+                                                                         value="Nuke notice"
+                                                                         icon="fa fa-bomb"/>
+                                                    </h:panelGroup>
+                                                </ui:remove>
+
                                             </h:panelGrid>
                                         </div>
 
 
                                     </p:dataScroller>
-                                            <div class="outlinedBox">
-                                                <h3>Full letter text</h3>
-                                                <h:outputText value="#{notice.noticeText}" id="letterTextBox" escape="false"/>
-                                            </div>
-
-                                        </p:rowExpansion>
 
 
-                                    </p:dataTable>
+                                </h:form>
 
-                                    <p:spacer height="15px"/>
+                                <p:spacer height="15px"/>
 
+
+                                <h:form id="citation-form">
 
 
                                     <h3>Citations</h3>
@@ -438,18 +451,17 @@
                                                      icon="fa fa-warning"/>
 
                                     <p:dataTable
-                                        id="citationTable"
+                                        id="citation-table"
                                         var="citation"
                                         selectionMode="single"
                                         selection="#{caseProfileBB.selectedCitation}"
                                         rowKey="#{citation.citationID}"
-                                        value="#{caseProfileBB.citationList}"
+                                        value="#{caseProfileBB.currentCase.citationList}"
                                         tableStyleClass="primeDataTable"
                                         expandedRow="false"
                                         rowExpandMode="multiple"
                                         draggableColumns="true"
                                         reflow="true">
-
 
                                         <p:column width="4%">
                                             <p:rowToggler />
@@ -511,14 +523,16 @@
                                     <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
                                                      value="Updated selected citation"/>
 
+                                </h:form>
+
+                                <h:form id="action-requests-form">
+
 
                                     <h3>Action Requests</h3>    
 
                                     <p:dataTable
                                         id="actionRequestTable"
                                         var="r"
-                                        selectionMode="single"
-                                        selection="#{caseProfileBB.selectedActionRequest}"
                                         rowKey="#{r.requestID}"
                                         value="#{caseProfileBB.currentCase.requestList}"
                                         tableStyleClass="primeDataTable"
@@ -676,6 +690,11 @@
                                         </p:rowExpansion>
                                     </p:dataTable>
 
+                                </h:form>
+
+                                <h:form id="events-form">
+
+
                                     <h3>Events</h3>
 
 
@@ -685,7 +704,7 @@
                                         selectionMode="single"
                                         selection="#{caseProfileBB.selectedEvent}"
                                         rowKey="#{e.eventID}"
-                                        value="#{caseProfileBB.eventList}"
+                                        value="#{caseProfileBB.currentCase.eventList}"
                                         tableStyleClass="primeDataTable"
                                         resizableColumns="true"
                                         rowExpandMode="multiple"
@@ -777,12 +796,14 @@
                                                             <h:outputText value="#{e.discloseToPublic}"/>
                                                         </div>
                                                     </h:panelGroup>
+
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Creation time stamp"/>
                                                         <div class="rowExpansion">
                                                             <h:outputText value="#{e.eventTimeStamp}"/>
                                                         </div>
                                                     </h:panelGroup>
+
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Active Event?"/>
                                                         <div class="rowExpansion">
@@ -811,8 +832,6 @@
                                                         </div>
                                                     </h:panelGroup>
 
-
-
                                                     <f:facet name="footer" class="leftalign">
                                                         <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
                                                         <p:spacer height="15px"/>
@@ -824,70 +843,22 @@
                                                 </h:panelGrid>
                                             </div>
                                         </p:rowExpansion>
+
                                     </p:dataTable>
-
-
-                                    <p:commandLink value="Export event history as pdf" ajax="false">
-                                        <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{sessionBean.activeCECase.property.address}_idno#{sessionBean.activeCECase.caseID}_eventHistory"/>
-                                    </p:commandLink>
-
-
-
-
-                                    <h:outputLabel styleClass="bold" value="Available actions:"/>
-
-                                    <p:spacer height="5px"/>
-
-
-
-
-
-
-                                    <p:commandButton    id="manually-override-status-cb"
-                                                        value="Manually override case phase"
-                                                        rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
-                                                        disabled="#{empty caseProfileBB.selectedCase}"
-                                                        icon="fa fa-gears"/>
-
-
-
-                                </h:form>
-                                <h:form id="casePhaseChangeForm">
-
-
-                                    <p:selectOneMenu value="#{caseProfileBB.selectedCasePhase}"
-                                                     id="casePhaseSOM">
-
-                                        <f:selectItems value="#{caseProfileBB.casePhaseList}"
-                                                       var="cp"
-                                                       itemValue="#{cp}"
-                                                       itemLabel="#{cp.label}"/>
-                                    </p:selectOneMenu>
-                                    <p:spacer/>
-                                    <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
-                                                     value="Override to selected phase"/>
-
-                                    <p:spacer height="10px"/>
 
                                     <ui:remove>
 
-                                        <p:commandButton onclick="PF('cd').show()" type="button" icon="fa fa-bullhorn"
-                                                         value="Manually override case phase to selected value"/>
 
-                                        <p:confirmDialog message="Manually override a case's phase can cause a spaghetti-like mess of our
-                                                         case management process. Note: This action will generate a special event which will
-                                                         be analyzed at our next group meeting to discuss changes to our standard protocol to avoid
-                                                         the need for any manual case phase changes. Please add a note event to the case to explain
-                                                         why the case phase is being changed manually." severity="alert" widgetVar="cd">
-
-                                            <p:commandButton value="Abort override" onclick="PF('cd').hide()" type="button" icon="fa fa-stop"/>
-                                            <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
-                                                             value="Yes, override phase" oncomplete="PF('cd').hide()"/>
-                                        </p:confirmDialog>
+                                        <p:commandLink value="Export event history as pdf" ajax="false">
+                                            <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{sessionBean.activeCECase.property.address}_idno#{sessionBean.activeCECase.caseID}_eventHistory"/>
+                                        </p:commandLink>
 
                                     </ui:remove>
 
+
                                 </h:form>
+
+
 
 
                             </h:panelGroup>

@@ -558,7 +558,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // new letters won't have a LocalDateTime object
         // so insert instead of update in this case
         if(nov.getInsertionTimeStamp() == null){
-            cvi.insertViolationLetter(c, nov);
+            cvi.insertNoticeOfViolation(c, nov);
             
         } else {
             cvi.updateViolationLetter(nov);
