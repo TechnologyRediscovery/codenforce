@@ -493,7 +493,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     
     /**
      * Utility method for populating a ChecklistBlueprint with metadata
-     * @param rs containing all metatdata fields from the checklist table
+     * @param rs containing all metadata fields from the checklist table
      * @return half-baked ChecklistBlueprint object (no element lists)
      */
     private ChecklistBlueprint generateChecklistBlueprint(ResultSet rs) throws SQLException, IntegrationException{
