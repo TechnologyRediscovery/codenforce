@@ -179,9 +179,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
     
     
     
-    public String recordCompliance() throws IntegrationException{
+    public void recordCompliance(CodeViolation cv) throws IntegrationException{
         CaseCoordinator cc = getCaseCoordinator();
         RoleType u = getFacesUser().getRoleType(); 
+        selectedViolations = new ArrayList<>();
+        selectedViolations.add(cv);
+        
         
         EventCoordinator ec = getEventCoordinator();
         if(!selectedViolations.isEmpty()){
@@ -192,30 +195,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable{
             // when event is submitted, send violation list to c
             getSessionBean().setActiveEvent(e);
             getSessionBean().setActiveViolationList(selectedViolations);
-            return "eventAdd";
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "Please select a violation and try again", ""));
-            return "";
         }
     }
-    public String recordCompliance(CodeViolation cv) throws IntegrationException{
-        CaseCoordinator cc = getCaseCoordinator();
-        RoleType u = getFacesUser().getRoleType(); 
-        
-        EventCoordinator ec = getEventCoordinator();
-            // generate event for compliance with selected violations
-            EventCECase e = ec.generateViolationComplianceEvent(selectedViolations);
-
-            // when event is submitted, send violation list to c
-            getSessionBean().setActiveEvent(e);
-            getSessionBean().setActiveViolationList(selectedViolations);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Please select a violation and try again", ""));
-            return "eventAdd";
-    }
+    
+    
     
     public String editViolation(){
         ArrayList<CodeViolation> ll = new ArrayList();
