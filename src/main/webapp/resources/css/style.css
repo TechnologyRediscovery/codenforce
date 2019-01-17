@@ -68,6 +68,26 @@ h4{
     color:#163F8A;
 }
 
+.property-blue{
+    color: #03305C;
+    
+}
+
+.person-maroon{
+    color: #710040;
+}
+
+.code-enforcement-orange{
+    color: #B36A00;
+}
+
+.occupancy-green{
+    
+}
+
+
+
+
 /*************** END HEADERS ****************/
 
 /*********** MENUS and TABS*********************/
@@ -254,9 +274,42 @@ div.headerLink a:before, a:visited{
 }
 
 /************** END LINKS ******************/
+.two-column-page-flex-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding:5px;
+      
+}
+
+.list-column{
+    flex-basis:auto;
+    flex-shrink: 1;
+    min-width: 450px;
+    max-width: 450px;
+    padding-right:10px;
+    
+    
+}
+
+.object-column{
+    flex-basis: auto;
+    flex-grow: 1;
+    padding-left: 10px;
+
+    
+}
 
 
-/* ----------- MAIN PAGE LAYOUT BOXES -------- */
+
+/* ----------- Primary two-column setup: PAGE LAYOUT BOXES -------- */
+
+
+
+
+
+/* ----------- Horizontal bars: LAYOUT BOXES  (OLD)-------- */
+
 
 
 .flex-box-container{
@@ -495,9 +548,9 @@ div.headerLinkCont{
 }
 
 .infoBarData{
-    font-size: 1.5em;
+    font-size: .9em;
     font-family: mono;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 
@@ -514,6 +567,7 @@ div.headerLinkCont{
 .wrapText{
     white-space: normal;
     overflow-wrap: normal;
+    word-break: break-all;
 }
 
 .outlinedBox{

@@ -42,15 +42,9 @@ Council of Governments, PA
  * @author Eric C. Darsow
  */
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
-    private PropertyWithLists currentProperty;
-    private ArrayList<Person> propertyPersonList;
-    private Person selectedPerson;
+    
+    private PropertyWithLists currProp;
     private ArrayList<Person> filteredPersonList;
-    
-    private ArrayList<CECase> ceCaseList;
-    private CECase selectedCECase;
-    
-    private ArrayList<CEActionRequest> ceActionRequestList;
     
     private String parid;
     private String address;
@@ -65,6 +59,92 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     private int selectedMuniCode;
 
+    
+    /**
+     * Creates a new instance of PropertyProfileBB
+     */
+    public PropertyProfileBB() {
+    }
+    
+     public void searchForProperties(ActionEvent event){
+        System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
+        PropertyIntegrator pi = new PropertyIntegrator();
+        
+        try {
+            if(isAllMunis()){
+                setPropList(pi.searchForProperties(getHouseNum(), getStreetName()));
+            } else {
+                setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSelectedMuniCode()));
+            }
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Your search completed with " + getPropList().size() + " results", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to complete search! ", ""));
+        }
+    }
+    
+    public String openCECase(){
+        getSessionBean().setActiveProp(currProp);
+        return "addNewCase";
+    }
+    
+    public String viewCase(CECase c){
+        getSessionBean().setcECase(c);
+        return "ceCases";
+    }
+    
+    
+    
+    
+    public String viewPersonProfile(Person p){
+        System.out.println("PropertyProfileBB.viewPersonProfile");
+        getSessionBean().setActivePerson(p);
+        return "personProfile";
+    }
+    
+    public void manageProperty(Property prop){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            currProp = pi.getPropertyWithLists(prop.getPropertyID());
+            System.out.println("PropertyProfileBB.manageProperty | curr Prop: " + currProp.getAddress());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    /**
+     * @return the currentProperty
+     */
+    public PropertyWithLists getCurrProp() {
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            if(currProp == null){
+                currProp = pi.getPropertyWithLists(getSessionBean().getActiveProp().getPropertyID());
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return currProp;
+    }
+    
+    /**
+     * @param currentProperty the currentProperty to set
+     */
+    public void setCurrProp(PropertyWithLists currentProperty) {
+        this.currProp = currentProperty;
+    }
+    
+    public String updateProperty(){
+        System.out.println("PropertyProfileBB.updateProperty");
+        return "propertyUpdate";
+        
+    }
+
+    
     /**
      * @return the parid
      */
@@ -205,146 +285,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.selectedMuniCode = selectedMuniCode;
     }
 
-    /**
-     * Creates a new instance of PropertyProfileBB
-     */
-    public PropertyProfileBB() {
-    }
-    
-     public void searchForProperties(ActionEvent event){
-        System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
-        PropertyIntegrator pi = new PropertyIntegrator();
-        
-        try {
-            if(isAllMunis()){
-                setPropList(pi.searchForProperties(getHouseNum(), getStreetName()));
-            } else {
-                setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSelectedMuniCode()));
-            }
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Your search completed with " + getPropList().size() + " results", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to complete search! ", ""));
-        }
-    }
-    
-    public String viewProperty(Property prop){
-        getSessionBean().setActiveProp(prop);
-        return "propertyProfile";
-    }
-    
-    public String openCECase(Property prop){
-        getSessionBean().setActiveProp(prop);
-        return "addNewCase";
-    }
-    
-    
-    
-    public String createCase(){
-        
-        
-        return "addNewCase";
-    }
-    
-    public String viewPersonProfile(Person p){
-        System.out.println("PropertyProfileBB.viewPersonProfile");
-        getSessionBean().setActivePerson(selectedPerson);
-        return "personProfile";
-    }
-    
-    /**
-     * @return the currentProperty
-     */
-    public Property getCurrentProperty() {
-        PropertyIntegrator pi = getPropertyIntegrator();
-        try {
-            currentProperty = pi.getPropertyWithLists(getSessionBean().getActiveProp().getPropertyID());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return currentProperty;
-    }
-    
-    public String viewCase(CECase c){
-        
-        return "caseProfile";
-    }
+   
 
-    /**
-     * @param currentProperty the currentProperty to set
-     */
-    public void setCurrentProperty(PropertyWithLists currentProperty) {
-        this.currentProperty = currentProperty;
-    }
-    
-    public String updateProperty(){
-        System.out.println("PropertyProfileBB.updateProperty");
-        return "propertyUpdate";
-        
-    }
-
-    /**
-     * @return the propertyPersonList
-     */
-    public ArrayList<Person> getPropertyPersonList() {
-        propertyPersonList = currentProperty.getPropertyPersonList();
-        return propertyPersonList;
-    }
-
-    /**
-     * @return the ceCaseList
-     */
-    public ArrayList<CECase> getCeCaseList() {
-        ceCaseList = currentProperty.getPropertyCaseList();
-        return ceCaseList;
-    }
-
-    /**
-     * @return the ceActionRequestList
-     */
-    public ArrayList<CEActionRequest> getCeActionRequestList() {
-        return ceActionRequestList;
-    }
-
-    /**
-     * @param propertyPersonList the propertyPersonList to set
-     */
-    public void setPropertyPersonList(ArrayList<Person> propertyPersonList) {
-        this.propertyPersonList = propertyPersonList;
-    }
-
-    /**
-     * @param ceCaseList the ceCaseList to set
-     */
-    public void setCeCaseList(ArrayList<CECase> ceCaseList) {
-        this.ceCaseList = ceCaseList;
-    }
-
-    /**
-     * @param ceActionRequestList the ceActionRequestList to set
-     */
-    public void setCeActionRequestList(ArrayList<CEActionRequest> ceActionRequestList) {
-        this.ceActionRequestList = ceActionRequestList;
-    }
-
-    /**
-     * @return the selectedPerson
-     */
-    public Person getSelectedPerson() {
-        return selectedPerson;
-    }
-
-    /**
-     * @param selectedPerson the selectedPerson to set
-     */
-    public void setSelectedPerson(Person selectedPerson) {
-        this.selectedPerson = selectedPerson;
-    }
-
+  
     /**
      * @return the filteredPersonList
      */
@@ -359,17 +302,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.filteredPersonList = filteredPersonList;
     }
 
-    /**
-     * @return the selectedCECase
-     */
-    public CECase getSelectedCECase() {
-        return selectedCECase;
-    }
-
-    /**
-     * @param selectedCECase the selectedCECase to set
-     */
-    public void setSelectedCECase(CECase selectedCECase) {
-        this.selectedCECase = selectedCECase;
-    }  
+   
+ 
 }
