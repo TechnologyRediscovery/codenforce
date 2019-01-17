@@ -23,12 +23,12 @@ public class AccessKeyCard implements Serializable{
     private final boolean hasMuniStaffPermissions;
     private final boolean hasMuniReaderPermissions;
 
-    public AccessKeyCard( boolean dev,
-                    boolean admin,
-                    boolean cogstaff,
-                    boolean ceo,
-                    boolean munistaff,
-                    boolean munireader){
+    public AccessKeyCard(   boolean dev,
+                            boolean admin,
+                            boolean cogstaff,
+                            boolean ceo,
+                            boolean munistaff,
+                            boolean munireader){
         
         hasDeveloperPermissions = dev;
         hasSysAdminPermissions = admin;

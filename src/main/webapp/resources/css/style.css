@@ -687,7 +687,8 @@ tr.reinspect{
     background-color: lightpink
 }
 
-td.gridTd {
+/*td.gridTd {*/
+.gridTd {
     border: none;
 }
 

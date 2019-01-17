@@ -50,12 +50,11 @@
                         
                         <p:spacer height="15px"/>
                         
+                        <p:commandButton action="ceCases" icon="fa fa-arrow-left"
+                                         value="cancel without saving"/>
+                        
                         <p:commandButton ajax="false" action="#{noticeOfViolationBB.saveNoticeDraft}"
-                                                icon="fa fa-save" value="Save notice draft (do not queue for mailing)"/>
-                        
-                        <p:commandButton ajax="false" action="#{noticeOfViolationBB.queueNotice}"
-                                                icon="fa fa-paper-plane" value="Queue notice for mailing"/>
-                        
+                                                icon="fa fa-save" value="Save and return to cases"/>
                     </h:form>
                 </div>
                 
