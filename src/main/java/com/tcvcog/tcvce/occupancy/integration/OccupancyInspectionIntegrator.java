@@ -30,8 +30,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * This integrator creates our PostGres connection for DB manipulation
- * @author Adam Gutonski
+ * 
+ * 
  */
 public class OccupancyInspectionIntegrator extends BackingBeanUtils implements Serializable {
     

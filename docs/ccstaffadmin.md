@@ -8,3 +8,4 @@
 5. Keeping tabs on active improvement tickets and coordinating with Eric and staff for updating these (and deciding which are most important)
 6. Generating reports and suggesting ideas for new and improved reports
 7. Thinking high level about what work flows we'd like new versions of the system to support
+8. Becoming the steward of municipal code elements, sources, and enforcability

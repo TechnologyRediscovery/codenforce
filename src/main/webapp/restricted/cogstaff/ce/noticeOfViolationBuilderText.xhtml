@@ -22,6 +22,8 @@
                     <h1>Notice text block builder</h1>
 
                     <h:form id="noticeBuilderForm">
+                        
+                            
 
                                     <h2>Greeting</h2>
                                     <p:selectOneListbox 
@@ -36,15 +38,17 @@
                                             itemLabel="#{block.textBlockName}"/>
                                     </p:selectOneListbox>
                                     
+                        <ui:remove>
                                     <p:commandButton ajax="true" update="blockListOL" 
                                                      actionListener="#{noticeOfViolationBB.addBlockToList}"/>
                                     
                                     <p:orderList id="blockListOL"
                                         value="#{noticeOfViolationBB.selectedBlockList}" var="block"
-                                        itemLabel="#{block}" itemValue="#{block}" 
+                                        itemLabel="#{block.textBlockName}" itemValue="#{block}" 
                                         converter="textBlockConverter">
                                        
                                     </p:orderList>
+                        </ui:remove>
 
                                     <h4>Text preview:</h4>
                                     <p><h:outputText id="greetingOT" value="#{noticeOfViolationBB.greetingBlock.textBlockText}" /> </p>
@@ -55,7 +59,7 @@
                                         tabindex="s"
                                         value="#{noticeOfViolationBB.introBlock}">
                                         <f:converter converterId="textBlockConverter"/>
-                                        <p:ajax update="introOT" immediate="true"/>
+                                        <p:ajax update="noticeBuilderForm:introOT" immediate="true"/>
                                         <f:selectItems
                                             value="#{noticeOfViolationBB.textBlockListByMuni}"
                                             var="block" 
@@ -81,7 +85,7 @@
                                             tabindex="7"
                                             value="#{noticeOfViolationBB.tb1}">
                                             <f:converter converterId="textBlockConverter"/>
-                                            <p:ajax update="optional1OT" immediate="true"/>
+                                            <p:ajax update="noticeBuilderForm:optional1OT" immediate="true"/>
                                             <f:selectItems
                                                 value="#{noticeOfViolationBB.textBlockListByMuni}"
                                                 var="block" 
@@ -105,7 +109,7 @@
                                             tabindex="7"
                                             value="#{noticeOfViolationBB.tb2}">
                                             <f:converter converterId="textBlockConverter"/>
-                                            <p:ajax update="optional2OT" immediate="true"/>
+                                            <p:ajax update="noticeBuilderForm:optional2OT" immediate="true"/>
                                             <f:selectItems
                                                 value="#{noticeOfViolationBB.textBlockListByMuni}"
                                                 var="block" 
@@ -125,7 +129,7 @@
                                         tabindex="7"
                                         value="#{noticeOfViolationBB.complianceBlock}">
                                         <f:converter converterId="textBlockConverter"/>
-                                        <p:ajax update="complianceOT" immediate="true"/>
+                                        <p:ajax update="noticeBuilderForm:complianceOT" immediate="true"/>
                                         <f:selectItems
                                             value="#{noticeOfViolationBB.textBlockListByMuni}"
                                             var="block" 
@@ -144,7 +148,7 @@
                                         tabindex="7"
                                         value="#{noticeOfViolationBB.penaltyBlock}">
                                         <f:converter converterId="textBlockConverter"/>
-                                        <p:ajax update="penaltyOT" immediate="true"/>
+                                        <p:ajax update="noticeBuilderForm:penaltyOT" immediate="true"/>
                                         <f:selectItems
                                             value="#{noticeOfViolationBB.textBlockListByMuni}"
                                             var="block" 
@@ -171,7 +175,7 @@
                                             tabindex="7"
                                             value="#{noticeOfViolationBB.tb3}">
                                             <f:converter converterId="textBlockConverter"/>
-                                            <p:ajax update="optional3OT" immediate="true"/>
+                                            <p:ajax update="noticeBuilderForm:optional3OT" immediate="true"/>
                                             <f:selectItems
                                                 value="#{noticeOfViolationBB.textBlockListByMuni}"
                                                 var="block" 
@@ -196,7 +200,7 @@
                                             tabindex="7"
                                             value="#{noticeOfViolationBB.tb4}">
                                             <f:converter converterId="textBlockConverter"/>
-                                            <p:ajax update="optional4OT" immediate="true"/>
+                                            <p:ajax update="noticeBuilderForm:optional4OT" immediate="true"/>
                                             <f:selectItems
                                                 value="#{noticeOfViolationBB.textBlockListByMuni}"
                                                 var="block" 
@@ -227,6 +231,8 @@
                                 <p:commandButton ajax="false" value="Assemble and edit draft notice" 
                                                  action="#{noticeOfViolationBB.assembleNotice}"
                                                  icon="fa fa-tasks"/>
+                                <p:commandButton action="ceCases" icon="fa fa-arrow-left"
+                                         value="cancel"/>
                     </h:form>
                 </div>
             </ui:define>
