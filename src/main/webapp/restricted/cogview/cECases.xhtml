@@ -13,7 +13,10 @@
         <ui:composition template="../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view id="cases-view">
-                    <div class="mainContainer">
+                    
+                    <div class="two-column-page-flex-container">
+                        <div class="list-column">
+                            
 
                         <h:form id="cecases-messages-form">
 
@@ -30,10 +33,6 @@
                         <h:outputText value="#{caseProfileBB.ceCaseSearchParams.isOpen}"/>
 
 
-                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter" styleClass="split-page-panelgrid"
-                                     columnClasses="gridTd-splitPage, gridTd-splitPage">
-
-                            <h:panelGroup styleClass="split-page-list-side">
                                 <h2>CE Case docket</h2>
 
                                 <h:form id="caseListForm">
@@ -77,14 +76,17 @@
                                             <h:outputText value="#{c.caseStage}"/>
                                         </p:column>
 
-                                        <p:column width="20%"
-                                                  sortBy="#{c.casePhase.label}"
-                                                  filterBy="#{c.casePhase.label}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Phase" />
-                                            </f:facet>
-                                            <h:outputText value="#{c.casePhase.label}"/>
-                                        </p:column>
+                                        <ui:remove>
+                                            
+                                            <p:column width="20%"
+                                                      sortBy="#{c.casePhase.label}"
+                                                      filterBy="#{c.casePhase.label}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Phase" />
+                                                </f:facet>
+                                                <h:outputText value="#{c.casePhase.label}"/>
+                                            </p:column>
+                                        </ui:remove>
 
                                         <p:column width="8%" sortBy="#{c.caseAge}">
                                             <f:facet name="header">
@@ -132,10 +134,9 @@
 
                                     <p:spacer height="10px"/>
                                 </h:form>
-                            </h:panelGroup>  
-
-
-                            <h:panelGroup styleClass="split-page-manage-side">
+                        </div>
+                        <div class="object-column">
+                            
                                 <h:form id="case-details-form">
 
                                     <h1>
@@ -148,9 +149,10 @@
 
                                     <div class="outlinedBox">
 
-                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                        <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd">
 
+                        
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Case ID:" />
                                                 <div class="rowExpansion">
@@ -244,7 +246,8 @@
 
                                     <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
                                                      value="Add new code violation"
-                                                     icon="fa fa-plus"/>
+                                                     icon="fa fa-plus"
+                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>
                                     <p:spacer height="15px"/>
 
                                     <p:dataTable
@@ -351,8 +354,10 @@
 
                                 <h:form id="notices-form">
                                     <h2>Notices of violation</h2>
-                                    <p:commandButton ajax="false" action="#{caseProfileBB.createNewNotice}"
-                                                     value="Build notice of violation letter"/>
+                                    <p:commandButton ajax="false" 
+                                                     action="#{caseProfileBB.createNewNotice}"
+                                                     value="Build notice of violation letter"
+                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>
                                     <p:dataTable
                                         id="notices-table"
                                         var="notice"
@@ -456,11 +461,13 @@
                                     <h3>Citations</h3>
                                     <p:commandButton ajax="false" action="#{caseProfileBB.createCitationForAllViolations}"
                                                      value="Generate citation for all Violations"
-                                                     icon="fa fa-warning"/>
+                                                     icon="fa fa-warning"
+                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>"/>
 
                                     <p:commandButton ajax="false" action="#{caseProfileBB.createCitationFromSelected}"
                                                      value="Generate citation for selected violations"
-                                                     icon="fa fa-warning"/>
+                                                     icon="fa fa-warning"
+                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>/>
 
                                     <p:dataTable
                                         id="citation-table"
@@ -533,7 +540,8 @@
                                     </p:dataTable>
 
                                     <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
-                                                     value="Updated selected citation"/>
+                                                     value="Updated selected citation"
+                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>/>
 
                                 </h:form>
 
@@ -859,25 +867,15 @@
                                     </p:dataTable>
 
                                     <ui:remove>
-
-
                                         <p:commandLink value="Export event history as pdf" ajax="false">
-                                            <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{sessionBean.activeCECase.property.address}_idno#{sessionBean.activeCECase.caseID}_eventHistory"/>
+                                            <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{caseProfileBB.currentCase.caseID}_idnoeventHistory"/>
                                         </p:commandLink>
-
                                     </ui:remove>
-
-
                                 </h:form>
 
 
-
-
-                            </h:panelGroup>
-
-                        </h:panelGrid>
-
-
+                        </div>
+                    </div>
 
                         <p:dialog       id="unknown_id"
                                         height="650" width="700"
@@ -886,8 +884,6 @@
                                         rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
 
                         </p:dialog>
-
-                    </div>
                 </f:view>
             </ui:define>
         </ui:composition>

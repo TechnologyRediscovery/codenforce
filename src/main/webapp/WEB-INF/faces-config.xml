@@ -225,11 +225,19 @@
         <managed-bean-name>codeSourceAddUpdateBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CodeSourceAddUpdateBB</managed-bean-class>
     
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>missionControlBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.MissionControlBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+        
+    
+    <managed-bean>
+        <managed-bean-name>propertyProfileBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
         
@@ -771,15 +779,6 @@
     </navigation-rule>
     
     <!--Properties-->
-        
-    
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/propertyProfile.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>propertyUpdate</from-outcome>
-            <to-view-id>/restricted/cogstaff/gen/propertyUpdate.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
     
     <navigation-rule>
         <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
@@ -793,7 +792,7 @@
         <from-view-id>/restricted/cogstaff/propertyUpdate.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/propertoes.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>

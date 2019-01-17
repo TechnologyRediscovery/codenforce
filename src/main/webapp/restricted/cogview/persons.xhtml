@@ -30,17 +30,6 @@
                         <h:outputText value="#{caseProfileBB.ceCaseSearchParams.isOpen}"/>
 
 
-                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter" styleClass="split-page-panelgrid"
-                                     columnClasses="gridTd-splitPage, gridTd-splitPage">
-
-                            <h:panelGroup styleClass="split-page-list-side">
-                                <h2>CE Case docket</h2>
-
-                                <h:form id="caseListForm">
-
-
-
-                                    <p:spacer height="15px"/>
                                     <p:dataTable
                                         id="caseTable"
                                         var="c"
@@ -122,16 +111,8 @@
 
 
 
-                                    <p:commandLink value="Export case docket as pdf" ajax="false">
-                                        <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
-                                    </p:commandLink>
-
-                                    <p:spacer height="10px"/>
                                 </h:form>
-                            </h:panelGroup>  
-
-
-                            <h:panelGroup styleClass="split-page-manage-side">
+                                
                                 <h:form id="case-details-form">
 
                                     <h2>

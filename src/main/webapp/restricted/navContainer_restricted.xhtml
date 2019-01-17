@@ -118,7 +118,7 @@
                                 <f:facet name="options">
                                     <p:commandButton 
                                                      action="#{missionControlBB.logout}" 
-                                                     value="Logout: #{facesUser.FName} #{facesUser.LName} (#{facesUser.roleType.label})"
+                                                     value="Logout: #{facesUser.FName}"
                                                      ajax="false"/>
                                 </f:facet>
                             </p:menubar>
@@ -139,8 +139,11 @@
                                     <h:outputText styleClass="infoBarDataLabel" value="property: "/>
                                     <h:outputText styleClass="infoBarData" value="#{sessionBean.activeProp.address} "/> 
                                     <h:outputText styleClass="infoBarData" value="(#{sessionBean.activeProp.muni.muniName})  "/>
-                                    <p:commandButton styleClass="sessionInfoButton" action="#{navigationBB.gotoPropertyProfile}" value="profile" ajax="false" icon="fa fa-home" disabled="#{navigationBB.noActiveProperty}"/>
-                                    <p:commandButton styleClass="sessionInfoButton" action="propertySearch" value="change prop" ajax="false" icon="fa fa-search"/>
+                                    <ui:remove>
+
+                                        <p:commandButton styleClass="sessionInfoButton" action="#{navigationBB.gotoPropertyProfile}" value="profile" ajax="false" icon="fa fa-home" disabled="#{navigationBB.noActiveProperty}"/>
+                                        <p:commandButton styleClass="sessionInfoButton" action="propertySearch" value="change prop" ajax="false" icon="fa fa-search"/>
+                                    </ui:remove>
                                 </div>
                                
                                 <div class="activeObjectBox">
