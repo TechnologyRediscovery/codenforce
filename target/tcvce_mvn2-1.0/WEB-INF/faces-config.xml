@@ -225,11 +225,19 @@
         <managed-bean-name>codeSourceAddUpdateBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CodeSourceAddUpdateBB</managed-bean-class>
     
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>missionControlBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.MissionControlBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+        
+    
+    <managed-bean>
+        <managed-bean-name>propertyProfileBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
         
@@ -342,17 +350,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>propertyProfileBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>propertySearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertySearchBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>propertyUpdateBB</managed-bean-name>
@@ -364,8 +361,8 @@
     <managed-bean>
         <managed-bean-name>ceCasesBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECasesBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>caseProfileBB</managed-bean-name>
@@ -461,6 +458,12 @@
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationEditBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>userAuthMuniManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UserAuthMuniManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
  
     <!--request-scoped beans-->
     
@@ -535,8 +538,8 @@
     </navigation-rule>
 
 
-    <navigation-rule>
-        <from-view-id>/restricted/initiateInternalSession.xhtml</from-view-id>
+    <navigation-rule> 
+       <from-view-id>/restricted/initiateInternalSession.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>success</from-outcome>
             <to-view-id>/restricted/missionControl.xhtml</to-view-id>
@@ -641,6 +644,14 @@
     <navigation-rule>
         <from-view-id>*</from-view-id>  
         <navigation-case>
+            <from-outcome>photoUpload</from-outcome>
+            <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_photoUpload.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
             <from-outcome>requestorDetails</from-outcome>
             <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow_requestorDetails.xhtml</to-view-id>
         </navigation-case>
@@ -671,16 +682,7 @@
 
 
     
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
-        
-        <navigation-case>
-            <from-action>#{ceCasesBB.viewCase}</from-action>
-            <from-outcome>caseProfile</from-outcome>
-            <to-view-id>/restricted/cogview/caseProfile.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
-
+  
 
     <navigation-rule>
         <from-view-id>*</from-view-id>
@@ -785,23 +787,9 @@
     </navigation-rule>
     
     <!--Properties-->
-        
     
     <navigation-rule>
-        <from-view-id>/restricted/cogview/propertyProfile.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>propertyUpdate</from-outcome>
-            <to-view-id>/restricted/cogstaff/gen/propertyUpdate.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
-    
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/propertySearch.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/propertyProfile.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
+        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>propertyUpdate</from-outcome>
             <to-view-id>/restricted/cogstaff/propertyUpdate.xhtml</to-view-id>
@@ -812,7 +800,7 @@
         <from-view-id>/restricted/cogstaff/propertyUpdate.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/propertyProfile.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -840,20 +828,20 @@
         <from-view-id>*</from-view-id>
         
         <navigation-case>
-            <from-outcome>propertySearch</from-outcome>
-            <to-view-id>/restricted/cogview/propertySearch.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>propertyProfile</from-outcome>
-            <to-view-id>/restricted/cogview/propertyProfile.xhtml</to-view-id>
+            <from-outcome>properties</from-outcome>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
             <from-outcome>propertySearch</from-outcome>
-            <to-view-id>/restricted/cogview/propertySearch.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+
+        <navigation-case>
+            <from-outcome>propertyProfile</from-outcome>
+            <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>    
@@ -869,7 +857,13 @@
          
         <navigation-case>
             <from-outcome>personSearch</from-outcome>
-            <to-view-id>/restricted/cogview/personSearch.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/persons.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>persons</from-outcome>
+            <to-view-id>/restricted/cogview/persons.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -901,7 +895,7 @@
 
         <navigation-case>
             <from-outcome>caseProfile</from-outcome>
-            <to-view-id>/restricted/cogview/caseProfile.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
 
@@ -942,6 +936,22 @@
             <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilder.xhtml</to-view-id>
         </navigation-case>
  
+
+        <navigation-case>
+            <from-outcome>noticeOfViolationPrint</from-outcome>
+            <to-view-id>/restricted/cogview/noticeOfViolationPrint.xhtml</to-view-id>
+        </navigation-case>
+
+        <navigation-case>
+            <from-outcome>noticeOfViolationBuilderPersons</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilderPersons.xhtml</to-view-id>
+        </navigation-case>
+
+        <navigation-case>
+            <from-outcome>noticeOfViolationBuilderText</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilderText.xhtml</to-view-id>
+        </navigation-case>
+ 
         <navigation-case>
             <from-outcome>noticeOfViolationEditor</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/noticeOfViolationEditor.xhtml</to-view-id>
@@ -959,6 +969,15 @@
             <redirect />
         </navigation-case>
     
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>violationSelectElement</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     </navigation-rule>
     
     <navigation-rule>
@@ -996,7 +1015,7 @@
         <navigation-case>
             <from-action>#{violationEditBB.backTocaseProfiler}</from-action>
             <from-outcome>caseProfile</from-outcome>
-            <to-view-id>/restricted/cogview/caseProfile.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -1244,6 +1263,15 @@
     </navigation-rule>
 
     <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>userMuniMapping</from-outcome>
+            <to-view-id>/restricted/cogadmin/userAuthMuniManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
         <from-view-id>/restricted/cogadmin/userAdd.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>userManage</from-outcome>
@@ -1251,9 +1279,15 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
+       
+    <navigation-rule>
+        <navigation-case>
+            <from-outcome>userAuthMuniManage</from-outcome>
+            <to-view-id>/restricted/cogadmin/userAuthMuniManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
-
-        
     <navigation-rule>
         <from-view-id>*</from-view-id>
     

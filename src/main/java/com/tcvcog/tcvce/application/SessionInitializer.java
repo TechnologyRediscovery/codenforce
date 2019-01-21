@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.logging.Level;
@@ -57,6 +58,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * 2) User comes back with a default municipality object, which is stored in the session
      * 3) From this muni, extract the default code set ID, which is then used to grab
      * the code set from the DB and store this in the session as well.
+     * 4) Fill in a bunch of session objects to quash those null pointers
      * 
      * @return success or failure String used by faces to navigate to the internal page
      * or the error page
@@ -67,6 +69,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         System.out.println("SessionInitializer.initiateInternalSession");
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
             User extractedUser = uc.getUser(getContainerAuthenticatedUser());
@@ -79,6 +82,9 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 Municipality muni = extractedUser.getMuni();
                 getSessionBean().setAccessKeyCard(extractedUser.getKeyCard());
                 getSessionBean().setActiveMuni(muni);
+                getSessionBean().setActiveProp(pi.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("arbitraryPlaceholderPropertyID"))));
+                System.out.println("SessionInitializer.initiateInternalSession | set placeholder property");
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
                 getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getDefaultCodeSetID()));

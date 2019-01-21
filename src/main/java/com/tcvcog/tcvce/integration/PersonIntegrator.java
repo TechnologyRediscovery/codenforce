@@ -50,7 +50,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * Creates a new instance of PersonIntegrator
      */
     public PersonIntegrator() {
-        System.out.println("PersonIntegrator.PersonIntegrator - constructor");
     }
 
     /**
@@ -130,11 +129,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        if(person!= null){
-            System.out.println("PersonIntegrator.getPerson | returned from getPerson: " + person.getPersonID());
-        } else {
-            System.out.println("PersonIntegrator.getPerson | null person sent back");
-        }
         return person;
     }
 
@@ -159,7 +153,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             newPerson.setPersonID(rs.getInt("personid"));
-            System.out.println("PersonIntegrator.generatePersonFromResultSet | person Type from db: " + rs.getString("persontype"));
             newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
             Municipality m = muniIntegrator.getMuniFromMuniCode(rs.getInt("muni_muniCode"));
             newPerson.setMuni(m);
@@ -214,7 +207,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generating person from ResultSet", ex);
         }
-        System.out.println("PersonIntegrator.generateNewPerson | generated person ID: " + newPerson.getPersonID());
         return newPerson;
     } // close method
 
@@ -292,7 +284,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(1, params.getObjectID()); // and this is the only param after muni!
             }
             
-            System.out.println("PersonIntegrator.getPersonList | search-logic-built sql: " + stmt.getParameterMetaData().toString());
             rs = stmt.executeQuery();
             
             int counter = 0;
@@ -308,7 +299,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             while (rs.next() && counter < maxResults ) {
                 id=rs.getInt("personid");
-                System.out.println("PersonIntegrator.getPersonList | generated person: " + id);
                 p = getPerson(id);
                 personAL.add(p);
             }
@@ -359,7 +349,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, prop.getPropertyID());
             stmt.setInt(2, person.getPersonID());
 
-            System.out.println("PersonIntegrator.connectPersonToProperty | sql: " + stmt.toString());
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -382,146 +371,103 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public int insertPerson(Person personToStore) throws IntegrationException {
+        int unknownPersonSourceID = Integer.parseInt(getResourceBundle(
+                Constants.DB_FIXED_VALUE_BUNDLE).getString("unknownPersonSource"));
         System.out.println("PersonIntegrator.insertPerson");
         Connection con = getPostgresCon();
         System.out.println("PersonIntegrator.insertPerson | after pgcon");
-        StringBuilder query = new StringBuilder();
         ResultSet rs = null;
         int lastID;
 
         
+            String query = "INSERT INTO public.person(\n" +
+                    " personid, persontype, muni_municode, " +
+                    " fname, lname, jobtitle, \n" +
+                    " phonecell, phonehome, phonework, " +
+                    " email, address_street, address_city, \n" +
+                    " address_state, address_zip, notes, " +
+                    " lastupdated, expirydate, isactive, \n" +
+                    " isunder18, humanverifiedby, compositelname, " +
+                    " sourceid, creator, businessentity, " +
+                    " addressofresidence, mailing_address_street, mailing_address_city, \n" +
+                    " mailing_address_zip, mailing_address_state, mailingsameasresidence, \n" +
+                    " expirynotes, creationtimestamp)\n" +
+                    " VALUES (DEFAULT, CAST (? AS persontype), ?, ?, ?, ?, \n" +
+                    " ?, ?, ?, ?, ?, ?, \n" +
+                    " ?, ?, ?, ?, ?, ?, \n" +
+                    " ?, ?, ?, ?, ?, \n" +
+                    " ?, ?, ?, ?, \n" +
+                    " ?, ?, ?, \n" +
+                    " ?, ?);";
         
-        query.append("INSERT INTO public.person( \n" +
-                    "  person.personid, \n" +
-                    "  person.persontype, \n" +
-                    "  person.muni_municode, \n" +
-                
-                    "  person.fname, \n" + //3
-                    "  person.lname, \n" + 
-                    "  person.jobtitle, \n" + 
-                
-                    "  person.phonecell, \n" + //6
-                    "  person.phonehome, \n" +
-                    "  person.phonework, \n" +
-                
-                    "  person.email, \n" + //9
-                    "  person.address_street, \n" +
-                    "  person.address_city, \n" +
-                
-                    "  person.address_state, \n" + //12
-                    "  person.address_zip, \n" +
-                    "  person.notes, \n" +
-                
-                    "  person.lastupdated, \n" + //15
-                    "  person.expirydate, \n" +
-                    "  person.expirynotes, \n" +
-                
-                    "  person.mailingsameasresidence, \n" + //18
-                    "  person.mailing_address_state, \n" +
-                    "  person.mailing_address_zip, \n" +
-                
-                    "  person.mailing_address_city, \n" + //21
-                    "  person.mailing_address_street, \n" +
-                    "  person.addressofresidence, \n" +
-                
-                    "  person.businessentity, \n" + //24
-                    "  person.creator, \n" +
-                    "  person.sourceid, \n" +
-                
-                    "  person.compositelname, \n" + //27
-                    "  person.humanverifiedby, \n" +
-                    "  person.isunder18, \n" +
-                
-                    "  person.isactive, \n" //30
-                    + "person.creationtimestamp) " + 
-                
-                "    VALUES (DEFAULT, CAST ('Public' AS persontype), ?, ?, ?, ?, \n" +
-                    "            ?, ?, ?, ?, ?, ?, \n" + //7 -- paramindex = position count - 1
-                    "            ?, ?, ?, ?, ?, ?, \n" + //13
-                    "            ?, ?, ?, ?, ?, \n" + //19
-                    "            ?, ?, ?, ?, \n" +//23
-                    "            ?, ?, ?, \n" +//28
-                    "            ?, ?);");//31
-                
-          
+        /**
+//       
+//        String query = "INSERT INTO person(" +
+//                    "  person.personid, \n" +
+//                    "  person.persontype, \n" +
+//                    "  person.muni_municode, \n" +
+//                
+//                    "  person.fname, \n" + //3
+//                    "  person.lname, \n" + 
+//                    "  person.jobtitle, \n" + 
+//                
+//                    "  person.phonecell, \n" + //6
+//                    "  person.phonehome, \n" +
+//                    "  person.phonework, \n" +
+//                
+//                    "  person.email, \n" + //9
+//                    "  person.address_street, \n" +
+//                    "  person.address_city, \n" +
+//                
+//                    "  person.address_state, \n" + //12
+//                    "  person.address_zip, \n" +
+//                    "  person.notes, \n" +
+//                
+//                    "  person.lastupdated, \n" + //15
+//                    "  person.expirydate, \n" +
+//                    "  person.expirynotes, \n" +
+//                
+//                    "  person.mailingsameasresidence, \n" + //18
+//                    "  person.mailing_address_state, \n" +
+//                    "  person.mailing_address_zip, \n" +
+//                
+//                    "  person.mailing_address_city, \n" + //21
+//                    "  person.mailing_address_street, \n" +
+//                    "  person.addressofresidence, \n" +
+//                
+//                    "  person.businessentity, \n" + //24
+//                    "  person.creator, \n" +
+//                    "  person.sourceid, \n" +
+//                
+//                    "  person.compositelname, \n" + //27
+//                    "  person.humanverifiedby, \n" +
+//                    "  person.isunder18, \n" +
+//                
+//                    "  person.isactive, \n" //30
+//                    + "person.creationtimestamp) " + 
+//                
+//                "    VALUES (DEFAULT, CAST (? AS persontype), ?, ?, ?, ?, \n" +
+//                    "            ?, ?, ?, ?, ?, ?, \n" + //7 -- paramindex = position count - 1
+//                    "            ?, ?, ?, ?, ?, ?, \n" + //13
+//                    "            ?, ?, ?, ?, ?, \n" + //19
+//                    "            ?, ?, ?, ?, \n" +//23
+//                    "            ?, ?, ?, \n" +//28
+//                    "            ?, ?);";//31
+//                
+          **/
 
         PreparedStatement stmt = null;
         try {
-            stmt = con.prepareStatement(query.toString());
+            stmt = con.prepareStatement(query);
             // default ID generated by sequence in PostGres
-//            stmt.setString(1, "Public");
-            
-            
-//            if (personToStore.getPersonType() != null) {
-//                stmt.setString(1, personToStore.getPersonType().getLabel());
-//            } else {
-//                stmt.setNull(1, java.sql.Types.NULL);
-//                
-//            }
-            stmt.setInt(1, personToStore.getMuniCode());
 
-            stmt.setString(2, personToStore.getFirstName());
-            stmt.setString(3, personToStore.getLastName());
-            stmt.setString(4, personToStore.getJobTitle());
-
-            stmt.setString(5, personToStore.getPhoneCell());
-            stmt.setString(6, personToStore.getPhoneHome());
-            stmt.setString(7, personToStore.getPhoneWork());
-            
-            stmt.setString(8, personToStore.getEmail());
-            stmt.setString(9, personToStore.getAddressStreet());
-            stmt.setString(10, personToStore.getAddressCity());
-
-            stmt.setString(11, personToStore.getAddressState());
-            stmt.setString(12, personToStore.getAddressZip());
-            stmt.setString(13, personToStore.getNotes());
-            
-            stmt.setTimestamp(14, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            if (personToStore.getExpiryDate() != null) {
-                stmt.setTimestamp(15, java.sql.Timestamp.valueOf(personToStore.getExpiryDate()));
-
+            if (personToStore.getPersonType() != null) {
+                stmt.setString(1, personToStore.getPersonType().getLabel());
             } else {
-                stmt.setNull(15, java.sql.Types.NULL);
-            }
-            stmt.setString(16, personToStore.getExpiryNotes());
-            
-            stmt.setBoolean(17, personToStore.isMailingSameAsResidence());
-            stmt.setString(18, personToStore.getMailingAddressState());
-            stmt.setString(19, personToStore.getMailingAddressZip());
-            
-            stmt.setString(20, personToStore.getMailingAddressCity());
-            stmt.setString(21, personToStore.getMailingAddressStreet());
-            stmt.setBoolean(22, personToStore.isAddressOfResidence());
-            
-            stmt.setBoolean(23, personToStore.isBusinessEntity());
-            stmt.setInt(24, personToStore.getCreator().getUserID());
-            stmt.setInt(25, personToStore.getSourceID());
-            
-            stmt.setBoolean(26, personToStore.isCompositeLastName());
-            if(personToStore.getVerifiedBy() != null){
-                stmt.setInt(26, personToStore.getVerifiedBy().getUserID());
+                stmt.setNull(1, java.sql.Types.NULL);
                 
-            } else {
-                stmt.setNull(27, java.sql.Types.NULL);
             }
-            stmt.setBoolean(28, personToStore.isUnder18());
-            
-            stmt.setBoolean(29, personToStore.isActive());
-            stmt.setTimestamp(30, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            
-            
-            
-            /**
-            stmt.setString(1, "Public");
-            
-            
-//            if (personToStore.getPersonType() != null) {
-//                stmt.setString(1, personToStore.getPersonType().getLabel());
-//            } else {
-//                stmt.setNull(1, java.sql.Types.NULL);
-//                
-//            }
-            stmt.setInt(2, personToStore.getMuniCode());
+            stmt.setInt(2, personToStore.getMuni().getMuniCode());
 
             stmt.setString(3, personToStore.getFirstName());
             stmt.setString(4, personToStore.getLastName());
@@ -539,6 +485,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(13, personToStore.getAddressZip());
             stmt.setString(14, personToStore.getNotes());
             
+            // last updated
             stmt.setTimestamp(15, java.sql.Timestamp.valueOf(LocalDateTime.now()));
             if (personToStore.getExpiryDate() != null) {
                 stmt.setTimestamp(16, java.sql.Timestamp.valueOf(personToStore.getExpiryDate()));
@@ -546,33 +493,43 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(16, java.sql.Types.NULL);
             }
-            stmt.setString(17, personToStore.getExpiryNotes());
+            stmt.setBoolean(17, personToStore.isActive());
             
-            stmt.setBoolean(18, personToStore.isMailingSameAsResidence());
-            stmt.setString(19, personToStore.getMailingAddressState());
-            stmt.setString(20, personToStore.getMailingAddressZip());
             
-            stmt.setString(21, personToStore.getMailingAddressCity());
-            stmt.setString(22, personToStore.getMailingAddressStreet());
-            stmt.setBoolean(23, personToStore.isAddressOfResidence());
-            
-            stmt.setBoolean(24, personToStore.isBusinessEntity());
-            stmt.setInt(25, personToStore.getCreator().getUserID());
-            stmt.setInt(26, personToStore.getSourceID());
-            
-            stmt.setBoolean(27, personToStore.isCompositeLastName());
+            stmt.setBoolean(18, personToStore.isUnder18());
             if(personToStore.getVerifiedBy() != null){
-                stmt.setInt(28, personToStore.getVerifiedBy().getUserID());
-                
+                stmt.setInt(19, personToStore.getVerifiedBy().getUserID());
             } else {
-                stmt.setNull(28, java.sql.Types.NULL);
+                stmt.setNull(19, java.sql.Types.NULL);
             }
-            stmt.setBoolean(29, personToStore.isUnder18());
+            stmt.setBoolean(20, personToStore.isCompositeLastName());
             
-            stmt.setBoolean(30, personToStore.isActive());
+            
+            if(personToStore.getSourceID() != 0){
+                stmt.setInt(21, personToStore.getSourceID());
+            } else {
+                stmt.setInt(21, unknownPersonSourceID);
+            }
+            if(personToStore.getCreator() != null){
+                stmt.setInt(22, personToStore.getCreator().getUserID());
+            } else {
+                stmt.setNull(22, java.sql.Types.NULL);
+                
+            }
+            stmt.setBoolean(23, personToStore.isBusinessEntity());
+            
+            stmt.setBoolean(24, personToStore.isAddressOfResidence());
+            stmt.setString(25, personToStore.getMailingAddressState());
+            stmt.setString(26, personToStore.getMailingAddressCity());
+            stmt.setString(27, personToStore.getMailingAddressZip());
+            
+            stmt.setString(28, personToStore.getMailingAddressStreet());
+            stmt.setBoolean(29, personToStore.isMailingSameAsResidence());
+            
+            
+            stmt.setString(30, personToStore.getExpiryNotes());
             stmt.setTimestamp(31, java.sql.Timestamp.valueOf(LocalDateTime.now()));
             
-            * **/
             
             System.out.println("PersonIntegrator.insertPerson | sql: ");
 //            System.out.println("PersonIntegrator.insertPerson | sql: " + stmt.toString());
@@ -585,7 +542,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             Statement s = con.createStatement();
             rs = s.executeQuery(idNumQuery);
             rs.next();
-            lastID = rs.getInt(1);
+            lastID = rs.getInt("currval");
 
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -698,7 +655,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             // default ID generated by sequence in PostGres
             stmt.setString(1, personToUpdate.getPersonType().toString());
-            stmt.setInt(2, personToUpdate.getMuniCode());
+            stmt.setInt(2, personToUpdate.getMuni().getMuniCode());
 
             stmt.setString(3, personToUpdate.getFirstName());
             stmt.setString(4, personToUpdate.getLastName());
@@ -718,9 +675,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
             // Last updated set with a call to now() inside postgres
             if (personToUpdate.getExpiryDate() == null) {
-                System.out.println("PersonIntegrator.updatePerson | expiry date is null in the personToUpdate");
             } else {
-                System.out.println("PersonIntegrator.updatePerson | personToUpdateExpiryDate: " + personToUpdate.getExpiryDate().toString());
                 stmt.setTimestamp(15, java.sql.Timestamp.valueOf(personToUpdate.getExpiryDate()));
             }
 
@@ -728,7 +683,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(17, personToUpdate.isUnder18());
 
             stmt.setInt(18, personToUpdate.getPersonID());
-            System.out.println("PersonIntegrator.updatePerson | sql: " + stmt.toString());
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -751,13 +705,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s = "SELECT * FROM public.propertyperson WHERE property_propertyid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, p.getPropertyID());
-            System.out.println("PersonIntegrator.getPersonListByPropertyID | sql: " + stmt.toString());
 
             rs = stmt.executeQuery();
 
             while (rs.next()) {
                 Person pers = getPerson(rs.getInt("person_personid"));
-                System.out.println("PersonIntegrator.getPersonListByPropertyID | adding person: " + pers.getFirstName());
                 al.add(pers);
             }
 
@@ -786,7 +738,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, propertyID);
-            System.out.println("PropertyIntegrator.getProperty | sql: " + stmt.toString());
             rs = stmt.executeQuery();
             while(rs.next()){
                 personList.add(getPerson(rs.getInt("person_personid")));
@@ -817,7 +768,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, personToDeleteID);
-            System.out.println("PersonIntegrator.deletePerson | sql: " + stmt.toString());
             stmt.execute();
 
         } catch (SQLException ex) {

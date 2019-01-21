@@ -46,7 +46,7 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
     private int personid;
     private PersonType formPersonType;
     private PersonType[] personTypes;
-    private int formMuniCode;
+    private Municipality formMuni;
     private HashMap muniMap;
     
     private String formFirstName;
@@ -88,7 +88,7 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
         
         p.setPersonID(currentPerson.getPersonID());
         p.setPersonType(formPersonType);
-        p.setMuniCode(formMuniCode);
+        p.setMuni(formMuni);
         
         p.setFirstName(formFirstName);
         p.setLastName(formLastName);
@@ -151,11 +151,11 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the formMuni
      */
-    public int getFormMuniCode() {
+    public Municipality getFormMuniCode() {
         //System.out.println("PersonUpdateBB.getFormMuniID | muniID of active currentPerson: " + currentPerson.getMuni().getMuniCode());
         
-        formMuniCode = getSessionBean().getActivePerson().getMuniCode();
-        return formMuniCode;
+        formMuni = getSessionBean().getActivePerson().getMuni();
+        return formMuni;
     }
 
     /**
@@ -296,8 +296,8 @@ public class PersonUpdateBB extends BackingBeanUtils implements Serializable{
     /**
      * @param formMuni the formMuni to set
      */
-    public void setFormMuniCode(int formMuni) {
-        this.formMuniCode = formMuni;
+    public void setFormMuniCode(Municipality formMuni) {
+        this.formMuni = formMuni;
     }
 
     /**

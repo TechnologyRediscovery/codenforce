@@ -569,6 +569,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println("ActionRequestManageBB.getSearchparams | params is null");
             SearchCoordinator sc = getSearchCoordinator();
             searchParams = sc.getDefaultSearchParamsCEActionRequests();
+            searchParams.setMuni(getSessionBean().getActiveMuni());
         }
         return searchParams;
     }

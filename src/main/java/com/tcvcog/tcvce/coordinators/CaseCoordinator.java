@@ -43,6 +43,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -557,7 +558,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // new letters won't have a LocalDateTime object
         // so insert instead of update in this case
         if(nov.getInsertionTimeStamp() == null){
-            cvi.insertViolationLetter(c, nov);
+            cvi.insertNoticeOfViolation(c, nov);
             
         } else {
             cvi.updateViolationLetter(nov);
@@ -686,7 +687,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 throw new CaseLifecyleException("You cannot update a case's origination date to be after its closing date");
             }
        }
-       ci.updateCECase(c);
+       ci.updateCECaseMetadata(c);
    }
    
    public void deleteCitation(Citation c) throws IntegrationException{
@@ -709,6 +710,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    
    public CEActionRequest getNewActionRequest(){
        System.out.println("CaseCoordinator.getNewActionRequest");
+       CEActionRequest cear = new CEActionRequest();
+       // start by writing in the current date
+       cear.setDateOfRecordUtilDate(
+               java.util.Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
+       
        return new CEActionRequest();
        
    }

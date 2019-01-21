@@ -62,6 +62,7 @@
                                                 id="dateOfRecord"
                                                 showOn="button"
                                                 pattern="EEE, dd MMM, yyyy"
+                                                maxdate="#{cEActionRequestSubmitBB.currentDate}"
                                                 navigator="true"
                                                 showButtonPanel="true"
                                                 showTodayButton="true"/>
@@ -83,7 +84,7 @@
 
                                     <p:commandButton  ajax="false" tabindex="12"
                                                       value="Next: Your contact details" id="continueToContactInfoButton"
-                                                      action="#{cEActionRequestSubmitBB.addRequestorDetails}"/>
+                                                      action="#{cEActionRequestSubmitBB.saveConcernDescriptions}"/>
 
                         </h:form>
                         

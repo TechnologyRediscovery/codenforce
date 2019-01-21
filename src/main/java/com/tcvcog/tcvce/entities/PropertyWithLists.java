@@ -27,52 +27,52 @@ import java.util.ArrayList;
 public class PropertyWithLists extends Property implements Serializable{
     
     // cases store code enforcement data
-    private ArrayList<CECase> propertyCaseList;
+    private ArrayList<CECase> ceCaseList;
     // property units store occupancy data
-    private ArrayList<PropertyUnit> propertyUnitList;
+    private ArrayList<PropertyUnit> unitList;
     // both are connected to Person objects all over the place
-    private ArrayList<Person> propertyPersonList;
+    private ArrayList<Person> personList;
 
     /**
-     * @return the propertyCaseList
+     * @return the ceCaseList
      */
-    public ArrayList<CECase> getPropertyCaseList() {
-        return propertyCaseList;
+    public ArrayList<CECase> getCeCaseList() {
+        return ceCaseList;
     }
 
     /**
-     * @return the propertyUnitList
+     * @return the unitList
      */
-    public ArrayList<PropertyUnit> getPropertyUnitList() {
-        return propertyUnitList;
+    public ArrayList<PropertyUnit> getUnitList() {
+        return unitList;
     }
 
     /**
-     * @return the propertyPersonList
+     * @return the personList
      */
-    public ArrayList<Person> getPropertyPersonList() {
-        return propertyPersonList;
+    public ArrayList<Person> getPersonList() {
+        return personList;
     }
 
     /**
-     * @param propertyCaseList the propertyCaseList to set
+     * @param ceCaseList the ceCaseList to set
      */
-    public void setPropertyCaseList(ArrayList<CECase> propertyCaseList) {
-        this.propertyCaseList = propertyCaseList;
+    public void setCeCaseList(ArrayList<CECase> ceCaseList) {
+        this.ceCaseList = ceCaseList;
     }
 
     /**
-     * @param propertyUnitList the propertyUnitList to set
+     * @param unitList the unitList to set
      */
-    public void setPropertyUnitList(ArrayList<PropertyUnit> propertyUnitList) {
-        this.propertyUnitList = propertyUnitList;
+    public void setUnitList(ArrayList<PropertyUnit> unitList) {
+        this.unitList = unitList;
     }
 
     /**
-     * @param propertyPersonList the propertyPersonList to set
+     * @param personList the personList to set
      */
-    public void setPropertyPersonList(ArrayList<Person> propertyPersonList) {
-        this.propertyPersonList = propertyPersonList;
+    public void setPersonList(ArrayList<Person> personList) {
+        this.personList = personList;
     }
     
 }

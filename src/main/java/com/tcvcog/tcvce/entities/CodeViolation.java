@@ -16,8 +16,9 @@ Council of Governments, PA
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tcvcog.tcvce.entities;
-
+ 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,19 +28,24 @@ import java.util.List;
  *
  * @author Eric C. Darsow
  */
-public class CodeViolation implements Serializable{
+public class CodeViolation extends EntityUtils implements Serializable{
     private int violationID;
     private EnforcableCodeElement violatedEnfElement;
     private int ceCaseID;
     private int citationID;
     private LocalDateTime dateOfCitation;
+    private String dateOfCitationPretty;
     private List<Integer> citationIDList;
     private String citationsStringList;
     private int daysUntilStipulatedComplianceDate;
     private LocalDateTime dateOfRecord;
+    private String dateOfRecordPretty;
     private LocalDateTime entryTimeStamp;
+    private String entryTimeStampPretty;
     private LocalDateTime stipulatedComplianceDate;
+    private String stipulatedComplianceDatePretty;
     private LocalDateTime actualComplianceDate;
+    private String actualComplianceDatePretty;
     private double penalty;
     private String description;
     private String notes;
@@ -273,7 +279,8 @@ public class CodeViolation implements Serializable{
      * @return the daysUntilStipulatedComplianceDate
      */
     public int getDaysUntilStipulatedComplianceDate() {
-        
+        daysUntilStipulatedComplianceDate = 
+                getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
         return daysUntilStipulatedComplianceDate;
     }
 
@@ -282,6 +289,83 @@ public class CodeViolation implements Serializable{
      */
     public void setDaysUntilStipulatedComplianceDate(int daysUntilStipulatedComplianceDate) {
         this.daysUntilStipulatedComplianceDate = daysUntilStipulatedComplianceDate;
+    }
+
+    /**
+     * @return the dateOfCitationPretty
+     */
+    public String getDateOfCitationPretty() {
+        dateOfCitationPretty = getPrettyDate(dateOfCitation);
+        return dateOfCitationPretty;
+    }
+
+    /**
+     * @return the dateOfRecordPretty
+     */
+    public String getDateOfRecordPretty() {
+        dateOfRecordPretty = getPrettyDate(dateOfRecord);
+        return dateOfRecordPretty;
+    }
+
+    /**
+     * @return the entryTimeStampPretty
+     */
+    public String getEntryTimeStampPretty() {
+        entryTimeStampPretty = getPrettyDate(entryTimeStamp);
+        
+        return entryTimeStampPretty;
+    }
+
+    /**
+     * @return the stipulatedComplianceDatePretty
+     */
+    public String getStipulatedComplianceDatePretty() {
+        stipulatedComplianceDatePretty = getPrettyDate(stipulatedComplianceDate);
+        return stipulatedComplianceDatePretty;
+    }
+
+    /**
+     * @return the actualComplianceDatePretty
+     */
+    public String getActualComplianceDatePretty() {
+        actualComplianceDatePretty = getPrettyDate(actualComplianceDate);
+        
+        return actualComplianceDatePretty;
+    }
+
+    /**
+     * @param dateOfCitationPretty the dateOfCitationPretty to set
+     */
+    public void setDateOfCitationPretty(String dateOfCitationPretty) {
+        this.dateOfCitationPretty = dateOfCitationPretty;
+    }
+
+    /**
+     * @param dateOfRecordPretty the dateOfRecordPretty to set
+     */
+    public void setDateOfRecordPretty(String dateOfRecordPretty) {
+        this.dateOfRecordPretty = dateOfRecordPretty;
+    }
+
+    /**
+     * @param entryTimeStampPretty the entryTimeStampPretty to set
+     */
+    public void setEntryTimeStampPretty(String entryTimeStampPretty) {
+        this.entryTimeStampPretty = entryTimeStampPretty;
+    }
+
+    /**
+     * @param stipulatedComplianceDatePretty the stipulatedComplianceDatePretty to set
+     */
+    public void setStipulatedComplianceDatePretty(String stipulatedComplianceDatePretty) {
+        this.stipulatedComplianceDatePretty = stipulatedComplianceDatePretty;
+    }
+
+    /**
+     * @param actualComplianceDatePretty the actualComplianceDatePretty to set
+     */
+    public void setActualComplianceDatePretty(String actualComplianceDatePretty) {
+        this.actualComplianceDatePretty = actualComplianceDatePretty;
     }
 
    

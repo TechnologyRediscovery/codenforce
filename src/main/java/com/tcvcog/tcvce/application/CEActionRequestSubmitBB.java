@@ -91,6 +91,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private String form_requestor_addressCity;
     private String form_requestor_addressZip;
     private String form_requestor_addressState;
+    private java.util.Date currentDate;
 
     /**
      * Creates a new instance of ActionRequestBean
@@ -121,6 +122,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CEActionRequest cear;
         CaseCoordinator cc = getCaseCoordinator();
         cear = cc.getNewActionRequest();
+        cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
         getSessionBean().setCeactionRequestForSubmission(cear);
         return "chooseProperty";
@@ -136,16 +138,20 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         return "describeConcern";
     }
     
-    public String addRequestorDetails(){
+    public String saveConcernDescriptions(){
 //        User u = getSessionBean().getFacesUser();
 //        if(u == null){
-            return "requestorDetails";
+            return "photoUpload";
 //            
 //        } else {
 //            
 //            return "reviewAndSubmit";
 //        }
         
+    }
+    
+    public String savePhotos(){
+        return "requestorDetails";
     }
     
     
@@ -167,11 +173,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-//        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForSubmission().getActionRequestorPerson());
+        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForSubmission().getActionRequestorPerson());
         
-//        req.setPersonID(personID);
-// hard coded
-req.setPersonID(100);
+        req.setPersonID(personID);
         
         int controlCode = getControlCodeFromTime();
         req.setRequestPublicCC(controlCode);
@@ -259,7 +263,7 @@ req.setPersonID(100);
         
         currentPerson = new Person();
         currentPerson.setPersonType(submittingPersonType);
-        currentPerson.setMuniCode(getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
+        currentPerson.setMuni(getSessionBean().getCeactionRequestForSubmission().getMuni());
         
         currentPerson.setFirstName(form_requestorFName);
         currentPerson.setLastName(form_requestorLName);
@@ -280,6 +284,7 @@ req.setPersonID(100);
         
         currentPerson.setActive(true);
         currentPerson.setUnder18(false);
+        currentPerson.setVerifiedBy(null);
         
         getSessionBean().getCeactionRequestForSubmission().setActionRequestorPerson(currentPerson);
         
@@ -300,7 +305,7 @@ req.setPersonID(100);
                  new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
                     "You might call your municipal office to report this error and make a request over the phone. "
-                    + "You can also phone the Turtle Creek COG's tecnical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
+                    + "You can also phone the Turtle Creek COG's technical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
 
             
         } catch (NullPointerException ex){
@@ -792,5 +797,21 @@ req.setPersonID(100);
      */
     public void setViolationTypeMap(Map<String, Integer> violationTypeMap) {
         this.violationTypeMap = violationTypeMap;
+    }
+
+    /**
+     * @return the currentDate
+     */
+    public java.util.Date getCurrentDate() {
+        currentDate = java.util.Date.from(java.time.LocalDateTime.now()
+                .atZone(ZoneId.systemDefault()).toInstant());
+        return currentDate;
+    }
+
+    /**
+     * @param currentDate the currentDate to set
+     */
+    public void setCurrentDate(java.util.Date currentDate) {
+        this.currentDate = currentDate;
     }
 }

@@ -12,11 +12,22 @@ import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
+<<<<<<< HEAD
 import java.time.LocalDateTime;
+=======
+import java.sql.Connection;
+>>>>>>> master
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+<<<<<<< HEAD
 import org.primefaces.event.FileUploadEvent;
+=======
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIInput;
+import javax.faces.event.ActionEvent;
+>>>>>>> master
 
 /*
  * Copyright (C) 2018 Turtle Creek Valley
@@ -41,82 +52,105 @@ Council of Governments, PA
  * @author Eric C. Darsow
  */
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
-    private PropertyWithLists currentProperty;
-    private ArrayList<Person> propertyPersonList;
-    private Person selectedPerson;
+    
+    private PropertyWithLists currProp;
     private ArrayList<Person> filteredPersonList;
     
-    private ArrayList<CECase> ceCaseList;
-    private CECase selectedCECase;
+    private String parid;
+    private String address;
+    private String houseNum;
+    private String streetName;
+    private String addrPartAllMunis;
+    private boolean allMunis;
     
-    private int selectedPhotoID;
-    private ArrayList<Photograph> photoList;
+    private ArrayList<Property> propList;
+    private List<Property> filteredPropList;
+    private UIInput addressInput;
     
     private ArrayList<CEActionRequest> ceActionRequestList;
 
+    private int selectedMuniCode;
+    private CECase selectedCECase;
+
+
+    
     /**
      * Creates a new instance of PropertyProfileBB
      */
     public PropertyProfileBB() {
     }
     
-    public void handlePhotoUpload(FileUploadEvent ev){
-        if(ev == null){
-            System.out.println("PhotoBB.handleFileUpload | event: null");
-            return;
-        }
-       
-        System.out.println("PhotoBB.handleFileUpload | event: " + ev.toString());
+
+     public void searchForProperties(ActionEvent event){
+        System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
+        PropertyIntegrator pi = new PropertyIntegrator();
+        
         try {
-            
-            ImageServices is = getImageServices();
-            Photograph ph = new Photograph();
-            ph.setPhotoBytes(ev.getFile().getContents());
-            ph.setDescription("hello photo!");
-            ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
-            ph.setTimeStamp(LocalDateTime.now());
-            is.storePhotograph(ph);
+            if(isAllMunis()){
+                setPropList(pi.searchForProperties(getHouseNum(), getStreetName()));
+            } else {
+                setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSelectedMuniCode()));
+            }
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Your search completed with " + getPropList().size() + " results", ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to complete search! ", ""));
         }
-        this.getPhotoList();
     }
     
-    public String createCase(){
-        
-        
+    public String openCECase(){
+        getSessionBean().setActiveProp(currProp);
         return "addNewCase";
     }
     
+    public String viewCase(CECase c){
+        getSessionBean().setcECase(c);
+        return "ceCases";
+    }
+    
+    
+    
+    
     public String viewPersonProfile(Person p){
         System.out.println("PropertyProfileBB.viewPersonProfile");
-        getSessionBean().setActivePerson(selectedPerson);
+        getSessionBean().setActivePerson(p);
         return "personProfile";
+    }
+    
+    public void manageProperty(Property prop){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            currProp = pi.getPropertyWithLists(prop.getPropertyID());
+            System.out.println("PropertyProfileBB.manageProperty | curr Prop: " + currProp.getAddress());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
     
     /**
      * @return the currentProperty
      */
-    public Property getCurrentProperty() {
+    public PropertyWithLists getCurrProp() {
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            currentProperty = pi.getPropertyWithLists(getSessionBean().getActiveProp().getPropertyID());
+            if(currProp == null){
+                currProp = pi.getPropertyWithLists(getSessionBean().getActiveProp().getPropertyID());
+            }
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        return currentProperty;
+        return currProp;
     }
     
-    public String viewCase(CECase c){
-        
-        return "caseProfile";
-    }
-
     /**
      * @param currentProperty the currentProperty to set
      */
-    public void setCurrentProperty(PropertyWithLists currentProperty) {
-        this.currentProperty = currentProperty;
+    public void setCurrProp(PropertyWithLists currentProperty) {
+        this.currProp = currentProperty;
     }
     
     public String updateProperty(){
@@ -125,64 +159,155 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         
     }
 
+    
     /**
-     * @return the propertyPersonList
+     * @return the parid
      */
-    public ArrayList<Person> getPropertyPersonList() {
-        propertyPersonList = currentProperty.getPropertyPersonList();
-        return propertyPersonList;
+    public String getParid() {
+        return parid;
     }
 
     /**
-     * @return the ceCaseList
+     * @return the address
      */
-    public ArrayList<CECase> getCeCaseList() {
-        ceCaseList = currentProperty.getPropertyCaseList();
-        return ceCaseList;
+    public String getAddress() {
+        return address;
     }
 
     /**
-     * @return the ceActionRequestList
+     * @return the houseNum
      */
-    public ArrayList<CEActionRequest> getCeActionRequestList() {
-        return ceActionRequestList;
+    public String getHouseNum() {
+        return houseNum;
     }
 
     /**
-     * @param propertyPersonList the propertyPersonList to set
+     * @return the streetName
      */
-    public void setPropertyPersonList(ArrayList<Person> propertyPersonList) {
-        this.propertyPersonList = propertyPersonList;
+    public String getStreetName() {
+        return streetName;
     }
 
     /**
-     * @param ceCaseList the ceCaseList to set
+     * @return the addrPartAllMunis
      */
-    public void setCeCaseList(ArrayList<CECase> ceCaseList) {
-        this.ceCaseList = ceCaseList;
+    public String getAddrPartAllMunis() {
+        return addrPartAllMunis;
     }
 
     /**
-     * @param ceActionRequestList the ceActionRequestList to set
+     * @return the allMunis
      */
-    public void setCeActionRequestList(ArrayList<CEActionRequest> ceActionRequestList) {
-        this.ceActionRequestList = ceActionRequestList;
+    public boolean isAllMunis() {
+        return allMunis;
     }
 
     /**
-     * @return the selectedPerson
+     * @return the propList
      */
-    public Person getSelectedPerson() {
-        return selectedPerson;
+    public ArrayList<Property> getPropList() {
+        return propList;
     }
 
     /**
-     * @param selectedPerson the selectedPerson to set
+     * @return the filteredPropList
      */
-    public void setSelectedPerson(Person selectedPerson) {
-        this.selectedPerson = selectedPerson;
+    public List<Property> getFilteredPropList() {
+        return filteredPropList;
     }
 
+    /**
+     * @return the addressInput
+     */
+    public UIInput getAddressInput() {
+        return addressInput;
+    }
+
+    /**
+     * @return the selectedMuniCode
+     */
+    public int getSelectedMuniCode() {
+        return selectedMuniCode;
+    }
+
+    /**
+     * @param parid the parid to set
+     */
+    public void setParid(String parid) {
+        this.parid = parid;
+    }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    /**
+     * @param houseNum the houseNum to set
+     */
+    public void setHouseNum(String houseNum) {
+        this.houseNum = houseNum;
+    }
+
+    /**
+     * @param streetName the streetName to set
+     */
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
+    /**
+     * @param addrPartAllMunis the addrPartAllMunis to set
+     */
+    public void setAddrPartAllMunis(String addrPartAllMunis) {
+        this.addrPartAllMunis = addrPartAllMunis;
+    }
+
+    /**
+     * @param allMunis the allMunis to set
+     */
+    public void setAllMunis(boolean allMunis) {
+        this.allMunis = allMunis;
+    }
+
+    /**
+     * @param propList the propList to set
+     */
+    public void setPropList(ArrayList<Property> propList) {
+        this.propList = propList;
+    }
+
+    /**
+     * @param filteredPropList the filteredPropList to set
+     */
+    public void setFilteredPropList(List<Property> filteredPropList) {
+        this.filteredPropList = filteredPropList;
+    }
+
+    /**
+     * @param addressInput the addressInput to set
+     */
+
+    public void setSelectedCECase(CECase selectedCECase) {
+        this.selectedCECase = selectedCECase;
+    }
+
+    public void setAddressInput(UIInput addressInput) {
+        this.addressInput = addressInput;
+    }
+
+    /**
+     * @param selectedMuniCode the selectedMuniCode to set
+     */
+    public void setSelectedMuniCode(int selectedMuniCode) {
+        this.selectedMuniCode = selectedMuniCode;
+    }
+
+   
+
+  
     /**
      * @return the filteredPersonList
      */
@@ -197,51 +322,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.filteredPersonList = filteredPersonList;
     }
 
-    /**
-     * @return the selectedCECase
-     */
-    public CECase getSelectedCECase() {
-        return selectedCECase;
-    }
-
-    /**
-     * @param selectedCECase the selectedCECase to set
-     */
-    public void setSelectedCECase(CECase selectedCECase) {
-        this.selectedCECase = selectedCECase;
-    }  
-
-    /**
-     * @return the selectedPhotoID
-     */
-    public int getSelectedPhotoID() {
-        return selectedPhotoID;
-    }
-
-    /**
-     * @param selectedPhotoID the selectedPhotoID to set
-     */
-    public void setSelectedPhotoID(int selectedPhotoID) {
-        this.selectedPhotoID = selectedPhotoID;
-    }
-
-    /**
-     * @return the photoList
-     */
-    public ArrayList<Photograph> getPhotoList() {
-        ImageServices is = getImageServices();
-        try {
-            return is.getAllPhotographs();
-        } catch (IntegrationException ex) {
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-    }
-
-    /**
-     * @param photoList the photoList to set
-     */
-    public void setPhotoList(ArrayList<Photograph> photoList) {
-        this.photoList = photoList;
-    }
+   
+ 
+   
+ 
+>>>>>>> master
 }

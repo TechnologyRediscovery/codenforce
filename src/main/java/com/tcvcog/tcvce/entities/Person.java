@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Model object representing a person in the system. A Person has a type
@@ -33,7 +34,6 @@ public class Person implements Serializable{
     
     private PersonType personType;
     private Municipality muni;
-    private int muniCode;
     
     private int sourceID;
     private String sourceTitle;
@@ -351,20 +351,7 @@ public class Person implements Serializable{
         this.lastName = lastName;
     }
 
-    /**
-     * @return the muniCode
-     */
-    public int getMuniCode() {
-        muniCode = muni.getMuniCode();
-        return muniCode;
-    }
-
-    /**
-     * @param muniCode the muniCode to set
-     */
-    public void setMuniCode(int muniCode) {
-        this.muniCode = muniCode;
-    }
+   
     
     @Override
     public String toString(){
@@ -554,5 +541,155 @@ public class Person implements Serializable{
     public void setVerifiedBy(User verifiedBy) {
         this.verifiedBy = verifiedBy;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + this.personID;
+        hash = 79 * hash + Objects.hashCode(this.personType);
+        hash = 79 * hash + Objects.hashCode(this.muni);
+        hash = 79 * hash + this.sourceID;
+        hash = 79 * hash + Objects.hashCode(this.sourceTitle);
+        hash = 79 * hash + Objects.hashCode(this.creator);
+        hash = 79 * hash + Objects.hashCode(this.firstName);
+        hash = 79 * hash + Objects.hashCode(this.lastName);
+        hash = 79 * hash + (this.compositeLastName ? 1 : 0);
+        hash = 79 * hash + (this.businessEntity ? 1 : 0);
+        hash = 79 * hash + Objects.hashCode(this.jobTitle);
+        hash = 79 * hash + Objects.hashCode(this.phoneCell);
+        hash = 79 * hash + Objects.hashCode(this.phoneHome);
+        hash = 79 * hash + Objects.hashCode(this.phoneWork);
+        hash = 79 * hash + Objects.hashCode(this.email);
+        hash = 79 * hash + Objects.hashCode(this.addressStreet);
+        hash = 79 * hash + Objects.hashCode(this.addressCity);
+        hash = 79 * hash + Objects.hashCode(this.addressZip);
+        hash = 79 * hash + Objects.hashCode(this.addressState);
+        hash = 79 * hash + (this.addressOfResidence ? 1 : 0);
+        hash = 79 * hash + Objects.hashCode(this.mailingAddressStreet);
+        hash = 79 * hash + Objects.hashCode(this.mailingAddressCity);
+        hash = 79 * hash + Objects.hashCode(this.mailingAddressZip);
+        hash = 79 * hash + Objects.hashCode(this.mailingAddressState);
+        hash = 79 * hash + (this.mailingSameAsResidence ? 1 : 0);
+        hash = 79 * hash + Objects.hashCode(this.notes);
+        hash = 79 * hash + Objects.hashCode(this.lastUpdated);
+        hash = 79 * hash + Objects.hashCode(this.expiryDate);
+        hash = 79 * hash + Objects.hashCode(this.expiryNotes);
+        hash = 79 * hash + (this.active ? 1 : 0);
+        hash = 79 * hash + (this.under18 ? 1 : 0);
+        hash = 79 * hash + Objects.hashCode(this.verifiedBy);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Person other = (Person) obj;
+        if (this.personID != other.personID) {
+            return false;
+        }
+        if (this.sourceID != other.sourceID) {
+            return false;
+        }
+        if (this.compositeLastName != other.compositeLastName) {
+            return false;
+        }
+        if (this.businessEntity != other.businessEntity) {
+            return false;
+        }
+        if (this.addressOfResidence != other.addressOfResidence) {
+            return false;
+        }
+        if (this.mailingSameAsResidence != other.mailingSameAsResidence) {
+            return false;
+        }
+        if (this.active != other.active) {
+            return false;
+        }
+        if (this.under18 != other.under18) {
+            return false;
+        }
+        if (!Objects.equals(this.sourceTitle, other.sourceTitle)) {
+            return false;
+        }
+        if (!Objects.equals(this.firstName, other.firstName)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastName, other.lastName)) {
+            return false;
+        }
+        if (!Objects.equals(this.jobTitle, other.jobTitle)) {
+            return false;
+        }
+        if (!Objects.equals(this.phoneCell, other.phoneCell)) {
+            return false;
+        }
+        if (!Objects.equals(this.phoneHome, other.phoneHome)) {
+            return false;
+        }
+        if (!Objects.equals(this.phoneWork, other.phoneWork)) {
+            return false;
+        }
+        if (!Objects.equals(this.email, other.email)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressStreet, other.addressStreet)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressCity, other.addressCity)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressZip, other.addressZip)) {
+            return false;
+        }
+        if (!Objects.equals(this.addressState, other.addressState)) {
+            return false;
+        }
+        if (!Objects.equals(this.mailingAddressStreet, other.mailingAddressStreet)) {
+            return false;
+        }
+        if (!Objects.equals(this.mailingAddressCity, other.mailingAddressCity)) {
+            return false;
+        }
+        if (!Objects.equals(this.mailingAddressZip, other.mailingAddressZip)) {
+            return false;
+        }
+        if (!Objects.equals(this.mailingAddressState, other.mailingAddressState)) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.expiryNotes, other.expiryNotes)) {
+            return false;
+        }
+        if (this.personType != other.personType) {
+            return false;
+        }
+        if (!Objects.equals(this.muni, other.muni)) {
+            return false;
+        }
+        if (!Objects.equals(this.creator, other.creator)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastUpdated, other.lastUpdated)) {
+            return false;
+        }
+        if (!Objects.equals(this.expiryDate, other.expiryDate)) {
+            return false;
+        }
+        if (!Objects.equals(this.verifiedBy, other.verifiedBy)) {
+            return false;
+        }
+        return true;
+    }
+    
 
 }

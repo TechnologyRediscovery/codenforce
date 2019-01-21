@@ -68,6 +68,26 @@ h4{
     color:#163F8A;
 }
 
+.property-blue{
+    color: #03305C;
+    
+}
+
+.person-maroon{
+    color: #710040;
+}
+
+.code-enforcement-orange{
+    color: #B36A00;
+}
+
+.occupancy-green{
+    
+}
+
+
+
+
 /*************** END HEADERS ****************/
 
 /*********** MENUS and TABS*********************/
@@ -102,7 +122,14 @@ h4{
     color: black;
 }
 
+.bold-menu-item{
+    color:green;
+}
 
+.ui-menu .ui-menuitem-text{
+    font-weight: bold;
+    
+}
 
 
 
@@ -130,6 +157,10 @@ i.material-icons{
     text-indent: 0px;
 }
 
+.ui-menu .ui-menuitem-link .ui-menuitem-icon, .ui-menu .ui-submenu-icon{
+    padding-right: 8px;
+    
+}
 
 /*
 .icon-box-centered{
@@ -243,9 +274,42 @@ div.headerLink a:before, a:visited{
 }
 
 /************** END LINKS ******************/
+.two-column-page-flex-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding:5px;
+      
+}
+
+.list-column{
+    flex-basis:auto;
+    flex-shrink: 1;
+    min-width: 450px;
+    max-width: 450px;
+    padding-right:10px;
+    
+    
+}
+
+.object-column{
+    flex-basis: auto;
+    flex-grow: 1;
+    padding-left: 10px;
+
+    
+}
 
 
-/* ----------- MAIN PAGE LAYOUT BOXES -------- */
+
+/* ----------- Primary two-column setup: PAGE LAYOUT BOXES -------- */
+
+
+
+
+
+/* ----------- Horizontal bars: LAYOUT BOXES  (OLD)-------- */
+
 
 
 .flex-box-container{
@@ -291,10 +355,12 @@ div.headerLink a:before, a:visited{
     flex-basis: 100%;
     flex-shrink: 1;
     
-    height: 90px;
+    height: 65px;
     background-color: #2C5F90;
     
 }
+
+
 
 .flexing-box-sidebar{
     
@@ -329,7 +395,7 @@ div.headerLink a:before, a:visited{
     
     
     flex-grow: 1;
-    flex-basis: 80%;
+    flex-basis: max-content;
     flex-shrink: 1;
     
     
@@ -357,6 +423,18 @@ div.headerLink a:before, a:visited{
     flex-shrink: 3;
     
     
+}
+
+.split-page-panelgrid{
+    width: 100%;
+}
+
+.split-page-list-side{
+    width: 40%;
+}
+
+.split-page-manage-side{
+    width: 60%;
 }
 
 
@@ -470,9 +548,9 @@ div.headerLinkCont{
 }
 
 .infoBarData{
-    font-size: 1.5em;
+    font-size: .9em;
     font-family: mono;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 
@@ -489,6 +567,7 @@ div.headerLinkCont{
 .wrapText{
     white-space: normal;
     overflow-wrap: normal;
+    word-break: break-all;
 }
 
 .outlinedBox{
@@ -614,6 +693,11 @@ img.headerImg{
     
 }
 
+.spacier-rows{
+    height: 150%;
+    
+}
+
 
 table.primeDataTable td{
     font-size: small;
@@ -657,7 +741,8 @@ tr.reinspect{
     background-color: lightpink
 }
 
-td.gridTd {
+/*td.gridTd {*/
+.gridTd {
     border: none;
 }
 
@@ -683,6 +768,10 @@ td.userBarTd{
     align-content: center;
     border: none;
     
+}
+
+td.centeredColumnContent{
+    text-align: center;
 }
 
 .userBarTd .material-icons{

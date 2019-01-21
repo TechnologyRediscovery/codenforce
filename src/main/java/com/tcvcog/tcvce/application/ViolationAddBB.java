@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -58,7 +59,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     public String addViolation(){
         
         ViolationCoordinator vc = getViolationCoordinator();
-        
+        CaseIntegrator ci = getCaseIntegrator();
         
         currentViolation.setStipulatedComplianceDate(getStipulatedComplianceDate()
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
@@ -68,9 +69,11 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         currentViolation.setDescription(description);
         currentViolation.setNotes(notes);
         
+        
+        
         try {
              vc.addNewCodeViolation(currentViolation);
-
+             getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
