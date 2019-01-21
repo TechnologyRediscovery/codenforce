@@ -19,7 +19,64 @@
                         <h:messages id="missionControlMessages" globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                       
+                        <h:form enctype="multipart/form-data">
+                           <p:fileUpload   fileUploadListener="#{photoBB.handleFileUpload}"
+                                            mode="advanced"
+                                            sizeLimit="100000"
+                                            allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                            update="viewPhotosForm:photoResultTable"
+                                            />
+                        </h:form>
+                        
+                        <h:form id="viewPhotosForm">
+                            <p:commandButton value="show photos"
+                                             actionListener="#{photoBB.getAllPhotos}"
+                                             immediate="true"
+                                             ajax="true"
+                                             update="viewPhotosForm:photoResultTable"
+                                             />
+                            <p:dataTable
+                                id="photoResultTable"
+                                var="photo" 
+                                value="#{photoBB.phList}"
+                                tabindex="5"
+                                scrollable="true" scrollHeight="150"
+                                rowKey="#{photo.photoID}">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{photo.photoID}"/>
+                                    <p:commandButton value="delete" actionListener="#{photoBB.deletePhoto(photo.photoID)}"
+                                                     immediate="true"
+                                                     update="viewPhotosForm:photoResultTable"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Description" />
+                                    </f:facet>
+                                    <h:outputText value="#{photo.description}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Timestamp" />
+                                    </f:facet>
+                                    <h:outputText value="#{photo.timeStamp}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Image" />
+                                    </f:facet>
+                                    <p:graphicImage value="#{imageServices.image}">
+                                        <f:param name="photoID" value="#{photo.photoID}"/>
+                                    </p:graphicImage>
+                                </p:column>
+                            </p:dataTable>
+                            <p:graphicImage value="#{imageServices.image}">
+                                <f:param name="photoID" value="1005"/>
+                            </p:graphicImage>
+                        </h:form>
+                        
                         <h:form id="missionControlForm">
                             
                         <h3>Switch municipality</h3>

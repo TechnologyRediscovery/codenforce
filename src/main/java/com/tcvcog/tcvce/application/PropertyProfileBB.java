@@ -5,19 +5,19 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
-import java.sql.Connection;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.application.FacesMessage;
-import javax.faces.component.UIInput;
-import javax.faces.event.ActionEvent;
+import org.primefaces.event.FileUploadEvent;
 
 /*
  * Copyright (C) 2018 Turtle Creek Valley
@@ -57,7 +57,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private List<Property> filteredPropList;
     private UIInput addressInput;
     
-    private int selectedMuniCode;
+    private int selectedPhotoID;
+    private ArrayList<Photograph> photoList;
+    
+    private ArrayList<CEActionRequest> ceActionRequestList;
 
     
     /**
@@ -66,9 +69,30 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public PropertyProfileBB() {
     }
     
-     public void searchForProperties(ActionEvent event){
-        System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
-        PropertyIntegrator pi = new PropertyIntegrator();
+    public void handlePhotoUpload(FileUploadEvent ev){
+        if(ev == null){
+            System.out.println("PhotoBB.handleFileUpload | event: null");
+            return;
+        }
+       
+        System.out.println("PhotoBB.handleFileUpload | event: " + ev.toString());
+        try {
+            
+            ImageServices is = getImageServices();
+            Photograph ph = new Photograph();
+            ph.setPhotoBytes(ev.getFile().getContents());
+            ph.setDescription("hello photo!");
+            ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
+            ph.setTimeStamp(LocalDateTime.now());
+            is.storePhotograph(ph);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        this.getPhotoList();
+    }
+    
+    public String createCase(){
+        
         
         try {
             if(isAllMunis()){
@@ -274,34 +298,41 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @param addressInput the addressInput to set
      */
-    public void setAddressInput(UIInput addressInput) {
-        this.addressInput = addressInput;
+    public void setSelectedCECase(CECase selectedCECase) {
+        this.selectedCECase = selectedCECase;
+    }  
+
+    /**
+     * @return the selectedPhotoID
+     */
+    public int getSelectedPhotoID() {
+        return selectedPhotoID;
     }
 
     /**
-     * @param selectedMuniCode the selectedMuniCode to set
+     * @param selectedPhotoID the selectedPhotoID to set
      */
-    public void setSelectedMuniCode(int selectedMuniCode) {
-        this.selectedMuniCode = selectedMuniCode;
-    }
-
-   
-
-  
-    /**
-     * @return the filteredPersonList
-     */
-    public ArrayList<Person> getFilteredPersonList() {
-        return filteredPersonList;
+    public void setSelectedPhotoID(int selectedPhotoID) {
+        this.selectedPhotoID = selectedPhotoID;
     }
 
     /**
-     * @param filteredPersonList the filteredPersonList to set
+     * @return the photoList
      */
-    public void setFilteredPersonList(ArrayList<Person> filteredPersonList) {
-        this.filteredPersonList = filteredPersonList;
+    public ArrayList<Photograph> getPhotoList() {
+        ImageServices is = getImageServices();
+        try {
+            return is.getAllPhotographs();
+        } catch (IntegrationException ex) {
+            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 
-   
- 
+    /**
+     * @param photoList the photoList to set
+     */
+    public void setPhotoList(ArrayList<Photograph> photoList) {
+        this.photoList = photoList;
+    }
 }

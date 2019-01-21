@@ -76,6 +76,10 @@
         <extension>svg</extension>
         <mime-type>image/svg+xml</mime-type>
     </mime-mapping>
+    <mime-mapping>
+        <extension>png</extension>
+        <mime-type>image/png</mime-type>
+    </mime-mapping>
     <welcome-file-list>
         <welcome-file>public/systemHome.xhtml</welcome-file>
     </welcome-file-list>
