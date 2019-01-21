@@ -466,6 +466,69 @@
                             <p:spacer height="10px"/>
                             <hr/>
                             <p:spacer height="10px"/>
+                        </h:form>
+                            
+                        <h:form id="propertyPhotoForm">    
+                            <h2>Attached Photos</h2>
+                            <p>View photographs of this property</p>
+                            
+                            <p:dataTable
+                                id="photoResultTable"
+                                var="photo" 
+                                value="#{propertyProfileBB.phList}"
+                                tabindex="5"
+                                scrollable="true" scrollHeight="150"
+                                rowKey="#{photo.photoID}">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <p:commandButton value="delete" actionListener="#{photoBB.deletePhoto(photo.photoID)}"
+                                                     immediate="true"
+                                                     update=":photoResultTable"/>
+                                    <h:outputText value="#{photo.photoID}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Description" />
+                                    </f:facet>
+                                    <h:outputText value="#{photo.description}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Timestamp" />
+                                    </f:facet>
+                                    <h:outputText value="#{photo.timeStamp}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Image" />
+                                    </f:facet>
+                                    <p:graphicImage value="#{imageServices.image}">
+                                        <f:param name="photoID" value="#{photo.photoID}"/>
+                                    </p:graphicImage>
+                                </p:column>
+                            </p:dataTable>
+
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+                        </h:form>
+                        
+                        <h:form id="propertyUploadPhotoForm" enctype="multipart/form-data"> 
+                            <h2>Upload Photo</h2>
+                            <p>Upload a photo of this property</p>
+                            
+                           <p:fileUpload   fileUploadListener="#{photoBB.handleFileUpload}"
+                                           mode="advanced"
+                                           sizeLimit="100000"
+                                           allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                           update="propertyPhotoForm:photoResultTable"
+                                           />
+                            
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
 
                         </h:form>
 

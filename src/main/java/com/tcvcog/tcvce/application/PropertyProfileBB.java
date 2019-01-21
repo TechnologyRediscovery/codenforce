@@ -5,14 +5,18 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.primefaces.event.FileUploadEvent;
 
 /*
  * Copyright (C) 2018 Turtle Creek Valley
@@ -45,6 +49,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private ArrayList<CECase> ceCaseList;
     private CECase selectedCECase;
     
+    private int selectedPhotoID;
+    private ArrayList<Photograph> photoList;
+    
     private ArrayList<CEActionRequest> ceActionRequestList;
 
     /**
@@ -53,6 +60,27 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public PropertyProfileBB() {
     }
     
+    public void handlePhotoUpload(FileUploadEvent ev){
+        if(ev == null){
+            System.out.println("PhotoBB.handleFileUpload | event: null");
+            return;
+        }
+       
+        System.out.println("PhotoBB.handleFileUpload | event: " + ev.toString());
+        try {
+            
+            ImageServices is = getImageServices();
+            Photograph ph = new Photograph();
+            ph.setPhotoBytes(ev.getFile().getContents());
+            ph.setDescription("hello photo!");
+            ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
+            ph.setTimeStamp(LocalDateTime.now());
+            is.storePhotograph(ph);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        this.getPhotoList();
+    }
     
     public String createCase(){
         
@@ -182,4 +210,38 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void setSelectedCECase(CECase selectedCECase) {
         this.selectedCECase = selectedCECase;
     }  
+
+    /**
+     * @return the selectedPhotoID
+     */
+    public int getSelectedPhotoID() {
+        return selectedPhotoID;
+    }
+
+    /**
+     * @param selectedPhotoID the selectedPhotoID to set
+     */
+    public void setSelectedPhotoID(int selectedPhotoID) {
+        this.selectedPhotoID = selectedPhotoID;
+    }
+
+    /**
+     * @return the photoList
+     */
+    public ArrayList<Photograph> getPhotoList() {
+        ImageServices is = getImageServices();
+        try {
+            return is.getAllPhotographs();
+        } catch (IntegrationException ex) {
+            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+
+    /**
+     * @param photoList the photoList to set
+     */
+    public void setPhotoList(ArrayList<Photograph> photoList) {
+        this.photoList = photoList;
+    }
 }
