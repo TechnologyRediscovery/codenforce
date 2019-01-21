@@ -7,7 +7,13 @@ ALTER TABLE codeviolation ADD COLUMN compliancetfevent INTEGER CONSTRAINT codevi
 ALTER TABLE occupancypermitapplication RENAME COLUMN "multiUnit" TO multiunit;
 ALTER TABLE occupancypermitapplication RENAME COLUMN contatperson_personid TO contactperson_personid;
 
-ALTER TABLE photodoc ADD CONSTRAINT photodoc_photodoctype_fk FOREIGN KEY ( photodoctype_typeid) REFERENCES photodoctype (typeid) ;
+
+CREATE TABLE photodoctype
+(
+    typeid                  INTEGER PRIMARY KEY,
+    typeTitle               text
+) ;
+
 
 INSERT INTO public.photodoctype(
             typeid, typetitle)
@@ -16,6 +22,7 @@ INSERT INTO public.photodoctype(
             typeid, typetitle)
     VALUES (2, 'pdf');
 
+ALTER TABLE photodoc ADD CONSTRAINT photodoc_photodoctype_fk FOREIGN KEY ( photodoctype_typeid) REFERENCES photodoctype (typeid) ;
 
 CREATE TABLE public.codeviolationphotodoc
 (
