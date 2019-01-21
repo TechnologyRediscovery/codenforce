@@ -138,16 +138,20 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         return "describeConcern";
     }
     
-    public String addRequestorDetails(){
+    public String saveConcernDescriptions(){
 //        User u = getSessionBean().getFacesUser();
 //        if(u == null){
-            return "requestorDetails";
+            return "photoUpload";
 //            
 //        } else {
 //            
 //            return "reviewAndSubmit";
 //        }
         
+    }
+    
+    public String savePhotos(){
+        return "requestorDetails";
     }
     
     
