@@ -114,7 +114,8 @@
                                                     msg-form:person-add-messages"/>
                         <p:spacer height="5px"/>
                         
-                        <h:outputText id="lookup-person-it" value="Lookup verification: #{!empty noticeOfViolationBB.retrievedManualLookupPerson?noticeOfViolationBB.retrievedManualLookupPerson.lastName:null}"/>
+                        <h:outputText id="lookup-person-it" 
+                                      value="Lookup verification: #{!empty noticeOfViolationBB.retrievedManualLookupPerson?noticeOfViolationBB.retrievedManualLookupPerson.lastName:null}"/>
 
                         <hr/>
                         
