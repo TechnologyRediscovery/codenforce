@@ -44,21 +44,22 @@ import javax.faces.bean.SessionScoped;
 
 /**
  *
+ *       //@ManagedBean(name="sessionBean")
+ *       //@SessionScoped
  * @author Eric C. Darsow
  */
-@ManagedBean(name="sessionBean")
-@SessionScoped
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
     // primary security authoriziation container 
+    // TODO - remove and get the keycard directly from the User stored in the session
     private AccessKeyCard accessKeyCard;
     
-    
     /* *** System Core Objects Session Shelves ***  */
-    private User utilityUserToUpdate;
     private Municipality activeMuni;
     private List<Municipality> availableMuniList;
-    
+    // note that the User object is stored as a sibling of this SessionBean, not as a
+    // member variable on this SessionBean. 
+    // Retrieve a handle to the User with the BackingBeanUtils getFacesUser() method
     private Property activeProp;
     private Person activePerson;
     
@@ -72,6 +73,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Code Enf Action Request Session Shelves ***  */
     
     // temporary
+    private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
     private CEActionRequest activeRequest;
     private List<CEActionRequest> cEActionRequestList;
@@ -92,7 +94,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Citation activeCitation;
     private CodeViolation activeCodeViolation;
     
-    /* *** Public Data Sessino Shelves ***  */
+    /* *** Public Data Session Shelves ***  */
     private List<PublicInfoBundle> infoBundleList;
     private PublicInfoBundleCECase pibCECase;
  

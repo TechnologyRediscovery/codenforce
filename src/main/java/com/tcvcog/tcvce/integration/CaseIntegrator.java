@@ -280,7 +280,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         c.setProperty(pi.getProperty(rs.getInt("property_propertyid")));
         c.setPropertyUnit(null); // change when units are integrated
 
-        c.setUser(ui.getUser(rs.getInt("login_userid")));
+        c.setCaseManager(ui.getUser(rs.getInt("login_userid")));
 
         c.setCaseName(rs.getString("casename"));
         c.setCasePhase(CasePhase.valueOf(rs.getString("casephase")));
@@ -371,7 +371,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 stmt.setInt(3, ceCase.getPropertyUnit().getUnitID());
             } else { stmt.setNull(3, java.sql.Types.NULL); }
             
-            stmt.setInt(4, ceCase.getUser().getUserID());
+            stmt.setInt(4, ceCase.getCaseManager().getUserID());
             stmt.setString(5, ceCase.getCaseName());
             stmt.setString(6, ceCase.getCasePhase().toString());
             stmt.setTimestamp(7, java.sql.Timestamp

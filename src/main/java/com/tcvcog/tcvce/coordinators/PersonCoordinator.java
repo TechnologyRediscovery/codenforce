@@ -19,8 +19,16 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.SearchCoordinator;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -28,11 +36,35 @@ import java.io.Serializable;
  */
 public class PersonCoordinator extends BackingBeanUtils implements Serializable{
 
+    private PersonType[] personTypes;
+    
+    
     /**
      * Creates a new instance of PersonCoordinator
      */
     public PersonCoordinator() {
     }
+    
+    public void updatePerson(Person p, User u) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        StringBuilder sb = new StringBuilder();
+        sb.append(p.getNotes());
+        sb.append("<br/><br/>**************************************<br/>");
+        sb.append("PERSON INFO UPDATED");
+        sb.append(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("lastUpdated"));
+        sb.append("<br/>");
+        sb.append(getFacesUser().getFName());
+        sb.append(" ");
+        sb.append(getFacesUser().getLName());
+        sb.append(" at ");
+        sb.append(getPrettyDate(LocalDateTime.now()));
+        sb.append("<br/>");
+        sb.append("**************************************<br/>");
+        p.setNotes(sb.toString());
+        pi.updatePerson(p);
+        
+    }
+    
 
     /**
      * Hard-coded default values for person searches
@@ -59,6 +91,21 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         spp.setFilterByPropertySwitch(false);
         
         return spp;
+    }
+
+    /**
+     * @return the personTypes
+     */
+    public PersonType[] getPersonTypes() {
+        personTypes = PersonType.values();
+        return personTypes;
+    }
+
+    /**
+     * @param personTypes the personTypes to set
+     */
+    public void setPersonTypes(PersonType[] personTypes) {
+        this.personTypes = personTypes;
     }
     
 }

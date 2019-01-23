@@ -12,6 +12,7 @@
     <h:body>
         <ui:composition template="../navContainer_restricted.xhtml">
             <ui:define name="content">
+                
                 <f:view id="properties-view">
                     <div class="two-column-page-flex-container">
                         <div class="list-column">
@@ -152,6 +153,7 @@
                                                          actionListener="#{propertyProfileBB.manageProperty(prop)}" 
                                                          ajax="true"
                                                          update="
+                                                         property-info-form:header-ot
                                                          property-info-form:prop-info-addr-ot
                                                          property-info-form:prop-info-muni-ot
                                                          property-info-form:prop-info-parcelid-ot
@@ -169,10 +171,6 @@
                             </h:form>
                         </div>
 
-
-                        <ui:remove>
-                            MAJOR DIVIDE BETWEEN LISTS AND OBJECTS HERE
-                        </ui:remove>
 
                         <div class="object-column">
 
@@ -193,8 +191,7 @@
                                         <h:outputLabel for="prop-info-addr-ot" >
                                             <h:outputText styleClass="uiLabel" value="Address:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-addr-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address}"/>
                                     </h:panelGroup>
 
@@ -202,8 +199,7 @@
                                         <h:outputLabel for="prop-info-muni-ot" >
                                             <h:outputText styleClass="uiLabel" value="Municipality:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-muni-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.muni.muniName}"/>
                                     </h:panelGroup>
 
@@ -211,8 +207,7 @@
                                         <h:outputLabel for="prop-info-parcelid-ot" >
                                             <h:outputText styleClass="uiLabel" value="Parcel ID:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-parcelid-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.parID}"/>
                                     </h:panelGroup>
 
@@ -220,8 +215,7 @@
                                         <h:outputLabel for="prop-info-lotandblock-ot" >
                                             <h:outputText styleClass="uiLabel" value="Lot and Block:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-lotandblock-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.lotAndBlock}"/>
                                     </h:panelGroup>
 
@@ -229,8 +223,7 @@
                                         <h:outputLabel for="prop-info-usetype-ot" >
                                             <h:outputText styleClass="uiLabel" value="Use Type:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-usetype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.propertyUseType}"/>
                                     </h:panelGroup>
 
@@ -239,8 +232,7 @@
                                         <h:outputLabel for="prop-info-usegroup-ot" >
                                             <h:outputText styleClass="uiLabel" value="Use Group:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.useGroup}"/>
                                     </h:panelGroup>
 
@@ -248,8 +240,7 @@
                                         <h:outputLabel for="prop-info-consttype-ot" >
                                             <h:outputText styleClass="uiLabel" value="Construction Type:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-consttype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.constructionType}"/>
                                     </h:panelGroup>
 
@@ -257,8 +248,7 @@
                                         <h:outputLabel for="prop-info-countycode-ot" >
                                             <h:outputText styleClass="uiLabel" value="County Code:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.countyCode}"/>
                                     </h:panelGroup>
 
@@ -267,19 +257,12 @@
                                         <h:outputLabel for="prop-info-notes-ot" >
                                             <h:outputText styleClass="uiLabel" value="Notes:" />
                                         </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.notes}"/>
                                     </h:panelGroup>
                                 </h:panelGrid>
                                 <p:commandButton ajax="false" value="Update Selected Property Info" action="#{propertyProfileBB.updateProperty}" disabled="true"/>
                             </h:form>
-
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
-
-                            
 
                             <p:spacer height="10px"/>
                             <hr/>
@@ -292,7 +275,7 @@
                                 <p:commandButton ajax="false"  icon="fa fa-plus"
                                                  value="Open a new code enforcement case" 
                                                  action="#{propertyProfileBB.openCECase}"
-                                                 disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
                                 <p:spacer height="10px"/>
                                 <p:dataTable
                                     id="prop-cases-datatable"
@@ -341,7 +324,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Manager" />
                                         </f:facet>
-                                        <h:outputText value="#{c.user.LName}"/>
+                                        <h:outputText value="#{c.caseManager.LName}"/>
                                     </p:column>
                                     <p:column width="5%" exportable="false">
                                         <f:facet name="header">
@@ -579,7 +562,6 @@
                                         </p:rowExpansion>
                                     </p:dataTable>
 
-                                    <p:commandButton ajax="false" value="Create a communication event with this person" action="communicationEvent" disabled="true"/>
                                     <p:commandButton ajax="false" value="View Person's profile and edit info" action="personProfile" disabled="true"/>
 
                                     <p:spacer height="10px"/>

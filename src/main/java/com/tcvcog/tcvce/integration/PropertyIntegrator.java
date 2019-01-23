@@ -271,7 +271,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     } // close getProperty()
     
-    public PropertyWithLists getPropertyWithLists(int propID) throws IntegrationException{
+    public PropertyWithLists getPropertyWithLists(int propertyID) throws IntegrationException{
         PropertyWithLists p = new PropertyWithLists();
         String query = "SELECT * from property WHERE propertyid = ?;";
         
@@ -283,7 +283,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
  
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, propID);
+            stmt.setInt(1, propertyID);
             rs = stmt.executeQuery();
             while(rs.next()){
                 p = generatePropertyWithLists(rs);

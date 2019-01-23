@@ -292,6 +292,16 @@ div.headerLink a:before, a:visited{
     
 }
 
+.list-column-persons{
+    flex-basis:auto;
+    flex-shrink: 1;
+    min-width: 600px;
+    max-width: 600px;
+    padding-right:10px;
+    
+    
+}
+
 .object-column{
     flex-basis: auto;
     flex-grow: 1;

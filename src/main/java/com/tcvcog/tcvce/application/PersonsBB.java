@@ -21,9 +21,12 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -32,11 +35,12 @@ import javax.faces.event.ActionEvent;
  *
  * @author Ellen Baskem
  */
-public class PersonBB extends BackingBeanUtils implements Serializable{
+public class PersonsBB extends BackingBeanUtils implements Serializable{
 
     private ArrayList<Person> personList;
     private Person selectedPerson;
     private ArrayList<Person> filteredPersonList;
+    private PersonType[] personTypes;
     
     private SearchParamsPersons searchParams;
     
@@ -44,8 +48,34 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
     /**
      * Creates a new instance of PersonBB
      */
-    public PersonBB() {
+    public PersonsBB() {
         personList = new ArrayList<>();
+    }
+    
+    public String viewPersonAssociatedProperty(Property p){
+        getSessionBean().setActiveProp(p);
+        return "properties";
+    }
+    
+    
+    public void updatePerson(ActionEvent ev){
+        
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.updatePerson(selectedPerson, getSessionBean().getFacesUser());
+            getSessionBean().setActivePerson(selectedPerson);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Person updated! This updated person is now your 'active person'", ""));
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to update person, my apologies", ""));
+            
+        }
+        
     }
     
     public void searchForPersons(ActionEvent event){
@@ -54,19 +84,6 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
         personList = null;
     }
     
-    public String viewPersonProfile(){
-        if(selectedPerson != null){
-            
-            getSessionBean().setActivePerson(selectedPerson);
-            return "personProfile";
-        } else {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Please select a person from the table to view details", ""));
-            return "";
-            
-        }
-    }
     
     public void selectPerson(Person p){
         selectedPerson = p;
@@ -92,6 +109,8 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
         personList = null;
         return "";
     }
+    
+    
     
     /**
      * @return the personList
@@ -141,6 +160,9 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
      * @return the selectedPerson
      */
     public Person getSelectedPerson() {
+        if(selectedPerson == null){
+            selectedPerson = getSessionBean().getActivePerson();
+        }
         return selectedPerson;
     }
 
@@ -182,6 +204,20 @@ public class PersonBB extends BackingBeanUtils implements Serializable{
      */
     public void setSearchParams(SearchParamsPersons searchParams) {
         this.searchParams = searchParams;
+    }
+
+    /**
+     * @return the personTypes
+     */
+    public PersonType[] getPersonTypes() {
+        return personTypes;
+    }
+
+    /**
+     * @param personTypes the personTypes to set
+     */
+    public void setPersonTypes(PersonType[] personTypes) {
+        this.personTypes = personTypes;
     }
     
 }

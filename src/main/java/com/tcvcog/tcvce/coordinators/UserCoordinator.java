@@ -47,7 +47,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
    
     /**
      * Primary user retrieval method: Note that there aren't as many checks here
-     * since the glassfish container is managing the lookup of authenticated users. 
+     * since the jboss container is managing the lookup of authenticated users. 
      * We are pulling the login name from the already authenticated glassfish user 
      * and just grabbing their profile from the db
      * 
@@ -80,6 +80,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Container for all access control mechanism authorization switches
+     * 
+     * Design goal: have boolean type getters on users for use by the View
+     * to turn on and off rendering and enabling as needed.
      * 
      * NOTE: This is the ONLY method system wide that calls any setters for
      * access permissions
