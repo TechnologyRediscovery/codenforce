@@ -204,7 +204,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCECase event) throws IntegrationException, EventException{
         EventIntegrator ei = getEventIntegrator();
-        String updateViolationDescr = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("violationChangeEventDescription");
+        String updateViolationDescr = getResourceBundle(Constants.MESSAGE_TEXT).getString("violationChangeEventDescription");
         // fetch the event category id from the event category bundle under the key updateViolationEventCategoryID
         // now we're ready to log the event
         EventCategory ec = new EventCategory();

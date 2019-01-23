@@ -127,7 +127,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Unable to add change public access code status",
-                    getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
     }
 

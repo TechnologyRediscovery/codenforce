@@ -45,13 +45,33 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public PersonCoordinator() {
     }
     
-    public void updatePerson(Person p, User u) throws IntegrationException{
+    public void updatePerson(Person p, User u, String updateNotes) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         StringBuilder sb = new StringBuilder();
-        sb.append(p.getNotes());
-        sb.append("<br/><br/>**************************************<br/>");
-        sb.append("PERSON INFO UPDATED");
-        sb.append(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("lastUpdated"));
+        sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordUpdateHeader"));
+        sb.append("<br />");
+        sb.append(updateNotes);
+        p.setNotes(appendNoteBlock(p.getNotes(), sb.toString()));
+        pi.updatePerson(p);
+        
+    }
+    
+    public void addNotesToPerson(Person p, User u, String noteToAdd) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        StringBuilder sb = new StringBuilder();
+        sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordNotesGeneral"));
+        sb.append("<br />");
+        sb.append(noteToAdd);
+        p.setNotes(appendNoteBlock(p.getNotes(), sb.toString()));
+        pi.updatePerson(p);
+        
+    }
+    
+    private String appendNoteBlock(String previousNotes, String newNotes){
+        StringBuilder sb = new StringBuilder();
+        sb.append(previousNotes);
+        sb.append("<br/>**************************************<br/>");
+        sb.append(newNotes);
         sb.append("<br/>");
         sb.append(getFacesUser().getFName());
         sb.append(" ");
@@ -60,11 +80,11 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(getPrettyDate(LocalDateTime.now()));
         sb.append("<br/>");
         sb.append("**************************************<br/>");
-        p.setNotes(sb.toString());
-        pi.updatePerson(p);
+        return sb.toString();
         
     }
     
+   
 
     /**
      * Hard-coded default values for person searches

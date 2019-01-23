@@ -84,8 +84,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             MessageBuilderParams mbp = new MessageBuilderParams();
             mbp.user = getFacesUser();
             mbp.existingContent = selectedRequest.getPublicExternalNotes();
-            mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("attachedToCaseHeader");
-            mbp.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("attachedToCaseExplanation");
+            mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader");
+            mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation");
             mbp.newMessageContent = "";
             
             selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
@@ -127,7 +127,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to connect request to case.", 
-                        getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                        getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         selectedRequest.setCaseID(selectedCaseForAttachment.getCaseID());
         updateSelectedRequestStatusWithBundleKey("actionRequestExistingCaseStatusCode");
@@ -144,8 +144,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             MessageBuilderParams mcc = new MessageBuilderParams();
             mcc.user = getFacesUser();
             mcc.existingContent = selectedRequest.getPublicExternalNotes();
-            mcc.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("invalidActionRequestHeader");
-            mcc.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("invalidActionRequestExplanation");
+            mcc.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestHeader");
+            mcc.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestExplanation");
             mcc.newMessageContent = invalidMessage;
             selectedRequest.setPublicExternalNotes(appendNoteBlock(mcc));
             try {
@@ -179,8 +179,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             MessageBuilderParams mbp = new MessageBuilderParams();
             mbp.user = getFacesUser();
             mbp.existingContent = selectedRequest.getPublicExternalNotes();
-            mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("noViolationFoundHeader");
-            mbp.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("noViolationFoundExplanation");
+            mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundHeader");
+            mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundExplanation");
             mbp.newMessageContent = noViolationFoundMessage;
             
             selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
@@ -244,7 +244,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to complete a property search! Sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -263,7 +263,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to change request property, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
         StringBuilder sb = new StringBuilder();
@@ -279,14 +279,14 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             sb.append(selectedRequest.getRequestProperty().getMuni().getMuniName());
             sb.append(")");
         } else {
-            sb.append(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("noPreviousAddress"));
+            sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("noPreviousAddress"));
         }
         
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getPublicExternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("propertyChangedHeader");
-        mbp.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("propertyChangedExplanation");
+        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedHeader");
+        mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedExplanation");
         mbp.newMessageContent = sb.toString();
         
         selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
@@ -298,7 +298,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to add property change note to public listing, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         // force table reload to show changes
         requestList = null;
@@ -325,7 +325,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to change requestor person"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -343,7 +343,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to add change public access code status"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
     }
     
@@ -354,7 +354,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getCogInternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("internalNote");
+        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("internalNote");
         mbp.explanation = "";
         mbp.newMessageContent = internalMessageText;
         String newNotes = appendNoteBlock(mbp);
@@ -368,7 +368,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to update notes, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -379,7 +379,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getMuniNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("muniNote");
+        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("muniNote");
         mbp.explanation = "";
         mbp.newMessageContent = muniMessageText;
         
@@ -392,7 +392,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to update notes, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -403,7 +403,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getPublicExternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("externalNote");
+        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("externalNote");
         mbp.explanation = "";
         mbp.newMessageContent = publicMessageText;
         
@@ -416,7 +416,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to update notes, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }

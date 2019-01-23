@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
@@ -335,6 +336,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         connectPersonToProperty(person, prop);
 
     }
+    
+    
 
     public void connectPersonToProperty(Person person, Property prop) throws IntegrationException {
 
@@ -723,6 +726,44 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
+        return al;
+
+    }
+
+    public ArrayList<Person> getPersonHistory(User u) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<Person> al = new ArrayList();
+
+        try {
+            String s = "SELECT person_personid, entrytimestamp FROM loginobjecthistory "
+                    + "WHERE login_userid = ? "
+                    + "AND person_personid IS NOT NULL "
+                    + "ORDER BY entrytimestamp DESC;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, u.getUserID());
+
+            rs = stmt.executeQuery();
+            int MAX_RES = 10;
+            int iter = 0;
+            
+            while (rs.next() && iter < MAX_RES) {
+                Person pers = getPerson(rs.getInt("person_personid"));
+                al.add(pers);
+                iter++;
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        System.out.println("PersonIntegrator Retrieved history of size: " + al.size());
         return al;
 
     }

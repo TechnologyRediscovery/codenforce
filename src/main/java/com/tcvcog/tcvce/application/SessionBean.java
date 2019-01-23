@@ -57,11 +57,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** System Core Objects Session Shelves ***  */
     private Municipality activeMuni;
     private List<Municipality> availableMuniList;
-    // note that the User object is stored as a sibling of this SessionBean, not as a
-    // member variable on this SessionBean. 
-    // Retrieve a handle to the User with the BackingBeanUtils getFacesUser() method
+    private User facesUser;
     private Property activeProp;
     private Person activePerson;
+    private List<Person> activePersonList;
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
@@ -498,6 +497,34 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setActiveRequest(CEActionRequest activeRequest) {
         this.activeRequest = activeRequest;
+    }
+
+    /**
+     * @return the facesUser
+     */
+    public User getFacesUser() {
+        return facesUser;
+    }
+
+    /**
+     * @param facesUser the facesUser to set
+     */
+    public void setFacesUser(User facesUser) {
+        this.facesUser = facesUser;
+    }
+
+    /**
+     * @return the activePersonList
+     */
+    public List<Person> getActivePersonList() {
+        return activePersonList;
+    }
+
+    /**
+     * @param activePersonList the activePersonList to set
+     */
+    public void setActivePersonList(List<Person> activePersonList) {
+        this.activePersonList = activePersonList;
     }
     
 }

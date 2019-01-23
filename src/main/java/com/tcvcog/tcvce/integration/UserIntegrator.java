@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ObjectNotFoundException;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
@@ -502,4 +503,40 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * Writes in a history record when a User accesses that object.
+     * The Object's type will be checked against existing history 
+     * recording opportunities and create an appropriate entry in the
+     * loginobjecthistory table.
+     * @param u the User who viewed the object
+     * @param ob any Object that's displayed in a data table or list in the system
+     * @throws IntegrationException 
+     */
+    public void logObjectView(User u, Object ob) throws IntegrationException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO loginobjecthistory ");
+        
+        try {
+            if(ob instanceof Person){
+                Person p = (Person) ob;
+                sb.append("(login_userid, person_personid, entrytimestamp) VALUES (?, ?, DEFAULT); ");
+                stmt = con.prepareStatement(sb.toString());
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPersonID());
+                stmt.execute();
+                System.out.println("UserIntegrator.logObjectView: Person view logged id = " + p.getPersonID());
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error writign user person history", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
 }

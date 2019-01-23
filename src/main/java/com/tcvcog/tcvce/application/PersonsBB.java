@@ -24,10 +24,17 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
+import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -37,10 +44,12 @@ import javax.faces.event.ActionEvent;
  */
 public class PersonsBB extends BackingBeanUtils implements Serializable{
 
-    private ArrayList<Person> personList;
+    private List<Person> personList;
     private Person selectedPerson;
-    private ArrayList<Person> filteredPersonList;
+    private List<Person> filteredPersonList;
     private PersonType[] personTypes;
+    private String notesToAppend;
+    private String updateDescription;
     
     private SearchParamsPersons searchParams;
     
@@ -49,7 +58,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      * Creates a new instance of PersonBB
      */
     public PersonsBB() {
-        personList = new ArrayList<>();
+      
     }
     
     public String viewPersonAssociatedProperty(Property p){
@@ -57,17 +66,32 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         return "properties";
     }
     
+    public void attachNoteToPerson(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+
+        try {
+            pc.addNotesToPerson(selectedPerson, getSessionBean().getFacesUser(), notesToAppend);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
+                    , "Done: Notes added to person ID:" + selectedPerson.getPersonID(),"" ));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
+                    , "Unable to update notes, sorry!"
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        }
+        
+    }
+    
     
     public void updatePerson(ActionEvent ev){
         
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            pc.updatePerson(selectedPerson, getSessionBean().getFacesUser());
-            getSessionBean().setActivePerson(selectedPerson);
+            pc.updatePerson(selectedPerson, getSessionBean().getFacesUser(), updateDescription);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Person updated! This updated person is now your 'active person'", ""));
-            
+            getSessionBean().setActivePerson(selectedPerson);
         } catch (IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -75,7 +99,6 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
                         "Unable to update person, my apologies", ""));
             
         }
-        
     }
     
     public void searchForPersons(ActionEvent event){
@@ -86,6 +109,15 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     
     public void selectPerson(Person p){
+        UserIntegrator ui = getUserIntegrator();
+        try {
+            ui.logObjectView(getSessionBean().getFacesUser(), p);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Person history logging is broken!",""));
+        }
         selectedPerson = p;
     }
 
@@ -115,33 +147,41 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the personList
      */
-    public ArrayList<Person> getPersonList() {
-        
+    public List<Person> getPersonList() {
+
         System.out.println("PersonBB.getPersonList");
         PersonIntegrator integrator = getPersonIntegrator();
-        if(personList == null){
+        List<Person> sessionPersonList = getSessionBean().getActivePersonList();
+
+        if (personList == null) {
             System.out.println("PersonBB.getPersonList | found Null person List");
+            if (sessionPersonList != null) {
+                personList = sessionPersonList;
+                System.out.println("PersonBB.getPersonList | loaded list from session");
+                getSessionBean().setActivePersonList(null);
+            } else {
+                try {
+                    personList = integrator.getPersonList(searchParams);
+                    if (personList.isEmpty()) {
+                        System.out.println("PersonBB.getPersonList | Emtpy list");
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                        "Database search returned 0 Persons",
+                                        "Please try again, perhaps by removing some letters from your name text"));
 
-            try {
-                personList = integrator.getPersonList(searchParams);
-                if(personList.isEmpty()){
-                    System.out.println("PersonBB.getPersonList | Emtpy list");
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                                "Database search returned 0 Persons", 
-                                "Please try again, perhaps by removing some letters from your name text"));
+                    } else {
+                        System.out.println("PersonBB.getPersonList | at least 1 in list");
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                        "Database search returned " + personList.size() + " Persons", ""));
+                    }
 
-                } else {
-                    System.out.println("PersonBB.getPersonList | at least 1 in list");
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
                     getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                                "Database search returned "+ personList.size() + " Persons", ""));
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "System-related search error", "This issue requires administrator attention, sorry"));
                 }
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "System-related search error", "This issue requires administrator attention, sorry"));
             }
         }
         return personList;
@@ -176,14 +216,14 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the filteredPersonList
      */
-    public ArrayList<Person> getFilteredPersonList() {
+    public List<Person> getFilteredPersonList() {
         return filteredPersonList;
     }
 
     /**
      * @param filteredPersonList the filteredPersonList to set
      */
-    public void setFilteredPersonList(ArrayList<Person> filteredPersonList) {
+    public void setFilteredPersonList(List<Person> filteredPersonList) {
         this.filteredPersonList = filteredPersonList;
     }
 
@@ -218,6 +258,34 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      */
     public void setPersonTypes(PersonType[] personTypes) {
         this.personTypes = personTypes;
+    }
+
+    /**
+     * @return the notesToAppend
+     */
+    public String getNotesToAppend() {
+        return notesToAppend;
+    }
+
+    /**
+     * @param notesToAppend the notesToAppend to set
+     */
+    public void setNotesToAppend(String notesToAppend) {
+        this.notesToAppend = notesToAppend;
+    }
+
+    /**
+     * @return the updateDescription
+     */
+    public String getUpdateDescription() {
+        return updateDescription;
+    }
+
+    /**
+     * @param updateDescription the updateDescription to set
+     */
+    public void setUpdateDescription(String updateDescription) {
+        this.updateDescription = updateDescription;
     }
     
 }
