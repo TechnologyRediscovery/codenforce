@@ -107,8 +107,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     public void manageCECase(CECase c) {
-        // replace any session case with this one
-//        getSessionBean().setcECase(null);
+        System.out.println("CaseProfileBB.manageCECase | case id: " + c.getCaseID());
+        getSessionBean().setcECase(c);
         currentCase = c;
     }
 
@@ -142,8 +142,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String overrideCasePhase() {
         CaseCoordinator cc = getCaseCoordinator();
+        CaseIntegrator ci = getCaseIntegrator();
         try {
             cc.manuallyChangeCasePhase(currentCase, selectedCasePhase);
+            currentCase = ci.getCECase(currentCase.getCaseID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -158,6 +160,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                             "Please check with your system administrator"));
 
         }
+        
         return "";
     }
 
@@ -175,7 +178,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         if (!selectedViolations.isEmpty()) {
 
             // generate event for compliance with selected violations
-            EventCECase e = ec.generateViolationComplianceEvent(selectedViolations);
+            EventCECase e = ec.generateViolationComplianceEvent(cv);
 
             // when event is submitted, send violation list to c
             getSessionBean().setActiveEvent(e);

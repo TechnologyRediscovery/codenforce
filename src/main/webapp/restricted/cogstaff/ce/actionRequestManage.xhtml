@@ -36,7 +36,7 @@
                             </p:selectOneMenu>
                             
                             <p:commandButton ajax="true" value="Change request status" 
-                                             update="actionRequestStatusOT" rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                             update="actionRequestStatusOT" rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                              action="#{actionRequestManageBB.changeActionRequestStatus}"/>
 
 

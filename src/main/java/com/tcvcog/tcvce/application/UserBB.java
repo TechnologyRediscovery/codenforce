@@ -35,8 +35,7 @@ import javax.faces.bean.ViewScoped;
  *
  * @author Eric C. Darsow
  */
-@ManagedBean(name="userBB")
-@ViewScoped
+
 public class UserBB extends BackingBeanUtils implements Serializable {
 
     private ArrayList<User> userList;

@@ -197,7 +197,7 @@
                                     
                                     
                                     <p:commandLink value="Export event history as pdf" ajax="false">
-                                        <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{sessionBean.activeCECase.property.address}_idno#{sessionBean.activeCECase.caseID}_eventHistory"/>
+                                        <p:dataExporter type="pdf" target="caseEventTable" fileName="case__idno_eventHistory"/>
                                     </p:commandLink>
 
 
@@ -268,7 +268,7 @@
                                 <h2>Case key details</h2>
 
                                 <span class="bold">Case Manager: </span>
-                                <h:outputText value="#{caseProfileBB.currentCase.user.LName}"/>
+                                <h:outputText value="#{caseProfileBB.currentCase.caseManager.LName}"/>
 
                                 <p:spacer height="10px"/>
 

@@ -28,7 +28,7 @@ import java.util.Objects;
  * 
  * @author Eric Darsow
  */
-public class Person implements Serializable{
+public class Person extends EntityUtils implements Serializable{
     
     private int personID;
     
@@ -72,6 +72,7 @@ public class Person implements Serializable{
     private String notes;
     
     private LocalDateTime lastUpdated;
+    private String lastUpdatedPretty;
     
     private LocalDateTime expiryDate;
     private String expiryNotes;
@@ -689,6 +690,21 @@ public class Person implements Serializable{
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the lastUpdatedPretty
+     */
+    public String getLastUpdatedPretty() {
+        String s = getPrettyDate(lastUpdated);
+        return s;
+    }
+
+    /**
+     * @param lastUpdatedPretty the lastUpdatedPretty to set
+     */
+    public void setLastUpdatedPretty(String lastUpdatedPretty) {
+        this.lastUpdatedPretty = lastUpdatedPretty;
     }
     
 

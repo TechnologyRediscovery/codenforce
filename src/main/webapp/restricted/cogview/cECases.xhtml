@@ -119,7 +119,6 @@
                                                              case-details-form:selcase-forwardlinking-sbcb
                                                              violation-form:violation-table
                                                              notices-form:notices-table
-                                                             citation-form:citation-table
                                                              action-requests-form:actionRequestTable
                                                              events-form:caseEventTable
                                                              "/>
@@ -203,7 +202,7 @@
                                                 <h:outputLabel styleClass="bold" value="Manager:"/>
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
-                                                    <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.user.FName} #{caseProfileBB.currentCase.user.LName}"/>
+                                                    <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.caseManager.FName} #{caseProfileBB.currentCase.caseManager.LName}"/>
                                                 </div>
                                             </h:panelGroup>
 
@@ -216,14 +215,14 @@
                                                 <p:spacer height="5px"/>
                                                 <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
                                                 <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
-                                                                         disabled="#{!sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+                                                                         disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
                                                     <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
                                                 </p:selectBooleanCheckbox>
                                                 <p:spacer height="5px"/>
                                                 <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
                                                 <h:outputText value=" "/>
                                                 <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
-                                                                         disabled="#{!sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+                                                                         disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
                                                     <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
                                                 </p:selectBooleanCheckbox>
                                                 <p:spacer height="5px"/>
@@ -247,7 +246,7 @@
                                     <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
                                                      value="Add new code violation"
                                                      icon="fa fa-plus"
-                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>
+                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
                                     <p:spacer height="15px"/>
 
                                     <p:dataTable
@@ -287,6 +286,14 @@
                                             <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
 
                                         </p:column>
+                                        
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Compliance!" />
+                                            </f:facet>
+                                            <p:commandButton ajax="false" action="#{caseProfileBB.recordCompliance(v)}"
+                                                             icon="fa fa-check" />
+                                        </p:column>
 
                                         <p:column width="15%">
                                             <f:facet name="header">
@@ -295,10 +302,6 @@
                                             <h:outputText value="#{v.actualComplianceDate}"/>
                                         </p:column>
 
-                                        <p:column width="5%">
-                                            <p:commandButton ajax="false" action="#{caseProfileBB.recordCompliance(v)}"
-                                                             icon="fa fa-check" />
-                                        </p:column>
 
 
                                         <p:rowExpansion>
@@ -355,7 +358,7 @@
                                     <p:commandButton ajax="false" 
                                                      action="#{caseProfileBB.createNewNotice}"
                                                      value="Build notice of violation letter"
-                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>
+                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
                                     <p:dataTable
                                         id="notices-table"
                                         var="notice"
@@ -456,16 +459,19 @@
                                 <p:spacer height="15px"/>
                                 
                                 <h:form id="citation-form">
+                                    
+                                    <ui:remove>
+                                        
                                     <h3>Citations</h3>
                                     <p:commandButton ajax="false" action="#{caseProfileBB.createCitationForAllViolations}"
                                                      value="Generate citation for all Violations"
                                                      icon="fa fa-warning"
-                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>"/>
+                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>"/>
 
                                     <p:commandButton ajax="false" action="#{caseProfileBB.createCitationFromSelected}"
                                                      value="Generate citation for selected violations"
                                                      icon="fa fa-warning"
-                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>/>
+                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>/>
 
                                     <p:dataTable
                                         id="citation-table"
@@ -539,7 +545,8 @@
 
                                     <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
                                                      value="Updated selected citation"
-                                                     disabled="#{!(sessionBean.accessKeyCard.hasEnfOfficialPermissions)}"/>/>
+                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>/>
+                                    </ui:remove>
 
                                 </h:form>
 
@@ -875,11 +882,11 @@
                         </div>
                     </div>
 
-                        <p:dialog       id="unknown_id"
+                        <p:dialog       id="ceevent-add-dialog"
                                         height="650" width="700"
                                         widgetVar="unknown-dialog-var"
                                         closable="true" 
-                                        rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
 
                         </p:dialog>
                 </f:view>

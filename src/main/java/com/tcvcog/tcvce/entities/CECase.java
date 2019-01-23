@@ -16,7 +16,7 @@ import java.util.Locale;
 
 /**
  *
- * @author cedba
+ * @author Sylvia Baskem
  */
 public class CECase extends EntityUtils implements Serializable{
     
@@ -37,7 +37,7 @@ public class CECase extends EntityUtils implements Serializable{
     
     private Property property;
     private PropertyUnit propertyUnit;
-    private User user;
+    private User caseManager;
     
     private List<CodeViolation> violationList;
     private List<EventCECase> eventList;
@@ -116,17 +116,17 @@ public class CECase extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the user
+     * @return the caseManager
      */
-    public User getUser() {
-        return user;
+    public User getCaseManager() {
+        return caseManager;
     }
 
     /**
-     * @param user the user to set
+     * @param caseManager the caseManager to set
      */
-    public void setUser(User user) {
-        this.user = user;
+    public void setCaseManager(User caseManager) {
+        this.caseManager = caseManager;
     }
 
     /**

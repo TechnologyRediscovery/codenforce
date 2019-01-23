@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
 import java.util.Enumeration;
@@ -42,9 +43,7 @@ import com.tcvcog.tcvce.util.Constants;
  */
 public class SessionInitializer extends BackingBeanUtils implements Serializable {
 
-    private String glassfishUser;
-    private String sessionID;
-    private User retrievedCOGUser;
+   
     
     /**
      * Creates a new instance of SessionInitializer
@@ -70,21 +69,33 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
+        PersonIntegrator persInt = getPersonIntegrator();
         
         try {
             User extractedUser = uc.getUser(getContainerAuthenticatedUser());
             if(extractedUser != null){
+                
                 ExternalContext ec = facesContext.getExternalContext();
                 ec.getSessionMap().put("facesUser", extractedUser);
                 System.out.println("SessionInitializer.initiateInternalSession "
                         + "| facesUserFromDB: " + extractedUser.getLName());
+                
+
                 // get the user's default municipality
                 Municipality muni = extractedUser.getMuni();
+                
+                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("arbitraryPlaceholderPersonID"))));
+                
                 getSessionBean().setAccessKeyCard(extractedUser.getKeyCard());
+                
                 getSessionBean().setActiveMuni(muni);
+                
                 getSessionBean().setActiveProp(pi.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("arbitraryPlaceholderPropertyID"))));
+                
                 System.out.println("SessionInitializer.initiateInternalSession | set placeholder property");
+                
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
                 getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getDefaultCodeSetID()));
@@ -115,47 +126,17 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     }
 
     /**
-     * @return the glassfishUser
+     * @return the username string of an authenticated user from the container
      */
     private String getContainerAuthenticatedUser() {
         
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
-        String sessionUserName = request.getRemoteUser();
-        System.out.println("SessionInitializer.getGlassfishUserName | " + sessionUserName);
-        glassfishUser = sessionUserName;
-        return glassfishUser;
+        return request.getRemoteUser();
+
     }
 
     
 
-    /**
-     * @return the retrievedCOGUser
-     */
-    public User getRetrievedCOGUser() {
-        return retrievedCOGUser;
-    }
-
-    /**
-     * @param glassfishUser the glassfishUser to set
-     */
-    public void setGlassfishUser(String glassfishUser) {
-        this.glassfishUser = glassfishUser;
-    }
-
-    /**
-     * @param sessionID the sessionID to set
-     */
-    public void setSessionID(String sessionID) {
-        this.sessionID = sessionID;
-    }
-
-    /**
-     * @param retrievedCOGUser the retrievedCOGUser to set
-     */
-    public void setRetrievedCOGUser(User retrievedCOGUser) {
-        this.retrievedCOGUser = retrievedCOGUser;
-    }
-    
 }
