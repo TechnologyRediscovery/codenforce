@@ -86,9 +86,9 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 
                 getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("arbitraryPlaceholderPersonID"))));
-                
+                getSessionBean().setFacesUser(extractedUser);
                 getSessionBean().setAccessKeyCard(extractedUser.getKeyCard());
-                
+                getSessionBean().setActivePersonList(persInt.getPersonHistory(extractedUser));
                 getSessionBean().setActiveMuni(muni);
                 
                 getSessionBean().setActiveProp(pi.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)

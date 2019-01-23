@@ -67,7 +67,9 @@
                                             <h:outputText value="First Name"/>
                                         </p:outputLabel>
                                         <p:inputText id="formFirstName-person" value="#{personsBB.searchParams.firstNameSS}" 
-                                                     style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                                     style="width: 200px;" tabindex="1" required="false" styleClass="inputText">
+                                            <f:validateLength minimum="2" maximum="100"/>
+                                        </p:inputText>
                                         <h:message for="formFirstName-person" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
@@ -83,7 +85,9 @@
                                             <h:outputText value="Last Name"/>
                                         </p:outputLabel>
                                         <p:inputText id="formLastName-person" value="#{personsBB.searchParams.lastNameSS}" 
-                                                     style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
+                                                     style="width: 200px;" tabindex="4" required="false" styleClass="inputText">
+                                            <f:validateLength minimum="2" maximum="100"/>
+                                        </p:inputText>
                                         <h:message for="formLastName-person" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
@@ -121,6 +125,7 @@
                                     change-person-form:muniSelectMenu-person
                                     change-person-form:personTable
                                     change-person-form:person-search-messages
+                                    messages-left-form:persons-messages-global
                                     "/>
 
 
@@ -133,8 +138,6 @@
                                     value="#{personsBB.personList}"
                                     rowKey="#{p.personID}"
                                     tableStyleClass="primeDataTable"
-                                    scrollable="true"
-                                    scrollHeight="300"
                                     rowExpandMode="single"
                                     expandedRow="false"
                                     filteredValue="#{personsBB.filteredPersonList}"
@@ -334,7 +337,12 @@
                                             </h:panelGroup>
 
                                             <f:facet name="footer">
-                                                <h:outputLabel styleClass="bold" value="Person notes"/>
+                                                <h:outputLabel styleClass="bold" value="Person notes"/> 
+                                                 <p:commandButton onclick="PF('person-notes-dialog').show()" 
+                                                             icon="fa fa-pencil-square-o"
+                                                             value="new note" 
+                                                             styleClass="noFill button-size-small" 
+                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" />
                                                 <p:spacer height="15px"/>
                                                 <div class="rowExpansion">
                                                     <h:outputText escape="false" value="#{p.notes}"/>
@@ -454,13 +462,11 @@
                                         <f:selectItems value="#{personCoordinator.personTypes}"
                                                        var="pt" itemValue="#{pt}" itemLabel="#{pt.label}"/>
                                     </p:selectOneMenu>
-
                                     <h:message for="personTypeSelectMenu" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
 
                                 <h:panelGroup>
-
 
                                     <h:outputLabel value="Municipality" for="personMuniSelectMenu"/>
                                     <p:spacer height="3px"/>
@@ -588,6 +594,10 @@
 
 
                             </h:panelGrid>
+                            
+                            <h:outputLabel for="update-desc-ita" value="Brief description of update: "/>
+                            <p:inputTextarea id="update-desc-ita" style="width: 300px; height: 200px;" value="#{personsBB.updateDescription}" tabindex="1"/>
+                            
                             <p:spacer height="10px"/>
                             <p:commandButton ajax="true" value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('update-person-dialog').hide()"/>
@@ -599,9 +609,33 @@
                                              oncomplete="PF('update-person-dialog').hide()"/>
                         </h:form>
                     </p:dialog>
+                    
+                    
+                    
+                        <p:confirmDialog message="Attach note to Person" 
+                                         severity="alert" widgetVar="person-note-dialog"
+                                         closable="true" responsive="true"
+                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
 
+                            <h:form id="person-note-form">
+                                <h:outputLabel for="note-ita" value="Message text"/>
+                                <p:spacer height="15px"/>
+                                <p:inputTextarea id="note-ita" style="width: 300px; height: 200px;" value="#{personsBB.notesToAppend}" tabindex="1"/>
+                                <p:spacer height="15px"/>
+                                <h:outputText escape="false" value="The above text, your name, and a timestamp will be attached to "/> 
+                                <h:outputText value="#{p.firstName} #{p.lastName} (#{p.muni.muniName})"/>, Person ID:<h:outputText value="#{p.personID}"/>
 
-
+                                <p:spacer height="15px"/>
+                                <p:commandButton ajax="true" tabindex="2"
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('person-note-dialog').hide()"/>
+                                <p:commandButton    ajax="true" actionListener="#{personsBB.attachNoteToPerson}" tabindex="3"
+                                                    value="Submit" icon="fa fa-link" oncomplete="PF('person-note-dialog').hide()"
+                                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                    update="    selected-person-info-form:selected-person-info-ds
+                                                                messages-left-form:persons-messages-global"/>
+                            </h:form>
+                        </p:confirmDialog>
                 </f:view>
             </ui:define>
         </ui:composition>

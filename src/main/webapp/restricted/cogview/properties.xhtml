@@ -57,7 +57,7 @@
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
                                         <p:selectOneMenu id="personMuniSelectMenu" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuniCode}">
-                                            <f:selectItems value="#{muniBB.muniMap}"/>
+                                            <f:selectItems value="#{sessionBean.facesUser.authMunis}"/>
                                         </p:selectOneMenu>
                                         <h:message for="personMuniSelectMenu" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />

@@ -356,8 +356,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // hardcoding it down here in the Java
         e.setDateOfRecord(LocalDateTime.now());
         e.setEventOwnerUser(getFacesUser());
-        e.setEventDescription(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("automaticClosingEventDescription"));
-        e.setNotes(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("automaticClosingEventNotes"));
+        e.setEventDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
+        e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
         ei.insertEvent(e);
         
@@ -575,7 +575,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         noticeEvent.setCaseID(c.getCaseID());
         noticeEvent.setDateOfRecord(LocalDateTime.now());
         
-        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("noticeQueuedEventDesc");
+        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setEventDescription(queuedNoticeEventNotes);
         
         noticeEvent.setEventOwnerUser(getFacesUser());
