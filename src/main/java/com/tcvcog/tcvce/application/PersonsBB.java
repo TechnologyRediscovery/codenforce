@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -59,6 +61,14 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      */
     public PersonsBB() {
       
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        PersonCoordinator pc = getPersonCoordinator();
+        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
+        
+        
     }
     
     public String viewPersonAssociatedProperty(Property p){
@@ -103,8 +113,23 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     public void searchForPersons(ActionEvent event){
         System.out.println("PersonBB.searchForPersons");
-        // clear past search results
+        // clear past search results on bean and on the session
         personList = null;
+        getSessionBean().setActivePersonList(null);
+        // this will trigger database lookup logic inside
+        // getPersonList() when we tell the search result table to clear itself
+    }
+    
+    
+    public void searchForPersonsByNameOnly(ActionEvent event){
+        System.out.println("PersonBB.searchForPersonsByNameOnly");
+        PersonCoordinator pc = getPersonCoordinator();
+        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
+        // clear past search results on bean and on the session
+        personList = null;
+        getSessionBean().setActivePersonList(null);
+        // this will trigger database lookup logic inside
+        // getPersonList() when we tell the search result table to clear itself
     }
     
     
@@ -118,6 +143,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Person history logging is broken!",""));
         }
+        getSessionBean().setActivePerson(selectedPerson);
         selectedPerson = p;
     }
 
@@ -153,19 +179,20 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         PersonIntegrator integrator = getPersonIntegrator();
         List<Person> sessionPersonList = getSessionBean().getActivePersonList();
 
+        // first check if our view-scoped list is emtpy, if so, we need a list!
         if (personList == null) {
             System.out.println("PersonBB.getPersonList | found Null person List");
-            if (sessionPersonList != null) {
+            if (sessionPersonList != null) { // if we've got a session list, use that before going to DB
                 personList = sessionPersonList;
                 System.out.println("PersonBB.getPersonList | loaded list from session");
-                getSessionBean().setActivePersonList(null);
             } else {
                 try {
-                    personList = integrator.getPersonList(searchParams);
+                    personList = integrator.getPersonList(searchParams); // go to Integrator with searchParams
+                    getSessionBean().setActivePersonList(personList);
                     if (personList.isEmpty()) {
                         System.out.println("PersonBB.getPersonList | Emtpy list");
                         getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                new FacesMessage(FacesMessage.SEVERITY_WARN,
                                         "Database search returned 0 Persons",
                                         "Please try again, perhaps by removing some letters from your name text"));
 
@@ -184,6 +211,9 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
                 }
             }
         }
+        
+        
+        
         return personList;
     }
     
@@ -231,11 +261,6 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      * @return the searchParams
      */
     public SearchParamsPersons getSearchParams() {
-        SearchCoordinator sc = getSearchCoordinator();
-        if(searchParams == null){
-            searchParams = sc.getDeafaultSearchParamsPersons();
-            searchParams.setMuni(getSessionBean().getActiveMuni());
-        }
         return searchParams;
     }
 

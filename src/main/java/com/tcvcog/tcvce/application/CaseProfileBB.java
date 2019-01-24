@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
@@ -36,6 +37,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.ZoneId;
@@ -45,6 +47,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -105,10 +108,26 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         imageFilenameMap.put(CasePhase.SecondaryPostHearingComplianceTimeframe, "stage3_postHearing.svg");
         imageFilenameMap.put(CasePhase.Closed, "stage3_closed.svg");
     }
+    
+    @PostConstruct
+    public void initBean(){
+        CaseCoordinator cc = getCaseCoordinator();
+        ceCaseSearchParams = cc.getDefaultSearchParamsCECase(getSessionBean().getActiveMuni());
+    }
 
+/**
+ * Primary injection point for setting the case which will be displayed in the right
+ * column (the manage object column) on cECases.xhtml
+ * @param c the case to be managed--comes from the data table row button
+ */
     public void manageCECase(CECase c) {
-        System.out.println("CaseProfileBB.manageCECase | case id: " + c.getCaseID());
+        UserIntegrator ui = getUserIntegrator();
         getSessionBean().setcECase(c);
+        try {
+            ui.logObjectView(getSessionBean().getFacesUser(), c);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         currentCase = c;
     }
 
@@ -989,10 +1008,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @return the ceCaseSearchParams
      */
     public SearchParamsCECases getCeCaseSearchParams() {
-        SearchCoordinator sc = getSearchCoordinator();
-        if (ceCaseSearchParams == null) {
-            ceCaseSearchParams = sc.getDefaultSearchParamsCECase();
-        }
+        
         return ceCaseSearchParams;
     }
 

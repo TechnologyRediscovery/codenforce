@@ -18,8 +18,8 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.application.SearchCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.User;
@@ -44,6 +44,32 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public PersonCoordinator() {
     }
+    
+    
+    public SearchParamsPersons getDefaultSearchParamsPersons(Municipality m){
+        SearchParamsPersons spp = new SearchParamsPersons();
+        // on the parent class SearchParams
+        spp.setFilterByStartEndDate(false);
+        spp.setLimitResultCountTo100(true);
+        spp.setMuni(m);
+        
+        // on the subclass SearchParamsPersons
+        spp.setFilterByFirstName(true);
+        spp.setFilterByLastName(true);
+        spp.setOnlySearchCompositeLastNames(false);
+        
+        spp.setFilterByPersonTypes(false);
+        spp.setFilterByEmail(false);
+        spp.setFilterByAddressStreet(false);
+        
+        spp.setFilterByActiveSwitch(false);
+        spp.setFilterByVerifiedSwitch(false);
+        spp.setFilterByPropertySwitch(false);
+        
+        return spp;
+        
+    }
+    
     
     public void updatePerson(Person p, User u, String updateNotes) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
@@ -85,33 +111,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     }
     
    
-
-    /**
-     * Hard-coded default values for person searches
-     * @return 
-     */
-    public SearchParamsPersons getDefaultSearchParamsPersons() {
-        SearchParamsPersons spp = new SearchParamsPersons();
-        // on the parent class SearchParams
-        spp.setMuni(getSessionBean().getActiveMuni());
-        spp.setFilterByStartEndDate(false);
-        spp.setLimitResultCountTo100(true);
-        
-        // on the subclass SearchParamsPersons
-        spp.setFilterByFirstName(false);
-        spp.setFilterByLastName(true);
-        spp.setOnlySearchCompositeLastNames(false);
-        
-        spp.setFilterByPersonTypes(false);
-        spp.setFilterByEmail(false);
-        spp.setFilterByAddressStreet(false);
-        
-        spp.setFilterByActiveSwitch(false);
-        spp.setFilterByVerifiedSwitch(false);
-        spp.setFilterByPropertySwitch(false);
-        
-        return spp;
-    }
 
     /**
      * @return the personTypes

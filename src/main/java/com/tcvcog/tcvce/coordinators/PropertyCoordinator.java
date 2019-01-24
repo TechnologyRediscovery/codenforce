@@ -21,12 +21,12 @@ package com.tcvcog.tcvce.coordinators;
  *
  * @author Eric C. Darsow
  */
-public class PropertyUnitCoordinator {
+public class PropertyCoordinator {
 
     /**
      * Creates a new instance of PropertyUnitCoordinator
      */
-    public PropertyUnitCoordinator() {
+    public PropertyCoordinator() {
     }
     
 }

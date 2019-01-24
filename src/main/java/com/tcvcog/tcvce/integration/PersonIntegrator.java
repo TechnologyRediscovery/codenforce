@@ -302,6 +302,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 id=rs.getInt("personid");
                 p = getPerson(id);
                 personAL.add(p);
+                counter++;
             }
 
         } catch (SQLException ex) {
@@ -745,7 +746,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, u.getUserID());
 
             rs = stmt.executeQuery();
-            int MAX_RES = 10;
+            int MAX_RES = 20;  //behold a MAGICAL number
             int iter = 0;
             
             while (rs.next() && iter < MAX_RES) {

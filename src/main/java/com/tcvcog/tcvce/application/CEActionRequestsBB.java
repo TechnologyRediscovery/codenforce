@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -72,6 +74,20 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     private boolean disablePACCControl;
     private boolean disabledDueToRoutingNotAllowed;
     
+    
+      /**
+     * Creates a new instance of ActionRequestManageBB
+     */
+    public CEActionRequestsBB() {
+    
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        CaseCoordinator cc = getCaseCoordinator();
+        searchParams = cc.getDefaultSearchParamsCEActionRequests(getSessionBean().getActiveMuni());
+        
+    }
     
     public String path1CreateNewCaseAtProperty(){
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
@@ -472,12 +488,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
 
-    /**
-     * Creates a new instance of ActionRequestManageBB
-     */
-    public CEActionRequestsBB() {
-    
-    }
+  
     
     public void updateActionRequestStatus(ActionEvent ev){
         System.out.println("updateStatus");
@@ -564,13 +575,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      * @return the searchParams
      */
     public SearchParamsCEActionRequests getSearchParams() {
-        System.out.println("ActionRequestManageBB.getSearchparams");
-        if(searchParams == null){
-            System.out.println("ActionRequestManageBB.getSearchparams | params is null");
-            SearchCoordinator sc = getSearchCoordinator();
-            searchParams = sc.getDefaultSearchParamsCEActionRequests();
-            searchParams.setMuni(getSessionBean().getActiveMuni());
-        }
         return searchParams;
     }
 

@@ -184,9 +184,9 @@
 
     <managed-bean>
         <managed-bean-name>propertyUnitCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.PropertyUnitCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.PropertyCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <description>Interfaces between business objects, the integration layer, and jsf beans </description>
@@ -1352,9 +1352,9 @@
     </managed-bean>
     <managed-bean>
         <managed-bean-name>searchCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.SearchCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.SearchCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>session</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>municipalityManageBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>

@@ -39,45 +39,14 @@
                                              columnClasses="gridTd-solid-back, gridTd-solid-back">
 
                                     <h:panelGroup>
-                                        <p:outputLabel for="muniSelectMenu-person">
-                                            <h:outputText value="Municipality:"/>
-                                        </p:outputLabel>
-                                        <p:spacer height="5px"/>
-
-                                        <p:selectOneMenu id="muniSelectMenu-person" 
-                                                         tabindex="1" 
-                                                         value="#{personsBB.searchParams.muni}">
-                                            <f:converter converterId="muniConverter"/>
-                                            <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
-                                            <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup class="spacer"></h:panelGroup>    
-
-
-                                    <h:panelGroup>
-                                        <p:outputLabel id="filter-by-fname-ol" for="filter-by-fname-cb" value="Filter by first name?"/>
-                                        <p:spacer height="5px"/>
-                                        <p:selectBooleanCheckbox id="filter-by-fname-cb" value="#{personsBB.searchParams.filterByFirstName}" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
                                         <p:outputLabel for="formFirstName-person">
                                             <h:outputText value="First Name"/>
                                         </p:outputLabel>
                                         <p:inputText id="formFirstName-person" value="#{personsBB.searchParams.firstNameSS}" 
                                                      style="width: 200px;" tabindex="1" required="false" styleClass="inputText">
-                                            <f:validateLength minimum="2" maximum="100"/>
                                         </p:inputText>
-                                        <h:message for="formFirstName-person" showDetail="false" showSummary="true" 
+                                        <h:message for="formFirstName-person" showDetail="true" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:outputLabel id="filter-by-lname-ol" for="filter-by-lname-cb" value="Filter by last name?"/>
-                                        <p:spacer height="5px"/>
-                                        <p:selectBooleanCheckbox id="filter-by-lname-cb" value="#{personsBB.searchParams.filterByLastName}" />
                                     </h:panelGroup>
 
                                     <h:panelGroup id="lname-person-person">
@@ -85,52 +54,37 @@
                                             <h:outputText value="Last Name"/>
                                         </p:outputLabel>
                                         <p:inputText id="formLastName-person" value="#{personsBB.searchParams.lastNameSS}" 
-                                                     style="width: 200px;" tabindex="4" required="false" styleClass="inputText">
-                                            <f:validateLength minimum="2" maximum="100"/>
+                                                     style="width: 200px;" tabindex="2" required="false" styleClass="inputText">
                                         </p:inputText>
-                                        <h:message for="formLastName-person" showDetail="false" showSummary="true" 
+                                        <h:message for="formLastName-person" showDetail="true" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-
-                                    <h:panelGroup>
-                                        <p:outputLabel id="filter-by-personid-ol" for="filter-by-personid-cb" value="Filter by person ID?"/>
-                                        <p:spacer height="5px"/>
-                                        <p:selectBooleanCheckbox id="filter-by-personid-cb" value="#{personsBB.searchParams.filterByObjectID}" />
-                                    </h:panelGroup>
-
-
-
-                                    <h:panelGroup id="personID">
-                                        <p:outputLabel for="formPersonID">
-                                            <h:outputText value="Person ID number"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="formPersonID" value="#{personsBB.searchParams.objectID}" 
-                                                     style="width: 25%;" tabindex="3" required="true" styleClass="inputText"/>
-                                        <h:message for="formPersonID" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
                                     </h:panelGroup>
                                 </h:panelGrid>
 
                                 <p:commandButton
-                                    value="Search for Persons" tabindex="4" ajax="true" icon="fa fa-search"
+                                    value="Search by name only" tabindex="3" 
+                                    ajax="true" icon="fa fa-search"
+                                    process=    "   @form
+                                                    change-person-form:formFirstName-person
+                                                    change-person-form:formLastName-person"
                                     actionListener="#{personsBB.searchForPersons}" 
-                                    update=    "change-person-form:filter-by-personid-cb
-                                    change-person-form:formPersonID
-                                    change-person-form:filter-by-fname-cb
-                                    change-person-form:formFirstName-person
-                                    change-person-form:filter-by-lname-cb
-                                    change-person-form:formLastName-person
-                                    change-person-form:muniSelectMenu-person
-                                    change-person-form:personTable
-                                    change-person-form:person-search-messages
-                                    messages-left-form:persons-messages-global
-                                    "/>
+                                    update=    ":search-params-form
+                                                change-person-form:formFirstName-person
+                                                change-person-form:formLastName-person
+                                                change-person-form:personTable
+                                                change-person-form:person-search-messages
+                                                messages-left-form:persons-messages-global"/>
+                                
+                                <p:commandButton    id="open-search-options-cb"
+                                                    ajax="true" process="@none"
+                                                    value="Advanced search options"
+                                                    disabled="!#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                    onclick="PF('search-params-dialog').show()"
+                                                    icon="fa fa-gears"/>
 
 
 
-                                <h2>Search Results</h2>
+                                <h2>Search Results in <h:outputText value="#{personsBB.searchParams.muni.muniName}" /></h2>
 
                                 <p:dataTable
                                     id="personTable"
@@ -188,11 +142,11 @@
 
                                     <p:column width="10%" >
                                         <f:facet name="header">
-                                            <h:outputText value="Select" />
+                                            <h:outputText value="View" />
                                         </f:facet>
                                         <p:commandButton actionListener="#{personsBB.selectPerson(p)}"
-                                                         ajax="true"
-                                                         value="select"
+                                                         ajax="true" icon="fa fa-hand-o-right"
+                                                         value="select" value="view"
                                                          update="
                                                          selected-person-info-form:selected-person-info-ds"/>
                                     </p:column>
@@ -438,6 +392,85 @@
                         </div>
                     </div>
 
+                    <p:dialog   height="650" width="700"
+                                widgetVar="search-params-dialog"
+                                closable="true" 
+                                rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+
+                        <h:form id="search-params-form">
+                            <h3>Advanced Person search options</h3>
+                            
+                             <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                 columnClasses="gridTd-solid-back, gridTd-solid-back">
+                                              
+
+                            <h:panelGroup>
+                                <p:outputLabel id="filter-by-fname-ol" for="filter-by-fname-cb" value="Filter by first name?"/>
+                                <p:spacer height="5px"/>
+                                <p:selectBooleanCheckbox id="filter-by-fname-cb" value="#{personsBB.searchParams.filterByFirstName}" />
+                            </h:panelGroup>
+
+                           
+
+                            <h:panelGroup>
+                                <p:outputLabel id="filter-by-lname-ol" for="filter-by-lname-cb" value="Filter by last name?"/>
+                                <p:spacer height="5px"/>
+                                <p:selectBooleanCheckbox id="filter-by-lname-cb" value="#{personsBB.searchParams.filterByLastName}" />
+                            </h:panelGroup>
+
+                           
+
+                            <h:panelGroup>
+                                <p:outputLabel for="muniSelectMenu-person">
+                                    <h:outputText value="Municipality:"/>
+                                </p:outputLabel>
+                                <p:spacer height="5px"/>
+
+                                <p:selectOneMenu id="muniSelectMenu-person" 
+                                                 tabindex="1" 
+                                                 value="#{personsBB.searchParams.muni}">
+                                    <f:converter converterId="muniConverter"/>
+                                    <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
+                                    <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel id="filter-by-personid-ol" for="filter-by-personid-cb" value="Filter by person ID?"/>
+                                <p:spacer height="5px"/>
+                                <p:selectBooleanCheckbox id="filter-by-personid-cb" value="#{personsBB.searchParams.filterByObjectID}" />
+                            </h:panelGroup>
+
+
+
+                            <h:panelGroup id="personID">
+                                <p:outputLabel for="formPersonID">
+                                    <h:outputText value="Person ID number"/>
+                                </p:outputLabel>
+                                <p:inputText id="formPersonID" value="#{personsBB.searchParams.objectID}" 
+                                             style="width: 25%;" tabindex="3" required="true" styleClass="inputText"/>
+                                <h:message for="formPersonID" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                            </h:panelGroup>
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true" value="Cancel" icon="fa fa-stop" immediate="true"
+                                             onclick="PF('search-params-dialog').hide()"/>
+
+                            <p:commandButton ajax="true" value="Engage the wizards!"  icon="fa fa-search"
+                                             process="  @form
+                                                        change-person-form:formFirstName-person
+                                                        change-person-form:formLastName-person"
+                                             actionListener="#{personsBB.searchForPersons}"
+                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                             update="   change-person-form:personTable
+                                                        messages-left-form:persons-messages-global"
+                                             oncomplete="PF('search-params-dialog').hide()"/>
+
+                        </h:form>
+                    </p:dialog>
+
                     <p:dialog      height="650" width="700"
                                    widgetVar="update-person-dialog"
                                    closable="true" 
@@ -599,7 +632,7 @@
                             <p:inputTextarea id="update-desc-ita" style="width: 300px; height: 200px;" value="#{personsBB.updateDescription}" tabindex="1"/>
                             
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="true" value="Cancel" icon="fa fa-stop" 
+                            <p:commandButton ajax="true" value="Cancel" icon="fa fa-stop" immediate="true"
                                              onclick="PF('update-person-dialog').hide()"/>
 
                             <p:commandButton ajax="true" value="Update Person" actionListener="#{personsBB.updatePerson}"
