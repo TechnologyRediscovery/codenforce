@@ -96,9 +96,9 @@
                                         </p:column>
                                         <p:column width="8%" exportable="false">
                                             <f:facet name="header">
-                                                <h:outputText value="manage" />
+                                                <h:outputText value="view" />
                                             </f:facet>
-                                            <p:commandButton icon="fa fa-hand-o-right"
+                                            <p:commandButton icon="fa fa-hand-o-right" value="view"
                                                              actionListener="#{caseProfileBB.manageCECase(c)}" 
                                                              ajax="true"
                                                              update="
@@ -193,7 +193,7 @@
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Age (Days)" />
                                                 <div class="rowExpansion">
-                                                    <h:outputText id="selcase-age-it" value="#{caseProfileBB.currentCase.caseAge}" rendered="" />
+                                                    <h:outputText id="selcase-age-it" value="#{caseProfileBB.currentCase.caseAge}" />
                                                 </div>
                                             </h:panelGroup>
 
@@ -355,10 +355,12 @@
 
                                 <h:form id="notices-form">
                                     <h2>Notices of violation</h2>
+                                    
                                     <p:commandButton ajax="false" 
                                                      action="#{caseProfileBB.createNewNotice}"
-                                                     value="Build notice of violation letter"
+                                                     value="Create new notice of violation letter"
                                                      disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                    <p:spacer height="5px"/>
                                     <p:dataTable
                                         id="notices-table"
                                         var="notice"

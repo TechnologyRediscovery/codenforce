@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
      */
     public CEActionRequestIntegrator() {
     }
+    
+    
+    
 
     public void attachMessageToCEActionRequest(PublicInfoBundleCEActionRequest request, String message) throws IntegrationException {
         String q = "UPDATE public.ceactionrequest\n"

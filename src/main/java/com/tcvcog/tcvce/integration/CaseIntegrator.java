@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -494,6 +495,43 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
+    }
+    
+    
+    public List<CECase> getCECaseHistoryList(User u) throws IntegrationException{
+        List<CECase> cList = new ArrayList<>();
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String s = "SELECT cecase_caseid, entrytimestamp FROM loginobjecthistory "
+                    + "WHERE login_userid = ? "
+                    + "AND cecase_caseid IS NOT NULL "
+                    + "ORDER BY entrytimestamp DESC;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, u.getUserID());
+
+            rs = stmt.executeQuery();
+            int MAX_RES = 27;  //behold a MAGICAL number
+            int iter = 0;
+            
+            while (rs.next() && iter < MAX_RES) {
+                CECase c = getCECase(rs.getInt("cecase_caseid"));
+                cList.add(c);
+                iter++;
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate case history list", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return cList;
     }
     
     

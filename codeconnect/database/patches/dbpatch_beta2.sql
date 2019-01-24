@@ -1,6 +1,7 @@
 BEGIN;
 
 ALTER TABLE cecase ADD COLUMN propertyinfocase BOOLEAN;
+
 ALTER TABLE ceevent ADD COLUMN viewrequestedby_userid INTEGER;
 ALTER TABLE ceevent ADD CONSTRAINT ceevent_viewrequestedby_fk FOREIGN KEY (viewrequestedby_userid)
     REFERENCES public.login (userid);

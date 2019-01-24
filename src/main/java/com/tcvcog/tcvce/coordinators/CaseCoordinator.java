@@ -31,10 +31,13 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
@@ -64,6 +67,65 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         
     
+    }
+    
+    /**
+     * The temporarily hard-coded values for default search parameters for various
+     * types of search Param objects
+     * 
+     * @param m
+     * @return an search params object for CEAction requests with default values
+     * which amount to requests that aren't attached to a case and were submitted
+     * within the past 10 years
+     */
+    public SearchParamsCEActionRequests getDefaultSearchParamsCEActionRequests(Municipality m){
+        
+            System.out.println("CaseCoordinator.configureDefaultSearchParams "
+                    + "| found actionrequest param object");
+            
+            SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
+
+            sps.setMuni(m);
+            LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
+            sps.setStartDate(pastTenYears);
+            
+            // action requests cannot have a time stamp past the current datetime
+            sps.setEndDate(LocalDateTime.now());
+
+            sps.setUseAttachedToCase(true);
+            sps.setAttachedToCase(false);
+            sps.setUseMarkedUrgent(false);
+            sps.setUseNotAtAddress(false);
+            sps.setUseRequestStatus(false);
+        
+        return sps;
+    }
+    
+     /**
+     * Returns a SearchParams subclass for retrieving all open
+     * cases in a given municipality. Open cases are defined as a 
+     * case whose closing date is null.
+     * @param m
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCECases getDefaultSearchParamsCECase(Municipality m){
+        SearchParamsCECases spcecase = new SearchParamsCECases();
+        
+        // superclass 
+        spcecase.setMuni(m);
+        spcecase.setFilterByStartEndDate(false);
+        spcecase.setFilterByObjectID(false);
+        spcecase.setLimitResultCountTo100(true);
+        
+        // subclass specific
+        spcecase.setUseIsOpen(true);
+        spcecase.setIsOpen(true);
+        spcecase.setUseCaseCloseDateRange(false);
+        spcecase.setUseCaseManagerID(false);
+        spcecase.setUseLegacy(false);
+        
+        return spcecase;
     }
     
     public CECase getInitializedCECase(Property p, User u){
