@@ -48,20 +48,19 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     }
     
     public ArrayList<OccPermitApplicationReason> getOccPermitApplicationReasons(){
-        // temp to close
+        
         return new ArrayList();
     }
     
     public OccPermitApplication getOccPermitApplication(int applicationID) throws IntegrationException {
-        OccPermitApplication occpermitapp = new OccPermitApplication();
+        OccPermitApplication occpermitapp = null;
         
         // EDIT THIS STATEMENT, UTILISE getOccPermitApplicationReason();
-        String query = "SELECT applicationid, multiunit, reason_reasonid, submissiontimestamp, currentowner_personid, \n"
-                + "		contactperson_personid, newoccupant_personid, newowner_personid, \n"
-                + "		occupancyinspection_id, submitternotes, internalnotes, propertyunitid,\n"
-                + "		reasontitle, reasondescription, activereason\n"
+        String query = "SELECT applicationid, multiunit, reason_reasonid, submissiontimestamp, "
+                + "currentowner_personid, contactperson_personid, newoccupant_personid, "
+                + "newowner_personid, occupancyinspection_id, submitternotes, internalnotes, "
+                + "propertyunitid, reasontitle, reasondescription, activereason\n"
                 + "FROM occupancypermitapplication\n"
-                + "	INNER JOIN occpermitapplicationreason ON occupancypermitapplication.reason_reasonid = occpermitapplicationreason.reasonid\n"
                 + "WHERE occupancypermitapplication.applicationid = ?;";
         
         Connection con = null;
@@ -85,27 +84,21 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     
     private OccPermitApplication generateOccPermitApplication(ResultSet rs) throws IntegrationException {
         OccPermitApplication occpermitapp = new OccPermitApplication();
-        OccPermitApplicationReason reason = new OccPermitApplicationReason();
-        int applicationid;
         PersonIntegrator pi = getPersonIntegrator();
         try {
-            applicationid = rs.getInt("applicationid");
+            occpermitapp.setId(rs.getInt("applicationid"));
+            occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("applicationid")));
             occpermitapp.setMultiUnit(rs.getBoolean("multiunit"));
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
+            occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("reasonid")));
+            occpermitapp.setCurrentOwner(pi.getPerson(rs.getInt("currentowner_personid")));
+            occpermitapp.setContactPerson(pi.getPerson(rs.getInt("contactperson_personid")));
+            occpermitapp.setNewOwner(pi.getPerson(rs.getInt("newowner_personid")));
+            occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
+            occpermitapp.setInternalNotes(rs.getString("internalNotes"));
             
-            // still need to set Person and OccPermitApplicationReason objects
-            
-            
-            
-           
-           
-           
-           
-           
-           
-           
-           
-            
+//          occpermitapp.setNewOccupants(newOccupants); how does this work in db? 1/31/2019 DP
+      
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplication | "
                     + "Integration Error: Unable to generate occupancy permit application ", ex);
@@ -120,6 +113,51 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     public void deleteOccPermitApplication(OccPermitApplication application){
         
     }
+    
+    public OccPermitApplicationReason getOccPermitApplicationReason(int reasonId) throws IntegrationException{
+        OccPermitApplicationReason occpermitappreason = null;
+        String query = "SELECT reasonid, reasontitle, reasondescription, activereason\n "
+                + "FROM occpermitapplicationreason\n"
+                + "WHERE reasonid = ?;";
+        
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, reasonId);
+            rs= stmt.executeQuery();
+            
+            while (rs.next()) {
+                occpermitappreason = generateOccPermitApplicationReason(rs);
+            }
+            
+        } catch(SQLException ex) {
+            throw new IntegrationException("OccupancyInspectionIntegrator.getOccPermitApplicationReason | "
+                    + "Integration Error: Unable to get occupancy permit application reason ", ex);            
+        }
+        
+        return occpermitappreason;
+    }
+    
+    public OccPermitApplicationReason generateOccPermitApplicationReason(ResultSet rs) throws IntegrationException{
+        OccPermitApplicationReason occpermitappreason = new OccPermitApplicationReason();
+        
+        try {
+            occpermitappreason.setId(rs.getInt("reasonid"));
+            occpermitappreason.setTitle(rs.getString("reasontitle"));
+            occpermitappreason.setDescription(rs.getString("reasondescription"));
+            occpermitappreason.setActive(rs.getBoolean("activereason"));                
+        } catch(SQLException ex) {
+            throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplicationReason | "
+                    + "Integration Error: Unable to generate occupancy permit application reason ", ex);
+        }      
+        
+        return occpermitappreason;
+    }
+
     
     public ArrayList<OccInspecStatus> getOccInspecStatusList(){
         return new ArrayList();
