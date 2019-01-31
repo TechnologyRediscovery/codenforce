@@ -40,8 +40,7 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
         private boolean filterByActiveSwitch;
         private boolean verifiedSwitch;
         private boolean filterByVerifiedSwitch;
-        private Property propertySA;
-        private boolean filterByPropertySwitch;
+       
         
         
         
@@ -259,33 +258,7 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
         this.filterByVerifiedSwitch = filterByVerifiedSwitch;
     }
 
-    /**
-     * @return the propertySA
-     */
-    public Property getPropertySA() {
-        return propertySA;
-    }
-
-    /**
-     * @param propertySA the propertySA to set
-     */
-    public void setPropertySA(Property propertySA) {
-        this.propertySA = propertySA;
-    }
-
-    /**
-     * @return the filterByPropertySwitch
-     */
-    public boolean isFilterByPropertySwitch() {
-        return filterByPropertySwitch;
-    }
-
-    /**
-     * @param filterByPropertySwitch the filterByPropertySwitch to set
-     */
-    public void setFilterByPropertySwitch(boolean filterByPropertySwitch) {
-        this.filterByPropertySwitch = filterByPropertySwitch;
-    }
+  
    
    
    
