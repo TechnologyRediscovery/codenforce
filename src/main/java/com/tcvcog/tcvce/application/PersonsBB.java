@@ -65,8 +65,14 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        PersonCoordinator pc = getPersonCoordinator();
-        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
+        try {
+            PersonCoordinator pc = getPersonCoordinator();
+            PersonIntegrator pi = getPersonIntegrator();
+            searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
+            selectedPerson = pi.getPerson(100);
+        } catch (IntegrationException ex) {
+            Logger.getLogger(PersonsBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         
     }
@@ -94,20 +100,70 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     
     public void updatePerson(ActionEvent ev){
-        
+        System.out.println("PersonsBB.updatePerson");
+        PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
         try {
             pc.updatePerson(selectedPerson, getSessionBean().getFacesUser(), updateDescription);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Person updated! This updated person is now your 'active person'", ""));
-            getSessionBean().setActivePerson(selectedPerson);
+            // go get the new data:
+            selectedPerson = pi.getPerson(selectedPerson.getPersonID());
+            System.out.println("PersonsBB.updatePerson : completed update and reloaded bean person");
         } catch (IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to update person, my apologies", ""));
             
+        }
+        
+    }
+    
+    public void initiatePersonCreation(){
+        PersonCoordinator pc = getPersonCoordinator();
+        selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getActiveMuni());
+        
+    }
+    
+    public void loadPersonHistory(ActionEvent ev){
+        System.out.println("PersonsBB.LoadPersonHistory");
+        PersonIntegrator pi = getPersonIntegrator();
+        try {
+            personList = pi.getPersonHistory(getSessionBean().getFacesUser());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "History was loaded!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Could not load history, sorry", ""));
+            System.out.println(ex);
+        }
+        
+    }
+    
+    public void createNewPerson(){
+        PersonCoordinator pc = getPersonCoordinator();
+        PersonIntegrator pi = getPersonIntegrator();
+        UserIntegrator ui = getUserIntegrator();
+        
+        int newPersonID;
+        try {
+            newPersonID = pc.addNewPerson(selectedPerson);
+            selectedPerson = pi.getPerson(newPersonID);
+            getSessionBean().setActivePerson(selectedPerson);
+            ui.logObjectView(getSessionBean().getFacesUser(), selectedPerson);
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Person created! This person is now your active one and has been added to your history.'", ""));
+        
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "Unable to create new Person in the system.'", ""));
         }
     }
     
@@ -144,6 +200,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
                         "Person history logging is broken!",""));
         }
         getSessionBean().setActivePerson(selectedPerson);
+        System.out.println("PersonsBB.selectPreson | person: " + selectedPerson.getPersonID());
         selectedPerson = p;
     }
 

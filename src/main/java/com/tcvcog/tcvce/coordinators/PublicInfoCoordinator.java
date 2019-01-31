@@ -198,6 +198,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         
         System.out.println("PublicInfoCoordinator.attachmessagToBundle: In coordinator");
         
+        
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         if(bundle.getTypeName().equals("Code enforcement action request")){
             requestBundle = (PublicInfoBundleCEActionRequest) bundle;

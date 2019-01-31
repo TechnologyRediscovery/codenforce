@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  *
@@ -43,6 +44,13 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Creates a new instance of PersonCoordinator
      */
     public PersonCoordinator() {
+    }
+    
+    public int addNewPerson(Person p) throws IntegrationException{
+        int newid;
+        PersonIntegrator pi = getPersonIntegrator();
+        newid = pi.insertPerson(p);
+        return newid;
     }
     
     
@@ -64,7 +72,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
         spp.setFilterByActiveSwitch(false);
         spp.setFilterByVerifiedSwitch(false);
-        spp.setFilterByPropertySwitch(false);
+        
         
         return spp;
         
@@ -74,17 +82,32 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public void updatePerson(Person p, User u, String updateNotes) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         StringBuilder sb = new StringBuilder();
+        // create the new note header
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordUpdateHeader"));
         sb.append("<br />");
         sb.append(updateNotes);
         p.setNotes(appendNoteBlock(p.getNotes(), sb.toString()));
         pi.updatePerson(p);
+        pi.updatePersonNotes(p);
+        
+    }
+    
+    public Person getNewPersonSkeleton(Municipality m){
+        Person newP = new Person();
+        newP.setActive(true);
+        newP.setPersonID(0);
+        newP.setCanExpire(false);
+        newP.setBusinessEntity(false);
+        newP.setCompositeLastName(false);
+        newP.setUseSeparateMailingAddress(false);
+        return newP;
         
     }
     
     public void addNotesToPerson(Person p, User u, String noteToAdd) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         StringBuilder sb = new StringBuilder();
+        // create the general note header
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordNotesGeneral"));
         sb.append("<br />");
         sb.append(noteToAdd);
@@ -97,13 +120,16 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         StringBuilder sb = new StringBuilder();
         sb.append(previousNotes);
         sb.append("<br/>**************************************<br/>");
-        sb.append(newNotes);
-        sb.append("<br/>");
-        sb.append(getFacesUser().getFName());
+        sb.append("NOTE CREATED BY: ");
+        sb.append(getSessionBean().getFacesUser().getFName());
         sb.append(" ");
-        sb.append(getFacesUser().getLName());
-        sb.append(" at ");
+        sb.append(getSessionBean().getFacesUser().getLName());
+        sb.append(" (User ID ");
+        sb.append(String.valueOf(getSessionBean().getFacesUser().getUserID()));
+        sb.append(") on ");
         sb.append(getPrettyDate(LocalDateTime.now()));
+        sb.append(":<br/>");
+        sb.append(newNotes);
         sb.append("<br/>");
         sb.append("**************************************<br/>");
         return sb.toString();
@@ -116,6 +142,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return the personTypes
      */
     public PersonType[] getPersonTypes() {
+        ArrayList<PersonType> al = new ArrayList<>();
         personTypes = PersonType.values();
         return personTypes;
     }
