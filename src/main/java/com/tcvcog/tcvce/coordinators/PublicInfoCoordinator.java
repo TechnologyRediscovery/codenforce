@@ -103,11 +103,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
             
             StringBuilder sb = new StringBuilder();
-            sb.append(c.getUser().getFName());
+            sb.append(c.getCaseManager().getFName());
             sb.append(" ");
-            sb.append(c.getUser().getLName());
+            sb.append(c.getCaseManager().getLName());
             pib.setCaseManagerName(sb.toString());
-            pib.setCaseManagerContact(c.getUser().getPhoneWork());
+            pib.setCaseManagerContact(c.getCaseManager().getPhoneWork());
             
             
             pib.setPublicEventList(new ArrayList<EventCECase>());
@@ -197,6 +197,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PublicInfoBundleCEActionRequest requestBundle;
         
         System.out.println("PublicInfoCoordinator.attachmessagToBundle: In coordinator");
+        
         
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         if(bundle.getTypeName().equals("Code enforcement action request")){

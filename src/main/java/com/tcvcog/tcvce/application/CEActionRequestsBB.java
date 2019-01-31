@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -73,6 +75,20 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     private boolean disabledDueToRoutingNotAllowed;
     
     
+      /**
+     * Creates a new instance of ActionRequestManageBB
+     */
+    public CEActionRequestsBB() {
+    
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        CaseCoordinator cc = getCaseCoordinator();
+        searchParams = cc.getDefaultSearchParamsCEActionRequests(getSessionBean().getActiveMuni());
+        
+    }
+    
     public String path1CreateNewCaseAtProperty(){
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
 
@@ -84,8 +100,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             MessageBuilderParams mbp = new MessageBuilderParams();
             mbp.user = getFacesUser();
             mbp.existingContent = selectedRequest.getPublicExternalNotes();
-            mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("attachedToCaseHeader");
-            mbp.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("attachedToCaseExplanation");
+            mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader");
+            mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation");
             mbp.newMessageContent = "";
             
             selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
@@ -127,7 +143,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to connect request to case.", 
-                        getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                        getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         selectedRequest.setCaseID(selectedCaseForAttachment.getCaseID());
         updateSelectedRequestStatusWithBundleKey("actionRequestExistingCaseStatusCode");
@@ -144,8 +160,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             MessageBuilderParams mcc = new MessageBuilderParams();
             mcc.user = getFacesUser();
             mcc.existingContent = selectedRequest.getPublicExternalNotes();
-            mcc.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("invalidActionRequestHeader");
-            mcc.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("invalidActionRequestExplanation");
+            mcc.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestHeader");
+            mcc.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestExplanation");
             mcc.newMessageContent = invalidMessage;
             selectedRequest.setPublicExternalNotes(appendNoteBlock(mcc));
             try {
@@ -179,8 +195,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             MessageBuilderParams mbp = new MessageBuilderParams();
             mbp.user = getFacesUser();
             mbp.existingContent = selectedRequest.getPublicExternalNotes();
-            mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("noViolationFoundHeader");
-            mbp.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("noViolationFoundExplanation");
+            mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundHeader");
+            mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundExplanation");
             mbp.newMessageContent = noViolationFoundMessage;
             
             selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
@@ -244,7 +260,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to complete a property search! Sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -263,7 +279,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to change request property, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
         StringBuilder sb = new StringBuilder();
@@ -279,14 +295,14 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             sb.append(selectedRequest.getRequestProperty().getMuni().getMuniName());
             sb.append(")");
         } else {
-            sb.append(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("noPreviousAddress"));
+            sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("noPreviousAddress"));
         }
         
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getPublicExternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("propertyChangedHeader");
-        mbp.explanation = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("propertyChangedExplanation");
+        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedHeader");
+        mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedExplanation");
         mbp.newMessageContent = sb.toString();
         
         selectedRequest.setPublicExternalNotes(appendNoteBlock(mbp));
@@ -298,7 +314,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to add property change note to public listing, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         // force table reload to show changes
         requestList = null;
@@ -325,7 +341,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to change requestor person"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -343,7 +359,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to add change public access code status"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
     }
     
@@ -354,7 +370,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getCogInternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("internalNote");
+        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("internalNote");
         mbp.explanation = "";
         mbp.newMessageContent = internalMessageText;
         String newNotes = appendNoteBlock(mbp);
@@ -368,7 +384,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to update notes, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -379,7 +395,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getMuniNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("muniNote");
+        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("muniNote");
         mbp.explanation = "";
         mbp.newMessageContent = muniMessageText;
         
@@ -392,7 +408,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to update notes, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -403,7 +419,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.user = getFacesUser();
         mbp.existingContent = selectedRequest.getPublicExternalNotes();
-        mbp.header = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("externalNote");
+        mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("externalNote");
         mbp.explanation = "";
         mbp.newMessageContent = publicMessageText;
         
@@ -416,7 +432,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to update notes, sorry!"
-                    , getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         
     }
@@ -472,12 +488,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
 
-    /**
-     * Creates a new instance of ActionRequestManageBB
-     */
-    public CEActionRequestsBB() {
-    
-    }
+  
     
     public void updateActionRequestStatus(ActionEvent ev){
         System.out.println("updateStatus");
@@ -564,13 +575,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      * @return the searchParams
      */
     public SearchParamsCEActionRequests getSearchParams() {
-        System.out.println("ActionRequestManageBB.getSearchparams");
-        if(searchParams == null){
-            System.out.println("ActionRequestManageBB.getSearchparams | params is null");
-            SearchCoordinator sc = getSearchCoordinator();
-            searchParams = sc.getDefaultSearchParamsCEActionRequests();
-            searchParams.setMuni(getSessionBean().getActiveMuni());
-        }
         return searchParams;
     }
 

@@ -458,11 +458,28 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-        
+    
+/**
+ * This and the primary generateEventFromRS method are working together in a somewhat
+ * dubious way to allow us to shuttle around events that know about their case and property
+ * since a regular old event is just one object in a CECase's ArrayList of events.
+ * 
+ * The solution is a subclass with the prop and case info. If we need this type of event,
+ * we get our normal result set from the DB and pass it to this method 
+ * who creates the subclass object, gets it loaded up with standard innards, and then layers on
+ * the case and property objects
+ * 
+ * @param rs
+ * @return a loaded Event
+ * @throws SQLException
+ * @throws IntegrationException 
+ */    
     private EventWithCasePropInfo generateSuperEvent(ResultSet rs) throws SQLException, IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
         EventWithCasePropInfo ev = new EventWithCasePropInfo();
+        // generateEventFromRS returns the superclass type only, downcast needed
+        // see previous line
         ev = (EventWithCasePropInfo) generateEventFromRS(rs, ev);
         ev.setEventProp(pi.getProperty(rs.getInt("propertyid")));
         ev.setEventCase(ci.getCECase(rs.getInt("caseid")));

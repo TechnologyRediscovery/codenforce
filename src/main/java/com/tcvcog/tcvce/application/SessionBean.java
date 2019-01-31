@@ -44,23 +44,23 @@ import javax.faces.bean.SessionScoped;
 
 /**
  *
+ *       //@ManagedBean(name="sessionBean")
+ *       //@SessionScoped
  * @author Eric C. Darsow
  */
-@ManagedBean(name="sessionBean")
-@SessionScoped
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
     // primary security authoriziation container 
+    // TODO - remove and get the keycard directly from the User stored in the session
     private AccessKeyCard accessKeyCard;
     
-    
     /* *** System Core Objects Session Shelves ***  */
-    private User utilityUserToUpdate;
     private Municipality activeMuni;
     private List<Municipality> availableMuniList;
-    
+    private User facesUser;
     private Property activeProp;
     private Person activePerson;
+    private List<Person> activePersonList;
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
@@ -72,6 +72,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Code Enf Action Request Session Shelves ***  */
     
     // temporary
+    private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
     private CEActionRequest activeRequest;
     private List<CEActionRequest> cEActionRequestList;
@@ -92,7 +93,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Citation activeCitation;
     private CodeViolation activeCodeViolation;
     
-    /* *** Public Data Sessino Shelves ***  */
+    /* *** Public Data Session Shelves ***  */
     private List<PublicInfoBundle> infoBundleList;
     private PublicInfoBundleCECase pibCECase;
  
@@ -496,6 +497,34 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setActiveRequest(CEActionRequest activeRequest) {
         this.activeRequest = activeRequest;
+    }
+
+    /**
+     * @return the facesUser
+     */
+    public User getFacesUser() {
+        return facesUser;
+    }
+
+    /**
+     * @param facesUser the facesUser to set
+     */
+    public void setFacesUser(User facesUser) {
+        this.facesUser = facesUser;
+    }
+
+    /**
+     * @return the activePersonList
+     */
+    public List<Person> getActivePersonList() {
+        return activePersonList;
+    }
+
+    /**
+     * @param activePersonList the activePersonList to set
+     */
+    public void setActivePersonList(List<Person> activePersonList) {
+        this.activePersonList = activePersonList;
     }
     
 }

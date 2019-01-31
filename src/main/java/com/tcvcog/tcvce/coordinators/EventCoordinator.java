@@ -115,6 +115,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Skeleton event factory
      * For use by the public messaging system which attaches events to code enforcement
      * cases without having access to the entire CECase object--only the caseid
      * @param caseID to which the event should be attached
@@ -203,7 +204,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCECase event) throws IntegrationException, EventException{
         EventIntegrator ei = getEventIntegrator();
-        String updateViolationDescr = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("violationChangeEventDescription");
+        String updateViolationDescr = getResourceBundle(Constants.MESSAGE_TEXT).getString("violationChangeEventDescription");
         // fetch the event category id from the event category bundle under the key updateViolationEventCategoryID
         // now we're ready to log the event
         EventCategory ec = new EventCategory();
@@ -230,11 +231,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * Configures an event which represents the moment of compliance with
      * a code violation attached to a code enforcement case
      * 
-     * @param violationList
+     * @param violation
      * @return a partially-baked event ready for inserting
      * @throws IntegrationException 
      */
-    public EventCECase generateViolationComplianceEvent(List<CodeViolation> violationList) throws IntegrationException{
+    public EventCECase generateViolationComplianceEvent(CodeViolation violation) throws IntegrationException{
         EventCECase e = new EventCECase();
         EventIntegrator ei = getEventIntegrator();
           e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
@@ -244,23 +245,18 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         e.setDiscloseToMunicipality(true);
         e.setDiscloseToPublic(true);
         
-        ListIterator<CodeViolation> li = violationList.listIterator();
-        CodeViolation cv;
         StringBuilder sb = new StringBuilder();
         sb.append("Compliance with the following code violations was observed:");
         sb.append("<br/><br/>");
         
-        while(li.hasNext()){
-            cv = li.next();
-            sb.append(cv.getViolatedEnfElement().getCodeElement().getOrdchapterNo());
+            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdchapterNo());
             sb.append(".");
-            sb.append(cv.getViolatedEnfElement().getCodeElement().getOrdSecNum());
+            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSecNum());
             sb.append(".");
-            sb.append(cv.getViolatedEnfElement().getCodeElement().getOrdSubSecNum());
+            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSubSecNum());
             sb.append(":");
-            sb.append(cv.getViolatedEnfElement().getCodeElement().getOrdSubSecTitle());
+            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSubSecTitle());
             sb.append("<br/><br/>");
-        }
         e.setNotes(sb.toString());
         return e;
     }
@@ -276,6 +272,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public String updateEvent(EventCECase event, boolean clearViewConfirmation) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
+        // YIKES TODO: Case vetting logic needed here!
         ei.updateEvent(event, clearViewConfirmation);
         
         return "caseProfile";
@@ -296,14 +293,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * CaseCoordinator.
      * @param c the current case
      * @param e the event to be processed which is passed over to the CaseCoordinator
+     * @param cv
      * @throws IntegrationException
      * @throws CaseLifecyleException
      * @throws ViolationException 
      */
-    public void initiateEventProcessing(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException, ViolationException{
+    public void initiateEventProcessing(CECase c, EventCECase e, CodeViolation cv) throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseCoordinator cc = getCaseCoordinator();
         
-        cc.processCEEvent(c, e);
+        cc.processCEEvent(c, e, null);
         
     }
     

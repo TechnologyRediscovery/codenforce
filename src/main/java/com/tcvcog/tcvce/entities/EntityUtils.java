@@ -29,6 +29,12 @@ public class EntityUtils {
         return formattedDateTime;
     }
     
+    /**
+     * Counts days between two LocalDateTimes and returns the primitive
+     * @param from
+     * @param to
+     * @return 
+     */
     public int getTimePeriodAsDays(LocalDateTime from, LocalDateTime to){
         int totalDays;
         int days;

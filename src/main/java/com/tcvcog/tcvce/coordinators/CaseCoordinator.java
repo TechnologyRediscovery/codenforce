@@ -31,10 +31,13 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
@@ -66,6 +69,65 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     }
     
+    /**
+     * The temporarily hard-coded values for default search parameters for various
+     * types of search Param objects
+     * 
+     * @param m
+     * @return an search params object for CEAction requests with default values
+     * which amount to requests that aren't attached to a case and were submitted
+     * within the past 10 years
+     */
+    public SearchParamsCEActionRequests getDefaultSearchParamsCEActionRequests(Municipality m){
+        
+            System.out.println("CaseCoordinator.configureDefaultSearchParams "
+                    + "| found actionrequest param object");
+            
+            SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
+
+            sps.setMuni(m);
+            LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
+            sps.setStartDate(pastTenYears);
+            
+            // action requests cannot have a time stamp past the current datetime
+            sps.setEndDate(LocalDateTime.now());
+
+            sps.setUseAttachedToCase(true);
+            sps.setAttachedToCase(false);
+            sps.setUseMarkedUrgent(false);
+            sps.setUseNotAtAddress(false);
+            sps.setUseRequestStatus(false);
+        
+        return sps;
+    }
+    
+     /**
+     * Returns a SearchParams subclass for retrieving all open
+     * cases in a given municipality. Open cases are defined as a 
+     * case whose closing date is null.
+     * @param m
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCECases getDefaultSearchParamsCECase(Municipality m){
+        SearchParamsCECases spcecase = new SearchParamsCECases();
+        
+        // superclass 
+        spcecase.setMuni(m);
+        spcecase.setFilterByStartEndDate(false);
+        spcecase.setFilterByObjectID(false);
+        spcecase.setLimitResultCountTo100(true);
+        
+        // subclass specific
+        spcecase.setUseIsOpen(true);
+        spcecase.setIsOpen(true);
+        spcecase.setUseCaseCloseDateRange(false);
+        spcecase.setUseCaseManagerID(false);
+        spcecase.setUseLegacy(false);
+        
+        return spcecase;
+    }
+    
     public CECase getInitializedCECase(Property p, User u){
         CECase newCase = new CECase();
         
@@ -75,7 +137,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
         newCase.setProperty(p);
-        newCase.setUser(u);
+        newCase.setCaseManager(u);
         
         return newCase;
     }
@@ -135,6 +197,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             
             
         } else {
+            // since there's no action request, the assumed method is called "observation"
             originationCategory = ec.getInitiatlizedEventCategory(
                     Integer.parseInt(getResourceBundle(
                     Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByObservation")));
@@ -148,7 +211,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationEvent.setEventOwnerUser(u);
             originationEvent.setCaseID(insertedCase.getCaseID());
             originationEvent.setDateOfRecord(LocalDateTime.now());
-            processCEEvent(newCase, originationEvent);
+            processCEEvent(newCase, originationEvent, null);
     }
     
     /**
@@ -200,7 +263,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         ci.changeCECasePhase(c);
         
         ec.generateAndInsertManualCasePhaseOverrideEvent(c, pastPhase);
-        refreshCase(c);
+        
     }
     
     
@@ -216,20 +279,22 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the case to which the event should be added
      * @param e the event to add to the case also included in this call
+     * @param violationList
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public void processCEEvent(CECase c, EventCECase e) 
+    public void processCEEvent(CECase c, EventCECase e, List<CodeViolation> violationList) 
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
+         
         
         switch(eventType){
             case Action:
                 processActionEvent(c, e);
                 break;
             case Compliance:
-                processComplianceEvent(c, e);
+                processComplianceEvent(c, e, violationList);
                 break;
             case Closing:
                 processClosingEvent(c, e);
@@ -253,14 +318,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException in the case of a DB error
      * @throws CaseLifecyleException in the case of date mismatch
      */
-    private void processComplianceEvent(CECase c, EventCECase e) 
+    private void processComplianceEvent(CECase c, EventCECase e, List<CodeViolation> activeViolationList) 
             throws ViolationException, IntegrationException, CaseLifecyleException{
         
         
         ViolationCoordinator vc = getViolationCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
-        List<CodeViolation> activeViolationList = getSessionBean().getActiveViolationList();
         ListIterator<CodeViolation> li = activeViolationList.listIterator();
         CodeViolation cv;
         
@@ -275,7 +339,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // then look at the whole case and close if necessary
         checkForFullComplianceAndCloseCaseIfTriggered(c);
         
-        refreshCase(c);
+        
     } // close method
     
     /**
@@ -332,7 +396,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                    
             complianceClosingEvent = ec.getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
-            processCEEvent(c, complianceClosingEvent);
+            processCEEvent(c, complianceClosingEvent, caseViolationList);
             
         } // close if
         
@@ -354,11 +418,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // hardcoding it down here in the Java
         e.setDateOfRecord(LocalDateTime.now());
         e.setEventOwnerUser(getFacesUser());
-        e.setEventDescription(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("automaticClosingEventDescription"));
-        e.setNotes(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("automaticClosingEventNotes"));
+        e.setEventDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
+        e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
         ei.insertEvent(e);
-        refreshCase(c);
+        
     }
     
     
@@ -573,7 +637,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         noticeEvent.setCaseID(c.getCaseID());
         noticeEvent.setDateOfRecord(LocalDateTime.now());
         
-        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_BUNDLE).getString("noticeQueuedEventDesc");
+        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setEventDescription(queuedNoticeEventNotes);
         
         noticeEvent.setEventOwnerUser(getFacesUser());

@@ -44,7 +44,7 @@ public class Constants {
     
     // these are the names of the properties files/bundles
 
-    public final static String MESSAGE_BUNDLE= "messagetext";
+    public final static String MESSAGE_TEXT= "messagetext";
     public final static String LOGGING_CATEGORIES = "loggingcategories";
     public final static String EVENT_CATEGORY_BUNDLE = "eventCategories";
     public final static String DB_FIXED_VALUE_BUNDLE = "dbFixedValueLookup";

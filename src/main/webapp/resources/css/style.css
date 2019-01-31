@@ -292,6 +292,16 @@ div.headerLink a:before, a:visited{
     
 }
 
+.list-column-persons{
+    flex-basis:auto;
+    flex-shrink: 1;
+    min-width: 600px;
+    max-width: 600px;
+    padding-right:10px;
+    
+    
+}
+
 .object-column{
     flex-basis: auto;
     flex-grow: 1;
@@ -744,6 +754,8 @@ tr.reinspect{
 /*td.gridTd {*/
 .gridTd {
     border: none;
+    vertical-align: top;
+    padding: 10px;
 }
 
 .gridTd-solid-back{
@@ -842,7 +854,7 @@ gridTd-bignum{
 }
 
 .noFill{
-    background: none;
+    background-color: white;
 }
 
 .sessionInfoButton{

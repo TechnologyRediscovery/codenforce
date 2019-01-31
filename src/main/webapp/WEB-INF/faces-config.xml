@@ -150,69 +150,71 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
-    <!--session-scoped beans-->
     
     <managed-bean>
         <managed-bean-name>loggingCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.LogCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <description>Interfaces between code violation related objects and integration layer objects</description>
         <managed-bean-name>violationCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.ViolationCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>codeCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.CodeCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>eventCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.EventCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>personCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.PersonCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>propertyUnitCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.PropertyUnitCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.PropertyCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <description>Interfaces between business objects, the integration layer, and jsf beans </description>
         <managed-bean-name>caseCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.CaseCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>login</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.Login</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>occupancyCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>paymentCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.coordinators.PaymentCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <!--session-scoped beans-->
+    
+    
+    <managed-bean>
+        <managed-bean-name>sessionBean</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.SessionBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
+    
 
     <!--view-scoped beans-->
     <managed-bean>
@@ -224,7 +226,6 @@
     <managed-bean>
         <managed-bean-name>codeSourceAddUpdateBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CodeSourceAddUpdateBB</managed-bean-class>
-    
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
@@ -325,19 +326,12 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    
     <managed-bean>
-        <managed-bean-name>personBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonBB</managed-bean-class>
+        <managed-bean-name>personsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>personUpdateBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonUpdateBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
     <managed-bean>
         <managed-bean-name>muniBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.MuniBB</managed-bean-class>
@@ -1358,9 +1352,9 @@
     </managed-bean>
     <managed-bean>
         <managed-bean-name>searchCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.SearchCoordinator</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.SearchCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>session</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>municipalityManageBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>

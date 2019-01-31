@@ -16,10 +16,12 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
@@ -102,6 +104,7 @@ public class BackingBeanUtils implements Serializable{
     private CEActionRequestIntegrator cEActionRequestIntegrator;
     private PublicInfoCoordinator publicInfoCoordinator;
     private PersonCoordinator personCoordinator;
+    private PropertyCoordinator propertyCoordinator;
     
     private ChecklistIntegrator checklistIntegrator;
     private OccupancyInspectionIntegrator occupancyInspectionIntegrator;
@@ -221,7 +224,7 @@ public class BackingBeanUtils implements Serializable{
         sb.append(mcc.newMessageContent);
         sb.append("<br/>");
         sb.append("--------------------------------------<br/>");
-        sb.append(getResourceBundle(Constants.MESSAGE_BUNDLE).getString("signatureLeader"));
+        sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("signatureLeader"));
         sb.append(getFacesUser().getFName());
         sb.append(" ");
         sb.append(getFacesUser().getLName());
@@ -331,6 +334,9 @@ public class BackingBeanUtils implements Serializable{
    
         return propertyIntegrator;
     }
+    
+   
+    
 
     /**
      * @param propertyIntegrator the propertyIntegrator to set
@@ -792,6 +798,25 @@ public class BackingBeanUtils implements Serializable{
      */
     public void setPersonCoordinator(PersonCoordinator personCoordinator) {
         this.personCoordinator = personCoordinator;
+    }
+
+    /**
+     * @return the propertyCoordinator
+     */
+    public PropertyCoordinator getPropertyCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{propertyCoordinator}", PropertyCoordinator.class);
+        propertyCoordinator = (PropertyCoordinator) ve.getValue(context.getELContext());
+        
+        return propertyCoordinator;
+    }
+
+    /**
+     * @param propertyCoordinator the propertyCoordinator to set
+     */
+    public void setPropertyCoordinator(PropertyCoordinator propertyCoordinator) {
+        this.propertyCoordinator = propertyCoordinator;
     }
 
        

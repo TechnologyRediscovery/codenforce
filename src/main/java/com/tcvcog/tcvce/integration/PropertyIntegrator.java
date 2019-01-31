@@ -19,8 +19,10 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,6 +32,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -271,7 +274,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     } // close getProperty()
     
-    public PropertyWithLists getPropertyWithLists(int propID) throws IntegrationException{
+    public PropertyWithLists getPropertyWithLists(int propertyID) throws IntegrationException{
         PropertyWithLists p = new PropertyWithLists();
         String query = "SELECT * from property WHERE propertyid = ?;";
         
@@ -283,7 +286,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
  
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, propID);
+            stmt.setInt(1, propertyID);
             rs = stmt.executeQuery();
             while(rs.next()){
                 p = generatePropertyWithLists(rs);
@@ -302,6 +305,42 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         return p;
         
+    }
+    
+    public List<Property> getPropertyHistoryList(User u) throws IntegrationException{
+        List<Property> propList = new ArrayList<>();
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String s = "SELECT property_propertyid, entrytimestamp FROM loginobjecthistory "
+                    + "WHERE login_userid = ? "
+                    + "AND property_propertyid IS NOT NULL "
+                    + "ORDER BY entrytimestamp DESC;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, u.getUserID());
+
+            rs = stmt.executeQuery();
+            int MAX_RES = 20;  //behold a MAGICAL number
+            int iter = 0;
+            
+            while (rs.next() && iter < MAX_RES) {
+                Property p = getProperty(rs.getInt("property_propertyid"));
+                propList.add(p);
+                iter++;
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate property history list", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return propList;
     }
     
     public void insertPropertyUnit(PropertyUnit pu) throws IntegrationException{
