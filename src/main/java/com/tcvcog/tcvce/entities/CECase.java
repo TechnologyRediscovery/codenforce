@@ -18,7 +18,9 @@ import java.util.Locale;
  *
  * @author cedba
  */
-public class CECase implements Serializable{
+public class CECase extends EntityUtils implements Serializable{
+    
+
     
     private int caseID;
     private int publicControlCode;
@@ -68,7 +70,7 @@ public class CECase implements Serializable{
     }
     
     public int getCaseAge(){
-        return java.time.Period.between(creationTimestamp.toLocalDate(), LocalDate.now()).getDays();
+        return getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
     
     /**

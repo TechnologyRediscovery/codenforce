@@ -36,8 +36,6 @@ public enum PersonType{
     LegacyOwner("Legacy owner"),
     LegacyAgent("Legacy Agent");
     
-    
-    
     private final String label;
     
     private PersonType(String label){

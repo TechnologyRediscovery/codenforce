@@ -58,8 +58,6 @@ public class OccPermitApplicationReason {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-    
-    
+    }   
     
 }

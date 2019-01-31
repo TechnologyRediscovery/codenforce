@@ -287,9 +287,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
             while(rs.next()){
                 p = generatePropertyWithLists(rs);
-                p.setPropertyCaseList(ci.getCECasesByProp(p));
-                p.setPropertyUnitList(getPropertyUnitList(p));
-                p.setPropertyPersonList(pi.getPersonList(p));
+                p.setCeCaseList(ci.getCECasesByProp(p));
+                p.setUnitList(getPropertyUnitList(p));
+                p.setPersonList(pi.getPersonList(p));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());

@@ -87,7 +87,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
-    public void insertViolationLetter(CECase c, NoticeOfViolation notice) throws IntegrationException {
+    public void insertNoticeOfViolation(CECase c, NoticeOfViolation notice) throws IntegrationException {
 
         String query = "INSERT INTO public.noticeofviolation(\n"
                 + " noticeid, caseid, personid_recipient, lettertext, insertiontimestamp, dateofrecord, \n"

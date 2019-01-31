@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Notice of Violation Builder</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+
+            <ui:define name="content">
+                <div class="mainContainer">
+                    
+                    <h:form id="msg-form">
+                        
+
+                        <h:messages globalOnly="true" id="person-add-messages"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+                    </h:form>
+
+                    <h:form id="notice-recipient-form">
+
+                        <h1>Choose notice recipient</h1>
+                        
+                        <h2>Option 1: Select from existing persons connected to this property: <h:outputText value="#{sessionBean.activeProp.address}"/></h2>
+
+                        <p:dataTable
+                            id="newRecipientPersonTD"
+                            var="p"
+                            selectionMode="single"
+                            selection="#{noticeOfViolationBB.selectedRecipient}"
+                            rowKey="#{p.personID}"
+                            value="#{noticeOfViolationBB.personCandidateAL}"
+                            tableStyleClass="primeDataTable"
+                            expandedRow="false"
+                            rowExpandMode="single">
+
+                            <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Person Type" />
+                                </f:facet>
+                                <h:outputText value="#{p.personType.label}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Person ID" />
+                                </f:facet>
+                                <h:outputText value="#{p.personID}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Municipality" />
+                                </f:facet>
+                                <h:outputText value="#{p.muni.muniName}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="First" />
+                                </f:facet>
+                                <h:outputText value="#{p.firstName}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Last" />
+                                </f:facet>
+                                <h:outputText value="#{p.lastName}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Address" />
+                                </f:facet>
+                                <h:outputText value="#{p.addressStreet}"/>
+                            </p:column>
+                        </p:dataTable>
+
+
+                        <hr />
+                        <h2>Option 2: Manaully enter a person ID</h2>
+                        
+                        <p:selectBooleanButton id="addPersonByIdIS" 
+                                               value="#{noticeOfViolationBB.addPersonByID}" 
+                                               onIcon="fa fa-user-o"    offIcon="fa fa-list-alt"
+                                               onLabel="Option 2 Selected: Add by person ID below" offLabel="Click to use option 2: Manual ID Entry" />
+                        
+
+                        <p>If you wish to send the letter to a person not on the list above, 
+                            enter the Person's ID number in the box below and toggle option switch to "Add from ID". 
+                            You can open the Persons's search page by "right-clicking" the link to "Persons" 
+                            on the left sidebar and opening that page in its own browser tab.</p>
+
+                        <h:commandLink  class="bold" target="_blank" action="persons" value="Open person search in new tab ---> "/>
+                        <p:spacer height="5px"/>
+
+                        <h:outputLabel for="personIDIT" value="Person ID Number: "/>
+
+                        <p:inputText id="personIDIT" value="#{noticeOfViolationBB.recipientPersonID}"/>
+
+                        <p:spacer height="10px"/>
+
+                        
+                        <p:commandButton id="chartBtn" 
+                                         value="Verify Person ID" 
+                                         actionListener="#{noticeOfViolationBB.checkNOVRecipient}" 
+                                         ajax="true" 
+                                         update=    "notice-recipient-form:lookup-person-it
+                                                    msg-form:person-add-messages"/>
+                        <p:spacer height="5px"/>
+                        
+                        <h:outputText id="lookup-person-it" 
+                                      value="Lookup verification: #{!empty noticeOfViolationBB.retrievedManualLookupPerson?noticeOfViolationBB.retrievedManualLookupPerson.lastName:null}"/>
+
+                        <hr/>
+                        
+                        <p:commandButton action="ceCases" icon="fa fa-arrow-left"
+                                         value="cancel"/>
+                        
+                        <p:commandButton ajax="false" value="Continue to assemble letter" 
+                                             action="#{noticeOfViolationBB.storeRecipient}"
+                                             icon="fa fa-tasks"/>
+                    </h:form>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

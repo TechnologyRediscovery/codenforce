@@ -1,0 +1,370 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Open code enforcement cases</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="cases-view">
+                    <div class="mainContainer">
+
+                        <h:form id="cecases-messages-form">
+
+                            <h:messages id="cecases-messages-global"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+
+                        <h1><h:outputText value="Open cases in #{sessionBean.activeMuni.muniName}"/></h1>
+                        <h3>List builder:</h3>
+                        <h:outputText value="Filer#{caseProfileBB.ceCaseSearchParams.useIsOpen}"/>
+                        <h:outputText value="#{caseProfileBB.ceCaseSearchParams.isOpen}"/>
+
+
+                                    <p:dataTable
+                                        id="caseTable"
+                                        var="c"
+                                        filteredValue="#{caseProfileBB.filteredCaseList}"
+                                        rowKey="#{c.caseID}"
+                                        rowExpandMode="multiple"
+                                        widgetVar="ceViewTable"
+                                        value="#{caseProfileBB.caseList}"
+                                        tableStyleClass="primeDataTable">
+
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{c.caseID}"/>
+                                        </p:column>
+                                        <p:column width="15%" sortBy="#{c.property.address}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Property" />
+                                            </f:facet>
+                                            <h:outputText value="#{c.property.address}"/>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Name" />
+                                            </f:facet>
+                                            <h:outputText value="#{c.caseName}"/>
+                                        </p:column>
+                                        <p:column width="8%" sortBy="#{c.caseStage}"
+                                                  filterBy="#{c.caseStage}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Stage" />
+                                            </f:facet>
+                                            <h:outputText value="#{c.caseStage}"/>
+                                        </p:column>
+
+                                        <p:column width="20%"
+                                                  sortBy="#{c.casePhase.label}"
+                                                  filterBy="#{c.casePhase.label}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Phase" />
+                                            </f:facet>
+                                            <h:outputText value="#{c.casePhase.label}"/>
+                                        </p:column>
+
+                                        <p:column width="8%" sortBy="#{c.caseAge}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Age" />
+                                            </f:facet>
+                                            <h:outputText value="#{c.caseAge}"/>
+                                        </p:column>
+                                        <p:column width="8%" exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="manage" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-hand-o-right"
+                                                             actionListener="#{caseProfileBB.manageCECase(c)}" 
+                                                             ajax="true"
+                                                             update="
+                                                                case-details-form:header-id-ot
+                                                                case-details-form:header-type-ot
+                                                                case-details-form:header-addr-ot
+                                                                case-details-form:header-muni-ot
+                                                                case-details-form:selcase-id-ot
+                                                                case-details-form:selcase-addr-ot
+                                                                case-details-form:selcase-muni-ot
+                                                                case-details-form:selcase-stage-ot
+                                                                case-details-form:selcase-odate-it
+                                                                case-details-form:selcase-cdate-it
+                                                                case-details-form:selcase-age-it
+                                                                case-details-form:selcase-manager-it
+                                                                case-details-form:selcase-pacc
+                                                                case-details-form:selcase-access-sbcb
+                                                                case-details-form:selcase-forwardlinking-sbcb
+                                                                case-details-form:violationTable
+                                                             "/>
+                                        </p:column>
+                                    </p:dataTable>
+
+
+
+                                </h:form>
+                                
+                                <h:form id="case-details-form">
+
+                                    <h2>
+                                        Code Enforcement Case #<h:outputText id="header-id-ot" value="#{caseProfileBB.selectedCase.caseID}"/><br/> 
+                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.selectedCase.caseName}"/>
+                                        at <h:outputText id="header-addr-ot" value="#{caseProfileBB.selectedCase.property.address} "/>  
+                                        <h:outputText id="header-muni-ot" value="(#{caseProfileBB.selectedCase.property.muni.muniName})"/>  
+
+                                    </h2>
+
+                                    <div class="outlinedBox">
+
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd">
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Case ID:" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selcase-id-ot"  value="#{caseProfileBB.selectedCase.caseID}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Property:"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selcase-addr-ot" value="#{caseProfileBB.selectedCase.property.address}"/><br/>
+                                                    <h:outputText id="selcase-muni-ot" value="#{caseProfileBB.selectedCase.property.muni.muniName} (#{caseProfileBB.selectedCase.property.propertyUseType})"/><br/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Stage and Phase:" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selcase-stage-ot" value="#{caseProfileBB.selectedCase.caseStage}: #{caseProfileBB.selectedCase.casePhase.label} "/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Opening Date:"/>
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selcase-odate-it" value="#{caseProfileBB.selectedCase.originiationDatePretty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Closing Date:"/>
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.selectedCase.closingDatePretty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Age (Days)" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selcase-age-it" value="#{caseProfileBB.selectedCase.caseAge}" rendered="" />
+                                                </div>
+                                            </h:panelGroup>
+
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Manager:"/>
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selcase-manager-it" value="#{caseProfileBB.selectedCase.user.FName} #{caseProfileBB.selectedCase.user.LName}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+
+
+                                            <h:panelGroup>
+                                                
+                                                <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
+                                                <h:outputText id="selcase-pacc" value="#{caseProfileBB.selectedCase.publicControlCode}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
+                                                <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.selectedCase.paccEnabled}"
+                                                                         disabled="#{!sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+                                                    <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                                </p:selectBooleanCheckbox>
+                                                <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
+                                                <h:outputText value=" "/>
+                                                <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.selectedCase.paccEnabled}"
+                                                                         disabled="#{!sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+                                                    <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                                </p:selectBooleanCheckbox>
+                                                <p:spacer height="5px"/>
+
+                                            </h:panelGroup>
+
+                                        </h:panelGrid>
+
+                                    </div>
+                                    
+                                    <h3>code violations:  </h3>
+                                    
+                                        
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
+                                                     value="Add new code violation to case"
+                                                     icon="fa fa-plus"/>
+                                    <p:spacer height="15px"/>
+
+                                    <p:dataTable
+                                        id="violationTable"
+                                        var="v"
+                                        selectionMode="mulitiple"
+                                        selection="#{caseProfileBB.selectedViolations}"
+                                        rowKey="#{v.violationID}"
+                                        value="#{caseProfileBB.selectedCase.violationList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true">
+
+
+                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                        <p:column width="4%">
+                                            <p:rowToggler />
+                                        </p:column>
+                                        <p:column width="20%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Ordinance" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                        </p:column>
+
+                                        <p:column width="20">
+                                            <f:facet name="header">
+                                                <h:outputText value="Stip Comp Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                        </p:column>
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Days left" />
+                                            </f:facet>
+                                            <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+                                            
+                                        </p:column>
+
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Actual Comp Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.actualComplianceDate}"/>
+                                        </p:column>
+
+                                        <p:column width="5%">
+                                            <p:commandButton ajax="false" action="#{caseProfileBB.recordCompliance(v)}"
+                                                             icon="fa fa-check" />
+                                        </p:column>
+                                        
+                                        
+
+
+                                        <p:rowExpansion>
+                                            
+                                            <div class="outlinedBox">
+                                                <h3>Violation details</h3>
+                                                <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
+                                                                 value="Edit violation details"
+                                                                 icon="fa fa-edit"/>
+
+                                                <h:outputText value="ID: " />
+                                                <h:outputText value="#{v.violationID}"/>
+                                                
+                                                <h:outputText value="Citations: " />
+                                                <h:outputText value="#{v.citationsStringList}"/>
+
+                                                <h:outputText value="re-link" />
+                                                <p:commandButton icon="fa fa-link"
+                                                                 actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
+                                                                 ajax="true" oncomplete="PF('linkDialog').show()"/>
+
+                                                <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
+                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Penalty:"/>
+                                                <h:outputText value="#{v.penalty}"/>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Description: "/>
+                                                <h:outputText value="#{v.description}"/>
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Violation Notes: "/>
+                                                <h:outputText value="#{v.notes}" escape="false"/>
+                                            </div>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable> 
+                                    
+                                    
+                                    <h3>Notice letters</h3>
+                                    
+                                    
+                                    <h3>Citations</h3>
+                                    
+                                    
+                                    <h3>Events</h3>
+                                        
+
+
+                                    <h:outputLabel styleClass="bold" value="Available actions:"/>
+
+                                    <p:spacer height="5px"/>
+
+                                  
+
+
+
+                                        
+                                    <p:commandButton    id="manually-override-status-cb"
+                                                        value="Manually override case phase"
+                                                        rendered="#{sessionBean.accessKeyCard.hasEnfOfficialPermissions}"
+                                                        disabled="#{empty caseProfileBB.selectedCase}"
+                                                        icon="fa fa-gears"/>
+
+
+
+                                </h:form>
+                            </h:panelGroup>
+                            </h:panelGrid>
+
+
+
+                            <p:dialog       id="unknown_id"
+                                            height="650" width="700"
+                                            widgetVar="unknown-dialog-var"
+                                            closable="true" 
+                                            rendered="#{sessionBean.accessKeyCard.hasMuniStaffPermissions}">
+
+                            </p:dialog>
+
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
