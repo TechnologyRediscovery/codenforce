@@ -16,17 +16,21 @@
  */
 package com.tcvcog.tcvce.occupancy.integration;
 
-import java.sql.*;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
 import com.tcvcog.tcvce.occupancy.entities.OccInspecFee;
 import com.tcvcog.tcvce.occupancy.entities.OccInspecStatus;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
+import java.sql.Connection;
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -48,14 +52,65 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         return new ArrayList();
     }
     
-    public OccPermitApplication getOccPermitApplication(int applicationID){
-        return new OccPermitApplication();
+    public OccPermitApplication getOccPermitApplication(int applicationID) throws IntegrationException {
+        OccPermitApplication occpermitapp = new OccPermitApplication();
+        
+        // EDIT THIS STATEMENT, UTILISE getOccPermitApplicationReason();
+        String query = "SELECT applicationid, multiunit, reason_reasonid, submissiontimestamp, currentowner_personid, \n"
+                + "		contactperson_personid, newoccupant_personid, newowner_personid, \n"
+                + "		occupancyinspection_id, submitternotes, internalnotes, propertyunitid,\n"
+                + "		reasontitle, reasondescription, activereason\n"
+                + "FROM occupancypermitapplication\n"
+                + "	INNER JOIN occpermitapplicationreason ON occupancypermitapplication.reason_reasonid = occpermitapplicationreason.reasonid\n"
+                + "WHERE occupancypermitapplication.applicationid = ?;";
+        
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, applicationID);
+            rs= stmt.executeQuery();
+            
+            while (rs.next()) {
+                occpermitapp = generateOccPermitApplication(rs);
+            }
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyInspectionIntegrator.getOccPermitApplication | "
+                    + "Integration Error: Unable to retrieve occupancy permit application ", ex);
+        }
+        return occpermitapp;
     }
     
-    private OccPermitApplication generateApplication(ResultSet rs){
-        OccPermitApplication app = new OccPermitApplication();
-        
-        return app;
+    private OccPermitApplication generateOccPermitApplication(ResultSet rs) throws IntegrationException {
+        OccPermitApplication occpermitapp = new OccPermitApplication();
+        OccPermitApplicationReason reason = new OccPermitApplicationReason();
+        int applicationid;
+        PersonIntegrator pi = getPersonIntegrator();
+        try {
+            applicationid = rs.getInt("applicationid");
+            occpermitapp.setMultiUnit(rs.getBoolean("multiunit"));
+            occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
+            
+            // still need to set Person and OccPermitApplicationReason objects
+            
+            
+            
+           
+           
+           
+           
+           
+           
+           
+           
+            
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplication | "
+                    + "Integration Error: Unable to generate occupancy permit application ", ex);
+        }
+        return occpermitapp;
     }
     
     public void updateOccPermitApplication(OccPermitApplication application){

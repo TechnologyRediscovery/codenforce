@@ -23,41 +23,41 @@ package com.tcvcog.tcvce.occupancy.entities;
  */
 public class OccPermitApplicationReason {
     
-    private int reasonid;
-    private String reasontitle;
-    private String reasonDescription;
-    private boolean activereason;
+    private int id;
+    private String title;
+    private String description;
+    private boolean active;
 
-    public int getReasonid() {
-        return reasonid;
+    public int getId() {
+        return id;
     }
 
-    public void setReasonid(int reasonid) {
-        this.reasonid = reasonid;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getReasontitle() {
-        return reasontitle;
+    public String getTitle() {
+        return title;
     }
 
-    public void setReasontitle(String reasontitle) {
-        this.reasontitle = reasontitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getReasonDescription() {
-        return reasonDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setReasonDescription(String reasonDescription) {
-        this.reasonDescription = reasonDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public boolean isActivereason() {
-        return activereason;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setActivereason(boolean activereason) {
-        this.activereason = activereason;
+    public void setActive(boolean active) {
+        this.active = active;
     }
     
     
