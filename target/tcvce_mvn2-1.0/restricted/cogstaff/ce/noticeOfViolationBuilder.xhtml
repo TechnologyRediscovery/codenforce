@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Notice of Violation Builder</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+
+            <ui:define name="content">
+                <div class="mainContainer">
+
+                    <h:messages globalOnly="true"
+                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+
+
+                    <h:form id="noticeBuilderForm">
+                        <h1>Notice of violation builder</h1>
+                        <h2>Step 1: Verify code violation list</h2>
+                        <p> Kindly remove any violations you do not wish to include in the letter.</p>
+                        <p>Removals from this list ONLY apply to how this particular letter will be generated; the actual CE case remains untouched.</p>
+                        
+                        <p:dataTable
+                                        id="violation-table"
+                                        var="v"
+                                        rowKey="#{v.violationID}"
+                                        value="#{noticeOfViolationBB.activeVList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true"
+                                        rowStyleClass="spacier-rows">
+
+
+                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                        <p:column width="4%">
+                                            <p:rowToggler />
+                                        </p:column>
+
+                                        <p:column width="6%">
+                                            <p:commandButton ajax="true" action="#{noticeOfViolationBB.removeViolationFromList(v)}"
+                                                             value="remove" update="noticeBuilderForm:violation-table"
+                                                             icon="fa fa" />
+                                        </p:column>
+                                        <p:column width="20%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Ordinance" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                        </p:column>
+
+                                        <p:column width="20">
+                                            <f:facet name="header">
+                                                <h:outputText value="Stip Comp Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                        </p:column>
+                                        <p:column width="5%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Days left" />
+                                            </f:facet>
+                                            <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+
+                                        </p:column>
+
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Actual Comp Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{v.actualComplianceDate}"/>
+                                        </p:column>
+
+
+
+
+                                        <p:rowExpansion>
+
+                                            <div class="outlinedBox">
+                                                <h3>Violation details</h3>
+
+                                                <h:outputText value="ID: " />
+                                                <h:outputText value="#{v.violationID}"/>
+
+                                                <h:outputText value="Citations: " />
+                                                <h:outputText value="#{v.citationsStringList}"/>
+
+                                                <h:outputText value="re-link" />
+                                                <p:commandButton icon="fa fa-link"
+                                                                 actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
+                                                                 ajax="true" oncomplete="PF('linkDialog').show()"/>
+
+                                                <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
+                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                               #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                               #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                               #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                               #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Penalty:"/>
+                                                <h:outputText value="#{v.penalty}"/>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Description: "/>
+                                                <h:outputText value="#{v.description}"/>
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Violation Notes: "/>
+                                                <h:outputText value="#{v.notes}" escape="false"/>
+                                            </div>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable> 
+                        
+                        <p:spacer height="5px"/>
+                        
+                        <p:commandButton action="ceCases" icon="fa fa-arrow-left"
+                                         value="cancel"/>
+                        
+                        <p:commandButton action="#{noticeOfViolationBB.setupNewNotice}" icon="fa fa-user-plus"
+                                         value="next step: choose recipient" ajax="false" />
+                        <p:spacer height="5px"/>
+                        
+                    </h:form>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
