@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
@@ -36,6 +37,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.ZoneId;
@@ -45,6 +47,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -105,10 +108,26 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         imageFilenameMap.put(CasePhase.SecondaryPostHearingComplianceTimeframe, "stage3_postHearing.svg");
         imageFilenameMap.put(CasePhase.Closed, "stage3_closed.svg");
     }
+    
+    @PostConstruct
+    public void initBean(){
+        CaseCoordinator cc = getCaseCoordinator();
+        ceCaseSearchParams = cc.getDefaultSearchParamsCECase(getSessionBean().getActiveMuni());
+    }
 
+/**
+ * Primary injection point for setting the case which will be displayed in the right
+ * column (the manage object column) on cECases.xhtml
+ * @param c the case to be managed--comes from the data table row button
+ */
     public void manageCECase(CECase c) {
-        // replace any session case with this one
-//        getSessionBean().setcECase(null);
+        UserIntegrator ui = getUserIntegrator();
+        getSessionBean().setcECase(c);
+        try {
+            ui.logObjectView(getSessionBean().getFacesUser(), c);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         currentCase = c;
     }
 
@@ -127,7 +146,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Unable to add change public access code status",
-                    getResourceBundle(Constants.MESSAGE_BUNDLE).getString("systemLevelError")));
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
     }
 
@@ -142,8 +161,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String overrideCasePhase() {
         CaseCoordinator cc = getCaseCoordinator();
+        CaseIntegrator ci = getCaseIntegrator();
         try {
             cc.manuallyChangeCasePhase(currentCase, selectedCasePhase);
+            currentCase = ci.getCECase(currentCase.getCaseID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -158,6 +179,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                             "Please check with your system administrator"));
 
         }
+        
         return "";
     }
 
@@ -175,7 +197,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         if (!selectedViolations.isEmpty()) {
 
             // generate event for compliance with selected violations
-            EventCECase e = ec.generateViolationComplianceEvent(selectedViolations);
+            EventCECase e = ec.generateViolationComplianceEvent(cv);
 
             // when event is submitted, send violation list to c
             getSessionBean().setActiveEvent(e);
@@ -986,10 +1008,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @return the ceCaseSearchParams
      */
     public SearchParamsCECases getCeCaseSearchParams() {
-        SearchCoordinator sc = getSearchCoordinator();
-        if (ceCaseSearchParams == null) {
-            ceCaseSearchParams = sc.getDefaultSearchParamsCECase();
-        }
+        
         return ceCaseSearchParams;
     }
 

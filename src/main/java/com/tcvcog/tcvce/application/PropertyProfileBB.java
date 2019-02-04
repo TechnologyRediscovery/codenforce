@@ -149,6 +149,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return "propertyUpdate";
         
     }
+    
+        /**
+     * @return the propList
+     */
+    public ArrayList<Property> getPropList() {
+        return propList;
+    }
 
     
     /**
@@ -193,12 +200,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return allMunis;
     }
 
-    /**
-     * @return the propList
-     */
-    public ArrayList<Property> getPropList() {
-        return propList;
-    }
+
 
     /**
      * @return the filteredPropList

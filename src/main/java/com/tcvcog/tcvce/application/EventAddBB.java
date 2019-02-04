@@ -126,7 +126,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         // now check for persons to connect
         
         try {
-            cc.processCEEvent(ceCase, e);
+            cc.processCEEvent(ceCase, e, null);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully logged event.", ""));

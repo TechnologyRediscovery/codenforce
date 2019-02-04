@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 /**
@@ -28,7 +29,7 @@ import java.util.Objects;
  * 
  * @author Eric Darsow
  */
-public class Person implements Serializable{
+public class Person extends EntityUtils implements Serializable{
     
     private int personID;
     
@@ -38,6 +39,7 @@ public class Person implements Serializable{
     private int sourceID;
     private String sourceTitle;
     private User creator;
+    private LocalDateTime creationTimeStamp;
     
     // for backwards compatability
     
@@ -60,22 +62,28 @@ public class Person implements Serializable{
     
     private String addressZip;
     private String addressState;
-    private boolean addressOfResidence;
     
+    private boolean useSeparateMailingAddress;
     private String mailingAddressStreet;
     private String mailingAddressCity;
     private String mailingAddressZip;
     
     private String mailingAddressState;
     // postgres defaults this to true
-    private boolean mailingSameAsResidence;
+    
     private String notes;
     
     private LocalDateTime lastUpdated;
+    private String lastUpdatedString;
     
+    
+    private boolean canExpire;
     private LocalDateTime expiryDate;
+    private String expireString;
+    private java.util.Date expiryDateUtilDate;
     private String expiryNotes;
     private boolean active;
+    private User userLink;
     
     /**
      * Tenancy tracking
@@ -387,10 +395,10 @@ public class Person implements Serializable{
     }
 
     /**
-     * @return the addressOfResidence
+     * @return the useSeparateMailingAddress
      */
-    public boolean isAddressOfResidence() {
-        return addressOfResidence;
+    public boolean isUseSeparateMailingAddress() {
+        return useSeparateMailingAddress;
     }
 
     /**
@@ -421,12 +429,7 @@ public class Person implements Serializable{
         return mailingAddressState;
     }
 
-    /**
-     * @return the mailingSameAsResidence
-     */
-    public boolean isMailingSameAsResidence() {
-        return mailingSameAsResidence;
-    }
+   
 
     /**
      * @return the expiryNotes
@@ -466,10 +469,10 @@ public class Person implements Serializable{
     }
 
     /**
-     * @param addressOfResidence the addressOfResidence to set
+     * @param useSeparateMailingAddress the useSeparateMailingAddress to set
      */
-    public void setAddressOfResidence(boolean addressOfResidence) {
-        this.addressOfResidence = addressOfResidence;
+    public void setUseSeparateMailingAddress(boolean useSeparateMailingAddress) {
+        this.useSeparateMailingAddress = useSeparateMailingAddress;
     }
 
     /**
@@ -500,12 +503,7 @@ public class Person implements Serializable{
         this.mailingAddressState = mailingAddressState;
     }
 
-    /**
-     * @param mailingSameAsResidence the mailingSameAsResidence to set
-     */
-    public void setMailingSameAsResidence(boolean mailingSameAsResidence) {
-        this.mailingSameAsResidence = mailingSameAsResidence;
-    }
+    
 
     /**
      * @param expiryNotes the expiryNotes to set
@@ -564,12 +562,11 @@ public class Person implements Serializable{
         hash = 79 * hash + Objects.hashCode(this.addressCity);
         hash = 79 * hash + Objects.hashCode(this.addressZip);
         hash = 79 * hash + Objects.hashCode(this.addressState);
-        hash = 79 * hash + (this.addressOfResidence ? 1 : 0);
+        hash = 79 * hash + (this.useSeparateMailingAddress ? 1 : 0);
         hash = 79 * hash + Objects.hashCode(this.mailingAddressStreet);
         hash = 79 * hash + Objects.hashCode(this.mailingAddressCity);
         hash = 79 * hash + Objects.hashCode(this.mailingAddressZip);
         hash = 79 * hash + Objects.hashCode(this.mailingAddressState);
-        hash = 79 * hash + (this.mailingSameAsResidence ? 1 : 0);
         hash = 79 * hash + Objects.hashCode(this.notes);
         hash = 79 * hash + Objects.hashCode(this.lastUpdated);
         hash = 79 * hash + Objects.hashCode(this.expiryDate);
@@ -604,12 +601,10 @@ public class Person implements Serializable{
         if (this.businessEntity != other.businessEntity) {
             return false;
         }
-        if (this.addressOfResidence != other.addressOfResidence) {
+        if (this.useSeparateMailingAddress != other.useSeparateMailingAddress) {
             return false;
         }
-        if (this.mailingSameAsResidence != other.mailingSameAsResidence) {
-            return false;
-        }
+        
         if (this.active != other.active) {
             return false;
         }
@@ -689,6 +684,99 @@ public class Person implements Serializable{
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * @return the canExpire
+     */
+    public boolean isCanExpire() {
+        return canExpire;
+    }
+
+    /**
+     * @param canExpire the canExpire to set
+     */
+    public void setCanExpire(boolean canExpire) {
+        this.canExpire = canExpire;
+    }
+
+    /**
+     * @return the userLink
+     */
+    public User getUserLink() {
+        return userLink;
+    }
+
+    /**
+     * @param userLink the userLink to set
+     */
+    public void setUserLink(User userLink) {
+        this.userLink = userLink;
+    }
+
+    /**
+     * @return the creationTimeStamp
+     */
+    public LocalDateTime getCreationTimeStamp() {
+        return creationTimeStamp;
+    }
+
+    /**
+     * @param creationTimeStamp the creationTimeStamp to set
+     */
+    public void setCreationTimeStamp(LocalDateTime creationTimeStamp) {
+        this.creationTimeStamp = creationTimeStamp;
+    }
+
+    /**
+     * @return the expiryDateUtilDate
+     */
+    public java.util.Date getExpiryDateUtilDate() {
+        if(expiryDate != null){
+            expiryDateUtilDate = java.util.Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return expiryDateUtilDate;
+    }
+
+    /**
+     * @param edut
+     */
+    public void setExpiryDateUtilDate(java.util.Date edut) {
+        expiryDateUtilDate = edut;
+        expiryDate = edut.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        
+    }
+
+    /**
+     * @return the expireString
+     */
+    public String getExpireString() {
+        expireString = getPrettyDate(expiryDate);
+        return expireString;
+        
+    }
+
+    /**
+     * @param expireString the expireString to set
+     */
+    public void setExpireString(String expireString) {
+        this.expireString = expireString;
+    }
+
+    /**
+     * @return the lastUpdatedString
+     */
+    public String getLastUpdatedString() {
+        lastUpdatedString = getPrettyDate(lastUpdated);
+        return lastUpdatedString;
+    }
+
+    /**
+     * @param lastUpdatedString the lastUpdatedString to set
+     */
+    public void setLastUpdatedString(String lastUpdatedString) {
+        this.lastUpdatedString = lastUpdatedString;
     }
     
 
