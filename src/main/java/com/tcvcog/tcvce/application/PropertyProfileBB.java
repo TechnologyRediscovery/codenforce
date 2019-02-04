@@ -5,12 +5,13 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -57,7 +58,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private List<Property> filteredPropList;
     private UIInput addressInput;
     
+    private ArrayList<CEActionRequest> ceActionRequestList;
+
     private int selectedMuniCode;
+    private CECase selectedCECase;
+
 
     
     /**
@@ -66,6 +71,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public PropertyProfileBB() {
     }
     
+
      public void searchForProperties(ActionEvent event){
         System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
         PropertyIntegrator pi = new PropertyIntegrator();
@@ -276,6 +282,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @param addressInput the addressInput to set
      */
+
+    public void setSelectedCECase(CECase selectedCECase) {
+        this.selectedCECase = selectedCECase;
+    }
+
     public void setAddressInput(UIInput addressInput) {
         this.addressInput = addressInput;
     }
@@ -304,6 +315,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.filteredPersonList = filteredPersonList;
     }
 
+   
+ 
    
  
 }
