@@ -12,12 +12,13 @@ import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.primefaces.event.FileUploadEvent;
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIInput;
+import javax.faces.event.ActionEvent;
 
 /*
  * Copyright (C) 2018 Turtle Creek Valley
@@ -337,4 +338,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void setPhotoList(ArrayList<Photograph> photoList) {
         this.photoList = photoList;
     }
+
+   
+ 
+   
+ 
 }
