@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -84,7 +85,10 @@ public class CEActionRequest implements Serializable{
     // these are populated on the lookup when the linked
     // tables with the String values are selected
     
-
+    // list of photo id's associated with this request
+    // is there a better way? ask eric
+    private List<Integer> photoList;
+    
     /**
      * Creates a new instance of ActionRequest
      */
@@ -604,8 +608,22 @@ public class CEActionRequest implements Serializable{
     public void setCaseAttachmentTimeStamp(java.time.LocalDateTime caseAttachmentTimeStamp) {
         this.caseAttachmentTimeStamp = caseAttachmentTimeStamp;
     }
-    
+
+    /**
+     * @return the photoList
+     */
+    public List<Integer> getPhotoList() {
+        return photoList;
+    }
+
+    /**
+     * @param photoList the photoList to set
+     */
+    public void setPhotoList(List<Integer> photoList) {
+        this.photoList = photoList;
+    }
+
     
 
-   
+    
 }

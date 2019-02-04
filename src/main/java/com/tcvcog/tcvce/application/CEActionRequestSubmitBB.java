@@ -26,16 +26,22 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
+import org.primefaces.event.FileUploadEvent;
 /**
  *
  * @author cedba
@@ -92,6 +98,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private String form_requestor_addressZip;
     private String form_requestor_addressState;
     private java.util.Date currentDate;
+    
+    private List<Photograph> photoList;
+    private Photograph selectedPhoto;
 
     /**
      * Creates a new instance of ActionRequestBean
@@ -102,6 +111,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 .atZone(ZoneId.systemDefault()).toInstant());
         currentTabIndex = 0;
         System.out.println("ActionRequestBean.ActionRequestBean");
+        
+        // init new, empty photo list
+        this.photoList = new ArrayList<>();
     }
     
     public String getReturnValue(){
@@ -151,7 +163,60 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
     
     public String savePhotos(){
+        ImageServices is = getImageServices();
+        
+        for(Photograph photo : this.photoList){
+            
+            try { 
+                // update db entries with new descriptions
+                is.updatePhotoDescription(photo);
+                
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                                "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
+                                "Please call your municipal office and report your concern by phone."));
+                return "";
+            }
+        }
         return "requestorDetails";
+    }
+    
+    public void handlePhotoUpload(FileUploadEvent ev){
+        if(ev == null){
+            System.out.println("CEActionRequestBB.handlePhotoUpload | event: null");
+            return;
+        }
+        if(getSessionBean().getCeactionRequestForSubmission().getPhotoList() == null){
+            getSessionBean().getCeactionRequestForSubmission().setPhotoList(new ArrayList<Integer>());
+        }
+        
+        ImageServices is = getImageServices();
+        Photograph ph = new Photograph();
+        ph.setPhotoBytes(ev.getFile().getContents());
+        ph.setDescription("no description");
+        ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
+        ph.setTimeStamp(LocalDateTime.now());
+        // store photo on this bean
+        try {
+           getSessionBean().getCeactionRequestForSubmission().getPhotoList().add(is.storePhotograph(ph));
+        } catch (IntegrationException ex) {
+            System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | upload failed!\n" + ex);
+            return;
+        }
+        this.photoList.add(ph);
+        System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | upload succesful!");
+
+        // views that this function knows how to handle
+        // there's probably a better way to do this, some sort of view constants .java
+    //    String requestCEActionFlow1ViewID = "/public/services/requestCEActionFlow/requestCEActionFlow_photoUpload.xhtml";
+        
+        // get the current view to determine where we should link this photo
+    //    String curViewID = FacesContext.getCurrentInstance().getViewRoot().getViewId();
+    //    System.out.println("handlePhotoUpload | currViewID: " + curViewID);
+        
+        
     }
     
     
@@ -164,6 +229,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        ImageServices is = getImageServices();
         
         int submittedActionRequestID;
         
@@ -204,6 +270,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             submittedActionRequestID = ceari.submitCEActionRequest(req);
             getSessionBean().setActiveRequest(ceari.getActionRequestByRequestID(submittedActionRequestID));
             
+            // commit photos to db and link to request
+            for(Integer photoID : req.getPhotoList()){
+                is.commitPhotograph(photoID);
+                is.linkPhotoToActionRequest(photoID, submittedActionRequestID);
+            }
+                    
             // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -813,5 +885,33 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public void setCurrentDate(java.util.Date currentDate) {
         this.currentDate = currentDate;
+    }
+
+    /**
+     * @return the photoList
+     */
+    public List<Photograph> getPhotoList() {
+        return photoList;
+    }
+
+    /**
+     * @param photoList the photoList to set
+     */
+    public void setPhotoList(List<Photograph> photoList) {
+        this.photoList = photoList;
+    }
+
+    /**
+     * @return the selectedPhoto
+     */
+    public Photograph getSelectedPhoto() {
+        return selectedPhoto;
+    }
+
+    /**
+     * @param selectedPhoto the selectedPhoto to set
+     */
+    public void setSelectedPhoto(Photograph selectedPhoto) {
+        this.selectedPhoto = selectedPhoto;
     }
 }
