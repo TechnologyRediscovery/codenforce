@@ -847,6 +847,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         this.selectedPersonForAttachment = selectedPersonForAttachment;
     }
 
-   
-    
+
+
 }

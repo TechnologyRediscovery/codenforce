@@ -19,6 +19,8 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import com.tcvcog.tcvce.util.Constants;
+import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
 
 /**
  *
@@ -28,7 +30,7 @@ public class PhotoBB extends BackingBeanUtils implements Serializable {
 
     private int photoID;
     private Photograph photo;
-    private ArrayList<Photograph> phList;
+    private ArrayList<Photograph> photoList;
     
     /**
      * Creates a new instance of PhotoBB
@@ -38,26 +40,23 @@ public class PhotoBB extends BackingBeanUtils implements Serializable {
     }
     
     public StreamedContent displayPhoto(Photograph photo){
-        ImageServices is = getImageServices();
-        StreamedContent photoSC = null;
-        photoSC = new DefaultStreamedContent(
-            new ByteArrayInputStream(photo.getPhotoBytes()), "image/jpeg");
-        return photoSC;
+        System.out.println("PhotoBB | displayPhoto: in method");
+        FacesContext context = FacesContext.getCurrentInstance();
+        DefaultStreamedContent sc =null;
+        
+        if(context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+            sc = new DefaultStreamedContent();
+            return sc;
+        } else {
+            sc = new DefaultStreamedContent(new ByteArrayInputStream(photo.getPhotoBytes()), "image/png", Integer.toString(photo.getPhotoID()));
+            return sc;
+        }
     }
     
     public void deletePhoto(int phID){
         ImageServices is = getImageServices();
         try {
             is.deletePhotograph(phID);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-    }
-    
-    public void getAllPhotos(){
-        ImageServices is = getImageServices();
-        try {
-            this.setPhList(is.getAllPhotographs());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -72,29 +71,17 @@ public class PhotoBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void handleFileUpload(FileUploadEvent ev){
-        if(ev == null){
-            System.out.println("PhotoBB.handleFileUpload | event: null");
-            return;
-        }
-       
-        System.out.println("PhotoBB.handleFileUpload | event: " + ev.toString());
+    public void searchForPhotoByPropID(int propID){
+        // TODO: This is a copy/paste job, dont use it yet my G
+        ImageServices is = getImageServices();
         try {
-            
-            ImageServices is = getImageServices();
-            Photograph ph = new Photograph();
-            ph.setPhotoBytes(ev.getFile().getContents());
-            ph.setDescription("hello photo!");
-            ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
-            ph.setTimeStamp(LocalDateTime.now());
-            is.storePhotograph(ph);
+            this.setPhoto(is.getPhotograph(propID));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        this.getAllPhotos();
     }
     
-
+    
     /**
      * @return the photoID
      */
@@ -126,17 +113,17 @@ public class PhotoBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the phList
+     * @return the photoList
      */
-    public ArrayList<Photograph> getPhList() {
-        return phList;
+    public ArrayList<Photograph> getPhotoList() {
+        return photoList;
     }
 
     /**
-     * @param phList the phList to set
+     * @param photoList the photoList to set
      */
-    public void setPhList(ArrayList<Photograph> phList) {
-        this.phList = phList;
+    public void setPhotoList(ArrayList<Photograph> photoList) {
+        this.photoList = photoList;
     }
 
 }
