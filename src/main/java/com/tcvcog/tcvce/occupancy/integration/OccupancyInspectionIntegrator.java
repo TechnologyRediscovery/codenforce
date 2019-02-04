@@ -53,13 +53,11 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     }
     
     public OccPermitApplication getOccPermitApplication(int applicationID) throws IntegrationException {
-        OccPermitApplication occpermitapp = null;
-        
-        // EDIT THIS STATEMENT, UTILISE getOccPermitApplicationReason();
+        OccPermitApplication occpermitapp = null;     
         String query = "SELECT applicationid, multiunit, reason_reasonid, submissiontimestamp, "
-                + "currentowner_personid, contactperson_personid, newoccupant_personid, "
+                + "currentowner_personid, contactperson_personid, "
                 + "newowner_personid, occupancyinspection_id, submitternotes, internalnotes, "
-                + "propertyunitid, reasontitle, reasondescription, activereason\n"
+                + "propertyunitid\n"
                 + "FROM occupancypermitapplication\n"
                 + "WHERE occupancypermitapplication.applicationid = ?;";
         
@@ -87,17 +85,16 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         PersonIntegrator pi = getPersonIntegrator();
         try {
             occpermitapp.setId(rs.getInt("applicationid"));
-            occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("applicationid")));
+            occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("reasonid")));
             occpermitapp.setMultiUnit(rs.getBoolean("multiunit"));
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
-            occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("reasonid")));
             occpermitapp.setCurrentOwner(pi.getPerson(rs.getInt("currentowner_personid")));
             occpermitapp.setContactPerson(pi.getPerson(rs.getInt("contactperson_personid")));
+            occpermitapp.setNewOccupants(pi.getOccPermitAppPersons(rs.getInt("applicationid")));
             occpermitapp.setNewOwner(pi.getPerson(rs.getInt("newowner_personid")));
             occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
-            
-//          occpermitapp.setNewOccupants(newOccupants); how does this work in db? 1/31/2019 DP
+            occpermitapp.setPropertyUnitId(rs.getString("propertyunitid"));            
       
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplication | "
@@ -106,12 +103,42 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         return occpermitapp;
     }
     
-    public void updateOccPermitApplication(OccPermitApplication application){
+    public void updateOccPermitApplication(OccPermitApplication application) throws IntegrationException{
+        String query = "UPDATE public.occupancypermitapplication"
+                + "SET multiunit=?, reason_reasonid=?, submissiontimestamp=?, "
+                + "currentowner_personid=?, contactperson_personid=?, "
+                + "newowner_personid=?, submitternotes=?, internalnotes=?, propertyunitid=?"
+                + "WHERE occupancypermitapplication.applicationid = ?;";
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setBoolean(1,application.isMultiUnit());
+            stmt.setInt(2,application.getReason().getId());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
+            stmt.setInt(4,application.getCurrentOwner().getPersonID());
+            stmt.setInt(5,application.getContactPerson().getPersonID());
+            stmt.setInt(6,application.getNewOwner().getPersonID());
+            stmt.setString(7,application.getSubmissionNotes());
+            stmt.setString(8,application.getInternalNotes());
+            stmt.setString(9,application.getPropertyUnitId());
+            stmt.setInt(10,application.getId());           
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyInspectionIntegrator.updateOccPermitApplication"
+                    + " | IntegrationError: Unable to update occupancy permit application ", ex);
+        } finally{
+            if (con != null) { try { con.close();} catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
         
     }
     
     public void deleteOccPermitApplication(OccPermitApplication application){
-        
+        // leave blank for now. Do we need? DP 2/4/2019
     }
     
     public OccPermitApplicationReason getOccPermitApplicationReason(int reasonId) throws IntegrationException{

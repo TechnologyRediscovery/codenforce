@@ -568,17 +568,18 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     
-   public ArrayList<Person> getPersonList(int[] people) throws IntegrationException {
+   public ArrayList<Person> getPersonList(ArrayList<Integer> people) throws IntegrationException {
         ArrayList<Person> list = new ArrayList<>();
 
         // loop through the array of integers provided and ask
         // our getPersonByID() method for a person object associated with
         // each id
-        for (int i = 0; i < people.length; i++) {
-            list.add(PersonIntegrator.this.getPerson(people[i]));
+        
+        for (int personId: people){
+            list.add(PersonIntegrator.this.getPerson(personId));
         }
         return list;
-    } // close getPersonListe()
+    } // close getPersonList()
 
     /**
      * Updates a given record for a person in the database. Will throw an error
@@ -773,6 +774,32 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     public HashMap getPersonMapByCaseID(int caseID) {
 
         return new HashMap();
+    }
+    
+    public ArrayList<Person> getOccPermitAppPersons(int applicationID) throws IntegrationException{
+        String query = "SELECT person_personid FROM occpermitapplicationperson WHERE permitapp_applicationid = ?";
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;        
+        ArrayList<Integer> personIDs = new ArrayList();
+        ArrayList<Person> persons = new ArrayList();
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, applicationID);
+            rs = stmt.executeQuery();
+            while (rs.next()){
+                personIDs.add(rs.getInt("person_personid"));
+            }
+            persons = getPersonList(personIDs);
+            
+            
+        } catch (SQLException ex) {
+            throw new IntegrationException("PersonIntegrator.getOccPermitAppPersons | Unable to "
+                    + "retrieve person(s) for given applicationID ", ex);
+        }
+        
+        return persons;
     }
 
     public void updatePersonNotes(Person p) throws IntegrationException {
