@@ -114,7 +114,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, personId);
-//            System.out.println("PersonIntegrator.getPerson | sql: " + s);
 
             rs = stmt.executeQuery();
 
@@ -563,20 +562,15 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      *
      * @return a linked list of person objects that can be used for display and
      * selection
-     * @param people an integer array containing Person id numbers to be
-     * converted into a ArrayList of Person objects for display in the view
+     * @param peopleIDs
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     
    public ArrayList<Person> getPersonList(ArrayList<Integer> peopleIDs) throws IntegrationException {
         ArrayList<Person> list = new ArrayList<>();
-
-        // loop through the array of integers provided and ask
-        // our getPersonByID() method for a person object associated with
-        // each id
         
         for (int personId: peopleIDs){
-            list.add(PersonIntegrator.this.getPerson(personId));
+            list.add(getPerson(personId));
         }
         return list;
     } // close getPersonList()

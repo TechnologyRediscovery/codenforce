@@ -43,13 +43,64 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         
     }
     
-    public void insertOccPermitApplication(OccPermitApplication application){
+    public void insertOccPermitApplication(OccPermitApplication application) throws IntegrationException{
+        String query = "INSERT INTO public.occupancypermitapplication(applicationid, multiunit, "
+                + "reason_reasonid, submissiontimestamp, currentowner_personid, "
+                + "contactperson_personid, newowner_personid, "
+                + "submitternotes, internalnotes, propertyunitid) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         
+        Connection con = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, application.getId());
+            stmt.setBoolean(2, application.isMultiUnit());
+            stmt.setInt(3, application.getReason().getId());
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
+            stmt.setInt(5, application.getCurrentOwner().getPersonID());
+            stmt.setInt(6, application.getContactPerson().getPersonID());
+            stmt.setInt(7, application.getNewOwner().getPersonID());
+            stmt.setString(8, application.getSubmissionNotes());
+            stmt.setString(9, application.getInternalNotes());
+            stmt.setString(10, application.getPropertyUnitId());
+            
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyInspectionIntegraton.insertOccPermitApplication"
+                    + "| IntegrationError: unable to insert occupancy permit application ", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
     }
     
-    public ArrayList<OccPermitApplicationReason> getOccPermitApplicationReasons(){
+    public ArrayList<OccPermitApplicationReason> getOccPermitApplicationReasons() throws IntegrationException{
+        OccPermitApplicationReason reason = null;
+        ArrayList<OccPermitApplicationReason> reasons = new ArrayList<>();
+        String query = "SELECT reasonid, reasontitle, reasondescription, activereason "
+                + "FROM public.occpermitapplicationreason;";
         
-        return new ArrayList();
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try{
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                reason = generateOccPermitApplicationReason(rs);
+                reasons.add(reason);
+            }            
+            
+        } catch(SQLException ex) {
+            throw new IntegrationException("OccupancyInspectionIntegrator.getOccPermitApplicationReasons "
+                    + "| IntegrationException: Unable to get occupancy permit application reasons ", ex);
+        }
+        
+        return reasons;
     }
     
     public OccPermitApplication getOccPermitApplication(int applicationID) throws IntegrationException {
@@ -75,7 +126,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
             }
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyInspectionIntegrator.getOccPermitApplication | "
-                    + "Integration Error: Unable to retrieve occupancy permit application ", ex);
+                    + "IntegrationException: Unable to retrieve occupancy permit application ", ex);
         }
         return occpermitapp;
     }
@@ -98,7 +149,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
       
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplication | "
-                    + "Integration Error: Unable to generate occupancy permit application ", ex);
+                    + "IntegrationException: Unable to generate occupancy permit application ", ex);
         }
         return occpermitapp;
     }
@@ -129,7 +180,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
             
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyInspectionIntegrator.updateOccPermitApplication"
-                    + " | IntegrationError: Unable to update occupancy permit application ", ex);
+                    + " | IntegrationException: Unable to update occupancy permit application ", ex);
         } finally{
             if (con != null) { try { con.close();} catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -163,7 +214,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
             
         } catch(SQLException ex) {
             throw new IntegrationException("OccupancyInspectionIntegrator.getOccPermitApplicationReason | "
-                    + "Integration Error: Unable to get occupancy permit application reason ", ex);            
+                    + "IntegrationException: Unable to get occupancy permit application reason ", ex);            
         }
         
         return occpermitappreason;
