@@ -568,14 +568,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     
-   public ArrayList<Person> getPersonList(ArrayList<Integer> people) throws IntegrationException {
+   public ArrayList<Person> getPersonList(ArrayList<Integer> peopleIDs) throws IntegrationException {
         ArrayList<Person> list = new ArrayList<>();
 
         // loop through the array of integers provided and ask
         // our getPersonByID() method for a person object associated with
         // each id
         
-        for (int personId: people){
+        for (int personId: peopleIDs){
             list.add(PersonIntegrator.this.getPerson(personId));
         }
         return list;
