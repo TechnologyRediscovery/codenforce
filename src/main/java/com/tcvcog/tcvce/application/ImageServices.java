@@ -184,7 +184,7 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.photodoc(\n" +
                         "            photodocid, photodocdescription, photodocdate, photodoctype_typeid, \n" +
-                        "            photodocblob, photodoccommited)\n" +
+                        "            photodocblob, photodoccommitted)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
                         "            ?, ?);";
         
@@ -227,7 +227,7 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
     public void commitPhotograph(int photoID) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  " UPDATE public.photodoc\n" +
-                        " SET photodoccommited = true\n" +
+                        " SET photodoccommitted = true\n" +
                         " WHERE photodocid = ?;";
         
         PreparedStatement stmt = null;
