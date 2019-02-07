@@ -17,16 +17,95 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.occupancy.entities.OccPermit;
+import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
- * @author Eric C. Darsow
+ * @author Dominic Pimpinella
  */
-public class PropertyCoordinator {
+public class PropertyCoordinator extends BackingBeanUtils implements Serializable {
 
+    private final String DEFAULTUNITNUMBER = "0";
+    private final boolean DEFAULTRENTAL = false;
+    
     /**
      * Creates a new instance of PropertyUnitCoordinator
      */
     public PropertyCoordinator() {
     }
+    
+    public Property getNewProperty(){
+        Property prop = new Property();
+        return prop;
+    }
+    
+    /**
+     * This method generates a skeleton PropertyUnit with logical, preset defaults, including
+     * empty lists.
+     * @return 
+     */
+    public PropertyUnit getNewPropertyUnit(){
+        PropertyUnit propUnit = new PropertyUnit();
+        
+        propUnit.setUnitNumber(DEFAULTUNITNUMBER);
+        propUnit.setRental(DEFAULTRENTAL);
+        propUnit.setPropertyUnitPeople(new ArrayList<Person>());
+        propUnit.setOccupancyPermitList(new ArrayList<OccPermit>());
+
+        return propUnit;
+    }
+    
+    public PropertyWithLists getNewPropertyWithLists(){
+        PropertyWithLists propWithLists = new PropertyWithLists();
+        return propWithLists;
+    }
+    
+    /**
+     * 
+     * @param prop
+     * @return PropertyWithLists object
+     */
+    public PropertyWithLists checkPropertyForUnits(Property prop){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyWithLists propWithLists = pi.getNewPropertyWithLists();
+        
+        try{
+            propWithLists = pi.getPropertyWithLists(prop.getPropertyID());
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        // Removes the default, automatically generated PropertyUnit        
+        ArrayList<PropertyUnit> unitList = propWithLists.getUnitList();
+        PropertyUnit defaultUnit = null;
+        for(PropertyUnit unit:unitList){
+            if(unit.getUnitNumber().equals("-1")){
+            defaultUnit = unit;
+            }
+        }
+        unitList.remove(defaultUnit);        
+
+        return propWithLists;
+    }
+    
+    public ArrayList<PersonType> generatePersonTypeRequirements(OccPermitApplication occpermitapp){
+        
+        
+        return new ArrayList<>();
+    }
+    
     
 }
