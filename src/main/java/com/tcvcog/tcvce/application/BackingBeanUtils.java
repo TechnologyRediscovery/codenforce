@@ -51,6 +51,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 // system integrators
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
+import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.sql.SQLException;
@@ -110,6 +111,7 @@ public class BackingBeanUtils implements Serializable{
     private OccupancyInspectionIntegrator occupancyInspectionIntegrator;
     private OccupancyPermitIntegrator occupancyPermitIntegrator;
     private PaymentIntegrator paymentIntegrator;
+    private OccupancyCoordinator occupancyCoordinator;
     
     // system integrators
     private SystemIntegrator systemIntegrator;
@@ -817,6 +819,24 @@ public class BackingBeanUtils implements Serializable{
      */
     public void setPropertyCoordinator(PropertyCoordinator propertyCoordinator) {
         this.propertyCoordinator = propertyCoordinator;
+    }
+
+    /**
+     * @return the occupancyCoordiator
+     */
+    public OccupancyCoordinator getOccupancyCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{occupancyCoordinator}", OccupancyCoordinator.class);
+        occupancyCoordinator = (OccupancyCoordinator) ve.getValue(context.getELContext());
+        return occupancyCoordinator;
+    }
+
+    /**
+     * @param occupancyCoordiator the occupancyCoordiator to set
+     */
+    public void setOccupancyCoordinator(OccupancyCoordinator occupancyCoordiator) {
+        this.occupancyCoordinator = occupancyCoordiator;
     }
 
        
