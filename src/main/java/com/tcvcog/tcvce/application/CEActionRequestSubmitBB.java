@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.util.Date;
 import java.io.Serializable;
@@ -180,7 +181,17 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 return "";
             }
         }
+        // before moving onto the person page, get a person's skeleton from the coordinator, put it
+        // in the session for use on the next page
+        setupPersonEntry();
         return "requestorDetails";
+    }
+    
+    private void setupPersonEntry(){
+        PersonCoordinator pc = getPersonCoordinator();
+        Person p = pc.getNewPersonSkeleton(getSessionBean().getCeactionRequestForSubmission().getMuni());
+        p.setMuni(getSessionBean().getCeactionRequestForSubmission().getMuni());
+        getSessionBean().setPersonForCEActionRequestSubmission(p);
     }
     
     public void handlePhotoUpload(FileUploadEvent ev){
@@ -230,6 +241,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         ImageServices is = getImageServices();
+        PersonIntegrator pi = getPersonIntegrator();
         
         int submittedActionRequestID;
         
@@ -239,13 +251,20 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-        int personID = storeActionRequestorPerson(getSessionBean().getCeactionRequestForSubmission().getActionRequestorPerson());
+        int personID = storeActionRequestorPerson(getSessionBean().getPersonForCEActionRequestSubmission());
         
-        req.setPersonID(personID);
+        try {
+            System.out.println("CEActionRequstsSubmitBB.submitActionRequest | inserting personID " + personID);
+            req.setActionRequestorPerson(pi.getPerson(personID));
+        } catch (IntegrationException ex) {
+            System.out.println("CEActionRequestSubmitBB.submitActionRequest | Person insert error");
+            System.out.println(ex);
+        }
         
         int controlCode = getControlCodeFromTime();
         req.setRequestPublicCC(controlCode);
         
+        // all requests now are required to be at a known address
         req.setIsAtKnownAddress(true);
         
 //        if (form_atSpecificAddress){
@@ -296,6 +315,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     /**
      * Coordinates the active tab index based on the status of various
      * form fields. it's not pretty, but it's functional
+     * @deprecated 
      */
     private void manageTabs(){
         System.out.println("ActionRequestBean | manageTab | prop: " + selectedProperty);
@@ -333,32 +353,32 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
     public String populateActionRequestorPerson(){
         
-        currentPerson = new Person();
-        currentPerson.setPersonType(submittingPersonType);
-        currentPerson.setMuni(getSessionBean().getCeactionRequestForSubmission().getMuni());
-        
-        currentPerson.setFirstName(form_requestorFName);
-        currentPerson.setLastName(form_requestorLName);
-        currentPerson.setJobTitle(form_requestorJobtitle);
-        
-        currentPerson.setPhoneCell(form_requestor_phoneCell);
-        currentPerson.setPhoneHome(form_requestor_phoneHome);
-        currentPerson.setPhoneWork(form_requestor_phoneWork);
-        
-        currentPerson.setEmail(form_requestor_email);
-        currentPerson.setAddressStreet(form_requestor_addressStreet);
-        currentPerson.setAddressCity(form_requestor_addressCity);
-        currentPerson.setAddressZip(form_requestor_addressZip);
-        currentPerson.setAddressState(form_requestor_addressState);
-        
-        currentPerson.setNotes("[System-Generated] This person was created "
-                + "from the code enforcement action request form");
-        
-        currentPerson.setActive(true);
-        currentPerson.setUnder18(false);
-        currentPerson.setVerifiedBy(null);
-        
-        getSessionBean().getCeactionRequestForSubmission().setActionRequestorPerson(currentPerson);
+//        currentPerson = new Person();
+//        currentPerson.setPersonType(submittingPersonType);
+//        currentPerson.setMuni(getSessionBean().getCeactionRequestForSubmission().getMuni());
+//        
+//        currentPerson.setFirstName(form_requestorFName);
+//        currentPerson.setLastName(form_requestorLName);
+//        currentPerson.setJobTitle(form_requestorJobtitle);
+//        
+//        currentPerson.setPhoneCell(form_requestor_phoneCell);
+//        currentPerson.setPhoneHome(form_requestor_phoneHome);
+//        currentPerson.setPhoneWork(form_requestor_phoneWork);
+//        
+//        currentPerson.setEmail(form_requestor_email);
+//        currentPerson.setAddressStreet(form_requestor_addressStreet);
+//        currentPerson.setAddressCity(form_requestor_addressCity);
+//        currentPerson.setAddressZip(form_requestor_addressZip);
+//        currentPerson.setAddressState(form_requestor_addressState);
+//        
+//        currentPerson.setNotes("[System-Generated] This person was created "
+//                + "from the code enforcement action request form");
+//        
+//        currentPerson.setActive(true);
+//        currentPerson.setUnder18(false);
+//        currentPerson.setVerifiedBy(null);
+//        
+//        getSessionBean().getCeactionRequestForSubmission().setActionRequestorPerson(currentPerson);
         
         return "reviewAndSubmit";
         
@@ -371,6 +391,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         try {
             insertedPersonID = personIntegrator.insertPerson(p);
+            System.out.println("CEActionReqeustSubmitBB.storeActionRequestorPerson | PersonID " + insertedPersonID);
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
