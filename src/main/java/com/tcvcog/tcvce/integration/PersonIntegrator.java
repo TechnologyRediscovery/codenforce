@@ -395,28 +395,28 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         int lastID;
         
-            String query = "INSERT INTO public.person(\n" +
+            String query = "INSERT INTO public.person(" +
                     " personid, persontype, muni_municode, " +
-                    " fname, lname, jobtitle, \n" +
+                    " fname, lname, jobtitle, " +
                     " phonecell, phonehome, phonework, " +
-                    " email, address_street, address_city, \n" +
+                    " email, address_street, address_city, " +
                     " address_state, address_zip, notes, " +
-                    " lastupdated, expirydate, isactive, \n" +
+                    " lastupdated, expirydate, isactive, " +
                     " isunder18, humanverifiedby, compositelname, " +
                     " sourceid, creator, businessentity, " +
-                    " mailing_address_street, mailing_address_city, \n" +
-                    " mailing_address_zip, mailing_address_state, useseparatemailingaddr, \n" +
-                    " expirynotes, creationtimestamp, canexpire, userlink)\n" +
+                    " mailing_address_street, mailing_address_city, " +
+                    " mailing_address_zip, mailing_address_state, useseparatemailingaddr, " +
+                    " expirynotes, creationtimestamp, canexpire, userlink) " +
                     " VALUES (DEFAULT, CAST (? AS persontype), ?, " //1-2
-                    + "?, ?, ?, \n" + //3-5, through jobtitle
+                    + "?, ?, ?, " + //3-5, through jobtitle
                     " ?, ?, ?, "
-                    + "?, ?, ?, \n" +
+                    + "?, ?, ?, " +
                     " ?, ?, ?, " // through notes
-                    + "?, ?, ?, \n" +
+                    + "?, ?, ?, " +
                     " ?, ?, ?," // through 20
-                    + "?, ?, ?, \n" 
-                    + "?, ?," // through 25, mailing_address_city
-                    + "?, ?, ? "
+                    + "?, ?, ?, " 
+                    + "?, ?, " // through 25, mailing_address_city
+                    + "?, ?, ?, "
                     + "?, ?, ?, ?);"; // through 32
 
         PreparedStatement stmt = null;

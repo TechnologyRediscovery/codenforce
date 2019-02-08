@@ -14,9 +14,9 @@
         <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <div class="mainContainer">
-9
+
                     <f:view id="enforcableCodeElementsInsSetManage">
-                        <h:outputLink value="codeSetManage.xhtml">&lt;--Return to set manager</h:outputLink>
+                        <h:outputLink value="codeSetManage.xhtml">&lt;--Return to Code Book manager</h:outputLink>
                         <h2>Enforceable code elements in code set: <h:outputText value="#{codeSetElementBB.currentCodeSet.codeSetName}"/></h2>
                         <h:messages globalOnly="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
@@ -236,7 +236,7 @@
                             <p:commandButton 
                                 ajax="false" tabindex="2" icon="fa fa-bomb"
                                 value="Nuke Selected Element from code set (Along with all its enforcability data!)"
-                                id="addElementToSetButton"
+                                id="addElementToSetButton" disabled="true"
                                 action="#{codeSetElementBB.nukeECE}" />
 
                         </h:form>

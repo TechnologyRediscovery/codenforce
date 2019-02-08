@@ -72,6 +72,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     /* *** Code Enf Action Request Session Shelves ***  */
     
+    private Person personForCEActionRequestSubmission;
+    
     // temporary
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
@@ -503,6 +505,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the facesUser
      */
+    @Override
     public User getFacesUser() {
         return facesUser;
     }
@@ -510,6 +513,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @param facesUser the facesUser to set
      */
+    @Override
     public void setFacesUser(User facesUser) {
         this.facesUser = facesUser;
     }
@@ -526,6 +530,21 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setActivePersonList(List<Person> activePersonList) {
         this.activePersonList = activePersonList;
+    }
+
+   
+    /**
+     * @return the personForCEActionRequestSubmission
+     */
+    public Person getPersonForCEActionRequestSubmission() {
+        return personForCEActionRequestSubmission;
+    }
+
+    /**
+     * @param personForCEActionRequestSubmission the personForCEActionRequestSubmission to set
+     */
+    public void setPersonForCEActionRequestSubmission(Person personForCEActionRequestSubmission) {
+        this.personForCEActionRequestSubmission = personForCEActionRequestSubmission;
     }
     
 }
