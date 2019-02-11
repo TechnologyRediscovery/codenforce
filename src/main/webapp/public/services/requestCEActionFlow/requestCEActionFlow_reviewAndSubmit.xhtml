@@ -87,7 +87,33 @@
                                                 <h:outputText id="selr-pers-email" value="#{sessionBean.ceactionRequestForSubmission.actionRequestorPerson.email}"/>
                                             </div>
                                         </h:panelGroup>
-
+                                
+                                        <f:facet name="footer" class="leftalign">
+                                            <h:outputLabel styleClass="bold" value="Photos: "/>
+                                            <p:spacer height="5px"/>
+                                            <p:dataTable
+                                                id="photoTable"
+                                                var="photoid"
+                                                value="#{sessionBean.ceactionRequestForSubmission.photoList}"
+                                                rowKey="#{photoid}"
+                                                tableStyleClass="primeDataTable"
+                                                draggableRows="false" tabindex="6">
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Photo"/>
+                                                    </f:facet>
+                                                    <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                        <f:param name="photoID" value="#{photoid}"/>
+                                                    </p:graphicImage>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Description"/>
+                                                    </f:facet>
+                                                    <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </f:facet>
 
 
                                         <f:facet name="footer" class="leftalign">
