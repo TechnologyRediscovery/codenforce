@@ -231,6 +231,7 @@
                                                              req-details-form:selr-notes-internal
                                                              req-details-form:selr-notes-muni
                                                              req-details-form:selr-notes-public
+                                                             req-details-form:selr-photos
                                                              req-details-form:open-new-case-cb
                                                              req-details-form:attach-to-case-cb
                                                              req-details-form:no-violation-found-cb
@@ -444,6 +445,19 @@
                                                 <h:outputText id="selr-descr" escape="false" value="#{cEActionRequestsBB.selectedRequest.requestDescription}"/>
                                             </div>
                                             
+                                            <p:spacer height="5px"/>
+                                            <hr />
+                                            <p:spacer height="5px"/>
+                                            
+                                            <h:outputLabel id="selr-photos" styleClass="bold" value="Photos on request: #{cEActionRequestsBB.selectedRequest.photoList.size()}"/>
+                                            <p:commandButton onclick="PF('photo-dialog').show()" 
+                                                             icon="fa fa-pencil-square-o"
+                                                             value="view photos" 
+                                                             styleClass="noFill button-size-small"
+                                                             update="photo-form:photoTable"
+                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
+                                            
+
                                             <p:spacer height="5px"/>
                                             <hr />
                                             <p:spacer height="5px"/>
@@ -1137,7 +1151,7 @@
                         
                         <p:confirmDialog message="Attach municipality message" 
                                          severity="alert" widgetVar="muni-message-dialog"
-                                         closable="true"
+                                         closable="true" responsive="true"
                                          rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
 
                             <h:form id="muni-message-form">
@@ -1180,6 +1194,55 @@
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
                                                  onclick="PF('public-message-dialog').hide()"/>
+                            </h:form>
+                        </p:confirmDialog>
+                        
+                        <p:confirmDialog message="Photos attached to action request" 
+                                         severity="alert" widgetVar="photo-dialog"
+                                         closable="false"
+                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+
+                            <h:form id="photo-form">
+                                
+                                <p:dataTable
+                                                id="photoTable"
+                                                var="photoid"
+                                                value="#{cEActionRequestsBB.selectedRequest.photoList}"
+                                                rowKey="#{photoid}"
+                                                tableStyleClass="primeDataTable"
+                                                draggableRows="false" tabindex="6">
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Manage"/>
+                                                    </f:facet>
+                                                    <p:commandButton ajax="true" 
+                                                                     actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
+                                                                     value="Delete" 
+                                                                     icon="fa fa-bomb"
+                                                                     rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                                     update=":photo-form:photoTable"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Photo"/>
+                                                    </f:facet>
+                                                    <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                        <f:param name="photoID" value="#{photoid}"/>
+                                                    </p:graphicImage>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Description"/>
+                                                    </f:facet>
+                                                    <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                                </p:column>
+                                </p:dataTable>
+                                
+                                <p:spacer height="15px"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Continue" 
+                                                 update="req-details-form:selr-photos"
+                                                 onclick="PF('photo-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
                         

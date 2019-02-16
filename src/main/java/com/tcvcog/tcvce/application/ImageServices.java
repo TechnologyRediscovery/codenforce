@@ -57,9 +57,22 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
         // TODO: delete entry in property helper table
         Connection con = getPostgresCon();
         String query = "DELETE" +
-                        "  FROM public.photodoc WHERE photodocid = ?;";
+                        "  FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ?;";
         
         PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photoID);
+            stmt.executeQuery();
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting new photo", ex);
+        }
+        
+        query = "DELETE FROM public.photodoc WHERE photodocid = ?;";
+        
+        stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
