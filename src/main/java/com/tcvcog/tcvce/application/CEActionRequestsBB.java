@@ -437,6 +437,21 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         
     }
     
+    public void deletePhoto(int photoID){
+        for(Integer pid : this.selectedRequest.getPhotoList()){
+            if(pid.compareTo(photoID) == 0){
+                this.selectedRequest.getPhotoList().remove(pid);
+                break;
+            }
+        }
+        ImageServices is = getImageServices();
+        try {
+            is.deletePhotograph(photoID);
+        } catch (IntegrationException ex) {
+            System.out.println("CEActionRequessBB.deletePhotograph | " + ex);
+        }
+    }
+    
     public void manageActionRequest(CEActionRequest req){
         System.out.println("ActionRequestManagebb.manageActionRequest req: " + req.getRequestID());
         selectedRequest = req;
