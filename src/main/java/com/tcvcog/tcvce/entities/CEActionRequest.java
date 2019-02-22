@@ -84,7 +84,6 @@ public class CEActionRequest implements Serializable{
     // tables with the String values are selected
     
     // list of photo id's associated with this request
-    // is there a better way? ask eric
     private List<Integer> photoList;
     
     /**
@@ -591,6 +590,7 @@ public class CEActionRequest implements Serializable{
      * @return the photoList
      */
     public List<Integer> getPhotoList() {
+        System.out.println("CEActionRequest | photoList = " + photoList.size());
         return photoList;
     }
 

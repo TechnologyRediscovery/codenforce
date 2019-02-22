@@ -195,7 +195,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         ph.setDescription("no description");
         ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
         ph.setTimeStamp(LocalDateTime.now());
-        // store photo on this bean
+        // store photo on the request (by id)
         try {
            getSessionBean().getCeactionRequestForSubmission().getPhotoList().add(is.storePhotograph(ph));
         } catch (IntegrationException ex) {
