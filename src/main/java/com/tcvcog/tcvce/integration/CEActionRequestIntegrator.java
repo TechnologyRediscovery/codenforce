@@ -193,7 +193,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             }
 
             stmt.setInt(4, actionRequest.getIssueType_issueTypeID());
-            stmt.setInt(5, actionRequest.getPersonID());
+            stmt.setInt(5, actionRequest.getActionRequestorPerson().getPersonID());
             // case ID is null since the request hasn't been assigned to a case yet
             stmt.setNull(6, java.sql.Types.NULL); // 0 is the int version of null
 

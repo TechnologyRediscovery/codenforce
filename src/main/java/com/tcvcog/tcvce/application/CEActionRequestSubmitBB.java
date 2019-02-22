@@ -84,20 +84,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
     // located address
         
-    private PersonType submittingPersonType;
-    private String form_requestorFName;
-    private String form_requestorLName;
-    private String form_requestorJobtitle;
-    
-    private String form_requestor_phoneCell;
-    private String form_requestor_phoneHome;
-    private String form_requestor_phoneWork;
-    
-    private String form_requestor_email;
-    private String form_requestor_addressStreet;
-    private String form_requestor_addressCity;
-    private String form_requestor_addressZip;
-    private String form_requestor_addressState;
     private java.util.Date currentDate;
     
     private List<Photograph> photoList;
@@ -256,6 +242,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         try {
             System.out.println("CEActionRequstsSubmitBB.submitActionRequest | inserting personID " + personID);
             req.setActionRequestorPerson(pi.getPerson(personID));
+            System.out.println("CEActionRequstsSubmitBB.submitActionRequest | person injected into request " + req.getActionRequestorPerson().getPersonID());
         } catch (IntegrationException ex) {
             System.out.println("CEActionRequestSubmitBB.submitActionRequest | Person insert error");
             System.out.println(ex);
@@ -312,76 +299,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
    
     
-    /**
-     * Coordinates the active tab index based on the status of various
-     * form fields. it's not pretty, but it's functional
-     * @deprecated 
-     */
-    private void manageTabs(){
-        System.out.println("ActionRequestBean | manageTab | prop: " + selectedProperty);
-        System.out.println("ActionRequestBean | manageTab | lname: " + form_requestorLName);
-        System.out.println("ActionRequestBean | violationType ID: " + violationTypeID);
-        
-        // check for first tab completed
-        if((selectedProperty != null 
-                && violationTypeID <= 0
-                && form_requestorLName == null) 
-                || 
-                (form_nonPropertyLocation != null && !form_atSpecificAddress)) {
-            System.out.println("selecting tab index 1");
-            currentTabIndex = 1; // go to request details tab
-        // check for second tab com1pleted
-        } else if(selectedProperty != null
-                && violationTypeID > 0
-                && form_requestorLName == null) {
-            System.out.println("selecting tab index 2");
-            currentTabIndex = 2; // to to contact info tab
-        // check for third tab completed
-        } else if(selectedProperty != null
-                && violationTypeID > 0
-                && form_requestorLName != null){
-            System.out.println("selecting tab index 3");
-            currentTabIndex = 3; // go to final tab
-            
-        } else {
-            currentTabIndex = 0;
-        }
-        if(tabView != null){
-          tabView.setActiveIndex(currentTabIndex);
-        }
-    }
-    
     public String populateActionRequestorPerson(){
-        
-//        currentPerson = new Person();
-//        currentPerson.setPersonType(submittingPersonType);
-//        currentPerson.setMuni(getSessionBean().getCeactionRequestForSubmission().getMuni());
-//        
-//        currentPerson.setFirstName(form_requestorFName);
-//        currentPerson.setLastName(form_requestorLName);
-//        currentPerson.setJobTitle(form_requestorJobtitle);
-//        
-//        currentPerson.setPhoneCell(form_requestor_phoneCell);
-//        currentPerson.setPhoneHome(form_requestor_phoneHome);
-//        currentPerson.setPhoneWork(form_requestor_phoneWork);
-//        
-//        currentPerson.setEmail(form_requestor_email);
-//        currentPerson.setAddressStreet(form_requestor_addressStreet);
-//        currentPerson.setAddressCity(form_requestor_addressCity);
-//        currentPerson.setAddressZip(form_requestor_addressZip);
-//        currentPerson.setAddressState(form_requestor_addressState);
-//        
-//        currentPerson.setNotes("[System-Generated] This person was created "
-//                + "from the code enforcement action request form");
-//        
-//        currentPerson.setActive(true);
-//        currentPerson.setUnder18(false);
-//        currentPerson.setVerifiedBy(null);
-//        
-//        getSessionBean().getCeactionRequestForSubmission().setActionRequestorPerson(currentPerson);
-        
         return "reviewAndSubmit";
-        
     }
     
     public int storeActionRequestorPerson(Person p){
@@ -399,28 +318,21 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                     "INTEGRATION ERROR: Sorry, the system was unable to store your contact information and as a result, your request has not been recorded.", 
                     "You might call your municipal office to report this error and make a request over the phone. "
                     + "You can also phone the Turtle Creek COG's technical support specialist, Eric Darsow, at 412.840.3020 and leave a message"));
-
-            
         } catch (NullPointerException ex){
              System.out.println(ex.toString());
         }
-        
         return insertedPersonID;
-        
     } // close storePerson 
     
     public void storePropertyLocationInfo(ActionEvent event){
-        manageTabs();
         
     }
     
     public void storeNoPropertyInfo(ActionEvent event){
-        manageTabs();
         System.out.println("ActionRequestBean.storeNoPropertyInfo | request location: " + form_nonPropertyLocation);
     }
     
     public void incrementalFormContinue(ActionEvent event){
-        manageTabs();
         System.out.println("ActionRequestBean.incrementalFormContinue | tabview: " + currentTabIndex);
     }
 
@@ -516,103 +428,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         this.form_dateOfRecord = form_dateOfRecord;
     }
 
-    /**
-     * @return the form_requestorFName
-     */
-    public String getForm_requestorFName() {
-        return form_requestorFName;
-    }
-
-    /**
-     * @param form_requestorFName the form_requestorFName to set
-     */
-    public void setForm_requestorFName(String form_requestorFName) {
-        this.form_requestorFName = form_requestorFName;
-    }
-
-    /**
-     * @return the form_requestorLName
-     */
-    public String getForm_requestorLName() {
-        return form_requestorLName;
-    }
-
-    /**
-     * @param form_requestorLName the form_requestorLName to set
-     */
-    public void setForm_requestorLName(String form_requestorLName) {
-        this.form_requestorLName = form_requestorLName;
-    }
-
-    /**
-     * @return the form_requestor_phoneCell
-     */
-    public String getForm_requestor_phoneCell() {
-        return form_requestor_phoneCell;
-    }
-
-    /**
-     * @param form_requestor_phoneCell the form_requestor_phoneCell to set
-     */
-    public void setForm_requestor_phoneCell(String form_requestor_phoneCell) {
-        this.form_requestor_phoneCell = form_requestor_phoneCell;
-    }
-
-    /**
-     * @return the form_requestor_email
-     */
-    public String getForm_requestor_email() {
-        return form_requestor_email;
-    }
-
-    /**
-     * @param form_requestor_email the form_requestor_email to set
-     */
-    public void setForm_requestor_email(String form_requestor_email) {
-        this.form_requestor_email = form_requestor_email;
-    }
-
-    /**
-     * @return the form_requestor_addressStreet
-     */
-    public String getForm_requestor_addressStreet() {
-        return form_requestor_addressStreet;
-    }
-
-    /**
-     * @param form_requestor_addressStreet the form_requestor_addressStreet to set
-     */
-    public void setForm_requestor_addressStreet(String form_requestor_addressStreet) {
-        this.form_requestor_addressStreet = form_requestor_addressStreet;
-    }
-
-    /**
-     * @return the form_requestor_addressCity
-     */
-    public String getForm_requestor_addressCity() {
-        return form_requestor_addressCity;
-    }
-
-    /**
-     * @param form_requestor_addressCity the form_requestor_addressCity to set
-     */
-    public void setForm_requestor_addressCity(String form_requestor_addressCity) {
-        this.form_requestor_addressCity = form_requestor_addressCity;
-    }
-
-    /**
-     * @return the form_requestor_addressZip
-     */
-    public String getForm_requestor_addressZip() {
-        return form_requestor_addressZip;
-    }
-
-    /**
-     * @param form_requestor_addressZip the form_requestor_addressZip to set
-     */
-    public void setForm_requestor_addressZip(String form_requestor_addressZip) {
-        this.form_requestor_addressZip = form_requestor_addressZip;
-    }
+   
 
     /**
      * @return the form_anonymous
@@ -674,49 +490,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         this.currentPerson = currentPerson;
     }
 
-    /**
-     * @return the submittingPersonType
-     */
-    public PersonType getSubmittingPersonType() {
-        submittingPersonType = PersonType.Public;
-        return submittingPersonType;
-    }
-
-    /**
-     * @param submittingPersonType the submittingPersonType to set
-     */
-    public void setSubmittingPersonType(PersonType submittingPersonType) {
-        this.submittingPersonType = submittingPersonType;
-    }
-
-    /**
-     * @return the form_requestor_phoneHome
-     */
-    public String getForm_requestor_phoneHome() {
-        return form_requestor_phoneHome;
-    }
-
-    /**
-     * @param form_requestor_phoneHome the form_requestor_phoneHome to set
-     */
-    public void setForm_requestor_phoneHome(String form_requestor_phoneHome) {
-        this.form_requestor_phoneHome = form_requestor_phoneHome;
-    }
-
-    /**
-     * @return the form_requestor_phoneWork
-     */
-    public String getForm_requestor_phoneWork() {
-        return form_requestor_phoneWork;
-    }
-
-    /**
-     * @param form_requestor_phoneWork the form_requestor_phoneWork to set
-     */
-    public void setForm_requestor_phoneWork(String form_requestor_phoneWork) {
-        this.form_requestor_phoneWork = form_requestor_phoneWork;
-    }
-
+   
     
 
     /**
@@ -743,33 +517,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     /**
-     * @return the form_requestorJobtitle
-     */
-    public String getForm_requestorJobtitle() {
-        return form_requestorJobtitle;
-    }
-
-    /**
-     * @return the form_requestor_addressState
-     */
-    public String getForm_requestor_addressState() {
-        return form_requestor_addressState;
-    }
-
-    /**
-     * @param form_requestorJobtitle the form_requestorJobtitle to set
-     */
-    public void setForm_requestorJobtitle(String form_requestorJobtitle) {
-        this.form_requestorJobtitle = form_requestorJobtitle;
-    }
-
-    /**
-     * @param form_requestor_addressState the form_requestor_addressState to set
-     */
-    public void setForm_requestor_addressState(String form_requestor_addressState) {
-        this.form_requestor_addressState = form_requestor_addressState;
-    }
-
+    
   
     /**
      * @return the propList
