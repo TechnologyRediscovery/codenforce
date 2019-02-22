@@ -36,6 +36,7 @@ public class OccPermitApplication {
     private Person newOwner;
     private String submissionNotes;
     private String internalNotes;
+    private String propertyUnitId;
 
     /**
      * @return the id
@@ -176,5 +177,14 @@ public class OccPermitApplication {
     public void setInternalNotes(String internalNotes) {
         this.internalNotes = internalNotes;
     }
+
+    public String getPropertyUnitId() {
+        return propertyUnitId;
+    }
+
+    public void setPropertyUnitId(String propertyUnitId) {
+        this.propertyUnitId = propertyUnitId;
+    }
+    
     
 }
