@@ -49,6 +49,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     private double penalty;
     private String description;
     private String notes;
+    private List<Integer> photoList;
 
     /**
      * @return the violationID
@@ -366,6 +367,20 @@ public class CodeViolation extends EntityUtils implements Serializable{
      */
     public void setActualComplianceDatePretty(String actualComplianceDatePretty) {
         this.actualComplianceDatePretty = actualComplianceDatePretty;
+    }
+
+    /**
+     * @return the photoList
+     */
+    public List<Integer> getPhotoList() {
+        return photoList;
+    }
+
+    /**
+     * @param photoList the photoList to set
+     */
+    public void setPhotoList(List<Integer> photoList) {
+        this.photoList = photoList;
     }
 
    
