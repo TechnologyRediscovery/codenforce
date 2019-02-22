@@ -25,15 +25,19 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
+import org.primefaces.event.FileUploadEvent;
 
 /**
  *
@@ -47,6 +51,8 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     private double penalty;
     private String description;
     private String notes;
+    private List<Photograph> photoList;
+    private Photograph selectedPhoto;
     
    
     
@@ -54,6 +60,51 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
      * Creates a new instance of ViolationAdd
      */
     public ViolationAddBB() {
+        
+    }
+    
+    public void updateDescription(Photograph photo){
+        ImageServices is = getImageServices();
+        try {
+            is.updatePhotoDescription(photo);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    public void handlePhotoUpload(FileUploadEvent ev){
+        if(this.currentViolation == null){
+            this.currentViolation = getSessionBean().getActiveCodeViolation();
+        }
+        if(ev == null){
+            System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
+            return;
+        }
+        if(this.currentViolation.getPhotoList() == null){
+            this.currentViolation.setPhotoList(new ArrayList<Integer>());
+        }
+        if(this.photoList == null){
+            this.photoList = new ArrayList<>();
+        }
+        
+        ImageServices is = getImageServices();
+        Photograph ph = new Photograph();
+        ph.setPhotoBytes(ev.getFile().getContents());
+        ph.setDescription("no description");
+        ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
+        ph.setTimeStamp(LocalDateTime.now());
+        // store photo on the request (by id)
+        try {
+            this.currentViolation.getPhotoList().add(is.storePhotograph(ph));
+        } catch (IntegrationException ex) {
+            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed!\n" + ex);
+            return;
+        }
+        this.getPhotoList().add(ph);
+    }
+    
+    private void savePhotos(){
+        
     }
     
     public String addViolation(){
@@ -68,7 +119,6 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         currentViolation.setPenalty(penalty);
         currentViolation.setDescription(description);
         currentViolation.setNotes(notes);
-        
         
         
         try {
@@ -94,7 +144,76 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         
     }
     
-
+    public String addViolationWithPhotos(){
+        
+        ViolationCoordinator vc = getViolationCoordinator();
+        CaseIntegrator ci = getCaseIntegrator();
+        
+        currentViolation.setStipulatedComplianceDate(getStipulatedComplianceDate()
+                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        currentViolation.setDateOfRecord(getDateOfRecord()
+                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        currentViolation.setPenalty(penalty);
+        currentViolation.setDescription(description);
+        currentViolation.setNotes(notes);
+        
+        
+        try {
+             currentViolation.setViolationID(vc.addNewCodeViolation(currentViolation));
+             getSessionBean().setActiveCodeViolation(currentViolation);
+             getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Success! Violation added.", ""));
+            return "violationPhotos";
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Unable to edit violation.", 
+                                "This is a system-level error that must be corrected by an administrator, Sorry!"));
+            
+        } catch (ViolationException ex) {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                            ex.getMessage(), "Stipulated compliance date must be in the future; please revise the stipulated compliance date."));
+        }
+        return "";
+        
+    }
+    
+    public String photosConfirm(){
+        if(this.currentViolation == null){
+            this.currentViolation = getSessionBean().getActiveCodeViolation();
+        }
+        if(this.getPhotoList() == null  ||  this.getPhotoList().isEmpty()){
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                                "No uploaded photos to commit.", 
+                                "Use the 'Return to case home without commiting photos' button bellow if you have no photos to upload."));
+            return "";
+        }
+        
+        ImageServices is = getImageServices();
+        
+        for(Photograph photo : this.getPhotoList()){
+            
+            try { 
+                // commit and link
+                is.commitPhotograph(photo.getPhotoID());
+                is.linkPhotoToCodeViolation(photo.getPhotoID(), currentViolation.getViolationID());
+                
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                                "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
+                                "Please call your municipal office and report your concern by phone."));
+                    return "";
+            }
+        }
+        return "ceHome";
+    }
    
 
     /**
@@ -189,6 +308,34 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
      */
     public void setDateOfRecord(Date dateOfRecord) {
         this.dateOfRecord = dateOfRecord;
+    }
+
+    /**
+     * @return the photoList
+     */
+    public List<Photograph> getPhotoList() {
+        return photoList;
+    }
+
+    /**
+     * @param photoList the photoList to set
+     */
+    public void setPhotoList(List<Photograph> photoList) {
+        this.photoList = photoList;
+    }
+
+    /**
+     * @return the selectedPhoto
+     */
+    public Photograph getSelectedPhoto() {
+        return selectedPhoto;
+    }
+
+    /**
+     * @param selectedPhoto the selectedPhoto to set
+     */
+    public void setSelectedPhoto(Photograph selectedPhoto) {
+        this.selectedPhoto = selectedPhoto;
     }
 
   

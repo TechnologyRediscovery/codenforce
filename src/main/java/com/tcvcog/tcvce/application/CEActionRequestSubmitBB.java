@@ -206,7 +206,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             return;
         }
         this.photoList.add(ph);
-        System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | upload succesful!");
+    //    System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | upload succesful!");
 
         // views that this function knows how to handle
         // there's probably a better way to do this, some sort of view constants .java

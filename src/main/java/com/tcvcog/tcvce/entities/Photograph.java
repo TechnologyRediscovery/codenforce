@@ -71,6 +71,7 @@ public class Photograph {
      * @param description the description to set
      */
     public void setDescription(String description) {
+        System.out.println("in setDescription");
         this.description = description;
     }
 
