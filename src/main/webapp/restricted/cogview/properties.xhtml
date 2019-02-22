@@ -24,18 +24,18 @@
                             </h:form>
 
                             <h1 class="property-blue">Properties</h1>
-                            <h:outputText value="List query name: #{caseProfileBB.ceCaseSearchParams.searchName}"/>
+                            
 
                             <h:form id="propertySearchForm">
 
-                                <p:panelGrid columns="2">
+                                <p:panelGrid columns="2" >
 
                                     <h:panelGroup>
                                         <p:outputLabel for="propSearchITwMuni">
                                             <h:outputText value="House number"/>
                                         </p:outputLabel>
                                         <p:inputText id="propSearchITwMuni" value="#{propertyProfileBB.houseNum}" 
-                                                     style="width: 100px;" tabindex="3" required="false" styleClass="inputText"/>
+                                                     style="width: 100px;" tabindex="1" required="false" styleClass="inputText"/>
                                         <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
@@ -45,29 +45,36 @@
                                             <h:outputText value="Street name"/>
                                         </p:outputLabel>
                                         <p:inputText id="propSearchITStreet" value="#{propertyProfileBB.streetName}" 
-                                                     style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
+                                                     style="width: 200px;" tabindex="2" required="false" styleClass="inputText"/>
 
                                         <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
 
+                                    
+                            <ui:remove>
+                                        
                                     <h:panelGroup>
-                                        <p:outputLabel for="personMuniSelectMenu">
+                                        <p:outputLabel for="propSearchSelectMuni">
                                             <h:outputText value="Municipality"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:selectOneMenu id="personMuniSelectMenu" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuniCode}">
+                                        <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuniCode}">
                                             <f:selectItems value="#{sessionBean.facesUser.authMunis}"/>
                                         </p:selectOneMenu>
-                                        <h:message for="personMuniSelectMenu" showDetail="false" showSummary="true" 
+                                        <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
 
+                            </ui:remove>
+                                    
                                     <h:panelGroup>
                                         <p:commandButton
-                                            value="Search" tabindex="6" ajax="false"
+                                            value="Search in #{sessionBean.activeMuni.muniName}" tabindex="3" ajax="false"
                                             icon="fa fa-search"  actionListener="#{propertyProfileBB.searchForProperties}" />
                                     </h:panelGroup>
+                                
+                            <ui:remove>
 
                                     <h:panelGroup>
                                         <p:outputLabel for="searchAllCB">
@@ -77,7 +84,13 @@
                                         <p:selectBooleanCheckbox id="searchAllCB" value="#{propertyProfileBB.allMunis}" tabindex="7"
                                                                  widgetVar="allMuniCB" onchange="PF('muniSelectMenu').disable()"/>
                                     </h:panelGroup>
+                            </ui:remove>
 
+                                    <h:panelGroup>
+                                        
+                                        <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" tabindex="4" styleClass="noFill" icon="fa fa-question-circle"/>
+                                    </h:panelGroup>
+                                    
                                 </p:panelGrid>
 
                                 <p:dialog header="Search Tips" 
@@ -102,7 +115,6 @@
                                 </p:dialog>
                                 
                                 <p:spacer height="5px"/>
-                                <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
                                 <p:spacer height="5px"/>
 
                                 <h2>Search Results:</h2>

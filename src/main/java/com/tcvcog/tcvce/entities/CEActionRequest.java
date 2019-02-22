@@ -47,8 +47,6 @@ public class CEActionRequest implements Serializable{
     private CEActionRequestStatus requestStatus;
 
     private Municipality muni;
-    // for legacy compatability
-    private int personID;
     private Person actionRequestorPerson;
 
     private Property requestProperty;
@@ -348,22 +346,6 @@ public class CEActionRequest implements Serializable{
 
   
     /**
-     * @return the personID
-     */
-    public int getPersonID() {
-        return personID;
-    }
-
-  
-    /**
-     * @param personID the personID to set
-     */
-    public void setPersonID(int personID) {
-        this.personID = personID;
-    }
-
-
-    /**
      * @return the muni
      */
     public Municipality getMuni() {
@@ -456,7 +438,6 @@ public class CEActionRequest implements Serializable{
         hash = 73 * hash + this.requestPublicCC;
         hash = 73 * hash + Objects.hashCode(this.requestStatus);
         hash = 73 * hash + Objects.hashCode(this.muni);
-        hash = 73 * hash + this.personID;
         hash = 73 * hash + Objects.hashCode(this.actionRequestorPerson);
         hash = 73 * hash + Objects.hashCode(this.requestProperty);
         hash = 73 * hash + this.issueType_issueTypeID;
@@ -495,9 +476,6 @@ public class CEActionRequest implements Serializable{
             return false;
         }
         if (this.requestPublicCC != other.requestPublicCC) {
-            return false;
-        }
-        if (this.personID != other.personID) {
             return false;
         }
         if (this.issueType_issueTypeID != other.issueType_issueTypeID) {

@@ -96,11 +96,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         
         
         try {
-            if(isAllMunis()){
-                setPropList(pi.searchForProperties(getHouseNum(), getStreetName()));
-            } else {
-                setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSelectedMuniCode()));
-            }
+            setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getActiveMuni().getMuniCode()));
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));
