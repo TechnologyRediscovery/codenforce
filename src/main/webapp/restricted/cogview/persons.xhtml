@@ -501,7 +501,7 @@
                             <p:commandButton ajax="true" value="Cancel" icon="fa fa-stop" immediate="true"
                                              onclick="PF('search-params-dialog').hide()"/>
 
-                            <p:commandButton ajax="true" value="Engage the wizards!"  icon="fa fa-search"
+                            <p:commandButton ajax="true" value="Conduct search"  icon="fa fa-search"
                                              process="  @form
                                                         change-person-form:formFirstName-person
                                                         change-person-form:formLastName-person"
@@ -815,26 +815,21 @@
                                              disabled="#{personsBB.selectedPerson.personID == 0}"
                                              update="selected-person-info-form:selected-person-info-ds
                                              messages-left-form:persons-messages-global
-                                             update-box-messages-form:update-box-messages"
+                                             update-box-messages-form:update-box-messages
+                                             change-person-form:change-person-form"
                                              
                                              onclick="PF('update-person-dialog').hide()"/>
 
-                            <p:commandButton    id="new-person-cb"
-                                                ajax="true" value="Store new Person" actionListener="#{personsBB.createNewPerson}"
+                            <p:commandButton id="new-person-cb"
+                                             ajax="true" value="Store new Person" actionListener="#{personsBB.createNewPerson}"
                                              rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" icon="fa fa-plus"
                                              disabled="#{!(personsBB.selectedPerson.personID == 0)}"
                                              update="selected-person-info-form:selected-person-info-ds
                                              messages-left-form:persons-messages-global
                                              update-box-messages-form:update-box-messages"/>
                             
-                            <p:commandButton    id="close-win-cb"
-                                                ajax="true" value="Close window" icon="fa fa-window-close" immediate="true"
-                                                 onclick="PF('update-person-dialog').hide()"/>
-                            
                         </h:form>
                     </p:dialog>
-                    
-                    
                     
                         <p:confirmDialog message="Attach note to Person" 
                                          severity="alert" widgetVar="person-note-dialog"

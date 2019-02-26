@@ -69,6 +69,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             PersonCoordinator pc = getPersonCoordinator();
             PersonIntegrator pi = getPersonIntegrator();
             searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
+            // the selected person should be initiated using logic in getSelectedPerson
             selectedPerson = pi.getPerson(100);
         } catch (IntegrationException ex) {
             Logger.getLogger(PersonsBB.class.getName()).log(Level.SEVERE, null, ex);
@@ -153,7 +154,9 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         try {
             newPersonID = pc.addNewPerson(selectedPerson);
             selectedPerson = pi.getPerson(newPersonID);
+            System.out.println("PersonsBB.createNewPerson | newly inserted personID: " + selectedPerson.getPersonID());
             getSessionBean().setActivePerson(selectedPerson);
+            personList.add(selectedPerson);
             ui.logObjectView(getSessionBean().getFacesUser(), selectedPerson);
             
             getFacesContext().addMessage(null,
