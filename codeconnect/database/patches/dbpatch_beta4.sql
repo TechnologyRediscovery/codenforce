@@ -1,7 +1,8 @@
-BEGIN;
 
 ALTER TYPE persontype ADD VALUE IF NOT EXISTS 'FutureOwner' AFTER 'OwnerNonOccupant';
 ALTER TYPE persontype ADD VALUE IF NOT EXISTS 'Owner' AFTER 'FutureOwner';
+
+BEGIN;
 
 ALTER TABLE occpermitapplicationreason ADD COLUMN requiredpersontypes persontype[];
 
