@@ -7,7 +7,7 @@ BEGIN;
 ALTER TABLE occpermitapplicationreason ADD COLUMN requiredpersontypes persontype[];
 
 INSERT INTO public.occpermitapplicationreason(
-            reasonid, reasontitle, reasondescription, activereason, requiredpersontypes)
+            reasonid, reasontitle, reasondescription, activereason)
     VALUES (4, 'Change of use', 'Zoning change', TRUE);
 
 UPDATE occpermitapplicationreason SET requiredpersontypes = ARRAY['Owner'::persontype, 'Tenant'::persontype] WHERE reasonid = 1;
