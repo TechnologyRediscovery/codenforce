@@ -240,7 +240,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
         
-        
         sb.append("SELECT personid FROM public.person ");   // < -- don't for get
         
         if(!params.isFilterByObjectID()){
