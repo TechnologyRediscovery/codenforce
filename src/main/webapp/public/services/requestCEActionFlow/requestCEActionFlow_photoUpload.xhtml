@@ -26,9 +26,12 @@
                             update="requestCEActionFlowFormDescribePhoto:photoTable"
                             multiple="true"
                             fileLimit="3"
-                            sizeLimit="100000" 
+                            sizeLimit="10000000" 
                             allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
                         </h:form>
+                        
+                        <p:spacer height="5px"/>
+                                  
                         
                         <h:form id="requestCEActionFlowFormDescribePhoto">
                             <p:dataTable
@@ -65,6 +68,7 @@
                                 </p:column>
                             </p:dataTable>
                         </h:form>
+                        <p:spacer height="5px"/>
                         
                         <h:form id="editor">  
                             <p:editor  id="photoDescriptionEditor"  value="#{cEActionRequestSubmitBB.selectedPhoto.description}" 
@@ -77,21 +81,16 @@
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     <p:commandButton value="Save description" icon="ui-icon-disk" update=":requestCEActionFlowFormDescribePhoto:photoTable" />
                         </h:form>
+                        <p:spacer height="5px"/>
 
                         <h:form id="requestCEActionFlowFormSavePhoto">
                             
                             
-                            <p:commandButton  ajax="false" tabindex="12"
+                        <p:commandButton  ajax="false" tabindex="12"
                                               value="Next: Your contact details" id="continueToContactInfoButton"
                                               action="#{cEActionRequestSubmitBB.savePhotos}"/>
 
                         </h:form>
-                        
-                        
-
-
-
-
 
                     </div>
                 </f:view>

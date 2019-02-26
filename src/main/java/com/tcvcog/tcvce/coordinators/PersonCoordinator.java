@@ -100,6 +100,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         newP.setBusinessEntity(false);
         newP.setCompositeLastName(false);
         newP.setUseSeparateMailingAddress(false);
+        newP.setAddressState("PA");
         return newP;
         
     }
@@ -135,8 +136,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return sb.toString();
         
     }
-    
-   
 
     /**
      * @return the personTypes

@@ -79,9 +79,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 ec.getSessionMap().put("facesUser", extractedUser);
                 System.out.println("SessionInitializer.initiateInternalSession "
                         + "| facesUserFromDB: " + extractedUser.getLName());
-                
 
-                // get the user's default municipality
                 Municipality muni = extractedUser.getMuni();
                 
 //                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
@@ -94,7 +92,10 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 getSessionBean().setActiveProp(pi.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("arbitraryPlaceholderPropertyID"))));
                 
-                System.out.println("SessionInitializer.initiateInternalSession | set placeholder property");
+                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("arbitraryPlaceholderPersonID"))));
+                
+                
                 
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean

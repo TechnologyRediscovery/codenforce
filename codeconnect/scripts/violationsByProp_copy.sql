@@ -1,0 +1,1 @@
+\COPY (SELECT parid AS parcelid, address, count(violationid) AS count_violations FROM property INNER JOIN cecase ON cecase.property_propertyid = property.propertyid INNER JOIN codeviolation ON codeviolation.cecase_caseid = cecase.caseid WHERE municipality_municode = 867 GROUP BY parid, address ORDER BY count(violationid) DESC) TO 'wilmerdingviolations.csv' WITH csv
