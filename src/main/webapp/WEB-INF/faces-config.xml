@@ -841,9 +841,9 @@
     </navigation-rule>
     
     <navigation-rule>
-        <from-view-id>/restricted/cogview/*</from-view-id>
+        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
         <navigation-case>
-            <from-outcome>updateProperty</from-outcome>
+            <from-outcome>propertyUpdate</from-outcome>
             <to-view-id>/restricted/cogstaff/gen/propertyUpdate.xhtml</to-view-id>
             <redirect />
         </navigation-case>
