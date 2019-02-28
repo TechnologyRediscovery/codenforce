@@ -233,6 +233,224 @@
                                     </div>
 
                                 </h:form>
+                            
+                            
+                                <h:form id="events-form">
+
+
+                                    <h3>Events</h3>
+                                    
+
+                                    <h:form id="formEventAddAjax">
+
+                                        <h:panelGrid columns="3" border="0" 
+                                                     cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
+                                                     footerClass="gridFooter" style="vertical-align: top;">
+
+                                            <h:panelGroup>
+                                                <h:outputLabel for="newEventTypeMenu">
+                                                    <h:outputText value="Select an event type:"/>
+                                                </h:outputLabel>
+
+                                                <p:selectOneListbox id="newEventTypeMenu" required="true" value="#{eventAddBB.selectedEventType}" tabindex="10">
+                                                    <p:ajax update="categoryList" immediate="true"/> 
+                                                    <f:selectItems value="#{eventAddBB.userAdminEventTypeList}"/>
+                                                </p:selectOneListbox>
+
+                                                <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <h:outputLabel for="categoryList">
+                                                    <h:outputText value="Event Categories of selected type:"/>
+                                                </h:outputLabel>
+
+                                                <p:selectOneListbox style="width: 300px;" id="categoryList" value="#{eventAddBB.selectedEventCategory}" tabindex="10">
+                                                    <p:ajax update="selectedEventCategoryDescription
+                                                                    selectedEventCategoryDescription 
+                                                                    selectedEventCateogryRequiresViewConfirm 
+                                                                    selectedEventCateogryNotifiesCaseMonitors" 
+                                                                    immediate="true"/>
+                                                    <f:converter converterId="eventCategoryConverter"/>
+                                                    <f:selectItems  id="catItemsList" value="#{eventAddBB.eventCategoryList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                                </p:selectOneListbox>
+
+                                                <h:message for="categoryList" showDetail="false" showSummary="true"  
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                <p:commandButton ajax="true" actionListener="#{eventAddBB.startNewEvent}" onclick="PF('add-event-dialog').show()"
+                                                                 value="Create new event of this category"  icon="fa fa-edit"/>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText value="Event Cateogry Description: #{eventAddBB.selectedEventCateogryDescription}" id="selectedEventCategoryDescription"/>
+                                                <p:spacer height="10px"/>
+                                                <h:outputText value="Requires View Confirmation: #{eventAddBB.selectedEventRequiresViewConfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
+                                                <p:spacer height="10px"/>
+                                                <h:outputText value="Triggers notification of case monitor subscribers: #{eventAddBB.selectedEventNotifiesCaseMonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
+
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                    </h:form>
+                                    
+
+
+                                    <p:dataTable
+                                        id="caseEventTable"
+                                        var="e"
+                                        selectionMode="single"
+                                        selection="#{caseProfileBB.selectedEvent}"
+                                        rowKey="#{e.eventID}"
+                                        value="#{caseProfileBB.currentCase.eventList}"
+                                        tableStyleClass="primeDataTable"
+                                        resizableColumns="true"
+                                        rowExpandMode="multiple"
+                                        expandedRow="false"
+                                        scrollHeight="400"
+                                        filteredValue="#{caseProfileBB.filteredEventList}"
+                                        widgetVar="caseEventTable"
+                                        >
+                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                        <p:column width="3%" exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="Expand"/>
+                                            </f:facet>
+                                            <p:rowToggler/>
+                                        </p:column>
+
+                                        <p:column width="11%" sortBy="#{e.dateOfRecord}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Date" />
+                                            </f:facet>
+                                            <h:outputText value="#{e.prettyDateOfRecord}"/>
+                                        </p:column>
+
+                                        <p:column width="8%" sortBy="#{e.category.eventType.label}"
+                                                  filterBy="#{e.category.eventType.label}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Type" />
+                                            </f:facet>
+                                            <h:outputText value="#{e.category.eventType.label}"/>
+                                        </p:column>
+
+                                        <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
+                                                  filterBy="#{e.category.eventCategoryTitle}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Category" />
+                                            </f:facet>
+                                            <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                        </p:column>
+                                        <p:column width="5%" filterBy="#{e.eventOwnerUser.LName}"
+                                                  sortBy="#{e.eventOwnerUser.LName}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Creator" />
+                                            </f:facet>
+                                            <h:outputText value="#{e.eventOwnerUser.LName}"/>
+                                        </p:column>
+                                        <p:column width="20%" style="word-wrap: normal;">
+                                            <f:facet name="header">
+                                                <h:outputText value="Description" />
+                                            </f:facet>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{e.eventDescription}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column width="5%" exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="edit" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-edit"
+                                                             action="#{caseProfileBB.editEvent(e)}" 
+                                                             ajax="false"/>
+
+                                        </p:column>
+
+                                        <p:rowExpansion>
+
+                                            <div class="outlinedBox">
+                                                <h2>Event ID: <h:outputText value="#{e.eventID}"/> </h2>
+                                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Description" />
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.eventDescription}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.discloseToMunicipality}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Disclose to Public?" />
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.discloseToPublic}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Creation time stamp"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.eventTimeStamp}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Active Event?"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.activeEvent}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.requiresViewConfirmation}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="View confirmed by"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputText styleClass="bold" value="View confirmed at"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{e.viewConfirmedAt}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <f:facet name="footer" class="leftalign">
+                                                        <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion" style="text-align: left">
+                                                            <h:outputText escape="false" value="#{e.notes}"/>
+                                                        </div>
+                                                    </f:facet>
+
+                                                </h:panelGrid>
+                                            </div>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable>
+
+                                    <ui:remove>
+                                        <p:commandLink value="Export event history as pdf" ajax="false">
+                                            <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{caseProfileBB.currentCase.caseID}_idnoeventHistory"/>
+                                        </p:commandLink>
+                                    </ui:remove>
+                                </h:form>
+
 
 
 
@@ -245,7 +463,7 @@
                                     <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
                                                      value="Add new code violation"
                                                      icon="fa fa-plus"
-                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                     disabled="#{!sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"/>
                                     <p:spacer height="15px"/>
 
                                     <p:dataTable
@@ -265,14 +483,14 @@
                                         <p:column width="4%">
                                             <p:rowToggler />
                                         </p:column>
-                                        <p:column width="20%">
+                                        <p:column width="15%">
                                             <f:facet name="header">
                                                 <h:outputText value="Ordinance" />
                                             </f:facet>
                                             <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
                                         </p:column>
 
-                                        <p:column width="20">
+                                        <p:column width="30">
                                             <f:facet name="header">
                                                 <h:outputText value="Stip Comp Date" />
                                             </f:facet>
@@ -750,177 +968,124 @@
 
                                 </h:form>
 
-                                <h:form id="events-form">
-
-
-                                    <h3>Events</h3>
-
-
-                                    <p:dataTable
-                                        id="caseEventTable"
-                                        var="e"
-                                        selectionMode="single"
-                                        selection="#{caseProfileBB.selectedEvent}"
-                                        rowKey="#{e.eventID}"
-                                        value="#{caseProfileBB.currentCase.eventList}"
-                                        tableStyleClass="primeDataTable"
-                                        resizableColumns="true"
-                                        rowExpandMode="multiple"
-                                        expandedRow="false"
-                                        scrollHeight="400"
-                                        filteredValue="#{caseProfileBB.filteredEventList}"
-                                        widgetVar="caseEventTable"
-                                        >
-                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
-
-                                        <p:column width="3%" exportable="false">
-                                            <f:facet name="header">
-                                                <h:outputText value="Expand"/>
-                                            </f:facet>
-                                            <p:rowToggler/>
-                                        </p:column>
-
-                                        <p:column width="11%" sortBy="#{e.dateOfRecord}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Date" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.prettyDateOfRecord}"/>
-                                        </p:column>
-
-                                        <p:column width="8%" sortBy="#{e.category.eventType.label}"
-                                                  filterBy="#{e.category.eventType.label}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Type" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.category.eventType.label}"/>
-                                        </p:column>
-
-                                        <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
-                                                  filterBy="#{e.category.eventCategoryTitle}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Category" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.category.eventCategoryTitle}"/>
-                                        </p:column>
-                                        <p:column width="5%" filterBy="#{e.eventOwnerUser.LName}"
-                                                  sortBy="#{e.eventOwnerUser.LName}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Creator" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.eventOwnerUser.LName}"/>
-                                        </p:column>
-                                        <p:column width="20%" style="word-wrap: normal;">
-                                            <f:facet name="header">
-                                                <h:outputText value="Description" />
-                                            </f:facet>
-                                            <div class="rowExpansion">
-                                                <h:outputText value="#{e.eventDescription}"/>
-                                            </div>
-                                        </p:column>
-                                        <p:column width="5%" exportable="false">
-                                            <f:facet name="header">
-                                                <h:outputText value="edit" />
-                                            </f:facet>
-                                            <p:commandButton icon="fa fa-edit"
-                                                             action="#{caseProfileBB.editEvent(e)}" 
-                                                             ajax="false"/>
-
-                                        </p:column>
-
-                                        <p:rowExpansion>
-
-                                            <div class="outlinedBox">
-                                                <h2>Event ID: <h:outputText value="#{e.eventID}"/> </h2>
-                                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Description" />
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.eventDescription}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.discloseToMunicipality}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Disclose to Public?" />
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.discloseToPublic}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Creation time stamp"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.eventTimeStamp}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Active Event?"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.activeEvent}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.requiresViewConfirmation}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="View confirmed by"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.viewConfirmedBy.LName}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="View confirmed at"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.viewConfirmedAt}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <f:facet name="footer" class="leftalign">
-                                                        <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion" style="text-align: left">
-                                                            <h:outputText escape="false" value="#{e.notes}"/>
-                                                        </div>
-                                                    </f:facet>
-
-                                                </h:panelGrid>
-                                            </div>
-                                        </p:rowExpansion>
-
-                                    </p:dataTable>
-
-                                    <ui:remove>
-                                        <p:commandLink value="Export event history as pdf" ajax="false">
-                                            <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{caseProfileBB.currentCase.caseID}_idnoeventHistory"/>
-                                        </p:commandLink>
-                                    </ui:remove>
-                                </h:form>
-
 
                         </div>
                     </div>
 
-                        <p:dialog       id="ceevent-add-dialog"
-                                        height="650" width="700"
-                                        widgetVar="unknown-dialog-var"
-                                        closable="true" 
-                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                <p:dialog       id="add-event-dialog"
+                                height="650" width="700"
+                                widgetVar="unknown-dialog-var"
+                                closable="true" 
+                                rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
 
+                            
+                                  
+                    <h1>Add Event</h1>
+                    
+                    <h:outputText value="Current Case: #{eventAddBB.eventInFormation.ceCase.caseName}"/>
+                    <p:spacer height="5px"/>
+                    <h:outputText value="Event Type: #{eventAddBB.eventInFormation.currentEvent.category.eventType.label}"/>
+                    <p:spacer height="5px"/>
+                    <h:outputText value="Event Category: #{eventAddBB.eventInFormation.currentEvent.category.eventCategoryTitle}"/>
+                    
+                        
+                    <h:form id="addNewEventForm">
+
+                                <p:spacer height="10px"/>
+
+                                <h:panelGrid columns="2" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd"
+                                             footerClass="gridFooter">
+
+                                    <f:facet name="header">
+                                        <h:panelGroup>
+                                            <p:outputLabel for="eventDesc">
+                                                <h:outputText value="Short Description:"/>
+                                            </p:outputLabel>
+                                            <p:inputText id="eventDesc" value="#{eventAddBB.eventInFormation.eventDescription}" 
+                                                         style="width: 100%;" tabindex="3" required="true" styleClass="inputText"/>
+                                            <h:message for="eventDesc" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </f:facet>
+
+                                    <h:panelGroup>
+                                        
+                                         <h:outputLabel for="activeEvent">
+                                            <h:outputText value="Active Event?"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch tabindex="18" id="activeEvent" value="#{eventAddBB.eventInFormation.activeEvent}" onLabel="Yes" offLabel="No" />
+                                        
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="eventDateCal">
+                                            <h:outputText value="Date of Record"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:calendar value="#{eventAddBB.eventInFormation.}" 
+                                                    mode="popup"  id="eventDateCal"
+                                                    showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" showTodayButton="true"
+                                                    required="true"/>
+                                        <h:message for="eventDateCal" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="discloseToMuniIS">
+                                            <h:outputText value="Disclose to Municipalities"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{eventAddBB.eventInFormation.formDiscloseToMuni}" onLabel="Yes" offLabel="No" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="discloseToPublic">
+                                            <h:outputText value="Disclose to Public"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{eventAddBB.eventInFormation.formDiscloseToPublic}" onLabel="Yes" offLabel="No" />
+                                    </h:panelGroup>
+                                    
+                                    
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="requireViewConfirmationSwitch">
+                                            <h:outputText value="Require view confirmation by case manager"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventAddBB.eventInFormation.formRequireViewConfirmation}" onLabel="Yes" offLabel="No" />
+                                    </h:panelGroup>
+
+                                    <f:facet name="footer">
+                                        <h:outputLabel for="eventNotes">
+                                            <h:outputText value="Event Notes:"/>
+                                        </h:outputLabel>
+                                        <h:panelGroup>
+                                            <p:editor id="eventNotes" value="#{eventAddBB.eventInFormation.formEventNotes}" 
+                                                    controls="bold italic underline strikethrough font size style color 
+                                                    bullets numbering center undo redo rule link removeformat outdent 
+                                                    indent link unlink copy cut paste rule alignleft center alignright"
+                                                    width="1000"
+                                                    height="200"/>
+                                            <h:message for="eventNotes" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </f:facet>
+
+                                </h:panelGrid>
+                                
+                            
+                                <p:commandButton ajax="true" actionListener="#{eventAddBB.addEvent}"
+                                                 value="Create new event" icon="fa fa-plus"/>
+                                <p:spacer height="5px"/>
+                                    <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('add-event-dialog').hide()"/>
+                        </h:form>
                         </p:dialog>
                 </f:view>
             </ui:define>

@@ -24,13 +24,14 @@ import java.time.LocalDateTime;
  *
  * @author Eric C. Darsow
  */
-public class Event implements Serializable {
+public class Event extends EntityUtils implements Serializable {
     
     private int eventID;
     private EventCategory category;
     private LocalDateTime dateOfRecord;
     private String prettyDateOfRecord;
     private LocalDateTime eventTimeStamp;
+    private java.util.Date dateOfRecordUtilDate;
     private String eventDescription;
     private User eventOwnerUser;
     private boolean discloseToMunicipality;
@@ -266,6 +267,20 @@ public class Event implements Serializable {
      */
     public void setViewConfirmed(boolean viewConfirmed) {
         this.viewConfirmed = viewConfirmed;
+    }
+
+    /**
+     * @return the dateOfRecordUtilDate
+     */
+    public java.util.Date getDateOfRecordUtilDate() {
+        return dateOfRecordUtilDate;
+    }
+
+    /**
+     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
+     */
+    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
+        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
     }
 
     
