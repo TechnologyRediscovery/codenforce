@@ -67,6 +67,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     
     private CECase ceCase;
     private EventCECase currentEvent;
+    private EventCECase eventInFormation;
     
     private String formEventDesc;
     private Date formEventDate;
@@ -104,7 +105,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         return "eventAdd";
     }
     
-    public String addEvent() throws ViolationException{
+    public void addEvent(ActionEvent ev) throws ViolationException{
         
         //Event e = getSessionBean().getActiveEvent();
         EventCECase e = currentEvent;
@@ -154,14 +155,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
             
         }
-        // get user back to the most logical case page
-        switch(e.getCategory().getEventType()){
-            case Compliance:
-                return "caseProfile";
-            default:
-                return "caseProfile";
-                
-        }
+        
     }
     
     
@@ -593,6 +587,20 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedCadidatePerson(Person p) {
         this.selectedCadidatePerson = p;
+    }
+
+    /**
+     * @return the eventInFormation
+     */
+    public EventCECase getEventInFormation() {
+        return eventInFormation;
+    }
+
+    /**
+     * @param eventInFormation the eventInFormation to set
+     */
+    public void setEventInFormation(EventCECase eventInFormation) {
+        this.eventInFormation = eventInFormation;
     }
 
    
