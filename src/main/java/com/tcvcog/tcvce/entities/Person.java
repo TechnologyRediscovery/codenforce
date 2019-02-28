@@ -744,7 +744,10 @@ public class Person extends EntityUtils implements Serializable{
      */
     public void setExpiryDateUtilDate(java.util.Date edut) {
         expiryDateUtilDate = edut;
-        expiryDate = edut.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if(edut != null){
+            expiryDate = edut.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            
+        }
         
     }
 

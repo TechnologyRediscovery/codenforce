@@ -65,15 +65,11 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        try {
-            PersonCoordinator pc = getPersonCoordinator();
-            PersonIntegrator pi = getPersonIntegrator();
-            searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
-            // the selected person should be initiated using logic in getSelectedPerson
-            selectedPerson = pi.getPerson(100);
-        } catch (IntegrationException ex) {
-            Logger.getLogger(PersonsBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        PersonCoordinator pc = getPersonCoordinator();
+        PersonIntegrator pi = getPersonIntegrator();
+        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
+        // the selected person should be initiated using logic in getSelectedPerson
+        selectedPerson = getSessionBean().getActivePerson();
         
         
     }
@@ -100,7 +96,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     }
     
     
-    public void updatePerson(ActionEvent ev){
+    public String updatePerson(){
         System.out.println("PersonsBB.updatePerson");
         PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
@@ -119,12 +115,23 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
                         "Unable to update person, my apologies", ""));
             
         }
+        return "persons";
+        
         
     }
     
-    public void initiatePersonCreation(){
+    public String initiatePersonUpdate(){
+        getSessionBean().setActivePerson(selectedPerson);
+        return "personAdd";
+        
+    }
+    
+    public String initiatePersonCreation(){
         PersonCoordinator pc = getPersonCoordinator();
-        selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getActiveMuni());
+        getSessionBean().setActivePerson(pc.getNewPersonSkeleton(getSessionBean().getActiveMuni()));
+        return "personAdd";
+        
+        
         
     }
     
@@ -145,10 +152,11 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void createNewPerson(){
+    public String createNewPerson(){
         PersonCoordinator pc = getPersonCoordinator();
         PersonIntegrator pi = getPersonIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        System.out.println("PersonsBB.createNewPerson | before insert selected person: " + selectedPerson.getPersonID());
         
         int newPersonID;
         try {
@@ -156,8 +164,10 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             selectedPerson = pi.getPerson(newPersonID);
             System.out.println("PersonsBB.createNewPerson | newly inserted personID: " + selectedPerson.getPersonID());
             getSessionBean().setActivePerson(selectedPerson);
-            personList.add(selectedPerson);
-            ui.logObjectView(getSessionBean().getFacesUser(), selectedPerson);
+            getSessionBean().getActivePersonList().add(selectedPerson);
+            
+            
+//            ui.logObjectView(getSessionBean().getFacesUser(), selectedPerson);
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -168,6 +178,8 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     "Unable to create new Person in the system.'", ""));
         }
+        return "persons";
+        
     }
     
     public void searchForPersons(ActionEvent event){
