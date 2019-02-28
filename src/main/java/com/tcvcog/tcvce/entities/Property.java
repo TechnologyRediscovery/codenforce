@@ -29,6 +29,8 @@ public class Property implements Serializable{
     private String constructionType;
     private String countyCode;
     
+    private boolean multiUnit, rental;
+    
     private String notes;
     
   /**
@@ -192,6 +194,34 @@ public class Property implements Serializable{
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the multiUnit
+     */
+    public boolean isMultiUnit() {
+        return multiUnit;
+    }
+
+    /**
+     * @param multiUnit the multiUnit to set
+     */
+    public void setMultiUnit(boolean multiUnit) {
+        this.multiUnit = multiUnit;
+    }
+
+    /**
+     * @return the rental
+     */
+    public boolean isRental() {
+        return rental;
+    }
+
+    /**
+     * @param rental the rental to set
+     */
+    public void setRental(boolean rental) {
+        this.rental = rental;
     }
   
 }

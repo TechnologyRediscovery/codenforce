@@ -29,6 +29,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -204,8 +206,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public String updateProperty(Property propToUpdate) throws IntegrationException{
         String query = "UPDATE public.property\n" +
                 "   SET parid=?, lotandblock=?, \n" +
-                "       address=?, propertyUseType_UseID=?, rental=?, multiunit=?, \n" +
-                "       usegroup=?, constructiontype=?, countycode=?, notes=?" +
+                "       address=?, propertyusetype=?, \n" +
+                "       usegroup=?, constructiontype=?, countycode=?, notes=?, \n" +
+                "       containsrentalunits=?, multiunit=? , vacant=?, \n" +
+                "       lastupdatedby=?, lastupdated=?" +
                 " WHERE propertyid = ?;";
         
         Connection con = getPostgresCon();
@@ -224,9 +228,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(9, propToUpdate.getCountyCode());
             stmt.setString(10, propToUpdate.getNotes());
             
+            stmt.setBoolean(11, true);
+            stmt.setBoolean(12, true);
+            stmt.setBoolean(13, true);
+            
+            stmt.setInt(14, 99);
+            stmt.setTimestamp(15, Timestamp.valueOf(LocalDateTime.now()));
+            
             // figure out if we need to do changes in the list elements
             
-            stmt.setInt(11, propToUpdate.getPropertyID());
+            stmt.setInt(16, propToUpdate.getPropertyID());
             
             stmt.executeUpdate();
             

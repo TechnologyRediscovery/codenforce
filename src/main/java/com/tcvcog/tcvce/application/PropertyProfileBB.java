@@ -160,6 +160,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String updateProperty(){
+        getSessionBean().setActivePropWithList(currProp);
         System.out.println("PropertyProfileBB.updateProperty");
         return "propertyUpdate";
         
