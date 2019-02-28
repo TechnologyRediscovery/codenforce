@@ -68,8 +68,7 @@
                                             </f:facet>
                                             <h:outputText value="#{c.caseName}"/>
                                         </p:column>
-                                        <p:column width="8%" sortBy="#{c.caseStage}"
-                                                  filterBy="#{c.caseStage}">
+                                        <p:column width="8%" sortBy="#{c.caseStage}">
                                             <f:facet name="header">
                                                 <h:outputText value="Stage" />
                                             </f:facet>
@@ -118,7 +117,7 @@
                                                              case-details-form:selcase-access-sbcb
                                                              case-details-form:selcase-forwardlinking-sbcb
                                                              violation-form:violation-table
-                                                             notices-form:notices-table
+                                                             notices-form:notices-ds
                                                              action-requests-form:actionRequestTable
                                                              events-form:caseEventTable
                                                              "/>
@@ -352,109 +351,141 @@
                                     </p:dataTable> 
 
                                 </h:form>
+                            
 
-                                <h:form id="notices-form">
+
+                                
                                     <h2>Notices of violation</h2>
+
+                                    <h:form id="notices-messages-form">
+
+                                        <h:messages id="notices-messages-global"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
                                     
+                                
+                                    <h:form id="notices-form">
                                     <p:commandButton ajax="false" 
                                                      action="#{caseProfileBB.createNewNotice}"
                                                      value="Create new notice of violation letter"
                                                      disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
                                     <p:spacer height="5px"/>
-                                    <p:dataTable
-                                        id="notices-table"
-                                        var="notice"
-                                        rowKey="#{notice.noticeID}"
+                                   
+                                      <p:dataScroller
+                                        id="notices-ds"
                                         value="#{caseProfileBB.currentCase.noticeList}"
-                                        tableStyleClass="primeDataTable"
-                                        expandedRow="true"
-                                        rowExpandMode="multiple"
-                                        draggableColumns="true"
-                                        reflow="true">
+                                        var="notice"
+                                        rendered="true">
+                                      
+                                
 
 
                                         <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                                        <p:column width="4%">
-                                            <p:rowToggler />
-                                        </p:column>
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Notice No." />
-                                            </f:facet>
-                                            <h:outputText value="#{notice.noticeID}"/>
-                                        </p:column>
+                                        <h:outputText styleClass="bold" style="font-size:1.5em;"  value="Notice ID:" />
+                                            <h:outputText style="font-size:1.5em;"   value="#{notice.noticeID}"/>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Date of Record" />
-                                            </f:facet>
+                                            <p:spacer height="5px"/>
+                                            
+                                            <h:outputText styleClass="bold"   value="Date of Record: " />
                                             <h:outputText value="#{notice.dateOfRecordPretty}"/>
-                                        </p:column>
+                                                
+                                            <p:spacer height="5px"/>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Queued for Mailing" />
-                                            </f:facet>
-                                            <h:outputText value="#{notice.requestToSend}"/>
-                                        </p:column>
+                                            <h:outputText styleClass="bold"   value="Queued for Mailing: " />
+                                            <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
+                                            <p:spacer height="5px"/>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Sent Date" />
-                                            </f:facet>
-                                            <h:outputText value="#{notice.letterSentDatePretty}"/>
-                                        </p:column>
+                                            <h:outputText styleClass="bold"  value="Sent Date: " />
+                                            <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Returned?" />
-                                            </f:facet>
-                                            <h:outputText value="#{notice.letterReturnedDatePretty}"/>
-                                        </p:column>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText styleClass="bold"  value="Returned? " />
+                                            <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
 
-                                        <p:rowExpansion>
+                                            <p:spacer height="5px"/>
 
-                                            <h:panelGrid    id="notice-rowexpand-pg" columns="3"  >
+                                            <h:panelGrid    id="notice-rowexpand-pg" columns="4" columnClasses="gridTD, gridTD, gridTD, gridTD" >
 
                                                 <h:panelGroup>
                                                     <p:commandButton ajax="false" action="#{caseProfileBB.printNotice(notice)}"
-                                                                     value="Print/View" styleClass="noFill"
-                                                                     icon="fa fa-print"/>
+                                                                     value="Print/View" styleClass="noFill button-size-small"
+                                                                     icon="fa fa-print" disabled="#{(empty notice)}" />
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:commandButton ajax="false" action="#{caseProfileBB.editNoticeOfViolation(notice)}"
+                                                    <p:commandButton id="nov-edit-cb"
+                                                                     ajax="false" action="#{caseProfileBB.editNoticeOfViolation(notice)}"
                                                                      value="Edit notice" styleClass="noFill"
-                                                                     icon="fa fa-edit " disabled="#{!(empty notice.letterSentDate)}" />
+                                                                     icon="fa fa-edit " disabled="#{notice.requestToSend}" />
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:commandButton ajax="true" action="#{caseProfileBB.queueNotice(notice)}"
-                                                                     value="Mark notice: ready-to-mail" styleClass="noFill"
-                                                                     icon="fa fa-edit" disabled="#{!(empty notice.letterSentDate) || !(empty notice.letterReturnedDate)}"/>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:commandButton ajax="true" action="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
-                                                                     value="Mark notice: mailed" styleClass="noFill"
-                                                                     icon="fa fa-bomb" disabled="#{!(empty notice.letterSentDate)}"/>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:commandButton ajax="true" action="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
-                                                                     value="Mark notice: returned" styleClass="noFill"
-                                                                     icon="fa fa-mail-reply" disabled="#{(empty notice.letterSentDate)}"/>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:commandButton ajax="true" action="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
+                                                    <p:commandButton id="nov-delete-cb"
+                                                                     ajax="true" actionListener="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
                                                                      value="Nuke notice" styleClass="noFill"
-                                                                     icon="fa fa-bomb" disabled="#{!(empty notice.letterSentDate) || !(empty notice.letterReturnedDate)}"/>
+                                                                     icon="fa fa-bomb" disabled="#{notice.requestToSend}"
+                                                                     update="notices-messages-form:notices-messages-global
+                                                                     notices-ds"/>
+                                                </h:panelGroup>
+                                                <h:panelGroup></h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:commandButton id="nov-queuenotice-cb"
+                                                                     ajax="true" action="#{caseProfileBB.queueNotice(notice)}"
+                                                                     value="Mark notice: Ready-to-mail" styleClass="noFill"
+                                                                     icon="fa fa-edit" disabled="#{notice.requestToSend}"
+                                                                     update="notices-messages-form:notices-messages-global
+                                                                     nov-queuenotice-cb
+                                                                     nov-queued-ot
+                                                                     nov-edit-cb
+                                                                     nov-delete-cb
+                                                                     nov-sent-cb"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:commandButton id="nov-sent-cb"
+                                                                     ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
+                                                                     value="Mark notice: Mailed!" styleClass="noFill"
+                                                                     icon="fa fa-paper-plane" disabled="#{!(notice.requestToSend) || (!(empty notice.letterSentDate) and notice.requestToSend)}"
+                                                                     update="notices-messages-form:notices-messages-global
+                                                                     nov-sent-date
+                                                                     nov-returned-cb
+                                                                     nov-sent-cb
+                                                                     "/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:commandButton id="nov-returned-cb"
+                                                                     ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
+                                                                     value="Mark notice: returned" styleClass="noFill"
+                                                                     icon="fa fa-mail-reply" disabled="#{(empty notice.letterSentDate) || !(empty notice.letterReturnedDate)}"
+                                                                     update="notices-messages-form:notices-messages-global
+                                                                     nov-returned-date
+                                                                     nov-returned-cb"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:commandButton id="nov-reset-cb"
+                                                                     ajax="true" actionListener="#{caseProfileBB.resetNotice(notice)}"
+                                                                     value="Reset mailing status" styleClass="noFill"
+                                                                     icon="fa fa-window-close-o" disabled="false"
+                                                                     update="notices-messages-form:notices-messages-global
+                                                                     nov-returned-date
+                                                                     nov-returned-cb
+                                                                     nov-sent-cb
+                                                                     nov-queuenotice-cb
+                                                                     nov-delete-cb
+                                                                     nov-edit-cb
+                                                                     nov-queued-ot
+                                                                     nov-sent-date
+                                                                     nov-returned-date"/>
                                                 </h:panelGroup>
                                             </h:panelGrid>
-                                        </p:rowExpansion>
-                                    </p:dataTable>
+                                            <hr />
+                                          </p:dataScroller>
                                     </h:form>
 
 

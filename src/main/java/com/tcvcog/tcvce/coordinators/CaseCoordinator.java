@@ -50,6 +50,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -599,6 +601,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         al = cvi.getCodeViolations(ceCase);
         return al;
+    }
+    
+    public void resetNOVMailing(CECase cs, NoticeOfViolation nov) throws IntegrationException{
+        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        nov.setRequestToSend(false);
+        nov.setLetterSentDate(null);
+        nov.setLetterReturnedDate(null);
+        cvi.updateViolationLetter(nov);
+        
     }
     
     

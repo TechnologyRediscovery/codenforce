@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  *
  * @author Eric C. Darsow
  */
-public class NoticeOfViolation {
+public class NoticeOfViolation extends EntityUtils {
     
     private int noticeID;
     private Person recipient;
@@ -187,6 +187,10 @@ public class NoticeOfViolation {
      * @return the letterReturnedDatePretty
      */
     public String getLetterReturnedDatePretty() {
+        if(letterReturnedDate != null){
+            letterReturnedDatePretty = getPrettyDate(letterReturnedDate);
+            
+        }
         return letterReturnedDatePretty;
     }
 
