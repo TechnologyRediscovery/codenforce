@@ -232,7 +232,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setBoolean(12, true);
             stmt.setBoolean(13, true);
             
-            stmt.setInt(14, 99);
+            stmt.setInt(14, getSessionBean().getFacesUser().getUserID());
             stmt.setTimestamp(15, Timestamp.valueOf(LocalDateTime.now()));
             
             // figure out if we need to do changes in the list elements
