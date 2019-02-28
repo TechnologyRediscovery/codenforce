@@ -54,7 +54,7 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
     }
     
     public void deletePhotograph(int photoID) throws IntegrationException{
-        // TODO: delete entry in property helper table
+        // TODO: delete from linker tables as they are added
         Connection con = getPostgresCon();
         String query = "DELETE" +
                         "  FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ?;";
@@ -67,7 +67,7 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
             stmt.executeQuery();
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error inserting new photo", ex);
+            throw new IntegrationException("Error deleting photo", ex);
         }
         
         query = "DELETE FROM public.photodoc WHERE photodocid = ?;";
@@ -80,7 +80,7 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
             stmt.executeQuery();
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error inserting new photo", ex);
+            throw new IntegrationException("Error deleting photo", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -274,12 +274,12 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
             stmt.setString(1, photo.getDescription());
             stmt.setInt(2, photo.getPhotoID());
             
-            System.out.println("ImageServices.commitPhotograph | Statement: " + stmt.toString());
+            System.out.println("ImageServices.updatePhotoDescription | Statement: " + stmt.toString());
             stmt.execute();
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error commiting photo", ex);
+            throw new IntegrationException("Error updating photo description", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -300,6 +300,31 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
             stmt.setInt(1, ph.getPhotoID());
             stmt.setInt(2, ar.getRequestID());
             System.out.println("ImageServices.linkPhotoToActionRequest | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error linking photo to actionrequest", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public void linkPhotoToCodeViolation(int photoID, int cvID) throws IntegrationException{
+        //Store Photograph first please 
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.codeviolationphotodoc(\n" +
+                        "            photodoc_photodocid, codeviolation_violationid)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photoID);
+            stmt.setInt(2, cvID);
+            System.out.println("ImageServices.linkPhotoToCodeViolation | Statement: " + stmt.toString());
             stmt.execute();
             
         } catch (SQLException ex) {
