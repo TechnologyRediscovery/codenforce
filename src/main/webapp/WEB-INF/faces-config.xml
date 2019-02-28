@@ -838,6 +838,15 @@
             <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>updateProperty</from-outcome>
+            <to-view-id>/restricted/cogstaff/propertyUpdate.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     </navigation-rule>    
         
     <!--Persons-->
