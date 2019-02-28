@@ -34,6 +34,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.User;
@@ -62,6 +63,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Property activeProp;
     private Person activePerson;
     private List<Person> activePersonList;
+    private PropertyWithLists activePropWithList;
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
@@ -545,6 +547,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setPersonForCEActionRequestSubmission(Person personForCEActionRequestSubmission) {
         this.personForCEActionRequestSubmission = personForCEActionRequestSubmission;
+    }
+
+    /**
+     * @return the activePropWithList
+     */
+    public PropertyWithLists getActivePropWithList() {
+        return activePropWithList;
+    }
+
+    /**
+     * @param activePropWithList the activePropWithList to set
+     */
+    public void setActivePropWithList(PropertyWithLists activePropWithList) {
+        this.activePropWithList = activePropWithList;
     }
     
 }
