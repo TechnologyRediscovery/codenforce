@@ -854,10 +854,10 @@
     </navigation-rule>
     
     <navigation-rule>
-        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
+        <from-view-id>/restricted/cogview/*</from-view-id>
         <navigation-case>
             <from-outcome>updateProperty</from-outcome>
-            <to-view-id>/restricted/cogstaff/propertyUpdate.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/gen/propertyUpdate.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>    
