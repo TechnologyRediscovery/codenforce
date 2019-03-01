@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -70,6 +71,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         UserCoordinator uc = getUserCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         PersonIntegrator persInt = getPersonIntegrator();
+        CaseIntegrator caseint = getCaseIntegrator();
         
         try {
             User extractedUser = uc.getUser(getContainerAuthenticatedUser());
@@ -94,6 +96,9 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 
                 getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("arbitraryPlaceholderPersonID"))));
+                
+                getSessionBean().setcECase(caseint.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("arbitraryPlaceholderCaseID"))));
                 
                 
                 

@@ -36,9 +36,6 @@
                                 <h2>CE Case docket</h2>
 
                                 <h:form id="caseListForm">
-
-
-
                                     <p:spacer height="15px"/>
                                     <p:dataTable
                                         id="caseTable"
@@ -119,12 +116,10 @@
                                                              violation-form:violation-table
                                                              notices-form:notices-ds
                                                              action-requests-form:actionRequestTable
-                                                             events-form:caseEventTable
+                                                             event-dt-form:caseEventTable
                                                              "/>
                                         </p:column>
                                     </p:dataTable>
-
-
 
                                     <p:commandLink value="Export case docket as pdf" ajax="false">
                                         <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
@@ -229,13 +224,40 @@
                                             </h:panelGroup>
 
                                         </h:panelGrid>
+                                        
+                                           <p:commandButton    id="refresh-case-cb" 
+                                                               ajax="true" actionListener="#{caseProfileBB.refreshCurrentCase}"
+                                                                icon="fa fa-refresh"
+                                                                value="reload current case data" 
+                                                                update="
+                                                                    case-details-form:header-id-ot
+                                                                    case-details-form:header-type-ot
+                                                                    case-details-form:header-addr-ot
+                                                                    case-details-form:header-muni-ot
+                                                                    case-details-form:selcase-id-ot
+                                                                    case-details-form:selcase-addr-ot
+                                                                    case-details-form:selcase-muni-ot
+                                                                    case-details-form:selcase-stage-ot
+                                                                    case-details-form:selcase-odate-it
+                                                                    case-details-form:selcase-cdate-it
+                                                                    case-details-form:selcase-age-it
+                                                                    case-details-form:selcase-manager-it
+                                                                    case-details-form:selcase-pacc
+                                                                    case-details-form:selcase-access-sbcb
+                                                                    case-details-form:selcase-forwardlinking-sbcb
+                                                                    violation-form:violation-table
+                                                                    notices-form:notices-ds
+                                                                    action-requests-form:actionRequestTable
+                                                                    event-dt-form:caseEventTable
+                                                                    "
+                                                                
+                                                                />
 
                                     </div>
 
                                 </h:form>
                             
                             
-                                <h:form id="events-form">
 
 
                                     <h3>Events</h3>
@@ -279,22 +301,33 @@
                                                 <h:message for="categoryList" showDetail="false" showSummary="true"  
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                                <p:commandButton ajax="true" actionListener="#{eventAddBB.startNewEvent}" onclick="PF('add-event-dialog').show()"
-                                                                 value="Create new event of this category"  icon="fa fa-edit"/>
+                                                <p:commandButton    id="event-add-dialog-show-cb"
+                                                                    ajax="true" 
+                                                                    process="@form"
+                                                                    actionListener="#{eventAddBB.startNewEvent}" 
+                                                                    oncomplete="PF('add-event-dialog-var').show()"
+                                                                    value="Create new event of this category"  
+                                                                    icon="fa fa-edit"
+                                                                    update="add-event-dialog
+                                                                    addNewEventForm:add-event-currcase-ot
+                                                                    addNewEventForm:add-event-et-ot
+                                                                    addNewEventForm:add-event-ec-ot
+                                                                    addNewEventForm:add-event-cd-ot"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
-                                                <h:outputText value="Event Cateogry Description: #{eventAddBB.selectedEventCateogryDescription}" id="selectedEventCategoryDescription"/>
+                                                <h:outputText value="Event Cateogry Description: #{eventAddBB.selectedEventCategory.eventCategoryDesc}" id="selectedEventCategoryDescription"/>
                                                 <p:spacer height="10px"/>
-                                                <h:outputText value="Requires View Confirmation: #{eventAddBB.selectedEventRequiresViewConfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
+                                                <h:outputText value="Requires View Confirmation: #{eventAddBB.selectedEventCategory.requiresviewconfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
                                                 <p:spacer height="10px"/>
-                                                <h:outputText value="Triggers notification of case monitor subscribers: #{eventAddBB.selectedEventNotifiesCaseMonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
+                                                <h:outputText value="Triggers notification of case monitor subscribers: #{eventAddBB.selectedEventCategory.notifycasemonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
 
                                             </h:panelGroup>
                                         </h:panelGrid>
                                     </h:form>
                                     
 
+                                <h:form id="event-dt-form">
 
                                     <p:dataTable
                                         id="caseEventTable"
@@ -508,8 +541,16 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Compliance!" />
                                             </f:facet>
-                                            <p:commandButton ajax="false" action="#{caseProfileBB.recordCompliance(v)}"
-                                                             icon="fa fa-check" />
+                                            <p:commandButton    id="violation-compliance-cb" 
+                                                                ajax="true" action="#{caseProfileBB.recordCompliance(v)}"
+                                                                icon="fa fa-check"
+                                                                oncomplete="PF('add-event-dialog-var').show()"
+                                                                value="Record compliance"  
+                                                                update="add-event-dialog
+                                                                addNewEventForm:add-event-currcase-ot
+                                                                addNewEventForm:add-event-et-ot
+                                                                addNewEventForm:add-event-ec-ot
+                                                                addNewEventForm:add-event-cd-ot"/>
                                         </p:column>
 
                                         <p:column width="15%">
@@ -803,7 +844,6 @@
 
                                 <h:form id="action-requests-form">
 
-
                                     <h3>Action Requests</h3>    
 
                                     <p:dataTable
@@ -972,24 +1012,26 @@
                         </div>
                     </div>
 
-                <p:dialog       id="add-event-dialog"
-                                height="650" width="700"
-                                widgetVar="unknown-dialog-var"
-                                closable="true" 
-                                rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                <p:dialog    id="add-event-dialog"
+                                    height="650" width="900"
+                                    widgetVar="add-event-dialog-var"
+                                    closable="true" 
+                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
 
                             
+                    <h:form id="addNewEventForm">
                                   
                     <h1>Add Event</h1>
                     
-                    <h:outputText value="Current Case: #{eventAddBB.eventInFormation.ceCase.caseName}"/>
+                    <h:outputText id="add-event-currcase-ot" value="Current Case: #{caseProfileBB.currentCase.caseID}: #{caseProfileBB.currentCase.caseName} "/>
                     <p:spacer height="5px"/>
-                    <h:outputText value="Event Type: #{eventAddBB.eventInFormation.currentEvent.category.eventType.label}"/>
+                    <h:outputText id="add-event-et-ot" value="Event Type: #{eventAddBB.eventInFormation.category.eventType.label}"/>
                     <p:spacer height="5px"/>
-                    <h:outputText value="Event Category: #{eventAddBB.eventInFormation.currentEvent.category.eventCategoryTitle}"/>
+                    <h:outputText id="add-event-ec-ot" value="Event Category: #{eventAddBB.eventInFormation.category.eventCategoryTitle}"/>
+                    <p:spacer height="5px"/>
+                    <h:outputText id="add-event-cd-ot" value="Category description: #{eventAddBB.eventInFormation.category.eventCategoryDesc}"/>
                     
                         
-                    <h:form id="addNewEventForm">
 
                                 <p:spacer height="10px"/>
 
@@ -1003,7 +1045,7 @@
                                                 <h:outputText value="Short Description:"/>
                                             </p:outputLabel>
                                             <p:inputText id="eventDesc" value="#{eventAddBB.eventInFormation.eventDescription}" 
-                                                         style="width: 100%;" tabindex="3" required="true" styleClass="inputText"/>
+                                                         style="width: 600px;" tabindex="3" required="true" styleClass="inputText"/>
                                             <h:message for="eventDesc" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                         </h:panelGroup>
@@ -1024,7 +1066,7 @@
                                             <h:outputText value="Date of Record"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:calendar value="#{eventAddBB.eventInFormation.}" 
+                                        <p:calendar value="#{eventAddBB.eventInFormation.dateOfRecordUtilDate}" 
                                                     mode="popup"  id="eventDateCal"
                                                     showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                     navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -1039,7 +1081,7 @@
                                             <h:outputText value="Disclose to Municipalities"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{eventAddBB.eventInFormation.formDiscloseToMuni}" onLabel="Yes" offLabel="No" />
+                                        <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{eventAddBB.eventInFormation.discloseToMunicipality}" onLabel="Yes" offLabel="No" />
                                     </h:panelGroup>
 
                                     <h:panelGroup>
@@ -1047,7 +1089,7 @@
                                             <h:outputText value="Disclose to Public"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{eventAddBB.eventInFormation.formDiscloseToPublic}" onLabel="Yes" offLabel="No" />
+                                        <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{eventAddBB.eventInFormation.discloseToPublic}" onLabel="Yes" offLabel="No" />
                                     </h:panelGroup>
                                     
                                     
@@ -1057,7 +1099,7 @@
                                             <h:outputText value="Require view confirmation by case manager"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventAddBB.eventInFormation.formRequireViewConfirmation}" onLabel="Yes" offLabel="No" />
+                                        <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventAddBB.eventInFormation.requiresViewConfirmation}" onLabel="Yes" offLabel="No" />
                                     </h:panelGroup>
 
                                     <f:facet name="footer">
@@ -1065,11 +1107,11 @@
                                             <h:outputText value="Event Notes:"/>
                                         </h:outputLabel>
                                         <h:panelGroup>
-                                            <p:editor id="eventNotes" value="#{eventAddBB.eventInFormation.formEventNotes}" 
+                                            <p:editor id="eventNotes" value="#{eventAddBB.eventInFormation.notes}" 
                                                     controls="bold italic underline strikethrough font size style color 
                                                     bullets numbering center undo redo rule link removeformat outdent 
                                                     indent link unlink copy cut paste rule alignleft center alignright"
-                                                    width="1000"
+                                                    width="700"
                                                     height="200"/>
                                             <h:message for="eventNotes" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1078,15 +1120,22 @@
 
                                 </h:panelGrid>
                                 
-                            
-                                <p:commandButton ajax="true" actionListener="#{eventAddBB.addEvent}"
-                                                 value="Create new event" icon="fa fa-plus"/>
-                                <p:spacer height="5px"/>
-                                    <p:commandButton ajax="true" 
+                                <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('add-event-dialog').hide()"/>
+                                                 onclick="PF('add-event-dialog-var').hide()"/>
+                            
+                                <p:commandButton ajax="true" actionListener="#{eventAddBB.attachEventToCase}"
+                                                 value="Create new event" icon="fa fa-plus"
+                                                 oncomplete="PF('add-event-dialog-var').hide()"
+                                                 update="event-dt-form:caseEventTable
+                                                 violation-form:violation-table
+                                                 case-details-form:selcase-stage-ot
+                                                 case-details-form:selcase-cdate-it
+                                                 cecases-messages-form:cecases-messages-global"/>
+                                
+                                
                         </h:form>
-                        </p:dialog>
+                </p:dialog>
                 </f:view>
             </ui:define>
         </ui:composition>

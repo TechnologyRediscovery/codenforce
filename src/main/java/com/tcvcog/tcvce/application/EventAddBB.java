@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -59,23 +60,10 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     private ArrayList catCustomList;
     
     private EventCategory selectedEventCategory ;
-    private String selectedEventCateogryDescription;
-    private boolean selectedEventRequiresViewConfirmation;
-    private boolean selectedEventNotifiesCaseMonitors;
     private EventType selectedEventType;
     private EventType[] userAdminEventTypeList;
     
-    private CECase ceCase;
-    private EventCECase currentEvent;
     private EventCECase eventInFormation;
-    
-    private String formEventDesc;
-    private Date formEventDate;
-    private boolean formDiscloseToMuni;
-    private boolean formDiscloseToPublic;
-    private boolean activeEvent;
-    private String formEventNotes;
-    private boolean formRequireViewConfirmation;
     
     private ArrayList<Person> candidatePersonList;
     private Person selectedCadidatePerson;
@@ -87,47 +75,50 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     }
     
     public String startNewEvent(){
-        System.out.println("EventAddBB.startNewEvent | category: " + selectedEventCategory.getEventCategoryTitle());
         
-        CECase c = getSessionBean().getcECase();
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            currentEvent = ec.getInitializedEvent(c, selectedEventCategory);
-        } catch (CaseLifecyleException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            ex.getMessage(), ""));
-            
-            
+        if (selectedEventCategory != null){
+
+            System.out.println("EventAddBB.startNewEvent | category: " + selectedEventCategory.getEventCategoryTitle());
+
+            CECase c = getSessionBean().getcECase();
+            EventCoordinator ec = getEventCoordinator();
+            try {
+                eventInFormation = ec.getInitializedEvent(c, selectedEventCategory);
+            } catch (CaseLifecyleException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                                ex.getMessage(), ""));
+            }
+            getSessionBean().setActiveEvent(eventInFormation);
+        } else {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Please select an event category to create a new event." ,""));
         }
-        getSessionBean().setActiveEvent(currentEvent);
         return "eventAdd";
     }
     
-    public void addEvent(ActionEvent ev) throws ViolationException{
+    public void attachEventToCase(ActionEvent ev) throws ViolationException{
         
         //Event e = getSessionBean().getActiveEvent();
-        EventCECase e = currentEvent;
         CaseCoordinator cc = getCaseCoordinator();
+        CECase ccase = getSessionBean().getcECase();
         
         // category is already set from initialization sequence
-        e.setCaseID(getSessionBean().getcECase().getCaseID());
-        System.out.println("EventAddBB.addEvent | CaseID: " + e.getCaseID());
-        e.setEventDescription(formEventDesc);
-        e.setActiveEvent(activeEvent);
-        e.setEventOwnerUser(getFacesUser());
-        e.setDateOfRecord(formEventDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        e.setDiscloseToMunicipality(formDiscloseToMuni);
-        e.setDiscloseToPublic(formDiscloseToPublic);
-        e.setRequiresViewConfirmation(formRequireViewConfirmation);
-        e.setNotes(formEventNotes);
+        eventInFormation.setCaseID(ccase.getCaseID());
+        System.out.println("EventAddBB.addEvent | CaseID: " + eventInFormation.getCaseID());
+        eventInFormation.setEventOwnerUser(getSessionBean().getFacesUser());
 //        e.setEventPersons(formSelectedPersons);
         
         // now check for persons to connect
         
         try {
-            cc.processCEEvent(ceCase, e, null);
+            if(eventInFormation.getCategory().getEventType() == EventType.Compliance){
+                cc.processComplianceEvent(ccase, eventInFormation, getSessionBean().getActiveCodeViolation());
+            } else {
+                cc.processCEEvent(ccase, eventInFormation);
+            }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully logged event.", ""));
@@ -138,91 +129,19 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
                             ex.getMessage(), 
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
         } catch (CaseLifecyleException ex) {
-            Logger.getLogger(EventAddBB.class.getName()).log(Level.SEVERE, null, ex);
+           
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             ex.getMessage(), 
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
         }
-        
-        try {
-            cc.refreshCase(ceCase);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            ex.getMessage(), 
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-            
-        }
-        
+
+        // nullify the session's case so that the reload of currentCase
+        // no the cecaseProfile.xhtml will trigger a new DB read
+        getSessionBean().setcECase(null);
     }
     
     
-    /**
-     * @return the formEventDesc
-     */
-    public String getFormEventDesc() {
-        formEventDesc = currentEvent.getEventDescription();
-        return formEventDesc;
-    }
-    
-    
-
-    /**
-     * @return the formEventDate
-     */
-    public Date getFormEventDate() {
-        LocalDateTime current = LocalDateTime.now();
-        formEventDate = java.util.Date.from(current.atZone(ZoneId.systemDefault()).toInstant());
-        
-        return formEventDate;
-    }
-
-    /**
-     * @return the eventType
-     */
-   
-
-    /**
-     * @return the formDiscloseToMuni
-     */
-    public boolean isFormDiscloseToMuni() {
-         if(currentEvent == null){
-            formDiscloseToMuni = true;
-        } else {
-            formDiscloseToMuni = currentEvent.isDiscloseToMunicipality();
-        }
-        return formDiscloseToMuni;
-    }
-
-    /**
-     * @return the formDiscloseToPublic
-     */
-    public boolean isFormDiscloseToPublic() {
-        formDiscloseToPublic = currentEvent.isDiscloseToPublic();
-        return formDiscloseToPublic;
-    }
-
-    /**
-     * @return the activeEvent
-     */
-    public boolean isActiveEvent() {
-        if(currentEvent == null){
-            activeEvent = true;
-        } else {
-            activeEvent = currentEvent.isActiveEvent();
-        }
-        return activeEvent;
-    }
-
-    /**
-     * @return the formEventNotes
-     */
-    public String getFormEventNotes() {
-        formEventNotes = currentEvent.getNotes();
-        return formEventNotes;
-    }
 
     /**
      * @return the candidatePersonList
@@ -230,8 +149,6 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     public ArrayList<Person> getCandidatePersonList() {
         System.out.println("EventAddBB.getCandidatePersonList | inside method");
         PersonIntegrator pi = getPersonIntegrator();
-        
-        
         try {
             candidatePersonList = pi.getPersonList(getSessionBean().getcECase().getProperty());
         } catch (IntegrationException ex) {
@@ -240,75 +157,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         return candidatePersonList;
     }
 
-    /**
-     * @param formEventDesc the formEventDesc to set
-     */
-    public void setFormEventDesc(String formEventDesc) {
-        this.formEventDesc = formEventDesc;
-    }
-
-    /**
-     * @param formEventDate the formEventDate to set
-     */
-    public void setFormEventDate(Date formEventDate) {
-        this.formEventDate = formEventDate;
-    }
-
-    
-    /**
-     * @param formDiscloseToMuni the formDiscloseToMuni to set
-     */
-    public void setFormDiscloseToMuni(boolean formDiscloseToMuni) {
-        this.formDiscloseToMuni = formDiscloseToMuni;
-    }
-
-    /**
-     * @param formDiscloseToPublic the formDiscloseToPublic to set
-     */
-    public void setFormDiscloseToPublic(boolean formDiscloseToPublic) {
-        this.formDiscloseToPublic = formDiscloseToPublic;
-    }
-
-    /**
-     * @param activeEvent the activeEvent to set
-     */
-    public void setActiveEvent(boolean activeEvent) {
-        this.activeEvent = activeEvent;
-    }
-
-    /**
-     * @param formEventNotes the formEventNotes to set
-     */
-    public void setFormEventNotes(String formEventNotes) {
-        this.formEventNotes = formEventNotes;
-    }
-
-    /**
-     * @param candidatePersonList the candidatePersonList to set
-     */
-    public void setCandidatePersonList(ArrayList<Person> candidatePersonList) {
-        this.candidatePersonList = candidatePersonList;
-    }
-
    
-
-    /**
-     * @return the ceCase
-     */
-    public CECase getCeCase() {
-        
-        ceCase = getSessionBean().getcECase();
-        return ceCase;
-    }
-
-    /**
-     * @param ceCase the ceCase to set
-     */
-    public void setCeCase(CECase ceCase) {
-        
-        this.ceCase = ceCase;
-    }
-    
     public void attachSelectedPerson(){
         System.out.println("EventAddBB.attachSelectedPersons | In listener method");
         if(selectedCadidatePerson != null){
@@ -345,22 +194,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         this.formSelectedPersons = formSelectedPersons;
     }
 
-    /**
-     * @return the currentEvent
-     */
-    public EventCECase getCurrentEvent() {
-        
-        EventCECase currentEvent = getSessionBean().getActiveEvent();
-        this.currentEvent = currentEvent;
-        return this.currentEvent;
-    }
-
-    /**
-     * @param currentEvent the currentEvent to set
-     */
-    public void setCurrentEvent(EventCECase currentEvent) {
-        this.currentEvent = currentEvent;
-    }
+   
 
     /**
      * @return the eventCategoryList
@@ -509,71 +343,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         this.userAdminEventTypeList = userAdminEventTypeList;
     }
 
-    /**
-     * @return the selectedEventCateogryDescription
-     */
-    public String getSelectedEventCateogryDescription() {
-        if(selectedEventCategory != null){
-            selectedEventCateogryDescription = selectedEventCategory.getEventCategoryDesc();
-        }
-        return selectedEventCateogryDescription;
-    }
-
-    /**
-     * @param selectedEventCateogryDescription the selectedEventCateogryDescription to set
-     */
-    public void setSelectedEventCateogryDescription(String selectedEventCateogryDescription) {
-        this.selectedEventCateogryDescription = selectedEventCateogryDescription;
-    }
-
-    /**
-     * @return the selectedEventRequiresViewConfirmation
-     */
-    public boolean isSelectedEventRequiresViewConfirmation() {
-        if(selectedEventCategory != null){
-            selectedEventRequiresViewConfirmation = selectedEventCategory.isRequiresviewconfirmation();
-        }
-        return selectedEventRequiresViewConfirmation;
-    }
-
-    /**
-     * @return the selectedEventNotifiesCaseMonitors
-     */
-    public boolean isSelectedEventNotifiesCaseMonitors() {
-          if(selectedEventCategory != null){
-            selectedEventNotifiesCaseMonitors = selectedEventCategory.isNotifycasemonitors();
-        }
-        return selectedEventNotifiesCaseMonitors;
-    }
-
-    /**
-     * @param selectedEventRequiresViewConfirmation the selectedEventRequiresViewConfirmation to set
-     */
-    public void setSelectedEventRequiresViewConfirmation(boolean selectedEventRequiresViewConfirmation) {
-        this.selectedEventRequiresViewConfirmation = selectedEventRequiresViewConfirmation;
-    }
-
-    /**
-     * @param selectedEventNotifiesCaseMonitors the selectedEventNotifiesCaseMonitors to set
-     */
-    public void setSelectedEventNotifiesCaseMonitors(boolean selectedEventNotifiesCaseMonitors) {
-        this.selectedEventNotifiesCaseMonitors = selectedEventNotifiesCaseMonitors;
-    }
-
-    /**
-     * @return the formRequireViewConfirmation
-     */
-    public boolean isFormRequireViewConfirmation() {
-        formRequireViewConfirmation = currentEvent.isRequiresViewConfirmation();
-        return formRequireViewConfirmation;
-    }
-
-    /**
-     * @param formRequireViewConfirmation the formRequireViewConfirmation to set
-     */
-    public void setFormRequireViewConfirmation(boolean formRequireViewConfirmation) {
-        this.formRequireViewConfirmation = formRequireViewConfirmation;
-    }
+   
 
     /**
      * @return the selectedCadidatePersons
@@ -593,6 +363,10 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
      * @return the eventInFormation
      */
     public EventCECase getEventInFormation() {
+        EventCECase evCECase = getSessionBean().getActiveEvent();
+        if(evCECase != null){
+            eventInFormation = evCECase;
+        }
         return eventInFormation;
     }
 
@@ -604,7 +378,5 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     }
 
    
-    
-    
     
 }

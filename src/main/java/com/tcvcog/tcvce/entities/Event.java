@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  *
@@ -281,6 +282,9 @@ public class Event extends EntityUtils implements Serializable {
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
+        if(dateOfRecordUtilDate != null){
+            dateOfRecord = this.dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     
