@@ -607,7 +607,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ceevent.eventid, ");
+        sb.append("SELECT  ");
         sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
         sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
         sb.append("INNER JOIN property on (property_propertyid = propertyid) ");
@@ -674,7 +674,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 }
             }
             
-            if(params.isFilterByViewConfirmedBy()){    
+            if(params.isFilterByPerson()){    
                 sb.append("AND viewconfirmedby = ? ");
             }
             
@@ -698,6 +698,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setInt(1, params.getObjectID());
             }
+            
+            
             
             rs = stmt.executeQuery();
             

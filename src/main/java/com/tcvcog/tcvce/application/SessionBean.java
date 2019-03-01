@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.AccessKeyCard;
+import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
@@ -74,6 +75,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     private Person personForCEActionRequestSubmission;
     
+    
     // temporary
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
@@ -91,6 +93,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<CECase> cECaseList;
     
     private EventCECase activeEvent;
+    private List<EventWithCasePropInfo> activeFancyCEEventList;
     private List<CodeViolation> activeViolationList;
     private NoticeOfViolation activeNotice;
     private Citation activeCitation;
@@ -545,6 +548,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setPersonForCEActionRequestSubmission(Person personForCEActionRequestSubmission) {
         this.personForCEActionRequestSubmission = personForCEActionRequestSubmission;
+    }
+
+    /**
+     * @return the activeFancyCEEventList
+     */
+    public List<EventWithCasePropInfo> getActiveFancyCEEventList() {
+        return activeFancyCEEventList;
+    }
+
+    /**
+     * @param activeFancyCEEventList the activeFancyCEEventList to set
+     */
+    public void setActiveFancyCEEventList(List<EventWithCasePropInfo> activeFancyCEEventList) {
+        this.activeFancyCEEventList = activeFancyCEEventList;
     }
     
 }

@@ -28,7 +28,9 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
@@ -464,4 +466,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             
          } // close switch
     } // close method
+    
+    /**
+     * Pathway for injecting business logic into the event search process. Now its just a pass through.
+     * @param params
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventWithCasePropInfo> queryEvents(SearchParamsCEEvents params) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        return ei.getEvents(params);
+    }
+    
+    
 } // close class

@@ -1,0 +1,412 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>CE Events</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <f:view>
+
+                        <h:form id="ceev-form-globalmessages">
+                            <h:messages id="ceev-globalmessages" globalOnly="true" showDetail="false" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <h1>Code enforcement event explorer</h1>
+
+                        <p>All future timeline events in <h:outputText value="#{sessionBean.activeMuni.muniName} and events requiring your personal view confirmation."/></p>
+
+                        <h:form id="ceev-form-search">
+
+                            <p:fieldset legend="search options"
+                                        toggleable="true" collapsed="true" style="background-color: white;">
+
+                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                             columnClasses="gridTd-solid-back, gridTd-solid-back">
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-search-startend-bool-ol" for="cev-search-startend-bool" value="filter by date range?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-search-startend-chkbx" value="#{cEEventsBBBB.searchParams.filterByStartEndDate}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="query start date: "/>
+                                        <p:calendar id="eventDateCalStart" value="#{cEEventsBB.searchParams.startDateUtilDate}" 
+                                                    mode="popup"  
+                                                    showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" showTodayButton="true"
+                                                    required="true"/>
+                                        <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="query end date: "/>
+                                        <p:calendar id="eventDateCalEnd" value="#{cEEventsBB.searchParams.endDateUtilDate}" 
+                                                    mode="popup" 
+                                                    showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" showTodayButton="true"
+                                                    required="true" />
+                                        <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="seev-filter-type-ol" for="seev-filter-type" value="filter by event type?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="seev-filter-type" value="#{cEEventsBB.searchParams.filterByEventType}" />
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="ceev-criteria-type">
+                                            <h:outputText value="all available event types:"/>
+                                        </h:outputLabel>
+                                        <p:selectOneListbox id="ceev-critera-type" required="false" value="#{cEEventsBB.searchParams.evtType}" tabindex="10">
+                                            <p:ajax update="categoryList" immediate="true"/> 
+                                            <f:selectItems value="#{cEEventsBB.eventTypesList}"/>
+                                        </p:selectOneListbox>
+                                        <h:message for="ceev-critera-type" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-cat-ol" for="ceev-filter-cat" value="filter by event category?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-cat" value="#{cEEventsBB.searchParams.filterByEventCategory}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="ceev-criteria-cat" id="ceev-criteria-cat-ol">
+                                            <h:outputText value="event Categories in your selected event type:"/>
+                                        </h:outputLabel>
+                                        <p:selectOneListbox style="width: 300px;" id="ceev-criteria-cat" value="#{cEEventsBB.searchParams.eventCategory}" tabindex="10">
+                                            <p:ajax update="selectedEventCategoryDescription" 
+                                                    immediate="true"/>
+                                            <f:converter converterId="eventCategoryConverter"/>
+                                            <f:selectItems  id="catItemsList" value="#{cEEventsBB.eventCatList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                        </p:selectOneListbox>
+                                        <h:outputText value="cateogry description: #{eventAddBB.selectedEventCategory.eventCategoryDesc}" id="selectedEventCategoryDescription"/>
+                                        <h:message for="ceev-criteria-cat" showDetail="false" showSummary="true"  
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-id-ol" for="ceev-filter-id" value="filter by ce case ID?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-id" value="#{cEEventsBB.searchParams.filterByCaseID}" disabled="false" />
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-criteria-caseid-ol" for="ceev-criteria-caseid" value="ce case ID:"/>
+                                        <p:spacer height="5px"/>
+                                        <p:inputText id="ceev-criteria-caseid" value="#{cEEventsBB.searchParams.caseId}" disabled="false"/>
+                                        <h:message for="ceev-criteria-caseid" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-creator-ol" for="ceev-filter-creator" value="filter by event creator?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-creator" value="#{cEEventsBB.searchParams.filterByEventOwner}" />
+                                    </h:panelGroup>
+                                        
+                                    <h:panelGroup>
+                                        <h:outputLabel for="ceev-criteria-user" id="ceev-criteria-user-ol">
+                                            <h:outputText value="event Categories in your selected event type:"/>
+                                        </h:outputLabel>
+                                        <p:selectOneMenu id="ceev-criteria-user" required="false" value="#{cEEventsBB.searchParams.ownerUserID}">
+                                            <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
+                                            <f:selectItems value="#{cEEventsBB.userList}"  var="u" itemValue="#{u}" 
+                                                           itemLabel="#{u.username}"/>
+                                            <f:converter converterId="userConverter"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-person-ol" for="ceev-filter-person" value="filter by person?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-person" value="#{cEEventsBB.searchParams.filterByPerson}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-criteria-person-ol" for="ceev-criteria-person" value="your current session's person list:"/>
+                                        <p:selectOneMenu id="ceev-criteria-person" required="false" value="#{cEEventsBB.searchParams.ownerUserID}">
+                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                            <f:selectItems value="#{sessionBean.activePersonList}"  var="p" itemValue="#{p}" 
+                                                           itemLabel="#{p.firstName} #{p.lastName}"/>
+                                            <f:converter converterId="personConverter"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="ceev-criteria-person" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-active-ol" for="ceev-filter-active" value="filter by active?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-active" value="#{cEEventsBB.searchParams.filterByActive}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-criteria-active-ol" for="ceev-criteria-active" value="checked = only active events:"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-criteria-active" value="#{cEEventsBB.searchParams.isActive}" disabled="false" />
+                                    </h:panelGroup>
+                                    
+                                    
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-hidden-ol" for="ceev-filter-hidden" value="filter by hidden?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-hidden" value="#{cEEventsBB.searchParams.filterByHidden}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-criteria-hidden-ol" for="ceev-criteria-hidden" value="checked = only hidden events"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-criteria-hidden" value="#{cEEventsBB.searchParams.isHidden}" disabled="false" />
+                                    </h:panelGroup>
+                                    
+                                    
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-requireview-ol" for="ceev-filter-requireview" value="filter by requiring view confirmation?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-requireview" value="#{cEEventsBB.searchParams.filterByRequiresViewConfirmation}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-criteria-requireview-ol" for="ceev-criteria-requireview" value="checked = requires view conf"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-criteria-requireview" value="#{cEEventsBB.searchParams.isViewConfirmationRequired}" disabled="false" />
+                                    </h:panelGroup>
+                                    
+                                    
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-viewstatus-ol" for="ceev-filter-viewstatus" value="filter by viewed status?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-viewstatus" value="#{cEEventsBB.searchParams.filterByViewed}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-criteria-view-ol" for="ceev-criteria-view" value="checked = has been viewed"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-criteria-view" value="#{cEEventsBB.searchParams.isViewed}" disabled="false" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-filter-eventid-ol" for="ceev-filter-eventid" value="filter by event ID?"/>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="ceev-filter-eventid" value="#{cEEventsBB.searchParams.filterByObjectID}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel id="ceev-criteria-eventid-ol" for="ceev-criteria-eventid" value="event id:"/>
+                                        <p:spacer height="5px"/>
+                                        <p:inputText id="ceev-criteria-eventid" value="#{cEEventsBB.searchParams.objectID}" disabled="false"/>
+                                        <h:message for="ceev-criteria-eventid" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+                                <p:commandButton ajax="true" value="Run query" actionListener="#{cEEventsBB.executeQuery}"
+                                                 process="@form"
+                                                 update="ceevents-form-events-dt:ceevent-td
+                                                 ceev-form-globalmessages:ceev-globalmessages
+                                                 "/>
+
+                            </p:fieldset>
+                        </h:form>
+
+
+
+                        <h:form id="ceevents-form-events-dt">
+                            <p:dataTable
+                                id="ceevent-td"
+                                var="e"
+                                rowKey="#{e.eventID}"
+                                value="#{cEEventsBB.eventList}"
+                                tableStyleClass="primeDataTable"
+                                resizableColumns="true"
+                                rowExpandMode="multiple"
+                                expandedRow="false"
+                                filteredValue="#{cEEventsBB.filteredEventList}"
+                                widgetVar="ceevent-dt-var"
+                                >
+                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                <p:column width="3%" exportable="false">
+                                    <f:facet name="header">
+                                        <h:outputText value="Expand"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+
+                                <p:column width="11%" sortBy="#{e.dateOfRecord}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.prettyDateOfRecord}"/>
+                                </p:column>
+
+                                <p:column width="8%" sortBy="#{e.category.eventType.label}"
+                                          filterBy="#{e.category.eventType.label}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.category.eventType.label}"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
+                                          filterBy="#{e.category.eventCategoryTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                </p:column>
+                                <p:column width="5%" filterBy="#{e.eventOwnerUser.LName}"
+                                          sortBy="#{e.eventOwnerUser.LName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Creator" />
+                                    </f:facet>
+                                    <h:outputText value="#{e.eventOwnerUser.LName}"/>
+                                </p:column>
+                                <p:column width="20%" style="word-wrap: normal;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Description" />
+                                    </f:facet>
+                                    <div class="rowExpansion">
+                                        <h:outputText value="#{e.eventDescription}"/>
+                                    </div>
+                                </p:column>
+                                <p:column width="5%" exportable="false">
+                                    <f:facet name="header">
+                                        <h:outputText value="edit" />
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-edit"
+                                                     action="#{caseProfileBB.editEvent(e)}" 
+                                                     ajax="false"/>
+
+                                </p:column>
+
+                                <p:rowExpansion>
+
+                                    <div class="outlinedBox">
+                                        <h2>Event ID: <h:outputText value="#{e.eventID}"/> </h2>
+                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Description" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.eventDescription}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.discloseToMunicipality}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Disclose to Public?" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.discloseToPublic}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Creation time stamp"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.eventTimeStamp}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Active Event?"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.activeEvent}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.requiresViewConfirmation}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="View confirmed by"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="View confirmed at"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{e.viewConfirmedAt}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+
+
+                                            <f:facet name="footer" class="leftalign">
+                                                <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion" style="text-align: left">
+                                                    <h:outputText escape="false" value="#{e.notes}"/>
+                                                </div>
+                                            </f:facet>
+
+                                        </h:panelGrid>
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+
+
+                            <p:commandLink value="Export event history as pdf" ajax="false">
+                                <p:dataExporter type="pdf" target="caseEventTable" fileName="case__idno_eventHistory"/>
+                            </p:commandLink>
+
+
+                        </h:form>
+
+
+
+
+                        <p:dialog header="Code Enforcement Profile" widgetVar="helpdlg" responsive="true">
+                            <h2>Code enforcement case profile</h2>
+                            <p>This page is the launchpad for all other case-related actions and displays the entire case event history.</p>
+                        </p:dialog>
+
+                        <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                        <p:spacer height="10px"/>
+
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

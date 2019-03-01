@@ -274,8 +274,10 @@ public class Event extends EntityUtils implements Serializable {
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {
-        dateOfRecordUtilDate = java.util.Date.from(
-                this.dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
+        if(dateOfRecord != null){
+            dateOfRecordUtilDate = java.util.Date.from(
+                    this.dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
+        }
         return dateOfRecordUtilDate;
     }
 

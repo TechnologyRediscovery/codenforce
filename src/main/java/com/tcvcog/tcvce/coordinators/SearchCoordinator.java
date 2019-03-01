@@ -91,7 +91,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByViewed(true);
         eventParams.setIsViewed(false);
         
-        eventParams.setFilterByViewConfirmedBy(false);
+        eventParams.setFilterByPerson(false);
         eventParams.setFilterByViewConfirmedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
