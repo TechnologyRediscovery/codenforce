@@ -904,6 +904,12 @@
         </navigation-case>
 
         <navigation-case>
+            <from-outcome>ceEvents</from-outcome>
+            <to-view-id>/restricted/cogview/ceEvents.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+
+        <navigation-case>
             <from-outcome>ceCaseHistory</from-outcome>
             <to-view-id>/restricted/cogview/ceCaseHistory.xhtml</to-view-id>
             <redirect />
@@ -1454,5 +1460,9 @@
         <managed-bean-class>com.tcvcog.tcvce.application.PhotoBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
+    <managed-bean>
+        <managed-bean-name>cEEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

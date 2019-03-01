@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.AccessKeyCard;
+import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
@@ -79,6 +80,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     private Person personForCEActionRequestSubmission;
     
+    
     // temporary
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
@@ -96,6 +98,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<CECase> cECaseList;
     
     private EventCECase activeEvent;
+    private List<EventWithCasePropInfo> activeFancyCEEventList;
     private List<CodeViolation> activeViolationList;
     private NoticeOfViolation activeNotice;
     private Citation activeCitation;
@@ -558,61 +561,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activePropWithList
+     * @return the activeFancyCEEventList
      */
-    public PropertyWithLists getActivePropWithList() {
-        return activePropWithList;
+    public List<EventWithCasePropInfo> getActiveFancyCEEventList() {
+        return activeFancyCEEventList;
     }
 
     /**
-     * @param activePropWithList the activePropWithList to set
+     * @param activeFancyCEEventList the activeFancyCEEventList to set
      */
-    public void setActivePropWithList(PropertyWithLists activePropWithList) {
-        this.activePropWithList = activePropWithList;
-    }
-    
-    public OccPermitApplication getOccPermitApplication() {
-        return occPermitApplication;
-    }
-
-    public void setOccPermitApplication(OccPermitApplication occPermitApplication) {
-        this.occPermitApplication = occPermitApplication;
-    }
-
-    public PropertyUnit getActivePropUnit() {
-        return activePropUnit;
-    }
-
-    public void setActivePropUnit(PropertyUnit activePropUnit) {
-        this.activePropUnit = activePropUnit;
-    }
-
-    /**
-     * @return the activePropWithLists
-     */
-    public PropertyWithLists getActivePropWithLists() {
-        return activePropWithLists;
-    }
-
-    /**
-     * @param activePropWithLists the activePropWithLists to set
-     */
-    public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
-        this.activePropWithLists = activePropWithLists;
-    }
-
-    /**
-     * @return the occPermitApplicationReason
-     */
-    public OccPermitApplicationReason getOccPermitApplicationReason() {
-        return occPermitApplicationReason;
-    }
-
-    /**
-     * @param occPermitApplicationReason the occPermitApplicationReason to set
-     */
-    public void setOccPermitApplicationReason(OccPermitApplicationReason occPermitApplicationReason) {
-        this.occPermitApplicationReason = occPermitApplicationReason;
+    public void setActiveFancyCEEventList(List<EventWithCasePropInfo> activeFancyCEEventList) {
+        this.activeFancyCEEventList = activeFancyCEEventList;
     }
     
 }

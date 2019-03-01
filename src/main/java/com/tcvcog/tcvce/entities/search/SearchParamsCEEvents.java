@@ -6,6 +6,8 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Person;
 import java.io.Serializable;
 
 /**
@@ -15,8 +17,10 @@ import java.io.Serializable;
 public class SearchParamsCEEvents extends SearchParams implements Serializable{
     
     private boolean filterByEventCategory;
-    private boolean filterByEventType;
     private EventCategory eventCategory;
+    
+    private boolean filterByEventType;
+    private EventType evtType;
     
     private boolean filterByCaseID;
     private int caseId;
@@ -24,6 +28,9 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     private boolean filterByEventOwner;
     private int ownerUserID;   
   
+    private boolean filterByPerson;
+    private Person person;
+    
     private boolean filterByActive;
     private boolean isActive;
     
@@ -36,8 +43,6 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     private boolean filterByViewed;
     private boolean isViewed;
     
-    private boolean filterByViewConfirmedBy;
-    private int confirmerUserID;
     
     private boolean filterByViewConfirmedAtDateRange;
     
@@ -130,19 +135,13 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @return the filterByViewConfirmedBy
+     * @return the filterByPerson
      */
-    public boolean isFilterByViewConfirmedBy() {
-        return filterByViewConfirmedBy;
+    public boolean isFilterByPerson() {
+        return filterByPerson;
     }
 
-    /**
-     * @return the confirmerUserID
-     */
-    public int getConfirmerUserID() {
-        return confirmerUserID;
-    }
-
+    
     /**
      * @return the filterByViewConfirmedAtDateRange
      */
@@ -235,19 +234,13 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @param filterByViewConfirmedBy the filterByViewConfirmedBy to set
+     * @param filterByPerson the filterByPerson to set
      */
-    public void setFilterByViewConfirmedBy(boolean filterByViewConfirmedBy) {
-        this.filterByViewConfirmedBy = filterByViewConfirmedBy;
+    public void setFilterByPerson(boolean filterByPerson) {
+        this.filterByPerson = filterByPerson;
     }
 
-    /**
-     * @param confirmerUserID the confirmerUserID to set
-     */
-    public void setConfirmerUserID(int confirmerUserID) {
-        this.confirmerUserID = confirmerUserID;
-    }
-
+   
     /**
      * @param filterByViewConfirmedAtDateRange the filterByViewConfirmedAtDateRange to set
      */
@@ -295,6 +288,34 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
      */
     public void setIsViewed(boolean isViewed) {
         this.isViewed = isViewed;
+    }
+
+    /**
+     * @return the evtType
+     */
+    public EventType getEvtType() {
+        return evtType;
+    }
+
+    /**
+     * @param evtType the evtType to set
+     */
+    public void setEvtType(EventType evtType) {
+        this.evtType = evtType;
+    }
+
+    /**
+     * @return the person
+     */
+    public Person getPerson() {
+        return person;
+    }
+
+    /**
+     * @param person the person to set
+     */
+    public void setPerson(Person person) {
+        this.person = person;
     }
    
    

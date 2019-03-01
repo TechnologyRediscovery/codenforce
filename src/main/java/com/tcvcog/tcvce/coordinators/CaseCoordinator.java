@@ -38,6 +38,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
@@ -103,6 +104,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             sps.setUseRequestStatus(false);
         
         return sps;
+    }
+    
+    
+    public SearchParamsCEEvents getDefaultSearchParamsCEEventsRequiringView(int user){
+        SearchCoordinator sc = new SearchCoordinator();
+        return sc.getSearchParamsEventsRequiringView(user);
+        
     }
     
      /**
