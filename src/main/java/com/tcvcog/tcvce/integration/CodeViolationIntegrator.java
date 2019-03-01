@@ -50,13 +50,15 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
     public int insertCodeViolation(CodeViolation v) throws IntegrationException {
         int lastID = 0;
 
-        String query = "INSERT INTO public.codeviolation(\n"
-                + "            violationid, codesetelement_elementid, cecase_caseid, \n"
-                + "            dateofrecord, entrytimestamp, stipulatedcompliancedate, \n"
-                + "            actualcompliancdate, penalty, description, notes)\n"
-                + "    VALUES (DEFAULT, ?, ?, \n"
-                + "             ?, now(), ?, \n"
-                + "            NULL, ?, ?, ?);";
+        String query = "INSERT INTO public.codeviolation("
+                + "            violationid, codesetelement_elementid, cecase_caseid, "
+                + "            dateofrecord, entrytimestamp, stipulatedcompliancedate,"
+                + "            actualcompliancdate, penalty, description, notes, "
+                + "             legacyimport, compliancetimestamp, " 
+                + "            complianceuser, compliancetfevent)"
+                + "    VALUES (DEFAULT, ?, ?,"
+                + "             ?, now(), ?,"
+                + "            NULL, ?, ?, ?, ?, NULL, NULL, NULL );";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -75,6 +77,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt.setDouble(5, v.getPenalty());
             stmt.setString(6, v.getDescription());
             stmt.setString(7, v.getNotes());
+            stmt.setBoolean(8, v.isLeagacyImport());
 
             stmt.execute();
             
@@ -316,7 +319,8 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         String query = "UPDATE public.codeviolation\n"
                 + "   SET codesetelement_elementid=?, cecase_caseid=?, \n"
                 + "       dateofrecord=?, entrytimestamp=now(), stipulatedcompliancedate=?, \n"
-                + "       actualcompliancdate=?, penalty=?, description=?, notes=?\n"
+                + "       actualcompliancdate=?, penalty=?, description=?, notes=?,"
+                + "       compliancetfevent=? "
                 + " WHERE violationid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -339,6 +343,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString((7), v.getDescription());
             stmt.setString(8, v.getNotes());
             stmt.setInt(9, v.getViolationID());
+            stmt.setInt(10, v.getCompTimeFrameComplianceEvent().getEventID());
 
             System.out.println("CodeViolationIntegrator.updateViolation | stmt: " + stmt.toString());
 
@@ -347,6 +352,35 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("cannot fetch code violation by ID, sorry.", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    public void recordCompliance(CodeViolation v) throws IntegrationException {
+        String query = "UPDATE public.codeviolation\n"
+                +   "   SET actualcompliancdate=?, compliancetimestamp=now(), \n" 
+                +   "       complianceuser=? "
+                +   "   WHERE violationid = ?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(v.getActualComplianceDate()));
+            stmt.setInt(2, v.getComplianceUser().getUserID());
+            stmt.setInt(3, v.getViolationID());
+
+            System.out.println("CodeViolationIntegrator.recordCompliance");
+
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("cannot complete compliance certification.", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

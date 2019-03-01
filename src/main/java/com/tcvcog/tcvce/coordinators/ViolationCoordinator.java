@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -26,7 +27,10 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,24 +72,36 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
      * ALSO creates a corresponding timeline event to match the stipulated compliance
      * date on the violation that's added.
      * @param v
+     * @param c
+     * @return the database key assigned to the inserted violation
      * @throws IntegrationException
      * @throws ViolationException 
      */
-    public int addNewCodeViolation(CodeViolation v) throws IntegrationException, ViolationException{
+    public int attachViolationToCaseAndInsertTimeFrameEvent(CodeViolation v, CECase c) throws IntegrationException, ViolationException, CaseLifecyleException{
         
         CodeViolationIntegrator vi = getCodeViolationIntegrator();
         EventCoordinator ec = getEventCoordinator();
-        EventCategory eventCat = ec.getInitializedEventCateogry();
-        eventCat.setEventType(EventType.Timeline);
-        eventCat.setRequiresviewconfirmation(true);
+        EventCECase tfEvent;
+        int violationStoredDBKey;
+        
+        
+//        EventCategory eventCat = ec.getInitiatlizedEventCategory(
+//                                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+//                                .getString("complianceTimeframeExpiry")));
+        EventCategory eventCat = ec.getInitiatlizedEventCategory(113);
+        tfEvent = ec.getInitializedEvent(c, eventCat);
+        tfEvent.setDateOfRecord(v.getStipulatedComplianceDate());
+        tfEvent.setEventOwnerUser(c.getCaseManager());
+        tfEvent.setEventDescription(getResourceBundle(Constants.MESSAGE_TEXT)
+                        .getString("complianceTimeframeEndEventDesc"));
         
         if(verifyCodeViolationAttributes(v)){
-            return vi.insertCodeViolation(v);
-            
+            violationStoredDBKey = vi.insertCodeViolation(v);
+            ec.insertEvent(tfEvent);
         } else {
             throw new ViolationException("Failed violation verification");
         }
-        
+        return violationStoredDBKey;
         
     }
     
@@ -105,7 +121,26 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         if(verifyCodeViolationAttributes(cv)){
             cvi.updateCodeViolation(cv);
         }
+    }
+    
+    /**
+     * CodeViolation should have the actual compliance date set from the user's 
+     * event date of record
+     * @param cv
+     * @param u the user carrying out the compliance certification
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void recordCompliance(CodeViolation cv, User u) throws IntegrationException{
         
+        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        EventIntegrator ei = getEventIntegrator();
+        // update violation record for compliance
+        cv.setComplianceTimeStamp(LocalDateTime.now());
+        cv.setComplianceUser(u);
+        cvi.recordCompliance(cv);
+                
+        // inactivate timeframe expiry event
+        ei.inactivateEvent(cv.getCompTimeFrameComplianceEvent().getEventID());
         
     }
     

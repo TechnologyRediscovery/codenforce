@@ -65,7 +65,7 @@
                                 <h:panelGroup>
                                     <h:outputText value="Event Cateogry Description: #{eventAddBB.selectedEventCateogryDescription}" id="selectedEventCategoryDescription"/>
                                     <p:spacer height="10px"/>
-                                    <h:outputText value="Requires View Confirmation: #{eventAddBB.selectedEventRequiresViewConfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
+                                    <h:outputText value="Requires View Confirmation: #{eventAddBB.selectedEventrequestsAction}" id="selectedEventCateogryRequiresViewConfirm"/>
                                     <p:spacer height="10px"/>
                                     <h:outputText value="Triggers notification of case monitor subscribers: #{eventAddBB.selectedEventNotifiesCaseMonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
 

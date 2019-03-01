@@ -145,6 +145,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                         "Unable to connect request to case.", 
                         getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
+//          selectedRequest.
         selectedRequest.setCaseID(selectedCaseForAttachment.getCaseID());
         updateSelectedRequestStatusWithBundleKey("actionRequestExistingCaseStatusCode");
         // force a reload of request list

@@ -445,7 +445,7 @@
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.requiresViewConfirmation}"/>
+                                                            <h:outputText value="#{e.category.requiresviewconfirmation}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -537,7 +537,7 @@
 
                                         </p:column>
                                         
-                                        <p:column width="5%">
+                                        <p:column width="10%">
                                             <f:facet name="header">
                                                 <h:outputText value="Compliance!" />
                                             </f:facet>
@@ -545,7 +545,7 @@
                                                                 ajax="true" action="#{caseProfileBB.recordCompliance(v)}"
                                                                 icon="fa fa-check"
                                                                 oncomplete="PF('add-event-dialog-var').show()"
-                                                                value="Record compliance"  
+                                                                value="Compliance"  
                                                                 update="add-event-dialog
                                                                 addNewEventForm:add-event-currcase-ot
                                                                 addNewEventForm:add-event-et-ot
@@ -557,7 +557,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Actual Comp Date" />
                                             </f:facet>
-                                            <h:outputText value="#{v.actualComplianceDate}"/>
+                                            <h:outputText value="#{v.actualComplianceDatePretty}"/>
                                         </p:column>
 
 
@@ -1025,11 +1025,11 @@
                     
                     <h:outputText id="add-event-currcase-ot" value="Current Case: #{caseProfileBB.currentCase.caseID}: #{caseProfileBB.currentCase.caseName} "/>
                     <p:spacer height="5px"/>
-                    <h:outputText id="add-event-et-ot" value="Event Type: #{eventAddBB.eventInFormation.category.eventType.label}"/>
+                    <h:outputText id="add-event-et-ot" value="Event Type: #{eventAddBB.eventInProcess.category.eventType.label}"/>
                     <p:spacer height="5px"/>
-                    <h:outputText id="add-event-ec-ot" value="Event Category: #{eventAddBB.eventInFormation.category.eventCategoryTitle}"/>
+                    <h:outputText id="add-event-ec-ot" value="Event Category: #{eventAddBB.eventInProcess.category.eventCategoryTitle}"/>
                     <p:spacer height="5px"/>
-                    <h:outputText id="add-event-cd-ot" value="Category description: #{eventAddBB.eventInFormation.category.eventCategoryDesc}"/>
+                    <h:outputText id="add-event-cd-ot" value="Category description: #{eventAddBB.eventInProcess.category.eventCategoryDesc}"/>
                     
                         
 
@@ -1044,7 +1044,7 @@
                                             <p:outputLabel for="eventDesc">
                                                 <h:outputText value="Short Description:"/>
                                             </p:outputLabel>
-                                            <p:inputText id="eventDesc" value="#{eventAddBB.eventInFormation.eventDescription}" 
+                                            <p:inputText id="eventDesc" value="#{eventAddBB.eventInProcess.eventDescription}" 
                                                          style="width: 600px;" tabindex="3" required="true" styleClass="inputText"/>
                                             <h:message for="eventDesc" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1057,7 +1057,7 @@
                                             <h:outputText value="Active Event?"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch tabindex="18" id="activeEvent" value="#{eventAddBB.eventInFormation.activeEvent}" onLabel="Yes" offLabel="No" />
+                                        <p:inputSwitch tabindex="18" id="activeEvent" value="#{eventAddBB.eventInProcess.activeEvent}" onLabel="Yes" offLabel="No" />
                                         
                                     </h:panelGroup>
 
@@ -1066,7 +1066,7 @@
                                             <h:outputText value="Date of Record"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:calendar value="#{eventAddBB.eventInFormation.dateOfRecordUtilDate}" 
+                                        <p:calendar value="#{eventAddBB.eventInProcess.dateOfRecordUtilDate}" 
                                                     mode="popup"  id="eventDateCal"
                                                     showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                     navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -1081,7 +1081,7 @@
                                             <h:outputText value="Disclose to Municipalities"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{eventAddBB.eventInFormation.discloseToMunicipality}" onLabel="Yes" offLabel="No" />
+                                        <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{eventAddBB.eventInProcess.discloseToMunicipality}" onLabel="Yes" offLabel="No" />
                                     </h:panelGroup>
 
                                     <h:panelGroup>
@@ -1089,7 +1089,7 @@
                                             <h:outputText value="Disclose to Public"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{eventAddBB.eventInFormation.discloseToPublic}" onLabel="Yes" offLabel="No" />
+                                        <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{eventAddBB.eventInProcess.discloseToPublic}" onLabel="Yes" offLabel="No" />
                                     </h:panelGroup>
                                     
                                     
@@ -1099,7 +1099,7 @@
                                             <h:outputText value="Require view confirmation by case manager"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventAddBB.eventInFormation.requiresViewConfirmation}" onLabel="Yes" offLabel="No" />
+                                        <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventAddBB.eventInProcess.requiresViewConfirmation}" onLabel="Yes" offLabel="No" />
                                     </h:panelGroup>
 
                                     <f:facet name="footer">
@@ -1107,7 +1107,7 @@
                                             <h:outputText value="Event Notes:"/>
                                         </h:outputLabel>
                                         <h:panelGroup>
-                                            <p:editor id="eventNotes" value="#{eventAddBB.eventInFormation.notes}" 
+                                            <p:editor id="eventNotes" value="#{eventAddBB.eventInProcess.notes}" 
                                                     controls="bold italic underline strikethrough font size style color 
                                                     bullets numbering center undo redo rule link removeformat outdent 
                                                     indent link unlink copy cut paste rule alignleft center alignright"
