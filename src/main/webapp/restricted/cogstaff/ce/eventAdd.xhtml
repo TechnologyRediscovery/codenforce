@@ -18,7 +18,7 @@
                         
                     <h1>Add Event</h1>
                     
-                    <h:outputText value="Current Case: #{eventAddBB.ceCase.caseName}"/>
+                    <h:outputText value="Current Case: #{eventAddBB.currentCase.caseName}"/>
                     <p:spacer height="5px"/>
                     <h:outputText value="Event Type: #{eventAddBB.currentEvent.category.eventType.label}"/>
                     <p:spacer height="5px"/>
@@ -101,7 +101,7 @@
                                             <h:outputText value="Event Notes:"/>
                                         </h:outputLabel>
                                         <h:panelGroup>
-                                            <p:editor id="eventNotes" value="#{eventAddBB.formEventNotes}" 
+                                            <p:editor id="eventNotes" value="#{eventAddBB.eventInFormation.notes}" 
                                                     controls="bold italic underline strikethrough font size style color 
                                                     bullets numbering center undo redo rule link removeformat outdent 
                                                     indent link unlink copy cut paste rule alignleft center alignright"
@@ -115,7 +115,7 @@
                                 </h:panelGrid>
                                 
                             
-                                <p:commandButton ajax="false" action="#{eventAddBB.addEvent}"
+                                <p:commandButton ajax="false" action="#{eventAddBB.attachEventToCase}"
                                                  value="Create new event" icon="fa fa-plus"/>
                         </h:form>
                                 
