@@ -109,6 +109,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
         event.setActiveEvent(true);
         event.setHidden(false);
+        event.setCaseID(c.getCaseID());
         System.out.println("EventCoordinator.getInitalizedEvent | eventCat: " 
                 + event.getCategory().getEventCategoryTitle());
         return event;
@@ -261,6 +262,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return e;
     }
     
+    
+    
     /**
      * At its current impelementation, this amounts to a factory for ArrayLists
      * that are populated by the user when creating events
@@ -279,6 +282,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
+    /**
+     * A container for future event-related business logic
+     * @param e
+     * @throws IntegrationException 
+     */
     public void insertEvent(EventCECase e) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ei.insertEvent(e);

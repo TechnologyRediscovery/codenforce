@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -63,7 +64,7 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     private EventType selectedEventType;
     private EventType[] userAdminEventTypeList;
     
-    private EventCECase eventInFormation;
+    private EventCECase eventInProcess;
     
     private ArrayList<Person> candidatePersonList;
     private Person selectedCadidatePerson;
@@ -74,6 +75,12 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         
     }
     
+    @PostConstruct
+    public void initBean(){
+        
+    }
+    
+    
     public String startNewEvent(){
         
         if (selectedEventCategory != null){
@@ -83,14 +90,14 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
             CECase c = getSessionBean().getcECase();
             EventCoordinator ec = getEventCoordinator();
             try {
-                eventInFormation = ec.getInitializedEvent(c, selectedEventCategory);
+                eventInProcess = ec.getInitializedEvent(c, selectedEventCategory);
             } catch (CaseLifecyleException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                                 ex.getMessage(), ""));
             }
-            getSessionBean().setActiveEvent(eventInFormation);
+            getSessionBean().setActiveEvent(eventInProcess);
         } else {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -106,18 +113,18 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
         CECase ccase = getSessionBean().getcECase();
         
         // category is already set from initialization sequence
-        eventInFormation.setCaseID(ccase.getCaseID());
-        System.out.println("EventAddBB.addEvent | CaseID: " + eventInFormation.getCaseID());
-        eventInFormation.setEventOwnerUser(getSessionBean().getFacesUser());
+        eventInProcess.setCaseID(ccase.getCaseID());
+        System.out.println("EventAddBB.addEvent | CaseID: " + eventInProcess.getCaseID());
+        eventInProcess.setEventOwnerUser(getSessionBean().getFacesUser());
 //        e.setEventPersons(formSelectedPersons);
         
         // now check for persons to connect
         
         try {
-            if(eventInFormation.getCategory().getEventType() == EventType.Compliance){
-                cc.processComplianceEvent(ccase, eventInFormation, getSessionBean().getActiveCodeViolation());
+            if(eventInProcess.getCategory().getEventType() == EventType.Compliance){
+                cc.processComplianceEvent(ccase, eventInProcess, getSessionBean().getActiveCodeViolation());
             } else {
-                cc.processCEEvent(ccase, eventInFormation);
+                cc.processCEEvent(ccase, eventInProcess);
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -360,21 +367,21 @@ public class EventAddBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the eventInFormation
+     * @return the eventInProcess
      */
-    public EventCECase getEventInFormation() {
+    public EventCECase getEventInProcess() {
         EventCECase evCECase = getSessionBean().getActiveEvent();
         if(evCECase != null){
-            eventInFormation = evCECase;
+            eventInProcess = evCECase;
         }
-        return eventInFormation;
+        return eventInProcess;
     }
 
     /**
-     * @param eventInFormation the eventInFormation to set
+     * @param eventInProcess the eventInProcess to set
      */
-    public void setEventInFormation(EventCECase eventInFormation) {
-        this.eventInFormation = eventInFormation;
+    public void setEventInProcess(EventCECase eventInProcess) {
+        this.eventInProcess = eventInProcess;
     }
 
    
