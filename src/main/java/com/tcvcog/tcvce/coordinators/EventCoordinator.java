@@ -275,7 +275,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // YIKES TODO: Case vetting logic needed here!
         ei.updateEvent(event, clearViewConfirmation);
         
-        return "caseProfile";
+        return "cecases";
     }
     
     
@@ -301,7 +301,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public void initiateEventProcessing(CECase c, EventCECase e, CodeViolation cv) throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseCoordinator cc = getCaseCoordinator();
         
-        cc.processCEEvent(c, e, null);
+        cc.processCEEvent(c, e);
         
     }
     

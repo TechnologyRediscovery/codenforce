@@ -307,7 +307,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, event.getCategory().getCategoryID());
             stmt.setInt(2, event.getCaseID());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(event.getDateOfRecord()));
+            if(event.getDateOfRecord() != null){
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(event.getDateOfRecord()));
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
             
             // note that the timestamp is set by a call to postgres's now()
             stmt.setString(4, event.getEventDescription());
@@ -500,10 +504,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ev.setEventID(rs.getInt("eventid"));
         ev.setCategory(getEventCategory(rs.getInt("ceeventCategory_catID")));
         ev.setCaseID(rs.getInt("cecase_caseid"));
-        LocalDateTime dt = rs.getTimestamp("dateofrecord").toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime();
-        ev.setDateOfRecord(dt);
-        ev.setPrettyDateOfRecord(getPrettyDate(dt));
+        if(rs.getTimestamp("dateofrecord") != null){
+            LocalDateTime dt = rs.getTimestamp("dateofrecord").toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDateTime();
+            ev.setDateOfRecord(dt);
+            ev.setPrettyDateOfRecord(getPrettyDate(dt));
+        }
         
         ev.setEventTimeStamp(rs.getTimestamp("eventtimestamp").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());

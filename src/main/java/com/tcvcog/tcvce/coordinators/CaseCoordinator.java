@@ -71,6 +71,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     }
     
+    
+    
     /**
      * The temporarily hard-coded values for default search parameters for various
      * types of search Param objects
@@ -213,7 +215,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationEvent.setEventOwnerUser(u);
             originationEvent.setCaseID(insertedCase.getCaseID());
             originationEvent.setDateOfRecord(LocalDateTime.now());
-            processCEEvent(newCase, originationEvent, null);
+            processCEEvent(newCase, originationEvent);
     }
     
     /**
@@ -286,7 +288,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public void processCEEvent(CECase c, EventCECase e, List<CodeViolation> violationList) 
+    public void processCEEvent(CECase c, EventCECase e) 
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
          
@@ -296,7 +298,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 processActionEvent(c, e);
                 break;
             case Compliance:
-                processComplianceEvent(c, e, violationList);
+                // deprecated--previously called processComplianceEvent()
                 break;
             case Closing:
                 processClosingEvent(c, e);
@@ -316,25 +318,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the current case
      * @param e the Compliance event
+     * @param viol
      * @throws ViolationException in the case of a malformed violation
      * @throws IntegrationException in the case of a DB error
      * @throws CaseLifecyleException in the case of date mismatch
      */
-    private void processComplianceEvent(CECase c, EventCECase e, List<CodeViolation> activeViolationList) 
+    public void processComplianceEvent(CECase c, EventCECase e, CodeViolation viol) 
             throws ViolationException, IntegrationException, CaseLifecyleException{
         
         
         ViolationCoordinator vc = getViolationCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
-        ListIterator<CodeViolation> li = activeViolationList.listIterator();
-        CodeViolation cv;
-        
-        while(li.hasNext()){
-            cv = li.next();
-            cv.setActualComplianceDate(e.getDateOfRecord());
-            vc.updateCodeViolation(cv);
-        } // close while
+            viol.setActualComplianceDate(e.getDateOfRecord());
+            vc.updateCodeViolation(viol);
         
         // first insert our nice compliance event for all selected violations
         ec.insertEvent(e);
@@ -398,7 +395,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                    
             complianceClosingEvent = ec.getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
-            processCEEvent(c, complianceClosingEvent, caseViolationList);
+            processCEEvent(c, complianceClosingEvent);
             
         } // close if
         
