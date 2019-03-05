@@ -407,16 +407,11 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>eventAddBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventAddBB</managed-bean-class>
+        <managed-bean-name>eventManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventManageBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>eventEditBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventEditBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+   
 
     <managed-bean>
         <managed-bean-name>personConnectBB</managed-bean-name>

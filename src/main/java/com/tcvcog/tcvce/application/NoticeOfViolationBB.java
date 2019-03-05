@@ -101,7 +101,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public void removeViolationFromList(CodeViolation viol){
         activeVList.remove(viol);
-        getSessionBean().setActiveViolationList(activeVList);
+        getSessionBean().setViolationQueue(activeVList);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Done: violation ID " + viol.getViolationID() + "will not be included in letter.",""));
@@ -180,7 +180,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public String assembleNotice(){
         currentNotice = getSessionBean().getActiveNotice();
-        activeVList = getSessionBean().getActiveViolationList();
+        activeVList = getSessionBean().getViolationQueue();
         
         StringBuilder sb = new StringBuilder();
         sb.append(getPrettyDate(LocalDateTime.now()));
@@ -397,7 +397,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public List<CodeViolation> getActiveVList() {
         if(activeVList == null){
-            activeVList = getSessionBean().getActiveViolationList();
+            activeVList = getSessionBean().getViolationQueue();
         }
         return activeVList;
     }

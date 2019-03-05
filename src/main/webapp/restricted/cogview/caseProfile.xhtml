@@ -196,9 +196,12 @@
                                     </p:dataTable>
                                     
                                     
-                                    <p:commandLink value="Export event history as pdf" ajax="false">
-                                        <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{sessionBean.activeCECase.property.address}_idno#{sessionBean.activeCECase.caseID}_eventHistory"/>
-                                    </p:commandLink>
+                                    <ui:remove>
+                                        
+                                        <p:commandLink value="Export event history as pdf" ajax="false">
+                                            <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{sessionBean.activeCECase.property.address}_idno#{sessionBean.activeCECase.caseID}_eventHistory"/>
+                                        </p:commandLink>
+                                    </ui:remove>
 
 
                                 </h:form>

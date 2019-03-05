@@ -178,4 +178,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return munis;
     }
     
+    
+    
 } // close class

@@ -33,13 +33,12 @@
                         <p:dataTable
                             id="newRecipientPersonTD"
                             var="p"
-                            selectionMode="single"
-                            selection="#{noticeOfViolationBB.selectedRecipient}"
                             rowKey="#{p.personID}"
                             value="#{noticeOfViolationBB.personCandidateAL}"
                             tableStyleClass="primeDataTable"
                             expandedRow="false"
-                            rowExpandMode="single">
+                            rowExpandMode="single"
+                            rowIndexVar="rowIndex">
 
                             <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 

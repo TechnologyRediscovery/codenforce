@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 
 /**
@@ -26,7 +27,7 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     private int caseId;
     
     private boolean filterByEventOwner;
-    private int ownerUserID;   
+    private User ownerUser;
   
     private boolean filterByPerson;
     private Person person;
@@ -88,8 +89,8 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     /**
      * @return the ownerUserID
      */
-    public int getOwnerUserID() {
-        return ownerUserID;
+    public User getOwnerUser() {
+        return ownerUser;
     }
 
     /**
@@ -187,8 +188,8 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     /**
      * @param ownerUserID the ownerUserID to set
      */
-    public void setOwnerUserID(int ownerUserID) {
-        this.ownerUserID = ownerUserID;
+    public void setOwnerUserID(User ownerUserID) {
+        this.setOwnerUser(ownerUserID);
     }
 
     /**
@@ -316,6 +317,13 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
      */
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    /**
+     * @param ownerUser the ownerUser to set
+     */
+    public void setOwnerUser(User ownerUser) {
+        this.ownerUser = ownerUser;
     }
    
    

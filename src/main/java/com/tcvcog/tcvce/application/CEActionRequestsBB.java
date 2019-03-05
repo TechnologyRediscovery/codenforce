@@ -710,7 +710,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         disabledDueToRoutingNotAllowed = 
                 !(cc.determineCEActionRequestRoutingActionEnabledStatus(
                         selectedRequest,
-                        getSessionBean().getAccessKeyCard()));
+                        getSessionBean().getFacesUser().getKeyCard()));
         System.out.println("CEACtionRequestsBB.isRoutingAllowedOnSelectedRequest | Status: " 
                 + disabledDueToRoutingNotAllowed);
         return disabledDueToRoutingNotAllowed;
@@ -840,7 +840,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public boolean isDisablePACCControl() {
         disablePACCControl = false;
-        if(getSessionBean().getAccessKeyCard().isHasMuniStaffPermissions() == false){
+        if(getSessionBean().getFacesUser().getKeyCard().isHasMuniStaffPermissions() == false){
             disablePACCControl = true;
         }
         return disablePACCControl;

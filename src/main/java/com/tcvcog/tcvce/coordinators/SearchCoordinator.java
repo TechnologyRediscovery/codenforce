@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
@@ -58,7 +59,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return propParams;
     }
     
-    protected SearchParamsCEEvents getSearchParamsEventsRequiringView(int ownerID){
+    protected SearchParamsCEEvents getSearchParamsEventsRequiringView(User u){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory
@@ -80,7 +81,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByCaseID(false);
         
         eventParams.setFilterByEventOwner(true);
-        eventParams.setOwnerUserID(ownerID);
+        eventParams.setOwnerUserID(u);
         
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
