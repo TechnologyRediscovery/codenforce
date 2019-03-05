@@ -23,10 +23,13 @@ import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.occupancy.entities.InspectedElement;
 import com.tcvcog.tcvce.occupancy.entities.InspectedSpace;
 import com.tcvcog.tcvce.occupancy.entities.LocationDescriptor;
+import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
 import com.tcvcog.tcvce.occupancy.entities.Space;
 import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ListIterator;
 
 /**
@@ -62,5 +65,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public void saveNewlyInspectedSpace(OccupancyInspection oi, InspectedSpace is) throws IntegrationException{
         ChecklistIntegrator ci = getChecklistIntegrator();
         ci.insertNewlyInspectedSpace(oi, is);
+    }
+    
+    public OccPermitApplication getNewOccPermitApplication(){
+        OccPermitApplication occpermitapp = new OccPermitApplication();        
+        occpermitapp.setSubmissionDate(LocalDateTime.now());        
+        return occpermitapp;       
     }
 }

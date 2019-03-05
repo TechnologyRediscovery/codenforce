@@ -267,6 +267,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
  
         
         System.out.println("MunicipalityIntegrator.gnerateCompleteMuniNameIDMap: con chars: " + con.toString());
+        
         try {
             stmt = con.createStatement();
             rs = stmt.executeQuery(query);

@@ -34,10 +34,15 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
+import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
+import com.tcvcog.tcvce.occupancy.entities.OccPermitType;
 import java.io.Serializable;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -62,6 +67,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Property activeProp;
     private Person activePerson;
     private List<Person> activePersonList;
+    private PropertyWithLists activePropWithList;
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
@@ -99,8 +105,13 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Public Data Session Shelves ***  */
     private List<PublicInfoBundle> infoBundleList;
     private PublicInfoBundleCECase pibCECase;
- 
-
+    
+    
+    /* *** Occupancy Permit Application Session Shelves *** */
+    private OccPermitApplication occPermitApplication;
+    private PropertyUnit activePropUnit;
+    private PropertyWithLists activePropWithLists;
+    private OccPermitApplicationReason occPermitApplicationReason;
     /**
      * Creates a new instance of getSessionBean()
      */
@@ -545,6 +556,64 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setPersonForCEActionRequestSubmission(Person personForCEActionRequestSubmission) {
         this.personForCEActionRequestSubmission = personForCEActionRequestSubmission;
+    }
+
+    /**
+     * @return the activePropWithList
+     */
+    public PropertyWithLists getActivePropWithList() {
+        return activePropWithList;
+    }
+
+    /**
+     * @param activePropWithList the activePropWithList to set
+     */
+    public void setActivePropWithList(PropertyWithLists activePropWithList) {
+        this.activePropWithList = activePropWithList;
+    }
+    
+    public OccPermitApplication getOccPermitApplication() {
+        return occPermitApplication;
+    }
+
+    public void setOccPermitApplication(OccPermitApplication occPermitApplication) {
+        this.occPermitApplication = occPermitApplication;
+    }
+
+    public PropertyUnit getActivePropUnit() {
+        return activePropUnit;
+    }
+
+    public void setActivePropUnit(PropertyUnit activePropUnit) {
+        this.activePropUnit = activePropUnit;
+    }
+
+    /**
+     * @return the activePropWithLists
+     */
+    public PropertyWithLists getActivePropWithLists() {
+        return activePropWithLists;
+    }
+
+    /**
+     * @param activePropWithLists the activePropWithLists to set
+     */
+    public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
+        this.activePropWithLists = activePropWithLists;
+    }
+
+    /**
+     * @return the occPermitApplicationReason
+     */
+    public OccPermitApplicationReason getOccPermitApplicationReason() {
+        return occPermitApplicationReason;
+    }
+
+    /**
+     * @param occPermitApplicationReason the occPermitApplicationReason to set
+     */
+    public void setOccPermitApplicationReason(OccPermitApplicationReason occPermitApplicationReason) {
+        this.occPermitApplicationReason = occPermitApplicationReason;
     }
     
 }
