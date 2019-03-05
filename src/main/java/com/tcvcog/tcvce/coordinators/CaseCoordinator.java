@@ -107,7 +107,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public SearchParamsCEEvents getDefaultSearchParamsCEEventsRequiringView(int user){
+    public SearchParamsCEEvents getDefaultSearchParamsCEEventsRequiringView(User user){
         SearchCoordinator sc = new SearchCoordinator();
         return sc.getSearchParamsEventsRequiringView(user);
         
@@ -809,7 +809,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                     Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                             .getString("actionRequestInitialStatusCode")))
                     && 
-                    getSessionBean().getAccessKeyCard().isHasEnfOfficialPermissions()
+                    getSessionBean().getFacesUser().getKeyCard().isHasEnfOfficialPermissions()
                 ){
                 System.out.println("Routing enabled!");
                 return true;

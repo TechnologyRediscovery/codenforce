@@ -62,8 +62,9 @@ public class SearchParams implements Serializable{
      * @return the startDateUtilDate
      */
     public java.util.Date getStartDateUtilDate() {
-        
-        startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+        if(startDate != null){
+            startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+        }
         return startDateUtilDate;
     }
 
@@ -72,14 +73,18 @@ public class SearchParams implements Serializable{
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
         this.startDateUtilDate = startDateUtilDate;
-        startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if(startDateUtilDate != null){
+            startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     /**
      * @return the endDateUtilDate
      */
     public java.util.Date getEndDateUtilDate() {
-        endDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+        if(endDate != null){
+            endDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+        }
         return endDateUtilDate;
     }
 
@@ -88,7 +93,9 @@ public class SearchParams implements Serializable{
      */
     public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
         this.endDateUtilDate = endDateUtilDate;
-        endDate = endDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if(endDateUtilDate != null){
+            endDate = endDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     /**
@@ -123,7 +130,9 @@ public class SearchParams implements Serializable{
      * @return the startDateSQLDate
      */
     public java.sql.Timestamp getStartDateSQLDate() {
-        startDateSQLDate = java.sql.Timestamp.valueOf(getStartDate());
+        if(startDate != null){
+            startDateSQLDate = java.sql.Timestamp.valueOf(getStartDate());
+        }
         return startDateSQLDate;
     }
 
@@ -131,7 +140,9 @@ public class SearchParams implements Serializable{
      * @return the endDateSQLDate
      */
     public java.sql.Timestamp getEndDateSQLDate() {
-        endDateSQLDate = java.sql.Timestamp.valueOf(getEndDate());
+        if(endDate != null){
+            endDateSQLDate = java.sql.Timestamp.valueOf(getEndDate());
+        }
         return endDateSQLDate;
     }
 

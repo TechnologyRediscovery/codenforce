@@ -7,13 +7,14 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +49,14 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         CaseCoordinator cc = getCaseCoordinator();
         searchParams = cc.getDefaultSearchParamsCEEventsRequiringView(
-                getSessionBean().getFacesUser().getUserID());
-        
+                getSessionBean().getFacesUser());
     }
     
-    public void executeQuery(ActionEvent ev){
+    public void executeQuery(){
+        System.out.println("CEEventsBB.executeQuery");
         EventCoordinator ec = getEventCoordinator();
         int listSize = 0;
+        searchParams.setMuni(getSessionBean().getActiveMuni());
         try {
             eventList = ec.queryEvents(searchParams);
             if(eventList != null){
@@ -62,7 +64,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Your search completed with " + listSize + "results", ""));
+                            "Your query completed with " + listSize + " results", ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -93,6 +95,12 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      * @return the eventTypesList
      */
     public List<EventType> getEventTypesList() {
+        EventType[] evTypeList = EventType.values();
+        List<EventType> l = new ArrayList<>();
+        for(int i = 0; i <evTypeList.length ; i++){
+            l.add(evTypeList[i]);
+        }
+        eventTypesList = l;
         return eventTypesList;
     }
 
@@ -100,6 +108,16 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      * @return the eventCatList
      */
     public List<EventCategory> getEventCatList() {
+         EventIntegrator ei = getEventIntegrator();
+        
+        if(searchParams.getEvtType() != null){
+            
+            try {
+                eventCatList = ei.getEventCategoryList(searchParams.getEvtType() );
+            } catch (IntegrationException ex) {
+                // do nothing
+            }
+        }
         return eventCatList;
     }
 
@@ -107,6 +125,12 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      * @return the userList
      */
     public List<User> getUserList() {
+        UserIntegrator ui = getUserIntegrator();
+        try {
+            userList = ui.getCompleteUserList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         return userList;
     }
 
@@ -114,6 +138,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      * @return the eventList
      */
     public List<EventWithCasePropInfo> getEventList() {
+        
         return eventList;
     }
 

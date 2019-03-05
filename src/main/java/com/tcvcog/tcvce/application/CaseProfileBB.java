@@ -163,7 +163,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         try {
-            cc.manuallyChangeCasePhase(currentCase, selectedCasePhase);
+            cc.manuallyChangeCasePhase(currentCase, getSelectedCasePhase());
             currentCase = ci.getCECase(currentCase.getCaseID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -230,7 +230,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         
         if (retrievedList != null) {
             if (retrievedList.size() > 0) {
-                getSessionBean().setActiveViolationList(retrievedList);
+                getSessionBean().setViolationQueue(retrievedList);
                 getSessionBean().setActiveProp(currentCase.getProperty());
                 getSessionBean().setcECase(currentCase);
             }
@@ -1040,5 +1040,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setCeCaseSearchParams(SearchParamsCECases ceCaseSearchParams) {
         this.ceCaseSearchParams = ceCaseSearchParams;
+    }
+
+    /**
+     * @return the selectedCasePhase
+     */
+    public CasePhase getSelectedCasePhase() {
+        return selectedCasePhase;
     }
 }

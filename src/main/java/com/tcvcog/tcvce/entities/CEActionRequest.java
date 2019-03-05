@@ -594,7 +594,6 @@ public class CEActionRequest implements Serializable{
      * @return the photoList
      */
     public List<Integer> getPhotoList() {
-        System.out.println("CEActionRequest | photoList = " + photoList.size());
         return photoList;
     }
 
