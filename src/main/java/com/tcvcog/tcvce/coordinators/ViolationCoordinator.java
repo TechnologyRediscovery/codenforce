@@ -71,7 +71,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
      * @throws IntegrationException
      * @throws ViolationException 
      */
-    public void addNewCodeViolation(CodeViolation v) throws IntegrationException, ViolationException{
+    public int addNewCodeViolation(CodeViolation v) throws IntegrationException, ViolationException{
         
         CodeViolationIntegrator vi = getCodeViolationIntegrator();
         EventCoordinator ec = getEventCoordinator();
@@ -80,7 +80,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         eventCat.setRequiresviewconfirmation(true);
         
         if(verifyCodeViolationAttributes(v)){
-            vi.insertCodeViolation(v);
+            return vi.insertCodeViolation(v);
             
         } else {
             throw new ViolationException("Failed violation verification");

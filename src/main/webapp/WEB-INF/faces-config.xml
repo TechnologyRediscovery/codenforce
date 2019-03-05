@@ -851,6 +851,15 @@
             <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>propertyUpdate</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/propertyUpdate.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     </navigation-rule>    
         
     <!--Persons-->
@@ -1037,7 +1046,23 @@
         </navigation-case>
     </navigation-rule>
     
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/violationAdd.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>violationPhotos</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>ceHome</from-outcome>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
    
     <navigation-rule>

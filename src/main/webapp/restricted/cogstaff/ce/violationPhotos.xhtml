@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Add photos of the violation</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                    
+                    <h1>Add  and describe photos of this violation</h1>
+                    
+                    <f:view>
+                        
+                        <h:form id="violationPhotosUploadForm" enctype="multipart/form-data">
+                            <h2>Upload photos of this violation (3 max)</h2>
+                            <p:fileUpload fileUploadListener="#{violationAddBB.handlePhotoUpload}"
+                            mode="advanced" 
+                            update=":violationPhotosViewForm:photoTable"
+                            multiple="true"
+                            fileLimit="3"
+                            sizeLimit="100000" 
+                            allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
+                        </h:form>
+                        
+                        <h:form id="violationPhotosViewForm">
+                                <p:spacer height="10px"/>
+                                
+                                <h2>Review and describe uploaded photos</h2>
+                                    <p:dataTable
+                                        id="photoTable"
+                                        var="photo"
+                                        value="#{violationAddBB.photoList}"
+                                        rowKey="#{photo.photoID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="false" tabindex="6">
+                                        <p:column width="50%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Photo"/>
+                                            </f:facet>
+                                            <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                <f:param name="photoID" value="#{photo.photoID}"/>
+                                            </p:graphicImage>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Description"/>
+                                            </f:facet>
+                                            <p:inputTextarea id="desc" value="#{photo.description}"
+                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
+                                                <p:ajax />
+                                            </p:inputTextarea>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Save Descriptions"/>
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-disk"
+                                                             actionListener="#{violationAddBB.updateDescription(photo)}"
+                                                             update="@form"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                    
+                            <p:spacer height="10px"/>
+                        </h:form>
+                        
+                        
+                        <h:form id="violationPhotosConfirmForm">
+                            <p:commandButton    ajax="false" action="#{violationAddBB.photosConfirm}" icon="fa fa-disk"
+                                                value="Commit photos and descriptions to violation and return to case home" tabindex="6"/>
+                            <p:commandButton    ajax="false" action="ceHome" icon="fa fa-disk"
+                                                value="Return to case home without commiting photos" tabindex="6"/>
+                        </h:form>
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

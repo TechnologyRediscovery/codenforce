@@ -67,6 +67,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Property activeProp;
     private Person activePerson;
     private List<Person> activePersonList;
+    private PropertyWithLists activePropWithList;
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
@@ -555,6 +556,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setPersonForCEActionRequestSubmission(Person personForCEActionRequestSubmission) {
         this.personForCEActionRequestSubmission = personForCEActionRequestSubmission;
+    }
+
+    /**
+     * @return the activePropWithList
+     */
+    public PropertyWithLists getActivePropWithList() {
+        return activePropWithList;
+    }
+
+    /**
+     * @param activePropWithList the activePropWithList to set
+     */
+    public void setActivePropWithList(PropertyWithLists activePropWithList) {
+        this.activePropWithList = activePropWithList;
     }
     
     public OccPermitApplication getOccPermitApplication() {
