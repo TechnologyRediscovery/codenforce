@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.occupancy.entities.OccPermit;
+import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import java.util.ArrayList;
 
 /**
@@ -34,6 +35,7 @@ public class PropertyUnit {
     private Property thisProperty;
     private ArrayList<Person> propertyUnitPeople;
     private ArrayList<OccPermit> occupancyPermitList;
+    private ArrayList<OccPermitApplication> occPermitApplicationList;
     
 
     /**
@@ -146,6 +148,20 @@ public class PropertyUnit {
      */
     public void setThisProperty(Property thisProperty) {
         this.thisProperty = thisProperty;
+    }
+
+    /**
+     * @return the occPermitApplicationList
+     */
+    public ArrayList<OccPermitApplication> getOccPermitApplicationList() {
+        return occPermitApplicationList;
+    }
+
+    /**
+     * @param occPermitApplicationList the occPermitApplicationList to set
+     */
+    public void setOccPermitApplicationList(ArrayList<OccPermitApplication> occPermitApplicationList) {
+        this.occPermitApplicationList = occPermitApplicationList;
     }
     
 }

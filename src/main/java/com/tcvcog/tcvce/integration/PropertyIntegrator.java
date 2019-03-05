@@ -59,7 +59,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param rs
      * @return the fully baked Property with all fields set from DB data
      */
-    private Property generatePropertyFromRS(ResultSet rs) throws IntegrationException{
+    private Property generateProperty(ResultSet rs) throws IntegrationException{
         
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
        
@@ -150,7 +150,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
             int counter = 0;
             while(rs.next() && counter <= MAX_RESULTS){
-                propList.add(generatePropertyFromRS(rs));
+                propList.add(generateProperty(rs));
                 counter++;
             }
         } catch (SQLException ex) {
@@ -186,7 +186,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println("PropertyIntegrator.searchForProperties - with muni | sql: " + stmt.toString());
             int counter = 0;
             while(rs.next() && counter <= MAX_RESULTS){
-                propList.add(generatePropertyFromRS(rs));
+                propList.add(generateProperty(rs));
                 counter++;
             }
         } catch (SQLException ex) {
@@ -270,7 +270,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, propertyID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                p = generatePropertyFromRS(rs);
+                p = generateProperty(rs);
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -425,8 +425,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         pu.setRental(rs.getBoolean("rental"));
         pu.setThisProperty(getProperty(rs.getInt("property_propertyid")));
         pu.setPropertyUnitPeople(persInt.getPersonList(rs.getInt("property_propertyid")));
-        
-        
         return pu;
     }
     
@@ -438,6 +436,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public void deletePropertyUnit(PropertyUnit pu){
         
        
+    }
+    
+    public PropertyWithLists getNewPropertyWithLists(){
+        return new PropertyWithLists();
     }
     
 } // close class

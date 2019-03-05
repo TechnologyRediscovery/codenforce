@@ -60,21 +60,22 @@
                         <p:menu>
 
                                 <p:menuitem value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
-                                <p:menuitem value="Request code enf." action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard"/>
+                                <p:menuitem value="Request code&lt;br /&gt; enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
                                 <p:menuitem value="Check on your case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
+                                <p:menuitem value="Apply for occupancy&lt;br /&gt; inspection permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false"/>
                                 <p:menuitem value="About" action="about" ajax="false" icon="fa fa-info" />
                                 <p:menuitem value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
 
                             <p:submenu label="Help" expanded="true">
                                 
                                 <p:menuitem value="How-To Guides" action="howtos" ajax="false" 
-                                            icon="ui-icon-disk" />
+                                            icon="fa fa-question-circle" />
                                 
                                 <p:menuitem value="Learn core concepts" action="coreConcepts" ajax="false" 
-                                            icon="ui-icon-disk"/>
+                                            icon="fa fa-pencil"/>
                                 
                                 <p:menuitem value="For developers" action="technical"  ajax="false" 
-                                            icon="ui-icon-arrowrefresh-1-w" />
+                                            icon="fa fa-database" />
                             </p:submenu>
                         </p:menu>
                     </h:form>
