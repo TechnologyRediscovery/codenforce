@@ -39,6 +39,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
 import java.io.Serializable;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -61,6 +62,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<CECase> cECaseQueue;
     private List<EventWithCasePropInfo> cEEventWCPIQueue;
     private List<CodeViolation> violationQueue;
+    private List<OccupancyInspection> inspectionQueue;
     
     /* *** System Core Objects Session Shelves ***  */
     private Municipality activeMuni;
@@ -506,6 +508,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setActiveEvent(EventCECase activeEvent) {
         this.activeEvent = activeEvent;
+    }
+
+    /**
+     * @return the inspectionQueue
+     */
+    public List<OccupancyInspection> getInspectionQueue() {
+        return inspectionQueue;
+    }
+
+    /**
+     * @param inspectionQueue the inspectionQueue to set
+     */
+    public void setInspectionQueue(List<OccupancyInspection> inspectionQueue) {
+        this.inspectionQueue = inspectionQueue;
     }
     
 }

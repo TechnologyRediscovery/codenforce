@@ -1,0 +1,1357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2018 Adam Gutonski
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Occupancy inspections</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                
+                    <f:view id="cases-view">
+
+                    <div class="two-column-page-flex-container">
+                        <div class="list-column">
+
+                            <h:form id="inspections-messages-form">
+                                <h:messages id="inspections-messages-global"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+
+                            <h1><h:outputText value="Open cases in #{sessionBean.activeMuni.muniName}"/></h1>
+                            <h3>List builder:</h3>
+                            <h:outputText value="Filer#{caseProfileBB.ceCaseSearchParams.useIsOpen}"/>
+                            <h:outputText value="#{caseProfileBB.ceCaseSearchParams.isOpen}"/>
+
+
+                            <h2>CE Case docket</h2>
+
+                            <h:form id="caseListForm">
+                                <p:spacer height="15px"/>
+                                <h1>Occupancy Inspection Configuration Tool</h1>
+                    <p>View, create, and manage occupancy inspections</p>
+                    <f:view>
+                        <h:form id="occInsFeeDisplay">
+                            <h2>Occupancy Inspection Details</h2>
+                            <p:dataTable
+                                    id="datatable-inspections"
+                                    var="o"
+                                    rowKey="#{o.inspectionID}"
+                                    value="#{}"
+                                    tableStyleClass="primeDataTable"
+                                    tabindex="1">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.inspectionID}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Property Unit" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.propertyUnitID}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="User ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.loginUserID}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="First Inspection" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.firstInspectionDate}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="First Pass" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.firstInspectionPass}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Second Inspection" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.secondInspectionDate}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Second Pass" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.secondInspectionPass}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Resolved" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.resolved}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Fee Paid" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.totalFeePaid}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Notes" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyInspectionNotes}"/>
+                                    </p:column>
+     
+                                </p:dataTable>
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{occupancyInspectionBB.editOccupancyInspection}"
+                                             value="Update Selected Occupancy Inspection" tabindex="2"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{occupancyInspectionBB.deleteSelectedOccupancyInspection}"
+                                            value="Nuke Selected Category Forever" tabindex="3"/>
+                            
+                                <p:spacer height="10px"/>
+                            </h:form>
+                        </div>
+                        <div class="object-column">
+
+                            <h:form id="case-details-form">
+
+                                <h1>
+                                    Code Enforcement Case #<h:outputText id="header-id-ot" value="#{caseProfileBB.currentCase.caseID}"/><br/> 
+                                    <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName}"/>
+                                    at <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
+                                    <h:outputText id="header-muni-ot" value="(#{caseProfileBB.currentCase.property.muni.muniName})"/>  
+
+                                </h1>
+
+                                <div class="outlinedBox">
+
+                                    <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                                 columnClasses="gridTd, gridTd">
+
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Case ID:" />
+                                            <div class="rowExpansion">
+                                                <h:outputText id="selcase-id-ot"  value="#{caseProfileBB.currentCase.caseID}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Property:"/>
+                                            <div class="rowExpansion">
+                                                <h:outputText id="selcase-addr-ot" value="#{caseProfileBB.currentCase.property.address}"/><br/>
+                                                <h:outputText id="selcase-muni-ot" value="#{caseProfileBB.currentCase.property.muni.muniName} (#{caseProfileBB.currentCase.property.propertyUseType})"/><br/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Stage and Phase:" />
+                                            <div class="rowExpansion">
+                                                <h:outputText id="selcase-stage-ot" value="#{caseProfileBB.currentCase.caseStage}: #{caseProfileBB.currentCase.casePhase.label} "/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Opening Date:"/>
+                                            <p:spacer height="5px"/>
+                                            <div class="rowExpansion" style="leftalign">
+                                                <h:outputText id="selcase-odate-it" value="#{caseProfileBB.currentCase.originiationDatePretty}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Closing Date:"/>
+                                            <p:spacer height="5px"/>
+                                            <div class="rowExpansion" style="leftalign">
+                                                <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.currentCase.closingDatePretty}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Age (Days)" />
+                                            <div class="rowExpansion">
+                                                <h:outputText id="selcase-age-it" value="#{caseProfileBB.currentCase.caseAge}" />
+                                            </div>
+                                        </h:panelGroup>
+
+
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Manager:"/>
+                                            <p:spacer height="5px"/>
+                                            <div class="rowExpansion" style="leftalign">
+                                                <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.caseManager.FName} #{caseProfileBB.currentCase.caseManager.LName}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+
+
+                                        <h:panelGroup>
+
+                                            <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
+                                            <h:outputText id="selcase-pacc" value="#{caseProfileBB.currentCase.publicControlCode}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
+                                            <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
+                                                                     disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="inspections-messages-form:inspections-messages-global" />
+                                            </p:selectBooleanCheckbox>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
+                                            <h:outputText value=" "/>
+                                            <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
+                                                                     disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="inspections-messages-form:inspections-messages-global" />
+                                            </p:selectBooleanCheckbox>
+                                            <p:spacer height="5px"/>
+
+                                        </h:panelGroup>
+
+                                    </h:panelGrid>
+
+                                    <p:commandButton    id="refresh-case-cb" 
+                                                        ajax="true" actionListener="#{caseProfileBB.refreshCurrentCase}"
+                                                        icon="fa fa-refresh"
+                                                        value="reload current case data" 
+                                                        update="
+                                                        case-details-form:header-id-ot
+                                                        case-details-form:header-type-ot
+                                                        case-details-form:header-addr-ot
+                                                        case-details-form:header-muni-ot
+                                                        case-details-form:selcase-id-ot
+                                                        case-details-form:selcase-addr-ot
+                                                        case-details-form:selcase-muni-ot
+                                                        case-details-form:selcase-stage-ot
+                                                        case-details-form:selcase-odate-it
+                                                        case-details-form:selcase-cdate-it
+                                                        case-details-form:selcase-age-it
+                                                        case-details-form:selcase-manager-it
+                                                        case-details-form:selcase-pacc
+                                                        case-details-form:selcase-access-sbcb
+                                                        case-details-form:selcase-forwardlinking-sbcb
+                                                        violation-form:violation-table
+                                                        notices-form:notices-ds
+                                                        action-requests-form:actionRequestTable
+                                                        event-dt-form:caseEventTable
+                                                        "
+
+                                                        />
+
+                                </div>
+
+                            </h:form>
+
+
+
+
+                            <h3>Events</h3>
+
+
+                            <h:form id="formEventAddAjax">
+
+                                <h:panelGrid columns="3" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
+                                             footerClass="gridFooter" style="vertical-align: top;">
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="newEventTypeMenu">
+                                            <h:outputText value="Select an event type:"/>
+                                        </h:outputLabel>
+
+                                        <p:selectOneListbox id="newEventTypeMenu" required="true" value="#{eventManageBB.selectedEventType}" tabindex="10">
+                                            <p:ajax update="categoryList" immediate="true"/> 
+                                            <f:selectItems value="#{eventManageBB.userAdminEventTypeList}"/>
+                                        </p:selectOneListbox>
+
+                                        <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <h:outputLabel for="categoryList">
+                                            <h:outputText value="Event Categories of selected type:"/>
+                                        </h:outputLabel>
+
+                                        <p:selectOneListbox style="width: 300px;" id="categoryList" value="#{eventManageBB.selectedEventCategory}" tabindex="10">
+                                            <p:ajax update="selectedEventCategoryDescription
+                                                    selectedEventCategoryDescription 
+                                                    selectedEventCateogryRequiresViewConfirm 
+                                                    selectedEventCateogryNotifiesCaseMonitors" 
+                                                    immediate="true"/>
+                                            <f:converter converterId="eventCategoryConverter"/>
+                                            <f:selectItems  id="catItemsList" value="#{eventManageBB.eventCategoryList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                        </p:selectOneListbox>
+
+                                        <h:message for="categoryList" showDetail="false" showSummary="true"  
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:commandButton    id="event-add-dialog-show-cb"
+                                                            ajax="true" 
+                                                            process="@form"
+                                                            actionListener="#{eventManageBB.startNewEvent}" 
+                                                            oncomplete="PF('add-event-dialog-var').show()"
+                                                            value="Create new event of this category"  
+                                                            icon="fa fa-edit"
+                                                            update="add-event-dialog
+                                                            addNewEventForm:add-event-currcase-ot
+                                                            addNewEventForm:add-event-et-ot
+                                                            addNewEventForm:add-event-ec-ot
+                                                            addNewEventForm:add-event-cd-ot"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputText value="Event Cateogry Description: #{eventManageBB.selectedEventCategory.eventCategoryDesc}" id="selectedEventCategoryDescription"/>
+                                        <p:spacer height="10px"/>
+                                        <h:outputText value="Requires View Confirmation: #{eventManageBB.selectedEventCategory.requiresviewconfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
+                                        <p:spacer height="10px"/>
+                                        <h:outputText value="Triggers notification of case monitor subscribers: #{eventManageBB.selectedEventCategory.notifycasemonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
+
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                            </h:form>
+
+
+                            <h:form id="event-dt-form">
+
+                                <p:dataTable
+                                    id="caseEventTable"
+                                    var="e"
+                                    selectionMode="single"
+                                    selection="#{caseProfileBB.selectedEvent}"
+                                    rowKey="#{e.eventID}"
+                                    value="#{caseProfileBB.currentCase.eventList}"
+                                    tableStyleClass="primeDataTable"
+                                    resizableColumns="true"
+                                    rowExpandMode="multiple"
+                                    expandedRow="false"
+                                    scrollHeight="400"
+                                    filteredValue="#{caseProfileBB.filteredEventList}"
+                                    widgetVar="caseEventTable"
+                                    >
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="3%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="Expand"/>
+                                        </f:facet>
+                                        <p:rowToggler/>
+                                    </p:column>
+
+                                    <p:column width="11%" sortBy="#{e.dateOfRecord}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Date" />
+                                        </f:facet>
+                                        <h:outputText value="#{e.prettyDateOfRecord}"/>
+                                    </p:column>
+
+                                    <p:column width="8%" sortBy="#{e.category.eventType.label}"
+                                              filterBy="#{e.category.eventType.label}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{e.category.eventType.label}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
+                                              filterBy="#{e.category.eventCategoryTitle}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Category" />
+                                        </f:facet>
+                                        <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                    </p:column>
+                                    <p:column width="5%" filterBy="#{e.eventOwnerUser.LName}"
+                                              sortBy="#{e.eventOwnerUser.LName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Creator" />
+                                        </f:facet>
+                                        <h:outputText value="#{e.eventOwnerUser.LName}"/>
+                                    </p:column>
+                                    <p:column width="20%" style="word-wrap: normal;">
+                                        <f:facet name="header">
+                                            <h:outputText value="Description" />
+                                        </f:facet>
+                                        <div class="rowExpansion">
+                                            <h:outputText value="#{e.eventDescription}"/>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="5%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="edit" />
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-edit"
+                                                         action="#{caseProfileBB.editEvent(e)}" 
+                                                         ajax="true"/>
+
+                                    </p:column>
+
+                                    <p:rowExpansion>
+
+                                        <div class="outlinedBox">
+                                            <h2>Event ID: <h:outputText value="#{e.eventID}"/> </h2>
+                                            <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Description" />
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.eventDescription}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.discloseToMunicipality}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Disclose to Public?" />
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.discloseToPublic}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Creation time stamp"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.eventTimeStamp}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Active Event?"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.activeEvent}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.category.requiresviewconfirmation}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="View confirmed by"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="View confirmed at"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.viewConfirmedAt}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <f:facet name="footer" class="leftalign">
+                                                    <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion" style="text-align: left">
+                                                        <h:outputText escape="false" value="#{e.notes}"/>
+                                                    </div>
+                                                </f:facet>
+
+                                            </h:panelGrid>
+                                        </div>
+                                    </p:rowExpansion>
+
+                                </p:dataTable>
+
+                                <ui:remove>
+                                    <p:commandLink value="Export event history as pdf" ajax="false">
+                                        <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{caseProfileBB.currentCase.caseID}_idnoeventHistory"/>
+                                    </p:commandLink>
+                                </ui:remove>
+                            </h:form>
+
+
+
+
+                            <h:form id="violation-form">
+
+
+                                <h2>code violations:  </h2>
+
+
+                                <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
+                                                 value="Add new code violation"
+                                                 icon="fa fa-plus"
+                                                 disabled="#{!sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"/>
+                                <p:spacer height="15px"/>
+
+                                <p:dataTable
+                                    id="violation-table"
+                                    var="v"
+                                    rowKey="#{v.violationID}"
+                                    value="#{caseProfileBB.currentCase.violationList}"
+                                    tableStyleClass="primeDataTable"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    draggableColumns="true"
+                                    reflow="true">
+
+
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="4%">
+                                        <p:rowToggler />
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Ordinance" />
+                                        </f:facet>
+                                        <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                    </p:column>
+
+                                    <p:column width="30">
+                                        <f:facet name="header">
+                                            <h:outputText value="Stip Comp Date" />
+                                        </f:facet>
+                                        <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                    </p:column>
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Days left" />
+                                        </f:facet>
+                                        <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+
+                                    </p:column>
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Compliance!" />
+                                        </f:facet>
+                                        <p:commandButton    id="violation-compliance-cb" 
+                                                            ajax="true" action="#{caseProfileBB.recordCompliance(v)}"
+                                                            icon="fa fa-check"
+                                                            oncomplete="PF('add-event-dialog-var').show()"
+                                                            value="Compliance"  
+                                                            update="add-event-dialog
+                                                            addNewEventForm:add-event-currcase-ot
+                                                            addNewEventForm:add-event-et-ot
+                                                            addNewEventForm:add-event-ec-ot
+                                                            addNewEventForm:add-event-cd-ot"/>
+                                    </p:column>
+
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Actual Comp Date" />
+                                        </f:facet>
+                                        <h:outputText value="#{v.actualComplianceDatePretty}"/>
+                                    </p:column>
+
+
+
+                                    <p:rowExpansion>
+
+                                        <div class="outlinedBox">
+                                            <h3>Violation details</h3>
+                                            <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
+                                                             value="Edit violation details"
+                                                             icon="fa fa-edit"/>
+
+                                            <h:outputText value="ID: " />
+                                            <h:outputText value="#{v.violationID}"/>
+
+                                            <h:outputText value="Citations: " />
+                                            <h:outputText value="#{v.citationsStringList}"/>
+
+                                            <h:outputText value="re-link" />
+                                            <p:commandButton icon="fa fa-link"
+                                                             actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
+                                                             ajax="true" oncomplete="PF('linkDialog').show()"/>
+
+                                            <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
+                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Penalty:"/>
+                                            <h:outputText value="#{v.penalty}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Description: "/>
+                                            <h:outputText value="#{v.description}"/>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Violation Notes: "/>
+                                            <h:outputText value="#{v.notes}" escape="false"/>
+                                        </div>
+                                    </p:rowExpansion>
+
+                                </p:dataTable> 
+
+                            </h:form>
+
+
+
+
+                            <h2>Notices of violation</h2>
+
+                            <h:form id="notices-messages-form">
+
+                                <h:messages id="notices-messages-global"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+
+
+                            <h:form id="notices-form">
+                                <p:commandButton ajax="false" 
+                                                 action="#{caseProfileBB.createNewNotice}"
+                                                 value="Create new notice of violation letter"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                <p:spacer height="5px"/>
+
+                                <p:dataScroller
+                                    id="notices-ds"
+                                    value="#{caseProfileBB.currentCase.noticeList}"
+                                    var="notice"
+                                    rendered="true">
+
+
+
+
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <h:outputText styleClass="bold" style="font-size:1.5em;"  value="Notice ID:" />
+                                    <h:outputText style="font-size:1.5em;"   value="#{notice.noticeID}"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputText styleClass="bold"   value="Date of Record: " />
+                                    <h:outputText value="#{notice.dateOfRecordPretty}"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputText styleClass="bold"   value="Queued for Mailing: " />
+                                    <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputText styleClass="bold"  value="Sent Date: " />
+                                    <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
+
+                                    <p:spacer height="5px"/>
+                                    <h:outputText styleClass="bold"  value="Returned? " />
+                                    <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:panelGrid    id="notice-rowexpand-pg" columns="4" columnClasses="gridTD, gridTD, gridTD, gridTD" >
+
+                                        <h:panelGroup>
+                                            <p:commandButton ajax="false" action="#{caseProfileBB.printNotice(notice)}"
+                                                             value="Print/View" styleClass="noFill button-size-small"
+                                                             icon="fa fa-print" disabled="#{(empty notice)}" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-edit-cb"
+                                                             ajax="false" action="#{caseProfileBB.editNoticeOfViolation(notice)}"
+                                                             value="Edit notice" styleClass="noFill"
+                                                             icon="fa fa-edit " disabled="#{notice.requestToSend}" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-delete-cb"
+                                                             ajax="true" actionListener="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
+                                                             value="Nuke notice" styleClass="noFill"
+                                                             icon="fa fa-bomb" disabled="#{notice.requestToSend}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             notices-ds"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup></h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-queuenotice-cb"
+                                                             ajax="true" action="#{caseProfileBB.queueNotice(notice)}"
+                                                             value="Mark notice: Ready-to-mail" styleClass="noFill"
+                                                             icon="fa fa-edit" disabled="#{notice.requestToSend}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-queuenotice-cb
+                                                             nov-queued-ot
+                                                             nov-edit-cb
+                                                             nov-delete-cb
+                                                             nov-sent-cb"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-sent-cb"
+                                                             ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
+                                                             value="Mark notice: Mailed!" styleClass="noFill"
+                                                             icon="fa fa-paper-plane" disabled="#{!(notice.requestToSend) || (!(empty notice.letterSentDate) and notice.requestToSend)}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-sent-date
+                                                             nov-returned-cb
+                                                             nov-sent-cb
+                                                             "/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-returned-cb"
+                                                             ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
+                                                             value="Mark notice: returned" styleClass="noFill"
+                                                             icon="fa fa-mail-reply" disabled="#{(empty notice.letterSentDate) || !(empty notice.letterReturnedDate)}"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-returned-date
+                                                             nov-returned-cb"/>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:commandButton id="nov-reset-cb"
+                                                             ajax="true" actionListener="#{caseProfileBB.resetNotice(notice)}"
+                                                             value="Reset mailing status" styleClass="noFill"
+                                                             icon="fa fa-window-close-o" disabled="false"
+                                                             update="notices-messages-form:notices-messages-global
+                                                             nov-returned-date
+                                                             nov-returned-cb
+                                                             nov-sent-cb
+                                                             nov-queuenotice-cb
+                                                             nov-delete-cb
+                                                             nov-edit-cb
+                                                             nov-queued-ot
+                                                             nov-sent-date
+                                                             nov-returned-date"/>
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                    <hr />
+                                </p:dataScroller>
+                            </h:form>
+
+
+                            <p:spacer height="15px"/>
+
+                            <h:form id="citation-form">
+
+                                <ui:remove>
+
+                                    <h3>Citations</h3>
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.createCitationForAllViolations}"
+                                                     value="Generate citation for all Violations"
+                                                     icon="fa fa-warning"
+                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>"/>
+
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.createCitationFromSelected}"
+                                                     value="Generate citation for selected violations"
+                                                     icon="fa fa-warning"
+                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>/>
+
+                                    <p:dataTable
+                                        id="citation-table"
+                                        var="citation"
+                                        selectionMode="single"
+                                        selection="#{caseProfileBB.selectedCitation}"
+                                        rowKey="#{citation.citationID}"
+                                        value="#{caseProfileBB.currentCase.citationList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="multiple"
+                                        draggableColumns="true"
+                                        reflow="true">
+
+                                        <p:column width="4%">
+                                            <p:rowToggler />
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Citation ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.citationID}"/>
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Citation No." />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.citationNo}"/>
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Court Entity ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.origin_courtentity.courtEntityName}"/>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Issuer" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.userOwner.LName}"/>
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Date of record" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.dateOfRecord}"/>
+                                        </p:column>
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Status" />
+                                            </f:facet>
+                                            <h:outputText value="#{citation.status.statusTitle}"/>
+                                        </p:column>
+
+                                        <p:rowExpansion>
+                                            <div class="outlinedBox">
+
+                                                <h:outputLabel value="Notes: "/>
+                                                <h:outputText value="#{citation.notes}"/>
+                                                <p:spacer height="10px"/>
+                                                <h:outputLabel value="Active: "/>
+                                                <h:outputText value="#{citation.isActive}"/>
+                                                <p:spacer height="10px"/>
+                                                <h:outputLabel value="Entry Timestamp: "/>
+                                                <h:outputText value="#{citation.timeStamp}"/>
+                                                <p:spacer height="10px"/>
+                                            </div>
+                                        </p:rowExpansion>
+
+                                    </p:dataTable>
+
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
+                                                     value="Updated selected citation"
+                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>/>
+                                </ui:remove>
+
+                            </h:form>
+
+                            <h:form id="action-requests-form">
+
+                                <h3>Action Requests</h3>    
+
+                                <p:dataTable
+                                    id="actionRequestTable"
+                                    var="r"
+                                    rowKey="#{r.requestID}"
+                                    value="#{caseProfileBB.currentCase.requestList}"
+                                    tableStyleClass="primeDataTable"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    draggableColumns="true"
+                                    reflow="true">
+
+
+                                    <p:column width="5%">
+                                        <p:rowToggler />
+                                    </p:column>
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <div class="wrapText">
+                                            <h:outputText value="#{r.requestID}"/>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Issue Type" />
+                                        </f:facet>
+                                        <div class="wrapText">
+                                            <h:outputText value="#{r.issueTypeString}"/>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <div class="rowExpansion">
+                                            <h:outputText value="#{r.requestProperty.address}"/>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Submitted" />
+                                        </f:facet>
+                                        <div class="wrapText">
+                                            <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
+                                        </div>
+                                    </p:column>
+
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Age" />
+                                        </f:facet>
+                                        <h:outputText value="#{r.daysSinceDateOfRecord}"/>
+                                    </p:column>
+
+                                    <ui:remove>
+
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Link" />
+                                            </f:facet>
+                                            <!--work out what to do with these references-->
+
+                                            <p:commandButton icon="fa fa-link" action="#{ceActionRequestsBB.viewSelectedActionRequest}">
+                                                <f:setPropertyActionListener value="#{r}" target="#{ceActionRequestsBB.selectedRequest}"/>
+                                            </p:commandButton>
+                                        </p:column>
+                                    </ui:remove>
+                                    <p:rowExpansion>
+
+                                        <div class="outlinedBox">
+                                            <h3>Code Enforcement Action Request</h3>
+                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="gridTd, gridTd">
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel class="bold" value="Issue Type" />
+                                                    <p:spacer height="5px"/>
+                                                    <div class="wrapText">
+                                                        <h:outputText value="#{r.issueTypeString}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel class="bold" value="Address" />
+                                                    <p:spacer height="5px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{r.requestProperty.address}"/>
+                                                    </div>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel class="bold" value="Date Submitted" />
+                                                    <p:spacer height="5px"/>
+                                                    <div class="wrapText">
+                                                        <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="ID"/>
+                                                    <p:spacer height="5px"/>
+                                                    <div class="wrapText">
+                                                        <h:outputText value="#{r.requestID}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <div class="wrapText">
+                                                        <h:outputLabel styleClass="bold" value="Human safety issue?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText value="#{r.isUrgent}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+
+                                                    <div class="wrapText">
+                                                        <h:outputLabel styleClass="bold" value="Requestor (#{r.actionRequestorPerson.personType.label}): "/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputText value="#{r.actionRequestorPerson.firstName} "/> 
+                                                        <h:outputText value="#{r.actionRequestorPerson.lastName}"/><br/> 
+                                                        <h:outputText value="#{r.actionRequestorPerson.addressStreet}"/> <br/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.addressCity}, "/> 
+                                                        <h:outputText value="#{r.actionRequestorPerson.addressState} "/> 
+                                                        <h:outputText value="#{r.actionRequestorPerson.addressZip}"/> 
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Contact: "/>
+                                                    <p:spacer height="5px"/>
+                                                    <div class="wrapText"> 
+                                                        <h:outputText value="Phone (cell): "/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.phoneCell}"/> <br/>
+                                                        <h:outputText value="Phone (work): "/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> <br/>
+                                                        <h:outputText value="Phone (home): "/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br/>
+                                                        <h:outputText value="Email: "/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.email}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+
+
+                                                <f:facet name="footer" class="leftalign">
+                                                    <h:outputLabel styleClass="bold" value="Request description"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion" style="leftalign">
+                                                        <h:outputText escape="false" value="#{r.requestDescription}"/>
+                                                    </div>
+                                                </f:facet>
+                                            </h:panelGrid>
+                                        </div>
+
+                                    </p:rowExpansion>
+                                </p:dataTable>
+
+                            </h:form>
+
+
+                        </div>
+                    </div>
+
+                    <p:dialog    id="add-event-dialog"
+                                 height="650" width="900"
+                                 widgetVar="add-event-dialog-var"
+                                 closable="true" 
+                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+
+
+                        <h:form id="addNewEventForm">
+
+                            <h1>Add new event to case</h1>
+
+                            <h:outputText id="add-event-currcase-ot" value="Current Case: #{caseProfileBB.currentCase.caseID}: #{caseProfileBB.currentCase.caseName} "/>
+                            <p:spacer height="5px"/>
+                            <h:outputText id="add-event-et-ot" value="Event Type: #{eventManageBB.eventInProcess.category.eventType.label}"/>
+                            <p:spacer height="5px"/>
+                            <h:outputText id="add-event-ec-ot" value="Event Category: #{eventManageBB.eventInProcess.category.eventCategoryTitle}"/>
+                            <p:spacer height="5px"/>
+                            <h:outputText id="add-event-cd-ot" value="Category description: #{eventManageBB.eventInProcess.category.eventCategoryDesc}"/>
+
+
+
+                            <h2>Event details</h2>
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <f:facet name="header">
+                                    <h:panelGroup>
+                                        <p:outputLabel for="eventDesc">
+                                            <h:outputText value="Short Description:"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="eventDesc" value="#{eventManageBB.eventInProcess.eventDescription}" 
+                                                     style="width: 600px;" tabindex="3" required="true" styleClass="inputText"/>
+                                        <h:message for="eventDesc" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                </f:facet>
+
+                                <h:panelGroup>
+
+                                    <h:outputLabel for="activeEvent">
+                                        <h:outputText value="Active Event?"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:inputSwitch tabindex="18" id="activeEvent" value="#{eventManageBB.eventInProcess.activeEvent}" onLabel="Yes" offLabel="No" />
+
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="eventDateCal">
+                                        <h:outputText value="Date of Record"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:calendar value="#{eventManageBB.eventInProcess.dateOfRecordUtilDate}" 
+                                                mode="popup"  id="eventDateCal"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true" showTodayButton="true"
+                                                required="true"/>
+                                    <h:message for="eventDateCal" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="discloseToMuniIS">
+                                        <h:outputText value="Disclose to Municipalities"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{eventManageBB.eventInProcess.discloseToMunicipality}" onLabel="Yes" offLabel="No" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="discloseToPublic">
+                                        <h:outputText value="Disclose to Public"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{eventManageBB.eventInProcess.discloseToPublic}" onLabel="Yes" offLabel="No" />
+                                </h:panelGroup>
+
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel for="requireViewConfirmationSwitch">
+                                        <h:outputText value="Require view confirmation by case manager"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="5px"/>
+                                    <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventManageBB.eventInProcess.requiresViewConfirmation}" onLabel="Yes" offLabel="No" />
+                                </h:panelGroup>
+
+                                <f:facet name="footer">
+                                    <h:outputLabel for="eventNotes">
+                                        <h:outputText value="Event Notes:"/>
+                                    </h:outputLabel>
+                                    <h:panelGroup>
+                                        <p:editor id="eventNotes" value="#{eventManageBB.eventInProcess.notes}" 
+                                                  controls="bold italic underline strikethrough font size style color 
+                                                  bullets numbering center undo redo rule link removeformat outdent 
+                                                  indent link unlink copy cut paste rule alignleft center alignright"
+                                                  width="700"
+                                                  height="200"/>
+                                        <h:message for="eventNotes" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+                                </f:facet>
+
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('add-event-dialog-var').hide()"/>
+
+                            <p:commandButton ajax="true" actionListener="#{eventManageBB.attachEventToCase}"
+                                             value="Create new event" icon="fa fa-plus"
+                                             oncomplete="PF('add-event-dialog-var').hide()"
+                                             update="event-dt-form:caseEventTable
+                                             violation-form:violation-table
+                                             case-details-form:selcase-stage-ot
+                                             case-details-form:selcase-cdate-it
+                                             inspections-messages-form:inspections-messages-global"/>
+                            </h:form>
+                            
+                            <h2>Connect persons to event</h2>
+                                
+                            <h:form id="add-person-to-event-form">
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
+                                    <p:selectOneMenu id="person-list-menu" required="false" value="#{eventManageBB.selectedPerson}">
+                                        <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                        <f:selectItems value="#{sessionBean.personQueue}"  var="p" itemValue="#{p}" 
+                                                       itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                        <f:converter converterId="personConverter"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="person-list-menu" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                            
+                            <p:commandButton    ajax="true" actionListener="#{eventManageBB.queueSelectedPerson}"
+                                                    value="Add selected person to event"
+                                                    update="persons-to-add-ds"/>
+                                <p:spacer height="5px"/>
+                            
+                                <p:dataScroller     id="persons-to-add-ds"
+                                                    value="#{eventManageBB.personsToAdd}"
+                                                    var="pers">
+                                    <h:outputText value="#{pers.firstName} #{pers.lastName} (id:#{pers.personID})"/>
+                                    <p:commandButton    ajax="true" icon="fa fa-stop"
+                                                        process="persons-to-add-ds" immediate="true"
+                                                        actionListener="#{eventManageBB.deQueuePersonFromEvent(pers)}"
+                                                        update="persons-to-add-ds"/>
+                                </p:dataScroller>
+                                                 
+                                
+                        </h:form>
+                    </p:dialog>
+
+                    <p:dialog    id="edit-case-metadata-dialog"
+                                 height="650" width="900"
+                                 widgetVar="edit-case-metadata-var"
+                                 closable="true" 
+                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+
+                        <h:outputText value="You are editing case no. #{caseProfileBB.currentCase.caseID}"/>
+                        <p:spacer height="10px"/>
+
+                        <h:form id="updateCaseForm">
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="2" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+                                <h:panelGroup>
+                                    <h:outputText value="Public access control code"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:inputText value="#{caseUpdateBB.formControlCode}"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:outputText value="Case name"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:inputText value="#{caseUpdateBB.formCaseName}"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:outputText value="Opening date"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <p:calendar value="#{caseUpdateBB.formOriginDate}" 
+                                                mode="popup" tabindex="3"
+                                                id="formCaseOriginationDateCal"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                required="true"/>
+
+                                    <h:message for="formCaseOriginationDateCal" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputText value="Notes:"/>
+                                </h:panelGroup> 
+                                <h:panelGroup>
+                                    <h:inputTextarea value="#{caseUpdateBB.formCaseNotes}"/>
+                                </h:panelGroup> 
+
+
+                            </h:panelGrid>
+
+                            <p:spacer height="10px"/>
+
+                            <p:commandButton ajax="false" value="Update Case" action="#{caseUpdateBB.updateCase}"  icon="fa fa-edit"/>
+
+                        </h:form>
+
+                    </p:dialog>
+
+
+
+                    <p:dialog    id="case-phase-dialog"
+                                 height="650" width="900"
+                                 widgetVar="case-phase-var"
+                                 closable="true" 
+                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+
+                        
+                        <h2>Case phase management</h2>
+
+                        <span class="bold">Current phase: </span>
+                        <h:outputText class="mono" value="#{caseProfileBB.currentCase.casePhase.label}"/>
+
+
+                        <h3>Manually change case phase</h3>
+                        <h:form id="casePhaseChangeForm">
+
+
+                            <p:selectOneMenu value="#{caseProfileBB.selectedCasePhase}"
+                                             id="casePhaseSOM">
+
+                                <f:selectItems value="#{caseProfileBB.casePhaseList}"
+                                               var="cp"
+                                               itemValue="#{cp}"
+                                               itemLabel="#{cp.label}"/>
+                            </p:selectOneMenu>
+                            <p:spacer/>
+                            <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
+                                             value="Override to selected phase"/>
+
+                            <p:spacer height="10px"/>
+
+                            <ui:remove>
+
+                                <p:commandButton onclick="PF('cd').show()" type="button" icon="fa fa-bullhorn"
+                                                 value="Manually override case phase to selected value"/>
+
+                                <p:confirmDialog message="Manually override a case's phase can cause a spaghetti-like mess of our
+                                                 case management process. Note: This action will generate a special event which will
+                                                 be analyzed at our next group meeting to discuss changes to our standard protocol to avoid
+                                                 the need for any manual case phase changes. Please add a note event to the case to explain
+                                                 why the case phase is being changed manually." severity="alert" widgetVar="cd">
+
+                                    <p:commandButton value="Abort override" onclick="PF('cd').hide()" type="button" icon="fa fa-stop"/>
+                                    <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
+                                                     value="Yes, override phase" oncomplete="PF('cd').hide()"/>
+                                </p:confirmDialog>
+
+                            </ui:remove>
+
+                        </h:form>
+
+
+                        <h2>Next case action (experimental)</h2>
+
+                        <span class="bold">Next phase: </span>
+                        <h:outputText class="mono" value="#{caseProfileBB.nextPhase.label}"/>
+
+                        <p:spacer height="10px"/>
+
+                        <span class="bold">Next action in protocol: </span>
+
+                        <h:outputText value="#{caseProfileBB.eventForTriggeringCasePhaseAdvancement.category.eventCategoryTitle}"/>
+
+
+                    </p:dialog>
+
+
+                </f:view>
+                
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                   
+                             
+                             
+                            <!--<p:fieldset legend="Update occupancy inspection "
+                                toggleable="true" collapsed="false" tabindex="4">
+                                    <h:form id="updateCategoryForm">
+                                        <p:spacer height="10px"/>
+                                        <p:outputLabel for="occInsFeeName">
+                                           <h:outputText value="Name:"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                                 style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
+                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:spacer height="20px"/>
+                                        
+                                       
+                                    </h:form>  
+                                </p:fieldset>-->
+                            
+                           
+                     
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
