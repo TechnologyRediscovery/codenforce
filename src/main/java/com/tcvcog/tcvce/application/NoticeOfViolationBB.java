@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
@@ -100,7 +101,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public void removeViolationFromList(CodeViolation viol){
         activeVList.remove(viol);
-        getSessionBean().setActiveViolationList(activeVList);
+        getSessionBean().setViolationQueue(activeVList);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Done: violation ID " + viol.getViolationID() + "will not be included in letter.",""));
@@ -141,6 +142,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
     }
     
+    
+    
     public String storeRecipient(){
         currentNotice = getSessionBean().getActiveNotice();
         PersonIntegrator pi = getPersonIntegrator();
@@ -177,7 +180,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public String assembleNotice(){
         currentNotice = getSessionBean().getActiveNotice();
-        activeVList = getSessionBean().getActiveViolationList();
+        activeVList = getSessionBean().getViolationQueue();
         
         StringBuilder sb = new StringBuilder();
         sb.append(getPrettyDate(LocalDateTime.now()));
@@ -283,6 +286,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
         CECase c = getSessionBean().getcECase();
         NoticeOfViolation notice = getSessionBean().getActiveNotice();
+        CaseIntegrator csi = getCaseIntegrator();
         
         CodeViolationIntegrator ci = getCodeViolationIntegrator();
         
@@ -298,6 +302,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             } else {
                 ci.updateViolationLetter(currentNotice);
             }
+            // refresh case
+            getSessionBean().setcECase(
+                    csi.getCECase(getSessionBean().getcECase().getCaseID()));
             
         } catch (IntegrationException ex) {
             System.out.println("NoticeOfViolationBB.saveNoticeDraft");
@@ -390,7 +397,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public List<CodeViolation> getActiveVList() {
         if(activeVList == null){
-            activeVList = getSessionBean().getActiveViolationList();
+            activeVList = getSessionBean().getViolationQueue();
         }
         return activeVList;
     }

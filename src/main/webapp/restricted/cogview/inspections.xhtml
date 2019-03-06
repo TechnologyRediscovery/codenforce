@@ -1,5 +1,21 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2018 Adam Gutonski
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -7,18 +23,19 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Open code enforcement cases</title>
+        <title>Occupancy inspections</title>
     </h:head>
     <h:body>
-        <ui:composition template="../navContainer_restricted.xhtml">
+        <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="cases-view">
+                
+                    <f:view id="cases-view">
 
                     <div class="two-column-page-flex-container">
                         <div class="list-column">
 
-                            <h:form id="cecases-messages-form">
-                                <h:messages id="cecases-messages-global"
+                            <h:form id="inspections-messages-form">
+                                <h:messages id="inspections-messages-global"
                                             globalOnly="true" showDetail="true" showSummary="true"
                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                 </h:messages>
@@ -34,94 +51,99 @@
 
                             <h:form id="caseListForm">
                                 <p:spacer height="15px"/>
-                                <p:dataTable
-                                    id="caseTable"
-                                    var="c"
-                                    filteredValue="#{caseProfileBB.filteredCaseList}"
-                                    rowKey="#{c.caseID}"
-                                    rowExpandMode="multiple"
-                                    widgetVar="ceViewTable"
-                                    value="#{caseProfileBB.caseList}"
-                                    tableStyleClass="primeDataTable">
+                                <h1>Occupancy Inspection Configuration Tool</h1>
+                    <p>View, create, and manage occupancy inspections</p>
+                    <f:view>
+                        <h:form id="occInsFeeDisplay">
+                            <h2>Occupancy Inspection Details</h2>
+                            <p:dataTable
+                                    id="datatable-inspections"
+                                    var="o"
+                                    rowKey="#{o.inspectionID}"
+                                    value="#{}"
+                                    tableStyleClass="primeDataTable"
+                                    tabindex="1">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                                    <p:column width="8%">
+                                    <p:column width="10%">
                                         <f:facet name="header">
                                             <h:outputText value="ID" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseID}"/>
+                                        <h:outputText value="#{o.inspectionID}"/>
                                     </p:column>
-                                    <p:column width="15%" sortBy="#{c.property.address}">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="Property" />
+                                            <h:outputText value="Property Unit" />
                                         </f:facet>
-                                        <h:outputText value="#{c.property.address}"/>
+                                        <h:outputText value="#{o.propertyUnitID}"/>
                                     </p:column>
-                                    <p:column width="15%">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="Name" />
+                                            <h:outputText value="User ID" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseName}"/>
+                                        <h:outputText value="#{o.loginUserID}"/>
                                     </p:column>
-                                    <p:column width="8%" sortBy="#{c.caseStage}">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="Stage" />
+                                            <h:outputText value="First Inspection" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseStage}"/>
+                                        <h:outputText value="#{o.firstInspectionDate}"/>
                                     </p:column>
-
-                                    <ui:remove>
-
-                                        <p:column width="20%"
-                                                  sortBy="#{c.casePhase.label}"
-                                                  filterBy="#{c.casePhase.label}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Phase" />
-                                            </f:facet>
-                                            <h:outputText value="#{c.casePhase.label}"/>
-                                        </p:column>
-                                    </ui:remove>
-
-                                    <p:column width="8%" sortBy="#{c.caseAge}">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="Age" />
+                                            <h:outputText value="First Pass" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseAge}"/>
+                                        <h:outputText value="#{o.firstInspectionPass}"/>
                                     </p:column>
-                                    <p:column width="8%" exportable="false">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="view" />
+                                            <h:outputText value="Second Inspection" />
                                         </f:facet>
-                                        <p:commandButton icon="fa fa-hand-o-right" value="view"
-                                                         actionListener="#{caseProfileBB.manageCECase(c)}" 
-                                                         ajax="true"
-                                                         update="
-                                                         case-details-form:header-id-ot
-                                                         case-details-form:header-type-ot
-                                                         case-details-form:header-addr-ot
-                                                         case-details-form:header-muni-ot
-                                                         case-details-form:selcase-id-ot
-                                                         case-details-form:selcase-addr-ot
-                                                         case-details-form:selcase-muni-ot
-                                                         case-details-form:selcase-stage-ot
-                                                         case-details-form:selcase-odate-it
-                                                         case-details-form:selcase-cdate-it
-                                                         case-details-form:selcase-age-it
-                                                         case-details-form:selcase-manager-it
-                                                         case-details-form:selcase-pacc
-                                                         case-details-form:selcase-access-sbcb
-                                                         case-details-form:selcase-forwardlinking-sbcb
-                                                         violation-form:violation-table
-                                                         notices-form:notices-ds
-                                                         action-requests-form:actionRequestTable
-                                                         event-dt-form:caseEventTable
-                                                         "/>
+                                        <h:outputText value="#{o.secondInspectionDate}"/>
                                     </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Second Pass" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.secondInspectionPass}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Resolved" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.resolved}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Fee Paid" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.totalFeePaid}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Notes" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyInspectionNotes}"/>
+                                    </p:column>
+     
                                 </p:dataTable>
-
-                                <p:commandLink value="Export case docket as pdf" ajax="false">
-                                    <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
-                                </p:commandLink>
-
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{occupancyInspectionBB.editOccupancyInspection}"
+                                             value="Update Selected Occupancy Inspection" tabindex="2"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{occupancyInspectionBB.deleteSelectedOccupancyInspection}"
+                                            value="Nuke Selected Category Forever" tabindex="3"/>
+                            
                                 <p:spacer height="10px"/>
                             </h:form>
                         </div>
@@ -207,14 +229,14 @@
                                             <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
                                             <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
                                                                      disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
-                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="inspections-messages-form:inspections-messages-global" />
                                             </p:selectBooleanCheckbox>
                                             <p:spacer height="5px"/>
                                             <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
                                             <h:outputText value=" "/>
                                             <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
                                                                      disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
-                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="inspections-messages-form:inspections-messages-global" />
                                             </p:selectBooleanCheckbox>
                                             <p:spacer height="5px"/>
 
@@ -1128,7 +1150,7 @@
                                              violation-form:violation-table
                                              case-details-form:selcase-stage-ot
                                              case-details-form:selcase-cdate-it
-                                             cecases-messages-form:cecases-messages-global"/>
+                                             inspections-messages-form:inspections-messages-global"/>
                             </h:form>
                             
                             <h2>Connect persons to event</h2>
@@ -1297,6 +1319,37 @@
 
 
                 </f:view>
+                
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                   
+                             
+                             
+                            <!--<p:fieldset legend="Update occupancy inspection "
+                                toggleable="true" collapsed="false" tabindex="4">
+                                    <h:form id="updateCategoryForm">
+                                        <p:spacer height="10px"/>
+                                        <p:outputLabel for="occInsFeeName">
+                                           <h:outputText value="Name:"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                                 style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
+                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:spacer height="20px"/>
+                                        
+                                       
+                                    </h:form>  
+                                </p:fieldset>-->
+                            
+                           
+                     
+                    </f:view>
+                </div>
             </ui:define>
         </ui:composition>
     </h:body>

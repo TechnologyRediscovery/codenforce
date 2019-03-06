@@ -285,8 +285,8 @@ div.headerLink a:before, a:visited{
 .list-column{
     flex-basis:auto;
     flex-shrink: 1;
-    min-width: 450px;
-    max-width: 450px;
+    min-width: 550px;
+    max-width: 550px;
     padding-right:10px;
     
     
@@ -757,6 +757,21 @@ tr.reinspect{
     vertical-align: top;
     padding: 10px;
 }
+
+.topbottom-lines-left{
+    text-align: right;
+    border-right: none;
+    color: black;
+    margin:0;
+    
+}
+    
+.topbottom-lines-right{
+    text-align: left;
+    border-left: none;
+    color:black;
+}
+
 
 .gridTd-solid-back{
     border:none;

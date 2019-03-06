@@ -80,7 +80,10 @@ public class CaseUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formControlCode
      */
     public int getFormControlCode() {
-        formControlCode = currentCase.getPublicControlCode();
+        if(currentCase != null){
+            formControlCode = currentCase.getPublicControlCode();
+            
+        }
         return formControlCode;
     }
 
@@ -88,7 +91,10 @@ public class CaseUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formCaseName
      */
     public String getFormCaseName() {
-        formCaseName = currentCase.getCaseName();
+        if(currentCase != null){
+            formCaseName = currentCase.getCaseName();
+            
+        }
         return formCaseName;
     }
 
@@ -96,8 +102,10 @@ public class CaseUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formOriginDate
      */
     public java.util.Date getFormOriginDate() {
-        formOriginDate = java.util.Date.from(currentCase
-                .getOriginationDate().atZone(ZoneId.systemDefault()).toInstant());
+        if(currentCase != null){
+            formOriginDate = java.util.Date.from(currentCase
+                    .getOriginationDate().atZone(ZoneId.systemDefault()).toInstant());
+        }
         return formOriginDate;
     }
 
@@ -105,7 +113,10 @@ public class CaseUpdateBB extends BackingBeanUtils implements Serializable{
      * @return the formCaseNotes
      */
     public String getFormCaseNotes() {
-        formCaseNotes = currentCase.getNotes();
+        if(currentCase != null){
+            formCaseNotes = currentCase.getNotes();
+            
+        }
         return formCaseNotes;
     }
 

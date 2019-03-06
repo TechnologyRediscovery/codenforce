@@ -28,7 +28,9 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
@@ -109,6 +111,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
         event.setActiveEvent(true);
         event.setHidden(false);
+        event.setCaseID(c.getCaseID());
         System.out.println("EventCoordinator.getInitalizedEvent | eventCat: " 
                 + event.getCategory().getEventCategoryTitle());
         return event;
@@ -261,6 +264,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return e;
     }
     
+    
+    
     /**
      * At its current impelementation, this amounts to a factory for ArrayLists
      * that are populated by the user when creating events
@@ -275,10 +280,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // YIKES TODO: Case vetting logic needed here!
         ei.updateEvent(event, clearViewConfirmation);
         
-        return "caseProfile";
+        return "cecases";
     }
     
     
+    /**
+     * A container for future event-related business logic
+     * @param e
+     * @throws IntegrationException 
+     */
     public void insertEvent(EventCECase e) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ei.insertEvent(e);
@@ -301,7 +311,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public void initiateEventProcessing(CECase c, EventCECase e, CodeViolation cv) throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseCoordinator cc = getCaseCoordinator();
         
-        cc.processCEEvent(c, e, null);
+        cc.processCEEvent(c, e);
         
     }
     
@@ -456,4 +466,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             
          } // close switch
     } // close method
+    
+    /**
+     * Pathway for injecting business logic into the event search process. Now its just a pass through.
+     * @param params
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventWithCasePropInfo> queryEvents(SearchParamsCEEvents params) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        return ei.getEvents(params);
+    }
+    
+    
 } // close class

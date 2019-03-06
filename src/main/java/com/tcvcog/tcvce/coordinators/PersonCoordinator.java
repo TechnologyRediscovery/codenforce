@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -134,6 +135,12 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("<br/>");
         sb.append("**************************************<br/>");
         return sb.toString();
+        
+    }
+    
+    public List<Person> loadPersonHistoryList(User u) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return pi.getPersonHistory(u);
         
     }
 

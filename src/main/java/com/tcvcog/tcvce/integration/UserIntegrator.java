@@ -590,7 +590,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 // prepare SELECT statement
                 selectSB.append("AND cecase_caseid = ? ");
                 stmt = con.prepareStatement(selectSB.toString());
-                stmt.setInt(1, c.getCaseID());
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, c.getCaseID());
                 rs = stmt.executeQuery();
                 
                 if(rs.first()){ // history entry with this user and person already exists
