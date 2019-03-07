@@ -110,7 +110,7 @@
                                     <h:message for="notes" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
-
+                                
                                 <f:facet name="footer">
                                     <h:panelGroup>
                                         <p:outputLabel for="desc">
@@ -125,6 +125,9 @@
                             </h:panelGrid>
                             <p:spacer height="10px"/>
                             
+                            <p:commandButton    ajax="false" action="#{violationAddBB.addViolationWithPhotos}" icon="fa fa-image"
+                                                value="Add code violation to case and upload photos of the violation" tabindex="6"/>
+                            <p:spacer height="10px"/>
                             <p:commandButton    ajax="false" action="#{violationAddBB.addViolation}" icon="fa fa-plus"
                                                 value="Add code violation to case and return to case home" tabindex="6"/>
                         </h:form>

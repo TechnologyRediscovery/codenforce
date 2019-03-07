@@ -29,6 +29,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.ArrayList;
@@ -46,7 +47,8 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
     public CodeViolationIntegrator() {
     }
 
-    public void insertCodeViolation(CodeViolation v) throws IntegrationException {
+    public int insertCodeViolation(CodeViolation v) throws IntegrationException {
+        int lastID = 0;
 
         String query = "INSERT INTO public.codeviolation(\n"
                 + "            violationid, codesetelement_elementid, cecase_caseid, \n"
@@ -75,15 +77,24 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString(7, v.getNotes());
 
             stmt.execute();
+            
+            String idNumQuery = "SELECT currval('codeviolation_violationid_seq');";
+            Statement s = con.createStatement();
+            ResultSet rs;
+            rs = s.executeQuery(idNumQuery);
+            rs.next();
+            lastID = rs.getInt(1);
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("cannot fetch code violation by ID, sorry.", ex);
+            throw new IntegrationException("cannot insert code violation, sorry.", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
+        
+        return lastID;
 
     }
 

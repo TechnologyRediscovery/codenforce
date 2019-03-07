@@ -29,6 +29,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -57,7 +59,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param rs
      * @return the fully baked Property with all fields set from DB data
      */
-    private Property generatePropertyFromRS(ResultSet rs) throws IntegrationException{
+    private Property generateProperty(ResultSet rs) throws IntegrationException{
         
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
        
@@ -148,7 +150,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
             int counter = 0;
             while(rs.next() && counter <= MAX_RESULTS){
-                propList.add(generatePropertyFromRS(rs));
+                propList.add(generateProperty(rs));
                 counter++;
             }
         } catch (SQLException ex) {
@@ -184,7 +186,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println("PropertyIntegrator.searchForProperties - with muni | sql: " + stmt.toString());
             int counter = 0;
             while(rs.next() && counter <= MAX_RESULTS){
-                propList.add(generatePropertyFromRS(rs));
+                propList.add(generateProperty(rs));
                 counter++;
             }
         } catch (SQLException ex) {
@@ -204,8 +206,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public String updateProperty(Property propToUpdate) throws IntegrationException{
         String query = "UPDATE public.property\n" +
                 "   SET parid=?, lotandblock=?, \n" +
-                "       address=?, propertyUseType_UseID=?, rental=?, multiunit=?, \n" +
-                "       usegroup=?, constructiontype=?, countycode=?, notes=?" +
+                "       address=?, propertyusetype=?, \n" +
+                "       usegroup=?, constructiontype=?, countycode=?, notes=?, \n" +
+                "       containsrentalunits=?, multiunit=? , vacant=?, \n" +
+                "       lastupdatedby=?, lastupdated=?" +
                 " WHERE propertyid = ?;";
         
         Connection con = getPostgresCon();
@@ -224,9 +228,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(9, propToUpdate.getCountyCode());
             stmt.setString(10, propToUpdate.getNotes());
             
+            stmt.setBoolean(11, true);
+            stmt.setBoolean(12, true);
+            stmt.setBoolean(13, true);
+            
+            stmt.setInt(14, getSessionBean().getFacesUser().getUserID());
+            stmt.setTimestamp(15, Timestamp.valueOf(LocalDateTime.now()));
+            
             // figure out if we need to do changes in the list elements
             
-            stmt.setInt(11, propToUpdate.getPropertyID());
+            stmt.setInt(16, propToUpdate.getPropertyID());
             
             stmt.executeUpdate();
             
@@ -259,7 +270,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, propertyID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                p = generatePropertyFromRS(rs);
+                p = generateProperty(rs);
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -414,8 +425,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         pu.setRental(rs.getBoolean("rental"));
         pu.setThisProperty(getProperty(rs.getInt("property_propertyid")));
         pu.setPropertyUnitPeople(persInt.getPersonList(rs.getInt("property_propertyid")));
-        
-        
         return pu;
     }
     
@@ -427,6 +436,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public void deletePropertyUnit(PropertyUnit pu){
         
        
+    }
+    
+    public PropertyWithLists getNewPropertyWithLists(){
+        return new PropertyWithLists();
     }
     
 } // close class

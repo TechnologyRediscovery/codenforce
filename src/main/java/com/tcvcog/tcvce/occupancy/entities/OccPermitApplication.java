@@ -17,9 +17,13 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.occupancy.entities;
 
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -30,13 +34,15 @@ public class OccPermitApplication {
     private OccPermitApplicationReason reason;
     private boolean multiUnit;
     private LocalDateTime submissionDate;
+    private java.util.Date submissionDateUtilDate;
     private Person currentOwner;
     private Person contactPerson;
     private ArrayList<Person> newOccupants;
     private Person newOwner;
     private String submissionNotes;
     private String internalNotes;
-    private String propertyUnitId;
+    private Property applicationProperty;
+
 
     /**
      * @return the id
@@ -178,13 +184,22 @@ public class OccPermitApplication {
         this.internalNotes = internalNotes;
     }
 
-    public String getPropertyUnitId() {
-        return propertyUnitId;
+    public Date getSubmissionDateUtilDate() {
+        submissionDateUtilDate = java.util.Date.from(submissionDate.atZone(ZoneId.systemDefault()).toInstant());
+        return submissionDateUtilDate;
     }
 
-    public void setPropertyUnitId(String propertyUnitId) {
-        this.propertyUnitId = propertyUnitId;
+    public void setSubmissionDateUtilDate(Date submissionDateUtilDate) {
+        this.submissionDateUtilDate = submissionDateUtilDate;
+        submissionDate = submissionDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
-    
+
+    public Property getApplicationProperty() {
+        return applicationProperty;
+    }
+
+    public void setApplicationProperty(Property applicationProperty) {
+        this.applicationProperty = applicationProperty;
+    }    
     
 }

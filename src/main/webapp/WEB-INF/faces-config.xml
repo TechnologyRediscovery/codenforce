@@ -184,8 +184,7 @@
 
     <managed-bean>
         <managed-bean-name>propertyUnitCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.PropertyCoordinator</managed-bean-class>
-    
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.PropertyCoordinator</managed-bean-class>    
         <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
@@ -266,6 +265,12 @@
         <description>Coordinates view-coordinator ignteractions around code enforcement actions</description>
         <managed-bean-name>cEActionRequestsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>occPermitApplicationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPermitApplicationBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
   
@@ -598,6 +603,14 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
+    
+    <navigation-rule>
+        <navigation-case>
+            <from-outcome>occPermitApplicationFlow</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitChooseMuni.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
         
     <!--ceaction request flow-->    
 
@@ -838,6 +851,15 @@
             <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>propertyUpdate</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/propertyUpdate.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     </navigation-rule>    
         
     <!--Persons-->
@@ -1024,7 +1046,23 @@
         </navigation-case>
     </navigation-rule>
     
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/violationAdd.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>violationPhotos</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
+    <navigation-rule>
+        <from-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>ceHome</from-outcome>
+            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
    
     <navigation-rule>
@@ -1084,11 +1122,46 @@
     <!--  OCCUPANCY  -->
     
     <navigation-rule>
-        <from-view-id>*</from-view-id>
+        
+        <navigation-case>
+            <from-view-id>/public/services/occpermitApplicationFlow/occPermitChooseMuni.xhtml</from-view-id>
+            <from-outcome>chooseProperty</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</from-view-id>
+            <from-outcome>addPropertyUnit</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     
+        <navigation-case>
+            <from-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</from-view-id>
+            <from-outcome>addReason</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml </from-view-id>
+            <from-outcome>addReason</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
+            <from-outcome> addPeople </from-outcome>
+            <to-view-id> /public/services/occPermitApplicationFlow/occPermitAddPeople.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
         <navigation-case>
             <from-outcome>occPermitApplications</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
+            <redirect />       
         </navigation-case>
         
         <navigation-case>
@@ -1381,4 +1454,5 @@
         <managed-bean-class>com.tcvcog.tcvce.application.PhotoBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+
 </faces-config>
