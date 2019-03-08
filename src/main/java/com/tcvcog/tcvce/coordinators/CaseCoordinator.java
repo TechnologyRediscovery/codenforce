@@ -657,7 +657,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         noticeEvent.setDescription(queuedNoticeEventNotes);
         
         noticeEvent.setCreator(getFacesUser());
-        noticeEvent.setActiveEvent(true);
+        noticeEvent.setActive(true);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
         noticeEvent.setRequiresViewConfirmation(false);

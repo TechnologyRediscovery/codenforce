@@ -410,7 +410,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(6, event.isDiscloseToMunicipality());
 
             stmt.setBoolean(7, event.isDiscloseToPublic());
-            stmt.setBoolean(8, event.isActiveEvent());
+            stmt.setBoolean(8, event.isActive());
             stmt.setBoolean(9, event.isRequiresViewConfirmation());
             stmt.setBoolean(10, event.isHidden());
             stmt.setString(11, event.getNotes());
@@ -525,7 +525,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(6, event.isDiscloseToMunicipality());
 
             stmt.setBoolean(7, event.isDiscloseToPublic());
-            stmt.setBoolean(8, event.isActiveEvent());
+            stmt.setBoolean(8, event.isActive());
             stmt.setBoolean(9, event.isHidden());
             stmt.setString(10, event.getNotes());
             stmt.setInt(11, event.getEventID());
@@ -654,13 +654,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      */
     private EventWithCasePropInfo generateSuperEvent(ResultSet rs) throws SQLException, IntegrationException {
-        PropertyIntegrator pi = getPropertyIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
         EventWithCasePropInfo ev = new EventWithCasePropInfo();
         // generateEventFromRS returns the superclass type only, downcast needed
         // see previous line
         ev = (EventWithCasePropInfo) generateEventFromRS(rs, ev);
-        ev.setEventProp(pi.getProperty(rs.getInt("property_propertyid")));
         ev.setEventCase(ci.getCECase(rs.getInt("cecase_caseid")));
         return ev;
 
@@ -687,22 +685,24 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ev.setEventID(rs.getInt("eventid"));
         ev.setCategory(getEventCategory(rs.getInt("ceeventCategory_catID")));
         ev.setCaseID(rs.getInt("cecase_caseid"));
+        
         if (rs.getTimestamp("dateofrecord") != null) {
             LocalDateTime dt = rs.getTimestamp("dateofrecord").toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime();
             ev.setDateOfRecord(dt);
-            ev.setPrettyDateOfRecord(getPrettyDate(dt));
         }
 
-        ev.setEventTimeStamp(rs.getTimestamp("eventtimestamp").toInstant()
+        ev.setTimestamp(rs.getTimestamp("eventtimestamp").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         ev.setDescription(rs.getString("eventDescription"));
         ev.setCreator(ui.getUser(rs.getInt("login_userid")));
+        ev.setAssignedTo(ui.getUser(rs.getInt("assignedto_login_userid")));
+       
         ev.setDiscloseToMunicipality(rs.getBoolean("disclosetomunicipality"));
-
         ev.setDiscloseToPublic(rs.getBoolean("disclosetopublic"));
-        ev.setActiveEvent(rs.getBoolean("activeevent"));
+        ev.setActive(rs.getBoolean("activeevent"));
 
+        // View confirmation stuff
         ev.setRequiresViewConfirmation(rs.getBoolean("requiresviewconfirmation"));
         Timestamp ldt = rs.getTimestamp("viewconfirmedat");
         if (ldt != null) {
@@ -715,7 +715,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         ev.setHidden(rs.getBoolean("hidden"));
         ev.setNotes(rs.getString("notes"));
-        ev.setAssignedTo(ui.getUser(rs.getInt("assignedto_login_userid")));
 
         return ev;
     }
@@ -957,10 +956,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT ceevent.eventid, ceevent.ceeventcategory_catid, ceevent.dateofrecord, \n"
                 + "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.login_userid, ceevent.disclosetomunicipality, \n"
                 + "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requiresviewconfirmation, ceevent.hidden, \n"
-                + "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, property.propertyid, cecase.caseid, ceeventcategory.categoryid\n"
+                + "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, cecase.caseid, ceeventcategory.categoryid\n"
                 + " FROM ceevent 	INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid)\n"
                 + "		INNER JOIN cecase ON (cecase_caseid = caseid)\n"
-                + "		INNER JOIN property on (property_propertyid = propertyid)\n"
                 + " WHERE categorytype = CAST ('Timeline' AS ceeventtype)\n"
                 + "		AND dateofrecord >= ? AND dateofrecord <= ? \n"
                 + "		AND activeevent = TRUE\n"
@@ -995,16 +993,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 LocalDateTime dt = rs.getTimestamp("dateofrecord").toInstant()
                         .atZone(ZoneId.systemDefault()).toLocalDateTime();
                 ev.setDateOfRecord(dt);
-                ev.setPrettyDateOfRecord(getPrettyDate(dt));
 
-                ev.setEventTimeStamp(rs.getTimestamp("eventtimestamp").toInstant()
+                ev.setTimestamp(rs.getTimestamp("eventtimestamp").toInstant()
                         .atZone(ZoneId.systemDefault()).toLocalDateTime());
                 ev.setDescription(rs.getString("eventDescription"));
                 ev.setCreator(ui.getUser(rs.getInt("login_userid")));
                 ev.setDiscloseToMunicipality(rs.getBoolean("disclosetomunicipality"));
 
                 ev.setDiscloseToPublic(rs.getBoolean("disclosetopublic"));
-                ev.setActiveEvent(rs.getBoolean("activeevent"));
+                ev.setActive(rs.getBoolean("activeevent"));
 
                 ev.setRequiresViewConfirmation(rs.getBoolean("requiresviewconfirmation"));
                 Timestamp ldt = rs.getTimestamp("viewconfirmedat");
@@ -1018,7 +1015,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 ev.setNotes(rs.getString("notes"));
 
                 // now for case and prop info
-                ev.setEventProp(pi.getProperty(rs.getInt("propertyid")));
                 ev.setEventCase(ci.getCECase(rs.getInt("caseid")));
                 eventList.add(ev);
 
