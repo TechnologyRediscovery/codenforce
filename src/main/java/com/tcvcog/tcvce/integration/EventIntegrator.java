@@ -564,7 +564,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    private void clearViewConfFromEvent(EventCECase ec) throws IntegrationException {
+    public void clearViewConfFromEvent(EventCECase ec) throws IntegrationException {
         String query = "UPDATE ceevent SET viewconfirmedby = null, "
                 + "viewconfirmedat = null WHERE eventid = ?;";
 
@@ -719,32 +719,48 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         return ev;
     }
+    
+    public EventWithCasePropInfo getSuperEvent(int evid) throws IntegrationException{
+        EventWithCasePropInfo ev = null;
 
-    /*
-        
-        sb.append("SELECT ceevent.eventid, ");
-        sb.append("ceevent.notes, ");
-        sb.append("ceevent.hidden, ");
-        sb.append("ceevent.ceeventcategory_catid, ");
-        sb.append("ceevent.requiresviewconfirmation, ");
-        sb.append("ceevent.activeevent, ");
-        sb.append("ceevent.disclosetopublic, ");
-        sb.append("ceevent.disclosetomunicipality, ");
-        sb.append("ceevent.login_userid, ");
-        sb.append("ceevent.eventdescription, ");
-        sb.append("ceevent.eventtimestamp, ");
-        sb.append("ceevent.dateofrecord, ");
-        sb.append("ceevent.viewconfirmedby, ");
-        sb.append("ceevent.viewconfirmedat, ");
-        sb.append("property.propertyid, ");
-        sb.append("cecase.caseid, ");
-        sb.append("ceeventcategory.categoryid ");
+       StringBuilder sb = new StringBuilder();
+        sb.append("SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, ");
+        sb.append("       eventtimestamp, eventdescription, ceevent.login_userid, disclosetomunicipality, ");
+        sb.append("       disclosetopublic, activeevent, ceeventcategory.requiresviewconfirmation, hidden, ");
+        sb.append("       ceevent.notes, viewconfirmedby, viewconfirmedat,");
+        sb.append("       viewnotes, property_propertyid, assignedto_login_userid ");
         sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
         sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
-        sb.append("INNER JOIN property on (property_propertyid = propertyid) ");
-        sb.append("WHERE categorytype = CAST ('Timeline' AS ceeventtype) ");
-        sb.append("AND municipality_municode = ?");
-     */
+        sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
+        sb.append("WHERE eventid = ?");
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, evid);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                ev = generateSuperEvent(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive event", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return ev;
+    }
+
+  
     public List<EventWithCasePropInfo> getEvents(SearchParamsCEEvents params) throws IntegrationException {
         List<EventWithCasePropInfo> eventList = new ArrayList<>();
         ResultSet rs = null;

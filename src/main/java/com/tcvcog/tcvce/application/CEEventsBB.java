@@ -17,6 +17,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,7 +89,59 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public void setSearchParams(SearchParamsCEEvents searchParams) {
         this.searchParams = searchParams;
     }
+    
+    public void refreshCurrentEventList() {
+        EventIntegrator ei = getEventIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        EventWithCasePropInfo e;
+        List<EventWithCasePropInfo> refreshedList = new ArrayList<>();
+        Iterator<EventWithCasePropInfo> iter = eventList.iterator();
+        try {
+            while (iter.hasNext()) {
+                e = iter.next();
+                e = ei.getSuperEvent(e.getEventID());
+                e.setCurrentUserCanConfirm(
+                        ec.computeEventViewConfirmationAbility(e, getSessionBean().getFacesUser()));
+                refreshedList.add(e);
+            }
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not refresh event list, sorry!", ""));
+            
+        }
+        eventList = refreshedList;
+    }
 
+    public void confirmViewWithoutNotes(EventWithCasePropInfo ev){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.confirmEventView(ev, getSessionBean().getFacesUser());
+            refreshCurrentEventList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Registered view confirmation!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not confirm view, sorry.", ""));
+        }
+    }
+    
+    public void clearViewconfirmation(EventWithCasePropInfo ev){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.clearEventView(ev);
+            refreshCurrentEventList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "View confirmation: cleared!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not clear view confirmation, sorry.", ""));
+        }
+    }
     
 
    

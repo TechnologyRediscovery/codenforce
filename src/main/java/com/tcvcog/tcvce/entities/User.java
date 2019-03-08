@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,16 +31,20 @@ public class User implements Serializable{
     private int userID;
     private RoleType roleType;
     private String username;
+    private String password;
     private List<Municipality> authMunis;
     
     // To be deprecated 
     private Municipality muni;
     
     private Person person;
+    private int personID;
     
     private String notes;
     private LocalDateTime activityStartDate;
+    private java.util.Date activityStartDateUtilDate;
     private LocalDateTime activityStopDate;
+    private java.util.Date activityStopDateUtilDate;
     
     // permissions
     private boolean systemAccessPermitted;
@@ -279,6 +284,82 @@ public class User implements Serializable{
      */
     public void setOriNumber(String oriNumber) {
         this.oriNumber = oriNumber;
+    }
+
+    /**
+     * @return the activityStopDateUtilDate
+     */
+    public java.util.Date getActivityStopDateUtilDate() {
+        if(getActivityStopDate() != null){
+            activityStopDateUtilDate = java.util.Date.from(getActivityStopDate()
+                    .atZone(ZoneId.systemDefault()).toInstant());
+            
+        }
+        return activityStopDateUtilDate;
+    }
+
+    /**
+     * @param activityStopDateUtilDate the activityStopDateUtilDate to set
+     */
+    public void setActivityStopDateUtilDate(java.util.Date activityStopDateUtilDate) {
+        this.activityStopDateUtilDate = activityStopDateUtilDate;
+        if(activityStopDateUtilDate != null){
+            activityStopDate = activityStopDateUtilDate
+                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    /**
+     * @return the activityStartDateUtilDate
+     */
+    public java.util.Date getActivityStartDateUtilDate() {
+        if(getActivityStartDate() != null){
+            activityStartDateUtilDate = java.util.Date.from(getActivityStartDate()
+                    .atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return activityStartDateUtilDate;
+    }
+
+    /**
+     * @param activityStartDateUtilDate the activityStartDateUtilDate to set
+     */
+    public void setActivityStartDateUtilDate(java.util.Date activityStartDateUtilDate) {
+        this.activityStartDateUtilDate = activityStartDateUtilDate;
+        if(activityStartDateUtilDate != null){
+            activityStartDate = activityStartDateUtilDate
+                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    /**
+     * @return the personID
+     */
+    public int getPersonID() {
+        if(person != null){
+            personID = person.getPersonID();
+        }
+        return personID;
+    }
+
+    /**
+     * @param personID the personID to set
+     */
+    public void setPersonID(int personID) {
+        this.personID = personID;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
     }
     
 }

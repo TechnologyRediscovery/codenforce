@@ -227,9 +227,9 @@ public class BackingBeanUtils implements Serializable{
         sb.append("<br/>");
         sb.append("--------------------------------------<br/>");
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("signatureLeader"));
-        sb.append(getFacesUser().getFName());
+        sb.append(getFacesUser().getPerson().getFirstName());
         sb.append(" ");
-        sb.append(getFacesUser().getLName());
+        sb.append(getFacesUser().getPerson().getLastName());
         sb.append(" at ");
         sb.append(getPrettyDate(LocalDateTime.now()));
         sb.append("<br/>");

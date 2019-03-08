@@ -30,35 +30,36 @@
                                          footerClass="gridFooter">
     
                                 
-                                <h:outputLabel value="First Name*" for="userFNameIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="userFNameIT" value="#{userBB.formFName}" 
-                                           style="width: 250px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="userFNameIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Last Name*" for="userLNameIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="userLNameIT" value="#{userBB.formLName}" 
-                                           style="width: 250px;" tabindex="2" required="true" styleClass="inputText"/>
-                                    <h:message for="userLNameIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
+                              
                                 
                                 <h:outputLabel value="Municipality*" for="userMuniIM"/>
                                 <h:panelGroup>
-                                    <p:selectOneMenu id="userMuniIM" required="true" value="#{userBB.formMuniCode}" tabindex="3">
-                                        <f:selectItems value="#{muniBB.muniMap}"/>
+                                    
+                                    <p:selectOneMenu id="useradd-muni-som" value="#{userBB.formMuni}" tabindex="1">
+                                        <f:selectItem itemLabel="Select a municipality" noSelectionOption="true" />
+                                        <f:selectItems value="#{muniBB.muniList}" var="m" itemValue="#{m}" 
+                                                       itemLabel="#{m.muniName}" />
+                                        <f:converter converterId="muniConverter"/>
                                     </p:selectOneMenu>
-                                    <h:message for="userMuniIM" showDetail="false" showSummary="true" 
+                                    <h:message for="useradd-muni-som" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                
+                                 <h:panelGroup>
+                                    <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
+                                    <p:selectOneMenu id="person-list-menu" required="false" value="#{userBB.formUserPerson}" tabindex="2">
+                                        <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                        <f:selectItems value="#{sessionBean.personQueue}"  var="p" itemValue="#{p}" 
+                                                       itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                        <f:converter converterId="personConverter"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="person-list-menu" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
 
                                 <h:outputLabel value="User's System Role*" for="roleIM"/>
                                 <h:panelGroup>
-                                    <p:selectOneMenu id="roleIM" required="true" value="#{userBB.formRoleType}" tabindex="4">
+                                    <p:selectOneMenu id="roleIM" required="true" value="#{userBB.formRoleType}" tabindex="3">
                                         <f:selectItems value="#{userBB.roleTypeArray}"/>
                                     </p:selectOneMenu>
                                     <h:message for="roleIM" showDetail="false" showSummary="true" 
@@ -68,91 +69,12 @@
                                 <h:outputLabel value="Username*" for="usernameIT"/>
                                 <h:panelGroup>
                                     <p:inputText id="usernameIT" value="#{userBB.formUsername}" 
-                                           style="width: 250px;" tabindex="5" required="true" styleClass="inputText"/>
+                                           style="width: 250px;" tabindex="4" required="true" styleClass="inputText"/>
                                     <h:message for="usernameIT" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
                                 
-                                <h:outputLabel value="Password*" for="passwordIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="passwordIT" value="#{userBB.formPassword}" 
-                                           style="width: 250px;" tabindex="6" required="true" styleClass="inputText"/>
-                                    <h:message for="passwordIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    <h:outputText value="Make it strong with numbers and symbols &amp; don't use simple dictionary words!"/>
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Work Title*" for="workTitleIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="workTitleIT" value="#{userBB.formWorkTitle}" 
-                                           style="width: 250px;" tabindex="7" required="true" styleClass="inputText"/>
-                                    <h:message for="workTitleIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Phone (cell)" for="cellIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="cellIT" value="#{userBB.formPhoneCell}" 
-                                           style="width: 250px;" tabindex="8" required="false" styleClass="inputText"/>
-                                    <h:message for="cellIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Phone (home)" for="homeIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="homeIT" value="#{userBB.formPhoneHome}" 
-                                           style="width: 250px;" tabindex="9" required="false" styleClass="inputText"/>
-                                    <h:message for="homeIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Phone (work)*" for="workIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="workIT" value="#{userBB.formPhoneWork}" 
-                                           style="width: 250px;" tabindex="10" required="true" styleClass="inputText"/>
-                                    <h:message for="workIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Email*" for="emailIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="emailIT" value="#{userBB.formEmail}" 
-                                           style="width: 250px;" tabindex="11" required="true" styleClass="inputText"/>
-                                    <h:message for="emailIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Street" for="streetIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="streetIT" value="#{userBB.formAddress_street}" 
-                                           style="width: 250px;" tabindex="12" required="false" styleClass="inputText"/>
-                                    <h:message for="streetIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="City" for="cityIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="cityIT" value="#{userBB.formAddress_city}" 
-                                           style="width: 250px;" tabindex="13" required="false" styleClass="inputText"/>
-                                    <h:message for="cityIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="State Abbrev." for="stateIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="stateIT" value="#{userBB.formAddress_state}" 
-                                           style="width: 40px;" tabindex="14" required="false" styleClass="inputText"/>
-                                    <h:message for="stateIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="ZIPCode" for="zipIT"/>
-                                <h:panelGroup>
-                                    <p:inputText id="zipIT" value="#{userBB.formAddress_zip}" 
-                                           style="width: 250px;" tabindex="15" required="false" styleClass="inputText"/>
-                                    <h:message for="zipIT" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                              
                                 
                                  <h:outputLabel value="Access Start Date*" for="startDateCal"/>
                                 <h:panelGroup>
@@ -162,7 +84,7 @@
                                             showOn="button"
                                             pattern="EEE, dd MMM, yyyy"
                                             navigator="true"
-                                            tabindex="16"
+                                            tabindex="5"
                                             showButtonPanel="true"
                                             showTodayButton="true"
                                             required="true"/>
@@ -175,7 +97,7 @@
                                   <h:outputLabel value="Access Termination Date*" for="terminationDateCal"/>
                                 <h:panelGroup>
                                     <p:calendar value="#{userBB.formActivityStopDate}" 
-                                            mode="popup" tabindex="17"
+                                            mode="popup" tabindex="6"
                                             id="terminationDateCal"
                                             showOn="button"
                                             pattern="EEE, dd MMM, yyyy"
@@ -191,22 +113,43 @@
                                   
                                  <h:outputLabel value="Permit System Access" for="activeInsystemSwitch"/>
                                  <h:panelGroup>
-                                     <p:inputSwitch tabindex="18" id="activeInsystemSwitch" value="#{userBB.formAccessPermitted}" onLabel="Yes" offLabel="No" />
+                                     <p:inputSwitch tabindex="7" id="activeInsystemSwitch" value="#{userBB.formAccessPermitted}" onLabel="Yes" offLabel="No" />
                                 </h:panelGroup>
                                 
-                                <h:outputLabel value="UserID" for="idIT"/>
+                               
+                                  
+                                 <h:outputLabel value="Is enforcement official?" for="useradd-enfofficial-is"/>
+                                 <h:panelGroup>
+                                     <p:inputSwitch tabindex="8" id="useradd-enfofficial-is" value="#{userBB.formIsEnfOfficial}" onLabel="Yes" offLabel="No" />
+                                </h:panelGroup>
+                                 
+                                  <h:outputLabel value="Badge number*" for="badgeIT"/>
                                 <h:panelGroup>
-                                    <p:inputText id="idIT" value="#{userBB.formUserID}" 
-                                           style="width: 40px;" tabindex="19" required="true" styleClass="inputText"/>
-                                    <h:message for="idIT" showDetail="false" showSummary="true" 
+                                    <p:inputText id="badgeIT" value="#{userBB.formBadgeNum}" 
+                                           style="width: 250px;" tabindex="5" required="true" styleClass="inputText"/>
+                                    <h:message for="badgeIT" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
+                                
+                              
+                                  
+                                <h:outputLabel value="ORI number" for="orinumIT"/>
+                                <h:panelGroup>
+                                    <p:inputText id="orinumIT" value="#{userBB.formOriNum}" 
+                                           style="width: 250px;" tabindex="9" required="true" styleClass="inputText"/>
+                                    <h:message for="orinumIT" showDetail="false" showSummary="true" 
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                
+                              
+                                
+                               
                                 
                                 <f:facet name="footer">
                                     <h:outputLabel value="User Notes" for="notesIT"/>
                                     <h:panelGroup>
                                         <p:inputTextarea id="notesIT" value="#{userBB.formNotes}" 
-                                               style="width: 100%;" tabindex="20" required="false" styleClass="inputText"/>
+                                               style="width: 100%;" tabindex="10" required="false" styleClass="inputText"/>
                                         <h:message for="notesIT" showDetail="false" showSummary="true" 
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
@@ -218,7 +161,9 @@
                             
                             <p:spacer height="15px"/>
                             
-                            <p:commandButton ajax="false" value="Add New User" icon="fa fa-plus" tabindex="21" action="#{userBB.commitInsert}"/>
+                            <p:commandButton ajax="false" value="Add New User" icon="fa fa-plus" 
+                                             tabindex="11" action="#{userBB.commitInsert}"
+                                             disabled="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"/>
 
                         </h:form>
                     </f:view>
