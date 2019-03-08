@@ -356,7 +356,8 @@
                                                     process="@form"
                                                     update="events-datascroller-form:events-datascroller
                                                     events-datatable-form:events-datatable
-                                                    ceev-form-globalmessages:ceev-globalmessages"
+                                                    ceev-form-globalmessages:ceev-globalmessages
+                                                    "
                                                     />
                             </p:fieldset>
                         </h:form>
@@ -385,11 +386,11 @@
                         </h:form>
 
                         
-                        <h2>Event list size: <h:outputText value="#{(!empty cEEventsBB.eventList) ? ceeventsBB.eventList.size:'[no list]'}" /></h2>
                
                         
                         
                                 <h:form id="events-datascroller-form">
+                                  
                                     <p:dataScroller
                                         id="events-datascroller"
                                         var="e"
@@ -430,7 +431,7 @@
                                                 <f:facet name="header" class="leftalign">
                                                     <h:outputText value="Description" />
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.description}"/>
+                                                        <h:outputText style="font-weight: normal;" value="#{e.description}"/>
                                                     </div>
                                                 </f:facet>
 
@@ -471,29 +472,42 @@
                                                             <p:spacer height="5px"/>
                                                              <p:commandButton   id="events-viewconf-confirmnonotes-cb" 
                                                                                 ajax="true"
+                                                                                actionListener="#{cEEventsBB.confirmViewWithoutNotes(e)}"
                                                                                  value="Confirm without notes" 
                                                                                  styleClass="noFill"
                                                                                  disabled="#{!(empty e.viewConfirmedBy)}"
                                                                                  icon="fa fa-check-square-o"
                                                                                  rendered="#{e.currentUserCanConfirm}"
+                                                                                 update="events-datascroller
+                                                                                        events-datatable-form:events-datatable
+                                                                                        ceev-form-globalmessages:ceev-globalmessages
+                                                                                        "
                                                                                  />
                                                              
+                                                             <ui:remove>
+                                                                 
                                                              <p:commandButton   id="events-viewconf-confirmwithnotes-cb" 
                                                                                 ajax="true"
                                                                                  value="Confirm with notes" 
                                                                                  styleClass="noFill"
-                                                                                 disabled="#{!(empty e.viewConfirmedBy)}"
+                                                                                 disabled="true"
                                                                                  icon="fa fa-edit"
                                                                                 rendered="#{e.currentUserCanConfirm}"
                                                                                  />
+                                                             </ui:remove>
                                                              
                                                              <p:commandButton   id="events-viewconf-clearconf-cb" 
                                                                                 ajax="true"
+                                                                                actionListener="#{cEEventsBB.clearViewconfirmation(e)}"
                                                                                 value="clear view conf" 
                                                                                 styleClass="noFill"
                                                                                 disabled="#{empty e.viewConfirmedBy}"
                                                                                 icon="fa fa-eraser"
                                                                                 rendered="#{e.currentUserCanConfirm}"
+                                                                                 update="events-datascroller
+                                                                                        events-datatable-form:events-datatable
+                                                                                        ceev-form-globalmessages:ceev-globalmessages
+                                                                                        "
                                                                                 />
                                                             
                                                         </f:facet>
@@ -603,12 +617,12 @@
                                             </f:facet>
                                             <h:outputText value="#{e.category.eventCategoryTitle}"/>
                                         </p:column>
-                                        <p:column width="5%" filterBy="#{e.creator.LName}"
-                                                  sortBy="#{e.creator.LName}">
+                                        <p:column width="5%" filterBy="#{e.creator.person.lastName}"
+                                                  sortBy="#{e.creator.person.lastName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator" />
                                             </f:facet>
-                                            <h:outputText value="#{e.creator.LName}"/>
+                                            <h:outputText value="#{e.creator.person.lastName}"/>
                                         </p:column>
                                         <p:column width="20%" style="word-wrap: normal;">
                                             <f:facet name="header">

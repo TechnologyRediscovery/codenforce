@@ -18,7 +18,10 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.UserIntegrator;
@@ -26,10 +29,14 @@ import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -39,7 +46,7 @@ import javax.faces.bean.ViewScoped;
 public class UserBB extends BackingBeanUtils implements Serializable {
 
     private ArrayList<User> userList;
-    private User selectedUser;
+    private User currentUser;
 
 //    @ManagedProperty(value="#{sessionBean}")
 //    private SessionBean subclassSessionBean;
@@ -49,12 +56,22 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     private RoleType[] roleTypeArray;
     private String formUsername;
     private String formPassword;
-    private int formMuniCode;
+    
+    private Municipality formMuni;
     
     private String formNotes;
     private Date formActivityStartDate;
     private Date formActivityStopDate;
     private boolean formAccessPermitted;
+    
+    private boolean formIsEnfOfficial;
+    private String formBadgeNum;
+    private String formOriNum;
+    
+    
+    
+    private Person formUserPerson;
+
     
 
     /**
@@ -62,39 +79,48 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      */
     public UserBB() {
     }
+    
+    @PostConstruct
+    public void initBean(){
+        currentUser = getSessionBean().getFacesUser();
+    }
+    
 
-    public String updateUser() {
+    public void updateUser(User u) {
         
-        getSessionBean().setUtilityUserToUpdate(selectedUser);
+        currentUser = u;
 
-        return "userUpdate";
+    }
+    
+    public void commitUpdates(ActionEvent ev){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            uc.updateUser(currentUser);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully udpated user", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update user", ""));
+            
+        }
     }
 
-    public String addUser() {
+    public void addUser(ActionEvent ev) {
+        UserCoordinator uc = getUserCoordinator();
         System.out.println("UserBB.addUser");
-
-        return "userAdd";
+        currentUser = uc.getUserSkeleton();
     }
 
-    public String commitInsert() {
+    public void commitInsert(ActionEvent ev) {
         System.out.println("UserBB.commitInsert");
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         int newUserID;
-        User u = new User();
-        u.setUserID(formUserID);
-        u.setRoleType(formRoleType);
-        u.setUsername(formUsername);
-        
-        u.setNotes(formNotes);
-        u.setActivityStartDate(formActivityStartDate.toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        u.setActivityStopDate(formActivityStopDate.toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        u.setSystemAccessPermitted(formAccessPermitted);
-
         
         try {
-            newUserID = ui.insertUser(u);
+            newUserID = uc.insertNewUser(currentUser);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added user with id" + newUserID
@@ -104,10 +130,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to add user to system, my apologies",
                             "This is a system-level error that msut be corrected by an administrator"));
-            return "";
         }
-
-        return "userManage";
 
     }
 
@@ -128,12 +151,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         return userList;
     }
 
-    /**
-     * @return the selectedUser
-     */
-    public User getSelectedUser() {
-        return selectedUser;
-    }
+    
 
     /**
      * @return the formRoleType
@@ -156,13 +174,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         return formPassword;
     }
 
-    /**
-     * @return the formMuniCode
-     */
-    public int getFormMuniCode() {
-        return formMuniCode;
-    }
-
+   
   
     /**
      * @return the formNotes
@@ -200,13 +212,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         this.userList = userList;
     }
 
-    /**
-     * @param selectedUser the selectedUser to set
-     */
-    public void setSelectedUser(User selectedUser) {
-        this.selectedUser = selectedUser;
-    }
-
+   
     /**
      * @param formRoleType the formRoleType to set
      */
@@ -226,13 +232,6 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      */
     public void setFormPassword(String formPassword) {
         this.formPassword = formPassword;
-    }
-
-    /**
-     * @param formMuniCode the formMuniCode to set
-     */
-    public void setFormMuniCode(int formMuniCode) {
-        this.formMuniCode = formMuniCode;
     }
 
    
@@ -291,6 +290,90 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      */
     public void setFormUserID(int formUserID) {
         this.formUserID = formUserID;
+    }
+
+    /**
+     * @return the formIsEnfOfficial
+     */
+    public boolean isFormIsEnfOfficial() {
+        return formIsEnfOfficial;
+    }
+
+    /**
+     * @param formIsEnfOfficial the formIsEnfOfficial to set
+     */
+    public void setFormIsEnfOfficial(boolean formIsEnfOfficial) {
+        this.formIsEnfOfficial = formIsEnfOfficial;
+    }
+
+    /**
+     * @return the formBadgeNum
+     */
+    public String getFormBadgeNum() {
+        return formBadgeNum;
+    }
+
+    /**
+     * @return the formOriNum
+     */
+    public String getFormOriNum() {
+        return formOriNum;
+    }
+
+    /**
+     * @param formBadgeNum the formBadgeNum to set
+     */
+    public void setFormBadgeNum(String formBadgeNum) {
+        this.formBadgeNum = formBadgeNum;
+    }
+
+    /**
+     * @param formOriNum the formOriNum to set
+     */
+    public void setFormOriNum(String formOriNum) {
+        this.formOriNum = formOriNum;
+    }
+
+    /**
+     * @return the formUserPerson
+     */
+    public Person getFormUserPerson() {
+        return formUserPerson;
+    }
+
+    /**
+     * @param formUserPerson the formUserPerson to set
+     */
+    public void setFormUserPerson(Person formUserPerson) {
+        this.formUserPerson = formUserPerson;
+    }
+
+    /**
+     * @return the formMuni
+     */
+    public Municipality getFormMuni() {
+        return formMuni;
+    }
+
+    /**
+     * @param formMuni the formMuni to set
+     */
+    public void setFormMuni(Municipality formMuni) {
+        this.formMuni = formMuni;
+    }
+
+    /**
+     * @return the currentUser
+     */
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    /**
+     * @param currentUser the currentUser to set
+     */
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 
     

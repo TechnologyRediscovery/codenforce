@@ -142,7 +142,12 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(8, userToInsert.isIsEnforcementOfficial());
             stmt.setString(9, userToInsert.getBadgeNumber());
             stmt.setString(10, userToInsert.getOriNumber());
-            stmt.setInt(11, userToInsert.getPerson().getPersonID());
+            if(userToInsert.getPerson() == null){
+                stmt.setInt(11, userToInsert.getPersonID());
+            } else {
+                stmt.setInt(11, userToInsert.getPerson().getPersonID());
+                
+            }
             
             
             System.out.println("UserIntegrator.insertUser | sql: " + stmt.toString());
@@ -196,7 +201,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query = "UPDATE public.login\n" +
             "   SET userrole= CAST (? as role), username=?, muni_municode=?, \n" +
             "       notes=?, activitystartdate=?, activitystopdate=?, accesspermitted=?"
-                + "\n" +
+                +" enforcementofficial=?, badgenumber=?, orinumber=?, personlink=? "  +
             " WHERE userid = ?";
         
         PreparedStatement stmt = null;
@@ -208,14 +213,18 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(2, userToUpdate.getUsername());
             stmt.setInt(3, userToUpdate.getMuni().getMuniCode());
             
-            stmt.setString(15, userToUpdate.getNotes());
-            stmt.setTimestamp(16, java.sql.Timestamp
+            stmt.setString(4, userToUpdate.getNotes());
+            stmt.setTimestamp(5, java.sql.Timestamp
                     .valueOf(userToUpdate.getActivityStartDate()));
-            stmt.setTimestamp(17, java.sql.Timestamp
+            stmt.setTimestamp(6, java.sql.Timestamp
                     .valueOf(userToUpdate.getActivityStopDate()));
-            stmt.setBoolean(18, userToUpdate.isSystemAccessPermitted());
+            stmt.setBoolean(7, userToUpdate.isSystemAccessPermitted());
+            stmt.setBoolean(8, userToUpdate.isIsEnforcementOfficial());
+            stmt.setString(9, userToUpdate.getBadgeNumber());
+            stmt.setString(10, userToUpdate.getOriNumber());
+            stmt.setInt(11, userToUpdate.getPerson().getPersonID());
             
-            stmt.setInt(19, userToUpdate.getUserID());
+            stmt.setInt(12, userToUpdate.getUserID());
             System.out.println("UserIntegrator.updateUser | sql: " + stmt.toString());
             
             stmt.execute();
@@ -254,17 +263,17 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             // passwords managed by Glassfish
             //user.setPassword(rs.getString("password"));
             user.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_muniCode")));
-            
             user.setNotes(rs.getString("notes"));
             
             if(rs.getTimestamp("activitystartdate") != null){
                 user.setActivityStartDate(rs.getTimestamp("activitystartdate").toLocalDateTime());
             }
-            
             if(rs.getTimestamp("activitystopdate") != null ){
                 user.setActivityStopDate(rs.getTimestamp("activitystopdate").toLocalDateTime());
-                
             }
+            user.setIsEnforcementOfficial(rs.getBoolean("enforcementofficial"));
+            user.setBadgeNumber(rs.getString("badgenumber"));
+            user.setOriNumber(rs.getString("orinumber"));
             
             user.setPerson(pi.getPerson(rs.getInt("personlink")));
             
@@ -297,11 +306,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         User newUser = new User();
         // broken query
-        String query = "SELECT userid, userrole, username, muni_municode, fname, lname, \n" +
-                        "       worktitle, phonecell, phonehome, phonework, email, address_street, \n" +
-                        "       address_city, address_zip, address_state, notes, activitystartdate, \n" +
+        String query = "SELECT userid, userrole, username, muni_municode, notes, activitystartdate, \n" +
                         "       activitystopdate, accesspermitted, enforcementofficial, badgenumber, \n" +
-                        "       orinumber, defaultcodeset, personlink "
+                        "       orinumber, personlink "
                 + "FROM login where userid = ?;";
         
         PreparedStatement stmt = null;

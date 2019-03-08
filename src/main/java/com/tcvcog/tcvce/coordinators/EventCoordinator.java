@@ -366,6 +366,18 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 
     } // close method
     
+    public void confirmEventView(EventWithCasePropInfo ev, User us) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.confirmEventView(us, ev);
+    }
+    
+    
+    public void clearEventView(EventWithCasePropInfo ev) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.clearViewConfFromEvent(ev);
+    }
+    
+    
     public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) throws IntegrationException, CaseLifecyleException{
           EventIntegrator ei = getEventIntegrator();
         
@@ -490,7 +502,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
-    private boolean computeEventViewConfirmationAbility(EventWithCasePropInfo ev, User u){
+    public boolean computeEventViewConfirmationAbility(EventWithCasePropInfo ev, User u){
         boolean canConfirm = false;
         EventType evType = ev.getCategory().getEventType();
         List<Municipality> muniList = u.getAuthMunis();

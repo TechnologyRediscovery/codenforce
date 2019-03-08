@@ -193,7 +193,7 @@
                                             <h:outputLabel styleClass="bold" value="Manager:"/>
                                             <p:spacer height="5px"/>
                                             <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.caseManager.FName} #{caseProfileBB.currentCase.caseManager.LName}"/>
+                                                <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.caseManager.person.firstName} #{caseProfileBB.currentCase.caseManager.person.lastName}"/>
                                             </div>
                                         </h:panelGroup>
 
@@ -372,20 +372,20 @@
                                         </f:facet>
                                         <h:outputText value="#{e.category.eventCategoryTitle}"/>
                                     </p:column>
-                                    <p:column width="5%" filterBy="#{e.creator.LName}"
-                                              sortBy="#{e.eventOwcreator}">
+                                    <p:column width="5%" filterBy="#{e.creator.person.lastName}"
+                                              sortBy="#{e.creator.person.lastName}">
                                                         
                                         <f:facet name="header">
                                             <h:outputText value="Creator" />
                                         </f:facet>
-                                        <h:outputText value="#{e.eventOwnerUsercreator}"/>
+                                        <h:outputText value="#{e.creator.person.lastName}"/>
                                 </p:column>
                                     <p:column width="20%" style="word-wrap: normal;">
                                         <f:facet name="header">
                                             <h:outputText value="Description" />
                                         </f:facet>
                                         <div class="rowExpansion">
-                                            <h:outputText value="#{e.eventDescription}"/>
+                                            <h:outputText value="#{e.description}"/>
                                         </div>
                                     </p:column>
                                     <p:column width="5%" exportable="false">
@@ -408,7 +408,7 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="Description" />
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.eventDescription}"/>
+                                                        <h:outputText value="#{e.description}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -436,7 +436,7 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="Active Event?"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.activeEvent}"/>
+                                                        <h:outputText value="#{e.active}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -450,7 +450,7 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="View confirmed by"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                                        <h:outputText value="#{e.viewConfirmedBy.person.lastName}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -801,7 +801,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Issuer" />
                                             </f:facet>
-                                            <h:outputText value="#{citation.userOwner.LName}"/>
+                                            <h:outputText value="#{citation.userOwner.person.lastName}"/>
                                         </p:column>
                                         <p:column width="10%">
                                             <f:facet name="header">
@@ -1042,7 +1042,7 @@
                                         <p:outputLabel for="eventDesc">
                                             <h:outputText value="Short Description:"/>
                                         </p:outputLabel>
-                                        <p:inputText id="eventDesc" value="#{eventManageBB.eventInProcess.eventDescription}" 
+                                        <p:inputText id="eventDesc" value="#{eventManageBB.eventInProcess.description}" 
                                                      style="width: 600px;" tabindex="3" required="true" styleClass="inputText"/>
                                         <h:message for="eventDesc" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1055,7 +1055,7 @@
                                         <h:outputText value="Active Event?"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:inputSwitch tabindex="18" id="activeEvent" value="#{eventManageBB.eventInProcess.activeEvent}" onLabel="Yes" offLabel="No" />
+                                    <p:inputSwitch tabindex="18" id="activeEvent" value="#{eventManageBB.eventInProcess.active}" onLabel="Yes" offLabel="No" />
 
                                 </h:panelGroup>
 

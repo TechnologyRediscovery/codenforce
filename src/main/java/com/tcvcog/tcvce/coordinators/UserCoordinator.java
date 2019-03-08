@@ -28,6 +28,7 @@ import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 @ApplicationScoped
 @Named("userCoordinator")
 public class UserCoordinator extends BackingBeanUtils implements Serializable {
+    final int MIN_PSSWD_LENGTH = 8;
     
     /**
      * Creates a new instance of UserCoordinator
@@ -47,10 +49,33 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     public int insertNewUser(User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
+        String tempPassword = String.valueOf(getControlCodeFromTime());
+        u.setPassword(tempPassword);
         int newUserID = ui.insertUser(u);
         return newUserID;
         
         
+    }
+    
+    public void updateUser(User u) throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        ui.updateUser(u);
+    }
+    
+    public void updateUserPassword(User u, String pw) throws IntegrationException, AuthorizationException{
+        UserIntegrator ui = getUserIntegrator();
+        if(pw.length() >= MIN_PSSWD_LENGTH){
+            ui.setUserPassword(u, pw);
+        } else {
+            throw new AuthorizationException("Password must be at least " + MIN_PSSWD_LENGTH + " characters");
+        }
+    }
+    
+    public User getUserSkeleton(){
+        User u = new User();
+        u.setActivityStartDate(LocalDateTime.now());
+        u.setActivityStopDate(LocalDateTime.now().plusYears(1));
+        return u;
     }
    
     /**

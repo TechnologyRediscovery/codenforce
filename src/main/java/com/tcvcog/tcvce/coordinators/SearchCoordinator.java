@@ -76,12 +76,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setLimitResultCountTo100(true);
         
         eventParams.setFilterByEventCategory(false);
-        eventParams.setFilterByEventType(true);
+        eventParams.setFilterByEventType(false);
         eventParams.setEventCategory(timelineEventTypeCategory);
         
         eventParams.setFilterByCaseID(false);
         
-        eventParams.setFilterByEventOwner(true);
+        eventParams.setFilterByEventOwner(false);
         eventParams.setOwnerUserID(u);
         
         eventParams.setFilterByActive(true);

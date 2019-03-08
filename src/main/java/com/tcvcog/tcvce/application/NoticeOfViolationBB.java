@@ -248,17 +248,17 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
         User u = getFacesUser();
         sb.append("<p>");
-        sb.append(u.getFName());
+        sb.append(u.getPerson().getFirstName());
         sb.append(" ");
-        sb.append(u.getLName());
+        sb.append(u.getPerson().getLastName());
         sb.append("<br>");
-        sb.append(u.getWorkTitle());
+        sb.append(u.getPerson().getJobTitle());
         sb.append("<br>");
         sb.append(u.getMuni().getMuniName());
         sb.append("<br>");
-        sb.append(u.getPhoneWork());
+        sb.append(u.getPerson().getPhoneWork());
         sb.append("<br>");
-        sb.append(u.getEmail());
+        sb.append(u.getPerson().getEmail());
         sb.append("</p>");
         return sb;
         
