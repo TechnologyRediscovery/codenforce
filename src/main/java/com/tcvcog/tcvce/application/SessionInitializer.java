@@ -81,8 +81,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 
                 ExternalContext ec = facesContext.getExternalContext();
                 ec.getSessionMap().put("facesUser", extractedUser);
-                System.out.println("SessionInitializer.initiateInternalSession "
-                        + "| facesUserFromDB: " + extractedUser.getLName());
+                System.out.println("SessionInitializer.initiateInternalSession ");
 
                 Municipality muni = extractedUser.getMuni();
                 
@@ -103,7 +102,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                          "SessionInitializer.initiateInternalSession | Created internal session", false, false);
             
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Good morning, " + extractedUser.getFName() + "!", ""));
+                    "Good morning, " + extractedUser.getPerson().getFirstName() + "!", ""));
             }
         
         } catch (IntegrationException ex) {

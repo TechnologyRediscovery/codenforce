@@ -939,6 +939,20 @@ div.checkBoxLabel{
     margin-bottom: 10px;
 }
 
+.viewconf-status{
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.conf-needed{
+    color:red;
+    
+}
+
+.conf-received{
+    color:purple;
+}
+
 
 
 /* ******************** CLOSE MISC ********************************/

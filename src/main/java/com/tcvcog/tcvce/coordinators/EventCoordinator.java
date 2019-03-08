@@ -29,7 +29,9 @@ import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
@@ -37,6 +39,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import javax.faces.application.FacesMessage;
@@ -471,12 +474,42 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Pathway for injecting business logic into the event search process. Now its just a pass through.
      * @param params
+     * @param user the current user
      * @return
      * @throws IntegrationException 
      */
-    public List<EventWithCasePropInfo> queryEvents(SearchParamsCEEvents params) throws IntegrationException{
+    public List<EventWithCasePropInfo> queryEvents(SearchParamsCEEvents params, User user) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        return ei.getEvents(params);
+        EventWithCasePropInfo ev;
+        List<EventWithCasePropInfo> evList = ei.getEvents(params);
+        Iterator<EventWithCasePropInfo> iter = evList.iterator();
+        while(iter.hasNext()){
+            ev = iter.next();
+            ev.setCurrentUserCanConfirm(computeEventViewConfirmationAbility(ev, user));
+        }        
+        return evList;
+    }
+    
+    private boolean computeEventViewConfirmationAbility(EventWithCasePropInfo ev, User u){
+        boolean canConfirm = false;
+        EventType evType = ev.getCategory().getEventType();
+        List<Municipality> muniList = u.getAuthMunis();
+        
+        // direct event assignment allows view conf to cut across regular permissions
+        // checks
+        if(ev.getAssignedTo().equals(u) || u.getKeyCard().isHasDeveloperPermissions()){
+            return true;
+            // check that the event is associated with the user's auth munis
+        } else if(muniList.contains(ev.getEventCase().getProperty().getMuni())){
+            // sys admins for a muni can confirm everything
+            if(u.getKeyCard().isHasSysAdminPermissions()){
+                return true;
+            } else if(evType != EventType.Timeline){
+                return true;
+            } else return u.getKeyCard().isHasEnfOfficialPermissions();
+        }
+                
+        return canConfirm;
     }
     
     
