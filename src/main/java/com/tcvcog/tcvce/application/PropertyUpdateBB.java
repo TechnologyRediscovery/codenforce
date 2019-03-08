@@ -35,14 +35,6 @@ import javax.faces.application.FacesMessage;
  */
 public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     
-    /*
-    ATTN: ERIC
-     - propertyUpdate.xhtml & PropertyIntegrator.updateProperty are finished and should work.  Unable to test because...
-     - I'm unable to navigate to the propertyUpdate.xhtml. I get the error page, but no errors in Wildfly output, 
-    no navigation rules so I added one (end of properties section).  Did not resolve issue. Not sure what else do try without error messages.
-    
-        -Noah
-    */
     
     private PropertyWithLists currProp;
 //    private Property property;
@@ -95,6 +87,7 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
             // pull a new version of the property from the DB and store that in
             // the session to avoid errors in viewing any data that's not in the DB
             
+            // TODO: ^this^ (the integrator can only update as of this comment) --3/7/2019
             getSessionBean().setActiveProp(getCurrProp());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -106,8 +99,8 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to update property in database, sorry", 
-                        "Property updates are tricky--please inform your administrator"));
+                        "Unable to update property in database, sorry. ", 
+                        "Property updates are tricky--please inform your administrator. "));
             return "";
         }
     }
