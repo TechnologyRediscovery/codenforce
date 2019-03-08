@@ -34,8 +34,11 @@ public class User implements Serializable{
     private String password;
     private int muniCode;
     private List<Municipality> authMunis;
+    
     // To be deprecated 
     private Municipality muni;
+    
+    private Person person;
     private String fName;
     private String lName;
     private String workTitle;
@@ -47,7 +50,9 @@ public class User implements Serializable{
     private String address_city;
     private String address_zip;
     private String address_state;
+    
     private String notes;
+    
     private LocalDateTime activityStartDate;
     private LocalDateTime activityStopDate;
     
@@ -408,6 +413,20 @@ public class User implements Serializable{
      */
     public void setRoleType(RoleType roleType) {
         this.roleType = roleType;
+    }
+
+    /**
+     * @return the person
+     */
+    public Person getPerson() {
+        return person;
+    }
+
+    /**
+     * @param person the person to set
+     */
+    public void setPerson(Person person) {
+        this.person = person;
     }
     
 }

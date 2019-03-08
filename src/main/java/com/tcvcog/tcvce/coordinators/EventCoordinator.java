@@ -110,7 +110,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCECase event = new EventCECase();
         event.setCategory(ec);
         event.setRequiresViewConfirmation(ec.isRequiresviewconfirmation());
-        event.setActiveEvent(true);
+        event.setActive(true);
         event.setHidden(false);
         event.setCaseID(c.getCaseID());
         System.out.println("EventCoordinator.getInitalizedEvent | eventCat: " 
@@ -183,7 +183,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCreator(getSystemRobotUser());
         event.setDiscloseToMunicipality(true);
         event.setDiscloseToPublic(true);
-        event.setActiveEvent(true);
+        event.setActive(true);
         event.setHidden(false);
         event.setNotes("Event created by a public user");
         
@@ -225,7 +225,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCreator(getFacesUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
-        event.setActiveEvent(true);
+        event.setActive(true);
         
         ei.insertEvent(event);
     }
@@ -245,7 +245,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
           e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
         e.setDescription("Compliance with municipal code achieved");
-        e.setActiveEvent(true);
+        e.setActive(true);
         e.setDiscloseToMunicipality(true);
         e.setDiscloseToPublic(true);
         
@@ -353,7 +353,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
         event.setCreator(getFacesUser());
-        event.setActiveEvent(true);
+        event.setActive(true);
         
         insertEvent(event);
         
@@ -383,7 +383,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
         event.setCreator(getFacesUser());
-        event.setActiveEvent(true);
+        event.setActive(true);
         
         insertEvent(event);
         

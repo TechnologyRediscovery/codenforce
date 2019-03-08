@@ -29,24 +29,28 @@ public class Event extends EntityUtils implements Serializable {
     
     private int eventID;
     private EventCategory category;
+    
     private LocalDateTime dateOfRecord;
-    private String prettyDateOfRecord;
-    private LocalDateTime eventTimeStamp;
+    private String dateOfRecordPretty;
     private java.util.Date dateOfRecordUtilDate;
+    private LocalDateTime timestamp;
+    private String timestampPretty;
+    
     private String description;
     private User creator;
     private User assignedTo;
     private boolean discloseToMunicipality;
     private boolean discloseToPublic;
-    private boolean activeEvent;
+    private boolean active;
     private boolean hidden;
     private String notes;
     
     private boolean requiresViewConfirmation;
-    // this boolean is not mapped into DB--only for using switches by user
+    
     private boolean viewConfirmed;
     private User viewConfirmedBy;
     private LocalDateTime viewConfirmedAt;
+    private String viewConfAtPrettyDate;
     private String viewNotes;
 
     /**
@@ -71,17 +75,19 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the prettyDateOfRecord
+     * @return the dateOfRecordPretty
      */
-    public String getPrettyDateOfRecord() {
-        return prettyDateOfRecord;
+    public String getDateOfRecordPretty() {
+        String pretty = getPrettyDate(dateOfRecord);
+        dateOfRecordPretty = pretty;
+        return dateOfRecordPretty;
     }
 
     /**
-     * @return the eventTimeStamp
+     * @return the timestamp
      */
-    public LocalDateTime getEventTimeStamp() {
-        return eventTimeStamp;
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 
     /**
@@ -113,10 +119,10 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the activeEvent
+     * @return the active
      */
-    public boolean isActiveEvent() {
-        return activeEvent;
+    public boolean isActive() {
+        return active;
     }
 
     /**
@@ -154,18 +160,12 @@ public class Event extends EntityUtils implements Serializable {
         this.dateOfRecord = dateOfRecord;
     }
 
+    
     /**
-     * @param prettyDateOfRecord the prettyDateOfRecord to set
+     * @param timestamp the timestamp to set
      */
-    public void setPrettyDateOfRecord(String prettyDateOfRecord) {
-        this.prettyDateOfRecord = prettyDateOfRecord;
-    }
-
-    /**
-     * @param eventTimeStamp the eventTimeStamp to set
-     */
-    public void setEventTimeStamp(LocalDateTime eventTimeStamp) {
-        this.eventTimeStamp = eventTimeStamp;
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 
     /**
@@ -197,10 +197,10 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @param activeEvent the activeEvent to set
+     * @param active the active to set
      */
-    public void setActiveEvent(boolean activeEvent) {
-        this.activeEvent = activeEvent;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     /**
@@ -321,6 +321,42 @@ public class Event extends EntityUtils implements Serializable {
     public void setViewNotes(String viewNotes) {
         this.viewNotes = viewNotes;
     }
+
+    /**
+     * @return the viewConfAtPrettyDate
+     */
+    public String getViewConfAtPrettyDate() {
+        String pretty = getPrettyDate(viewConfirmedAt);
+        viewConfAtPrettyDate = pretty;
+        return viewConfAtPrettyDate;
+    }
+
+    /**
+     * @param viewConfAtPrettyDate the viewConfAtPrettyDate to set
+     */
+    public void setViewConfAtPrettyDate(String viewConfAtPrettyDate) {
+        this.viewConfAtPrettyDate = viewConfAtPrettyDate;
+    }
+
+    /**
+     * @return the timestampPretty
+     */
+    public String getTimestampPretty() {
+        String s = getPrettyDate(timestamp);
+        timestampPretty = s;
+        return timestampPretty;
+    }
+
+    /**
+     * @param timestampPretty the timestampPretty to set
+     */
+    public void setTimestampPretty(String timestampPretty) {
+        this.timestampPretty = timestampPretty;
+    }
+
+   
+
+  
 
     
 }

@@ -60,12 +60,12 @@
                                 </p:column>
 
 
-                                <p:column width="7%" sortBy="#{e.prettyDateOfRecord}">
+                                <p:column width="7%" sortBy="#{e.dateOfRecordPretty}">
                                     <f:facet name="header">
                                         <h:outputText value="Date" />
                                     </f:facet>
                                     <div class="wrapText">
-                                        <h:outputText value="#{e.prettyDateOfRecord}"/>
+                                        <h:outputText value="#{e.dateOfRecordPretty}"/>
                                     </div>
                                 </p:column>
 
@@ -107,7 +107,7 @@
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Compliance Date" />
                                                 <div class="rowExpansion">
-                                                    <h:outputText value="#{e.prettyDateOfRecord}"/>
+                                                    <h:outputText value="#{e.dateOfRecordPretty}"/>
                                                 </div>
                                             </h:panelGroup>
 
