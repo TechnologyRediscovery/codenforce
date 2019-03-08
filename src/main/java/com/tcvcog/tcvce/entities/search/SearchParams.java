@@ -24,7 +24,9 @@ public class SearchParams implements Serializable{
     
     private String searchName;
     private String searchDescription;
+    private boolean filterByMuni;
     private Municipality muni;
+    
     private boolean filterByStartEndDate;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -33,6 +35,14 @@ public class SearchParams implements Serializable{
     private java.util.Date endDateUtilDate;
     private java.sql.Timestamp startDateSQLDate;
     private java.sql.Timestamp endDateSQLDate;
+    
+    private boolean useRelativeDates;
+    private int startDateRelativeDays;
+    private int endDateRelativeDays;
+    
+    private boolean useDateOfRecord;
+    private boolean useEntryTimestamp;
+    
     
     private boolean filterByObjectID;
     private int objectID;
@@ -102,6 +112,10 @@ public class SearchParams implements Serializable{
      * @return the startDate
      */
     public LocalDateTime getStartDate() {
+        if(useRelativeDates){
+            startDate = LocalDateTime.now().plusDays(startDateRelativeDays);
+        }
+        
         return startDate;
     }
 
@@ -109,6 +123,9 @@ public class SearchParams implements Serializable{
      * @return the endDate
      */
     public LocalDateTime getEndDate() {
+        if(useRelativeDates){
+            endDate = LocalDateTime.now().plusDays(endDateRelativeDays);
+        }
         return endDate;
     }
 
@@ -242,6 +259,90 @@ public class SearchParams implements Serializable{
      */
     public void setSearchDescription(String searchDescription) {
         this.searchDescription = searchDescription;
+    }
+
+    /**
+     * @return the filterByMuni
+     */
+    public boolean isFilterByMuni() {
+        return filterByMuni;
+    }
+
+    /**
+     * @param filterByMuni the filterByMuni to set
+     */
+    public void setFilterByMuni(boolean filterByMuni) {
+        this.filterByMuni = filterByMuni;
+    }
+
+    /**
+     * @return the useRelativeDates
+     */
+    public boolean isUseRelativeDates() {
+        return useRelativeDates;
+    }
+
+    /**
+     * @return the startDateRelativeDays
+     */
+    public int getStartDateRelativeDays() {
+        return startDateRelativeDays;
+    }
+
+    /**
+     * @return the endDateRelativeDays
+     */
+    public int getEndDateRelativeDays() {
+        return endDateRelativeDays;
+    }
+
+    /**
+     * @param useRelativeDates the useRelativeDates to set
+     */
+    public void setUseRelativeDates(boolean useRelativeDates) {
+        this.useRelativeDates = useRelativeDates;
+    }
+
+    /**
+     * @param startDateRelativeDays the startDateRelativeDays to set
+     */
+    public void setStartDateRelativeDays(int startDateRelativeDays) {
+        this.startDateRelativeDays = startDateRelativeDays;
+    }
+
+    /**
+     * @param endDateRelativeDays the endDateRelativeDays to set
+     */
+    public void setEndDateRelativeDays(int endDateRelativeDays) {
+        this.endDateRelativeDays = endDateRelativeDays;
+    }
+
+    /**
+     * @return the useEntryTimestamp
+     */
+    public boolean isUseEntryTimestamp() {
+        return useEntryTimestamp;
+    }
+
+    /**
+     * @param useEntryTimestamp the useEntryTimestamp to set
+     */
+    public void setUseEntryTimestamp(boolean useEntryTimestamp) {
+        this.useEntryTimestamp = useEntryTimestamp;
+    }
+
+    /**
+     * @return the useDateOfRecord
+     */
+    public boolean isUseDateOfRecord() {
+        return useDateOfRecord;
+    }
+
+    /**
+     * @param useDateOfRecord the useDateOfRecord to set
+     */
+    public void setUseDateOfRecord(boolean useDateOfRecord) {
+        this.useDateOfRecord = useDateOfRecord;
     }
 
     

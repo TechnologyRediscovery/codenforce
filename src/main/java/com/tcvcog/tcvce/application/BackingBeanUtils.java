@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
+import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
@@ -111,8 +112,9 @@ public class BackingBeanUtils implements Serializable{
     private OccupancyPermitIntegrator occupancyPermitIntegrator;
     private PaymentIntegrator paymentIntegrator;
     
-    // system integrators
+    // system 
     private SystemIntegrator systemIntegrator;
+    private SessionSystemCoordinator ssCoordinator;
     private LogIntegrator logIntegrator;
     
     private SearchCoordinator searchCoordinator;
@@ -817,6 +819,24 @@ public class BackingBeanUtils implements Serializable{
      */
     public void setPropertyCoordinator(PropertyCoordinator propertyCoordinator) {
         this.propertyCoordinator = propertyCoordinator;
+    }
+
+    /**
+     * @return the ssCoordinator
+     */
+    public SessionSystemCoordinator getSsCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{sessionSystemCoordinator}", SessionSystemCoordinator.class);
+        ssCoordinator = (SessionSystemCoordinator) ve.getValue(context.getELContext());
+        return ssCoordinator;
+    }
+
+    /**
+     * @param ssCoordinator the ssCoordinator to set
+     */
+    public void setSsCoordinator(SessionSystemCoordinator ssCoordinator) {
+        this.ssCoordinator = ssCoordinator;
     }
 
        

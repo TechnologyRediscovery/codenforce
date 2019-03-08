@@ -152,10 +152,9 @@
     
     
     <managed-bean>
-        <managed-bean-name>loggingCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.LogCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>sessionSystemCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.SessionSystemCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <description>Interfaces between code violation related objects and integration layer objects</description>

@@ -115,7 +115,7 @@ public class EventManageBB extends BackingBeanUtils implements Serializable {
         // category is already set from initialization sequence
         eventInProcess.setCaseID(ccase.getCaseID());
         System.out.println("EventAddBB.addEvent | CaseID: " + eventInProcess.getCaseID());
-        eventInProcess.setEventOwnerUser(getSessionBean().getFacesUser());
+        eventInProcess.setCreator(getSessionBean().getFacesUser());
 //        e.setEventPersons(formSelectedPersons);
         
         // now check for persons to connect

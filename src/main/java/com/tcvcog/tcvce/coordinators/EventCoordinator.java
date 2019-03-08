@@ -109,6 +109,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // the moment of event instantiaion!!!!
         EventCECase event = new EventCECase();
         event.setCategory(ec);
+        event.setRequiresViewConfirmation(ec.isRequiresviewconfirmation());
         event.setActiveEvent(true);
         event.setHidden(false);
         event.setCaseID(c.getCaseID());
@@ -178,8 +179,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCECase event = getInitializedEvent(caseID);
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
-        event.setEventDescription(message);
-        event.setEventOwnerUser(getSystemRobotUser());
+        event.setDescription(message);
+        event.setCreator(getSystemRobotUser());
         event.setDiscloseToMunicipality(true);
         event.setDiscloseToPublic(true);
         event.setActiveEvent(true);
@@ -219,9 +220,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.setCategory(ei.getEventCategory(117));
         event.setCaseID(ceCase.getCaseID());
         event.setDateOfRecord(LocalDateTime.now());
-        event.setEventDescription(updateViolationDescr);
+        event.setDescription(updateViolationDescr);
         //even descr set by violation coordinator
-        event.setEventOwnerUser(getFacesUser());
+        event.setCreator(getFacesUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
         event.setActiveEvent(true);
@@ -243,7 +244,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
           e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
-        e.setEventDescription("Compliance with municipal code achieved");
+        e.setDescription("Compliance with municipal code achieved");
         e.setActiveEvent(true);
         e.setDiscloseToMunicipality(true);
         e.setDiscloseToPublic(true);
@@ -289,7 +290,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param e
      * @throws IntegrationException 
      */
-    public void insertEvent(EventCECase e) throws IntegrationException{
+    protected void insertEvent(EventCECase e) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ei.insertEvent(e);
         
@@ -345,13 +346,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("\' to \'");
         sb.append(currentCase.getCasePhase().toString());
         sb.append("\' by an action event or manual override.");
-        event.setEventDescription(sb.toString());
+        event.setDescription(sb.toString());
         
         event.setCaseID(currentCase.getCaseID());
         event.setDateOfRecord(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setEventOwnerUser(getFacesUser());
+        event.setCreator(getFacesUser());
         event.setActiveEvent(true);
         
         insertEvent(event);
@@ -375,13 +376,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("\' to \'");
         sb.append(currentCase.getCasePhase().toString());
         sb.append("\' by a a case officer.");
-        event.setEventDescription(sb.toString());
+        event.setDescription(sb.toString());
         
         event.setCaseID(currentCase.getCaseID());
         event.setDateOfRecord(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setEventOwnerUser(getFacesUser());
+        event.setCreator(getFacesUser());
         event.setActiveEvent(true);
         
         insertEvent(event);

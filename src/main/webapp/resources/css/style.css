@@ -822,7 +822,7 @@ gridTd-bignum{
 /***********************CLOSE TABLE STYLES**********************/
 
 
-/*---------------------BUTTONS---------------------------*/
+/*---------------------BUTTONS & CONTROLS---------------------------*/
 
 
 /* this styling is for use w/ command button on codeSourceManage.xhtml */
@@ -881,8 +881,14 @@ gridTd-bignum{
     color: white;
 }
 
+.ui-chkbox-box{
+    margin:5px;
+}
+
 /* ****************** CLOSE BUTTON STYLES ********************/
 
+
+/* -------------------- MISC --------------------------------- */
 
 p.footer{
     font-style: italic;
@@ -932,6 +938,10 @@ div.checkBoxLabel{
     margin-top: 0px;
     margin-bottom: 10px;
 }
+
+
+
+/* ******************** CLOSE MISC ********************************/
 
 
 

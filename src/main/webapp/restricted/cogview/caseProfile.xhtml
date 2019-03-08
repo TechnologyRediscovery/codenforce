@@ -94,13 +94,12 @@
                                             </f:facet>
                                             <h:outputText value="#{e.category.eventCategoryTitle}"/>
                                         </p:column>
-                                        <p:column width="5%" filterBy="#{e.eventOwnerUser.LName}"
-                                                  sortBy="#{e.eventOwnerUser.LName}">
+                                        <p:column width="5%" filterBy="#{e.creator.LName}"
+                                                  sortBy="#{e.eventOwcreator">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator" />
                                             </f:facet>
-                                            <h:outputText value="#{e.eventOwnerUser.LName}"/>
-                                        </p:column>
+                                            <h:outputText value="#{e.eventOwnerUsercreator                                     </p:column>
                                         <p:column width="20%" style="word-wrap: normal;">
                                             <f:facet name="header">
                                                 <h:outputText value="Description" />

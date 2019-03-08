@@ -220,7 +220,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             
         }
             System.out.println("CaseCoordinator.createNewCECase | origination event: " + originationEvent.getCategory().getEventCategoryTitle());
-            originationEvent.setEventOwnerUser(u);
+            originationEvent.setCreator(u);
             originationEvent.setCaseID(insertedCase.getCaseID());
             originationEvent.setDateOfRecord(LocalDateTime.now());
             processCEEvent(newCase, originationEvent);
@@ -424,8 +424,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
         e.setDateOfRecord(LocalDateTime.now());
-        e.setEventOwnerUser(getFacesUser());
-        e.setEventDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
+        e.setCreator(getFacesUser());
+        e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
         ei.insertEvent(e);
@@ -654,9 +654,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         noticeEvent.setDateOfRecord(LocalDateTime.now());
         
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
-        noticeEvent.setEventDescription(queuedNoticeEventNotes);
+        noticeEvent.setDescription(queuedNoticeEventNotes);
         
-        noticeEvent.setEventOwnerUser(getFacesUser());
+        noticeEvent.setCreator(getFacesUser());
         noticeEvent.setActiveEvent(true);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
