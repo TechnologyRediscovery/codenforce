@@ -223,21 +223,23 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(3, propToUpdate.getAddress());
             stmt.setString(4, propToUpdate.getPropertyUseType());
             
-            stmt.setString(7, propToUpdate.getUseGroup());
-            stmt.setString(8, propToUpdate.getConstructionType());
-            stmt.setString(9, propToUpdate.getCountyCode());
-            stmt.setString(10, propToUpdate.getNotes());
+            stmt.setString(5, propToUpdate.getUseGroup());
+            stmt.setString(6, propToUpdate.getConstructionType());
+            stmt.setString(7, propToUpdate.getCountyCode());
+            stmt.setString(8, propToUpdate.getNotes());
             
-            stmt.setBoolean(11, true);
-            stmt.setBoolean(12, true);
-            stmt.setBoolean(13, true);
+            stmt.setBoolean(9, propToUpdate.isRental());  // containsrentalunits=?
+            stmt.setBoolean(10, propToUpdate.isMultiUnit());  // multiunit=?
+            stmt.setBoolean(11, propToUpdate.isVacant());  // vacant=?
             
-            stmt.setInt(14, getSessionBean().getFacesUser().getUserID());
-            stmt.setTimestamp(15, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(12, getSessionBean().getFacesUser().getUserID());
+            stmt.setTimestamp(13, Timestamp.valueOf(LocalDateTime.now()));
+            
+            // TODO: add event to dumby tracker case on this property to track who/when of changes
             
             // figure out if we need to do changes in the list elements
             
-            stmt.setInt(16, propToUpdate.getPropertyID());
+            stmt.setInt(14, propToUpdate.getPropertyID());
             
             stmt.executeUpdate();
             
