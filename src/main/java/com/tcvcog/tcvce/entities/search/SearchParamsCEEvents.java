@@ -45,7 +45,7 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     private boolean isViewed;
     
     
-    private boolean filterByViewConfirmedAtDateRange;
+    private boolean useViewConfirmedAtDateRange;
     
    public SearchParamsCEEvents(){
        
@@ -144,10 +144,10 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
 
     
     /**
-     * @return the filterByViewConfirmedAtDateRange
+     * @return the useViewConfirmedAtDateRange
      */
-    public boolean isFilterByViewConfirmedAtDateRange() {
-        return filterByViewConfirmedAtDateRange;
+    public boolean isUseViewConfirmedAtDateRange() {
+        return useViewConfirmedAtDateRange;
     }
 
     /**
@@ -243,10 +243,10 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
 
    
     /**
-     * @param filterByViewConfirmedAtDateRange the filterByViewConfirmedAtDateRange to set
+     * @param useViewConfirmedAtDateRange the useViewConfirmedAtDateRange to set
      */
-    public void setFilterByViewConfirmedAtDateRange(boolean filterByViewConfirmedAtDateRange) {
-        this.filterByViewConfirmedAtDateRange = filterByViewConfirmedAtDateRange;
+    public void setUseViewConfirmedAtDateRange(boolean useViewConfirmedAtDateRange) {
+        this.useViewConfirmedAtDateRange = useViewConfirmedAtDateRange;
     }
 
     /**

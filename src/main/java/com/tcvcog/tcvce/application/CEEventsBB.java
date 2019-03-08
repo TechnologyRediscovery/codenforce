@@ -50,13 +50,13 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         searchParams = cc.getDefaultSearchParamsCEEventsRequiringView(
                 getSessionBean().getFacesUser());
+        searchParams.setMuni(getSessionBean().getActiveMuni());
     }
     
     public void executeQuery(){
         System.out.println("CEEventsBB.executeQuery");
         EventCoordinator ec = getEventCoordinator();
         int listSize = 0;
-        searchParams.setMuni(getSessionBean().getActiveMuni());
         try {
             eventList = ec.queryEvents(searchParams);
             if(eventList != null){

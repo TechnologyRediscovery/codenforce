@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
+import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
@@ -113,8 +114,9 @@ public class BackingBeanUtils implements Serializable{
     private PaymentIntegrator paymentIntegrator;
     private OccupancyCoordinator occupancyCoordinator;
     
-    // system integrators
+    // system 
     private SystemIntegrator systemIntegrator;
+    private SessionSystemCoordinator ssCoordinator;
     private LogIntegrator logIntegrator;
     
     private SearchCoordinator searchCoordinator;
@@ -822,21 +824,21 @@ public class BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the occupancyCoordiator
+     * @return the ssCoordinator
      */
-    public OccupancyCoordinator getOccupancyCoordinator() {
+    public SessionSystemCoordinator getSsCoordinator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{occupancyCoordinator}", OccupancyCoordinator.class);
-        occupancyCoordinator = (OccupancyCoordinator) ve.getValue(context.getELContext());
-        return occupancyCoordinator;
+                .createValueExpression(context.getELContext(), "#{sessionSystemCoordinator}", SessionSystemCoordinator.class);
+        ssCoordinator = (SessionSystemCoordinator) ve.getValue(context.getELContext());
+        return ssCoordinator;
     }
 
     /**
-     * @param occupancyCoordiator the occupancyCoordiator to set
+     * @param ssCoordinator the ssCoordinator to set
      */
-    public void setOccupancyCoordinator(OccupancyCoordinator occupancyCoordiator) {
-        this.occupancyCoordinator = occupancyCoordiator;
+    public void setSsCoordinator(SessionSystemCoordinator ssCoordinator) {
+        this.ssCoordinator = ssCoordinator;
     }
 
        

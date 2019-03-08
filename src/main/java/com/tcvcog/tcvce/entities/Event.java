@@ -33,18 +33,21 @@ public class Event extends EntityUtils implements Serializable {
     private String prettyDateOfRecord;
     private LocalDateTime eventTimeStamp;
     private java.util.Date dateOfRecordUtilDate;
-    private String eventDescription;
-    private User eventOwnerUser;
+    private String description;
+    private User creator;
+    private User assignedTo;
     private boolean discloseToMunicipality;
     private boolean discloseToPublic;
     private boolean activeEvent;
     private boolean hidden;
     private String notes;
+    
     private boolean requiresViewConfirmation;
     // this boolean is not mapped into DB--only for using switches by user
     private boolean viewConfirmed;
     private User viewConfirmedBy;
     private LocalDateTime viewConfirmedAt;
+    private String viewNotes;
 
     /**
      * @return the eventID
@@ -82,17 +85,17 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the eventDescription
+     * @return the description
      */
-    public String getEventDescription() {
-        return eventDescription;
+    public String getDescription() {
+        return description;
     }
 
     /**
-     * @return the eventOwnerUser
+     * @return the creator
      */
-    public User getEventOwnerUser() {
-        return eventOwnerUser;
+    public User getCreator() {
+        return creator;
     }
 
     /**
@@ -166,17 +169,17 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @param eventDescription the eventDescription to set
+     * @param description the description to set
      */
-    public void setEventDescription(String eventDescription) {
-        this.eventDescription = eventDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
-     * @param eventOwnerUser the eventOwnerUser to set
+     * @param creator the creator to set
      */
-    public void setEventOwnerUser(User eventOwnerUser) {
-        this.eventOwnerUser = eventOwnerUser;
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     /**
@@ -289,6 +292,34 @@ public class Event extends EntityUtils implements Serializable {
         if(dateOfRecordUtilDate != null){
             dateOfRecord = this.dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
+    }
+
+    /**
+     * @return the assignedTo
+     */
+    public User getAssignedTo() {
+        return assignedTo;
+    }
+
+    /**
+     * @param assignedTo the assignedTo to set
+     */
+    public void setAssignedTo(User assignedTo) {
+        this.assignedTo = assignedTo;
+    }
+
+    /**
+     * @return the viewNotes
+     */
+    public String getViewNotes() {
+        return viewNotes;
+    }
+
+    /**
+     * @param viewNotes the viewNotes to set
+     */
+    public void setViewNotes(String viewNotes) {
+        this.viewNotes = viewNotes;
     }
 
     

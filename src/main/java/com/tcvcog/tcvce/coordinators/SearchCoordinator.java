@@ -70,6 +70,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         SearchParamsCEEvents eventParams = new SearchParamsCEEvents();
         
+        eventParams.setFilterByMuni(true);
         eventParams.setFilterByStartEndDate(false);
         eventParams.setFilterByObjectID(false);
         eventParams.setLimitResultCountTo100(true);
@@ -93,7 +94,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setIsViewed(false);
         
         eventParams.setFilterByPerson(false);
-        eventParams.setFilterByViewConfirmedAtDateRange(false);
+        eventParams.setUseViewConfirmedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
         

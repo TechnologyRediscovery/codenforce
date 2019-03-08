@@ -1,4 +1,5 @@
 
+-- note yet released: created while working with Noah on property stuff
 BEGIN;
 
 ALTER TABLE property ADD COLUMN multiunit boolean DEFAULT FALSE;

@@ -91,8 +91,8 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         EventCategory eventCat = ec.getInitiatlizedEventCategory(113);
         tfEvent = ec.getInitializedEvent(c, eventCat);
         tfEvent.setDateOfRecord(v.getStipulatedComplianceDate());
-        tfEvent.setEventOwnerUser(c.getCaseManager());
-        tfEvent.setEventDescription(getResourceBundle(Constants.MESSAGE_TEXT)
+        tfEvent.setCreator(c.getCaseManager());
+        tfEvent.setDescription(getResourceBundle(Constants.MESSAGE_TEXT)
                         .getString("complianceTimeframeEndEventDesc"));
         
         if(verifyCodeViolationAttributes(v)){

@@ -385,11 +385,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 + "            eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n"
                 + "            eventtimestamp, eventdescription, login_userid, disclosetomunicipality, \n"
                 + "            disclosetopublic, activeevent, requiresviewconfirmation, \n"
-                + "            hidden, notes)\n"
+                + "            hidden, notes, assignedto_login_userid)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
                 + "            now(), ?, ?, ?, \n"
                 + "            ?, ?, ?, "
-                + "?, ?);";
+                + "?, ?, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -405,8 +405,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
 
             // note that the timestamp is set by a call to postgres's now()
-            stmt.setString(4, event.getEventDescription());
-            stmt.setInt(5, event.getEventOwnerUser().getUserID());
+            stmt.setString(4, event.getDescription());
+            stmt.setInt(5, event.getCreator().getUserID());
             stmt.setBoolean(6, event.isDiscloseToMunicipality());
 
             stmt.setBoolean(7, event.isDiscloseToPublic());
@@ -414,6 +414,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(9, event.isRequiresViewConfirmation());
             stmt.setBoolean(10, event.isHidden());
             stmt.setString(11, event.getNotes());
+            stmt.setInt(12, event.getAssignedTo().getUserID());
 
             System.out.println("EventIntegrator.insertEventCategory| sql: " + stmt.toString());
             stmt.execute();
@@ -504,7 +505,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 + "   SET ceeventcategory_catid=?, cecase_caseid=?, dateofrecord=?, \n"
                 + "       eventdescription=?, login_userid=?, disclosetomunicipality=?, \n"
                 + "       disclosetopublic=?, activeevent=?, \n"
-                + "       hidden=?, notes=?\n"
+                + "       hidden=?, notes=?, assignedto_login_userid=?\n"
                 + " WHERE eventid = ?;";
 
         // TO DO: finish clearing view confirmation
@@ -519,8 +520,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(event.getDateOfRecord()));
 
             // timestamp is updated with a call to postgres's now()
-            stmt.setString(4, event.getEventDescription());
-            stmt.setInt(5, event.getEventOwnerUser().getUserID());
+            stmt.setString(4, event.getDescription());
+            stmt.setInt(5, event.getCreator().getUserID());
             stmt.setBoolean(6, event.isDiscloseToMunicipality());
 
             stmt.setBoolean(7, event.isDiscloseToPublic());
@@ -528,6 +529,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(9, event.isHidden());
             stmt.setString(10, event.getNotes());
             stmt.setInt(11, event.getEventID());
+            stmt.setInt(12, event.getAssignedTo().getUserID());
+            
 
             System.out.println("EventInteegrator.getEventByEventID| sql: " + stmt.toString());
 
@@ -693,8 +696,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         ev.setEventTimeStamp(rs.getTimestamp("eventtimestamp").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        ev.setEventDescription(rs.getString("eventDescription"));
-        ev.setEventOwnerUser(ui.getUser(rs.getInt("login_userid")));
+        ev.setDescription(rs.getString("eventDescription"));
+        ev.setCreator(ui.getUser(rs.getInt("login_userid")));
         ev.setDiscloseToMunicipality(rs.getBoolean("disclosetomunicipality"));
 
         ev.setDiscloseToPublic(rs.getBoolean("disclosetopublic"));
@@ -712,6 +715,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         ev.setHidden(rs.getBoolean("hidden"));
         ev.setNotes(rs.getString("notes"));
+        ev.setAssignedTo(ui.getUser(rs.getInt("assignedto_login_userid")));
 
         return ev;
     }
@@ -746,112 +750,124 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
+        boolean notFirstCriteria = false;
 
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, ");
         sb.append("       eventtimestamp, eventdescription, ceevent.login_userid, disclosetomunicipality, ");
         sb.append("       disclosetopublic, activeevent, ceeventcategory.requiresviewconfirmation, hidden, ");
         sb.append("       ceevent.notes, viewconfirmedby, viewconfirmedat,");
-        sb.append("       viewnotes, person_personid, property_propertyid ");
+        sb.append("       viewnotes, property_propertyid, assignedto_login_userid ");
         sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
         sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
         sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
-        sb.append("LEFT JOIN ceeventperson ON (ceevent_eventid = eventid) ");
         sb.append("WHERE ");
         // as long as this isn't an ID only search, do the normal SQL building process
         if (!params.isFilterByObjectID()) {
-            sb.append("municipality_municode = ? "); // param 1
+            if (params.isFilterByMuni()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                sb.append("municipality_municode = ? "); // param 1
+            }
 
             if (params.isFilterByStartEndDate()){
-                sb.append("AND dateofrecord BETWEEN ? AND ? "); // parm 2 and 3 without ID
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                if(params.isUseDateOfRecord()){
+                    sb.append("dateofrecord "); 
+                } else if(params.isUseViewConfirmedAtDateRange()){
+                    sb.append("viewconfirmedat ");
+                } else if(params.isUseEntryTimestamp()){
+                    sb.append("entrytimestamp "); 
+                } else {
+                    sb.append("dateofrecord "); 
+                }
+                sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
             }
-            
-/**
-            // if both date range searches are speified, only include start/end date
-            if (params.isFilterByViewConfirmedAtDateRange()
-                    && (params.isFilterByViewConfirmedAtDateRange())) {
-                sb.append("AND viewconfirmedat BETWEEN ? AND ? "); // parm 2 and 3 without ID
-            }
-            
-            if (!params.isFilterByViewConfirmedAtDateRange()
-                    && (params.isFilterByViewConfirmedAtDateRange())) {
-                sb.append("AND viewconfirmedat BETWEEN ? AND ? "); // parm 2 and 3 without ID
-            }
-            **/
 
             if (params.isFilterByEventType()) {
-                sb.append("AND categorytype = CAST ('?' AS ceeventtype) ");
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                sb.append("categorytype = CAST (? AS ceeventtype) ");
             }
 
             if (params.isFilterByEventCategory()) {
-                sb.append("AND ceeventcategory_catid = ? ");
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                sb.append("ceeventcategory_catid = ? ");
             }
 
 
             if (params.isFilterByCaseID()) {
-                sb.append("AND cecase_caseid = ? ");
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                sb.append("cecase_caseid = ? ");
             }
 
             if (params.isFilterByEventOwner()) {
-                sb.append("AND ceevent.login_userid = ? ");
+                if(params.getOwnerUser() != null){
+                        if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                        sb.append("ceevent.login_userid = ? ");
+                    }
             }
             
             if (params.isFilterByPerson()) {
-                sb.append("AND person_personid = ?");
+//                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+//                sb.append("person_personid = ?");
             }
 
 
             if (params.isFilterByActive()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 if (params.isIsActive()) {
-                    sb.append("AND activeevent = TRUE ");
+                    sb.append("activeevent = TRUE ");
                 } else {
-                    sb.append("AND activeevent = FALSE ");
+                    sb.append("activeevent = FALSE ");
                 }
             }
             
             if (params.isFilterByHidden()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 if (params.isIsHidden()) {
-                    sb.append("AND hidden = TRUE ");
+                    sb.append("hidden = TRUE ");
                 } else {
-                    sb.append("AND hidden = FALSE ");
+                    sb.append("hidden = FALSE ");
                 }
             }
 
             if (params.isFilterByRequiresViewConfirmation()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 if (params.isIsViewConfirmationRequired()) {
-                    sb.append("AND ceeventcategory.requiresviewconfirmation = TRUE ");
+                    sb.append("ceeventcategory.requiresviewconfirmation = TRUE ");
                 } else {
-                    sb.append("AND ceeventcategory.requiresviewconfirmation = FALSE ");
+                    sb.append("ceeventcategory.requiresviewconfirmation = FALSE ");
                 }
             }
 
 
             if (params.isFilterByViewed()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 if (params.isIsViewed()) {
-                    sb.append("AND viewconfirmedby IS NOT NULL ");
+                    sb.append("viewconfirmedby IS NOT NULL ");
                 } else {
-                    sb.append("AND viewconfirmedby IS NULL ");
+                    sb.append("viewconfirmedby IS NULL ");
                 }
             }
 
 
         } else {
-            sb.append(" eventid = ? "); // will be param 1 with ID search
+            sb.append("eventid = ? "); // will be param 1 with ID search
         }
-        sb.append(";");
         int paramCounter = 0;
             
         try {
             stmt = con.prepareStatement(sb.toString());
 
             if (!params.isFilterByObjectID()) {
-                stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+                if (params.isFilterByMuni()) {
+                    stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+                }
                 if (params.isFilterByStartEndDate()) {
                     stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
                     stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
                 }
                 if (params.isFilterByEventType()) {
-                    stmt.setString(++paramCounter, params.getEvtType().getLabel());
+                    stmt.setString(++paramCounter, params.getEvtType().name());
                 }
 
                 if (params.isFilterByEventCategory()) {
@@ -863,17 +879,19 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 }
 
                 if (params.isFilterByEventOwner()) {
-                    stmt.setInt(++paramCounter, params.getOwnerUser().getUserID());
+                    if(params.getOwnerUser() != null){
+                        stmt.setInt(++paramCounter, params.getOwnerUser().getUserID());
+                    }
                 }
 
                 if (params.isFilterByPerson()) {
-                    stmt.setInt(++paramCounter, params.getPerson().getPersonID());
+//                    stmt.setInt(++paramCounter, params.getPerson().getPersonID());
                 }
                 System.out.println("EventIntegrator.getEvents | Counter val after personFilter: " + paramCounter);
 
                 // ignore all other criteria and just search by ID
             } else {
-                stmt.setInt(1, params.getObjectID());
+                stmt.setInt(++paramCounter, params.getObjectID());
             }
 
             rs = stmt.executeQuery();
@@ -981,8 +999,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
                 ev.setEventTimeStamp(rs.getTimestamp("eventtimestamp").toInstant()
                         .atZone(ZoneId.systemDefault()).toLocalDateTime());
-                ev.setEventDescription(rs.getString("eventDescription"));
-                ev.setEventOwnerUser(ui.getUser(rs.getInt("login_userid")));
+                ev.setDescription(rs.getString("eventDescription"));
+                ev.setCreator(ui.getUser(rs.getInt("login_userid")));
                 ev.setDiscloseToMunicipality(rs.getBoolean("disclosetomunicipality"));
 
                 ev.setDiscloseToPublic(rs.getBoolean("disclosetopublic"));
