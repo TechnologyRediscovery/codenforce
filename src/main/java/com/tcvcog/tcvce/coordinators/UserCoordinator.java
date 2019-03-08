@@ -44,6 +44,14 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public UserCoordinator(){
     
     }    
+    
+    public int insertNewUser(User u) throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        int newUserID = ui.insertUser(u);
+        return newUserID;
+        
+        
+    }
    
     /**
      * Primary user retrieval method: Note that there aren't as many checks here

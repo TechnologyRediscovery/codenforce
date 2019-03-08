@@ -30,29 +30,14 @@ public class User implements Serializable{
     private int userID;
     private RoleType roleType;
     private String username;
-    // note password is not stored in the business object!
-    private String password;
-    private int muniCode;
     private List<Municipality> authMunis;
     
     // To be deprecated 
     private Municipality muni;
     
     private Person person;
-    private String fName;
-    private String lName;
-    private String workTitle;
-    private String phoneCell;
-    private String phoneHome;
-    private String phoneWork;
-    private String email;
-    private String address_street;
-    private String address_city;
-    private String address_zip;
-    private String address_state;
     
     private String notes;
-    
     private LocalDateTime activityStartDate;
     private LocalDateTime activityStopDate;
     
@@ -60,6 +45,9 @@ public class User implements Serializable{
     private boolean systemAccessPermitted;
     private AccessKeyCard keyCard;
     
+    private boolean isEnforcementOfficial;
+    private String badgeNumber;
+    private String oriNumber;
     
     
     /**
@@ -136,146 +124,7 @@ public class User implements Serializable{
         this.muni = muni;
     }
 
-    /**
-     * @return the fName
-     */
-    public String getFName() {
-        return fName;
-    }
-
-    /**
-     * @param fName the fName to set
-     */
-    public void setFName(String fName) {
-        this.fName = fName;
-    }
-
-    /**
-     * @return the lName
-     */
-    public String getLName() {
-        return lName;
-    }
-
-    /**
-     * @param lName the lName to set
-     */
-    public void setLName(String lName) {
-        this.lName = lName;
-    }
-
-    /**
-     * @return the workTitle
-     */
-    public String getWorkTitle() {
-        return workTitle;
-    }
-
-    /**
-     * @param workTitle the workTitle to set
-     */
-    public void setWorkTitle(String workTitle) {
-        this.workTitle = workTitle;
-    }
-
-    /**
-     * @return the phoneCell
-     */
-    public String getPhoneCell() {
-        return phoneCell;
-    }
-
-    /**
-     * @param phoneCell the phoneCell to set
-     */
-    public void setPhoneCell(String phoneCell) {
-        this.phoneCell = phoneCell;
-    }
-
-    /**
-     * @return the phoneHome
-     */
-    public String getPhoneHome() {
-        return phoneHome;
-    }
-
-    /**
-     * @param phoneHome the phoneHome to set
-     */
-    public void setPhoneHome(String phoneHome) {
-        this.phoneHome = phoneHome;
-    }
-
-    /**
-     * @return the phoneWork
-     */
-    public String getPhoneWork() {
-        return phoneWork;
-    }
-
-    /**
-     * @param phoneWork the phoneWork to set
-     */
-    public void setPhoneWork(String phoneWork) {
-        this.phoneWork = phoneWork;
-    }
-
-    /**
-     * @return the email
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * @param email the email to set
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
-     * @return the address_street
-     */
-    public String getAddress_street() {
-        return address_street;
-    }
-
-    /**
-     * @param address_street the address_street to set
-     */
-    public void setAddress_street(String address_street) {
-        this.address_street = address_street;
-    }
-
-    /**
-     * @return the address_city
-     */
-    public String getAddress_city() {
-        return address_city;
-    }
-
-    /**
-     * @param address_city the address_city to set
-     */
-    public void setAddress_city(String address_city) {
-        this.address_city = address_city;
-    }
-
-    /**
-     * @return the address_zip
-     */
-    public String getAddress_zip() {
-        return address_zip;
-    }
-
-    /**
-     * @param address_zip the address_zip to set
-     */
-    public void setAddress_zip(String address_zip) {
-        this.address_zip = address_zip;
-    }
-
+   
     /**
      * @return the notes
      */
@@ -320,47 +169,8 @@ public class User implements Serializable{
 
    
 
-    /**
-     * @return the password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * @param password the password to set
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
-     * @return the muniCode
-     */
-    public int getMuniCode() {
-        return muniCode;
-    }
-
-    /**
-     * @param muniCode the muniCode to set
-     */
-    public void setMuniCode(int muniCode) {
-        this.muniCode = muniCode;
-    }
-
-    /**
-     * @return the address_state
-     */
-    public String getAddress_state() {
-        return address_state;
-    }
-
-    /**
-     * @param address_state the address_state to set
-     */
-    public void setAddress_state(String address_state) {
-        this.address_state = address_state;
-    }
+   
+    
 
     /**
      * @return the authMunis
@@ -427,6 +237,48 @@ public class User implements Serializable{
      */
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    /**
+     * @return the isEnforcementOfficial
+     */
+    public boolean isIsEnforcementOfficial() {
+        return isEnforcementOfficial;
+    }
+
+    /**
+     * @param isEnforcementOfficial the isEnforcementOfficial to set
+     */
+    public void setIsEnforcementOfficial(boolean isEnforcementOfficial) {
+        this.isEnforcementOfficial = isEnforcementOfficial;
+    }
+
+    /**
+     * @return the badgeNumber
+     */
+    public String getBadgeNumber() {
+        return badgeNumber;
+    }
+
+    /**
+     * @return the oriNumber
+     */
+    public String getOriNumber() {
+        return oriNumber;
+    }
+
+    /**
+     * @param badgeNumber the badgeNumber to set
+     */
+    public void setBadgeNumber(String badgeNumber) {
+        this.badgeNumber = badgeNumber;
+    }
+
+    /**
+     * @param oriNumber the oriNumber to set
+     */
+    public void setOriNumber(String oriNumber) {
+        this.oriNumber = oriNumber;
     }
     
 }

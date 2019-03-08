@@ -58,7 +58,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
         int listSize = 0;
         try {
-            eventList = ec.queryEvents(searchParams);
+            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
             if(eventList != null){
                 listSize = eventList.size();
             }
@@ -66,6 +66,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your query completed with " + listSize + " results", ""));
         } catch (IntegrationException ex) {
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));

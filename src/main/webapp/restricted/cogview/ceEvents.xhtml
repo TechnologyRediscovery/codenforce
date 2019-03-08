@@ -418,7 +418,7 @@
 
                                             <h3>
                                                 <h:outputText value="#{e.eventCase.property.muni.muniName}: " />
-                                                <h:outputText value="#{e.eventCase.property.address}" />
+                                                <h:outputText value="#{e.eventCase.property.address} | " />
                                                 <h:outputText value="case: #{e.eventCase.caseName} | 
                                                                     id:#{e.eventCase.caseID} | 
                                                                     phase:#{e.eventCase.casePhase.label} " />
@@ -444,14 +444,16 @@
                                                     <h:outputText value="#{e.timestampPretty}"/>
                                                     <p:spacer height="5px"/>
 
-                                                    <h:outputText value="Creator: " />
+                                                    <h:outputText value="Creator: " styleClass="bold" />
                                                     <h:outputText value="#{e.creator.person.firstName} #{e.creator.person.lastName}"/>
+                                                    <p:spacer height="5px"/>
 
-                                                    <h:outputText value="Assigned to: " />
+                                                    <h:outputText value="Assigned to: " styleClass="bold"  />
                                                     <h:outputText value="#{e.assignedTo.person.firstName} #{e.assignedTo.person.lastName}"/>
+                                                    <p:spacer height="5px"/>
 
 
-                                                    <h:outputText value="edit" />
+                                                    <h:outputText value="Open in case explorer" />
                                                     <p:commandButton icon="fa fa-edit"
                                                                      action="#{caseProfileBB.editEvent(e)}" 
                                                                      ajax="false"/>
@@ -464,21 +466,56 @@
                                                          columnClasses="gridTd-solid-back, gridTd-solid-back" >
 
                                                         <f:facet name="header" class="leftalign">
-                                                            <h:outputText styleClass="bold" value=""/>
-                                                            <h:outputText value="#{empty e.viewConfirmedBy? 'Confirmation required!' : 'View confirmation received'}"/>
+                                                            <h:outputText value="#{empty e.viewConfirmedBy? 'View confirmation required!' : 'View confirmation received'}"
+                                                                          styleClass="viewconf-status #{empty e.viewConfirmedBy? 'conf-needed' : 'conf-received'}"/>
+                                                            <p:spacer height="5px"/>
+                                                             <p:commandButton   id="events-viewconf-confirmnonotes-cb" 
+                                                                                ajax="true"
+                                                                                 value="Confirm without notes" 
+                                                                                 styleClass="noFill"
+                                                                                 disabled="#{!(empty e.viewConfirmedBy)}"
+                                                                                 icon="fa fa-check-square-o"
+                                                                                 rendered="#{e.currentUserCanConfirm}"
+                                                                                 />
+                                                             
+                                                             <p:commandButton   id="events-viewconf-confirmwithnotes-cb" 
+                                                                                ajax="true"
+                                                                                 value="Confirm with notes" 
+                                                                                 styleClass="noFill"
+                                                                                 disabled="#{!(empty e.viewConfirmedBy)}"
+                                                                                 icon="fa fa-edit"
+                                                                                rendered="#{e.currentUserCanConfirm}"
+                                                                                 />
+                                                             
+                                                             <p:commandButton   id="events-viewconf-clearconf-cb" 
+                                                                                ajax="true"
+                                                                                value="clear view conf" 
+                                                                                styleClass="noFill"
+                                                                                disabled="#{empty e.viewConfirmedBy}"
+                                                                                icon="fa fa-eraser"
+                                                                                rendered="#{e.currentUserCanConfirm}"
+                                                                                />
+                                                            
                                                         </f:facet>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="View requested by"/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.viewConfRequestedBy.person.firstName} #{e.viewConfRequestedBy.person.lastName}"/>
+                                                            </div>
+                                                        </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="View confirmed by"/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                                                <h:outputText value="#{e.viewConfirmedBy.person.firstName} #{e.viewConfirmedBy.person.lastName}"/>
                                                             </div>
                                                         </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="View confirmed at"/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.viewConfirmedAt}"/>
+                                                                <h:outputText value="#{e.viewConfAtPrettyDate}"/>
                                                             </div>
                                                         </h:panelGroup>
 

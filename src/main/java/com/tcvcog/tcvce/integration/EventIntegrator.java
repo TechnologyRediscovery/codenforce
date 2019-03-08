@@ -704,6 +704,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         // View confirmation stuff
         ev.setRequiresViewConfirmation(rs.getBoolean("requiresviewconfirmation"));
+        ev.setCurrentUserCanConfirm(false);
         Timestamp ldt = rs.getTimestamp("viewconfirmedat");
         if (ldt != null) {
             ev.setViewConfirmedBy(ui.getUser(rs.getInt("viewconfirmedby")));

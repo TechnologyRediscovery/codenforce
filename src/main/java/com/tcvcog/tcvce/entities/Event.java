@@ -46,7 +46,8 @@ public class Event extends EntityUtils implements Serializable {
     private String notes;
     
     private boolean requiresViewConfirmation;
-    
+    private User viewConfRequestedBy;
+    private boolean currentUserCanConfirm;
     private boolean viewConfirmed;
     private User viewConfirmedBy;
     private LocalDateTime viewConfirmedAt;
@@ -352,6 +353,34 @@ public class Event extends EntityUtils implements Serializable {
      */
     public void setTimestampPretty(String timestampPretty) {
         this.timestampPretty = timestampPretty;
+    }
+
+    /**
+     * @return the currentUserCanConfirm
+     */
+    public boolean isCurrentUserCanConfirm() {
+        return currentUserCanConfirm;
+    }
+
+    /**
+     * @param currentUserCanConfirm the currentUserCanConfirm to set
+     */
+    public void setCurrentUserCanConfirm(boolean currentUserCanConfirm) {
+        this.currentUserCanConfirm = currentUserCanConfirm;
+    }
+
+    /**
+     * @return the viewConfRequestedBy
+     */
+    public User getViewConfRequestedBy() {
+        return viewConfRequestedBy;
+    }
+
+    /**
+     * @param viewConfRequestedBy the viewConfRequestedBy to set
+     */
+    public void setViewConfRequestedBy(User viewConfRequestedBy) {
+        this.viewConfRequestedBy = viewConfRequestedBy;
     }
 
    
