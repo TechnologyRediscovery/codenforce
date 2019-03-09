@@ -28,15 +28,18 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -107,8 +110,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // the moment of event instantiaion!!!!
         EventCECase event = new EventCECase();
         event.setCategory(ec);
-        event.setActiveEvent(true);
+        event.setRequiresViewConfirmation(ec.isRequiresviewconfirmation());
+        event.setActive(true);
         event.setHidden(false);
+        event.setCaseID(c.getCaseID());
         System.out.println("EventCoordinator.getInitalizedEvent | eventCat: " 
                 + event.getCategory().getEventCategoryTitle());
         return event;
@@ -175,11 +180,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCECase event = getInitializedEvent(caseID);
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
-        event.setEventDescription(message);
-        event.setEventOwnerUser(getSystemRobotUser());
+        event.setDescription(message);
+        event.setCreator(getSystemRobotUser());
         event.setDiscloseToMunicipality(true);
         event.setDiscloseToPublic(true);
-        event.setActiveEvent(true);
+        event.setActive(true);
         event.setHidden(false);
         event.setNotes("Event created by a public user");
         
@@ -187,6 +192,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // sent the built event to the integrator!
         ei.insertEvent(event);
         
+    }
+    
+    public void editEvent(EventCECase evcase) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.updateEvent(evcase, false);
     }
     
     
@@ -216,12 +226,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.setCategory(ei.getEventCategory(117));
         event.setCaseID(ceCase.getCaseID());
         event.setDateOfRecord(LocalDateTime.now());
-        event.setEventDescription(updateViolationDescr);
+        event.setDescription(updateViolationDescr);
         //even descr set by violation coordinator
-        event.setEventOwnerUser(getFacesUser());
+        event.setCreator(getFacesUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
-        event.setActiveEvent(true);
+        event.setActive(true);
         
         ei.insertEvent(event);
     }
@@ -240,8 +250,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
           e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
-        e.setEventDescription("Compliance with municipal code achieved");
-        e.setActiveEvent(true);
+        e.setDescription("Compliance with municipal code achieved");
+        e.setActive(true);
         e.setDiscloseToMunicipality(true);
         e.setDiscloseToPublic(true);
         
@@ -261,6 +271,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return e;
     }
     
+    
+    
     /**
      * At its current impelementation, this amounts to a factory for ArrayLists
      * that are populated by the user when creating events
@@ -279,7 +291,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public void insertEvent(EventCECase e) throws IntegrationException{
+    /**
+     * A container for future event-related business logic
+     * @param e
+     * @throws IntegrationException 
+     */
+    protected void insertEvent(EventCECase e) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         ei.insertEvent(e);
         
@@ -335,14 +352,14 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("\' to \'");
         sb.append(currentCase.getCasePhase().toString());
         sb.append("\' by an action event or manual override.");
-        event.setEventDescription(sb.toString());
+        event.setDescription(sb.toString());
         
         event.setCaseID(currentCase.getCaseID());
         event.setDateOfRecord(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setEventOwnerUser(getFacesUser());
-        event.setActiveEvent(true);
+        event.setCreator(getFacesUser());
+        event.setActive(true);
         
         insertEvent(event);
         
@@ -351,6 +368,18 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                     "The case phase has been changed", ""));
 
     } // close method
+    
+    public void confirmEventView(EventWithCasePropInfo ev, User us) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.confirmEventView(us, ev);
+    }
+    
+    
+    public void clearEventView(EventWithCasePropInfo ev) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.clearViewConfFromEvent(ev);
+    }
+    
     
     public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) throws IntegrationException, CaseLifecyleException{
           EventIntegrator ei = getEventIntegrator();
@@ -365,14 +394,14 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("\' to \'");
         sb.append(currentCase.getCasePhase().toString());
         sb.append("\' by a a case officer.");
-        event.setEventDescription(sb.toString());
+        event.setDescription(sb.toString());
         
         event.setCaseID(currentCase.getCaseID());
         event.setDateOfRecord(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setEventOwnerUser(getFacesUser());
-        event.setActiveEvent(true);
+        event.setCreator(getFacesUser());
+        event.setActive(true);
         
         insertEvent(event);
         
@@ -456,4 +485,47 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             
          } // close switch
     } // close method
+    
+    /**
+     * Pathway for injecting business logic into the event search process. Now its just a pass through.
+     * @param params
+     * @param user the current user
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventWithCasePropInfo> queryEvents(SearchParamsCEEvents params, User user) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        EventWithCasePropInfo ev;
+        List<EventWithCasePropInfo> evList = ei.getEvents(params);
+        Iterator<EventWithCasePropInfo> iter = evList.iterator();
+        while(iter.hasNext()){
+            ev = iter.next();
+            ev.setCurrentUserCanConfirm(computeEventViewConfirmationAbility(ev, user));
+        }        
+        return evList;
+    }
+    
+    public boolean computeEventViewConfirmationAbility(EventWithCasePropInfo ev, User u){
+        boolean canConfirm = false;
+        EventType evType = ev.getCategory().getEventType();
+        List<Municipality> muniList = u.getAuthMunis();
+        
+        // direct event assignment allows view conf to cut across regular permissions
+        // checks
+        if(ev.getAssignedTo().equals(u) || u.getKeyCard().isHasDeveloperPermissions()){
+            return true;
+            // check that the event is associated with the user's auth munis
+        } else if(muniList.contains(ev.getEventCase().getProperty().getMuni())){
+            // sys admins for a muni can confirm everything
+            if(u.getKeyCard().isHasSysAdminPermissions()){
+                return true;
+            } else if(evType != EventType.Timeline){
+                return true;
+            } else return u.getKeyCard().isHasEnfOfficialPermissions();
+        }
+                
+        return canConfirm;
+    }
+    
+    
 } // close class

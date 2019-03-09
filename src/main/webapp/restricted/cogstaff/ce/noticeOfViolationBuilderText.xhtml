@@ -51,7 +51,7 @@
                         </ui:remove>
 
                                     <h4>Text preview:</h4>
-                                    <p><h:outputText id="greetingOT" value="#{noticeOfViolationBB.greetingBlock.textBlockText}" /> </p>
+                                    <p><h:outputText id="greetingOT" escape="false" value="#{noticeOfViolationBB.greetingBlock.textBlockText}" /> </p>
 
                                     <h2>Introductory paragraph</h2>
                                     <p:selectOneMenu 
@@ -69,7 +69,7 @@
                                     </p:selectOneMenu>
 
                                     <h4>Text preview:</h4>
-                                    <p><h:outputText id="introOT" value="#{noticeOfViolationBB.introBlock.textBlockText}" /> </p>
+                                    <p><h:outputText id="introOT" escape="false" value="#{noticeOfViolationBB.introBlock.textBlockText}" /> </p>
 
 
                                     <p:fieldset legend="Add more paragraphs"
@@ -95,7 +95,7 @@
                                         </p:selectOneMenu>
 
                                         <h4>Text preview:</h4>
-                                        <p><h:outputText id="optional1OT" value="#{noticeOfViolationBB.tb1.textBlockText}" /> </p>
+                                        <p><h:outputText id="optional1OT" escape="false" value="#{noticeOfViolationBB.tb1.textBlockText}" /> </p>
 
 
 
@@ -119,7 +119,7 @@
                                         </p:selectOneMenu>
 
                                         <h4>Text preview:</h4>
-                                        <p><h:outputText id="optional2OT" value="#{noticeOfViolationBB.tb2.textBlockText}" /> </p>
+                                        <p><h:outputText id="optional2OT" escape="false" value="#{noticeOfViolationBB.tb2.textBlockText}" /> </p>
 
                                     </p:fieldset>
                                     <h2>Compliance instructions</h2>
@@ -139,7 +139,7 @@
                                     </p:selectOneMenu>
 
                                     <h4>Text preview:</h4>
-                                    <p><h:outputText id="complianceOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
+                                    <p><h:outputText id="complianceOT" escape="false" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
 
                                     <h2>Penalty notice</h2>
 
@@ -158,7 +158,7 @@
                                     </p:selectOneMenu>
 
                                     <h4>Text preview:</h4>
-                                    <p><h:outputText id="penaltyOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
+                                    <p><h:outputText id="penaltyOT" escape="false" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
 
 
                                     <p:fieldset legend="Add more paragraphs" toggleable="true" collapsed="true">
@@ -185,7 +185,7 @@
                                         </p:selectOneMenu>
 
                                         <h4>Text preview:</h4>
-                                        <p><h:outputText id="optional3OT" value="#{noticeOfViolationBB.tb3.textBlockText}" /> </p>
+                                        <p><h:outputText id="optional3OT" escape="false" value="#{noticeOfViolationBB.tb3.textBlockText}" /> </p>
 
 
                                         <h2>Optional text block 4</h2>
@@ -210,7 +210,7 @@
                                         </p:selectOneMenu>
 
                                         <h4>Text preview:</h4>
-                                        <p><h:outputText id="optional4OT" value="#{noticeOfViolationBB.tb4.textBlockText}" /> </p>
+                                        <p><h:outputText id="optional4OT" escape="false" value="#{noticeOfViolationBB.tb4.textBlockText}" /> </p>
 
                                     </p:fieldset>
 
@@ -218,11 +218,11 @@
 
 
                                 <p>
-                                    <h:outputText id="sig1" value="#{facesUser.FName} #{facesUser.LName}"/><br/>
-                                    <h:outputText id="sig2" value="#{facesUser.workTitle}"/><br/>
-                                    <h:outputText id="sig3" value="#{facesUser.muni.muniName}"/><br/>
-                                    <h:outputText id="sig4" value="#{facesUser.phoneCell}"/><br/>
-                                    <h:outputText id="sig5" value="#{facesUser.email}"/>
+                                    <h:outputText id="sig1" value="#{sessionBean.facesUser.person.firstName} #{facesUser.person.lastName}"/><br/>
+                                    <h:outputText id="sig2" value="#{sessionBean.facesUser.person.jobTitle}"/><br/>
+                                    <h:outputText id="sig3" value="#{sessionBean.facesUser.muni.muniName}"/><br/>
+                                    <h:outputText id="sig4" value="#{sessionbean.facesUser.person.phoneCell}"/><br/>
+                                    <h:outputText id="sig5" value="#{sessionBean.facesUser.person.email}"/>
                                 </p>
 
                                 <p:spacer height="15px"/>

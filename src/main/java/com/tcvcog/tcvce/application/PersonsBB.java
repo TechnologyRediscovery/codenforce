@@ -66,7 +66,6 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         PersonCoordinator pc = getPersonCoordinator();
-        PersonIntegrator pi = getPersonIntegrator();
         searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
         // the selected person should be initiated using logic in getSelectedPerson
         selectedPerson = getSessionBean().getActivePerson();
@@ -164,7 +163,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             selectedPerson = pi.getPerson(newPersonID);
             System.out.println("PersonsBB.createNewPerson | newly inserted personID: " + selectedPerson.getPersonID());
             getSessionBean().setActivePerson(selectedPerson);
-            getSessionBean().getActivePersonList().add(selectedPerson);
+            getSessionBean().getPersonQueue().add(selectedPerson);
             
             
 //            ui.logObjectView(getSessionBean().getFacesUser(), selectedPerson);
@@ -186,7 +185,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         System.out.println("PersonBB.searchForPersons");
         // clear past search results on bean and on the session
         personList = null;
-        getSessionBean().setActivePersonList(null);
+        getSessionBean().setPersonQueue(null);
         // this will trigger database lookup logic inside
         // getPersonList() when we tell the search result table to clear itself
     }
@@ -198,7 +197,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
         // clear past search results on bean and on the session
         personList = null;
-        getSessionBean().setActivePersonList(null);
+        getSessionBean().setPersonQueue(null);
         // this will trigger database lookup logic inside
         // getPersonList() when we tell the search result table to clear itself
     }
@@ -249,7 +248,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
 
         System.out.println("PersonBB.getPersonList");
         PersonIntegrator integrator = getPersonIntegrator();
-        List<Person> sessionPersonList = getSessionBean().getActivePersonList();
+        List<Person> sessionPersonList = getSessionBean().getPersonQueue();
 
         // first check if our view-scoped list is emtpy, if so, we need a list!
         if (personList == null) {
@@ -260,7 +259,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             } else {
                 try {
                     personList = integrator.getPersonList(searchParams); // go to Integrator with searchParams
-                    getSessionBean().setActivePersonList(personList);
+                    getSessionBean().setPersonQueue(personList);
                     if (personList.isEmpty()) {
                         System.out.println("PersonBB.getPersonList | Emtpy list");
                         getFacesContext().addMessage(null,

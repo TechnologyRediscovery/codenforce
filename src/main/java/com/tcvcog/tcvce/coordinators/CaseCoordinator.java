@@ -38,6 +38,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
+import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
@@ -105,6 +106,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return sps;
     }
     
+    
+    public SearchParamsCEEvents getDefaultSearchParamsCEEventsRequiringView(User user){
+        SearchCoordinator sc = new SearchCoordinator();
+        return sc.getSearchParamsEventsRequiringView(user);
+        
+    }
+    
      /**
      * Returns a SearchParams subclass for retrieving all open
      * cases in a given municipality. Open cases are defined as a 
@@ -125,8 +133,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // subclass specific
         spcecase.setUseIsOpen(true);
         spcecase.setIsOpen(true);
-        spcecase.setUseCaseCloseDateRange(false);
-        spcecase.setUseCaseManagerID(false);
+        spcecase.setUseCaseManager(false);
         spcecase.setUseLegacy(false);
         
         return spcecase;
@@ -212,7 +219,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             
         }
             System.out.println("CaseCoordinator.createNewCECase | origination event: " + originationEvent.getCategory().getEventCategoryTitle());
-            originationEvent.setEventOwnerUser(u);
+            originationEvent.setCreator(u);
             originationEvent.setCaseID(insertedCase.getCaseID());
             originationEvent.setDateOfRecord(LocalDateTime.now());
             processCEEvent(newCase, originationEvent);
@@ -416,8 +423,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
         e.setDateOfRecord(LocalDateTime.now());
-        e.setEventOwnerUser(getFacesUser());
-        e.setEventDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
+        e.setCreator(getFacesUser());
+        e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
         ei.insertEvent(e);
@@ -646,10 +653,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         noticeEvent.setDateOfRecord(LocalDateTime.now());
         
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
-        noticeEvent.setEventDescription(queuedNoticeEventNotes);
+        noticeEvent.setDescription(queuedNoticeEventNotes);
         
-        noticeEvent.setEventOwnerUser(getFacesUser());
-        noticeEvent.setActiveEvent(true);
+        noticeEvent.setCreator(getFacesUser());
+        noticeEvent.setActive(true);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
         noticeEvent.setRequiresViewConfirmation(false);
@@ -801,7 +808,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                     Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                             .getString("actionRequestInitialStatusCode")))
                     && 
-                    getSessionBean().getAccessKeyCard().isHasEnfOfficialPermissions()
+                    getSessionBean().getFacesUser().getKeyCard().isHasEnfOfficialPermissions()
                 ){
                 System.out.println("Routing enabled!");
                 return true;

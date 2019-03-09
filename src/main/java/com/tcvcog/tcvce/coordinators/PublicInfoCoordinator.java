@@ -103,11 +103,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
             
             StringBuilder sb = new StringBuilder();
-            sb.append(c.getCaseManager().getFName());
+            sb.append(c.getCaseManager().getPerson().getFirstName());
             sb.append(" ");
-            sb.append(c.getCaseManager().getLName());
+            sb.append(c.getCaseManager().getPerson().getLastName());
             pib.setCaseManagerName(sb.toString());
-            pib.setCaseManagerContact(c.getCaseManager().getPhoneWork());
+            pib.setCaseManagerContact(c.getCaseManager().getPerson().getPhoneWork());
             
             
             pib.setPublicEventList(new ArrayList<EventCECase>());

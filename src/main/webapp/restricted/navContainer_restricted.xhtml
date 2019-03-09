@@ -19,7 +19,7 @@
                 <div class="flexing-box-topbar">
                     <f:view id="navview">
                         <div class="logoBox">
-                            <h2 id="logoHeader" style="font-weight: bold;">COGBase Municipal Data Hub<br />Turtle Creek Valley Council of Governments</h2>
+                            <h2 id="logoHeader" style="font-weight: bold;"><span class="mono"> Municipal Code Enforcement Database [MCED]</span> <br />Turtle Creek Valley Council of Governments</h2>
                         </div>
                     </f:view>
                 </div>
@@ -44,7 +44,7 @@
                                 <p:submenu label="Code Enf" icon="fa fa-bullhorn">
                                     <p:menuitem value="CE Requests" action="cEActionRequests"  ajax="false" icon="fa fa-sign-in"/>
                                     <p:menuitem value="CE Cases" action="ceCases"  ajax="false" icon="fa fa-suitcase"/>
-                                    <p:menuitem value="CE Events" action="ceCases"  ajax="false" icon="fa fa-calendar"/>
+                                    <p:menuitem value="CE Events" action="ceEvents"  ajax="false" icon="fa fa-calendar"/>
                                     
                                     <p:submenu label="CE Configuration">
                                         <p:menuitem value="CE event config" action="eventManage" ajax="false" icon="fa fa-sliders" />
@@ -70,13 +70,10 @@
 
 
                                 <p:submenu label="Occupancy" icon="fa fa-list-alt" >
-                                    <p:menuitem value="Applications" action="occPermitApplications" ajax="false" icon="ui-icon-document" disabled="true"/>
-                                    <p:menuitem value="Open inspections" action="occInspections" ajax="false" icon="ui-icon-home" disabled="true" />
-                                    <p:menuitem value="New inspection" action="occInspectionAdd" ajax="false" icon="ui-icon-document" disabled="true"/>
-                                    <p:menuitem value="Current inspection" action="occProfile" ajax="false" icon="ui-icon-arrowthick-1-s" disabled="true"/>
+                                    <p:menuitem value="Inspections" action="occInspections" ajax="false" icon="ui-icon-home" disabled="true" />
                                     <p:menuitem value="Checklists"  action="checklists" ajax="false" icon="ui-icon-wrench" disabled="true"/>
-                                    <p:menuitem value="Payments" action="payments" ajax="false" icon="ui-icon-wrench" disabled="true"/>
-                                    <p:menuitem value="Fee config" action="feeManage" ajax="false" icon="ui-icon-wrench" disabled="true"/>
+                                    <p:menuitem value="Payments" action="payments" ajax="false" icon="ui-icon-wrench" disabled="false"/>
+                                    <p:menuitem value="Fee config" action="feeManage" ajax="false" icon="ui-icon-wrench" disabled="false"/>
                                     <p:menuitem value="Permits config"  action="occPermitTypeManage" ajax="false" icon="ui-icon-wrench" disabled="true"/>
                                 </p:submenu>
                                  
@@ -118,7 +115,7 @@
                                 <f:facet name="options">
                                     <p:commandButton 
                                                      action="#{missionControlBB.logout}" 
-                                                     value="Logout: #{facesUser.FName}"
+                                                     value="Logout: #{facesUser.person.firstName}"
                                                      ajax="false"/>
                                 </f:facet>
                             </p:menubar>

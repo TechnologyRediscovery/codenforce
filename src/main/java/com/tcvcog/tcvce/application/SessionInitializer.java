@@ -17,6 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -79,39 +81,27 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 
                 ExternalContext ec = facesContext.getExternalContext();
                 ec.getSessionMap().put("facesUser", extractedUser);
-                System.out.println("SessionInitializer.initiateInternalSession "
-                        + "| facesUserFromDB: " + extractedUser.getLName());
+                System.out.println("SessionInitializer.initiateInternalSession ");
 
                 Municipality muni = extractedUser.getMuni();
                 
 //                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                        .getString("arbitraryPlaceholderPersonID"))));
                 getSessionBean().setFacesUser(extractedUser);
-                getSessionBean().setAccessKeyCard(extractedUser.getKeyCard());
 //                getSessionBean().setActivePersonList(persInt.getPersonHistory(extractedUser));
                 getSessionBean().setActiveMuni(muni);
-                
-                getSessionBean().setActiveProp(pi.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("arbitraryPlaceholderPropertyID"))));
-                
-                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("arbitraryPlaceholderPersonID"))));
-                
-                getSessionBean().setcECase(caseint.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("arbitraryPlaceholderCaseID"))));
-                
-                
                 
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
                 getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getDefaultCodeSetID()));
+                
+                populateSessionObjectQueues(extractedUser);
 
                 getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
                         Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
                          "SessionInitializer.initiateInternalSession | Created internal session", false, false);
-            
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Good morning, " + extractedUser.getFName() + "!", ""));
+
+                
             }
         
         } catch (IntegrationException ex) {
@@ -140,7 +130,30 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
         return request.getRemoteUser();
+    }
 
+    
+        
+    private void populateSessionObjectQueues(User u) throws IntegrationException{
+        PersonCoordinator persCoord = getPersonCoordinator();
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        PropertyIntegrator propI = getPropertyIntegrator();
+        PersonIntegrator persInt = getPersonIntegrator();
+        CaseIntegrator caseInt = getCaseIntegrator();
+        
+        getSessionBean().setPersonQueue(persCoord.loadPersonHistoryList(u));
+        
+        getSessionBean().setActiveProp(propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("arbitraryPlaceholderPropertyID"))));
+
+        getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("arbitraryPlaceholderPersonID"))));
+
+        getSessionBean().setcECase(caseInt.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("arbitraryPlaceholderCaseID"))));
+
+
+        
     }
 
     

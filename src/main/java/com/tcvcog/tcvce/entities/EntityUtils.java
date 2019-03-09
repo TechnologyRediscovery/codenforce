@@ -19,15 +19,16 @@ public class EntityUtils {
     
     private final int DAYS_IN_YEAR = 365;
     
-    public String getPrettyDate(LocalDateTime ldt){
-        String formattedDateTime = null;
-        if(ldt != null){
+    protected String getPrettyDate(LocalDateTime ldtDate){
+        String formattedDateTime = "";
+        if(ldtDate != null){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-            formattedDateTime = ldt.format(formatter); 
+            formattedDateTime = ldtDate.format(formatter); 
             
         }
         return formattedDateTime;
     }
+   
     
     /**
      * Counts days between two LocalDateTimes and returns the primitive

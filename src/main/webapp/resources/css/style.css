@@ -758,6 +758,21 @@ tr.reinspect{
     padding: 10px;
 }
 
+.topbottom-lines-left{
+    text-align: right;
+    border-right: none;
+    color: black;
+    margin:0;
+    
+}
+    
+.topbottom-lines-right{
+    text-align: left;
+    border-left: none;
+    color:black;
+}
+
+
 .gridTd-solid-back{
     border:none;
     background-color: rgba(12,12,12,0);
@@ -807,7 +822,7 @@ gridTd-bignum{
 /***********************CLOSE TABLE STYLES**********************/
 
 
-/*---------------------BUTTONS---------------------------*/
+/*---------------------BUTTONS & CONTROLS---------------------------*/
 
 
 /* this styling is for use w/ command button on codeSourceManage.xhtml */
@@ -866,8 +881,14 @@ gridTd-bignum{
     color: white;
 }
 
+.ui-chkbox-box{
+    margin:5px;
+}
+
 /* ****************** CLOSE BUTTON STYLES ********************/
 
+
+/* -------------------- MISC --------------------------------- */
 
 p.footer{
     font-style: italic;
@@ -917,6 +938,24 @@ div.checkBoxLabel{
     margin-top: 0px;
     margin-bottom: 10px;
 }
+
+.viewconf-status{
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.conf-needed{
+    color:red;
+    
+}
+
+.conf-received{
+    color:blue;
+}
+
+
+
+/* ******************** CLOSE MISC ********************************/
 
 
 
