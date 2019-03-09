@@ -21,28 +21,19 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
-import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -147,8 +138,33 @@ public class EventManageBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setcECase(null);
     }
     
+    public String jumpToCasesToEditCEEvent(EventWithCasePropInfo ev){
+        List<CECase> caseList = getSessionBean().getcECaseQueue();
+        List<Property> propList = getSessionBean().getPropertyQueue();
+        if(caseList != null){
+            caseList.add(1, caseList.remove(0));
+            caseList.add(0, ev.getEventCase());
+        }
+        if(propList != null){
+            propList.add(1, propList.remove(0));
+            propList.add(0, ev.getEventCase().getProperty());
+        }
+        return "ceCases";
+    }
     
-
+    public void commitEventEdits(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.editEvent(eventInProcess);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Event udpated!", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Please select one or more people to attach to this event", 
+                "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        }
+    }
    
     public void queueSelectedPerson(ActionEvent ev){
         System.out.println("EventAddBB.queueSelectedPerson | In listener method");

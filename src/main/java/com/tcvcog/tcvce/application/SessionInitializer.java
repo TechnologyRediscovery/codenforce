@@ -100,9 +100,8 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
                         Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
                          "SessionInitializer.initiateInternalSession | Created internal session", false, false);
-            
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Good morning, " + extractedUser.getPerson().getFirstName() + "!", ""));
+
+                
             }
         
         } catch (IntegrationException ex) {

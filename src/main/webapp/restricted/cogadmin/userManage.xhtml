@@ -275,6 +275,9 @@
                                 
                                  <h:panelGroup>
                                     <p:outputLabel id="useradd-personid-ol" for="useradd-personid-it" value="User's Person id:"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    
                                     <p:inputText id="useradd-personid-it" value="#{userBB.currentUser.personID}" 
                                                  style="width: 250px;" tabindex="4" required="true" styleClass="inputText"/>
                                     <h:message for="useradd-personid-it" showDetail="false" showSummary="true" 
@@ -337,14 +340,14 @@
                                   
                                  <h:outputLabel value="Permit System Access" for="activeInsystemSwitch"/>
                                  <h:panelGroup>
-                                     <p:inputSwitch tabindex="7" id="activeInsystemSwitch" value="#{userBB.currentUser.systemAccessPermitted}" onLabel="Yes" offLabel="No" />
+                                     <p:selectBooleanCheckbox tabindex="7" id="activeInsystemSwitch" value="#{userBB.currentUser.systemAccessPermitted}" />
                                 </h:panelGroup>
                                 
                                
                                   
                                  <h:outputLabel value="Is enforcement official?" for="useradd-enfofficial-is"/>
                                  <h:panelGroup>
-                                     <p:inputSwitch tabindex="8" id="useradd-enfofficial-is" value="#{userBB.currentUser.isEnforcementOfficial}" onLabel="Yes" offLabel="No" />
+                                     <p:selectBooleanCheckbox tabindex="8" id="useradd-enfofficial-is" value="#{userBB.currentUser.isEnforcementOfficial}"  />
                                 </h:panelGroup>
                                  
                                   <h:outputLabel value="Badge number*" for="badgeIT"/>

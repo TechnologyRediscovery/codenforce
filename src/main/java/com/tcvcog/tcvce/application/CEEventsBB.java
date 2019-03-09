@@ -71,9 +71,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
-            
         }
-        
     }
 
     /**

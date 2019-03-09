@@ -38,10 +38,8 @@ import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -194,6 +192,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // sent the built event to the integrator!
         ei.insertEvent(event);
         
+    }
+    
+    public void editEvent(EventCECase evcase) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.updateEvent(evcase, false);
     }
     
     
