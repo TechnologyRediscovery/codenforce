@@ -163,7 +163,7 @@
 
                                                 <h:panelGroup>
                                                     <p:outputLabel id="ceev-filter-id-ol" for="ceev-filter-id" value="filter by ce case ID? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-id" value="#{caseProfileBB.searchParams.filterByCaseID}" 
+                                                    <p:selectBooleanCheckbox id="ceev-filter-id" value="#{caseProfileBB.searchParams.filterByObjectID}" 
                                                                              disabled="false" >
                                                         <p:ajax update="ceev-criteria-caseid" />
                                                     </p:selectBooleanCheckbox>
@@ -173,8 +173,8 @@
                                                     <p:outputLabel id="ceev-criteria-caseid-ol" for="ceev-criteria-caseid" value="ce case ID:"/>
                                                     <p:spacer height="5px"/>
                                                     <p:inputText id="ceev-criteria-caseid" 
-                                                                 value="#{caseProfileBB.searchParams.caseId}" 
-                                                                 disabled="#{!caseProfileBB.searchParams.filterByCaseID}"/>
+                                                                 value="#{caseProfileBB.searchParams.objectID}" 
+                                                                 disabled="#{!caseProfileBB.searchParams.filterByObjectID}"/>
                                                     <h:message for="ceev-criteria-caseid" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                 </h:panelGroup>
@@ -219,69 +219,6 @@
                                                                    value="(checked = only open cases)" styleClass="italic"/>
                                                 </h:panelGroup>
 
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-hidden-ol" for="ceev-filter-hidden" value="filter by hidden? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-hidden" value="#{caseProfileBB.searchParams.filterByHidden}" >
-                                                        <p:ajax update="ceev-criteria-hidden" />
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:selectBooleanCheckbox id="ceev-criteria-hidden" 
-                                                                             value="#{caseProfileBB.searchParams.isHidden}" 
-                                                                             disabled="#{!caseProfileBB.searchParams.filterByHidden}" />
-                                                    <p:outputLabel id="ceev-criteria-hidden-ol" for="ceev-criteria-hidden" 
-                                                                   value="(checked = only hidden events)" styleClass="italic"/>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-requireview-ol" for="ceev-filter-requireview" value="filter by requiring view confirmation? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-requireview" value="#{caseProfileBB.searchParams.filterByRequiresViewConfirmation}" >
-                                                        <p:ajax update="ceev-criteria-requireview" />
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:selectBooleanCheckbox id="ceev-criteria-requireview" 
-                                                                             value="#{caseProfileBB.searchParams.isViewConfirmationRequired}" 
-                                                                             disabled="#{!caseProfileBB.searchParams.filterByRequiresViewConfirmation}" />
-                                                    <p:outputLabel id="ceev-criteria-requireview-ol" for="ceev-criteria-requireview" 
-                                                                   value="(checked = requires view conf)" styleClass="italic"/>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-viewstatus-ol" for="ceev-filter-viewstatus" value="filter by viewed status? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-viewstatus" value="#{caseProfileBB.searchParams.filterByViewed}" >
-                                                        <p:ajax update="ceev-criteria-view" />
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:selectBooleanCheckbox id="ceev-criteria-view" 
-                                                                             value="#{caseProfileBB.searchParams.isViewed}" 
-                                                                             disabled="#{!caseProfileBB.searchParams.filterByViewed}" 
-                                                                             styleClass="checkbox"/>
-                                                    <p:outputLabel id="ceev-criteria-view-ol" for="ceev-criteria-view" 
-                                                                   value="(checked = has been viewed)" styleClass="italic"/>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-eventid-ol" for="ceev-filter-eventid" value="filter by event ID? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-eventid" 
-                                                                             value="#{caseProfileBB.searchParams.filterByObjectID}" 
-                                                                             styleClass="checkbox">
-                                                        <p:ajax update="ceev-criteria-eventid" />
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-criteria-eventid-ol" for="ceev-criteria-eventid" value="event id:"/>
-                                                    <p:spacer height="5px"/>
-                                                    <p:inputText id="ceev-criteria-eventid" 
-                                                                 value="#{caseProfileBB.searchParams.objectID}" 
-                                                                 disabled="#{!caseProfileBB.searchParams.filterByObjectID}"/>
-                                                    <h:message for="ceev-criteria-eventid" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
                                                 <h:panelGroup>
                                                     <p:outputLabel id="ceev-query-limit-ol" for="ceev-query-limit" value="limit results to 100? "/>
                                                     <p:selectBooleanCheckbox id="ceev-query-limit" value="#{caseProfileBB.searchParams.limitResultCountTo100}" />
