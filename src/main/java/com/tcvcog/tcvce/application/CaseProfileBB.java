@@ -65,7 +65,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     private List<CECase> caseList;
     private ArrayList<CECase> filteredCaseList;
-    private SearchParamsCECases ceCaseSearchParams;
+    private SearchParamsCECases searchParams;
 
     private ArrayList<CECase> filteredCaseHistoryList;
     private ArrayList<EventCECase> recentEventList;
@@ -112,8 +112,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean(){
         CaseCoordinator cc = getCaseCoordinator();
-        ceCaseSearchParams = cc.getDefaultSearchParamsCECase(getSessionBean().getActiveMuni());
-        currentCase = getSessionBean().getcECase();
+        searchParams = cc.getDefaultSearchParamsCECase(getSessionBean().getActiveMuni());
+        List<CECase> retrievedCaseLIst = getSessionBean().getcECaseQueue();
+        if(retrievedCaseLIst != null){
+            currentCase = retrievedCaseLIst.get(0);
+            caseList = retrievedCaseLIst;
+        }
     }
 
 /**
@@ -150,10 +154,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public String editEvent(EventCECase ev) {
-        getSessionBean().setActiveEvent(ev);
-        return "eventEdit";
-    }
+  
 
     /**
      *
@@ -383,20 +384,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         return "violationSelectElement";
     }
 
-    public String editSelectedEvent() {
-
-        if (selectedEvent != null) {
-
-            getSessionBean().setActiveEvent(selectedEvent);
-            return "eventEdit";
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select an event to edit and try again", ""));
-            return "";
-
-        }
-    }
     
     public String printNotice(NoticeOfViolation nov){
         System.out.println("CaseProfileBB.printNotice");
@@ -892,18 +879,15 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 //        List<CECase> sessionList = getSessionBean().getcECaseList();
         CaseIntegrator ci = getCaseIntegrator();
         if (caseList == null) {
-            ceCaseSearchParams.setMuni(getSessionBean().getActiveMuni());
+            searchParams.setMuni(getSessionBean().getActiveMuni());
             try {
                 System.out.println("CaseProfileBB.getCaseList | getting list for : " + getSessionBean().getActiveMuni().getMuniName());
-                caseList = ci.getCECases(ceCaseSearchParams);
+                caseList = ci.getCECases(searchParams);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
         }
 
-        if (caseList == null) {
-            caseList = new ArrayList<>();
-        }
 
         return caseList;
     }
@@ -1028,18 +1012,18 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the ceCaseSearchParams
+     * @return the searchParams
      */
-    public SearchParamsCECases getCeCaseSearchParams() {
+    public SearchParamsCECases getSearchParams() {
         
-        return ceCaseSearchParams;
+        return searchParams;
     }
 
     /**
-     * @param ceCaseSearchParams the ceCaseSearchParams to set
+     * @param searchParams the searchParams to set
      */
-    public void setCeCaseSearchParams(SearchParamsCECases ceCaseSearchParams) {
-        this.ceCaseSearchParams = ceCaseSearchParams;
+    public void setSearchParams(SearchParamsCECases searchParams) {
+        this.searchParams = searchParams;
     }
 
     /**

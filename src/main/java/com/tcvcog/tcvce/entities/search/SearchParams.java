@@ -21,11 +21,11 @@ import java.time.ZoneId;
  */
 public class SearchParams implements Serializable{
     
-    
+     
     private String searchName;
     private String searchDescription;
     private boolean filterByMuni;
-    private Municipality muni;
+    private Municipality muni; 
     
     private boolean filterByStartEndDate;
     private LocalDateTime startDate;
@@ -43,12 +43,10 @@ public class SearchParams implements Serializable{
     private boolean useDateOfRecord;
     private boolean useEntryTimestamp;
     
-    
     private boolean filterByObjectID;
     private int objectID;
     
     private boolean limitResultCountTo100;
-    
     
    public SearchParams(){
        

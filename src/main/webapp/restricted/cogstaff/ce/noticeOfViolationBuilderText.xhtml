@@ -218,11 +218,11 @@
 
 
                                 <p>
-                                    <h:outputText id="sig1" value="#{facesUser.FName} #{facesUser.LName}"/><br/>
-                                    <h:outputText id="sig2" value="#{facesUser.workTitle}"/><br/>
-                                    <h:outputText id="sig3" value="#{facesUser.muni.muniName}"/><br/>
-                                    <h:outputText id="sig4" value="#{facesUser.phoneCell}"/><br/>
-                                    <h:outputText id="sig5" value="#{facesUser.email}"/>
+                                    <h:outputText id="sig1" value="#{sessionBean.facesUser.person.firstName} #{facesUser.person.lastName}"/><br/>
+                                    <h:outputText id="sig2" value="#{sessionBean.facesUser.person.jobTitle}"/><br/>
+                                    <h:outputText id="sig3" value="#{sessionBean.facesUser.muni.muniName}"/><br/>
+                                    <h:outputText id="sig4" value="#{sessionbean.facesUser.person.phoneCell}"/><br/>
+                                    <h:outputText id="sig5" value="#{sessionBean.facesUser.person.email}"/>
                                 </p>
 
                                 <p:spacer height="15px"/>

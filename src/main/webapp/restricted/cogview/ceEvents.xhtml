@@ -68,7 +68,7 @@
 
                                                 <p:outputLabel id="ceev-search-usedor-ol" for="ceev-search-usedor-chkbx" value="use date of record field? "/>
                                                 <p:selectBooleanCheckbox id="ceev-search-usedor-chkbx" 
-                                                                         value="#{cEEventsBB.searchParams.useViewConfirmedAtDateRange}" 
+                                                                         value="#{cEEventsBB.searchParams.useDateOfRecord}" 
                                                                          disabled="#{!cEEventsBB.searchParams.filterByStartEndDate}"/>
 
                                                 <p:spacer height="1px"/>
@@ -637,7 +637,7 @@
                                                 <h:outputText value="edit" />
                                             </f:facet>
                                             <p:commandButton icon="fa fa-edit"
-                                                             action="#{caseProfileBB.editEvent(e)}" 
+                                                             action="#{eventManageBB.jumpToCasesToEditCEEvent(e)}" 
                                                              ajax="false"/>
 
                                         </p:column>
@@ -692,7 +692,7 @@
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed by"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                                            <h:outputText value="#{e.viewConfirmedBy.person.lastName}"/>
                                                         </div>
                                                     </h:panelGroup>
 

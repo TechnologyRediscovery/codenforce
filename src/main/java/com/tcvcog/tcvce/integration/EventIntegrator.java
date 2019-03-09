@@ -414,7 +414,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(9, event.isRequiresViewConfirmation());
             stmt.setBoolean(10, event.isHidden());
             stmt.setString(11, event.getNotes());
-            stmt.setInt(12, event.getAssignedTo().getUserID());
+            if(event.getAssignedTo() != null){
+                stmt.setInt(12, event.getAssignedTo().getUserID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
 
             System.out.println("EventIntegrator.insertEventCategory| sql: " + stmt.toString());
             stmt.execute();
