@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,7 +48,8 @@ public class CECase extends EntityUtils implements Serializable{
     
     private String caseName;
     private CasePhase casePhase;
-    private String caseStage;
+    private CaseStage caseStage;
+    
     
     private LocalDateTime originationDate;
     private String originiationDatePretty;
@@ -354,18 +356,70 @@ public class CECase extends EntityUtils implements Serializable{
     }
 
     /**
-     * @param caseStage the caseStage to set
+     * @return the caseStage
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
-    public void setCaseStage(String caseStage) {
-        this.caseStage = caseStage;
+    public CaseStage getCaseStage() throws CaseLifecyleException {
+        CaseStage stage;
+        
+         switch(casePhase){
+            
+            case PrelimInvestigationPending:
+                stage = CaseStage.Investigation;
+                break;
+            case NoticeDelivery:
+                stage = CaseStage.Investigation;
+                break;
+                // Letter marked with a send date
+            case InitialComplianceTimeframe:
+                stage = CaseStage.Enforcement;
+                break;
+                // compliance inspection
+            case SecondaryComplianceTimeframe:
+                stage = CaseStage.Enforcement;
+                break;
+                // Filing of citation
+            case AwaitingHearingDate:
+                stage = CaseStage.Citation;
+                break;
+                // hearing date scheduled
+            case HearingPreparation:
+                stage = CaseStage.Citation;
+                break;
+                // hearing not resulting in a case closing
+            case InitialPostHearingComplianceTimeframe:
+                stage = CaseStage.Citation;
+                break;
+            
+            case SecondaryPostHearingComplianceTimeframe:
+                stage = CaseStage.Citation;
+                break;
+                
+            case Closed:
+                stage = CaseStage.Closed;
+                // TODO deal with this later
+//                throw new CaseLifecyleException("Cannot advance a closed case to any other phase");
+                break;
+            case InactiveHolding:
+                stage = CaseStage.Closed;
+                throw new CaseLifecyleException("Cases in inactive holding must have "
+                        + "their case phase overriden manually to return to the case management flow");
+                
+            default:
+                throw new CaseLifecyleException("Unable to determine next case phase, sorry");
+        }
+        caseStage = stage;
+        return caseStage;
     }
 
     /**
-     * @return the caseStage
+     * @param caseStage the caseStage to set
      */
-    public String getCaseStage() {
-        return caseStage;
+    public void setCaseStage(CaseStage caseStage) {
+        this.caseStage = caseStage;
     }
+
+  
     
     
     

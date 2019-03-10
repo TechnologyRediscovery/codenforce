@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
@@ -62,6 +63,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private CasePhase nextPhase;
     private CasePhase[] casePhaseList;
     private CasePhase selectedCasePhase;
+    private CaseStage[] caseStageArray;
 
     private List<CECase> caseList;
     private ArrayList<CECase> filteredCaseList;
@@ -1031,5 +1033,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public CasePhase getSelectedCasePhase() {
         return selectedCasePhase;
+    }
+
+    /**
+     * @return the caseStageArray
+     */
+    public CaseStage[] getCaseStageArray() {
+        caseStageArray = CaseStage.values();
+        return caseStageArray;
+    }
+
+    /**
+     * @param caseStageArray the caseStageArray to set
+     */
+    public void setCaseStageArray(CaseStage[] caseStageArray) {
+        this.caseStageArray = caseStageArray;
     }
 }

@@ -2,7 +2,7 @@
 BEGIN;
 
 ALTER TABLE ceevent ADD COLUMN assignedto_login_userid INTEGER CONSTRAINT ceevent_assignedto_fk REFERENCES login (userid);
-ALTER TABLE ceevent RENAME COLUMN viewrequestedby_personid TO viewrequestedby_userid;
+-- ALTER TABLE ceevent RENAME COLUMN viewrequestedby_personid TO viewrequestedby_userid;
 
 ALTER TABLE login DROP COLUMN fname;
 ALTER TABLE login DROP COLUMN lname;

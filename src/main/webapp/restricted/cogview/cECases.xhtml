@@ -67,12 +67,10 @@
                                                                 ceev-search-relative-dates-cb" />
                                                     </p:selectBooleanCheckbox>
 
-                                                    <h4 style="margin-bottom: 2px;">date search options:</h4>
+                                                    <h4 style="margin-bottom: 2px;">case date search options:</h4>
                                                     
                                                     <p:selectOneRadio id="datetosearch-sor" layout="pageDirection" value="#{caseProfileBB.searchParams.dateToSearchCECases}">
-                                                        <f:selectItem itemLabel="Case opening date" itemValue="opening" />
-                                                        <f:selectItem itemLabel="Case creation timestamp" itemValue="timestamp" />
-                                                        <f:selectItem itemLabel="Case closing date" itemValue="closing" />
+                                                        <f:selectItems value="#{caseProfileBB.searchParams.dateSearchOptions}"/>
                                                     </p:selectOneRadio>
                                                 </h:panelGroup>
 
@@ -136,8 +134,15 @@
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                                 </h:panelGroup>
+                                                
+                                                 <h:panelGroup>
+                                                    <p:outputLabel id="ceev-filter-phase-ol" for="ceev-filter-phase" value="filter by case phase? "/>
+                                                    <p:selectBooleanCheckbox id="ceev-filter-phase" value="#{caseProfileBB.searchParams.useCasePhase}" >
+                                                        <p:ajax update="casePhaseSOM" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="seev-filter-type-ol" for="seev-filter-type" value="filter by case phase? "/>
+                                                    <p:outputLabel id="ceev-filter-phase-ol" for="casePhaseSOM" value="case phases? "/>
                                                     <p:selectOneMenu value="#{caseProfileBB.searchParams.casePhase}"
                                                         id="casePhaseSOM">
 
@@ -147,18 +152,23 @@
                                                                        itemLabel="#{cp.label}"/>
                                                     </p:selectOneMenu>
                                                 </h:panelGroup>
-
-
-                                                <h:panelGroup>
-                                                    
+                                                
+                                                 <h:panelGroup>
+                                                    <p:outputLabel id="ceev-filter-stage-ol" for="ceev-filter-stage" value="filter by case stage? "/>
+                                                    <p:selectBooleanCheckbox id="ceev-filter-stage" value="#{caseProfileBB.searchParams.useCaseStage}" >
+                                                        <p:ajax update="ceev-criteria-user" />
+                                                    </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
-
                                                 <h:panelGroup>
-                                                   
-                                                </h:panelGroup>
+                                                    <p:outputLabel id="ceev-filter-stage-ol" for="seev-filter-stage" value="case stages:"/>
+                                                    <p:selectOneMenu value="#{caseProfileBB.searchParams.caseStage}"
+                                                        id="casePhaseSOM">
 
-                                                <h:panelGroup>
-                                                   
+                                                        <f:selectItems value="#{caseProfileBB.caseStageList}"
+                                                                       var="cs"
+                                                                       itemValue="#{cs}"
+                                                                       itemLabel="#{cs.label}"/>
+                                                    </p:selectOneMenu>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
@@ -180,7 +190,7 @@
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-manager-ol" for="ceev-filter-creator" value="filter by case manager? "/>
+                                                    <p:outputLabel id="ceev-filter-manager-ol" for="ceev-filter-manager" value="filter by case manager? "/>
                                                     <p:selectBooleanCheckbox id="ceev-filter-manager" value="#{caseProfileBB.searchParams.filterByEventOwner}" >
                                                         <p:ajax update="ceev-criteria-user" />
                                                     </p:selectBooleanCheckbox>
@@ -202,7 +212,30 @@
                                                     </p:selectOneMenu>
                                                 </h:panelGroup>
 
-                                               
+                                                <h:panelGroup>
+                                                    <p:outputLabel id="ceev-filter-property-ol" for="ceev-filter-property" value="filter by property? "/>
+                                                    <p:selectBooleanCheckbox id="ceev-filter-property" value="#{caseProfileBB.searchParams.useProperty}" >
+                                                        <p:ajax update="ceev-criteria-property-som" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel for="ceev-criteria-property-som" id="ceev-criteria-property-ol">
+                                                        <h:outputText value="property list:"/>
+                                                    </h:outputLabel>
+                                                    <p:spacer height="5px"/>
+
+                                                    <p:selectOneMenu id="ceev-criteria-property-som" required="false" 
+                                                                     value="#{caseProfileBB.searchParams.property}"
+                                                                     disabled="#{!caseProfileBB.searchParams.useProperty}">
+                                                        
+                                                        <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
+                                                        <f:selectItems value="#{sessionBean.propertyQueue}"  var="p" itemValue="#{p}" 
+                                                                       itemLabel="#{p.address} (#{p.muni.managerName})"/>
+                                                        <f:converter converterId="propertyConverter"/>
+                                                        
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>
 
                                                 <h:panelGroup>
                                                     <p:outputLabel id="ceev-filter-open-ol" for="ceev-filter-open" value="filter by open case? "/>
@@ -220,11 +253,26 @@
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
+                                                    <p:outputLabel id="ceev-filter-propinfo-ol" for="ceev-filter-propinfo" value="filter by property info flag? "/>
+                                                    <p:selectBooleanCheckbox id="ceev-filter-propinfo" value="#{caseProfileBB.searchParams.usePropertyInfoCase}" >
+                                                        <p:ajax update="ceev-criteria-propinfo" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <p:selectBooleanCheckbox id="ceev-criteria-propinfo" 
+                                                                             value="#{caseProfileBB.searchParams.propertyInfoCase}" 
+                                                                             disabled="#{!caseProfileBB.searchParams.usePropertyInfoCase}" />
+                                                    <p:outputLabel id="ceev-criteria-propinfo-ol" for="ceev-criteria-propinfo" 
+                                                                   value="(checked = only cases that store property info)" styleClass="italic"/>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
                                                     <p:outputLabel id="ceev-query-limit-ol" for="ceev-query-limit" value="limit results to 100? "/>
                                                     <p:selectBooleanCheckbox id="ceev-query-limit" value="#{caseProfileBB.searchParams.limitResultCountTo100}" />
                                                 </h:panelGroup>
                                                 <h:panelGroup>
-
+                                                    
                                                 </h:panelGroup>
                                             </h:panelGrid>                                        
                                         </h:panelGroup>
