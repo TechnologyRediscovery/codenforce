@@ -369,19 +369,34 @@
                             
 
                             <p:commandButton    id="event-preset-allactivitybyoffandmuni" 
+                                                ajax="true"
                                                  value="all officer activity by muni (past week)" 
                                                  styleClass="noFill"
+                                                 actionListener="#{cEEventsBB.loadOfficerActivityPastWeek}"
                                                  disabled="false"
-                                                 icon="fa fa-home"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"/>
+                                                 icon="fa fa-wheelchair_alt"
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 update="
+                                                    ceev-form-search
+                                                    events-datascroller-form:events-datascroller
+                                                    events-datatable-form:events-datatable
+                                                    ceev-form-globalmessages:ceev-globalmessages
+                                                    "/>
 
                             <p:commandButton    id="event-preset-complianceevents" 
                                                 ajax="true"
-                                                 value="violation compliance events (past week)" 
+                                                 value="violation compliance events (past month)" 
+                                                 actionListener="#{cEEventsBB.loadComplianceEventsPastMonth}"
                                                  styleClass="noFill"
                                                  disabled="false"
-                                                 icon="fa fa-home"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"/>
+                                                 icon="fa fa-check-square"
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 update="
+                                                    ceev-form-search
+                                                    events-datascroller-form:events-datascroller
+                                                    events-datatable-form:events-datatable
+                                                    ceev-form-globalmessages:ceev-globalmessages
+                                                    "/>
 
                         </h:form>
 

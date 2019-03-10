@@ -67,7 +67,8 @@
 
                                                     <h4 style="margin-bottom: 2px;">case date search options:</h4>
                                                     
-                                                    <p:selectOneRadio id="datetosearch-sor" layout="pageDirection" value="#{caseProfileBB.searchParams.dateToSearchCECases}">
+                                                    <p:selectOneRadio id="datetosearch-sor" layout="pageDirection" value="#{caseProfileBB.searchParams.dateToSearchCECases}"
+                                                                      disabled="#{(!caseProfileBB.searchParams.filterByStartEndDate)}">
                                                         <f:selectItems value="#{caseProfileBB.searchParams.dateSearchOptions}"/>
                                                     </p:selectOneRadio>
                                                 </h:panelGroup>
@@ -176,6 +177,7 @@
                                                         <p:ajax update="cecases-criteria-caseid" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
+                                                
 
                                                 <h:panelGroup>
                                                     <p:outputLabel id="cecases-criteria-caseid-ol" for="cecases-criteria-caseid" value="ce case ID:"/>
@@ -189,7 +191,9 @@
 
                                                 <h:panelGroup>
                                                     <p:outputLabel id="cecases-filter-manager-ol" for="cecases-filter-manager" value="filter by case manager? "/>
-                                                    <p:selectBooleanCheckbox id="cecases-filter-manager" value="#{caseProfileBB.searchParams.useCaseManager}" >
+                                                    <p:selectBooleanCheckbox id="cecases-filter-manager" 
+                                                                             disabled="true"
+                                                                             value="#{caseProfileBB.searchParams.useCaseManager}" >
                                                         <p:ajax update="cecases-criteria-user" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
