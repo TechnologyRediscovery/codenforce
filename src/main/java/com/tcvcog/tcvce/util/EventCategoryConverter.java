@@ -33,21 +33,17 @@ public class EventCategoryConverter extends EntityConverter implements Converter
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        System.out.println("EventCategoryConverter.getAsObject | titleS: " + titleS);
         if(titleS.isEmpty()) {
             return null; 
         }
         
         EventCategory o = (EventCategory) this.getViewMap(fc).get(titleS);
         
-        System.out.println("EventCategoryConverter.getAsObject | Retrieved obj: " + o.getEventCategoryDesc());
-        
         return o;
     }
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        System.out.println("EventCategoryConverter.getAsString");
         
         if (o == null){
             return "";
@@ -57,9 +53,6 @@ public class EventCategoryConverter extends EntityConverter implements Converter
         String title = ec.getEventCategoryTitle();
         if (title != null){
             this.getViewMap(fc).put(title,o);
-            System.out.println("EventCategoryConverter.getAsString | putKey: " + title);
-            System.out.println("EventCategoryConverter.getAsString | putValue: " + o.toString());
-            
             return title;
             
         } else {

@@ -142,6 +142,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         CaseIntegrator caseInt = getCaseIntegrator();
         
         getSessionBean().setPersonQueue(persCoord.loadPersonHistoryList(u));
+        getSessionBean().setcECaseQueue(caseCoord.getOpenCECaseList(u.getMuni()));
         
         getSessionBean().setActiveProp(propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("arbitraryPlaceholderPropertyID"))));

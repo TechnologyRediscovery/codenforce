@@ -558,7 +558,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 Property p = (Property) ob;
                 // prepare SELECT statement
                 selectSB.append("AND property_propertyid = ? ");
-                stmt = con.prepareStatement(selectSB.toString());
+                stmt = con.prepareStatement(selectSB.toString(),
+                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 stmt.setInt(1, p.getPropertyID());
                 rs = stmt.executeQuery();
                 
@@ -581,7 +582,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 CECase c = (CECase) ob;
                 // prepare SELECT statement
                 selectSB.append("AND cecase_caseid = ? ");
-                stmt = con.prepareStatement(selectSB.toString());
+                stmt = con.prepareStatement(selectSB.toString(),
+                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 stmt.setInt(1, u.getUserID());
                 stmt.setInt(2, c.getCaseID());
                 rs = stmt.executeQuery();

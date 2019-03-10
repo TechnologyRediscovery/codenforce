@@ -402,11 +402,10 @@ public class CECase extends EntityUtils implements Serializable{
                 break;
             case InactiveHolding:
                 stage = CaseStage.Closed;
-                throw new CaseLifecyleException("Cases in inactive holding must have "
-                        + "their case phase overriden manually to return to the case management flow");
+                break;
                 
             default:
-                throw new CaseLifecyleException("Unable to determine next case phase, sorry");
+                stage = CaseStage.Closed;
         }
         caseStage = stage;
         return caseStage;

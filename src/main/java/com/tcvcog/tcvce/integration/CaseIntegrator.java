@@ -107,13 +107,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             if (params.isFilterByStartEndDate()){
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 switch (params.getDateToSearchCECases()) {
-                    case "opening":
+                    case "Opening date of record":
                         sb.append("originationdate ");
                         break;
-                    case "timestamp":
+                    case "Database record timestamp":
                         sb.append("creationtimestamp ");
                         break;
-                    case "closing": 
+                    case "Closing date": 
                         sb.append("closingdate ");
                         break;
                     default:
@@ -136,8 +136,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 List<CasePhase> phList = params.getCaseStageAsPhaseList();
                 if(phList != null){
                     int listLen = phList.size();
+                    sb.append("(");
                     for(CasePhase cp : phList){
-                        sb.append("casephase = (?::casephase ");
+                        sb.append("casephase = ?::casephase ");
                         if(listLen > 1){
                             sb.append("OR ");
                             listLen--;
@@ -179,7 +180,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } else {
             sb.append("caseid = ? "); // will be param 1 with ID search
         }
-        sb.append(";");
 
         int paramCounter = 0;
             
