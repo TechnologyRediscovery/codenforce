@@ -121,9 +121,9 @@
                                     </h:outputLabel>
                                  </h:panelGroup>
                                 <h:panelGroup>
-                                    <p:inputSwitch id="propRentalForm" value="#{propertyUpdateBB.currProp.rental}" onLabel="Yes" offLabel="No" tabindex="14" disabled="true">
+                                    <p:selectBooleanCheckbox id="propRentalForm" value="#{propertyUpdateBB.currProp.rental}" tabindex="14" disabled="false">
                                          <p:ajax />
-                                    </p:inputSwitch>
+                                    </p:selectBooleanCheckbox>
                                  </h:panelGroup>
                                              
                                  <h:panelGroup>
@@ -132,9 +132,9 @@
                                     </h:outputLabel>
                                  </h:panelGroup>
                                  <h:panelGroup>
-                                    <p:inputSwitch id="propMultiForm" value="#{propertyUpdateBB.currProp.multiUnit}" onLabel="Yes" offLabel="No" tabindex="14" disabled="true">
+                                    <p:selectBooleanCheckbox id="propMultiForm" value="#{propertyUpdateBB.currProp.multiUnit}" tabindex="14" disabled="false">
                                          <p:ajax />
-                                    </p:inputSwitch> 
+                                    </p:selectBooleanCheckbox> 
                                  </h:panelGroup>
                                  
                                  <h:panelGroup>
@@ -143,9 +143,9 @@
                                     </h:outputLabel>
                                  </h:panelGroup> 
                                  <h:panelGroup>
-                                    <p:inputSwitch id="propVacantForm" value="#{propertyUpdateBB.currProp.vacant}" onLabel="Yes" offLabel="No" tabindex="14" disabled="true">
+                                    <p:selectBooleanCheckbox id="propVacantForm" value="#{propertyUpdateBB.currProp.vacant}" tabindex="14" disabled="false">
                                         <p:ajax />
-                                    </p:inputSwitch>
+                                    </p:selectBooleanCheckbox>>
                                  </h:panelGroup>
                                  
                                  

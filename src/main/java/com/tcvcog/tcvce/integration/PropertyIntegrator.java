@@ -251,7 +251,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.execute();
             
             // grab the newly inserted propertyid
-            String idNumQuery = "SELECT currval('');";
+            String idNumQuery = "SELECT currval('propertyid_seq');";
             Statement s = con.createStatement();
             ResultSet rs;
             int lastID;
@@ -268,7 +268,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return propID;
+        
     }
   
     public String updateProperty(Property propToUpdate) throws IntegrationException{
