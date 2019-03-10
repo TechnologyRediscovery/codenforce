@@ -131,8 +131,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
                 stmt.setTimestamp(7, java.sql.Timestamp.valueOf(notice.getLetterReturnedDate()));   
             }
 
-            System.out.println("CodeViolationIntegrator.insertViolationletter | sql: " + stmt.toString());
-            
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -175,7 +173,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             
             stmt.setInt(7, notice.getNoticeID());
 
-            System.out.println("CodeViolationIntegrator.updateNoticeOfViolation| sql: " + stmt.toString());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -223,7 +220,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, violationID);
-            System.out.println("Code.getEventCategory| sql: " + stmt.toString());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -417,7 +413,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         CodeViolation v = new CodeViolation();
         CodeIntegrator ci = getCodeIntegrator();
         CitationIntegrator citInt = getCitationIntegrator();
-        System.out.println("CodeViolationIntegreator.generateCodeViolationFromRS | Current RS entry: " + rs.getString("description"));
 
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
@@ -459,7 +454,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, violationID);
-            System.out.println("Code.getEventCategory| sql: " + stmt.toString());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -497,7 +491,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, c.getCaseID());
-            System.out.println("CodeViolationCoordinator.getCodeViolations | stmt: " + stmt.toString());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -575,7 +568,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blockID);
-            System.out.println("CodeViolationIntegrator.getTextBlock| sql: " + stmt.toString());
             
             rs = stmt.executeQuery(); 
             
@@ -611,7 +603,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, m.getMuniCode());
-            System.out.println("CodeViolationIntegrator.getTextBlocksByMuni| sql: " + stmt.toString());
             
             rs = stmt.executeQuery(); 
             
@@ -646,7 +637,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            System.out.println("CodeViolationIntegrator.getTextBlocksByMuni| sql: " + stmt.toString());
             
             rs = stmt.executeQuery(); 
             
@@ -683,7 +673,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString(3, tb.getTextBlockName());
             stmt.setString(4, tb.getTextBlockText());
             
-            System.out.println("CodeViolationIntegrator.insertTextBlock| sql: " + stmt.toString());
             
             stmt.execute(); 
             
@@ -717,8 +706,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString(4, tb.getTextBlockText());
             stmt.setInt(5, tb.getBlockID());  
             
-            System.out.println("CodeViolationIntegrator.update text block| sql: " + stmt.toString());
-            
             stmt.execute(); 
             
         } catch (SQLException ex) {
@@ -743,8 +730,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, tb.getBlockID());
-            
-            System.out.println("CodeViolationIntegrator.deleteTextBlock| sql: " + stmt.toString());
             
             stmt.execute(); 
             

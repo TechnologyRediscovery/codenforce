@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
@@ -62,6 +63,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private CasePhase nextPhase;
     private CasePhase[] casePhaseList;
     private CasePhase selectedCasePhase;
+    private CaseStage[] caseStageArray;
 
     private List<CECase> caseList;
     private ArrayList<CECase> filteredCaseList;
@@ -113,13 +115,36 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         CaseCoordinator cc = getCaseCoordinator();
         searchParams = cc.getDefaultSearchParamsCECase(getSessionBean().getActiveMuni());
-        List<CECase> retrievedCaseLIst = getSessionBean().getcECaseQueue();
-        if(retrievedCaseLIst != null){
-            currentCase = retrievedCaseLIst.get(0);
-            caseList = retrievedCaseLIst;
+        List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
+        if(retrievedCaseList != null){
+            currentCase = retrievedCaseList.get(0);
+            caseList = retrievedCaseList;
         }
     }
 
+    
+    public void executeQuery(ActionEvent ev){
+        System.out.println("CaseProfileBB.executeQuery");
+        CaseCoordinator cc = getCaseCoordinator();
+        int listSize = 0;
+        try {
+            caseList = cc.queryCECases(searchParams);
+            if(caseList != null){
+                listSize = caseList.size();
+            }
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Your query completed with " + listSize + " results", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not query the database, sorry.", ""));
+        }
+        
+    }
+    
+    
 /**
  * Primary injection point for setting the case which will be displayed in the right
  * column (the manage object column) on cECases.xhtml
@@ -921,6 +946,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
+     *
      * @return the imageFilenameMap
      */
     public HashMap<CasePhase, String> getImageFilenameMap() {
@@ -1031,5 +1057,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public CasePhase getSelectedCasePhase() {
         return selectedCasePhase;
+    }
+
+    /**
+     * @return the caseStageArray
+     */
+    public CaseStage[] getCaseStageArray() {
+        caseStageArray = CaseStage.values();
+        return caseStageArray;
+    }
+
+    /**
+     * @param caseStageArray the caseStageArray to set
+     */
+    public void setCaseStageArray(CaseStage[] caseStageArray) {
+        this.caseStageArray = caseStageArray;
     }
 }

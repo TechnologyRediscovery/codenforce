@@ -765,7 +765,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
 
   
-    public List<EventWithCasePropInfo> getEvents(SearchParamsCEEvents params) throws IntegrationException {
+    public List<EventWithCasePropInfo> queryEvents(SearchParamsCEEvents params) throws IntegrationException {
         List<EventWithCasePropInfo> eventList = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -808,7 +808,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 sb.append("categorytype = CAST (? AS ceeventtype) ");
             }
 
-            if (params.isFilterByEventCategory()) {
+            if (params.isFilterByEventCategory() && params.getEventCategory() != null) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 sb.append("ceeventcategory_catid = ? ");
             }
@@ -819,11 +819,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 sb.append("cecase_caseid = ? ");
             }
 
-            if (params.isFilterByEventOwner()) {
-                if(params.getOwnerUser() != null){
-                        if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                        sb.append("ceevent.login_userid = ? ");
-                    }
+            if (params.isFilterByEventOwner() && params.getOwnerUser() != null) {
+                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                    sb.append("ceevent.login_userid = ? ");
             }
             
             if (params.isFilterByPerson()) {
@@ -890,7 +888,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setString(++paramCounter, params.getEvtType().name());
                 }
 
-                if (params.isFilterByEventCategory()) {
+                if (params.isFilterByEventCategory() && params.getEventCategory() != null) {
                     stmt.setInt(++paramCounter, params.getEventCategory().getCategoryID());
                 }
 
@@ -898,10 +896,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setInt(++paramCounter, params.getCaseId());
                 }
 
-                if (params.isFilterByEventOwner()) {
-                    if(params.getOwnerUser() != null){
+                if (params.isFilterByEventOwner() && params.getOwnerUser() != null) {
                         stmt.setInt(++paramCounter, params.getOwnerUser().getUserID());
-                    }
                 }
 
                 if (params.isFilterByPerson()) {

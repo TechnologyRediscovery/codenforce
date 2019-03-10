@@ -6,10 +6,13 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -17,22 +20,20 @@ import java.time.LocalDateTime;
  */
 public class SearchParamsCECases extends SearchParams implements Serializable{
     
-    enum DateSearchType{
-        Opening,
-        TimeStamp,
-        Closing;
-    }
+    
     
     private boolean useIsOpen;
     private boolean isOpen;
    
+    private List<String> dateSearchOptions;
     private String dateToSearchCECases;
 
     private boolean useCasePhase;
     private CasePhase casePhase;
     
     private boolean useCaseStage;
-    private String caseStage;
+    private CaseStage caseStage;
+    private List<CasePhase> caseStageAsPhaseList; 
     
     private boolean useProperty;
     private Property property;
@@ -42,10 +43,6 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
     
     private boolean useCaseManager;
     private User caseManagerUser;
-    
-    private boolean useLegacy;
-    private boolean legacyCase;
-    
     
    public SearchParamsCECases(){
        
@@ -64,10 +61,6 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
     public boolean isIsOpen() {
         return isOpen;
     }
-
-   
-
-   
 
     /**
      * @return the useCaseManager
@@ -107,33 +100,7 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
     }
 
     
-    /**
-     * @return the useLegacy
-     */
-    public boolean isUseLegacy() {
-        return useLegacy;
-    }
-
-    /**
-     * @return the legacyCase
-     */
-    public boolean isLegacyCase() {
-        return legacyCase;
-    }
-
-    /**
-     * @param useLegacy the useLegacy to set
-     */
-    public void setUseLegacy(boolean useLegacy) {
-        this.useLegacy = useLegacy;
-    }
-
-    /**
-     * @param legacyCase the legacyCase to set
-     */
-    public void setLegacyCase(boolean legacyCase) {
-        this.legacyCase = legacyCase;
-    }
+   
 
     /**
      * @return the useCasePhase
@@ -154,13 +121,6 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
      */
     public boolean isUseCaseStage() {
         return useCaseStage;
-    }
-
-    /**
-     * @return the caseStage
-     */
-    public String getCaseStage() {
-        return caseStage;
     }
 
     /**
@@ -220,13 +180,6 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
     }
 
     /**
-     * @param caseStage the caseStage to set
-     */
-    public void setCaseStage(String caseStage) {
-        this.caseStage = caseStage;
-    }
-
-    /**
      * @param useProperty the useProperty to set
      */
     public void setUseProperty(boolean useProperty) {
@@ -273,6 +226,81 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
      */
     public void setDateToSearchCECases(String dateToSearchCECases) {
         this.dateToSearchCECases = dateToSearchCECases;
+    }
+
+    /**
+     * @return the caseStageAsPhaseList
+     */
+    public List<CasePhase> getCaseStageAsPhaseList() {
+        List<CasePhase> phaseList = new ArrayList<>();
+        if(caseStage != null){
+            switch(caseStage){
+                case Investigation:
+                    phaseList.add(CasePhase.PrelimInvestigationPending);
+                    phaseList.add(CasePhase.NoticeDelivery);
+                    break;
+                
+                case Enforcement:
+                    phaseList.add(CasePhase.InitialComplianceTimeframe);
+                    phaseList.add(CasePhase.SecondaryPostHearingComplianceTimeframe);
+                    break;
+                    
+                case Citation:
+                    phaseList.add(CasePhase.AwaitingHearingDate);
+                    phaseList.add(CasePhase.HearingPreparation);
+                    phaseList.add(CasePhase.InitialPostHearingComplianceTimeframe);
+                    phaseList.add(CasePhase.SecondaryPostHearingComplianceTimeframe);
+                    break;
+                
+                case Closed:
+                    phaseList.add(CasePhase.Closed);
+                    phaseList.add(CasePhase.InactiveHolding);
+                    break;
+            }
+        }
+        
+        caseStageAsPhaseList = phaseList;
+        return caseStageAsPhaseList;
+    }
+
+    /**
+     * @param caseStageAsPhaseList the caseStageAsPhaseList to set
+     */
+    public void setCaseStageAsPhaseList(List<CasePhase> caseStageAsPhaseList) {
+        this.caseStageAsPhaseList = caseStageAsPhaseList;
+    }
+
+    /**
+     * @return the caseStage
+     */
+    public CaseStage getCaseStage() {
+        return caseStage;
+    }
+
+    /**
+     * @param caseStage the caseStage to set
+     */
+    public void setCaseStage(CaseStage caseStage) {
+        this.caseStage = caseStage;
+    }
+
+    /**
+     * @return the dateSearchOptions
+     */
+    public List<String> getDateSearchOptions() {
+        List<String> dateOptList = new ArrayList<>();
+        dateOptList.add("Opening date of record");
+        dateOptList.add("Database record timestamp");
+        dateOptList.add("Closing date");
+        dateSearchOptions = dateOptList;
+        return dateSearchOptions;
+    }
+
+    /**
+     * @param dateSearchOptions the dateSearchOptions to set
+     */
+    public void setDateSearchOptions(List<String> dateSearchOptions) {
+        this.dateSearchOptions = dateSearchOptions;
     }
    
    
