@@ -47,6 +47,7 @@ public class CECase extends EntityUtils implements Serializable{
     
     private String caseName;
     private CasePhase casePhase;
+    private String caseStage;
     
     private LocalDateTime originationDate;
     private String originiationDatePretty;
@@ -63,11 +64,7 @@ public class CECase extends EntityUtils implements Serializable{
     public String toString(){
         return caseName;
     }
-    
-    public String getCaseStage(){
-        
-        return "A";
-    }
+  
     
     public int getCaseAge(){
         return getTimePeriodAsDays(originationDate, LocalDateTime.now());
@@ -354,6 +351,20 @@ public class CECase extends EntityUtils implements Serializable{
      */
     public void setRequestList(List<CEActionRequest> requestList) {
         this.requestList = requestList;
+    }
+
+    /**
+     * @param caseStage the caseStage to set
+     */
+    public void setCaseStage(String caseStage) {
+        this.caseStage = caseStage;
+    }
+
+    /**
+     * @return the caseStage
+     */
+    public String getCaseStage() {
+        return caseStage;
     }
     
     

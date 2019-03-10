@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -122,9 +123,9 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(previousNotes);
         sb.append("<br/>**************************************<br/>");
         sb.append("NOTE CREATED BY: ");
-        sb.append(getSessionBean().getFacesUser().getFName());
+        sb.append(getSessionBean().getFacesUser().getPerson().getFirstName());
         sb.append(" ");
-        sb.append(getSessionBean().getFacesUser().getLName());
+        sb.append(getSessionBean().getFacesUser().getPerson().getLastName());
         sb.append(" (User ID ");
         sb.append(String.valueOf(getSessionBean().getFacesUser().getUserID()));
         sb.append(") on ");
@@ -134,6 +135,12 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("<br/>");
         sb.append("**************************************<br/>");
         return sb.toString();
+        
+    }
+    
+    public List<Person> loadPersonHistoryList(User u) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return pi.getPersonHistory(u);
         
     }
 

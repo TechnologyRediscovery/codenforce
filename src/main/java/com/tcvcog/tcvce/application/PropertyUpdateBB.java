@@ -107,7 +107,7 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
-        this.setCurrProp(getSessionBean().getActivePropWithList());
+        this.setCurrProp(getSessionBean().getActivePropWithLists());
     }
 
     /**

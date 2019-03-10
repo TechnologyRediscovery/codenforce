@@ -369,7 +369,7 @@ public class CEActionRequest implements Serializable{
     /**
      * @param caseID the caseID to set
      */
-    public void setCaseID(int caseID) {
+    public void event(int caseID) {
         this.caseID = caseID;
     }
 
@@ -414,6 +414,10 @@ public class CEActionRequest implements Serializable{
      */
     public void setRequestStatus(CEActionRequestStatus requestStatus) {
         this.requestStatus = requestStatus;
+    }
+    
+    public void setCaseID(int i){
+        this.caseID = i;
     }
 
     /**
@@ -590,7 +594,6 @@ public class CEActionRequest implements Serializable{
      * @return the photoList
      */
     public List<Integer> getPhotoList() {
-        System.out.println("CEActionRequest | photoList = " + photoList.size());
         return photoList;
     }
 

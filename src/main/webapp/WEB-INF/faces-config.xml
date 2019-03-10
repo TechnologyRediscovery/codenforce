@@ -152,10 +152,9 @@
     
     
     <managed-bean>
-        <managed-bean-name>loggingCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.LogCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>sessionSystemCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.SessionSystemCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <description>Interfaces between code violation related objects and integration layer objects</description>
@@ -412,16 +411,11 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>eventAddBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventAddBB</managed-bean-class>
+        <managed-bean-name>eventManageBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventManageBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>eventEditBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventEditBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+   
 
     <managed-bean>
         <managed-bean-name>personConnectBB</managed-bean-name>
@@ -461,6 +455,19 @@
     <managed-bean>
         <managed-bean-name>userAuthMuniManageBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.UserAuthMuniManageBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>inspectionsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.InspectionsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+ 
+    
+    <managed-bean>
+        <managed-bean-name>occupancyInspectionFeeBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccupancyInspectionFeeBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
  
@@ -897,6 +904,12 @@
         </navigation-case>
 
         <navigation-case>
+            <from-outcome>ceEvents</from-outcome>
+            <to-view-id>/restricted/cogview/ceEvents.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+
+        <navigation-case>
             <from-outcome>ceCaseHistory</from-outcome>
             <to-view-id>/restricted/cogview/ceCaseHistory.xhtml</to-view-id>
             <redirect />
@@ -1159,7 +1172,7 @@
         
         <navigation-case>
             <from-outcome>occInspections</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/occupancyInspections.xhtml</to-view-id>
+            <to-view-id>/restricted/cogview/inspections.xhtml</to-view-id>
         </navigation-case>
         
         <navigation-case>
@@ -1447,5 +1460,9 @@
         <managed-bean-class>com.tcvcog.tcvce.application.PhotoBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
+    <managed-bean>
+        <managed-bean-name>cEEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

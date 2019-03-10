@@ -201,7 +201,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Date" />
                                             </f:facet>
-                                            <h:outputText value="#{e.prettyDateOfRecord}"/>
+                                            <h:outputText value="#{e.dateOfRecordPretty}"/>
                                         </p:column>
 
 
@@ -213,11 +213,11 @@
                                         </p:column>
                                         
                                         <p:column width="5%"
-                                                  sortBy="#{e.eventOwnerUser.LName}">
+                                                  sortBy="#{e.creator.LName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator name" />
                                             </f:facet>
-                                            <h:outputText value="#{e.eventOwnerUser.LName}"/>
+                                            <h:outputText value="#{e.eventOwcreator"/>
                                         </p:column>
                                         
                                         <p:column width="20%" style="word-wrap: normal;">
