@@ -107,11 +107,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public SearchParamsCEEvents getDefaultSearchParamsCEEventsRequiringView(User user){
-        SearchCoordinator sc = new SearchCoordinator();
-        return sc.getSearchParamsEventsRequiringView(user);
-        
-    }
     
      /**
      * Returns a SearchParams subclass for retrieving all open

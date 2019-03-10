@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
@@ -48,24 +49,17 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      
     @PostConstruct
     public void initBean(){
-        CaseCoordinator cc = getCaseCoordinator();
-        searchParams = cc.getDefaultSearchParamsCEEventsRequiringView(
-                getSessionBean().getFacesUser());
-        searchParams.setMuni(getSessionBean().getActiveMuni());
+        EventCoordinator ec = getEventCoordinator();
+        searchParams = ec.getDefaultSearchParamsCEEventsRequiringView(
+                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
     }
     
     public void executeQuery(){
         System.out.println("CEEventsBB.executeQuery");
         EventCoordinator ec = getEventCoordinator();
-        int listSize = 0;
         try {
             eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
-            if(eventList != null){
-                listSize = eventList.size();
-            }
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Your query completed with " + listSize + " results", ""));
+            generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -73,12 +67,56 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
                             "Could not query the database, sorry.", ""));
         }
     }
+    
+    private void generateQueryResultMessage(){
+        int listSize = 0;
+        if(eventList != null){
+            listSize = eventList.size();
+        }
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Your query completed with " + listSize + " results", ""));
+        
+        
+    }
 
     /**
      * @return the searchParams
      */
     public SearchParamsCEEvents getSearchParams() {
         return searchParams;
+    }
+    
+    public void loadOfficerActivityPastWeek(ActionEvent ev){
+        System.out.println("CEEventsBB.loadOfficerActivity");
+        EventCoordinator ec = getEventCoordinator();
+        searchParams = ec.getSearchParamsOfficerActibityPastWeek(getSessionBean().getFacesUser(),
+                getSessionBean().getActiveMuni());
+        try {
+            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            generateQueryResultMessage();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not query the database, sorry.", ""));
+        }
+    }
+    
+    public void loadComplianceEventsPastMonth(ActionEvent ev){
+        System.out.println("CEEventsBB.loadComplianceEvents");
+        EventCoordinator ec = getEventCoordinator();
+        searchParams = ec.getSearchParamsComplianceEvPastMonth(getSessionBean().getActiveMuni());
+        try {
+            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            generateQueryResultMessage();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not query the database, sorry.", ""));
+        }
+        
     }
 
     /**
