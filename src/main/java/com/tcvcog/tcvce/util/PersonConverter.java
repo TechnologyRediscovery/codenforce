@@ -34,15 +34,10 @@ public class PersonConverter extends EntityConverter implements Converter{
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String pName) {
-        System.out.println("PersonConverter.getAsObject | name: " + pName);
         if(pName.isEmpty()) {
             return null; 
         }
-        
         Person p = (Person) this.getViewMap(fc).get(pName);
-        
-        System.out.println("PersonConverter.getAsObject | Retrieved obj: " + p.getFirstName());
-        
         return p;
     }
 
@@ -52,14 +47,10 @@ public class PersonConverter extends EntityConverter implements Converter{
         if (o == null){
             return "";
         }
-        
-        System.out.println("PersonConverter.getAsString | incoming Object: " + o.toString() );
         Person p = (Person) o;
         String fullName = p.getFirstName() + " " +  p.getLastName();
         if (fullName != null){
             this.getViewMap(fc).put(fullName,o);
-            
-            System.out.println("PersonConverter.getAsString | fullName " + fullName );
             return fullName;
             
         } else {

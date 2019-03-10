@@ -92,36 +92,146 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         ResultSet rs = null;
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
+        boolean notFirstCriteria = false;
         
-        sb.append("SELECT caseid FROM public.cecase, public.property ");
+        sb.append("SELECT caseid ");
+        sb.append("FROM public.cecase INNER JOIN public.property ON (property_propertyid = propertyid) ");
         sb.append("WHERE ");
-        sb.append("cecase.property_propertyid = property.propertyid ");
-        sb.append("AND property.municipality_municode = ? ");
         
-        if(params.isUseIsOpen()){
-            if(params.isIsOpen()){
-                sb.append("AND cecase.closingdate IS NULL ");
-            } else {
-                sb.append("AND cecase.closingdate IS NOT NULL ");
+         if (!params.isFilterByObjectID()) {
+            if (params.isFilterByMuni()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                sb.append("municipality_municode = ? "); // param 1
             }
+
+            if (params.isFilterByStartEndDate()){
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                switch (params.getDateToSearchCECases()) {
+                    case "Opening date of record":
+                        sb.append("originationdate ");
+                        break;
+                    case "Database record timestamp":
+                        sb.append("creationtimestamp ");
+                        break;
+                    case "Closing date": 
+                        sb.append("closingdate ");
+                        break;
+                    default:
+                        sb.append("originationdate ");
+                        break;
+                }
+                sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
+            }
+
+
+            if (params.isUseCasePhase()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                if(params.getCasePhase() != null){
+                    sb.append("casephase = ?::casephase ");
+                }
+            }
+
+            if (params.isUseCaseStage() && !params.isUseCasePhase()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                List<CasePhase> phList = params.getCaseStageAsPhaseList();
+                if(phList != null){
+                    int listLen = phList.size();
+                    sb.append("(");
+                    for(CasePhase cp : phList){
+                        sb.append("casephase = ?::casephase ");
+                        if(listLen > 1){
+                            sb.append("OR ");
+                            listLen--;
+                        } else {
+                            sb.append(") ");
+                        }
+                    }
+                }
+            }
+
+            if (params.isUseProperty()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                sb.append("property_propertyid = ? ");
+            }
+            if (params.isUseCaseManager()) {
+                if(params.getCaseManagerUser() != null){
+                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                    sb.append("login_userid = ? ");
+                }
+            }
+
+            if (params.isUsePropertyInfoCase()) {
+                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
+                if (params.isPropertyInfoCase()) {
+                    sb.append("propertyinfocase = TRUE ");
+                } else {
+                    sb.append("propertyinfocase = FALSE ");
+                }
+            }
+            if (params.isUseIsOpen()) {
+                if(notFirstCriteria){sb.append("AND ");}
+                if (params.isIsOpen()) {
+                    sb.append("closingdate IS NULL ");
+                } else {
+                    sb.append("closingdate IS NOT NULL ");
+                }
+            }
+            
+        } else {
+            sb.append("caseid = ? "); // will be param 1 with ID search
         }
-        
-        sb.append(";");
-        
+
+        int paramCounter = 0;
+            
         try {
-            
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, params.getMuni().getMuniCode());
+
+            if (!params.isFilterByObjectID()) {
+                if (params.isFilterByMuni()) {
+                    stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
+                }
+                if (params.isFilterByStartEndDate()) {
+                    stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
+                    stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
+                }
+                if (params.isUseCasePhase()) {
+                    stmt.setString(++paramCounter, params.getCasePhase().name());
+                }
+
+                if (params.isUseCaseStage() && !params.isUseCasePhase()) {
+                    List<CasePhase> phList = params.getCaseStageAsPhaseList();
+                    if(phList != null){
+                        for(CasePhase cp : phList){
+                            stmt.setString(++paramCounter, cp.name());
+                        }
+                    }
+                }
+
+                if (params.isUseProperty()) {
+                    if(params.getProperty() != null){
+                        stmt.setInt(++paramCounter, params.getProperty().getPropertyID());
+                    }
+                }
+
+                if (params.isUseCaseManager()) {
+                    if(params.getCaseManagerUser() != null){
+                        stmt.setInt(++paramCounter, params.getCaseManagerUser().getUserID());
+                    }
+                }
+            } else {
+                stmt.setInt(++paramCounter, params.getObjectID());
+            }
+
             rs = stmt.executeQuery();
-            
+
             int counter = 0;
             int maxResults;
-            if(params.isLimitResultCountTo100()){
+            if (params.isLimitResultCountTo100()) {
                 maxResults = 100;
             } else {
                 maxResults = Integer.MAX_VALUE;
             }
-            while(rs.next() && counter < maxResults){
+            while (rs.next() && counter < maxResults) {
                 caseList.add(getCECase(rs.getInt("caseid")));
                 counter++;
             }
