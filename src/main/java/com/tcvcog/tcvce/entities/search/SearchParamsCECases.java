@@ -5,13 +5,11 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
 
 /**
  *
@@ -19,18 +17,34 @@ import java.util.List;
  */
 public class SearchParamsCECases extends SearchParams implements Serializable{
     
+    enum DateSearchType{
+        Opening,
+        TimeStamp,
+        Closing;
+    }
+    
     private boolean useIsOpen;
     private boolean isOpen;
-       
-    private boolean useCaseCloseDateRange;
-    private LocalDateTime caseCloseStartDate;
-    private LocalDateTime caseCloseEndDate;
+   
+    private String dateToSearchCECases;
+
+    private boolean useCasePhase;
+    private CasePhase casePhase;
     
-    private boolean useCaseManagerID;
-    private int caseManagerID;
+    private boolean useCaseStage;
+    private String caseStage;
+    
+    private boolean useProperty;
+    private Property property;
+    
+    private boolean usePropertyInfoCase;
+    private boolean propertyInfoCase;
+    
+    private boolean useCaseManager;
+    private User caseManagerUser;
     
     private boolean useLegacy;
-     private boolean legacyCase;
+    private boolean legacyCase;
     
     
    public SearchParamsCECases(){
@@ -51,41 +65,22 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
         return isOpen;
     }
 
-    /**
-     * @return the useCaseCloseDateRange
-     */
-    public boolean isUseCaseCloseDateRange() {
-        return useCaseCloseDateRange;
-    }
-
-    /**
-     * @return the caseCloseStartDate
-     */
-    public LocalDateTime getCaseCloseStartDate() {
-        return caseCloseStartDate;
-    }
-
-    /**
-     * @return the caseCloseEndDate
-     */
-    public LocalDateTime getCaseCloseEndDate() {
-        return caseCloseEndDate;
-    }
+   
 
    
 
     /**
-     * @return the useCaseManagerID
+     * @return the useCaseManager
      */
-    public boolean isUseCaseManagerID() {
-        return useCaseManagerID;
+    public boolean isUseCaseManager() {
+        return useCaseManager;
     }
 
     /**
      * @return the caseManagerID
      */
-    public int getCaseManagerID() {
-        return caseManagerID;
+    public User getCaseManagerID() {
+        return getCaseManagerUser();
     }
 
     /**
@@ -102,42 +97,16 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
         this.isOpen = isOpen;
     }
 
-    /**
-     * @param useCaseCloseDateRange the useCaseCloseDateRange to set
-     */
-    public void setUseCaseCloseDateRange(boolean useCaseCloseDateRange) {
-        this.useCaseCloseDateRange = useCaseCloseDateRange;
-    }
-
-    /**
-     * @param caseCloseStartDate the caseCloseStartDate to set
-     */
-    public void setCaseCloseStartDate(LocalDateTime caseCloseStartDate) {
-        this.caseCloseStartDate = caseCloseStartDate;
-    }
-
-    /**
-     * @param caseCloseEndDate the caseCloseEndDate to set
-     */
-    public void setCaseCloseEndDate(LocalDateTime caseCloseEndDate) {
-        this.caseCloseEndDate = caseCloseEndDate;
-    }
-
+   
    
     /**
-     * @param useCaseManagerID the useCaseManagerID to set
+     * @param useCaseManager the useCaseManager to set
      */
-    public void setUseCaseManagerID(boolean useCaseManagerID) {
-        this.useCaseManagerID = useCaseManagerID;
+    public void setUseCaseManager(boolean useCaseManager) {
+        this.useCaseManager = useCaseManager;
     }
 
-    /**
-     * @param caseManagerID the caseManagerID to set
-     */
-    public void setCaseManagerID(int caseManagerID) {
-        this.caseManagerID = caseManagerID;
-    }
-
+    
     /**
      * @return the useLegacy
      */
@@ -164,6 +133,146 @@ public class SearchParamsCECases extends SearchParams implements Serializable{
      */
     public void setLegacyCase(boolean legacyCase) {
         this.legacyCase = legacyCase;
+    }
+
+    /**
+     * @return the useCasePhase
+     */
+    public boolean isUseCasePhase() {
+        return useCasePhase;
+    }
+
+    /**
+     * @return the casePhase
+     */
+    public CasePhase getCasePhase() {
+        return casePhase;
+    }
+
+    /**
+     * @return the useCaseStage
+     */
+    public boolean isUseCaseStage() {
+        return useCaseStage;
+    }
+
+    /**
+     * @return the caseStage
+     */
+    public String getCaseStage() {
+        return caseStage;
+    }
+
+    /**
+     * @return the useProperty
+     */
+    public boolean isUseProperty() {
+        return useProperty;
+    }
+
+    /**
+     * @return the property
+     */
+    public Property getProperty() {
+        return property;
+    }
+
+    /**
+     * @return the usePropertyInfoCase
+     */
+    public boolean isUsePropertyInfoCase() {
+        return usePropertyInfoCase;
+    }
+
+    /**
+     * @return the propertyInfoCase
+     */
+    public boolean isPropertyInfoCase() {
+        return propertyInfoCase;
+    }
+
+    /**
+     * @return the caseManagerUser
+     */
+    public User getCaseManagerUser() {
+        return caseManagerUser;
+    }
+
+    /**
+     * @param useCasePhase the useCasePhase to set
+     */
+    public void setUseCasePhase(boolean useCasePhase) {
+        this.useCasePhase = useCasePhase;
+    }
+
+    /**
+     * @param casePhase the casePhase to set
+     */
+    public void setCasePhase(CasePhase casePhase) {
+        this.casePhase = casePhase;
+    }
+
+    /**
+     * @param useCaseStage the useCaseStage to set
+     */
+    public void setUseCaseStage(boolean useCaseStage) {
+        this.useCaseStage = useCaseStage;
+    }
+
+    /**
+     * @param caseStage the caseStage to set
+     */
+    public void setCaseStage(String caseStage) {
+        this.caseStage = caseStage;
+    }
+
+    /**
+     * @param useProperty the useProperty to set
+     */
+    public void setUseProperty(boolean useProperty) {
+        this.useProperty = useProperty;
+    }
+
+    /**
+     * @param property the property to set
+     */
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    /**
+     * @param usePropertyInfoCase the usePropertyInfoCase to set
+     */
+    public void setUsePropertyInfoCase(boolean usePropertyInfoCase) {
+        this.usePropertyInfoCase = usePropertyInfoCase;
+    }
+
+    /**
+     * @param propertyInfoCase the propertyInfoCase to set
+     */
+    public void setPropertyInfoCase(boolean propertyInfoCase) {
+        this.propertyInfoCase = propertyInfoCase;
+    }
+
+    /**
+     * @param caseManagerUser the caseManagerUser to set
+     */
+    public void setCaseManagerUser(User caseManagerUser) {
+        this.caseManagerUser = caseManagerUser;
+    }
+
+    /**
+     * @return the dateToSearchCECases
+     */
+    public String getDateToSearchCECases() {
+        return dateToSearchCECases;
+    }
+
+    /**
+     * @param dateToSearchCECases the dateToSearchCECases to set
+     */
+    public void setDateToSearchCECases(String dateToSearchCECases) {
+        this.dateToSearchCECases = dateToSearchCECases;
     }
    
    

@@ -5,14 +5,11 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
 
 /**
  *
@@ -21,15 +18,20 @@ import java.util.List;
 public class SearchParamsCEEvents extends SearchParams implements Serializable{
     
     private boolean filterByEventCategory;
-    private boolean filterByEventType;
     private EventCategory eventCategory;
+    
+    private boolean filterByEventType;
+    private EventType evtType;
     
     private boolean filterByCaseID;
     private int caseId;
     
     private boolean filterByEventOwner;
-    private int ownerUserID;   
+    private User ownerUser;
   
+    private boolean filterByPerson;
+    private Person person;
+    
     private boolean filterByActive;
     private boolean isActive;
     
@@ -42,10 +44,8 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     private boolean filterByViewed;
     private boolean isViewed;
     
-    private boolean filterByViewConfirmedBy;
-    private int confirmerUserID;
     
-    private boolean filterByViewConfirmedAtDateRange;
+    private boolean useViewConfirmedAtDateRange;
     
    public SearchParamsCEEvents(){
        
@@ -89,8 +89,8 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     /**
      * @return the ownerUserID
      */
-    public int getOwnerUserID() {
-        return ownerUserID;
+    public User getOwnerUser() {
+        return ownerUser;
     }
 
     /**
@@ -136,24 +136,18 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @return the filterByViewConfirmedBy
+     * @return the filterByPerson
      */
-    public boolean isFilterByViewConfirmedBy() {
-        return filterByViewConfirmedBy;
+    public boolean isFilterByPerson() {
+        return filterByPerson;
     }
 
+    
     /**
-     * @return the confirmerUserID
+     * @return the useViewConfirmedAtDateRange
      */
-    public int getConfirmerUserID() {
-        return confirmerUserID;
-    }
-
-    /**
-     * @return the filterByViewConfirmedAtDateRange
-     */
-    public boolean isFilterByViewConfirmedAtDateRange() {
-        return filterByViewConfirmedAtDateRange;
+    public boolean isUseViewConfirmedAtDateRange() {
+        return useViewConfirmedAtDateRange;
     }
 
     /**
@@ -194,8 +188,8 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     /**
      * @param ownerUserID the ownerUserID to set
      */
-    public void setOwnerUserID(int ownerUserID) {
-        this.ownerUserID = ownerUserID;
+    public void setOwnerUserID(User ownerUserID) {
+        this.setOwnerUser(ownerUserID);
     }
 
     /**
@@ -241,24 +235,18 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @param filterByViewConfirmedBy the filterByViewConfirmedBy to set
+     * @param filterByPerson the filterByPerson to set
      */
-    public void setFilterByViewConfirmedBy(boolean filterByViewConfirmedBy) {
-        this.filterByViewConfirmedBy = filterByViewConfirmedBy;
+    public void setFilterByPerson(boolean filterByPerson) {
+        this.filterByPerson = filterByPerson;
     }
 
+   
     /**
-     * @param confirmerUserID the confirmerUserID to set
+     * @param useViewConfirmedAtDateRange the useViewConfirmedAtDateRange to set
      */
-    public void setConfirmerUserID(int confirmerUserID) {
-        this.confirmerUserID = confirmerUserID;
-    }
-
-    /**
-     * @param filterByViewConfirmedAtDateRange the filterByViewConfirmedAtDateRange to set
-     */
-    public void setFilterByViewConfirmedAtDateRange(boolean filterByViewConfirmedAtDateRange) {
-        this.filterByViewConfirmedAtDateRange = filterByViewConfirmedAtDateRange;
+    public void setUseViewConfirmedAtDateRange(boolean useViewConfirmedAtDateRange) {
+        this.useViewConfirmedAtDateRange = useViewConfirmedAtDateRange;
     }
 
     /**
@@ -301,6 +289,41 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
      */
     public void setIsViewed(boolean isViewed) {
         this.isViewed = isViewed;
+    }
+
+    /**
+     * @return the evtType
+     */
+    public EventType getEvtType() {
+        return evtType;
+    }
+
+    /**
+     * @param evtType the evtType to set
+     */
+    public void setEvtType(EventType evtType) {
+        this.evtType = evtType;
+    }
+
+    /**
+     * @return the person
+     */
+    public Person getPerson() {
+        return person;
+    }
+
+    /**
+     * @param person the person to set
+     */
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
+    /**
+     * @param ownerUser the ownerUser to set
+     */
+    public void setOwnerUser(User ownerUser) {
+        this.ownerUser = ownerUser;
     }
    
    

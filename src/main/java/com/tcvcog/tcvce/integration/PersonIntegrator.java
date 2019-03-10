@@ -697,11 +697,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    public ArrayList<Person> getPersonHistory(User u) throws IntegrationException {
+    public List<Person> getPersonHistory(User u) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        ArrayList<Person> al = new ArrayList();
+        ArrayList<Person> al = new ArrayList<>();
 
         try {
             String s = "SELECT person_personid, entrytimestamp FROM loginobjecthistory "
@@ -735,7 +735,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    public ArrayList<Person> getPersonList(int propertyID) throws IntegrationException{
+    public ArrayList<Person> getPersonList(int propertyUnitID) throws IntegrationException{
         ArrayList<Person> personList = new ArrayList();
         String query =  "SELECT person_personid\n" +
                         "  FROM public.propertyunitperson WHERE propertyunit_unitid=?;";
@@ -746,7 +746,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
  
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, propertyID);
+            stmt.setInt(1, propertyUnitID);
             rs = stmt.executeQuery();
             while(rs.next()){
                 personList.add(getPerson(rs.getInt("person_personid")));
@@ -764,10 +764,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
 
-    public HashMap getPersonMapByCaseID(int caseID) {
-
-        return new HashMap();
-    }
+    
     
     public ArrayList<Person> getOccPermitAppPersons(int applicationID) throws IntegrationException{
         String query = "SELECT person_personid FROM occpermitapplicationperson WHERE permitapp_applicationid = ?";

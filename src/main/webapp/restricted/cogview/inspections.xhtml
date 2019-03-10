@@ -1,5 +1,21 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2018 Adam Gutonski
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -7,330 +23,127 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Open code enforcement cases</title>
+        <title>Occupancy inspections</title>
     </h:head>
     <h:body>
-        <ui:composition template="../navContainer_restricted.xhtml">
+        <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="cases-view">
+                
+                    <f:view id="cases-view">
 
                     <div class="two-column-page-flex-container">
                         <div class="list-column">
 
-                            <h:form id="cecases-messages-form">
-                                <h:messages id="cecases-messages-global"
+                            <h:form id="inspections-messages-form">
+                                <h:messages id="inspections-messages-global"
                                             globalOnly="true" showDetail="true" showSummary="true"
                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                 </h:messages>
                             </h:form>
 
-                            <h1><h:outputText value="Code enforcement case manager"/></h1>
+                            <h1><h:outputText value="Open cases in #{sessionBean.activeMuni.muniName}"/></h1>
                             <h3>List builder:</h3>
                             <h:outputText value="Filer#{caseProfileBB.searchParams.useIsOpen}"/>
                             <h:outputText value="#{caseProfileBB.searchParams.isOpen}"/>
 
 
-                            <h:form id="cecases-search-form">
-                                <p:fieldset legend="search options"
-                                            toggleable="true" collapsed="false" style="background-color: white;">
-                                    <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd-solid-back"
-                                                 footerClass="gridFooter" >
-                                        <h:panelGroup>
-                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                         columnClasses="topbottom-lines-left, topbottom-lines-right">
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-muni-ol" for="seev-filter-type" value="filter by municipality? "/>
-                                                    <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{caseProfileBB.searchParams.filterByMuni}" >
-                                                        <p:ajax update="ceev-search-muni-som"/>
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:selectOneMenu id="ceev-search-muni-som" tabindex="1" value="#{caseProfileBB.searchParams.muni}"
-                                                                     disabled="#{!caseProfileBB.searchParams.filterByMuni}">
-                                                        <f:converter converterId="muniConverter"/>
-                                                        <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                                    </p:selectOneMenu>
-                                                    <h:message for="ceev-search-muni-som" showDetail="true" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
-
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-search-startend-chkbx-ol" for="ceev-search-startend-chkbx" value="filter by date range? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-search-startend-chkbx" value="#{caseProfileBB.searchParams.filterByStartEndDate}" >
-                                                        <p:ajax update="ceev-search-usedor-chkbx
-                                                                ceev-search-vconf-chkbx 
-                                                                ceev-search-timestamp-chkbx
-                                                                eventDateCalStart
-                                                                eventDateCalEnd
-                                                                ceev-search-relative-dates-cb" />
-                                                    </p:selectBooleanCheckbox>
-
-                                                    <h4 style="margin-bottom: 2px;">date search options:</h4>
-                                                    
-                                                    <p:selectOneRadio id="datetosearch-sor" layout="pageDirection" value="#{caseProfileBB.searchParams.dateToSearchCECases}">
-                                                        <f:selectItem itemLabel="Case opening date" itemValue="opening" />
-                                                        <f:selectItem itemLabel="Case creation timestamp" itemValue="timestamp" />
-                                                        <f:selectItem itemLabel="Case closing date" itemValue="closing" />
-                                                    </p:selectOneRadio>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup id="datepickers-pg">
-                                                    <p:spacer height="5px" />
-                                                    <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="query start date: "/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:calendar id="eventDateCalStart" value="#{caseProfileBB.searchParams.startDateUtilDate}" 
-                                                                mode="popup" disabled="#{(!caseProfileBB.searchParams.filterByStartEndDate) or caseProfileBB.searchParams.useRelativeDates}"
-                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                showButtonPanel="true" showTodayButton="true"
-                                                                required="false"/>
-                                                    <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                                    <p:spacer height="5px"/>
-
-                                                    <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="query end date: "/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:calendar id="eventDateCalEnd" value="#{caseProfileBB.searchParams.endDateUtilDate}" 
-                                                                mode="popup" disabled="#{(!caseProfileBB.searchParams.filterByStartEndDate) or caseProfileBB.searchParams.useRelativeDates}"
-                                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                                                showButtonPanel="true" showTodayButton="true"
-                                                                required="false" />
-                                                    <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-
-                                                    <p:outputLabel id="ceev-search-relative-dates-ol" for="ceev-search-relative-dates-cb" value="use relative dates? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-search-relative-dates-cb" 
-                                                                             value="#{caseProfileBB.searchParams.useRelativeDates}" 
-                                                                             disabled="#{!caseProfileBB.searchParams.filterByStartEndDate}">
-                                                        <p:ajax update="eventDateCalStart
-                                                                eventDateCalEnd
-                                                                ceev-search-relative-dates-start-it
-                                                                ceev-search-relative-dates-end-it" />
-                                                    </p:selectBooleanCheckbox>
-
-
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-search-relative-dates-start-ol" for="ceev-search-relative-dates-start-it" value="start date in days (relative to today)"/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:inputText id="ceev-search-relative-dates-start-it" 
-                                                                 value="#{caseProfileBB.searchParams.startDateRelativeDays}" 
-                                                                 disabled="#{!(caseProfileBB.searchParams.filterByStartEndDate and caseProfileBB.searchParams.useRelativeDates)}" />
-                                                    <h:message for="ceev-search-relative-dates-start-it" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                                    <p:spacer height="5px"/>
-                                                    <p:outputLabel id="ceev-search-relative-dates-end-ol" for="ceev-search-relative-dates-end-it" value="end date in days (relative to today)"/>
-                                                    <p:spacer height="1px"/>
-                                                    <p:inputText id="ceev-search-relative-dates-end-it" 
-                                                                 value="#{caseProfileBB.searchParams.endDateRelativeDays}" 
-                                                                 disabled="#{!(caseProfileBB.searchParams.filterByStartEndDate and caseProfileBB.searchParams.useRelativeDates)}" />
-                                                    <h:message for="ceev-search-relative-dates-end-it" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="seev-filter-type-ol" for="seev-filter-type" value="filter by case phase? "/>
-                                                    <p:selectOneMenu value="#{caseProfileBB.searchParams.casePhase}"
-                                                        id="casePhaseSOM">
-
-                                                        <f:selectItems value="#{caseProfileBB.casePhaseList}"
-                                                                       var="cp"
-                                                                       itemValue="#{cp}"
-                                                                       itemLabel="#{cp.label}"/>
-                                                    </p:selectOneMenu>
-                                                </h:panelGroup>
-
-
-                                                <h:panelGroup>
-                                                    
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                   
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                   
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-id-ol" for="ceev-filter-id" value="filter by ce case ID? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-id" value="#{caseProfileBB.searchParams.filterByObjectID}" 
-                                                                             disabled="false" >
-                                                        <p:ajax update="ceev-criteria-caseid" />
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-criteria-caseid-ol" for="ceev-criteria-caseid" value="ce case ID:"/>
-                                                    <p:spacer height="5px"/>
-                                                    <p:inputText id="ceev-criteria-caseid" 
-                                                                 value="#{caseProfileBB.searchParams.objectID}" 
-                                                                 disabled="#{!caseProfileBB.searchParams.filterByObjectID}"/>
-                                                    <h:message for="ceev-criteria-caseid" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-manager-ol" for="ceev-filter-creator" value="filter by case manager? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-manager" value="#{caseProfileBB.searchParams.filterByEventOwner}" >
-                                                        <p:ajax update="ceev-criteria-user" />
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <h:outputLabel for="ceev-criteria-user" id="ceev-criteria-user-ol">
-                                                        <h:outputText value="system user list:"/>
-                                                    </h:outputLabel>
-                                                    <p:spacer height="5px"/>
-
-                                                    <p:selectOneMenu id="ceev-criteria-user" required="false" 
-                                                                     value="#{caseProfileBB.searchParams.caseManagerUser}"
-                                                                     disabled="#{!caseProfileBB.searchParams.useCaseManager}">
-                                                        <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
-                                                        <f:selectItems value="#{caseProfileBB.userList}"  var="u" itemValue="#{u}" 
-                                                                       itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
-                                                        <f:converter converterId="userConverter"/>
-                                                    </p:selectOneMenu>
-                                                </h:panelGroup>
-
-                                               
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-open-ol" for="ceev-filter-open" value="filter by open case? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-open" value="#{caseProfileBB.searchParams.useIsOpen}" >
-                                                        <p:ajax update="ceev-criteria-open" />
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:selectBooleanCheckbox id="ceev-criteria-open" 
-                                                                             value="#{caseProfileBB.searchParams.isOpen}" 
-                                                                             disabled="#{!caseProfileBB.searchParams.useIsOpen}" />
-                                                    <p:outputLabel id="ceev-criteria-open-ol" for="ceev-criteria-open" 
-                                                                   value="(checked = only open cases)" styleClass="italic"/>
-                                                </h:panelGroup>
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="ceev-query-limit-ol" for="ceev-query-limit" value="limit results to 100? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-query-limit" value="#{caseProfileBB.searchParams.limitResultCountTo100}" />
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-
-                                                </h:panelGroup>
-                                            </h:panelGrid>                                        
-                                        </h:panelGroup>
-                                    </h:panelGrid>                               
-                                    <p:commandButton    id="queryButton"
-                                                        ajax="true" value="Run query" actionListener="#{caseProfileBB.executeQuery}"
-                                                        process="@form"
-                                                        update="events-datascroller-form:events-datascroller
-                                                        events-datatable-form:events-datatable
-                                                        ceev-form-globalmessages:ceev-globalmessages
-                                                        "
-                                                        />
-                                </p:fieldset>
-                            </h:form>
                             <h2>CE Case docket</h2>
 
                             <h:form id="caseListForm">
                                 <p:spacer height="15px"/>
-                                <p:dataTable
-                                    id="caseTable"
-                                    var="c"
-                                    filteredValue="#{caseProfileBB.filteredCaseList}"
-                                    rowKey="#{c.caseID}"
-                                    rowExpandMode="multiple"
-                                    widgetVar="ceViewTable"
-                                    value="#{caseProfileBB.caseList}"
-                                    tableStyleClass="primeDataTable">
+                                <h1>Occupancy Inspection Configuration Tool</h1>
+                    <p>View, create, and manage occupancy inspections</p>
+                    <f:view>
+                        <h:form id="occInsFeeDisplay">
+                            <h2>Occupancy Inspection Details</h2>
+                            <p:dataTable
+                                    id="datatable-inspections"
+                                    var="o"
+                                    rowKey="#{o.inspectionID}"
+                                    value="#{}"
+                                    tableStyleClass="primeDataTable"
+                                    tabindex="1">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                                    <p:column width="8%">
+                                    <p:column width="10%">
                                         <f:facet name="header">
                                             <h:outputText value="ID" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseID}"/>
+                                        <h:outputText value="#{o.inspectionID}"/>
                                     </p:column>
-                                    <p:column width="15%" sortBy="#{c.property.address}">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="Property" />
+                                            <h:outputText value="Property Unit" />
                                         </f:facet>
-                                        <h:outputText value="#{c.property.address}"/>
+                                        <h:outputText value="#{o.propertyUnitID}"/>
                                     </p:column>
-                                    <p:column width="15%">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="Name" />
+                                            <h:outputText value="User ID" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseName}"/>
+                                        <h:outputText value="#{o.loginUserID}"/>
                                     </p:column>
-                                    <p:column width="8%" sortBy="#{c.caseStage}">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="Stage" />
+                                            <h:outputText value="First Inspection" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseStage}"/>
+                                        <h:outputText value="#{o.firstInspectionDate}"/>
                                     </p:column>
-
-                                    <ui:remove>
-
-                                        <p:column width="12%"
-                                                  sortBy="#{c.casePhase.label}"
-                                                  filterBy="#{c.casePhase.label}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Phase" />
-                                            </f:facet>
-                                            <h:outputText value="#{c.casePhase.label}"/>
-                                        </p:column>
-                                    </ui:remove>
-
-                                    <p:column width="5%" sortBy="#{c.caseAge}">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="Age" />
+                                            <h:outputText value="First Pass" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseAge}"/>
+                                        <h:outputText value="#{o.firstInspectionPass}"/>
                                     </p:column>
-                                    <p:column width="12%" exportable="false">
+                                    
+                                    <p:column width="25%">
                                         <f:facet name="header">
-                                            <h:outputText value="view" />
+                                            <h:outputText value="Second Inspection" />
                                         </f:facet>
-                                        <p:commandButton icon="fa fa-hand-o-right" value="view"
-                                                         actionListener="#{caseProfileBB.manageCECase(c)}" 
-                                                         ajax="true"
-                                                         update="
-                                                         case-details-form:header-id-ot
-                                                         case-details-form:header-type-ot
-                                                         case-details-form:header-addr-ot
-                                                         case-details-form:header-muni-ot
-                                                         case-details-form:selcase-id-ot
-                                                         case-details-form:selcase-addr-ot
-                                                         case-details-form:selcase-muni-ot
-                                                         case-details-form:selcase-stage-ot
-                                                         case-details-form:selcase-odate-it
-                                                         case-details-form:selcase-cdate-it
-                                                         case-details-form:selcase-age-it
-                                                         case-details-form:selcase-manager-it
-                                                         case-details-form:selcase-pacc
-                                                         case-details-form:selcase-access-sbcb
-                                                         case-details-form:selcase-forwardlinking-sbcb
-                                                         violation-form:violation-table
-                                                         notices-form:notices-ds
-                                                         action-requests-form:actionRequestTable
-                                                         event-dt-form:caseEventTable
-                                                         "/>
+                                        <h:outputText value="#{o.secondInspectionDate}"/>
                                     </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Second Pass" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.secondInspectionPass}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Resolved" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.resolved}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Fee Paid" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.totalFeePaid}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Notes" />
+                                        </f:facet>
+                                        <h:outputText value="#{o.occupancyInspectionNotes}"/>
+                                    </p:column>
+     
                                 </p:dataTable>
-
-                                <p:commandLink value="Export case docket as pdf" ajax="false">
-                                    <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
-                                </p:commandLink>
-
+                            <p:spacer height="10px"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{occupancyInspectionBB.editOccupancyInspection}"
+                                             value="Update Selected Occupancy Inspection" tabindex="2"/>
+                            <p:commandButton ajax="false" 
+                                             actionListener="#{occupancyInspectionBB.deleteSelectedOccupancyInspection}"
+                                            value="Nuke Selected Category Forever" tabindex="3"/>
+                            
                                 <p:spacer height="10px"/>
                             </h:form>
                         </div>
@@ -402,7 +215,7 @@
                                             <h:outputLabel styleClass="bold" value="Manager:"/>
                                             <p:spacer height="5px"/>
                                             <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.caseManager.person.firstName} #{caseProfileBB.currentCase.caseManager.person.lastName}"/>
+                                                <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.caseManager.FName} #{caseProfileBB.currentCase.caseManager.LName}"/>
                                             </div>
                                         </h:panelGroup>
 
@@ -416,14 +229,14 @@
                                             <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
                                             <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
                                                                      disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
-                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="inspections-messages-form:inspections-messages-global" />
                                             </p:selectBooleanCheckbox>
                                             <p:spacer height="5px"/>
                                             <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
                                             <h:outputText value=" "/>
                                             <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
                                                                      disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
-                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                                <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="inspections-messages-form:inspections-messages-global" />
                                             </p:selectBooleanCheckbox>
                                             <p:spacer height="5px"/>
 
@@ -563,7 +376,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Date" />
                                         </f:facet>
-                                        <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                        <h:outputText value="#{e.prettyDateOfRecord}"/>
                                     </p:column>
 
                                     <p:column width="8%" sortBy="#{e.category.eventType.label}"
@@ -581,20 +394,19 @@
                                         </f:facet>
                                         <h:outputText value="#{e.category.eventCategoryTitle}"/>
                                     </p:column>
-                                    <p:column width="5%" filterBy="#{e.creator.person.lastName}"
-                                              sortBy="#{e.creator.person.lastName}">
-                                                        
+                                    <p:column width="5%" filterBy="#{e.eventOwnerUser.LName}"
+                                              sortBy="#{e.eventOwnerUser.LName}">
                                         <f:facet name="header">
                                             <h:outputText value="Creator" />
                                         </f:facet>
-                                        <h:outputText value="#{e.creator.person.lastName}"/>
-                                </p:column>
+                                        <h:outputText value="#{e.eventOwnerUser.LName}"/>
+                                    </p:column>
                                     <p:column width="20%" style="word-wrap: normal;">
                                         <f:facet name="header">
                                             <h:outputText value="Description" />
                                         </f:facet>
                                         <div class="rowExpansion">
-                                            <h:outputText value="#{e.description}"/>
+                                            <h:outputText value="#{e.eventDescription}"/>
                                         </div>
                                     </p:column>
                                     <p:column width="5%" exportable="false">
@@ -602,16 +414,8 @@
                                             <h:outputText value="edit" />
                                         </f:facet>
                                         <p:commandButton icon="fa fa-edit"
-                                                         ajax="true"
-                                                         actionListener="#{eventManageBB.editCEEvent(e)}" 
-                                                         oncomplete="PF('add-event-dialog-var').show()"
-                                                         update="
-                                                            add-event-dialog
-                                                            addNewEventForm:add-event-currcase-ot
-                                                            addNewEventForm:add-event-et-ot
-                                                            addNewEventForm:add-event-ec-ot
-                                                            addNewEventForm:add-event-cd-ot"
-                                                         />
+                                                         action="#{caseProfileBB.editEvent(e)}" 
+                                                         ajax="true"/>
 
                                     </p:column>
 
@@ -625,7 +429,7 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="Description" />
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.description}"/>
+                                                        <h:outputText value="#{e.eventDescription}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -653,7 +457,7 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="Active Event?"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.active}"/>
+                                                        <h:outputText value="#{e.activeEvent}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -667,7 +471,7 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="View confirmed by"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.viewConfirmedBy.person.lastName}"/>
+                                                        <h:outputText value="#{e.viewConfirmedBy.LName}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -1018,7 +822,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Issuer" />
                                             </f:facet>
-                                            <h:outputText value="#{citation.userOwner.person.lastName}"/>
+                                            <h:outputText value="#{citation.userOwner.LName}"/>
                                         </p:column>
                                         <p:column width="10%">
                                             <f:facet name="header">
@@ -1236,7 +1040,7 @@
 
                         <h:form id="addNewEventForm">
 
-                            <h1>Add/edit case event</h1>
+                            <h1>Add new event to case</h1>
 
                             <h:outputText id="add-event-currcase-ot" value="Current Case: #{caseProfileBB.currentCase.caseID}: #{caseProfileBB.currentCase.caseName} "/>
                             <p:spacer height="5px"/>
@@ -1259,7 +1063,7 @@
                                         <p:outputLabel for="eventDesc">
                                             <h:outputText value="Short Description:"/>
                                         </p:outputLabel>
-                                        <p:inputText id="eventDesc" value="#{eventManageBB.eventInProcess.description}" 
+                                        <p:inputText id="eventDesc" value="#{eventManageBB.eventInProcess.eventDescription}" 
                                                      style="width: 600px;" tabindex="3" required="true" styleClass="inputText"/>
                                         <h:message for="eventDesc" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1272,7 +1076,7 @@
                                         <h:outputText value="Active Event?"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="activeEvent" value="#{eventManageBB.eventInProcess.active}" />
+                                    <p:inputSwitch tabindex="18" id="activeEvent" value="#{eventManageBB.eventInProcess.activeEvent}" onLabel="Yes" offLabel="No" />
 
                                 </h:panelGroup>
 
@@ -1296,7 +1100,7 @@
                                         <h:outputText value="Disclose to Municipalities"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToMuniIS" value="#{eventManageBB.eventInProcess.discloseToMunicipality}" />
+                                    <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{eventManageBB.eventInProcess.discloseToMunicipality}" onLabel="Yes" offLabel="No" />
                                 </h:panelGroup>
 
                                 <h:panelGroup>
@@ -1304,7 +1108,7 @@
                                         <h:outputText value="Disclose to Public"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToPublic" value="#{eventManageBB.eventInProcess.discloseToPublic}" />
+                                    <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{eventManageBB.eventInProcess.discloseToPublic}" onLabel="Yes" offLabel="No" />
                                 </h:panelGroup>
 
 
@@ -1314,7 +1118,7 @@
                                         <h:outputText value="Require view confirmation by case manager"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="requireViewConfirmationSwitch" value="#{eventManageBB.eventInProcess.requiresViewConfirmation}"  />
+                                    <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventManageBB.eventInProcess.requiresViewConfirmation}" onLabel="Yes" offLabel="No" />
                                 </h:panelGroup>
 
                                 <f:facet name="footer">
@@ -1346,7 +1150,7 @@
                                              violation-form:violation-table
                                              case-details-form:selcase-stage-ot
                                              case-details-form:selcase-cdate-it
-                                             cecases-messages-form:cecases-messages-global"/>
+                                             inspections-messages-form:inspections-messages-global"/>
                             </h:form>
                             
                             <h2>Connect persons to event</h2>
@@ -1515,6 +1319,37 @@
 
 
                 </f:view>
+                
+                <div class="mainContainer">
+                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    </h:messages>
+                            
+                   
+                             
+                             
+                            <!--<p:fieldset legend="Update occupancy inspection "
+                                toggleable="true" collapsed="false" tabindex="4">
+                                    <h:form id="updateCategoryForm">
+                                        <p:spacer height="10px"/>
+                                        <p:outputLabel for="occInsFeeName">
+                                           <h:outputText value="Name:"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                                 style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
+                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        <p:spacer height="20px"/>
+                                        
+                                       
+                                    </h:form>  
+                                </p:fieldset>-->
+                            
+                           
+                     
+                    </f:view>
+                </div>
             </ui:define>
         </ui:composition>
     </h:body>

@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -103,10 +104,6 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         this.getPhotoList().add(ph);
     }
     
-    private void savePhotos(){
-        
-    }
-    
     public String addViolation(){
         
         ViolationCoordinator vc = getViolationCoordinator();
@@ -119,15 +116,16 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         currentViolation.setPenalty(penalty);
         currentViolation.setDescription(description);
         currentViolation.setNotes(notes);
-        
+       
         
         try {
-             vc.addNewCodeViolation(currentViolation);
+             vc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, 
+                     getSessionBean().getcECase());
              getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
-            return "caseProfile";
+            return "ceCases";
         } catch (IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -137,8 +135,14 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
             
         } catch (ViolationException ex) {
              getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
-                            ex.getMessage(), "Stipulated compliance date must be in the future; please revise the stipulated compliance date."));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            ex.getMessage(), "Stipulated compliance date must "
+                                + "be in the future; please revise the stipulated compliance date."));
+        } catch (CaseLifecyleException ex) {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            ex.getMessage(), "To preserve data integrity, this "
+                                + "case's phase restrictions forbid attaching new code violations."));
         }
         return "";
         
@@ -159,7 +163,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         
         
         try {
-             currentViolation.setViolationID(vc.addNewCodeViolation(currentViolation));
+             currentViolation.setViolationID(vc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, getSessionBean().getcECase()));
              getSessionBean().setActiveCodeViolation(currentViolation);
              getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
              getFacesContext().addMessage(null,
@@ -177,6 +181,11 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, 
                             ex.getMessage(), "Stipulated compliance date must be in the future; please revise the stipulated compliance date."));
+        } catch (CaseLifecyleException ex) {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            ex.getMessage(), "To preserve data integrity, this "
+                                + "case's phase restrictions forbid attaching new code violations."));
         }
         return "";
         

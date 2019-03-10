@@ -21,10 +21,12 @@ import java.time.ZoneId;
  */
 public class SearchParams implements Serializable{
     
-    
+     
     private String searchName;
     private String searchDescription;
-    private Municipality muni;
+    private boolean filterByMuni;
+    private Municipality muni; 
+    
     private boolean filterByStartEndDate;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -34,11 +36,17 @@ public class SearchParams implements Serializable{
     private java.sql.Timestamp startDateSQLDate;
     private java.sql.Timestamp endDateSQLDate;
     
+    private boolean useRelativeDates;
+    private int startDateRelativeDays;
+    private int endDateRelativeDays;
+    
+    private boolean useDateOfRecord;
+    private boolean useEntryTimestamp;
+    
     private boolean filterByObjectID;
     private int objectID;
     
     private boolean limitResultCountTo100;
-    
     
    public SearchParams(){
        
@@ -62,8 +70,9 @@ public class SearchParams implements Serializable{
      * @return the startDateUtilDate
      */
     public java.util.Date getStartDateUtilDate() {
-        
-        startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+        if(startDate != null){
+            startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+        }
         return startDateUtilDate;
     }
 
@@ -72,14 +81,18 @@ public class SearchParams implements Serializable{
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
         this.startDateUtilDate = startDateUtilDate;
-        startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if(startDateUtilDate != null){
+            startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     /**
      * @return the endDateUtilDate
      */
     public java.util.Date getEndDateUtilDate() {
-        endDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+        if(endDate != null){
+            endDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+        }
         return endDateUtilDate;
     }
 
@@ -88,13 +101,19 @@ public class SearchParams implements Serializable{
      */
     public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
         this.endDateUtilDate = endDateUtilDate;
-        endDate = endDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if(endDateUtilDate != null){
+            endDate = endDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     /**
      * @return the startDate
      */
     public LocalDateTime getStartDate() {
+        if(useRelativeDates){
+            startDate = LocalDateTime.now().plusDays(startDateRelativeDays);
+        }
+        
         return startDate;
     }
 
@@ -102,6 +121,9 @@ public class SearchParams implements Serializable{
      * @return the endDate
      */
     public LocalDateTime getEndDate() {
+        if(useRelativeDates){
+            endDate = LocalDateTime.now().plusDays(endDateRelativeDays);
+        }
         return endDate;
     }
 
@@ -123,7 +145,9 @@ public class SearchParams implements Serializable{
      * @return the startDateSQLDate
      */
     public java.sql.Timestamp getStartDateSQLDate() {
-        startDateSQLDate = java.sql.Timestamp.valueOf(getStartDate());
+        if(startDate != null){
+            startDateSQLDate = java.sql.Timestamp.valueOf(getStartDate());
+        }
         return startDateSQLDate;
     }
 
@@ -131,7 +155,9 @@ public class SearchParams implements Serializable{
      * @return the endDateSQLDate
      */
     public java.sql.Timestamp getEndDateSQLDate() {
-        endDateSQLDate = java.sql.Timestamp.valueOf(getEndDate());
+        if(endDate != null){
+            endDateSQLDate = java.sql.Timestamp.valueOf(getEndDate());
+        }
         return endDateSQLDate;
     }
 
@@ -231,6 +257,90 @@ public class SearchParams implements Serializable{
      */
     public void setSearchDescription(String searchDescription) {
         this.searchDescription = searchDescription;
+    }
+
+    /**
+     * @return the filterByMuni
+     */
+    public boolean isFilterByMuni() {
+        return filterByMuni;
+    }
+
+    /**
+     * @param filterByMuni the filterByMuni to set
+     */
+    public void setFilterByMuni(boolean filterByMuni) {
+        this.filterByMuni = filterByMuni;
+    }
+
+    /**
+     * @return the useRelativeDates
+     */
+    public boolean isUseRelativeDates() {
+        return useRelativeDates;
+    }
+
+    /**
+     * @return the startDateRelativeDays
+     */
+    public int getStartDateRelativeDays() {
+        return startDateRelativeDays;
+    }
+
+    /**
+     * @return the endDateRelativeDays
+     */
+    public int getEndDateRelativeDays() {
+        return endDateRelativeDays;
+    }
+
+    /**
+     * @param useRelativeDates the useRelativeDates to set
+     */
+    public void setUseRelativeDates(boolean useRelativeDates) {
+        this.useRelativeDates = useRelativeDates;
+    }
+
+    /**
+     * @param startDateRelativeDays the startDateRelativeDays to set
+     */
+    public void setStartDateRelativeDays(int startDateRelativeDays) {
+        this.startDateRelativeDays = startDateRelativeDays;
+    }
+
+    /**
+     * @param endDateRelativeDays the endDateRelativeDays to set
+     */
+    public void setEndDateRelativeDays(int endDateRelativeDays) {
+        this.endDateRelativeDays = endDateRelativeDays;
+    }
+
+    /**
+     * @return the useEntryTimestamp
+     */
+    public boolean isUseEntryTimestamp() {
+        return useEntryTimestamp;
+    }
+
+    /**
+     * @param useEntryTimestamp the useEntryTimestamp to set
+     */
+    public void setUseEntryTimestamp(boolean useEntryTimestamp) {
+        this.useEntryTimestamp = useEntryTimestamp;
+    }
+
+    /**
+     * @return the useDateOfRecord
+     */
+    public boolean isUseDateOfRecord() {
+        return useDateOfRecord;
+    }
+
+    /**
+     * @param useDateOfRecord the useDateOfRecord to set
+     */
+    public void setUseDateOfRecord(boolean useDateOfRecord) {
+        this.useDateOfRecord = useDateOfRecord;
     }
 
     

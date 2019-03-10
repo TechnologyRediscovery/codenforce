@@ -18,7 +18,10 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.UserIntegrator;
@@ -26,10 +29,14 @@ import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -39,7 +46,7 @@ import javax.faces.bean.ViewScoped;
 public class UserBB extends BackingBeanUtils implements Serializable {
 
     private ArrayList<User> userList;
-    private User selectedUser;
+    private User currentUser;
 
 //    @ManagedProperty(value="#{sessionBean}")
 //    private SessionBean subclassSessionBean;
@@ -49,22 +56,22 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     private RoleType[] roleTypeArray;
     private String formUsername;
     private String formPassword;
-    private int formMuniCode;
-    private String formFName;
-    private String formLName;
-    private String formWorkTitle;
-    private String formPhoneCell;
-    private String formPhoneHome;
-    private String formPhoneWork;
-    private String formEmail;
-    private String formAddress_street;
-    private String formAddress_city;
-    private String formAddress_zip;
-    private String formAddress_state;
+    
+    private Municipality formMuni;
+    
     private String formNotes;
     private Date formActivityStartDate;
     private Date formActivityStopDate;
     private boolean formAccessPermitted;
+    
+    private boolean formIsEnfOfficial;
+    private String formBadgeNum;
+    private String formOriNum;
+    
+    
+    
+    private Person formUserPerson;
+
     
 
     /**
@@ -72,63 +79,58 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      */
     public UserBB() {
     }
+    
+    @PostConstruct
+    public void initBean(){
+        currentUser = getSessionBean().getFacesUser();
+    }
+    
 
-    public String updateUser() {
+    public void updateUser(User u) {
         
-        getSessionBean().setUtilityUserToUpdate(selectedUser);
+        currentUser = u;
 
-        return "userUpdate";
     }
-
-    public String addUser() {
-        System.out.println("UserBB.addUser");
-
-        return "userAdd";
-    }
-
-    public String commitInsert() {
-        System.out.println("UserBB.commitInsert");
-        UserIntegrator ui = getUserIntegrator();
-
-        User u = new User();
-        u.setUserID(formUserID);
-        u.setRoleType(formRoleType);
-        u.setUsername(formUsername);
-        u.setPassword(formPassword);
-        u.setMuniCode(formMuniCode);
-        u.setFName(formFName);
-        u.setLName(formLName);
-        u.setWorkTitle(formWorkTitle);
-        u.setPhoneCell(formPhoneCell);
-        u.setPhoneHome(formPhoneHome);
-        u.setPhoneWork(formPhoneWork);
-        u.setEmail(formEmail);
-        u.setAddress_street(formAddress_street);
-        u.setAddress_city(formAddress_city);
-        u.setAddress_zip(formAddress_zip);
-        u.setAddress_state(formAddress_state);
-        u.setNotes(formNotes);
-        u.setActivityStartDate(formActivityStartDate.toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        u.setActivityStopDate(formActivityStopDate.toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        u.setSystemAccessPermitted(formAccessPermitted);
-
+    
+    public void commitUpdates(ActionEvent ev){
+        UserCoordinator uc = getUserCoordinator();
         try {
-            ui.insertUser(u);
+            uc.updateUser(currentUser);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully added " + u.getFName()
-                            + " to the system and this person can now login and get to work.", ""));
+                            "Successfully udpated user", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update user", ""));
+            
+        }
+    }
+
+    public void addUser(ActionEvent ev) {
+        UserCoordinator uc = getUserCoordinator();
+        System.out.println("UserBB.addUser");
+        currentUser = uc.getUserSkeleton();
+    }
+
+    public void commitInsert(ActionEvent ev) {
+        System.out.println("UserBB.commitInsert");
+        UserCoordinator uc = getUserCoordinator();
+        int newUserID;
+        
+        try {
+            newUserID = uc.insertNewUser(currentUser);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully added user with id" + newUserID
+                            + " to the system and this person can now login and get to work!", ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to add user to system, my apologies",
                             "This is a system-level error that msut be corrected by an administrator"));
-            return "";
         }
-
-        return "userManage";
 
     }
 
@@ -149,12 +151,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         return userList;
     }
 
-    /**
-     * @return the selectedUser
-     */
-    public User getSelectedUser() {
-        return selectedUser;
-    }
+    
 
     /**
      * @return the formRoleType
@@ -177,90 +174,8 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         return formPassword;
     }
 
-    /**
-     * @return the formMuniCode
-     */
-    public int getFormMuniCode() {
-        return formMuniCode;
-    }
-
-    /**
-     * @return the formFName
-     */
-    public String getFormFName() {
-        return formFName;
-    }
-
-    /**
-     * @return the formLName
-     */
-    public String getFormLName() {
-        return formLName;
-    }
-
-    /**
-     * @return the formWorkTitle
-     */
-    public String getFormWorkTitle() {
-        return formWorkTitle;
-    }
-
-    /**
-     * @return the formPhoneCell
-     */
-    public String getFormPhoneCell() {
-        return formPhoneCell;
-    }
-
-    /**
-     * @return the formPhoneHome
-     */
-    public String getFormPhoneHome() {
-        return formPhoneHome;
-    }
-
-    /**
-     * @return the formPhoneWork
-     */
-    public String getFormPhoneWork() {
-        return formPhoneWork;
-    }
-
-    /**
-     * @return the formEmail
-     */
-    public String getFormEmail() {
-        return formEmail;
-    }
-
-    /**
-     * @return the formAddress_street
-     */
-    public String getFormAddress_street() {
-        return formAddress_street;
-    }
-
-    /**
-     * @return the formAddress_city
-     */
-    public String getFormAddress_city() {
-        return formAddress_city;
-    }
-
-    /**
-     * @return the formAddress_zip
-     */
-    public String getFormAddress_zip() {
-        return formAddress_zip;
-    }
-
-    /**
-     * @return the formAddress_state
-     */
-    public String getFormAddress_state() {
-        return formAddress_state;
-    }
-
+   
+  
     /**
      * @return the formNotes
      */
@@ -297,13 +212,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         this.userList = userList;
     }
 
-    /**
-     * @param selectedUser the selectedUser to set
-     */
-    public void setSelectedUser(User selectedUser) {
-        this.selectedUser = selectedUser;
-    }
-
+   
     /**
      * @param formRoleType the formRoleType to set
      */
@@ -325,90 +234,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         this.formPassword = formPassword;
     }
 
-    /**
-     * @param formMuniCode the formMuniCode to set
-     */
-    public void setFormMuniCode(int formMuniCode) {
-        this.formMuniCode = formMuniCode;
-    }
-
-    /**
-     * @param formFName the formFName to set
-     */
-    public void setFormFName(String formFName) {
-        this.formFName = formFName;
-    }
-
-    /**
-     * @param formLName the formLName to set
-     */
-    public void setFormLName(String formLName) {
-        this.formLName = formLName;
-    }
-
-    /**
-     * @param formWorkTitle the formWorkTitle to set
-     */
-    public void setFormWorkTitle(String formWorkTitle) {
-        this.formWorkTitle = formWorkTitle;
-    }
-
-    /**
-     * @param formPhoneCell the formPhoneCell to set
-     */
-    public void setFormPhoneCell(String formPhoneCell) {
-        this.formPhoneCell = formPhoneCell;
-    }
-
-    /**
-     * @param formPhoneHome the formPhoneHome to set
-     */
-    public void setFormPhoneHome(String formPhoneHome) {
-        this.formPhoneHome = formPhoneHome;
-    }
-
-    /**
-     * @param formPhoneWork the formPhoneWork to set
-     */
-    public void setFormPhoneWork(String formPhoneWork) {
-        this.formPhoneWork = formPhoneWork;
-    }
-
-    /**
-     * @param formEmail the formEmail to set
-     */
-    public void setFormEmail(String formEmail) {
-        this.formEmail = formEmail;
-    }
-
-    /**
-     * @param formAddress_street the formAddress_street to set
-     */
-    public void setFormAddress_street(String formAddress_street) {
-        this.formAddress_street = formAddress_street;
-    }
-
-    /**
-     * @param formAddress_city the formAddress_city to set
-     */
-    public void setFormAddress_city(String formAddress_city) {
-        this.formAddress_city = formAddress_city;
-    }
-
-    /**
-     * @param formAddress_zip the formAddress_zip to set
-     */
-    public void setFormAddress_zip(String formAddress_zip) {
-        this.formAddress_zip = formAddress_zip;
-    }
-
-    /**
-     * @param formAddress_state the formAddress_state to set
-     */
-    public void setFormAddress_state(String formAddress_state) {
-        this.formAddress_state = formAddress_state;
-    }
-
+   
     /**
      * @param formNotes the formNotes to set
      */
@@ -464,6 +290,90 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      */
     public void setFormUserID(int formUserID) {
         this.formUserID = formUserID;
+    }
+
+    /**
+     * @return the formIsEnfOfficial
+     */
+    public boolean isFormIsEnfOfficial() {
+        return formIsEnfOfficial;
+    }
+
+    /**
+     * @param formIsEnfOfficial the formIsEnfOfficial to set
+     */
+    public void setFormIsEnfOfficial(boolean formIsEnfOfficial) {
+        this.formIsEnfOfficial = formIsEnfOfficial;
+    }
+
+    /**
+     * @return the formBadgeNum
+     */
+    public String getFormBadgeNum() {
+        return formBadgeNum;
+    }
+
+    /**
+     * @return the formOriNum
+     */
+    public String getFormOriNum() {
+        return formOriNum;
+    }
+
+    /**
+     * @param formBadgeNum the formBadgeNum to set
+     */
+    public void setFormBadgeNum(String formBadgeNum) {
+        this.formBadgeNum = formBadgeNum;
+    }
+
+    /**
+     * @param formOriNum the formOriNum to set
+     */
+    public void setFormOriNum(String formOriNum) {
+        this.formOriNum = formOriNum;
+    }
+
+    /**
+     * @return the formUserPerson
+     */
+    public Person getFormUserPerson() {
+        return formUserPerson;
+    }
+
+    /**
+     * @param formUserPerson the formUserPerson to set
+     */
+    public void setFormUserPerson(Person formUserPerson) {
+        this.formUserPerson = formUserPerson;
+    }
+
+    /**
+     * @return the formMuni
+     */
+    public Municipality getFormMuni() {
+        return formMuni;
+    }
+
+    /**
+     * @param formMuni the formMuni to set
+     */
+    public void setFormMuni(Municipality formMuni) {
+        this.formMuni = formMuni;
+    }
+
+    /**
+     * @return the currentUser
+     */
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    /**
+     * @param currentUser the currentUser to set
+     */
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 
     

@@ -23,12 +23,12 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
  *
  * @author Eric C. Darsow
  */
-public class LogCoordinator extends BackingBeanUtils {
+public class SessionSystemCoordinator extends BackingBeanUtils {
 
     /**
      * Creates a new instance of LoggingCoordinator
      */
-    public LogCoordinator() {
+    public SessionSystemCoordinator() {
     }
     
     
