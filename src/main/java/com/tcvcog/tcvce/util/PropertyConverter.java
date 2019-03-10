@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.util;
 
 import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.Property;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -28,35 +29,32 @@ import javax.faces.convert.FacesConverter;
  * @author Eric Darsow
  */
 
-@FacesConverter(forClass=EventCategory.class, value="eventCategoryConverter")
-public class EventCategoryConverter extends EntityConverter implements Converter{
+@FacesConverter(forClass=Property.class, value="propertyConverter")
+public class PropertyConverter extends EntityConverter implements Converter{
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
         if(titleS.isEmpty()) {
             return null; 
         }
-        
-        EventCategory o = (EventCategory) this.getViewMap(fc).get(titleS);
-        
+        Property o = (Property) this.getViewMap(fc).get(titleS);
         return o;
     }
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        
         if (o == null){
             return "";
         }
         
-        EventCategory ec = (EventCategory) o;
-        String title = ec.getEventCategoryTitle();
+        Property p = (Property) o;
+        String title = p.getAddress() + " (" + p.getMuni().getMuniName() + ")";
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;
             
         } else {
-            return "category error";
+            return "property error";
         }
         
         

@@ -122,21 +122,43 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * into the Integrator for case list retrieval
      */
     public SearchParamsCECases getDefaultSearchParamsCECase(Municipality m){
-        SearchParamsCECases spcecase = new SearchParamsCECases();
+        SearchParamsCECases params = new SearchParamsCECases();
         
         // superclass 
-        spcecase.setMuni(m);
-        spcecase.setFilterByStartEndDate(false);
-        spcecase.setFilterByObjectID(false);
-        spcecase.setLimitResultCountTo100(true);
+        params.setFilterByMuni(true);
+        params.setMuni(m);
+        params.setFilterByObjectID(false);
+        params.setLimitResultCountTo100(true);
         
         // subclass specific
-        spcecase.setUseIsOpen(true);
-        spcecase.setIsOpen(true);
-        spcecase.setUseCaseManager(false);
+        params.setUseIsOpen(true);
+        params.setIsOpen(true);
         
-        return spcecase;
+        params.setDateToSearchCECases("Opening date of record");
+        params.setUseCaseManager(false);
+        
+        params.setUseCasePhase(false);
+        params.setUseCaseStage(false);
+        params.setUseProperty(false);
+        params.setUsePropertyInfoCase(false);
+        params.setUseCaseManager(false);
+        
+        return params;
     }
+    
+    public List<CECase> getOpenCECaseList(Municipality m) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        List<CECase> cList = ci.getCECases(getDefaultSearchParamsCECase(m));
+        return cList;
+    }
+    
+    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        return ci.getCECases(params);
+        
+    }
+            
+            
     
     public CECase getInitializedCECase(Property p, User u){
         CECase newCase = new CECase();
@@ -588,11 +610,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 //                throw new CaseLifecyleException("Cannot advance a closed case to any other phase");
                 break;
             case InactiveHolding:
-                throw new CaseLifecyleException("Cases in inactive holding must have "
-                        + "their case phase overriden manually to return to the case management flow");
+                nextPhaseInSequence = CasePhase.InactiveHolding;
+                break;
                 
             default:
-                throw new CaseLifecyleException("Unable to determine next case phase, sorry");
+                nextPhaseInSequence = CasePhase.InactiveHolding;
         }
         
         return nextPhaseInSequence;

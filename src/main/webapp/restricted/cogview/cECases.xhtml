@@ -31,40 +31,38 @@
 
 
                             <h:form id="cecases-search-form">
-                                <p:fieldset legend="search options"
+                                <p:fieldset legend="search options" 
                                             toggleable="true" collapsed="false" style="background-color: white;">
                                     <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd-solid-back"
-                                                 footerClass="gridFooter" >
+                                                 footerClass="gridFooter">
                                         <h:panelGroup>
                                             <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                                          columnClasses="topbottom-lines-left, topbottom-lines-right">
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-muni-ol" for="seev-filter-type" value="filter by municipality? "/>
+                                                    <p:outputLabel id="cecases-filter-muni-ol" for="seev-filter-muni-chkbx" value="filter by municipality? "/>
                                                     <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{caseProfileBB.searchParams.filterByMuni}" >
-                                                        <p:ajax update="ceev-search-muni-som"/>
+                                                        <p:ajax update="cecases-search-muni-som"/>
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
                                                 <h:panelGroup>
-                                                    <p:selectOneMenu id="ceev-search-muni-som" tabindex="1" value="#{caseProfileBB.searchParams.muni}"
+                                                    <p:selectOneMenu id="cecases-search-muni-som" tabindex="1" value="#{caseProfileBB.searchParams.muni}"
                                                                      disabled="#{!caseProfileBB.searchParams.filterByMuni}">
                                                         <f:converter converterId="muniConverter"/>
                                                         <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
                                                         <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                                     </p:selectOneMenu>
-                                                    <h:message for="ceev-search-muni-som" showDetail="true" showSummary="true" 
+                                                    <h:message for="cecases-search-muni-som" showDetail="true" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                 </h:panelGroup>
 
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-search-startend-chkbx-ol" for="ceev-search-startend-chkbx" value="filter by date range? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-search-startend-chkbx" value="#{caseProfileBB.searchParams.filterByStartEndDate}" >
-                                                        <p:ajax update="ceev-search-usedor-chkbx
-                                                                ceev-search-vconf-chkbx 
-                                                                ceev-search-timestamp-chkbx
+                                                    <p:outputLabel id="cecases-search-startend-chkbx-ol" for="cecases-search-startend-chkbx" value="filter by date range? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-search-startend-chkbx" value="#{caseProfileBB.searchParams.filterByStartEndDate}" >
+                                                        <p:ajax update="datetosearch-sor
                                                                 eventDateCalStart
                                                                 eventDateCalEnd
-                                                                ceev-search-relative-dates-cb" />
+                                                                cecases-search-relative-dates-cb" />
                                                     </p:selectBooleanCheckbox>
 
                                                     <h4 style="margin-bottom: 2px;">case date search options:</h4>
@@ -103,46 +101,46 @@
 
                                                 <h:panelGroup>
 
-                                                    <p:outputLabel id="ceev-search-relative-dates-ol" for="ceev-search-relative-dates-cb" value="use relative dates? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-search-relative-dates-cb" 
+                                                    <p:outputLabel id="cecases-search-relative-dates-ol" for="cecases-search-relative-dates-cb" value="use relative dates? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-search-relative-dates-cb" 
                                                                              value="#{caseProfileBB.searchParams.useRelativeDates}" 
                                                                              disabled="#{!caseProfileBB.searchParams.filterByStartEndDate}">
                                                         <p:ajax update="eventDateCalStart
                                                                 eventDateCalEnd
-                                                                ceev-search-relative-dates-start-it
-                                                                ceev-search-relative-dates-end-it" />
+                                                                cecases-search-relative-dates-start-it
+                                                                cecases-search-relative-dates-end-it" />
                                                     </p:selectBooleanCheckbox>
 
 
                                                 </h:panelGroup>
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-search-relative-dates-start-ol" for="ceev-search-relative-dates-start-it" value="start date in days (relative to today)"/>
+                                                    <p:outputLabel id="cecases-search-relative-dates-start-ol" for="cecases-search-relative-dates-start-it" value="start date in days (relative to today)"/>
                                                     <p:spacer height="1px"/>
-                                                    <p:inputText id="ceev-search-relative-dates-start-it" 
+                                                    <p:inputText id="cecases-search-relative-dates-start-it" 
                                                                  value="#{caseProfileBB.searchParams.startDateRelativeDays}" 
                                                                  disabled="#{!(caseProfileBB.searchParams.filterByStartEndDate and caseProfileBB.searchParams.useRelativeDates)}" />
-                                                    <h:message for="ceev-search-relative-dates-start-it" showDetail="false" showSummary="true" 
+                                                    <h:message for="cecases-search-relative-dates-start-it" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                                     <p:spacer height="5px"/>
-                                                    <p:outputLabel id="ceev-search-relative-dates-end-ol" for="ceev-search-relative-dates-end-it" value="end date in days (relative to today)"/>
+                                                    <p:outputLabel id="cecases-search-relative-dates-end-ol" for="cecases-search-relative-dates-end-it" value="end date in days (relative to today)"/>
                                                     <p:spacer height="1px"/>
-                                                    <p:inputText id="ceev-search-relative-dates-end-it" 
+                                                    <p:inputText id="cecases-search-relative-dates-end-it" 
                                                                  value="#{caseProfileBB.searchParams.endDateRelativeDays}" 
                                                                  disabled="#{!(caseProfileBB.searchParams.filterByStartEndDate and caseProfileBB.searchParams.useRelativeDates)}" />
-                                                    <h:message for="ceev-search-relative-dates-end-it" showDetail="false" showSummary="true" 
+                                                    <h:message for="cecases-search-relative-dates-end-it" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                                 </h:panelGroup>
                                                 
                                                  <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-phase-ol" for="ceev-filter-phase" value="filter by case phase? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-phase" value="#{caseProfileBB.searchParams.useCasePhase}" >
+                                                    <p:outputLabel id="cecases-filter-phase-ol" for="cecases-filter-phase" value="filter by case phase? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-phase" value="#{caseProfileBB.searchParams.useCasePhase}" >
                                                         <p:ajax update="casePhaseSOM" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-phase-ol" for="casePhaseSOM" value="case phases? "/>
+                                                    <p:outputLabel id="cecases-critera-phase" for="casePhaseSOM" value="case phases? "/>
                                                     <p:selectOneMenu value="#{caseProfileBB.searchParams.casePhase}"
                                                         id="casePhaseSOM">
 
@@ -154,17 +152,17 @@
                                                 </h:panelGroup>
                                                 
                                                  <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-stage-ol" for="ceev-filter-stage" value="filter by case stage? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-stage" value="#{caseProfileBB.searchParams.useCaseStage}" >
-                                                        <p:ajax update="ceev-criteria-user" />
+                                                    <p:outputLabel id="cecases-filter-stage-ol" for="cecases-filter-stage" value="filter by case stage? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-stage" value="#{caseProfileBB.searchParams.useCaseStage}" >
+                                                        <p:ajax update="cecases-criteria-user" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-stage-ol" for="seev-filter-stage" value="case stages:"/>
+                                                    <p:outputLabel id="cecases-criteria-stage-ol" for="case-stage-som" value="case stages:"/>
                                                     <p:selectOneMenu value="#{caseProfileBB.searchParams.caseStage}"
-                                                        id="casePhaseSOM">
+                                                        id="case-stage-som">
 
-                                                        <f:selectItems value="#{caseProfileBB.caseStageList}"
+                                                        <f:selectItems value="#{caseProfileBB.caseStageArray}"
                                                                        var="cs"
                                                                        itemValue="#{cs}"
                                                                        itemLabel="#{cs.label}"/>
@@ -172,60 +170,60 @@
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-id-ol" for="ceev-filter-id" value="filter by ce case ID? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-id" value="#{caseProfileBB.searchParams.filterByObjectID}" 
+                                                    <p:outputLabel id="cecases-filter-id-ol" for="cecases-filter-id" value="filter by ce case ID? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-id" value="#{caseProfileBB.searchParams.filterByObjectID}" 
                                                                              disabled="false" >
-                                                        <p:ajax update="ceev-criteria-caseid" />
+                                                        <p:ajax update="cecases-criteria-caseid" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-criteria-caseid-ol" for="ceev-criteria-caseid" value="ce case ID:"/>
+                                                    <p:outputLabel id="cecases-criteria-caseid-ol" for="cecases-criteria-caseid" value="ce case ID:"/>
                                                     <p:spacer height="5px"/>
-                                                    <p:inputText id="ceev-criteria-caseid" 
+                                                    <p:inputText id="cecases-criteria-caseid" 
                                                                  value="#{caseProfileBB.searchParams.objectID}" 
                                                                  disabled="#{!caseProfileBB.searchParams.filterByObjectID}"/>
-                                                    <h:message for="ceev-criteria-caseid" showDetail="false" showSummary="true" 
+                                                    <h:message for="cecases-criteria-caseid" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-manager-ol" for="ceev-filter-manager" value="filter by case manager? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-manager" value="#{caseProfileBB.searchParams.filterByEventOwner}" >
-                                                        <p:ajax update="ceev-criteria-user" />
+                                                    <p:outputLabel id="cecases-filter-manager-ol" for="cecases-filter-manager" value="filter by case manager? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-manager" value="#{caseProfileBB.searchParams.useCaseManager}" >
+                                                        <p:ajax update="cecases-criteria-user" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <h:outputLabel for="ceev-criteria-user" id="ceev-criteria-user-ol">
+                                                    <h:outputLabel for="cecases-criteria-user" id="cecases-criteria-user-ol">
                                                         <h:outputText value="system user list:"/>
                                                     </h:outputLabel>
                                                     <p:spacer height="5px"/>
 
-                                                    <p:selectOneMenu id="ceev-criteria-user" required="false" 
+                                                    <p:selectOneMenu id="cecases-criteria-user" required="false" 
                                                                      value="#{caseProfileBB.searchParams.caseManagerUser}"
                                                                      disabled="#{!caseProfileBB.searchParams.useCaseManager}">
                                                         <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
-                                                        <f:selectItems value="#{caseProfileBB.userList}"  var="u" itemValue="#{u}" 
+                                                        <f:selectItems value="#{userBB.userList}"  var="u" itemValue="#{u}" 
                                                                        itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
                                                         <f:converter converterId="userConverter"/>
                                                     </p:selectOneMenu>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-property-ol" for="ceev-filter-property" value="filter by property? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-property" value="#{caseProfileBB.searchParams.useProperty}" >
-                                                        <p:ajax update="ceev-criteria-property-som" />
+                                                    <p:outputLabel id="cecases-filter-property-ol" for="cecases-filter-property" value="filter by property? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-property" value="#{caseProfileBB.searchParams.useProperty}" >
+                                                        <p:ajax update="cecases-criteria-property-som" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <h:outputLabel for="ceev-criteria-property-som" id="ceev-criteria-property-ol">
+                                                    <h:outputLabel for="cecases-criteria-property-som" id="cecases-criteria-property-ol">
                                                         <h:outputText value="property list:"/>
                                                     </h:outputLabel>
                                                     <p:spacer height="5px"/>
 
-                                                    <p:selectOneMenu id="ceev-criteria-property-som" required="false" 
+                                                    <p:selectOneMenu id="cecases-criteria-property-som" required="false" 
                                                                      value="#{caseProfileBB.searchParams.property}"
                                                                      disabled="#{!caseProfileBB.searchParams.useProperty}">
                                                         
@@ -238,38 +236,38 @@
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-open-ol" for="ceev-filter-open" value="filter by open case? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-open" value="#{caseProfileBB.searchParams.useIsOpen}" >
-                                                        <p:ajax update="ceev-criteria-open" />
+                                                    <p:outputLabel id="cecases-filter-open-ol" for="cecases-filter-open" value="filter by open case? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-open" value="#{caseProfileBB.searchParams.useIsOpen}" >
+                                                        <p:ajax update="cecases-criteria-open" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:selectBooleanCheckbox id="ceev-criteria-open" 
+                                                    <p:selectBooleanCheckbox id="cecases-criteria-open" 
                                                                              value="#{caseProfileBB.searchParams.isOpen}" 
                                                                              disabled="#{!caseProfileBB.searchParams.useIsOpen}" />
-                                                    <p:outputLabel id="ceev-criteria-open-ol" for="ceev-criteria-open" 
+                                                    <p:outputLabel id="cecases-criteria-open-ol" for="cecases-criteria-open" 
                                                                    value="(checked = only open cases)" styleClass="italic"/>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-filter-propinfo-ol" for="ceev-filter-propinfo" value="filter by property info flag? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-filter-propinfo" value="#{caseProfileBB.searchParams.usePropertyInfoCase}" >
-                                                        <p:ajax update="ceev-criteria-propinfo" />
+                                                    <p:outputLabel id="cecases-filter-propinfo-ol" for="cecases-filter-propinfo" value="filter by property info flag? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-filter-propinfo" value="#{caseProfileBB.searchParams.usePropertyInfoCase}" >
+                                                        <p:ajax update="cecases-criteria-propinfo" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:selectBooleanCheckbox id="ceev-criteria-propinfo" 
+                                                    <p:selectBooleanCheckbox id="cecases-criteria-propinfo" 
                                                                              value="#{caseProfileBB.searchParams.propertyInfoCase}" 
                                                                              disabled="#{!caseProfileBB.searchParams.usePropertyInfoCase}" />
-                                                    <p:outputLabel id="ceev-criteria-propinfo-ol" for="ceev-criteria-propinfo" 
+                                                    <p:outputLabel id="cecases-criteria-propinfo-ol" for="cecases-criteria-propinfo" 
                                                                    value="(checked = only cases that store property info)" styleClass="italic"/>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                    <p:outputLabel id="ceev-query-limit-ol" for="ceev-query-limit" value="limit results to 100? "/>
-                                                    <p:selectBooleanCheckbox id="ceev-query-limit" value="#{caseProfileBB.searchParams.limitResultCountTo100}" />
+                                                    <p:outputLabel id="cecases-query-limit-ol" for="cecases-query-limit" value="limit results to 100? "/>
+                                                    <p:selectBooleanCheckbox id="cecases-query-limit" value="#{caseProfileBB.searchParams.limitResultCountTo100}" />
                                                 </h:panelGroup>
                                                 <h:panelGroup>
                                                     
@@ -280,9 +278,9 @@
                                     <p:commandButton    id="queryButton"
                                                         ajax="true" value="Run query" actionListener="#{caseProfileBB.executeQuery}"
                                                         process="@form"
-                                                        update="events-datascroller-form:events-datascroller
-                                                        events-datatable-form:events-datatable
-                                                        ceev-form-globalmessages:ceev-globalmessages
+                                                        update="
+                                                        caseListForm:caseTable
+                                                        cecases-messages-form:cecases-messages-global
                                                         "
                                                         />
                                 </p:fieldset>
@@ -311,7 +309,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Property" />
                                         </f:facet>
-                                        <h:outputText value="#{c.property.address}"/>
+                                        <h:outputText value="#{c.property.address} (#{c.property.muni.muniName})"/>
                                     </p:column>
                                     <p:column width="15%">
                                         <f:facet name="header">
