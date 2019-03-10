@@ -11,26 +11,19 @@ package com.tcvcog.tcvce.entities;
  */
 public enum CaseStage {
     
-    Investigation("Investigation", "caseStageInvestigationIconID"),
-    Enforcement("Enforcement", "caseStageEnforcementIconID"),
-    Citation("Citation", "caseStageCitationIconID"),
-    Closed("Closed", "caseStageClosedIconID"),
-    Unknown("Unknown", "caseStageUnknownIconID");
+    Investigation("Investigation"),
+    Enforcement("Enforcement"),
+    Citation("Citation"),
+    Closed("Closed");
     
     private final String label;
-    private final String iconPropertyLookup;
     
-    private CaseStage(String label, String icon){
+    private CaseStage(String label){
         this.label = label;
-        this.iconPropertyLookup = icon;
     }
     
     public String getLabel(){
         return label;
-    }
-    
-    public String getIconPropertyLookup(){
-        return iconPropertyLookup;
     }
     
     

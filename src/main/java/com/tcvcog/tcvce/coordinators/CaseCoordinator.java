@@ -135,7 +135,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         spcecase.setIsOpen(true);
         spcecase.setUseCaseCloseDateRange(false);
         spcecase.setUseCaseManager(false);
-        spcecase.setUseLegacy(false);
         
         return spcecase;
     }
