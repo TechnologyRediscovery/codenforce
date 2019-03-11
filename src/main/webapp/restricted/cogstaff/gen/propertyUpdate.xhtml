@@ -143,9 +143,9 @@
                                     </h:outputLabel>
                                  </h:panelGroup> 
                                  <h:panelGroup>
-                                    <p:selectBooleanCheckbox id="propVacantForm" value="#{propertyUpdateBB.currProp.vacant}" tabindex="14" disabled="false">
+                                    <p:selectBooleanCheckbox id="propVacantForm" value="#{propertyUpdateBB.currProp.vacant}" tabindex="14" disabled="false" >
                                         <p:ajax />
-                                    </p:selectBooleanCheckbox>>
+                                    </p:selectBooleanCheckbox>
                                  </h:panelGroup>
                                  
                                  
@@ -163,8 +163,9 @@
                             <p:spacer height="10px"/>
                             
 
-                             <h:commandButton id="updatePropertyFormCB" value="Commit Updated Property Information" 
-                                             action="#{propertyUpdateBB.updateProperty}"/>
+                             <p:commandButton id="updatePropertyFormCB" value="Commit Updated Property Information" 
+                                              icon="fa fa-floppy-o"
+                                              action="#{propertyUpdateBB.updateProperty}"/>
                           
 
                         </h:form>

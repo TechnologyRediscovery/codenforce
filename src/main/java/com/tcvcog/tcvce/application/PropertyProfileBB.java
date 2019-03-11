@@ -71,30 +71,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public PropertyProfileBB() {
     }
     
-    public void handlePhotoUpload(FileUploadEvent ev){
-        if(ev == null){
-            System.out.println("PhotoBB.handleFileUpload | event: null");
-            return;
-        }
-       
-        System.out.println("PhotoBB.handleFileUpload | event: " + ev.toString());
-        try {
-            
-            ImageServices is = getImageServices();
-            Photograph ph = new Photograph();
-            ph.setPhotoBytes(ev.getFile().getContents());
-            ph.setDescription("hello photo!");
-            ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
-            ph.setTimeStamp(LocalDateTime.now());
-            is.storePhotograph(ph);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        this.getPhotoList();
-    }
-    
-    public String createCase(){
-        
+
+    public void searchForProperties(ActionEvent event){
+        System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
+        PropertyIntegrator pi = new PropertyIntegrator();
         
         try {
             setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getActiveMuni().getMuniCode()));
@@ -107,6 +87,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to complete search! ", ""));
         }
+    }
+    
+    public String addProperty(){
+        //getSessionBean().setActiveProp(new Property());  // we do this after the prop has been inserted
+        return "propertyAdd";
     }
     
     public String openCECase(){
