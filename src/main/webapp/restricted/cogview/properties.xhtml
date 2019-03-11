@@ -25,9 +25,17 @@
 
                             <h1 class="property-blue">Properties</h1>
                             
-
+                            
+                            
                             <h:form id="propertySearchForm">
 
+                                <p:commandButton id="propertyAddButton"
+                                                 value="Add new property in #{sessionBean.activeMuni.muniName}" icon="fa fa-plus"
+                                                 action="#{propertyProfileBB.addProperty()}"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"
+                                                 />
+                                <p:spacer height="10px"/>
+                                
                                 <p:panelGrid columns="2" >
 
                                     <h:panelGroup>
@@ -303,7 +311,9 @@
                                     </h:panelGroup>
                                 </h:panelGrid>
                                 
-                                <p:commandButton ajax="false" value="Update Selected Property Info" action="#{propertyProfileBB.updateProperty}" disabled="false"/>
+                                <p:commandButton ajax="false" value="Update Selected Property Info" 
+                                                 action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"/>
                             </h:form>
 
                             <p:spacer height="10px"/>

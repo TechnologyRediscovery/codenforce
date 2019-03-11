@@ -87,7 +87,7 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
             // pull a new version of the property from the DB and store that in
             // the session to avoid errors in viewing any data that's not in the DB
             
-            // TODO: ^this^ (the integrator can only update as of this comment) --3/7/2019
+            // TODO: ^this^ (the integrator can only update & select as of this comment) --3/7/2019
             getSessionBean().setActiveProp(getCurrProp());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
