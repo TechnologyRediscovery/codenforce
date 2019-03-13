@@ -34,64 +34,41 @@
                                   
                         
                         <h:form id="requestCEActionFlowFormDescribePhoto">
-                            <p:dataTable
-                                id="photoTable"
-                                var="photo"
-                                value="#{cEActionRequestSubmitBB.photoList}"
-                                rowKey="#{photo.photoID}"
-                                tableStyleClass="primeDataTable"
-                                draggableRows="false" tabindex="6">
-                                <p:column width="5%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Select"/>
-                                    </f:facet>
-                                    <p:commandButton
-                                        icon="ui-icon-search"
-                                        update=":editor:photoDescriptionEditor"
-                                        >
-                                        <f:setPropertyActionListener value="#{photo}" target="#{cEActionRequestSubmitBB.selectedPhoto}" />
-                                    </p:commandButton>
-                                </p:column>
-                                <p:column width="45%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Photo"/>
-                                    </f:facet>
-                                    <p:graphicImage width="100%" value="#{imageServices.image}">
-                                        <f:param name="photoID" value="#{photo.photoID}"/>
-                                    </p:graphicImage>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Description"/>
-                                    </f:facet>
-                                    <h:outputText escape="false" value="#{photo.description}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:form>
-                        <p:spacer height="5px"/>
-                        
-                        <h:form id="editor">  
-                            <p:editor  id="photoDescriptionEditor"  value="#{cEActionRequestSubmitBB.selectedPhoto.description}" 
-                                               controls="bold italic underline strikethrough font size style color 
-                                               bullets numbering center undo redo rule link removeformat outdent 
-                                               indent link unlink copy cut paste rule alignleft center alignright"
-                                               width="1000" 
-                                               height="200"/>
-                                    <h:message for="photoDescriptionEditor" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    <p:commandButton value="Save description" icon="ui-icon-disk" update=":requestCEActionFlowFormDescribePhoto:photoTable" />
-                        </h:form>
-                        <p:spacer height="5px"/>
-
-                        <h:form id="requestCEActionFlowFormSavePhoto">
+                            <h2>Review and describe uploaded photos</h2>
+                                    <p:dataTable
+                                        id="photoTable"
+                                        var="photo"
+                                        value="#{cEActionRequestSubmitBB.photoList}"
+                                        rowKey="#{photo.photoID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="false" tabindex="6">
+                                        <p:column width="70%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Photo"/>
+                                            </f:facet>
+                                            <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                <f:param name="photoID" value="#{photo.photoID}"/>
+                                            </p:graphicImage>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Description"/>
+                                            </f:facet>
+                                            <p:inputTextarea id="desc" value="#{photo.description}"
+                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
+                                                <p:ajax />
+                                            </p:inputTextarea>
+                                        </p:column>
+                                        
+                                    </p:dataTable>
                             
+                            <p:spacer height="5px"/>
                             
-                        <p:commandButton  ajax="false" tabindex="12"
+                            <p:commandButton  ajax="false" tabindex="12"
                                               value="Next: Your contact details" id="continueToContactInfoButton"
                                               action="#{cEActionRequestSubmitBB.savePhotos}"/>
-
                         </h:form>
-
+                        
                     </div>
                 </f:view>
             </ui:define>
