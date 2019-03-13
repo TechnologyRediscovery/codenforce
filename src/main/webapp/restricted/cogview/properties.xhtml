@@ -33,6 +33,7 @@
                                                  value="Add new property in #{sessionBean.activeMuni.muniName}" icon="fa fa-plus"
                                                  action="#{propertyProfileBB.addProperty()}"
                                                  disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"
+                                                 
                                                  />
                                 <p:spacer height="10px"/>
                                 
@@ -183,6 +184,9 @@
                                                          property-info-form:prop-info-consttype-ot
                                                          property-info-form:prop-info-countycode-ot
                                                          property-info-form:prop-info-notes-ot
+                                                         property-info-form:prop-info-multiUnit-cb
+                                                         property-info-form:prop-info-vacant-cb
+                                                         property-info-form:prop-info-rental-cb
                                                          property-lists-form:prop-cases-datatable
                                                          property-lists-form:prop-persons-datatable
                                                          "/>
@@ -279,7 +283,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <p:spacer width="5px"/>
-                                        <p:selectBooleanCheckbox id="prop-info-rental-cb" value="#{propertyprofileBB.currProp.vacant}" tabindex="14" disabled="true"/>
+                                        <p:selectBooleanCheckbox id="prop-info-rental-cb" value="#{propertyProfileBB.currProp.rental}" tabindex="14" disabled="true"/>
                                     </h:panelGroup>
                                     
                                     <h:panelGroup>
@@ -289,7 +293,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <p:spacer width="5px"/>
-                                        <p:selectBooleanCheckbox id="prop-info-multiUnit-cb" value="#{propertyprofileBB.currProp.multiUnit}" tabindex="14" disabled="true"/>
+                                        <p:selectBooleanCheckbox id="prop-info-multiUnit-cb" value="#{propertyProfileBB.currProp.multiUnit}" tabindex="14" disabled="true"/>
                                     </h:panelGroup>
                                     
                                     <h:panelGroup>
@@ -299,7 +303,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup> 
                                         <p:spacer width="5px"/>
-                                        <p:selectBooleanCheckbox id="prop-info-vacant-cb" value="#{propertyprofileBB.currProp.vacant}" tabindex="14" disabled="true"/>
+                                        <p:selectBooleanCheckbox id="prop-info-vacant-cb" value="#{propertyProfileBB.currProp.vacant}" tabindex="14" disabled="true"/>
                                     </h:panelGroup>
                                     
                                     <h:panelGroup>

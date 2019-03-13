@@ -19,7 +19,7 @@ import javax.faces.application.FacesMessage;
  */
 public class PropertyAddBB extends BackingBeanUtils implements Serializable{
     
-    private Property prop;
+    private PropertyWithLists prop;
 
     /**
      * Creates a new instance of PropertyAddBB
@@ -30,7 +30,7 @@ public class PropertyAddBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         SessionBean sb = getSessionBean();
-        this.prop = new Property();
+        this.prop = new PropertyWithLists();
         this.prop.setMuni(sb.getActiveMuni());
         this.prop.setMuniCode(sb.getActiveMuni().getMuniCode());
     }
@@ -39,7 +39,7 @@ public class PropertyAddBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             getProp().setPropertyID(pi.insertProperty(getProp()));
-            getSessionBean().setActiveProp(getProp());
+            getSessionBean().setActivePropWithLists(getProp());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Successfully inserted property with ID " + getProp().getPropertyID() 
@@ -59,14 +59,14 @@ public class PropertyAddBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the prop
      */
-    public Property getProp() {
+    public PropertyWithLists getProp() {
         return prop;
     }
 
     /**
      * @param prop the prop to set
      */
-    public void setProp(Property prop) {
+    public void setProp(PropertyWithLists prop) {
         this.prop = prop;
     }
 
