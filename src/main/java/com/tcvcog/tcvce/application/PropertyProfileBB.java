@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIInput;
 import javax.faces.event.ActionEvent;
@@ -71,6 +72,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public PropertyProfileBB() {
     }
     
+    @PostConstruct
+    public void initBean(){
+        this.currProp = getSessionBean().getActivePropWithLists();
+    }
 
     public void searchForProperties(ActionEvent event){
         System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
