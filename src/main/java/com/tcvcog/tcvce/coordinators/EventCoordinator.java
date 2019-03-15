@@ -273,9 +273,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void editEvent(EventCECase evcase) throws IntegrationException{
+    public void editEvent(EventCECase evcase, User u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.updateEvent(evcase, false);
+        System.out.println("EventCoordinator.editEvent");
+        evcase.setAssignedTo(u);
+        ei.editEvent(evcase, false);
     }
     
     
@@ -364,7 +366,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public String updateEvent(EventCECase event, boolean clearViewConfirmation) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         // YIKES TODO: Case vetting logic needed here!
-        ei.updateEvent(event, clearViewConfirmation);
+        ei.editEvent(event, clearViewConfirmation);
         
         return "cecases";
     }

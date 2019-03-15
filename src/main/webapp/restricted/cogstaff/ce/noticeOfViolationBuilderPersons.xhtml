@@ -78,6 +78,13 @@
                                 </f:facet>
                                 <h:outputText value="#{p.addressStreet}"/>
                             </p:column>
+                            <p:column>
+                                <p:commandButton id="use-person-from-table-cb"
+                                                 ajax="false"
+                                                 value="Select this person"
+                                                 action="#{noticeOfViolationBB.storeRecipient(p)}"
+                            </p:column>
+                            
                         </p:dataTable>
 
 
@@ -106,14 +113,25 @@
 
                         
                         <p:commandButton id="chartBtn" 
-                                         value="Verify Person ID" 
+                                         value="Look up person" 
                                          actionListener="#{noticeOfViolationBB.checkNOVRecipient}" 
                                          ajax="true" 
-                                         update=    "notice-recipient-form:lookup-person-it
+                                         update=    "notice-recipient-form:lookup-person-ot
                                                     msg-form:person-add-messages"/>
                         <p:spacer height="5px"/>
                         
-                        <h:outputText id="lookup-person-it" 
+                        
+                            <p:dataScroller
+                                id="person-scroller"
+                                value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                var="block" 
+                                widgetVar="noticebuilder-ds-var">
+                                
+                                
+                            </p:dataScroller>
+                        
+                        
+                        <h:outputText id="lookup-person-ot" 
                                       value="Lookup verification: #{!empty noticeOfViolationBB.retrievedManualLookupPerson?noticeOfViolationBB.retrievedManualLookupPerson.lastName:null}"/>
 
                         <hr/>

@@ -68,7 +68,7 @@ public class CECase extends EntityUtils implements Serializable{
     }
   
     
-    public int getCaseAge(){
+    public long getCaseAge(){
         return getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
     
@@ -259,8 +259,7 @@ public class CECase extends EntityUtils implements Serializable{
      * @return the originiationDatePretty
      */
     public String getOriginiationDatePretty() {
-        DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE dd MM yyyy, HH:mm");
-        originiationDatePretty = originationDate.format(f);
+        originiationDatePretty = getPrettyDate(originationDate);
         return originiationDatePretty;
     }
 

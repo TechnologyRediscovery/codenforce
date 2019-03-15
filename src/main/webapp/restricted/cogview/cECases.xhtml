@@ -282,10 +282,7 @@
                                     <p:commandButton    id="queryButton"
                                                         ajax="true" value="Run query" actionListener="#{caseProfileBB.executeQuery}"
                                                         process="@form"
-                                                        update="
-                                                        caseListForm:caseTable
-                                                        cecases-messages-form:cecases-messages-global
-                                                        "
+                                                        oncomplete="PF('case-phase-dialog').show()"
                                                         />
                                 </p:fieldset>
                             </h:form>
@@ -422,7 +419,17 @@
                                             <div class="rowExpansion">
                                                 <h:outputText id="selcase-stage-ot" value="#{caseProfileBB.currentCase.caseStage}: #{caseProfileBB.currentCase.casePhase.label} "/>
                                             </div>
+                                            <p:commandButton    id="overridephase-cb" 
+                                                                ajax="true"
+                                                                immediate="true"
+                                                                onclick="PF('phase-override').show()"
+                                                                icon="fa fa-bullhorn" styleClass="noFill button-size-small"
+                                                                rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                                value="override case phase" 
+                                                                update="casePhaseChangeForm"
+                                                                />
                                         </h:panelGroup>
+                                        
 
                                         <h:panelGroup>
                                             <h:outputLabel styleClass="bold" value="Opening Date:"/>
@@ -486,21 +493,7 @@
                                                         icon="fa fa-refresh" styleClass="noFill"
                                                         value="reload current case data" 
                                                         update="
-                                                        case-details-form:header-id-ot
-                                                        case-details-form:header-type-ot
-                                                        case-details-form:header-addr-ot
-                                                        case-details-form:header-muni-ot
-                                                        case-details-form:selcase-id-ot
-                                                        case-details-form:selcase-addr-ot
-                                                        case-details-form:selcase-muni-ot
-                                                        case-details-form:selcase-stage-ot
-                                                        case-details-form:selcase-odate-it
-                                                        case-details-form:selcase-cdate-it
-                                                        case-details-form:selcase-age-it
-                                                        case-details-form:selcase-manager-it
-                                                        case-details-form:selcase-pacc
-                                                        case-details-form:selcase-access-sbcb
-                                                        case-details-form:selcase-forwardlinking-sbcb
+                                                        case-details-form
                                                         violation-form:violation-table
                                                         notices-form:notices-ds
                                                         action-requests-form:actionRequestTable
@@ -511,7 +504,7 @@
                                      
                                     <p:commandButton   id="print-case-cb" 
                                                         ajax="false" action="#{caseProfileBB.printCase}"
-                                                        icon="fa fa-refresh" styleClass="noFill"
+                                                        icon="fa fa-print" styleClass="noFill"
                                                         value="print case profile" />
 
                                 </div>
@@ -521,8 +514,8 @@
 
 
 
-                            <h3>Events</h3>
 
+                            <h2>Add new event</h2>
 
                             <h:form id="formEventAddAjax">
 
@@ -531,12 +524,14 @@
                                              footerClass="gridFooter" style="vertical-align: top;">
 
                                     <h:panelGroup>
-                                        <h:outputLabel for="newEventTypeMenu">
-                                            <h:outputText value="Select an event type:"/>
+                                        <h:outputLabel styleClass="bold" for="newEventTypeMenu">
+                                            <h:outputText value="Step 1: Choose type"/>
                                         </h:outputLabel>
 
                                         <p:selectOneListbox id="newEventTypeMenu" required="true" value="#{caseProfileBB.selectedEventType}" tabindex="10">
-                                            <p:ajax update="categoryList" immediate="true"/> 
+                                            <p:ajax update="categoryList
+                                                    event-add-dialog-show-cb" 
+                                                    immediate="true"/> 
                                             <f:selectItems value="#{caseProfileBB.availableEventTypeList}" var="et" itemLabel="#{et.label}" />
                                         </p:selectOneListbox>
 
@@ -545,15 +540,17 @@
 
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <h:outputLabel for="categoryList">
-                                            <h:outputText value="Event Categories of selected type:"/>
+                                        <h:outputLabel styleClass="bold" for="categoryList">
+                                            <h:outputText value="Step 2: Choose category"/>
                                         </h:outputLabel>
 
                                         <p:selectOneListbox style="width: 300px;" id="categoryList" value="#{caseProfileBB.selectedEventCategory}" tabindex="10">
                                             <p:ajax update="selectedEventCategoryDescription
                                                     selectedEventCategoryDescription 
                                                     selectedEventCateogryRequiresViewConfirm 
-                                                    selectedEventCateogryNotifiesCaseMonitors" 
+                                                    selectedEventCateogryNotifiesCaseMonitors
+                                                    event-add-dialog-show-cb
+                                                    " 
                                                     immediate="true"/>
                                             <f:converter converterId="eventCategoryConverter"/>
                                             <f:selectItems  id="catItemsList" value="#{caseProfileBB.eventCategoryList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
@@ -562,17 +559,24 @@
                                         <h:message for="categoryList" showDetail="false" showSummary="true"  
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                         <h:outputLabel styleClass="bold" for="newEventTypeMenu">
+                                            <h:outputText value="Step 3: Create"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
                                         <p:commandButton    id="event-add-dialog-show-cb"
                                                             ajax="true" 
                                                             process="@form"
                                                             actionListener="#{caseProfileBB.startNewEvent}" 
                                                             oncomplete="PF('add-event-dialog-var').show()"
-                                                            value="Create new event of this category"  
+                                                            disabled="#{empty caseProfileBB.selectedEventCategory}"
+                                                            rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                            value="Create new event "  
                                                             icon="fa fa-edit"
                                                             update="addNewEventForm"/>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
+                                        <h3>Event category info:</h3>
                                         <h:outputText value="Event Cateogry Description: #{caseProfileBB.selectedEventCategory.eventCategoryDesc}" id="selectedEventCategoryDescription"/>
                                         <p:spacer height="10px"/>
                                         <h:outputText value="Requires View Confirmation: #{caseProfileBB.selectedEventCategory.requiresviewconfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
@@ -697,7 +701,7 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="Creation time stamp"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.eventTimeStamp}"/>
+                                                        <h:outputText value="#{e.timestampPretty}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -1411,9 +1415,11 @@
                             <p:commandButton ajax="true" actionListener="#{caseProfileBB.attachEventToCase}"
                                              value="Create new event" icon="fa fa-plus"
                                              oncomplete="PF('add-event-dialog-var').hide()"
-                                             disabled="#{caseProfileBB.selectedEvent.eventID == 0}"
+                                             disabled="#{!(caseProfileBB.selectedEvent.eventID == 0)}"
                                              rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
-                                             update="event-dt-form:caseEventTable
+                                             update="
+                                             case-details-form
+                                             event-dt-form:caseEventTable
                                              violation-form:violation-table
                                              case-details-form:selcase-stage-ot
                                              case-details-form:selcase-cdate-it
@@ -1421,10 +1427,12 @@
 
                             <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitEventEdits}"
                                              value="Edit event" icon="fa fa-edit"
-                                             disabled="#{!(caseProfileBB.selectedEvent.eventID == 0)}"
+                                             disabled="#{caseProfileBB.selectedEvent.eventID == 0}"
                                              rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
                                              oncomplete="PF('add-event-dialog-var').hide()"
-                                             update="event-dt-form:caseEventTable
+                                             update="
+                                             case-details-form
+                                             event-dt-form:caseEventTable
                                              violation-form:violation-table
                                              case-details-form:selcase-stage-ot
                                              case-details-form:selcase-cdate-it
@@ -1540,22 +1548,24 @@
 
 
                     <p:dialog    id="case-phase-dialog"
-                                 height="650" width="900"
-                                 widgetVar="case-phase-var"
-                                 closable="true" 
-                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+                                        height="650" width="900"
+                                        widgetVar="phase-override"
+                                        closable="true" >
 
                         
-                        <h2>Case phase management</h2>
-
-                        <span class="bold">Current phase: </span>
-                        <h:outputText class="mono" value="#{caseProfileBB.currentCase.casePhase.label}"/>
-
-
-                        <h3>Manually change case phase</h3>
+                        <h2>Override case phase</h2>
+                        
                         <h:form id="casePhaseChangeForm">
+                         <p:outputLabel for="override-currcase-ot">
+                                <h:outputText styleClass="bold" value="Current phase:"/>
+                            </p:outputLabel>
+                        <h:outputText id="override-currcase-ot" value="#{caseProfileBB.currentCase.casePhase.label} (case ID:#{caseProfileBB.currentCase.caseID}) "/>
+                            
+                        <p:spacer height="5px"/>
 
-
+                         <p:outputLabel for="casePhaseSOM">
+                                <h:outputText styleClass="bold" value="Choose new phase:"/>
+                            </p:outputLabel>
                             <p:selectOneMenu value="#{caseProfileBB.selectedCasePhase}"
                                              id="casePhaseSOM">
 
@@ -1564,43 +1574,23 @@
                                                itemValue="#{cp}"
                                                itemLabel="#{cp.label}"/>
                             </p:selectOneMenu>
-                            <p:spacer/>
-                            <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
-                                             value="Override to selected phase"/>
 
-                            <p:spacer height="10px"/>
+                            <p:commandButton value="Abort override" onclick="PF('phase-override').hide()" type="button" icon="fa fa-stop"/>
 
-                            <ui:remove>
-
-                                <p:commandButton onclick="PF('cd').show()" type="button" icon="fa fa-bullhorn"
-                                                 value="Manually override case phase to selected value"/>
-
-                                <p:confirmDialog message="Manually override a case's phase can cause a spaghetti-like mess of our
-                                                 case management process. Note: This action will generate a special event which will
-                                                 be analyzed at our next group meeting to discuss changes to our standard protocol to avoid
-                                                 the need for any manual case phase changes. Please add a note event to the case to explain
-                                                 why the case phase is being changed manually." severity="alert" widgetVar="cd">
-
-                                    <p:commandButton value="Abort override" onclick="PF('cd').hide()" type="button" icon="fa fa-stop"/>
-                                    <p:commandButton ajax="false" action="#{caseProfileBB.overrideCasePhase}" icon="fa fa-bullhorn"
-                                                     value="Yes, override phase" oncomplete="PF('cd').hide()"/>
-                                </p:confirmDialog>
-
-                            </ui:remove>
+                            <p:commandButton ajax="true" 
+                                             rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                             actionListener="#{caseProfileBB.overrideCasePhase}" 
+                                             icon="fa fa-bullhorn"
+                                             value="Override phase" 
+                                             oncomplete="PF('phase-override').hide()"
+                                             update="case-details-form
+                                             event-dt-form
+                                             caseListForm:caseTable
+                                             "/>
 
                         </h:form>
 
 
-                        <h2>Next case action (experimental)</h2>
-
-                        <span class="bold">Next phase: </span>
-                        <h:outputText class="mono" value="#{caseProfileBB.nextPhase.label}"/>
-
-                        <p:spacer height="10px"/>
-
-                        <span class="bold">Next action in protocol: </span>
-
-                        <h:outputText value="#{caseProfileBB.eventForTriggeringCasePhaseAdvancement.category.eventCategoryTitle}"/>
 
 
                     </p:dialog>

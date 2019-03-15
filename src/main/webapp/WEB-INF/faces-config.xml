@@ -1007,8 +1007,12 @@
             <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        <navigation-case>
+            <from-outcome>printCase</from-outcome>
+            <to-view-id>/restricted/cogView/ceCasePrint.xhtml</to-view-id>
+        </navigation-case>
     </navigation-rule>
-    
+        
     <navigation-rule>
         <from-view-id>/restricted/cogstaff/ce/requestManagement.xhtml</from-view-id>
         <navigation-case>
