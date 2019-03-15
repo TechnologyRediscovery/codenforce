@@ -87,6 +87,23 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         return searchParams;
     }
     
+    public void loadEventsRequiringViewConf(ActionEvent ev){
+        System.out.println("CEEventsBB.loadOfficerActivity");
+        EventCoordinator ec = getEventCoordinator();
+        searchParams = ec.getDefaultSearchParamsCEEventsRequiringView(
+                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+        try {
+            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            generateQueryResultMessage();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not query the database, sorry.", ""));
+        }
+    }
+    
+    
     public void loadOfficerActivityPastWeek(ActionEvent ev){
         System.out.println("CEEventsBB.loadOfficerActivity");
         EventCoordinator ec = getEventCoordinator();

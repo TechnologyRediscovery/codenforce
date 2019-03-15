@@ -18,6 +18,9 @@ ALTER TABLE property ALTER COLUMN propertyid SET DEFAULT nextval('propertyid_seq
 
 COMMIT;
 
+-- add updated persons in all the users
+
+
 
 BEGIN;
 -- update login entries with default person
