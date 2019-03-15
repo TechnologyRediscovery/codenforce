@@ -144,16 +144,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public List<CECase> getOpenCECaseList(Municipality m) throws IntegrationException{
         CaseIntegrator ci = getCaseIntegrator();
-        List<CECase> cList = ci.getCECases(getDefaultSearchParamsCECase(m));
+        List<CECase> cList = ci.queryCECases(getDefaultSearchParamsCECase(m));
         return cList;
     }
     
     public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException{
         CaseIntegrator ci = getCaseIntegrator();
-        return ci.getCECases(params);
+        return ci.queryCECases(params);
         
     }
-            
+    
+    
+    public String generateCaseProfileMarkup(CECase c){
+        StringBuilder sb = new StringBuilder();
+        
+        
+        
+        return sb.toString();
+    }
             
     
     public CECase getInitializedCECase(Property p, User u){
@@ -388,43 +396,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         
-         switch(role){
-            case Developer:
-              addGeneralEventTypes(typeList);
-                
-               
-               break;
-            
-            case SysAdmin:
-               
-               break;               
-               
-            case CogStaff:
-               
-               break;               
-               
-            case EnforcementOfficial:
-               
-               break;
-               
-            case MuniStaff:
-                
-               break;
-               
-            case MuniReader:
-                
-               break;               
-               
-            default:
-               
-        }        
         
         return typeList;
     }
     
-    private List<EventType> addGeneralEventTypes(List<EventType> list){
-        return list;
-    }
     
     
     /**
@@ -770,9 +745,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public void processReturnedNotice(CECase c, NoticeOfViolation nov) throws IntegrationException{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        
         nov.setLetterReturnedDate(LocalDateTime.now());
-        
         cvi.updateViolationLetter(nov);
         refreshCase(c);
     } 

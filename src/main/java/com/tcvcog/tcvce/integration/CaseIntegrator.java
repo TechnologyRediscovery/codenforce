@@ -86,7 +86,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return caseList;
     }
     
-    public List<CECase> getCECases(SearchParamsCECases params) throws IntegrationException{
+    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException{
         ArrayList<CECase> caseList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;

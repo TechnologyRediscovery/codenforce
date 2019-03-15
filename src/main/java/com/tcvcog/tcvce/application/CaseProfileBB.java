@@ -251,8 +251,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     
     public void commitEventEdits(){
         EventCoordinator ec = getEventCoordinator();
+        CaseIntegrator ci = getCaseIntegrator();
         try {
-            ec.editEvent(selectedEvent);
+            ec.editEvent(selectedEvent, getSessionBean().getFacesUser());
+            currentCase = ci.getCECase(currentCase.getCaseID());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Event udpated!", ""));
         } catch (IntegrationException ex) {
@@ -339,17 +341,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
   
-
     /**
      *
-     * @return
+     * @param ev
      */
-    public String overrideCasePhase() {
+    public void overrideCasePhase(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         try {
             cc.manuallyChangeCasePhase(currentCase, getSelectedCasePhase());
             currentCase = ci.getCECase(currentCase.getCaseID());
+            updateCaseInCaseList(currentCase);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Updated case phase; please refresh case",""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -364,8 +369,27 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                             "Please check with your system administrator"));
 
         }
-        
-        return "";
+    }
+    
+    private void updateCaseInCaseList(CECase c){
+        CaseIntegrator ci = getCaseIntegrator();
+        Iterator<CECase> it = caseList.iterator();
+        CECase localCase;
+        int idx = 0;
+        while(it.hasNext()){
+            localCase = it.next();
+            if(localCase.getCaseID() == c.getCaseID()){
+                try {
+                    caseList.set(idx, ci.getCECase(c.getCaseID()));
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Error updating case in case docket",
+                                    "Please check with your system administrator"));
+                } // end catch
+            } // end if
+            idx++;
+        } // end while
     }
 
     public String reloadPage() {
@@ -376,11 +400,15 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         try {
             currentCase = ci.getCECase(currentCase.getCaseID());
-            System.out.println("CaseProfileBB.refreshCurrentCase");
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         
+    }
+    
+    public void initiatePhaseOverride(ActionEvent ev){
+        System.out.println("CaseProfileBB.initiatePhaseOverride");
+        // do nothing
     }
 
     
@@ -1078,7 +1106,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             searchParams.setMuni(getSessionBean().getActiveMuni());
             try {
                 System.out.println("CaseProfileBB.getCaseList | getting list for : " + getSessionBean().getActiveMuni().getMuniName());
-                caseList = ci.getCECases(searchParams);
+                caseList = ci.queryCECases(searchParams);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }

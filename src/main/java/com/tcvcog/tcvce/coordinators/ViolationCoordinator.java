@@ -76,6 +76,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
      * @return the database key assigned to the inserted violation
      * @throws IntegrationException
      * @throws ViolationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
      */
     public int attachViolationToCaseAndInsertTimeFrameEvent(CodeViolation v, CECase c) throws IntegrationException, ViolationException, CaseLifecyleException{
         
@@ -83,7 +84,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         EventCoordinator ec = getEventCoordinator();
         EventCECase tfEvent;
         int violationStoredDBKey;
-        
+        StringBuilder sb = new StringBuilder();
         
 //        EventCategory eventCat = ec.getInitiatlizedEventCategory(
 //                                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
@@ -92,8 +93,19 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         tfEvent = ec.getInitializedEvent(c, eventCat);
         tfEvent.setDateOfRecord(v.getStipulatedComplianceDate());
         tfEvent.setCreator(c.getCaseManager());
-        tfEvent.setDescription(getResourceBundle(Constants.MESSAGE_TEXT)
+        
+        sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
                         .getString("complianceTimeframeEndEventDesc"));
+        sb.append("Case: ");
+        sb.append(c.getCaseName());
+        sb.append(" at ");
+        sb.append(c.getProperty().getAddress());
+        sb.append("(");
+        sb.append(c.getProperty().getMuni().getMuniName());
+        sb.append(")");
+        sb.append("; Violation: ");
+        sb.append(v.getViolatedEnfElement().getCodeElement().getHeaderString());
+        tfEvent.setDescription(sb.toString());
         
         if(verifyCodeViolationAttributes(v)){
             violationStoredDBKey = vi.insertCodeViolation(v);

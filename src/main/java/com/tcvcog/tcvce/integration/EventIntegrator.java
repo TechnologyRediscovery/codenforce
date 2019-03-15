@@ -504,7 +504,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void updateEvent(EventCECase event, boolean clearViewConfirmation) throws IntegrationException {
+    public void editEvent(EventCECase event, boolean clearViewConfirmation) throws IntegrationException {
         String query = "UPDATE public.ceevent\n"
                 + "   SET ceeventcategory_catid=?, cecase_caseid=?, dateofrecord=?, \n"
                 + "       eventdescription=?, login_userid=?, disclosetomunicipality=?, \n"
@@ -532,12 +532,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(8, event.isActive());
             stmt.setBoolean(9, event.isHidden());
             stmt.setString(10, event.getNotes());
-            stmt.setInt(11, event.getEventID());
-            stmt.setInt(12, event.getAssignedTo().getUserID());
-            
-
-            System.out.println("EventInteegrator.getEventByEventID| sql: " + stmt.toString());
-
+            stmt.setInt(11, event.getAssignedTo().getUserID());
+            stmt.setInt(12, event.getEventID());
             stmt.executeUpdate();
 
             // only call the method if the view has been confirmed--so there's something to clear

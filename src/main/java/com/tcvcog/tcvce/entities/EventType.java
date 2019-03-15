@@ -24,6 +24,7 @@ package com.tcvcog.tcvce.entities;
 public enum EventType {
     Origination("Case Origination"),
     Action("Officer Action"),
+    CaseAdmin("Case Admin"),
     PhaseChange("Case Phase Change"),
     Closing("Case Closing"),
     Timeline("Case Timeline"),
