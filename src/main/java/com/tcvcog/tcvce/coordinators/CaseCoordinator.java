@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
@@ -238,7 +239,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationEvent.setCreator(u);
             originationEvent.setCaseID(insertedCase.getCaseID());
             originationEvent.setDateOfRecord(LocalDateTime.now());
-            processCEEvent(newCase, originationEvent);
+            addNewCEEvent(newCase, originationEvent);
     }
     
     /**
@@ -306,12 +307,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the case to which the event should be added
      * @param e the event to add to the case also included in this call
-     * @param violationList
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public void processCEEvent(CECase c, EventCECase e) 
+    public void addNewCEEvent(CECase c, EventCECase e) 
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
          
@@ -321,7 +321,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 processActionEvent(c, e);
                 break;
             case Compliance:
-                // deprecated--previously called processComplianceEvent()
+                // deprecated--directly call addNewComplianceEvent instead
                 break;
             case Closing:
                 processClosingEvent(c, e);
@@ -346,7 +346,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException in the case of a DB error
      * @throws CaseLifecyleException in the case of date mismatch
      */
-    public void processComplianceEvent(CECase c, EventCECase e, CodeViolation viol) 
+    public void addNewComplianceEvent(CECase c, EventCECase e, CodeViolation viol) 
             throws ViolationException, IntegrationException, CaseLifecyleException{
         
         
@@ -363,6 +363,69 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         
     } // close method
+    
+     /**
+     * TODO: finish
+     * @param c
+     * @param u
+     * @return 
+     */
+    public List<EventType> getAvailableEvents(CECase c, User u){
+        List<EventType> typeList = new ArrayList<>();
+        RoleType role = u.getRoleType();
+        
+        if(role == RoleType.EnforcementOfficial 
+                || u.getRoleType() == RoleType.Developer){
+            typeList.add(EventType.Action);
+            typeList.add(EventType.Timeline);
+            
+        }
+        
+        if(role != RoleType.MuniReader){
+            typeList.add(EventType.Communication);
+            typeList.add(EventType.Meeting);
+            typeList.add(EventType.Custom);
+        }
+        
+        
+         switch(role){
+            case Developer:
+              addGeneralEventTypes(typeList);
+                
+               
+               break;
+            
+            case SysAdmin:
+               
+               break;               
+               
+            case CogStaff:
+               
+               break;               
+               
+            case EnforcementOfficial:
+               
+               break;
+               
+            case MuniStaff:
+                
+               break;
+               
+            case MuniReader:
+                
+               break;               
+               
+            default:
+               
+        }        
+        
+        return typeList;
+    }
+    
+    private List<EventType> addGeneralEventTypes(List<EventType> list){
+        return list;
+    }
+    
     
     /**
      * Iterates over all of a case's violations and checks for compliance. 
@@ -418,7 +481,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                    
             complianceClosingEvent = ec.getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
-            processCEEvent(c, complianceClosingEvent);
+            addNewCEEvent(c, complianceClosingEvent);
             
         } // close if
         

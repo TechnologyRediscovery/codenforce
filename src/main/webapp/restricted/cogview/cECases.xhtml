@@ -32,7 +32,7 @@
 
                             <h:form id="cecases-search-form">
                                 <p:fieldset legend="search options" 
-                                            toggleable="true" collapsed="false" style="background-color: white;">
+                                            toggleable="true" collapsed="true" style="background-color: white;">
                                     <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd-solid-back"
                                                  footerClass="gridFooter">
                                         <h:panelGroup>
@@ -483,7 +483,7 @@
 
                                     <p:commandButton    id="refresh-case-cb" 
                                                         ajax="true" actionListener="#{caseProfileBB.refreshCurrentCase}"
-                                                        icon="fa fa-refresh"
+                                                        icon="fa fa-refresh" styleClass="noFill"
                                                         value="reload current case data" 
                                                         update="
                                                         case-details-form:header-id-ot
@@ -508,6 +508,11 @@
                                                         "
 
                                                         />
+                                     
+                                    <p:commandButton   id="print-case-cb" 
+                                                        ajax="false" action="#{caseProfileBB.printCase}"
+                                                        icon="fa fa-refresh" styleClass="noFill"
+                                                        value="print case profile" />
 
                                 </div>
 
@@ -530,9 +535,9 @@
                                             <h:outputText value="Select an event type:"/>
                                         </h:outputLabel>
 
-                                        <p:selectOneListbox id="newEventTypeMenu" required="true" value="#{eventManageBB.selectedEventType}" tabindex="10">
+                                        <p:selectOneListbox id="newEventTypeMenu" required="true" value="#{caseProfileBB.selectedEventType}" tabindex="10">
                                             <p:ajax update="categoryList" immediate="true"/> 
-                                            <f:selectItems value="#{eventManageBB.userAdminEventTypeList}"/>
+                                            <f:selectItems value="#{caseProfileBB.availableEventTypeList}" var="et" itemLabel="#{et.label}" />
                                         </p:selectOneListbox>
 
                                         <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
@@ -544,14 +549,14 @@
                                             <h:outputText value="Event Categories of selected type:"/>
                                         </h:outputLabel>
 
-                                        <p:selectOneListbox style="width: 300px;" id="categoryList" value="#{eventManageBB.selectedEventCategory}" tabindex="10">
+                                        <p:selectOneListbox style="width: 300px;" id="categoryList" value="#{caseProfileBB.selectedEventCategory}" tabindex="10">
                                             <p:ajax update="selectedEventCategoryDescription
                                                     selectedEventCategoryDescription 
                                                     selectedEventCateogryRequiresViewConfirm 
                                                     selectedEventCateogryNotifiesCaseMonitors" 
                                                     immediate="true"/>
                                             <f:converter converterId="eventCategoryConverter"/>
-                                            <f:selectItems  id="catItemsList" value="#{eventManageBB.eventCategoryList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                            <f:selectItems  id="catItemsList" value="#{caseProfileBB.eventCategoryList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
                                         </p:selectOneListbox>
 
                                         <h:message for="categoryList" showDetail="false" showSummary="true"  
@@ -560,23 +565,19 @@
                                         <p:commandButton    id="event-add-dialog-show-cb"
                                                             ajax="true" 
                                                             process="@form"
-                                                            actionListener="#{eventManageBB.startNewEvent}" 
+                                                            actionListener="#{caseProfileBB.startNewEvent}" 
                                                             oncomplete="PF('add-event-dialog-var').show()"
                                                             value="Create new event of this category"  
                                                             icon="fa fa-edit"
-                                                            update="add-event-dialog
-                                                            addNewEventForm:add-event-currcase-ot
-                                                            addNewEventForm:add-event-et-ot
-                                                            addNewEventForm:add-event-ec-ot
-                                                            addNewEventForm:add-event-cd-ot"/>
+                                                            update="addNewEventForm"/>
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                        <h:outputText value="Event Cateogry Description: #{eventManageBB.selectedEventCategory.eventCategoryDesc}" id="selectedEventCategoryDescription"/>
+                                        <h:outputText value="Event Cateogry Description: #{caseProfileBB.selectedEventCategory.eventCategoryDesc}" id="selectedEventCategoryDescription"/>
                                         <p:spacer height="10px"/>
-                                        <h:outputText value="Requires View Confirmation: #{eventManageBB.selectedEventCategory.requiresviewconfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
+                                        <h:outputText value="Requires View Confirmation: #{caseProfileBB.selectedEventCategory.requiresviewconfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
                                         <p:spacer height="10px"/>
-                                        <h:outputText value="Triggers notification of case monitor subscribers: #{eventManageBB.selectedEventCategory.notifycasemonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
+                                        <h:outputText value="Triggers notification of case monitor subscribers: #{caseProfileBB.selectedEventCategory.notifycasemonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
 
                                     </h:panelGroup>
                                 </h:panelGrid>
@@ -653,7 +654,7 @@
                                         </f:facet>
                                         <p:commandButton icon="fa fa-edit"
                                                          ajax="true"
-                                                         actionListener="#{eventManageBB.editCEEvent(e)}" 
+                                                         actionListener="#{caseProfileBB.editEvent(e)}" 
                                                          oncomplete="PF('add-event-dialog-var').show()"
                                                          update="
                                                             add-event-dialog
@@ -1288,13 +1289,31 @@
 
                             <h1>Add/edit case event</h1>
 
-                            <h:outputText id="add-event-currcase-ot" value="Current Case: #{caseProfileBB.currentCase.caseID}: #{caseProfileBB.currentCase.caseName} "/>
+                            <p:outputLabel for="add-event-ec-ot">
+                                <h:outputText styleClass="bold" value="Event:"/>
+                            </p:outputLabel>
+                            <h:outputText id="add-event-ec-ot" value="#{caseProfileBB.selectedEvent.category.eventCategoryTitle} (ID:#{caseProfileBB.selectedEvent.eventID})"/>
+                            
                             <p:spacer height="5px"/>
-                            <h:outputText id="add-event-et-ot" value="Event Type: #{eventManageBB.eventInProcess.category.eventType.label}"/>
+                            
+                            <p:outputLabel for="add-event-currcase-ot">
+                                <h:outputText styleClass="bold" value="Case:"/>
+                            </p:outputLabel>
+                            <h:outputText id="add-event-currcase-ot" value="#{caseProfileBB.currentCase.caseName} (ID:#{caseProfileBB.currentCase.caseID}) "/>
+                            
                             <p:spacer height="5px"/>
-                            <h:outputText id="add-event-ec-ot" value="Event Category: #{eventManageBB.eventInProcess.category.eventCategoryTitle}"/>
+                            
+                            <p:outputLabel for="add-event-et-ot">
+                                <h:outputText styleClass="bold" value="Event type:"/>
+                            </p:outputLabel>
+                            <h:outputText id="add-event-et-ot" value="#{caseProfileBB.selectedEvent.category.eventType.label}"/>
+                            
                             <p:spacer height="5px"/>
-                            <h:outputText id="add-event-cd-ot" value="Category description: #{eventManageBB.eventInProcess.category.eventCategoryDesc}"/>
+                            
+                            <p:outputLabel for="add-event-cd-ot">
+                                <h:outputText styleClass="bold" value="Cateogry description:"/>
+                            </p:outputLabel>
+                            <h:outputText id="add-event-cd-ot" value="#{caseProfileBB.selectedEvent.category.eventCategoryDesc}"/>
 
 
 
@@ -1309,7 +1328,7 @@
                                         <p:outputLabel for="eventDesc">
                                             <h:outputText value="Short Description:"/>
                                         </p:outputLabel>
-                                        <p:inputText id="eventDesc" value="#{eventManageBB.eventInProcess.description}" 
+                                        <p:inputText id="eventDesc" value="#{caseProfileBB.selectedEvent.description}" 
                                                      style="width: 600px;" tabindex="3" required="true" styleClass="inputText"/>
                                         <h:message for="eventDesc" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1322,7 +1341,7 @@
                                         <h:outputText value="Active Event?"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="activeEvent" value="#{eventManageBB.eventInProcess.active}" />
+                                    <p:selectBooleanCheckbox tabindex="18" id="activeEvent" value="#{caseProfileBB.selectedEvent.active}" />
 
                                 </h:panelGroup>
 
@@ -1331,7 +1350,7 @@
                                         <h:outputText value="Date of Record"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:calendar value="#{eventManageBB.eventInProcess.dateOfRecordUtilDate}" 
+                                    <p:calendar value="#{caseProfileBB.selectedEvent.dateOfRecordUtilDate}" 
                                                 mode="popup"  id="eventDateCal"
                                                 showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                 navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -1346,7 +1365,7 @@
                                         <h:outputText value="Disclose to Municipalities"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToMuniIS" value="#{eventManageBB.eventInProcess.discloseToMunicipality}" />
+                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToMuniIS" value="#{caseProfileBB.selectedEvent.discloseToMunicipality}" />
                                 </h:panelGroup>
 
                                 <h:panelGroup>
@@ -1354,7 +1373,7 @@
                                         <h:outputText value="Disclose to Public"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToPublic" value="#{eventManageBB.eventInProcess.discloseToPublic}" />
+                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToPublic" value="#{caseProfileBB.selectedEvent.discloseToPublic}" />
                                 </h:panelGroup>
 
 
@@ -1364,7 +1383,7 @@
                                         <h:outputText value="Require view confirmation by case manager"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="requireViewConfirmationSwitch" value="#{eventManageBB.eventInProcess.requiresViewConfirmation}"  />
+                                    <p:selectBooleanCheckbox tabindex="18" id="requireViewConfirmationSwitch" value="#{caseProfileBB.selectedEvent.requiresViewConfirmation}"  />
                                 </h:panelGroup>
 
                                 <f:facet name="footer">
@@ -1372,7 +1391,7 @@
                                         <h:outputText value="Event Notes:"/>
                                     </h:outputLabel>
                                     <h:panelGroup>
-                                        <p:editor id="eventNotes" value="#{eventManageBB.eventInProcess.notes}" 
+                                        <p:editor id="eventNotes" value="#{caseProfileBB.selectedEvent.notes}" 
                                                   controls="bold italic underline strikethrough font size style color 
                                                   bullets numbering center undo redo rule link removeformat outdent 
                                                   indent link unlink copy cut paste rule alignleft center alignright"
@@ -1389,9 +1408,32 @@
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('add-event-dialog-var').hide()"/>
 
-                            <p:commandButton ajax="true" actionListener="#{eventManageBB.attachEventToCase}"
+                            <p:commandButton ajax="true" actionListener="#{caseProfileBB.attachEventToCase}"
                                              value="Create new event" icon="fa fa-plus"
                                              oncomplete="PF('add-event-dialog-var').hide()"
+                                             disabled="#{caseProfileBB.selectedEvent.eventID == 0}"
+                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                             update="event-dt-form:caseEventTable
+                                             violation-form:violation-table
+                                             case-details-form:selcase-stage-ot
+                                             case-details-form:selcase-cdate-it
+                                             cecases-messages-form:cecases-messages-global"/>
+
+                            <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitEventEdits}"
+                                             value="Edit event" icon="fa fa-edit"
+                                             disabled="#{!(caseProfileBB.selectedEvent.eventID == 0)}"
+                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                             oncomplete="PF('add-event-dialog-var').hide()"
+                                             update="event-dt-form:caseEventTable
+                                             violation-form:violation-table
+                                             case-details-form:selcase-stage-ot
+                                             case-details-form:selcase-cdate-it
+                                             cecases-messages-form:cecases-messages-global"/>
+                            
+                            <p:commandButton ajax="true" actionListener="#{caseProfileBB.deleteSelectedEvent}"
+                                             value="Nuke event" icon="fa fa-bomb"
+                                             oncomplete="PF('add-event-dialog-var').hide()"
+                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
                                              update="event-dt-form:caseEventTable
                                              violation-form:violation-table
                                              case-details-form:selcase-stage-ot
@@ -1405,7 +1447,7 @@
                                 
                                 <h:panelGroup>
                                     <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
-                                    <p:selectOneMenu id="person-list-menu" required="false" value="#{eventManageBB.selectedPerson}">
+                                    <p:selectOneMenu id="person-list-menu" required="false" value="#{caseProfileBB.selectedPerson}">
                                         <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
                                         <f:selectItems value="#{sessionBean.personQueue}"  var="p" itemValue="#{p}" 
                                                        itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
@@ -1415,18 +1457,18 @@
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
                             
-                            <p:commandButton    ajax="true" actionListener="#{eventManageBB.queueSelectedPerson}"
+                            <p:commandButton    ajax="true" actionListener="#{caseProfileBB.queueSelectedPerson}"
                                                     value="Add selected person to event"
                                                     update="persons-to-add-ds"/>
                                 <p:spacer height="5px"/>
                             
                                 <p:dataScroller     id="persons-to-add-ds"
-                                                    value="#{eventManageBB.personsToAdd}"
+                                                    value="#{caseProfileBB.personsToAdd}"
                                                     var="pers">
                                     <h:outputText value="#{pers.firstName} #{pers.lastName} (id:#{pers.personID})"/>
                                     <p:commandButton    ajax="true" icon="fa fa-stop"
                                                         process="persons-to-add-ds" immediate="true"
-                                                        actionListener="#{eventManageBB.deQueuePersonFromEvent(pers)}"
+                                                        actionListener="#{caseProfileBB.deQueuePersonFromEvent(pers)}"
                                                         update="persons-to-add-ds"/>
                                 </p:dataScroller>
                                                  
