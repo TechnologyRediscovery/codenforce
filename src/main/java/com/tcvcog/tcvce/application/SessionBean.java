@@ -94,7 +94,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
      /* *** Code Enforcement Case Session Shelves ***  */
     
-    private EventCECase activeEvent;
     private NoticeOfViolation activeNotice;
     private Citation activeCitation;
     private CodeViolation activeCodeViolation;
@@ -549,20 +548,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setPropertyQueue(List<Property> propertyQueue) {
         this.propertyQueue = propertyQueue;
-    }
-
-    /**
-     * @return the activeEvent
-     */
-    public EventCECase getActiveEvent() {
-        return activeEvent;
-    }
-
-    /**
-     * @param activeEvent the activeEvent to set
-     */
-    public void setActiveEvent(EventCECase activeEvent) {
-        this.activeEvent = activeEvent;
     }
 
     /**
