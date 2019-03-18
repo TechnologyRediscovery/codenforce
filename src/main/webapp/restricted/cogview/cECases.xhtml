@@ -784,6 +784,9 @@
                                     <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
                                     <p:column width="4%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Violation Details"/>
+                                        </f:facet>
                                         <p:rowToggler />
                                     </p:column>
                                     <p:column width="15%">
@@ -792,7 +795,16 @@
                                         </f:facet>
                                         <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
                                     </p:column>
-
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Photos" />
+                                        </f:facet>
+                                        <h:outputText value="Photos: #{empty v.photoList ? '0' : v.photoList.size()}"/>
+                                        <p:commandButton value="view" icon="fa fa-search"
+                                                         onclick="PF('photo-dialog').show()"
+                                                         actionListener="#{caseProfileBB.setSelectedViolation(v)}"
+                                                         update=":photo-form"/>
+                                    </p:column>
                                     <p:column width="30">
                                         <f:facet name="header">
                                             <h:outputText value="Stip Comp Date" />
@@ -823,7 +835,7 @@
                                                             addNewEventForm:add-event-cd-ot"/>
                                     </p:column>
 
-                                    <p:column width="15%">
+                                    <p:column width="10%">
                                         <f:facet name="header">
                                             <h:outputText value="Actual Comp Date" />
                                         </f:facet>
@@ -1594,6 +1606,57 @@
 
 
                     </p:dialog>
+                    
+                    
+                    <p:confirmDialog message="Photos attached to violation #{caseProfileBB.selectedViolation.violationID}" 
+                                         severity="alert" widgetVar="photo-dialog"
+                                         closable="true"
+                                        
+                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+
+                            <h:form id="photo-form">
+                                <p:scrollPanel style="width:1000px; height:400px" mode="native">
+                                    <p:dataTable
+                                                    id="photoTable"
+                                                    var="photoid"
+                                                    value="#{caseProfileBB.selectedViolation.photoList}"
+                                                    rowKey="#{photoid}"
+                                                    tableStyleClass="primeDataTable"
+                                                    draggableRows="false" tabindex="6">
+                                        <p:column width="10%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Manage"/>
+                                                        </f:facet>
+                                                        <p:commandButton ajax="true" 
+                                                                         actionListener="#{caseProfileBB.deletePhoto(photoid)}"
+                                                                         value="Delete" 
+                                                                         icon="fa fa-bomb"
+                                                                         rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                                                         update=":photo-form:photoTable"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Photo"/>
+                                                        </f:facet>
+                                                        <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                            <f:param name="photoID" value="#{photoid}"/>
+                                                        </p:graphicImage>
+                                                    </p:column>
+                                                    <p:column width="20%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Description"/>
+                                                        </f:facet>
+                                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                                    </p:column>
+                                    </p:dataTable>
+                                </p:scrollPanel>
+                                <p:spacer height="15px"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Continue" 
+                                                 update=":violation-form:violation-table"
+                                                 onclick="PF('photo-dialog').hide()"/>
+                            </h:form>
+                        </p:confirmDialog>
 
 
                 </f:view>

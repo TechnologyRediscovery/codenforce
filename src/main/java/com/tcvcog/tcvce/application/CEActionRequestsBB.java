@@ -439,6 +439,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
     
     public void deletePhoto(int photoID){
+        // TODO: remove entry from linker tbale for deleted photos
         for(Integer pid : this.selectedRequest.getPhotoList()){
             if(pid.compareTo(photoID) == 0){
                 this.selectedRequest.getPhotoList().remove(pid);

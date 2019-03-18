@@ -157,6 +157,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
     }
     
     public void deleteViolation(CodeViolation cv) throws IntegrationException{
+        //TODO: delete photos and photo links
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         cvi.deleteCodeViolation(cv);
     }

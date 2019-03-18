@@ -140,7 +140,22 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
              setPersonsToAdd(new ArrayList<Person>());
 
     }
-
+    
+    public void deletePhoto(int photoID){
+        // TODO: remove entry from linker table for deleted photos
+        for(Integer pid : this.selectedViolation.getPhotoList()){
+            if(pid.compareTo(photoID) == 0){
+                this.selectedViolation.getPhotoList().remove(pid);
+                break;
+            }
+        }
+        ImageServices is = getImageServices();
+        try {
+            is.deletePhotograph(photoID);
+        } catch (IntegrationException ex) {
+            System.out.println("CaseProfileBB.deletePhotograph | " + ex);
+        }
+    }
     
     public void executeQuery(ActionEvent ev){
         System.out.println("CaseProfileBB.executeQuery");
