@@ -478,6 +478,36 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         tinyCase.setCaseID(caseID);
         return CodeViolationIntegrator.this.getCodeViolations(tinyCase);
     }
+    
+    public void loadViolationPhotoList(CodeViolation cv) throws IntegrationException{
+        ArrayList<Integer> photoList = new ArrayList<>();
+        
+        String query = "SELECT photodoc_photodocid FROM public.codeviolationphotodoc WHERE codeviolation_violationid = ?";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cv.getViolationID());
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                photoList.add((Integer)rs.getInt(1));
+            }
+            
+            cv.setPhotoList(photoList);
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot load photos on violation.", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+    }
 
     public ArrayList<CodeViolation> getCodeViolations(CECase c) throws IntegrationException {
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n"
@@ -487,6 +517,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         ResultSet rs = null;
         PreparedStatement stmt = null;
         ArrayList<CodeViolation> cvList = new ArrayList();
+        CodeViolation cv;
 
         try {
             stmt = con.prepareStatement(query);
@@ -494,8 +525,9 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-
-                cvList.add(generateCodeViolationFromRS(rs));
+                cv = generateCodeViolationFromRS(rs);
+                loadViolationPhotoList(cv);
+                cvList.add(cv);
 
             }
 

@@ -94,7 +94,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         ph.setDescription("no description");
         ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
         ph.setTimeStamp(LocalDateTime.now());
-        // store photo on the request (by id)
+        
         try {
             this.currentViolation.getPhotoList().add(is.storePhotograph(ph));
         } catch (IntegrationException ex) {
