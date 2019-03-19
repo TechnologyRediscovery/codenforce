@@ -5,8 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.util.Objects;
-
 /**
  *
  * @author sylvia
@@ -23,47 +21,6 @@ public class Icon extends EntityUtils {
      */
     public int getIconid() {
         return iconid;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 73 * hash + this.iconid;
-        hash = 73 * hash + Objects.hashCode(this.name);
-        hash = 73 * hash + Objects.hashCode(this.styleClass);
-        hash = 73 * hash + Objects.hashCode(this.fontAwesome);
-        hash = 73 * hash + Objects.hashCode(this.materialIcon);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Icon other = (Icon) obj;
-        if (this.iconid != other.iconid) {
-            return false;
-        }
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        if (!Objects.equals(this.styleClass, other.styleClass)) {
-            return false;
-        }
-        if (!Objects.equals(this.fontAwesome, other.fontAwesome)) {
-            return false;
-        }
-        if (!Objects.equals(this.materialIcon, other.materialIcon)) {
-            return false;
-        }
-        return true;
     }
 
     /**

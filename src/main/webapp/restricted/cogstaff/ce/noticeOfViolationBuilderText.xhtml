@@ -32,7 +32,7 @@
 
                             <p:dataScroller
                                 id="paragraph-scroller"
-                                    value="#{noticeOfViolationBB.textBlockListByMuni}"
+                                value="#{noticeOfViolationBB.blockListByMuni}"
                                     var="block" 
                                     widgetVar="noticebuilder-ds-var">
 
@@ -45,16 +45,18 @@
                                         immediate="true"
                                         id="add-block-before-cb"
                                         value="Add before violations"
-                                        actionListener="#{noticeOfViolationBB.addBlockAfterViolations(block)}"
-                                        update="before-violations-scroller"
+                                        actionListener="#{noticeOfViolationBB.addBlockBeforeViolations(block)}"
+                                        update="noticeBuilderForm:before-violations-scroller
+                                        noticeBuilderForm:paragraph-scroller"
                                         />
                                     <p:commandButton 
                                         ajax="true"
                                         immediate="true"
-                                        id="add-block-before-cb"
+                                        id="add-block-after-cb"
                                         value="Add afterviolations"
                                         actionListener="#{noticeOfViolationBB.addBlockAfterViolations(block)}"
-                                        update="before-violations-scroller"
+                                        update="noticeBuilderForm:after-violations-scroller
+                                        noticeBuilderForm:paragraph-scroller"
                                         />
                                     <p:spacer height="5px"/>
                                     <p><h:outputText escape="false" value="#{block.textBlockText}"/> </p>
@@ -104,20 +106,15 @@
                         </h:panelGroup>
                     </h:panelGrid>
 
-                        
-                        
-                        
-                                
-                    
 
-                                <p:spacer height="15px"/>
+                        <p:spacer height="15px"/>
 
 
-                                <p:commandButton ajax="false" value="Assemble and edit draft notice" 
-                                                 action="#{noticeOfViolationBB.assembleNotice}"
-                                                 icon="fa fa-tasks"/>
-                                <p:commandButton action="ceCases" icon="fa fa-arrow-left"
-                                         value="cancel"/>
+                        <p:commandButton ajax="false" value="Assemble and edit draft notice" 
+                                         action="#{noticeOfViolationBB.assembleNotice}"
+                                         icon="fa fa-tasks"/>
+                        <p:commandButton action="ceCases" icon="fa fa-arrow-left"
+                                 value="cancel"/>
                     </h:form>
                 </div>
             </ui:define>

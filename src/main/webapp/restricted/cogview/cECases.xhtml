@@ -286,6 +286,7 @@
                                                         />
                                 </p:fieldset>
                             </h:form>
+                            
                             <h2>CE Case docket</h2>
 
                             <h:form id="caseListForm">
@@ -322,20 +323,10 @@
                                         <f:facet name="header">
                                             <h:outputText value="Stage" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseStage}"/>
+                                        <i class="material-icons"><h:outputText value="#{c.icon.materialIcon}"/></i>
                                     </p:column>
 
-                                    <ui:remove>
-
-                                        <p:column width="12%"
-                                                  sortBy="#{c.casePhase.label}"
-                                                  filterBy="#{c.casePhase.label}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Phase" />
-                                            </f:facet>
-                                            <h:outputText value="#{c.casePhase.label}"/>
-                                        </p:column>
-                                    </ui:remove>
+                                  
 
                                     <p:column width="5%" sortBy="#{c.caseAge}">
                                         <f:facet name="header">
@@ -411,31 +402,38 @@
                                             <div class="rowExpansion">
                                                 <h:outputText id="selcase-addr-ot" value="#{caseProfileBB.currentCase.property.address}"/><br/>
                                                 <h:outputText id="selcase-muni-ot" value="#{caseProfileBB.currentCase.property.muni.muniName} (#{caseProfileBB.currentCase.property.propertyUseType})"/><br/>
+                                                 <p:commandButton    id="view-property-cb" 
+                                                                ajax="false"
+                                                                disabled="trye"
+                                                                icon="fa fa-home" styleClass="noFill button-size-small"
+                                                                rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                                value="view property profile" 
+                                                                />
                                             </div>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Stage and Phase:" />
-                                            <div class="rowExpansion">
-                                                <h:outputText id="selcase-stage-ot" value="#{caseProfileBB.currentCase.caseStage}: #{caseProfileBB.currentCase.casePhase.label} "/>
-                                            </div>
+                                            <h:outputLabel styleClass="bold" value="Stage and Phase" />
                                             <p:commandButton    id="overridephase-cb" 
                                                                 ajax="true"
                                                                 immediate="true"
                                                                 onclick="PF('phase-override').show()"
-                                                                icon="fa fa-bullhorn" styleClass="noFill button-size-small"
+                                                                icon="fa fa-gears" styleClass="noFill button-size-small"
                                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                                value="override case phase" 
+
                                                                 update="casePhaseChangeForm"
                                                                 />
+                                            <div class="rowExpansion">
+                                                <h:outputText id="selcase-stage-ot" value="#{caseProfileBB.currentCase.caseStage}: #{caseProfileBB.currentCase.casePhase.label} "/>
+                                            </div>
                                         </h:panelGroup>
                                         
 
                                         <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Opening Date:"/>
+                                            <h:outputLabel styleClass="bold" value="Opening Date"/>
                                             <p:spacer height="5px"/>
                                             <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selcase-odate-it" value="#{caseProfileBB.currentCase.originiationDatePretty}"/>
+                                                <h:outputText id="selcase-odate-it" styleClass="mono" value="#{caseProfileBB.currentCase.originiationDatePretty}"/>
                                             </div>
                                         </h:panelGroup>
 
@@ -456,10 +454,15 @@
 
 
                                         <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Manager:"/>
+                                            <h:outputLabel styleClass="bold" value="Case Manager"/>
+                                            <p:commandButton   id="editcase-casemanager-cb" 
+                                                    ajax="false" 
+                                                    action="#{caseProfileBB.printCase}"
+                                                    icon="fa fa-gears" styleClass="noFill button-size-small inline-button"
+                                                     />
                                             <p:spacer height="5px"/>
                                             <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.caseManager.person.firstName} #{caseProfileBB.currentCase.caseManager.person.lastName}"/>
+                                                <h:outputText id="selcase-manager-it" value="#{caseProfileBB.currentCase.caseManager.person.firstName} #{caseProfileBB.currentCase.caseManager.person.lastName}"/>  
                                             </div>
                                         </h:panelGroup>
 
@@ -499,13 +502,18 @@
                                                         action-requests-form:actionRequestTable
                                                         event-dt-form:caseEventTable
                                                         "
-
                                                         />
-                                     
+                                    
                                     <p:commandButton   id="print-case-cb" 
+                                                        ajax="true"
+                                                        icon="fa fa-gears" styleClass="noFill"
+                                                        value="edit case info" />
+                                     
+                                    <p:commandButton   id="editcase-cb" 
                                                         ajax="false" action="#{caseProfileBB.printCase}"
                                                         icon="fa fa-print" styleClass="noFill"
                                                         value="print case profile" />
+                                     
 
                                 </div>
 
@@ -827,12 +835,8 @@
                                                             ajax="true" action="#{caseProfileBB.recordCompliance(v)}"
                                                             icon="fa fa-check"
                                                             oncomplete="PF('add-event-dialog-var').show()"
-                                                            value="Compliance"  
-                                                            update="add-event-dialog
-                                                            addNewEventForm:add-event-currcase-ot
-                                                            addNewEventForm:add-event-et-ot
-                                                            addNewEventForm:add-event-ec-ot
-                                                            addNewEventForm:add-event-cd-ot"/>
+                                                            value="Mark compliance"  
+                                                            update="addNewEventForm"/>
                                     </p:column>
 
                                     <p:column width="10%">
@@ -919,11 +923,6 @@
                                     value="#{caseProfileBB.currentCase.noticeList}"
                                     var="notice"
                                     rendered="true">
-
-
-
-
-                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
                                     <h:outputText styleClass="bold" style="font-size:1.5em;"  value="Notice ID:" />
                                     <h:outputText style="font-size:1.5em;"   value="#{notice.noticeID}"/>
@@ -1219,6 +1218,7 @@
                                                         <h:outputText value="#{r.requestProperty.address}"/>
                                                     </div>
                                                 </h:panelGroup>
+                                                
                                                 <h:panelGroup>
                                                     <h:outputLabel class="bold" value="Date Submitted" />
                                                     <p:spacer height="5px"/>
