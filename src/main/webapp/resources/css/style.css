@@ -830,6 +830,11 @@ gridTd-bignum{
     margin-bottom: 15px;
 }
 
+.inline-button{
+    margin-left:10px;
+    
+}
+
 /* formatting command buttons completeCodeSourceList & codeSourceTable on codeSourceManage.xhtml  */
 .buttonOwnLine1{
     margin-top: 10px;

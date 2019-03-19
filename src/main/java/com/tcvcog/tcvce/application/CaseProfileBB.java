@@ -416,18 +416,13 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         // build event details 
-        EventCECase e;
+        EventCECase e = null;
         try {
             e = ec.generateViolationComplianceEvent(cv);
-            cc.addNewComplianceEvent(currentCase, e, cv);
-        } catch (CaseLifecyleException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to record compliance due to the case's current phase",
-                            "Please check with your system administrator"));
-        } catch (ViolationException ex) {
         } catch (IntegrationException ex) {
         }
+        selectedEvent = e;
+//            cc.addNewComplianceEvent(currentCase, e, cv);
     }
 
     public String editViolation() {
@@ -454,8 +449,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         if (retrievedList != null) {
             if (retrievedList.size() > 0) {
                 getSessionBean().setViolationQueue(retrievedList);
+                getSessionBean().getPropertyQueue().add(0,currentCase.getProperty());
                 getSessionBean().setActiveProp(currentCase.getProperty());
                 getSessionBean().setcECase(currentCase);
+                getSessionBean().getcECaseQueue().set(0, currentCase);
             }
             return "noticeOfViolationBuilder";
 
