@@ -43,6 +43,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
+import com.tcvcog.tcvce.occupancy.entities.OccPermitType;
 import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
 import java.io.Serializable;
 import java.util.List;
@@ -74,6 +75,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private User facesUser;
     private Property activeProp;
     private Person activePerson;
+    private List<Person> activePersonList;
+    private PropertyWithLists activePropWithList;
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
@@ -477,6 +480,19 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.personForCEActionRequestSubmission = personForCEActionRequestSubmission;
     }
 
+    /**
+     * @return the activePropWithList
+     */
+    public PropertyWithLists getActivePropWithList() {
+        return activePropWithList;
+    }
+
+    /**
+     * @param activePropWithList the activePropWithList to set
+     */
+    public void setActivePropWithList(PropertyWithLists activePropWithList) {
+        this.activePropWithList = activePropWithList;
+    }
     
     public OccPermitApplication getOccPermitApplication() {
         return occPermitApplication;
@@ -523,8 +539,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
      
     /*
-    *
-    * @return the cEEventWCPIQueue
+     * @return the cEEventWCPIQueue
      */
     public List<EventWithCasePropInfo> getcEEventWCPIQueue() {
         return cEEventWCPIQueue;
