@@ -802,13 +802,6 @@
     
     <!--Properties-->
     
-    <navigation-rule>
-        <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>propertyUpdate</from-outcome>
-            <to-view-id>/restricted/cogstaff/propertyUpdate.xhtml</to-view-id>
-        </navigation-case>
-    </navigation-rule>
     
     <navigation-rule>
         <from-view-id>/restricted/cogstaff/propertyUpdate.xhtml</from-view-id>
@@ -862,9 +855,16 @@
     
     <navigation-rule>
         <from-view-id>/restricted/cogview/properties.xhtml</from-view-id>
+        
         <navigation-case>
             <from-outcome>propertyUpdate</from-outcome>
             <to-view-id>/restricted/cogstaff/gen/propertyUpdate.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>propertyAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/propertyAdd.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>    
@@ -1470,6 +1470,11 @@
     <managed-bean>
         <managed-bean-name>cEEventsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>propertyAddBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyAddBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

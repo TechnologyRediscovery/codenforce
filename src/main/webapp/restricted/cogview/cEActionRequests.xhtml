@@ -1199,45 +1199,46 @@
                         
                         <p:confirmDialog message="Photos attached to action request" 
                                          severity="alert" widgetVar="photo-dialog"
-                                         closable="false"
+                                         closable="true"
+                                        
                                          rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
 
                             <h:form id="photo-form">
-                                
-                                <p:dataTable
-                                                id="photoTable"
-                                                var="photoid"
-                                                value="#{cEActionRequestsBB.selectedRequest.photoList}"
-                                                rowKey="#{photoid}"
-                                                tableStyleClass="primeDataTable"
-                                                draggableRows="false" tabindex="6">
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Manage"/>
-                                                    </f:facet>
-                                                    <p:commandButton ajax="true" 
-                                                                     actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
-                                                                     value="Delete" 
-                                                                     icon="fa fa-bomb"
-                                                                     rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
-                                                                     update=":photo-form:photoTable"/>
-                                                </p:column>
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Photo"/>
-                                                    </f:facet>
-                                                    <p:graphicImage width="100%" value="#{imageServices.image}">
-                                                        <f:param name="photoID" value="#{photoid}"/>
-                                                    </p:graphicImage>
-                                                </p:column>
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Description"/>
-                                                    </f:facet>
-                                                    <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
-                                                </p:column>
-                                </p:dataTable>
-                                
+                                <p:scrollPanel style="width:1000px; height:400px" mode="native">
+                                    <p:dataTable
+                                                    id="photoTable"
+                                                    var="photoid"
+                                                    value="#{cEActionRequestsBB.selectedRequest.photoList}"
+                                                    rowKey="#{photoid}"
+                                                    tableStyleClass="primeDataTable"
+                                                    draggableRows="false" tabindex="6">
+                                        <p:column width="10%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Manage"/>
+                                                        </f:facet>
+                                                        <p:commandButton ajax="true" 
+                                                                         actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
+                                                                         value="Delete" 
+                                                                         icon="fa fa-bomb"
+                                                                         rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                                                         update=":photo-form:photoTable"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Photo"/>
+                                                        </f:facet>
+                                                        <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                            <f:param name="photoID" value="#{photoid}"/>
+                                                        </p:graphicImage>
+                                                    </p:column>
+                                                    <p:column width="20%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Description"/>
+                                                        </f:facet>
+                                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                                    </p:column>
+                                    </p:dataTable>
+                                </p:scrollPanel>
                                 <p:spacer height="15px"/>
                                 <p:commandButton ajax="true" 
                                                  value="Continue" 

@@ -202,6 +202,74 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return propList;
         
     }
+    
+    public int insertProperty(Property newProp) throws IntegrationException{
+        int propID;
+        // Validation would be dope
+        
+        String query = "INSERT INTO public.property(\n" +
+                "       propertyid, \n" + // DEFAULT
+                "       municipality_municode, \n" +
+                "       parid, lotandblock, \n" +
+                "       address, propertyusetype, \n" +
+                "       usegroup, constructiontype, countycode, notes, \n" +
+                "       containsrentalunits, multiunit, vacant, \n" +
+                "       lastupdatedby, lastupdated )\n" +
+                "   VALUES ( DEFAULT,\n" +
+                "       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // im so sorry 
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, newProp.getMuniCode());
+            
+            stmt.setString(2, newProp.getParID());
+            stmt.setString(3, newProp.getLotAndBlock());
+            
+            stmt.setString(4, newProp.getAddress());
+            stmt.setString(5, newProp.getPropertyUseType());
+            
+            stmt.setString(6, newProp.getUseGroup());
+            stmt.setString(7, newProp.getConstructionType());
+            stmt.setString(8, newProp.getCountyCode());
+            stmt.setString(9, newProp.getNotes());
+            
+            stmt.setBoolean(10, newProp.isRental());  // containsrentalunits=?
+            stmt.setBoolean(11, newProp.isMultiUnit());  // multiunit=?
+            stmt.setBoolean(12, newProp.isVacant());  // vacant=?
+            
+            stmt.setInt(13, getSessionBean().getFacesUser().getUserID());
+            stmt.setTimestamp(14, Timestamp.valueOf(LocalDateTime.now()));
+            
+            // TODO: add event to dumby tracker case on this property to track who/when of changes
+            
+            // figure out if we need to do changes in the list elements
+            
+            stmt.execute();
+            
+            // grab the newly inserted propertyid
+            String idNumQuery = "SELECT currval('propertyid_seq');";
+            Statement s = con.createStatement();
+            ResultSet rs;
+            int lastID;
+            rs = s.executeQuery(idNumQuery);
+            rs.next();
+            lastID = rs.getInt(1);
+            return lastID;
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Error inserting property. ", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        
+    }
   
     public String updateProperty(Property propToUpdate) throws IntegrationException{
         String query = "UPDATE public.property\n" +
@@ -223,21 +291,23 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(3, propToUpdate.getAddress());
             stmt.setString(4, propToUpdate.getPropertyUseType());
             
-            stmt.setString(7, propToUpdate.getUseGroup());
-            stmt.setString(8, propToUpdate.getConstructionType());
-            stmt.setString(9, propToUpdate.getCountyCode());
-            stmt.setString(10, propToUpdate.getNotes());
+            stmt.setString(5, propToUpdate.getUseGroup());
+            stmt.setString(6, propToUpdate.getConstructionType());
+            stmt.setString(7, propToUpdate.getCountyCode());
+            stmt.setString(8, propToUpdate.getNotes());
             
-            stmt.setBoolean(11, true);
-            stmt.setBoolean(12, true);
-            stmt.setBoolean(13, true);
+            stmt.setBoolean(9, propToUpdate.isRental());  // containsrentalunits=?
+            stmt.setBoolean(10, propToUpdate.isMultiUnit());  // multiunit=?
+            stmt.setBoolean(11, propToUpdate.isVacant());  // vacant=?
             
-            stmt.setInt(14, getSessionBean().getFacesUser().getUserID());
-            stmt.setTimestamp(15, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(12, getSessionBean().getFacesUser().getUserID());
+            stmt.setTimestamp(13, Timestamp.valueOf(LocalDateTime.now()));
+            
+            // TODO: add event to dumby tracker case on this property to track who/when of changes
             
             // figure out if we need to do changes in the list elements
             
-            stmt.setInt(16, propToUpdate.getPropertyID());
+            stmt.setInt(14, propToUpdate.getPropertyID());
             
             stmt.executeUpdate();
             
@@ -336,6 +406,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             int MAX_RES = 20;  //behold a MAGICAL number
             int iter = 0;
             
+            // are we too cool for for-loops?
             while (rs.next() && iter < MAX_RES) {
                 Property p = getProperty(rs.getInt("property_propertyid"));
                 propList.add(p);
