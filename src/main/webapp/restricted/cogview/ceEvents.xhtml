@@ -219,7 +219,7 @@
                                             </h:panelGroup>
 
                                             <h:panelGroup>
-                                                <p:outputLabel id="ceev-filter-creator-ol" for="ceev-filter-creator" value="filter by event creator? "/>
+                                                <p:outputLabel id="ceev-filter-creator-ol" for="ceev-filter-creator" value="filter by event owner? "/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-creator" value="#{cEEventsBB.searchParams.filterByEventOwner}" >
                                                     <p:ajax update="ceev-criteria-user" />
                                                 </p:selectBooleanCheckbox>
@@ -227,7 +227,7 @@
 
                                             <h:panelGroup>
                                                 <h:outputLabel for="ceev-criteria-user" id="ceev-criteria-user-ol">
-                                                    <h:outputText value="event Categories in your selected event type:"/>
+                                                    <h:outputText value="system user list"/>
                                                 </h:outputLabel>
                                                 <p:spacer height="5px"/>
 
@@ -236,7 +236,7 @@
                                                                  disabled="#{!cEEventsBB.searchParams.filterByEventOwner}">
                                                     <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                                     <f:selectItems value="#{cEEventsBB.userList}"  var="u" itemValue="#{u}" 
-                                                                   itemLabel="#{u.username}"/>
+                                                                    itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
                                                     <f:converter converterId="userConverter"/>
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
@@ -368,13 +368,28 @@
                         <h:form id="presets-form">
                             
 
+                            <p:commandButton    id="event-preset-eventsreqviewconf" 
+                                                ajax="true"
+                                                 value="events requiring view confirmation" 
+                                                 styleClass="noFill"
+                                                 actionListener="#{cEEventsBB.loadEventsRequiringViewConf(ev)}"
+                                                 disabled="false"
+                                                 icon="fa fa-tasks"
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 update="
+                                                    ceev-form-search
+                                                    events-datascroller-form:events-datascroller
+                                                    events-datatable-form:events-datatable
+                                                    ceev-form-globalmessages:ceev-globalmessages
+                                                    "/>
+
                             <p:commandButton    id="event-preset-allactivitybyoffandmuni" 
                                                 ajax="true"
                                                  value="all officer activity by muni (past week)" 
                                                  styleClass="noFill"
                                                  actionListener="#{cEEventsBB.loadOfficerActivityPastWeek}"
                                                  disabled="false"
-                                                 icon="fa fa-wheelchair_alt"
+                                                 icon="fa fa-wheelchair-alt"
                                                  rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
                                                  update="
                                                     ceev-form-search
@@ -652,7 +667,7 @@
                                                 <h:outputText value="edit" />
                                             </f:facet>
                                             <p:commandButton icon="fa fa-edit"
-                                                             action="#{eventManageBB.jumpToCasesToEditCEEvent(e)}" 
+                                                             action="#{caseProfileBB.jumpToCasesToEditCEEvent(e)}" 
                                                              ajax="false"/>
 
                                         </p:column>

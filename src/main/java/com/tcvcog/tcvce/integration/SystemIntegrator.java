@@ -19,6 +19,8 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
@@ -42,6 +44,67 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * Creates a new instance of SystemIntegrator
      */
     public SystemIntegrator() {
+    }
+    
+    public Icon getIcon(int iconID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT iconid, name, styleclass, fontawesome, materialicons ");
+        sb.append("FROM public.icon WHERE iconid=?;");
+        Icon i = null;
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, iconID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                i = new Icon();
+                i.setIconid(rs.getInt("iconid"));
+                i.setName(rs.getString("name"));
+                i.setStyleClass(rs.getString("styleclass"));
+                i.setFontAwesome(rs.getString("fontawesome"));
+                i.setMaterialIcon(rs.getString("materialicons"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate icon", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return i;
+        
+    }
+    
+    public Icon getIcon(CasePhase casephase) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT iconid ");
+        sb.append("FROM public.cecasestatusicon WHERE status=?::casephase;");
+        Icon i = null;
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, casephase.toString());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                i = getIcon(rs.getInt("iconid"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate icon", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return i;
+        
     }
     
     public void insertImprovementSuggestion(ImprovementSuggestion is) throws IntegrationException{

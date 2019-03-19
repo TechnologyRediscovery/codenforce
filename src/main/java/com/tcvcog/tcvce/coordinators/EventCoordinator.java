@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -40,6 +41,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -67,17 +70,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    /**
-     * TODO: finish
-     * @return 
-     */
-    public EventType[] getUserAdmnisteredEventTypeList(){
-        EventType[] eventTypeList = EventType.values();
-            
-        
-        return eventTypeList;
-        
-    }
+   
     
     
     public SearchParamsCEEvents getDefaultSearchParamsCEEventsRequiringView(User user, Municipality m){
@@ -148,6 +141,21 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return canConfirm;
     }
     
+    public void deleteEvent(EventCECase ev, User u) throws AuthorizationException{
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            if(u.getKeyCard().isHasSysAdminPermissions()){
+                ei.deleteEvent(ev);
+            } else {
+                throw new AuthorizationException("Must have sys admin permissions "
+                        + "to delete event; marking an event as inactive is like deleting it");
+                
+            }
+        } catch (IntegrationException ex) {
+            Logger.getLogger(EventCoordinator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     
     /**
      * Core coordinator method called by all other classes who want to 
@@ -180,6 +188,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // the moment of event instantiaion!!!!
         EventCECase event = new EventCECase();
         event.setCategory(ec);
+        event.setDateOfRecord(LocalDateTime.now());
         event.setRequiresViewConfirmation(ec.isRequiresviewconfirmation());
         event.setActive(true);
         event.setHidden(false);
@@ -264,9 +273,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void editEvent(EventCECase evcase) throws IntegrationException{
+    public void editEvent(EventCECase evcase, User u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.updateEvent(evcase, false);
+        System.out.println("EventCoordinator.editEvent");
+        evcase.setAssignedTo(u);
+        ei.editEvent(evcase, false);
     }
     
     
@@ -355,7 +366,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public String updateEvent(EventCECase event, boolean clearViewConfirmation) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         // YIKES TODO: Case vetting logic needed here!
-        ei.updateEvent(event, clearViewConfirmation);
+        ei.editEvent(event, clearViewConfirmation);
         
         return "cecases";
     }
@@ -388,7 +399,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public void initiateEventProcessing(CECase c, EventCECase e, CodeViolation cv) throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseCoordinator cc = getCaseCoordinator();
         
-        cc.processCEEvent(c, e);
+        cc.addNewCEEvent(c, e);
         
     }
     

@@ -112,10 +112,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(m);
         
-        eventParams.setFilterByStartEndDate(true);
-        eventParams.setUseRelativeDates(true);
+        eventParams.setFilterByStartEndDate(false);
+        eventParams.setUseRelativeDates(false);
+        eventParams.setUseDateOfRecord(false);
         // query from a week ago to now
-        eventParams.setStartDateRelativeDays(-7);
+        eventParams.setStartDateRelativeDays(-400);
         eventParams.setEndDateRelativeDays(0);
         
         eventParams.setFilterByObjectID(false);
@@ -126,7 +127,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         eventParams.setFilterByCaseID(false);
         
-        eventParams.setFilterByEventOwner(true);
+        eventParams.setFilterByEventOwner(false);
         eventParams.setOwnerUserID(u);
         
         eventParams.setFilterByActive(true);
@@ -162,15 +163,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setMuni(m);
         eventParams.setFilterByStartEndDate(true);
         eventParams.setUseRelativeDates(true);
+        eventParams.setUseDateOfRecord(true);
         // query from a week ago to now
-        eventParams.setStartDateRelativeDays(-30);
+        eventParams.setStartDateRelativeDays(-400);
         eventParams.setEndDateRelativeDays(0);
         
         eventParams.setFilterByObjectID(false);
         eventParams.setLimitResultCountTo100(true);
         
         eventParams.setFilterByEventCategory(false);
-        eventParams.setFilterByEventType(false);
+        eventParams.setFilterByEventType(true);
         eventParams.setEvtType(EventType.Compliance);
         
         eventParams.setFilterByCaseID(false);

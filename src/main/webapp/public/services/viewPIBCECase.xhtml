@@ -213,11 +213,11 @@
                                         </p:column>
                                         
                                         <p:column width="5%"
-                                                  sortBy="#{e.creator.LName}">
+                                                  sortBy="#{e.creator.person.lastName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator name" />
                                             </f:facet>
-                                            <h:outputText value="#{e.eventOwcreator"/>
+                                            <h:outputText value="#{e.creator.person.lastName}"/>
                                         </p:column>
                                         
                                         <p:column width="20%" style="word-wrap: normal;">

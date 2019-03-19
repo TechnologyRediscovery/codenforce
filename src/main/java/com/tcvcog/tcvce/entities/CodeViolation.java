@@ -37,7 +37,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     private String dateOfCitationPretty;
     private List<Integer> citationIDList;
     private String citationsStringList;
-    private int daysUntilStipulatedComplianceDate;
+    private long daysUntilStipulatedComplianceDate;
     private LocalDateTime dateOfRecord;
     private String dateOfRecordPretty;
     private LocalDateTime entryTimeStamp;
@@ -286,7 +286,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     /**
      * @return the daysUntilStipulatedComplianceDate
      */
-    public int getDaysUntilStipulatedComplianceDate() {
+    public long getDaysUntilStipulatedComplianceDate() {
         daysUntilStipulatedComplianceDate = 
                 getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
         return daysUntilStipulatedComplianceDate;
@@ -295,7 +295,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     /**
      * @param daysUntilStipulatedComplianceDate the daysUntilStipulatedComplianceDate to set
      */
-    public void setDaysUntilStipulatedComplianceDate(int daysUntilStipulatedComplianceDate) {
+    public void setDaysUntilStipulatedComplianceDate(long daysUntilStipulatedComplianceDate) {
         this.daysUntilStipulatedComplianceDate = daysUntilStipulatedComplianceDate;
     }
 

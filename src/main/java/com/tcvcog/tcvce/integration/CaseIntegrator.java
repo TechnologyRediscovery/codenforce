@@ -75,7 +75,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for person", ex);
+            throw new IntegrationException("Cannot get cases by property", ex);
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -86,7 +86,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return caseList;
     }
     
-    public List<CECase> getCECases(SearchParamsCECases params) throws IntegrationException{
+    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException{
         ArrayList<CECase> caseList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -282,7 +282,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for person", ex);
+            throw new IntegrationException("Cannot get open cecases", ex);
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -323,7 +323,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for person", ex);
+            throw new IntegrationException("Cannot get case history list", ex);
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -364,7 +364,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot search for person", ex);
+            throw new IntegrationException("Cannot get cecase by id", ex);
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -382,6 +382,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         CitationIntegrator ci = getCitationIntegrator();
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        
         int ceCaseID = rs.getInt("caseid");
         
         CECase c = new CECase();
@@ -394,7 +396,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         c.setCaseManager(ui.getUser(rs.getInt("login_userid")));
 
         c.setCaseName(rs.getString("casename"));
-        c.setCasePhase(CasePhase.valueOf(rs.getString("casephase")));
+        
+        CasePhase cp = CasePhase.valueOf(rs.getString("casephase"));
+        c.setCasePhase(cp);
+        c.setIcon(si.getIcon(cp));
 
         c.setOriginationDate(rs.getTimestamp("originationdate")
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());

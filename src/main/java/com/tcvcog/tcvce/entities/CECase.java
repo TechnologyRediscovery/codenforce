@@ -49,6 +49,7 @@ public class CECase extends EntityUtils implements Serializable{
     private String caseName;
     private CasePhase casePhase;
     private CaseStage caseStage;
+    private Icon icon;
     
     
     private LocalDateTime originationDate;
@@ -68,7 +69,7 @@ public class CECase extends EntityUtils implements Serializable{
     }
   
     
-    public int getCaseAge(){
+    public long getCaseAge(){
         return getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
     
@@ -259,8 +260,7 @@ public class CECase extends EntityUtils implements Serializable{
      * @return the originiationDatePretty
      */
     public String getOriginiationDatePretty() {
-        DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE dd MM yyyy, HH:mm");
-        originiationDatePretty = originationDate.format(f);
+        originiationDatePretty = getPrettyDate(originationDate);
         return originiationDatePretty;
     }
 
@@ -416,6 +416,20 @@ public class CECase extends EntityUtils implements Serializable{
      */
     public void setCaseStage(CaseStage caseStage) {
         this.caseStage = caseStage;
+    }
+
+    /**
+     * @return the icon
+     */
+    public Icon getIcon() {
+        return icon;
+    }
+
+    /**
+     * @param icon the icon to set
+     */
+    public void setIcon(Icon icon) {
+        this.icon = icon;
     }
 
   

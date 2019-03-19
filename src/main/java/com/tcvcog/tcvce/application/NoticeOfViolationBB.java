@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -33,6 +34,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -63,10 +66,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private List<Person> personCandidateAL;
     private List<TextBlock> selectedBlockList;
     
+    
     private boolean addPersonByID;
     private int recipientPersonID;
     
     private Person retrievedManualLookupPerson;
+    private List<Person> manualRetrievedPersonList;
     
     private TextBlock greetingBlock;
     private TextBlock introBlock;
@@ -82,6 +87,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private TextBlock tb4;
     private TextBlock closing;
     
+    private TextBlock chosenBlock;
+    private List<TextBlock> blockListBeforeViolations;
+    private List<TextBlock> blockListAfterViolations;
+    
+    
     /**
      * Creates a new instance of NoticeOfViolationBB
      */
@@ -92,6 +102,26 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         useTb4 = false;
         formDateOfRecord = java.sql.Date.valueOf(LocalDate.now());
     }
+    
+    @PostConstruct
+    public void initBean(){
+        blockListBeforeViolations = new ArrayList<>();
+        blockListAfterViolations = new ArrayList<>();
+        manualRetrievedPersonList = new ArrayList<>();
+    }
+    
+    public void addBlockBeforeViolations(TextBlock tb){
+        blockListByMuni.remove(tb);
+        blockListBeforeViolations.add(tb);
+    }
+    
+    
+    public void addBlockAfterViolations(TextBlock tb){
+        blockListByMuni.remove(tb);
+        blockListAfterViolations.add(tb);
+    }
+    
+    
     
     public void addBlockToList(ActionEvent ae){
         
@@ -108,7 +138,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
     
     public String setupNewNotice(){
-        System.out.println("NoticeOfViolationBB.setupNewNotice");
+        ViolationCoordinator vc = getViolationCoordinator();
         if(activeVList.isEmpty()){
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -116,7 +146,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             
             return "";
         }
-        currentNotice = new NoticeOfViolation();
+        currentNotice = vc.getNewNoticeOfViolation();
         getSessionBean().setActiveNotice(currentNotice);
         return "noticeOfViolationBuilderPersons";
     }
@@ -127,6 +157,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             retrievedManualLookupPerson = pi.getPerson(recipientPersonID);
             System.out.println("NoticeOfViolationBB.checkNOVRecipient | looked up person: " + retrievedManualLookupPerson);
             if(retrievedManualLookupPerson != null){
+                manualRetrievedPersonList.add(retrievedManualLookupPerson);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucess! Found person " + retrievedManualLookupPerson.getPersonID()  + "( " + retrievedManualLookupPerson.getLastName()+ ")",""));
                 
@@ -143,38 +174,25 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
     
     
-    
-    public String storeRecipient(){
-        currentNotice = getSessionBean().getActiveNotice();
+    public String connectPersonAndStoreRecipient(Person pers){
         PersonIntegrator pi = getPersonIntegrator();
-        Property p = getSessionBean().getActiveProp();
-        if((addPersonByID == false && selectedRecipient == null) || (addPersonByID == true && retrievedManualLookupPerson == null)){
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                "A notice needs a recipient! Please either select a person from the table or add a person by ID",""));
-            return "";
-        }
-         else {
-            if(addPersonByID == false && selectedRecipient != null){
-                currentNotice.setRecipient(selectedRecipient);
-            } else if (addPersonByID == true && retrievedManualLookupPerson != null) {
-                currentNotice.setRecipient(retrievedManualLookupPerson);
-                try {
-                    pi.connectPersonToProperty(retrievedManualLookupPerson, p);
-                } catch (IntegrationException ex) {
-                        System.out.println(ex);
-                        getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Error connecting this person to the current property. Please tell Eric about this.",""));
-                }
-            } else {
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "System error in assigning a person to this notice",""));
-                return "";
+        try {
+                pi.connectPersonToProperty(retrievedManualLookupPerson, getSessionBean().getPropertyQueue().get(0));
+            } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Error connecting this person to the current property. Please tell Eric about this.",""));
             }
-            return "noticeOfViolationBuilderText";
-        }
+        
+        return storeRecipient(pers);
+    }
+    
+    public String storeRecipient(Person pers){
+        currentNotice = getSessionBean().getActiveNotice();
+        currentNotice.setRecipient(pers);
+           
+        return "noticeOfViolationBuilderText";
     }
     
     
@@ -186,23 +204,19 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         sb.append(getPrettyDate(LocalDateTime.now()));
         sb.append("<br/><br/>");
         appendRecipientAddrBlock(sb, currentNotice.getRecipient());
-        appendTextBlockAsPara(greetingBlock, sb);
-        appendTextBlockAsPara(introBlock, sb);
-        if(useTb1){
-            appendTextBlockAsPara(tb1, sb);
+        Iterator<TextBlock> it = blockListBeforeViolations.iterator();
+        while(it.hasNext()){
+            appendTextBlockAsPara(it.next(), sb);
         }
-        if(useTb2){
-            appendTextBlockAsPara(tb2, sb);
-        }
+        
         appendViolationList(activeVList, sb);
-        appendTextBlockAsPara(complianceBlock, sb);
-        appendTextBlockAsPara(penaltyBlock, sb);
-        if(useTb3){
-            appendTextBlockAsPara(tb3, sb);
+        
+        it = blockListAfterViolations.iterator();
+        while(it.hasNext()){
+            appendTextBlockAsPara(it.next(), sb);
         }
-        if(useTb4){
-            appendTextBlockAsPara(tb4, sb);
-        }
+        
+        
         appendSignatureBlock(sb);
         
         // finally, extract the String from the StringBuilder and add to our
@@ -373,14 +387,15 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the textBlockListByMuni
      */
-    public List<TextBlock> getTextBlockListByMuni() {
+    public List<TextBlock> getBlockListByMuni() {
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        
-        Municipality m = getSessionBean().getActiveCodeSet().getMuni();
-        try {
-            blockListByMuni = cvi.getTextBlocks(m);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+        Municipality m = getSessionBean().getActiveMuni();
+        if(blockListByMuni == null){
+            try {
+                blockListByMuni = cvi.getTextBlocks(m);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
         }
         return blockListByMuni;
     }
@@ -684,6 +699,62 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setSelectedBlockList(List<TextBlock> selectedBlockList) {
         this.selectedBlockList = selectedBlockList;
+    }
+
+    /**
+     * @return the chosenBlock
+     */
+    public TextBlock getChosenBlock() {
+        return chosenBlock;
+    }
+
+    /**
+     * @param chosenBlock the chosenBlock to set
+     */
+    public void setChosenBlock(TextBlock chosenBlock) {
+        this.chosenBlock = chosenBlock;
+    }
+
+    /**
+     * @return the blockListBeforeViolations
+     */
+    public List<TextBlock> getBlockListBeforeViolations() {
+        return blockListBeforeViolations;
+    }
+
+    /**
+     * @param blockListBeforeViolations the blockListBeforeViolations to set
+     */
+    public void setBlockListBeforeViolations(List<TextBlock> blockListBeforeViolations) {
+        this.blockListBeforeViolations = blockListBeforeViolations;
+    }
+
+    /**
+     * @return the blockListAfterViolations
+     */
+    public List<TextBlock> getBlockListAfterViolations() {
+        return blockListAfterViolations;
+    }
+
+    /**
+     * @param blockListAfterViolations the blockListAfterViolations to set
+     */
+    public void setBlockListAfterViolations(List<TextBlock> blockListAfterViolations) {
+        this.blockListAfterViolations = blockListAfterViolations;
+    }
+
+    /**
+     * @return the manualRetrievedPersonList
+     */
+    public List<Person> getManualRetrievedPersonList() {
+        return manualRetrievedPersonList;
+    }
+
+    /**
+     * @param manualRetrievedPersonList the manualRetrievedPersonList to set
+     */
+    public void setManualRetrievedPersonList(List<Person> manualRetrievedPersonList) {
+        this.manualRetrievedPersonList = manualRetrievedPersonList;
     }
     
 }
