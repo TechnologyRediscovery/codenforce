@@ -625,7 +625,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("       eventtimestamp, eventdescription, ceevent.login_userid, disclosetomunicipality, ");
         sb.append("       disclosetopublic, activeevent, ceeventcategory.requiresviewconfirmation, hidden, ");
         sb.append("       ceevent.notes, viewconfirmedby, viewconfirmedat,");
-        sb.append("       viewnotes, property_propertyid, assignedto_login_userid ");
+        sb.append("       viewnotes, property_propertyid ");
         sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
         sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
         sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
@@ -950,11 +950,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public void logResponseToActionRequest(User u, EventCECase ev) throws IntegrationException {
+    public void logResponseToActionRequest(EventCECase ev) throws IntegrationException {
 
        String query = "UPDATE public.ceevent\n" +
             "   SET responsetimestamp=now(), respondernotes=?, \n" +
-            "       rejeecteventrequest=?, "
+            "       rejeecteventrequest=?, responseevent_eventid=?, "
                 + "responderactual_userid=? WHERE eventid = ?;";
 
         Connection con = getPostgresCon();
@@ -965,8 +965,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setString(1, ev.getResponseNotes());
             stmt.setBoolean(2, ev.isActionRequestRejected());
-            stmt.setInt(3, u.getUserID());
-            stmt.setInt(4, ev.getEventID());
+            if(ev.getResponseEventID() != 0){
+                stmt.setInt(3, ev.getResponseEventID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            stmt.setInt(4, ev.getResponderActual().getUserID());
+            stmt.setInt(5, ev.getEventID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());

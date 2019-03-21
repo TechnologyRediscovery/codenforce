@@ -166,10 +166,11 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         eventList = refreshedList;
     }
 
-    public void confirmViewWithoutNotes(EventWithCasePropInfo ev){
+    public void logActionResponse(EventWithCasePropInfo ev){
         EventCoordinator ec = getEventCoordinator();
         try {
-            ec.logResponseToActionRequest(ev, getSessionBean().getFacesUser());
+            ev.setResponderActual(getSessionBean().getFacesUser());
+            ec.logResponseToActionRequest(ev);
             refreshCurrentEventList();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,

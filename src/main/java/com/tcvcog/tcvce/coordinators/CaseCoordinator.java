@@ -315,6 +315,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the case to which the event should be added
      * @param e the event to add to the case also included in this call
+     * @param u
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
