@@ -713,7 +713,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         noticeEvent.setActive(true);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
-        noticeEvent.setRequiresViewConfirmation(false);
+        noticeEvent.setRequestedEventIDRequired(false);
         noticeEvent.setHidden(false);
         
         ArrayList<Person> al = new ArrayList();

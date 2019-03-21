@@ -152,9 +152,9 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         try {
             while (iter.hasNext()) {
                 e = iter.next();
-                e = ei.getSuperEvent(e.getEventID());
-                e.setCurrentUserCanConfirm(
-                        ec.computeEventViewConfirmationAbility(e, getSessionBean().getFacesUser()));
+                e = ei.getEventWithCaseAndProp(e.getEventID());
+                e.setCurrentUserCanTakeAction(
+                        ec.determineUserActionRequestEventAuthorization(e, getSessionBean().getFacesUser()));
                 refreshedList.add(e);
             }
         } catch (IntegrationException ex) {
@@ -169,7 +169,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public void confirmViewWithoutNotes(EventWithCasePropInfo ev){
         EventCoordinator ec = getEventCoordinator();
         try {
-            ec.confirmEventView(ev, getSessionBean().getFacesUser());
+            ec.logResponseToActionRequest(ev, getSessionBean().getFacesUser());
             refreshCurrentEventList();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -181,18 +181,18 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void clearViewconfirmation(EventWithCasePropInfo ev){
+    public void clearActionResponse(EventWithCasePropInfo ev){
         EventCoordinator ec = getEventCoordinator();
         try {
-            ec.clearEventView(ev);
+            ec.clearActionResponse(ev);
             refreshCurrentEventList();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "View confirmation: cleared!", ""));
+                            "Action response: cleared!", ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not clear view confirmation, sorry.", ""));
+                            "Could not clear action response, sorry.", ""));
         }
     }
     

@@ -730,14 +730,14 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="View confirmed by"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.viewConfirmedBy.person.lastName}"/>
+                                                        <h:outputText value="#{e.responderActual.person.lastName}"/>
                                                     </div>
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="View confirmed at"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.viewConfirmedAt}"/>
+                                                        <h:outputText value="#{e.responseTimestamp}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -1399,7 +1399,7 @@
                                         <h:outputText value="Require view confirmation by case manager"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="requireViewConfirmationSwitch" value="#{caseProfileBB.selectedEvent.requiresViewConfirmation}"  />
+                                    <p:selectBooleanCheckbox tabindex="18" id="requireViewConfirmationSwitch" value="#{caseProfileBB.selectedEvent.requireRequestedEventInsert}"  />
                                 </h:panelGroup>
 
                                 <f:facet name="footer">
