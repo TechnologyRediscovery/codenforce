@@ -372,32 +372,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     protected void insertEvent(EventCECase e) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         int insertedEventID = ei.insertEvent(e);
-        EventCECase triggeringEvent = (EventCECase) e.getTriggeringEvent();
+        Event triggeringEvent = e.getTriggeringEvent();
         if( triggeringEvent != null){
-            triggeringEvent.set
-        }
+            triggeringEvent.setResponseEventID(insertedEventID);
+            ei.logResponseToActionRequest(e);
+       }
         
     }
     
-    /**
-     * a pass through method called by the eventAddBB which sends the event and case
-     * over to the case coordinator for the meat of the processing cycle. This exists
-     * such that the eventAddBB is interacting only with the methods on the EventCoordinator
-     * and allows the implementation of event-specific logic before interacting with the
-     * CaseCoordinator.
-     * @param c the current case
-     * @param e the event to be processed which is passed over to the CaseCoordinator
-     * @param cv
-     * @throws IntegrationException
-     * @throws CaseLifecyleException
-     * @throws ViolationException 
-     */
-    public void initiateEventProcessing(CECase c, EventCECase e, CodeViolation cv) throws IntegrationException, CaseLifecyleException, ViolationException{
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        cc.addNewCEEvent(c, e);
-        
-    }
+    
+    
+    
     
     
     public ArrayList getEventList(CECase currentCase) throws IntegrationException{
@@ -446,9 +431,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 
     } // close method
     
-    public void logResponseToActionRequest(EventWithCasePropInfo ev, User us) throws IntegrationException{
+    public void logResponseToActionRequest(EventWithCasePropInfo ev) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.logResponseToActionRequest(us, ev);
+        ei.logResponseToActionRequest(ev);
     }
     
     

@@ -45,8 +45,21 @@ public class Event extends EntityUtils implements Serializable {
     private boolean hidden;
     private String notes;
     
+    // utility memvar which is true if there's a requested
+    // event category in requestedEventCategory
+    private boolean requestsAction;
+    
+    // computed based on the business logic for
+    // action request responses
+    private boolean requestProcessingComplete;
+    
+    // OPTIONAL: a pointer to the event whose action request
+    // parameters created this event
     private Event triggeringEvent;
-    private Event responseEvent;
+    
+    // the ID of the event generated based on this event's
+    // action request
+    private int responseEventID;
     
     private boolean currentUserCanTakeAction;
     private EventCategory requestedEventCategory;
@@ -431,18 +444,60 @@ public class Event extends EntityUtils implements Serializable {
         this.triggeringEvent = triggeringEvent;
     }
 
+
     /**
-     * @return the responseEvent
+     * @return the requestsAction
      */
-    public Event getResponseEvent() {
-        return responseEvent;
+    public boolean isRequestsAction() {
+        if(requestedEventCategory!= null){
+            requestsAction = true;
+        } else {
+           requestsAction = false;
+        }
+        return requestsAction;
     }
 
     /**
-     * @param responseEvent the responseEvent to set
+     * @param requestsAction the requestsAction to set
      */
-    public void setResponseEvent(Event responseEvent) {
-        this.responseEvent = responseEvent;
+    public void setRequestsAction(boolean requestsAction) {
+        this.requestsAction = requestsAction;
+    }
+
+    /**
+     * @return the requestProcessingComplete
+     */
+    public boolean isRequestProcessingComplete() {
+        boolean requestStatus = false;
+        if(requestedEventIDRequired && responseEventID != 0){
+            requestStatus = true;
+        } else if (!requestedEventIDRequired && responderActual != null){
+            requestStatus = true;
+        }
+            
+        requestProcessingComplete = requestStatus;
+        return requestProcessingComplete;
+    }
+
+    /**
+     * @param requestProcessingComplete the requestProcessingComplete to set
+     */
+    public void setRequestProcessingComplete(boolean requestProcessingComplete) {
+        this.requestProcessingComplete = requestProcessingComplete;
+    }
+
+    /**
+     * @return the responseEventID
+     */
+    public int getResponseEventID() {
+        return responseEventID;
+    }
+
+    /**
+     * @param responseEventID the responseEventID to set
+     */
+    public void setResponseEventID(int responseEventID) {
+        this.responseEventID = responseEventID;
     }
 
    

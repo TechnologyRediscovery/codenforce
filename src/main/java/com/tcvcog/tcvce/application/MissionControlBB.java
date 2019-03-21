@@ -106,22 +106,6 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
     
-    public void updateEventViewData(EventWithCasePropInfo ev){
-        System.out.println("MissionControlBB.updateEventViewData | event selected ID: " + ev.getEventID());
-        EventIntegrator ei = getEventIntegrator();
-        try {
-            ei.logResponseToActionRequest(getFacesUser(), ev);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Updated view info for event " 
-                        + ev.getEventID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-        }
-            getTimelineEventList();
-    }
-    
     public String switchMuni(){
         CodeIntegrator ci = getCodeIntegrator();
         getSessionBean().setActiveMuni(selectedMuni);
