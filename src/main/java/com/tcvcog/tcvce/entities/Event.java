@@ -39,20 +39,25 @@ public class Event extends EntityUtils implements Serializable {
     private String description;
     private User creator;
     private User assignedTo;
-    private boolean discloseToMunicipality;
+    private boolean discloseToMunicipality; 
     private boolean discloseToPublic;
     private boolean active;
     private boolean hidden;
     private String notes;
     
-    private boolean requiresViewConfirmation;
-    private User viewConfRequestedBy;
-    private boolean currentUserCanConfirm;
-    private boolean viewConfirmed;
-    private User viewConfirmedBy;
-    private LocalDateTime viewConfirmedAt;
-    private String viewConfAtPrettyDate;
-    private String viewNotes;
+    private Event triggeringEvent;
+    private Event responseEvent;
+    
+    private boolean currentUserCanTakeAction;
+    private EventCategory requestedEventCategory;
+    private boolean requestedEventIDRequired;
+    private User actionRequestedBy;
+    private User responderIntended;
+    private User responderActual;
+    private LocalDateTime responseTimestamp;
+    private String responseTimePrettyDate;
+    private String responseNotes;
+    private boolean actionRequestRejected;
 
     /**
      * @return the eventID
@@ -219,60 +224,47 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the requiresViewConfirmation
+     * @return the requestedEventIDRequired
      */
-    public boolean isRequiresViewConfirmation() {
-        return requiresViewConfirmation;
+    public boolean isRequestedEventIDRequired() {
+        return requestedEventIDRequired;
     }
 
     /**
-     * @return the viewConfirmedBy
+     * @return the responderActual
      */
-    public User getViewConfirmedBy() {
-        return viewConfirmedBy;
+    public User getResponderActual() {
+        return responderActual;
     }
 
     /**
-     * @return the viewConfirmedAt
+     * @return the responseTimestamp
      */
-    public LocalDateTime getViewConfirmedAt() {
-        return viewConfirmedAt;
+    public LocalDateTime getResponseTimestamp() {
+        return responseTimestamp;
     }
 
     /**
-     * @param requiresViewConfirmation the requiresViewConfirmation to set
+     * @param requestedEventIDRequired the requestedEventIDRequired to set
      */
-    public void setRequiresViewConfirmation(boolean requiresViewConfirmation) {
-        this.requiresViewConfirmation = requiresViewConfirmation;
+    public void setRequestedEventIDRequired(boolean requestedEventIDRequired) {
+        this.requestedEventIDRequired = requestedEventIDRequired;
     }
 
     /**
-     * @param viewConfirmedBy the viewConfirmedBy to set
+     * @param responderActual the responderActual to set
      */
-    public void setViewConfirmedBy(User viewConfirmedBy) {
-        this.viewConfirmedBy = viewConfirmedBy;
+    public void setResponderActual(User responderActual) {
+        this.responderActual = responderActual;
     }
 
     /**
-     * @param viewConfirmedAt the viewConfirmedAt to set
+     * @param responseTimestamp the responseTimestamp to set
      */
-    public void setViewConfirmedAt(LocalDateTime viewConfirmedAt) {
-        this.viewConfirmedAt = viewConfirmedAt;
+    public void setResponseTimestamp(LocalDateTime responseTimestamp) {
+        this.responseTimestamp = responseTimestamp;
     }
 
-    /**
-     * @return the viewConfirmed
-     */
-    public boolean isViewConfirmed() {
-        return viewConfirmed;
-    }
-
-    /**
-     * @param viewConfirmed the viewConfirmed to set
-     */
-    public void setViewConfirmed(boolean viewConfirmed) {
-        this.viewConfirmed = viewConfirmed;
-    }
 
     /**
      * @return the dateOfRecordUtilDate
@@ -310,33 +302,33 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the viewNotes
+     * @return the responseNotes
      */
-    public String getViewNotes() {
-        return viewNotes;
+    public String getResponseNotes() {
+        return responseNotes;
     }
 
     /**
-     * @param viewNotes the viewNotes to set
+     * @param responseNotes the responseNotes to set
      */
-    public void setViewNotes(String viewNotes) {
-        this.viewNotes = viewNotes;
+    public void setResponseNotes(String responseNotes) {
+        this.responseNotes = responseNotes;
     }
 
     /**
-     * @return the viewConfAtPrettyDate
+     * @return the responseTimePrettyDate
      */
-    public String getViewConfAtPrettyDate() {
-        String pretty = getPrettyDate(viewConfirmedAt);
-        viewConfAtPrettyDate = pretty;
-        return viewConfAtPrettyDate;
+    public String getResponseTimePrettyDate() {
+        String pretty = getPrettyDate(responseTimestamp);
+        responseTimePrettyDate = pretty;
+        return responseTimePrettyDate;
     }
 
     /**
-     * @param viewConfAtPrettyDate the viewConfAtPrettyDate to set
+     * @param responseTimePrettyDate the responseTimePrettyDate to set
      */
-    public void setViewConfAtPrettyDate(String viewConfAtPrettyDate) {
-        this.viewConfAtPrettyDate = viewConfAtPrettyDate;
+    public void setResponseTimePrettyDate(String responseTimePrettyDate) {
+        this.responseTimePrettyDate = responseTimePrettyDate;
     }
 
     /**
@@ -356,31 +348,101 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the currentUserCanConfirm
+     * @return the currentUserCanTakeAction
      */
-    public boolean isCurrentUserCanConfirm() {
-        return currentUserCanConfirm;
+    public boolean isCurrentUserCanTakeAction() {
+        return currentUserCanTakeAction;
     }
 
     /**
-     * @param currentUserCanConfirm the currentUserCanConfirm to set
+     * @param currentUserCanTakeAction the currentUserCanTakeAction to set
      */
-    public void setCurrentUserCanConfirm(boolean currentUserCanConfirm) {
-        this.currentUserCanConfirm = currentUserCanConfirm;
+    public void setCurrentUserCanTakeAction(boolean currentUserCanTakeAction) {
+        this.currentUserCanTakeAction = currentUserCanTakeAction;
     }
 
     /**
-     * @return the viewConfRequestedBy
+     * @return the actionRequestedBy
      */
-    public User getViewConfRequestedBy() {
-        return viewConfRequestedBy;
+    public User getActionRequestedBy() {
+        return actionRequestedBy;
     }
 
     /**
-     * @param viewConfRequestedBy the viewConfRequestedBy to set
+     * @param actionRequestedBy the actionRequestedBy to set
      */
-    public void setViewConfRequestedBy(User viewConfRequestedBy) {
-        this.viewConfRequestedBy = viewConfRequestedBy;
+    public void setActionRequestedBy(User actionRequestedBy) {
+        this.actionRequestedBy = actionRequestedBy;
+    }
+
+    /**
+     * @return the responderIntended
+     */
+    public User getResponderIntended() {
+        return responderIntended;
+    }
+
+    /**
+     * @param responderIntended the responderIntended to set
+     */
+    public void setResponderIntended(User responderIntended) {
+        this.responderIntended = responderIntended;
+    }
+
+    /**
+     * @return the actionRequestRejected
+     */
+    public boolean isActionRequestRejected() {
+        return actionRequestRejected;
+    }
+
+    /**
+     * @param actionRequestRejected the actionRequestRejected to set
+     */
+    public void setActionRequestRejected(boolean actionRequestRejected) {
+        this.actionRequestRejected = actionRequestRejected;
+    }
+
+    /**
+     * @return the requestedEventCategory
+     */
+    public EventCategory getRequestedEventCategory() {
+        return requestedEventCategory;
+    }
+
+    /**
+     * @param requestedEventCategory the requestedEventCategory to set
+     */
+    public void setRequestedEventCategory(EventCategory requestedEventCategory) {
+        this.requestedEventCategory = requestedEventCategory;
+    }
+
+    /**
+     * @return the triggeringEvent
+     */
+    public Event getTriggeringEvent() {
+        return triggeringEvent;
+    }
+
+    /**
+     * @param triggeringEvent the triggeringEvent to set
+     */
+    public void setTriggeringEvent(Event triggeringEvent) {
+        this.triggeringEvent = triggeringEvent;
+    }
+
+    /**
+     * @return the responseEvent
+     */
+    public Event getResponseEvent() {
+        return responseEvent;
+    }
+
+    /**
+     * @param responseEvent the responseEvent to set
+     */
+    public void setResponseEvent(Event responseEvent) {
+        this.responseEvent = responseEvent;
     }
 
    

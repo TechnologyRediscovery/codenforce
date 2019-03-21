@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
@@ -105,7 +106,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         Iterator<EventWithCasePropInfo> iter = evList.iterator();
         while(iter.hasNext()){
             ev = iter.next();
-            ev.setCurrentUserCanConfirm(computeEventViewConfirmationAbility(ev, user));
+            ev.setCurrentUserCanTakeAction(determineUserActionRequestEventAuthorization(ev, user));
         }        
         return evList;
     }
@@ -117,8 +118,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param u the User viewing the list of CEEvents
      * @return 
      */
-    public boolean computeEventViewConfirmationAbility(EventWithCasePropInfo ev, User u){
-        boolean canConfirm = false;
+    public boolean determineUserActionRequestEventAuthorization(EventWithCasePropInfo ev, User u){
+        boolean canDoRequestedEvent = false;
         EventType evType = ev.getCategory().getEventType();
         List<Municipality> muniList = u.getAuthMunis();
         
@@ -131,14 +132,16 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             // sys admins for a muni can confirm everything
             if(u.getKeyCard().isHasSysAdminPermissions()){
                 return true;
-            } else if(evType == EventType.Timeline && u.getKeyCard().isHasEnfOfficialPermissions()){
+                // only code officers can enact timeline events
+            } else if(((evType == EventType.Timeline) || (evType != EventType.Action)) 
+                    && u.getKeyCard().isHasEnfOfficialPermissions()){
                 return true;
-            } else if(u.getKeyCard().isHasMuniStaffPermissions()){
+            } else if(((evType != EventType.Action) || (evType !=EventType.Timeline)) 
+                    && u.getKeyCard().isHasMuniStaffPermissions()){
                 return true;
             }
         }
-                
-        return canConfirm;
+        return canDoRequestedEvent;
     }
     
     public void deleteEvent(EventCECase ev, User u) throws AuthorizationException{
@@ -189,7 +192,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCECase event = new EventCECase();
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
-        event.setRequiresViewConfirmation(ec.isRequiresviewconfirmation());
+        event.setRequestedEventIDRequired(ec.isRequiresviewconfirmation());
         event.setActive(true);
         event.setHidden(false);
         event.setCaseID(c.getCaseID());
@@ -267,17 +270,14 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setHidden(false);
         event.setNotes("Event created by a public user");
         
-        
         // sent the built event to the integrator!
         ei.insertEvent(event);
-        
     }
     
     public void editEvent(EventCECase evcase, User u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        System.out.println("EventCoordinator.editEvent");
         evcase.setAssignedTo(u);
-        ei.editEvent(evcase, false);
+        ei.editEvent(evcase);
     }
     
     
@@ -363,14 +363,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return new ArrayList<>();
     }
     
-    public String updateEvent(EventCECase event, boolean clearViewConfirmation) throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        // YIKES TODO: Case vetting logic needed here!
-        ei.editEvent(event, clearViewConfirmation);
-        
-        return "cecases";
-    }
-    
     
     /**
      * A container for future event-related business logic
@@ -379,7 +371,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     protected void insertEvent(EventCECase e) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.insertEvent(e);
+        int insertedEventID = ei.insertEvent(e);
+        EventCECase triggeringEvent = (EventCECase) e.getTriggeringEvent();
+        if( triggeringEvent != null){
+            triggeringEvent.set
+        }
         
     }
     
@@ -450,15 +446,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 
     } // close method
     
-    public void confirmEventView(EventWithCasePropInfo ev, User us) throws IntegrationException{
+    public void logResponseToActionRequest(EventWithCasePropInfo ev, User us) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.confirmEventView(us, ev);
+        ei.logResponseToActionRequest(us, ev);
     }
     
     
-    public void clearEventView(EventWithCasePropInfo ev) throws IntegrationException{
+    public void clearActionResponse(EventWithCasePropInfo ev) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.clearViewConfFromEvent(ev);
+        ei.clearActionResponse(ev);
     }
     
     

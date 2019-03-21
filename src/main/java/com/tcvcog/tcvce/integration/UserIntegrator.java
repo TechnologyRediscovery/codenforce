@@ -352,7 +352,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error getting a new person", ex);
+            throw new IntegrationException("a new person", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }

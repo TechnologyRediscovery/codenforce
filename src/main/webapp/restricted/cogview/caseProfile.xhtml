@@ -162,21 +162,21 @@
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.requiresViewConfirmation}"/>
+                                                            <h:outputText value="#{e.requireRequestedEventInsert}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed by"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.viewConfirmedBy.LName}"/>
+                                                            <h:outputText value="#{e.responderActual.LName}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed at"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.viewConfirmedAt}"/>
+                                                            <h:outputText value="#{e.responseTimestamp}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     
