@@ -370,9 +370,9 @@
 
                             <p:commandButton    id="event-preset-eventsreqviewconf" 
                                                 ajax="true"
-                                                 value="events requiring view confirmation" 
+                                                 value="Required actions" 
                                                  styleClass="noFill"
-                                                 actionListener="#{cEEventsBB.loadEventsRequiringViewConf(ev)}"
+                                                 actionListener="#{cEEventsBB.loadEventsRequiringAction(ev)}"
                                                  disabled="false"
                                                  icon="fa fa-tasks"
                                                  rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
@@ -442,9 +442,9 @@
                                                 <h:outputText value="id:#{e.eventID} |
                                                               #{e.active ? 'active' : 'inactive'} |
                                                               #{e.hidden ? 'hidden' : ''} |
-                                                              #{e.discloseToMunicipality? 'muni:viewable' : 'muni:hidden'} |
-                                                              #{e.discloseToPublic? 'public:viewable' : 'public:hidden'} |
-                                                              #{e.requireRequestedEventInsert? 'viewconf:yes' : 'viewconf:no'}"/>
+                                                              #{e.discloseToMunicipality? 'muni: viewable' : 'muni: hidden'} |
+                                                              #{e.discloseToPublic? 'public: viewable' : 'public: hidden'} |
+                                                              #{e.requiresAction? 'action requested: yes' : 'action requested: no'}"/>
                                             </h4>
 
                                             <h3>
@@ -493,17 +493,17 @@
 
                                                 <h:panelGroup>
 
-                                                    <h:panelGrid columns="2" rendered="#{e.requireRequestedEventInsert}"
+                                                    <h:panelGrid columns="2" rendered="#{e.requiresAction}"
                                                          columnClasses="gridTd-solid-back, gridTd-solid-back" >
 
                                                         <f:facet name="header" class="leftalign">
-                                                            <h:outputText value="#{empty e.responderActual? 'View confirmation required!' : 'View confirmation received'}"
+                                                            <h:outputText value="#{empty e.responderActual? 'action required!' : 'action complete'}"
                                                                           styleClass="viewconf-status #{empty e.responderActual? 'conf-needed' : 'conf-received'}"/>
                                                             <p:spacer height="5px"/>
                                                              <p:commandButton   id="events-viewconf-confirmnonotes-cb" 
                                                                                 ajax="true"
                                                                                 actionListener="#{cEEventsBB.logActionResponse(e)}"
-                                                                                 value="Confirm without notes" 
+                                                                                 value="Take action without notes" 
                                                                                  styleClass="noFill"
                                                                                  disabled="#{!(empty e.responderActual)}"
                                                                                  icon="fa fa-check-square-o"
@@ -529,12 +529,12 @@
                                                              <p:commandButton   id="events-viewconf-clearconf-cb" 
                                                                                 ajax="true"
                                                                                 actionListener="#{cEEventsBB.clearActionResponse(e)}"
-                                                                                value="clear view conf" 
+                                                                                value="clear action taken" 
                                                                                 styleClass="noFill"
                                                                                 disabled="#{empty e.responderActual}"
                                                                                 icon="fa fa-eraser"
                                                                                 rendered="#{e.currentUserCanTakeAction}"
-                                                                                 update="events-datascroller
+                                                                                update="events-datascroller
                                                                                         events-datatable-form:events-datatable
                                                                                         ceev-form-globalmessages:ceev-globalmessages
                                                                                         "
@@ -543,28 +543,56 @@
                                                         </f:facet>
 
                                                         <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="View requested by"/>
+                                                            <h:outputText styleClass="bold" value="Requested event: "/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.requestedEventCategory.eventType.label}: #{e.requestedEventCategory.eventCategoryTitle}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Action requested by: "/>
                                                             <div class="rowExpansion">
                                                                 <h:outputText value="#{e.actionRequestedBy.person.firstName} #{e.actionRequestedBy.person.lastName}"/>
                                                             </div>
                                                         </h:panelGroup>
 
                                                         <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="View confirmed by"/>
+                                                            <h:outputText styleClass="bold" value="Logged event required? "/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.requestedEventIDRequired ? 'Yes: logged event required' : 'No: logged event optional'}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Intended user/action taker: "/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.responderIntended.person.firstName} #{e.responderIntended.person.lastName}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Action taken by: "/>
                                                             <div class="rowExpansion">
                                                                 <h:outputText value="#{e.responderActual.person.firstName} #{e.responderActual.person.lastName}"/>
                                                             </div>
                                                         </h:panelGroup>
 
                                                         <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="View confirmed at"/>
+                                                            <h:outputText styleClass="bold" value="Action timestamp: "/>
                                                             <div class="rowExpansion">
                                                                 <h:outputText value="#{e.responseTimePrettyDate}"/>
                                                             </div>
                                                         </h:panelGroup>
 
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Request rejected? "/>
+                                                            <div class="rowExpansion">
+                                                                <h:outputText value="#{e.requestRejected}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
                                                         <f:facet name="footer" class="leftalign">
-                                                            <h:outputText styleClass="bold" value="View confirmation notes:"/>
+                                                            <h:outputText styleClass="bold" value="Action response notes:"/>
                                                             <div class="rowExpansion">
                                                                 <h:outputText value="#{e.responseNotes}"/>
                                                             </div>

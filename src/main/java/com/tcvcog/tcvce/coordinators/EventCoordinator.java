@@ -74,9 +74,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
    
     
     
-    public SearchParamsCEEvents getDefaultSearchParamsCEEventsRequiringView(User user, Municipality m){
+    public SearchParamsCEEvents getSearchParamsCEEventsRequiringAction(User user, Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
-        return sc.getSearchParamsEventsRequiringView(user,m);
+        return sc.getSearchParamsEventsRequiringAction(user,m);
         
     }
     
@@ -439,7 +439,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public void clearActionResponse(EventWithCasePropInfo ev) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.clearActionResponse(ev);
+        ei.clearResponseToActionRequest(ev);
     }
     
     

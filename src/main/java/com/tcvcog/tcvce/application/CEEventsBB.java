@@ -50,7 +50,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
-        searchParams = ec.getDefaultSearchParamsCEEventsRequiringView(
+        searchParams = ec.getSearchParamsCEEventsRequiringAction(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
     }
     
@@ -87,10 +87,10 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         return searchParams;
     }
     
-    public void loadEventsRequiringViewConf(ActionEvent ev){
+    public void loadEventsRequiringAction(ActionEvent ev){
         System.out.println("CEEventsBB.loadOfficerActivity");
         EventCoordinator ec = getEventCoordinator();
-        searchParams = ec.getDefaultSearchParamsCEEventsRequiringView(
+        searchParams = ec.getSearchParamsCEEventsRequiringAction(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
         try {
             eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
