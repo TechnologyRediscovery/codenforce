@@ -60,7 +60,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return propParams;
     }
     
-    public SearchParamsCEEvents getSearchParamsEventsRequiringView(User u, Municipality muni){
+    public SearchParamsCEEvents getSearchParamsEventsRequiringAction(User u, Municipality muni){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory

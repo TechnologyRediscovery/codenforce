@@ -564,7 +564,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             ev.setResponseTimestamp(rs.getTimestamp("responsetimestamp").toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime());
             ev.setResponseNotes(rs.getString("responseNotes"));
-            ev.setActionRequestRejected(rs.getBoolean("actionRequestRejected"));
+            ev.setRequestRejected(rs.getBoolean("actionRequestRejected"));
         } 
         
         return ev;
@@ -913,8 +913,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return eventList;
@@ -922,9 +922,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public void clearActionResponse(EventCECase ec) throws IntegrationException{
+    public void clearResponseToActionRequest(EventCECase ec) throws IntegrationException{
          String query = "UPDATE public.ceevent\n" +
-            "   SET responsetimestamp=now(), respondernotes=?, \n" +
+            "   SET responsetimestamp=NULL, respondernotes=NULL, \n" +
             "       responseevent_eventid=NULL, rejeecteventrequest=FALSE, "
                 + "responderactual_userid=NULL WHERE eventid = ?;";
 
@@ -964,7 +964,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             stmt = con.prepareStatement(query);
             stmt.setString(1, ev.getResponseNotes());
-            stmt.setBoolean(2, ev.isActionRequestRejected());
+            stmt.setBoolean(2, ev.isRequestRejected());
             if(ev.getResponseEventID() != 0){
                 stmt.setInt(3, ev.getResponseEventID());
             } else {

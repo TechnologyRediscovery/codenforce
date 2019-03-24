@@ -47,7 +47,7 @@ public class Event extends EntityUtils implements Serializable {
     
     // utility memvar which is true if there's a requested
     // event category in requestedEventCategory
-    private boolean requestsAction;
+    private boolean requiresAction;
     
     // computed based on the business logic for
     // action request responses
@@ -70,7 +70,7 @@ public class Event extends EntityUtils implements Serializable {
     private LocalDateTime responseTimestamp;
     private String responseTimePrettyDate;
     private String responseNotes;
-    private boolean actionRequestRejected;
+    private boolean requestRejected;
 
     /**
      * @return the eventID
@@ -403,17 +403,17 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the actionRequestRejected
+     * @return the requestRejected
      */
-    public boolean isActionRequestRejected() {
-        return actionRequestRejected;
+    public boolean isRequestRejected() {
+        return requestRejected;
     }
 
     /**
-     * @param actionRequestRejected the actionRequestRejected to set
+     * @param requestRejected the requestRejected to set
      */
-    public void setActionRequestRejected(boolean actionRequestRejected) {
-        this.actionRequestRejected = actionRequestRejected;
+    public void setRequestRejected(boolean requestRejected) {
+        this.requestRejected = requestRejected;
     }
 
     /**
@@ -446,36 +446,34 @@ public class Event extends EntityUtils implements Serializable {
 
 
     /**
-     * @return the requestsAction
+     * @return the requiresAction
      */
-    public boolean isRequestsAction() {
+    public boolean isRequiresAction() {
         if(requestedEventCategory!= null){
-            requestsAction = true;
+            requiresAction = true;
         } else {
-           requestsAction = false;
+           requiresAction = false;
         }
-        return requestsAction;
+        return requiresAction;
     }
 
     /**
-     * @param requestsAction the requestsAction to set
+     * @param requiresAction the requiresAction to set
      */
-    public void setRequestsAction(boolean requestsAction) {
-        this.requestsAction = requestsAction;
+    public void setRequiresAction(boolean requiresAction) {
+        this.requiresAction = requiresAction;
     }
 
     /**
      * @return the requestProcessingComplete
      */
     public boolean isRequestProcessingComplete() {
-        boolean requestStatus = false;
-        if(requestedEventIDRequired && responseEventID != 0){
-            requestStatus = true;
-        } else if (!requestedEventIDRequired && responderActual != null){
-            requestStatus = true;
-        }
-            
-        requestProcessingComplete = requestStatus;
+        requestProcessingComplete = false;
+        if(     (requestedEventIDRequired && responseEventID != 0) 
+                    ||
+                (!requestedEventIDRequired && responderActual != null)){
+            requestProcessingComplete = true;
+        } 
         return requestProcessingComplete;
     }
 
