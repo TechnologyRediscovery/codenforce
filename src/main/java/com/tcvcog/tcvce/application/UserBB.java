@@ -140,7 +140,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public ArrayList<User> getUserList() {
         UserIntegrator ui = getUserIntegrator();
         try {
-            userList = ui.getCompleteUserList();
+            userList = ui.getCompleteActiveUserList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

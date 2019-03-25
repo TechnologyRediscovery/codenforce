@@ -229,8 +229,6 @@ INSERT INTO public.icon(
 
 -- Updates for major shift from passive "confirm view" to active "request event" with each event.
 
-ALTER TABLE ceevent RENAME COLUMN requiresviewconfirmation TO requirerequestedeventinsert;
-
 ALTER TABLE ceevent RENAME COLUMN viewconfirmedby TO actionrequestedby;
 ALTER TABLE ceevent RENAME COLUMN viewconfirmedat TO responsetimestamp;
 ALTER TABLE ceevent RENAME COLUMN viewrequestedby_userid TO actionrequestedby_userid;
@@ -241,8 +239,7 @@ ALTER TABLE ceevent ADD COLUMN requestedeventcat_catid INTEGER CONSTRAINT ceeven
 ALTER TABLE ceevent ADD COLUMN requestedevent_eventid INTEGER CONSTRAINT ceevent_reqeventid_fk REFERENCES ceevent (eventid);
 ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 
--- beefing up our violations with severity ratings and classifications at the violation and municipal level
-
+	-- beefing up our violations with severity ratings and classifications at the violation and municipal level
 
 	CREATE SEQUENCE IF NOT EXISTS codeviolationseverityclass_seq
 	    START WITH 10
@@ -250,7 +247,6 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 	    MINVALUE 10
 	    NO MAXVALUE
 	    CACHE 1;
-
 
 	CREATE TABLE codeviolationseverityclass
 	(
@@ -263,15 +259,11 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 		icon_iconid 		INTEGER
 	);
 
-
 	ALTER TABLE codeviolationseverityclass ADD CONSTRAINT cvclass_fk FOREIGN KEY ( muni_muniCode ) REFERENCES municipality ( muniCode ) ;
 	ALTER TABLE codeviolationseverityclass ADD CONSTRAINT cvclass_iconid_fk FOREIGN KEY (icon_iconid) REFERENCES icon (iconid);
 
 	-- now link a code violation to its classification table we just made
 	ALTER TABLE codeviolation ADD COLUMN severity_classid INTEGER CONSTRAINT codeviolationseverityclass_fk REFERENCES codeviolationseverityclass (classid);
-
-
-
 
 	CREATE SEQUENCE IF NOT EXISTS codesetelementclass_seq
 	    START WITH 10
@@ -279,7 +271,6 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 	    MINVALUE 10
 	    NO MAXVALUE
 	    CACHE 1;
-
 
 	CREATE TABLE codesetelementclass
 	(
@@ -290,15 +281,12 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 		icon_iconid 		INTEGER
 	);
 
-
 	ALTER TABLE codesetelementclass ADD CONSTRAINT cvclass_fk FOREIGN KEY ( muni_muniCode ) REFERENCES municipality ( muniCode ) ;
 	ALTER TABLE codesetelementclass ADD CONSTRAINT cvclass_iconid_fk FOREIGN KEY (icon_iconid) REFERENCES icon (iconid);
 	
 	-- link our codesetelement (aka enforcable code element) to its class
 	ALTER TABLE codesetelement ADD COLUMN class_classid INTEGER CONSTRAINT codesetelementclass_fk REFERENCES codesetelementclass (classid);
 	ALTER TABLE codesetelementclass ADD COLUMN priority INTEGER DEFAULT 1;
-
-
 
 
 	INSERT INTO public.codesetelementclass(
@@ -331,19 +319,21 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 
 
 	ALTER TABLE ceevent DROP COLUMN actionrequestedby;
-
 	
 	ALTER TABLE ceevent RENAME COLUMN insertedrequestedevent_eventid TO insertedresponseevent_eventid;
 	ALTER TABLE ceevent RENAME COLUMN actionrequesttarget_userid TO responderintended_userid;
 	ALTER TABLE ceevent ADD COLUMN responderactual_userid INTEGER CONSTRAINT ceevent_responderact_fk REFERENCES	 login (userid);
 
 
-	ALTER TABLE ceeventcategory ADD COLUMN suggestedeventrequest INTEGER CONSTRAINT ceeventcat_suggev_fk REFERENCES ceeventcategory (categoryid);
-
 	ALTER TABLE ceevent RENAME COLUMN actionrequestnotes TO respondernotes;
 	ALTER TABLE ceevent ADD COLUMN responseevent_eventid INTEGER CONSTRAINT responseevent_fk REFERENCES ceevent (eventid);
--- have run locally until here
-ALTER TABLE ceevent RENAME COLUMN insertedresponseevent_eventid TO responseevent_eventid;
+
+	ALTER TABLE ceevent RENAME COLUMN creator_userid TO owner_userid;
+	-- have run locally until here
+
+	ALTER TABLE ceeventcategory DROP COLUMN requiresviewconfirmation;
+	ALTER TABLE ceeventcategory ADD COLUMN requestable BOOLEAN DEFAULT FALSE;
+
 
 COMMIT;
 

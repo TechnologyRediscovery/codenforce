@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -467,12 +468,12 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public ArrayList getCompleteUserList() throws IntegrationException{
+    public ArrayList getCompleteActiveUserList() throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         ArrayList<User> userList = new ArrayList();
         
-        String query = "SELECT * from login;";
+        String query =  "SELECT userid FROM login WHERE accesspermitted = TRUE;";
         
         PreparedStatement stmt = null;
         
@@ -481,7 +482,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             while(rs.next()){
-                userList.add(generateUser(rs));
+                userList.add(getUser(rs.getInt("userid")));
             }
             
         } catch (SQLException ex) {
@@ -496,6 +497,42 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return userList;
         
     }
+    
+     /**
+     * For attaching event requests to default code officers by muni
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<User> getActiveCodeOfficerList() throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        List<User> userList = new ArrayList<>();
+        
+        String query =  "SELECT userid FROM login WHERE enforcementofficial=TRUE AND accesspermitted=TRUE;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                userList.add(getUser(rs.getInt("userid")));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error fetching user list", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return userList;
+        
+    }
+    
     
     /**
      * Writes in a history record when a User accesses that object.

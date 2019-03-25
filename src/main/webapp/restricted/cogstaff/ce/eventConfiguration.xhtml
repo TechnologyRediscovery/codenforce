@@ -84,14 +84,13 @@
                                         <h:outputText value="#{c.publicdeployable}"/>
                                     </p:column>
                                     
-                                    
-                                    
                                     <p:column width="3%">
                                         <f:facet name="header">
-                                            <h:outputText value="RVC" />
+                                            <h:outputText value="REQ" />
                                         </f:facet>
-                                        <h:outputText value="#{c.requiresviewconfirmation}"/>
+                                        <h:outputText value="#{c.requestable}"/>
                                     </p:column>
+                                    
                                     
                                     
                                     <p:column width="3%">
@@ -132,7 +131,7 @@
                              <p:fieldset legend="Update event category"
                                          toggleable="true" collapsed="false" tabindex="4">
                                  
-                                 <h:form id="updateCategoryForm">
+                            <h:form id="updateCategoryForm">
                                      
                                  
                                 <h:outputLabel for="eventTypeMenu">
@@ -191,13 +190,14 @@
                                         
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <p:outputLabel for="requireViewConf">
-                                            <h:outputText value="Require case manager view confirmation"/>
+                                        <p:outputLabel for="requestable-is">
+                                            <h:outputText value="Requestable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="requireViewConf" value="#{eventConfigurationBB.formRequiresviewconfirmation}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="requestable-is" value="#{eventConfigurationBB.formRequestable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
+                                   
                                     <h:panelGroup>
                                         <p:outputLabel for="notifyCaseMonitors">
                                             <h:outputText value="Notify Case Monitors"/>
@@ -277,22 +277,24 @@
                                         <p:inputSwitch id="munideploy" value="#{eventConfigurationBB.newFormMunideployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                   
+                                     <h:panelGroup>
                                         <p:outputLabel for="publicDeploy">
                                             <h:outputText value="Public deployable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
                                         <p:inputSwitch id="publicDeploy" value="#{eventConfigurationBB.newFormPublicdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
-                                        
                                     </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:outputLabel for="requireViewConf">
-                                            <h:outputText value="Require case manager view confirmation"/>
+                                   
+                                   
+                                     <h:panelGroup>
+                                        <p:outputLabel for="new-requestable-is">
+                                            <h:outputText value="Requestable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="requireViewConf" value="#{eventConfigurationBB.newFormRequiresviewconfirmation}" onLabel="Yes" offLabel="No" tabindex="2"/>
-                                        
+                                        <p:inputSwitch id="new-requestable-is" value="#{eventConfigurationBB.newFormRequestable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                     </h:panelGroup>
+                                   
                                     <h:panelGroup>
                                         <p:outputLabel for="notifyCaseMonitors">
                                             <h:outputText value="Notify Case Monitors"/>

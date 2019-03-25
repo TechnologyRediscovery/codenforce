@@ -192,7 +192,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCECase event = new EventCECase();
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
-        event.setRequestedEventIDRequired(ec.isRequiresviewconfirmation());
         event.setActive(true);
         event.setHidden(false);
         event.setCaseID(c.getCaseID());
@@ -263,7 +262,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setCreator(getSystemRobotUser());
+        event.setOwner(getSystemRobotUser());
         event.setDiscloseToMunicipality(true);
         event.setDiscloseToPublic(true);
         event.setActive(true);
@@ -309,7 +308,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(updateViolationDescr);
         //even descr set by violation coordinator
-        event.setCreator(getFacesUser());
+        event.setOwner(getFacesUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
         event.setActive(true);
@@ -420,7 +419,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setDateOfRecord(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setCreator(getFacesUser());
+        event.setOwner(getFacesUser());
         event.setActive(true);
         
         insertEvent(event);
@@ -462,7 +461,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setDateOfRecord(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setCreator(getFacesUser());
+        event.setOwner(getFacesUser());
         event.setActive(true);
         
         insertEvent(event);

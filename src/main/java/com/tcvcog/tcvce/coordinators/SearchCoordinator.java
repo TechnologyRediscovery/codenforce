@@ -88,14 +88,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByRequiresViewConfirmation(true);
-        eventParams.setIsViewConfirmationRequired(true);
+        eventParams.setFilterByrequestsAction(true);
+        eventParams.setRequestsAction(true);
         
-        eventParams.setFilterByViewed(true);
-        eventParams.setIsViewed(false);
+        eventParams.setFilterByHasResponseEvent(true);
+        eventParams.setHasResponseEvent(false);
         
         eventParams.setFilterByPerson(false);
-        eventParams.setUseViewConfirmedAtDateRange(false);
+        eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
         
@@ -133,13 +133,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByRequiresViewConfirmation(false);
+        eventParams.setFilterByrequestsAction(false);
         
-        eventParams.setFilterByViewed(false);
-        eventParams.setIsViewed(false);
+        eventParams.setFilterByHasResponseEvent(false);
+        eventParams.setHasResponseEvent(false);
         
         eventParams.setFilterByPerson(false);
-        eventParams.setUseViewConfirmedAtDateRange(false);
+        eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
         
@@ -182,13 +182,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByRequiresViewConfirmation(false);
+        eventParams.setFilterByrequestsAction(false);
         
-        eventParams.setFilterByViewed(false);
-        eventParams.setIsViewed(false);
+        eventParams.setFilterByHasResponseEvent(false);
+        eventParams.setHasResponseEvent(false);
         
         eventParams.setFilterByPerson(false);
-        eventParams.setUseViewConfirmedAtDateRange(false);
+        eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
         

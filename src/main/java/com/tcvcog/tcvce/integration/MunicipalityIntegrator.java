@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -112,7 +113,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query = "SELECT municode, muniname, address_street, address_city, "
                 + "address_state, address_zip, phone, "
                 + "fax, email, managername, "
-                + "managerphone, population, activeinprogram, defaultcodeset, occpermitissuingsource_sourceid\n" +
+                + "managerphone, population, activeinprogram, defaultcodeset, "
+                + "occpermitissuingsource_sourceid, defaultcodeofficeruser\n" +
                 "FROM public.municipality WHERE municode = ?;";
         ResultSet rs = null;
  
@@ -140,9 +142,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
-    public Municipality generateMuni(ResultSet rs) throws SQLException{
-                
-        CodeIntegrator codeInt = getCodeIntegrator();
+    public Municipality generateMuni(ResultSet rs) throws SQLException, IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
         Municipality muni = new Municipality();
         muni.setMuniCode(rs.getInt("municode"));
         muni.setMuniName(rs.getString("muniname"));
@@ -162,6 +163,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setActiveInProgram(rs.getBoolean("activeinprogram"));             
         muni.setDefaultCodeSetID(rs.getInt("defaultcodeset"));
         muni.setIssuingPermitCodeSourceID(rs.getInt("occpermitissuingsource_sourceid"));
+        muni.setDefaultCodeOfficerUser(ui.getUser(rs.getInt("defaultcodeofficeruser")));
         
         return muni;
     }
@@ -194,6 +196,39 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         municipalityMap = muniMap;
     }
     
+    
+    public User getDefaultCodeOfficer(Municipality muni) throws IntegrationException{
+        User u = null;
+        UserIntegrator ui = getUserIntegrator();
+       
+        Connection con = getPostgresCon();
+        
+        String query = "SELECT defaultcodeofficeruser FROM municipality WHERE municode = ?;";
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+ 
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, muni.getMuniCode());
+            rs = stmt.executeQuery(query);
+            while(rs.next()){
+                u = ui.getUser(rs.getInt("defaultcodeofficeruser"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.generateCompleteMuniNameIDMap", ex);
+
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return u;
+    }
+    
+    
+    
     //TODO: finish me
     public void updateMuni(Municipality muni) throws IntegrationException{
         
@@ -201,7 +236,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query =  "UPDATE public.municipality\n" +
                         "   SET muniname=?, address_street=?, address_city=?, address_state=?, \n" +
                         "       address_zip=?, phone=?, fax=?, email=?, managername=?, managerphone=?, \n" +
-                        "       population=?, activeinprogram=?, defaultcodeset=?, occpermitissuingsource_sourceid=?\n" +
+                        "       population=?, activeinprogram=?, defaultcodeset=?, "
+                        + "occpermitissuingsource_sourceid=?, defaultcodeofficeruser=? \n" +
                         " WHERE municode=?;";
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -223,7 +259,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setBoolean(12, muni.isActiveInProgram());
             stmt.setInt(13, muni.getDefaultCodeSetID());
             stmt.setInt(14, muni.getIssuingPermitCodeSourceID());
-            stmt.setInt(15, muni.getMuniCode());
+            stmt.setInt(15, muni.getDefaultCodeOfficerUser().getUserID());
+            stmt.setInt(16, muni.getMuniCode());
             
             System.out.println("MunicipalityIntegrator.updateMuni | stmt: " + stmt.toString());
             stmt.executeUpdate();
