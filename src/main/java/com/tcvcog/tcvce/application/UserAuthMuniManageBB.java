@@ -92,7 +92,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
         UserIntegrator ui = getUserIntegrator();
         try {
             if (userList == null) {
-                userList = ui.getCompleteUserList();
+                userList = ui.getCompleteActiveUserList();
             }
         } catch (IntegrationException ex) {
             System.out.println("UserAuthMuniManageBB.getUserList | " + ex.toString());

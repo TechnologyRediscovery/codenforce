@@ -244,7 +244,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             
         }
             System.out.println("CaseCoordinator.createNewCECase | origination event: " + originationEvent.getCategory().getEventCategoryTitle());
-            originationEvent.setCreator(u);
+            originationEvent.setOwner(u);
             originationEvent.setCaseID(insertedCase.getCaseID());
             originationEvent.setDateOfRecord(LocalDateTime.now());
             addNewCEEvent(newCase, originationEvent);
@@ -478,7 +478,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
         e.setDateOfRecord(LocalDateTime.now());
-        e.setCreator(getFacesUser());
+        e.setOwner(getFacesUser());
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
@@ -710,7 +710,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setDescription(queuedNoticeEventNotes);
         
-        noticeEvent.setCreator(getFacesUser());
+        noticeEvent.setOwner(getFacesUser());
         noticeEvent.setActive(true);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);

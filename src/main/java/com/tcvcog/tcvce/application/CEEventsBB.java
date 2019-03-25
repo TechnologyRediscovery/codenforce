@@ -152,7 +152,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         try {
             while (iter.hasNext()) {
                 e = iter.next();
-                e = ei.getEventWithCaseAndProp(e.getEventID());
+                e = ei.getEventWithCaseAndPropInfo(e.getEventID());
                 e.setCurrentUserCanTakeAction(
                         ec.determineUserActionRequestEventAuthorization(e, getSessionBean().getFacesUser()));
                 refreshedList.add(e);
@@ -235,7 +235,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public List<User> getUserList() {
         UserIntegrator ui = getUserIntegrator();
         try {
-            userList = ui.getCompleteUserList();
+            userList = ui.getCompleteActiveUserList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

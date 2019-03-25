@@ -47,7 +47,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     private boolean formUserdeployable;
     private boolean formMunideployable;
     private boolean formPublicdeployable;
-    private boolean formRequiresviewconfirmation;
+    private boolean formRequestable;
     private boolean formNotifycasemonitors;
     private boolean formCasephasechangetrigger;
     private boolean formHidable;
@@ -59,7 +59,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     private boolean newFormUserdeployable;
     private boolean newFormMunideployable;
     private boolean newFormPublicdeployable;
-    private boolean newFormRequiresviewconfirmation;
+    private boolean newFormRequestable;
     private boolean newFormNotifycasemonitors;
     private boolean newFormCasephasechangetrigger;
     private boolean newFormHidable;
@@ -78,7 +78,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
             setFormUserdeployable(selectedEventCategory.isUserdeployable());
             setFormMunideployable(selectedEventCategory.isMunideployable());
             setFormPublicdeployable(selectedEventCategory.isPublicdeployable());
-            setFormRequiresviewconfirmation(selectedEventCategory.isRequiresviewconfirmation());
+            setFormRequestable(selectedEventCategory.isRequestable());
             setFormNotifycasemonitors(selectedEventCategory.isNotifycasemonitors());
             setFormHidable(selectedEventCategory.isHidable());
             
@@ -102,7 +102,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
         ec.setUserdeployable(formUserdeployable);
         ec.setMunideployable(formMunideployable);
         ec.setPublicdeployable(formPublicdeployable);
-        ec.setRequiresviewconfirmation(formRequiresviewconfirmation);
+        ec.setRequestable(formRequestable);
         ec.setNotifycasemonitors(formNotifycasemonitors);
         ec.setHidable(formHidable);
         
@@ -133,7 +133,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
         ec.setUserdeployable(newFormUserdeployable);
         ec.setMunideployable(newFormMunideployable);
         ec.setPublicdeployable(newFormCasephasechangetrigger);
-        ec.setRequiresviewconfirmation(newFormRequiresviewconfirmation);
+        ec.setRequestable(newFormRequestable);
         ec.setNotifycasemonitors(newFormNotifycasemonitors);
         ec.setHidable(newFormHidable);
         
@@ -257,7 +257,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
      * @param eventTypeList the eventTypeList to set
      */
     public void setEventTypeList(EventType[] eventTypeList) {
-        this.setEventTypeList(eventTypeList);
+        this.eventTypeList = eventTypeList;
     }
 
     /**
@@ -345,10 +345,10 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     }
 
     /**
-     * @return the formRequiresviewconfirmation
+     * @return the formRequestable
      */
-    public boolean isFormRequiresviewconfirmation() {
-        return formRequiresviewconfirmation;
+    public boolean isFormRequestable() {
+        return formRequestable;
     }
 
     /**
@@ -394,10 +394,10 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     }
 
     /**
-     * @return the newFormRequiresviewconfirmation
+     * @return the newFormRequestable
      */
-    public boolean isNewFormRequiresviewconfirmation() {
-        return newFormRequiresviewconfirmation;
+    public boolean isNewFormRequestable() {
+        return newFormRequestable;
     }
 
     /**
@@ -444,10 +444,10 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     }
 
     /**
-     * @param formRequiresviewconfirmation the formRequiresviewconfirmation to set
+     * @param formRequestable the formRequestable to set
      */
-    public void setFormRequiresviewconfirmation(boolean formRequiresviewconfirmation) {
-        this.formRequiresviewconfirmation = formRequiresviewconfirmation;
+    public void setFormRequestable(boolean formRequestable) {
+        this.formRequestable = formRequestable;
     }
 
     /**
@@ -493,10 +493,10 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     }
 
     /**
-     * @param newFormRequiresviewconfirmation the newFormRequiresviewconfirmation to set
+     * @param newFormRequestable the newFormRequestable to set
      */
-    public void setNewFormRequiresviewconfirmation(boolean newFormRequiresviewconfirmation) {
-        this.newFormRequiresviewconfirmation = newFormRequiresviewconfirmation;
+    public void setNewFormRequestable(boolean newFormRequestable) {
+        this.newFormRequestable = newFormRequestable;
     }
 
     /**

@@ -59,8 +59,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     public EventCategory getEventCategory(int catID) throws IntegrationException {
 
         String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n"
-                + "       munideployable, publicdeployable, requiresviewconfirmation, notifycasemonitors, \n"
-                + "       casephasechangetrigger, hidable\n"
+                + "       munideployable, publicdeployable, notifycasemonitors, \n"
+                + "       casephasechangetrigger, hidable, icon_iconid"
                 + "  FROM public.ceeventcategory WHERE categoryID = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -91,7 +91,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ec;
     }
 
-    public EventCategory generateEventCategoryFromRS(ResultSet rs) throws SQLException {
+    public EventCategory generateEventCategoryFromRS(ResultSet rs) throws SQLException, IntegrationException {
+        SystemIntegrator si = getSystemIntegrator();
         EventCategory ec = new EventCategory();
         ec.setCategoryID(rs.getInt("categoryid"));
         ec.setEventType(EventType.valueOf(rs.getString("categoryType")));
@@ -101,17 +102,19 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ec.setUserdeployable(rs.getBoolean("userdeployable"));
         ec.setMunideployable(rs.getBoolean("munideployable"));
         ec.setPublicdeployable(rs.getBoolean("publicdeployable"));
-        ec.setRequiresviewconfirmation(rs.getBoolean("requiresviewconfirmation"));
         ec.setNotifycasemonitors(rs.getBoolean("notifycasemonitors"));
         ec.setCasephasechangetrigger(rs.getBoolean("casephasechangetrigger"));
         ec.setHidable(rs.getBoolean("hidable"));
+        ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
 
         return ec;
 
     }
 
     public ArrayList<EventCategory> getEventCategoryList() throws IntegrationException {
-        String query = "SELECT * FROM public.ceeventcategory;";
+        String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n" +
+                        "       munideployable, publicdeployable, notifycasemonitors, casephasechangetrigger, \n" +
+                        "       hidable, icon_iconid, requestable FROM public.ceeventcategory;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -139,9 +142,47 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         return categoryList;
     }
+    
+    public List<EventCategory> getRequestableEventCategories() throws IntegrationException {
+        String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n" +
+                        "       munideployable, publicdeployable, notifycasemonitors, casephasechangetrigger, \n" +
+                        "       hidable, icon_iconid, requestable FROM public.ceeventcategory WHERE requestable = TRUE;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<EventCategory> categoryList = new ArrayList();
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            System.out.println("EventIntegrator.getEventCategoryList | SQL: " + stmt.toString());
+
+            while (rs.next()) {
+                categoryList.add(generateEventCategoryFromRS(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event categories", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return categoryList;
+    }
+    
+    
+    
 
     public ArrayList<EventCategory> getEventCategoryList(EventType et) throws IntegrationException {
-        String query = "SELECT * FROM public.ceeventcategory WHERE categorytype = cast (? as ceeventtype);";
+        String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n" +
+                "       munideployable, publicdeployable, notifycasemonitors, casephasechangetrigger, \n" +
+                "       hidable, icon_iconid, requestable"
+                + " FROM public.ceeventcategory WHERE categorytype = cast (? as ceeventtype);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -177,8 +218,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 + "categoryid, "
                 + "categorytype, title, description, "
                 + "userdeployable, munideployable, publicdeployable, "
-                + "requiresviewconfirmation, notifycasemonitors, casephasechangetrigger, "
-                + "hidable)\n"
+                + "notifycasemonitors, casephasechangetrigger, "
+                + "hidable, icon_iconid )\n"
                 + "    VALUES (DEFAULT, CAST (? as ceeventtype), ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?);";
@@ -196,11 +237,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(5, ec.isMunideployable());
             stmt.setBoolean(6, ec.isPublicdeployable());
 
-            stmt.setBoolean(7, ec.isRequiresviewconfirmation());
-            stmt.setBoolean(8, ec.isNotifycasemonitors());
-            stmt.setBoolean(9, ec.isCasephasechangetrigger());
+            stmt.setBoolean(7, ec.isNotifycasemonitors());
+            stmt.setBoolean(8, ec.isCasephasechangetrigger());
 
-            stmt.setBoolean(10, ec.isHidable());
+            stmt.setBoolean(9, ec.isHidable());
+            stmt.setInt(10, ec.getIcon().getIconid());
 
             System.out.println("EventInteegrator.insertEventCategory| sql: " + stmt.toString());
             stmt.execute();
@@ -219,8 +260,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         String query = "UPDATE public.ceeventcategory\n"
                 + "   SET categorytype=CAST (? as ceeventtype), title=?, description=?, userdeployable=?, \n"
-                + "       munideployable=?, publicdeployable=?, requiresviewconfirmation=?, \n"
-                + "       notifycasemonitors=?, casephasechangetrigger=?, hidable=?\n"
+                + "       munideployable=?, publicdeployable=?, \n"
+                + "       notifycasemonitors=?, casephasechangetrigger=?, hidable=?, icon_iconid=? \n"
                 + " WHERE categoryid = ?;";
 
         Connection con = getPostgresCon();
@@ -236,11 +277,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(5, ec.isMunideployable());
             stmt.setBoolean(6, ec.isPublicdeployable());
 
-            stmt.setBoolean(7, ec.isRequiresviewconfirmation());
-            stmt.setBoolean(8, ec.isNotifycasemonitors());
-            stmt.setBoolean(9, ec.isCasephasechangetrigger());
+            stmt.setBoolean(7, ec.isNotifycasemonitors());
+            stmt.setBoolean(8, ec.isCasephasechangetrigger());
 
-            stmt.setBoolean(10, ec.isHidable());
+            stmt.setBoolean(9, ec.isHidable());
+            stmt.setInt(10, ec.getIcon().getIconid());
+            
 
             stmt.setInt(11, ec.getCategoryID());
 
@@ -297,15 +339,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         String query = "INSERT INTO public.ceevent(\n"
                 + "            eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n"
-                + "            eventtimestamp, eventdescription, login_userid, disclosetomunicipality, \n"
-                + "            disclosetopublic, activeevent, requiresviewconfirmation, \n"
-                + "            hidden, notes, actionrequestedby_userid, requirerequestedeventinsert, \n"
+                + "            eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n"
+                + "            disclosetopublic, activeevent, requestsAction, \n"
+                + "            hidden, notes, actionrequestedby_userid, \n"
                 + "            responderintended_userid, requestedeventcat_catid)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
                 + "            now(), ?, ?, ?, \n"
                 + "            ?, ?, ?, " // params 7-9
-                + "            ?, ?, ?, ?,"// 10-13
-                + "            ?, ?);";  // 14-15
+                + "            ?, ?, ?, "// 10-12
+                + "            ?, ?);";  // 13-14
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -322,7 +364,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             // note that the timestamp is set by a call to postgres's now()
             stmt.setString(4, event.getDescription());
-            stmt.setInt(5, event.getCreator().getUserID());
+            stmt.setInt(5, event.getOwner().getUserID());
             stmt.setBoolean(6, event.isDiscloseToMunicipality());
 
             stmt.setBoolean(7, event.isDiscloseToPublic());
@@ -336,18 +378,16 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(12, java.sql.Types.NULL);
             }
-            stmt.setBoolean(13, event.isRequestedEventIDRequired());
-            
             if(event.getResponderIntended() != null){
-                stmt.setInt(14, event.getResponderIntended().getUserID());
+                stmt.setInt(13, event.getResponderIntended().getUserID());
             } else {
-                stmt.setNull(14, java.sql.Types.NULL);
+                stmt.setNull(13, java.sql.Types.NULL);
             }
             
             if(event.getRequestedEventCategory() != null){
-                stmt.setInt(15, event.getRequestedEventCategory().getCategoryID());
+                stmt.setInt(13, event.getRequestedEventCategory().getCategoryID());
             } else {
-                stmt.setNull(15, java.sql.Types.NULL);
+                stmt.setNull(13, java.sql.Types.NULL);
             }
             
             stmt.execute();
@@ -415,9 +455,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     public void editEvent(EventCECase event) throws IntegrationException {
         String query = "UPDATE public.ceevent\n"
                 + "   SET ceeventcategory_catid=?, cecase_caseid=?, dateofrecord=?, \n"
-                + "       eventdescription=?, login_userid=?, disclosetomunicipality=?, \n"
+                + "       eventdescription=?, owner_userid=?, disclosetomunicipality=?, \n"
                 + "       disclosetopublic=?, activeevent=?, \n"
-                + "       hidden=?, notes=?, assignedto_login_userid=?\n"
+                + "       hidden=?, notes=?\n"
                 + " WHERE eventid = ?;";
 
         // TO DO: finish clearing view confirmation
@@ -433,15 +473,14 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             // timestamp is updated with a call to postgres's now()
             stmt.setString(4, event.getDescription());
-            stmt.setInt(5, event.getCreator().getUserID());
+            stmt.setInt(5, event.getOwner().getUserID());
             stmt.setBoolean(6, event.isDiscloseToMunicipality());
 
             stmt.setBoolean(7, event.isDiscloseToPublic());
             stmt.setBoolean(8, event.isActive());
             stmt.setBoolean(9, event.isHidden());
             stmt.setString(10, event.getNotes());
-            stmt.setInt(11, event.getAssignedTo().getUserID());
-            stmt.setInt(12, event.getEventID());
+            stmt.setInt(11, event.getEventID());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
@@ -480,43 +519,18 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    /**
-     * This and the primary generateEventFromRS method are working together in a
-     * somewhat dubious way to allow us to shuttle around events that know about
-     * their case and property since a regular old event is just one object in a
-     * CECase's ArrayList of events.
-     *
-     * The solution is a subclass with the prop and case info. If we need this
-     * type of event, we get our normal result set from the DB and pass it to
-     * this method who creates the subclass object, gets it loaded up with
-     * standard innards, and then layers on the case and property objects
-     *
-     * @param rs
-     * @return a loaded Event
-     * @throws SQLException
-     * @throws IntegrationException
-     */
-    private EventWithCasePropInfo generateEventWithCasePropInfo(ResultSet rs) throws SQLException, IntegrationException {
-        CaseIntegrator ci = getCaseIntegrator();
-        EventWithCasePropInfo ev = new EventWithCasePropInfo();
-        // generateEventFromRS returns the superclass type only, downcast needed
-        // see previous line
-        ev = (EventWithCasePropInfo) generateEventFromRS(rs, ev);
-        ev.setEventCase(ci.getCECase(rs.getInt("cecase_caseid")));
-        return ev;
-
-    }
-
+   
     /**
      * Zanda was trippin when he wrote this!
      *
      * @param rs
-     * @param premadeEvent
+     * @param premadeEvent used by event creatino pathways that involve instantiation 
+     * at other locations -- somewhat hacky and consider unifying
      * @return
      * @throws SQLException
      * @throws IntegrationException
      */
-    private EventCECase generateEventFromRS(ResultSet rs, EventCECase premadeEvent) throws SQLException, IntegrationException {
+    private EventCECase generateEventFromRS(ResultSet rs, EventWithCasePropInfo premadeEvent) throws SQLException, IntegrationException {
         EventCECase ev;
         if (premadeEvent != null) {
             ev = premadeEvent;
@@ -538,8 +552,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ev.setTimestamp(rs.getTimestamp("eventtimestamp").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         ev.setDescription(rs.getString("eventDescription"));
-        ev.setCreator(ui.getUser(rs.getInt("login_userid")));
-        ev.setAssignedTo(ui.getUser(rs.getInt("assignedto_login_userid")));
+        ev.setOwner(ui.getUser(rs.getInt("owner_userid")));
        
         ev.setDiscloseToMunicipality(rs.getBoolean("disclosetomunicipality"));
         ev.setDiscloseToPublic(rs.getBoolean("disclosetopublic"));
@@ -548,43 +561,36 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ev.setHidden(rs.getBoolean("hidden"));
         ev.setNotes(rs.getString("notes"));
 
-        // action request field population
-        ev.setRequestedEventIDRequired(rs.getBoolean("requirerequestedeventinsert"));
         
         // why hardcoded false here?
         ev.setCurrentUserCanTakeAction(false);
-        if(rs.getInt("actionRequestedBy")!=0){
-            ev.setActionRequestedBy(ui.getUser(rs.getInt("actionRequestedBy")));
-            ev.setResponderIntended(ui.getUser(rs.getInt("responderIntended")));
+        
+        if((rs.getInt("actionrequestedby_userid")!=0) &&
+               (rs.getInt("responderintended_userid")!=0) ){
+            ev.setActionRequestedBy(ui.getUser(rs.getInt("actionrequestedby_userid")));
+            ev.setResponderIntended(ui.getUser(rs.getInt("responderintended_userid")));
             
         }
-        Timestamp ldt = rs.getTimestamp("responsetimestamp");
-        if (ldt != null) {
+        Timestamp ts = rs.getTimestamp("responsetimestamp");
+        if (ts != null) {
             ev.setResponderActual(ui.getUser(rs.getInt("responderactual_userid")));
             ev.setResponseTimestamp(rs.getTimestamp("responsetimestamp").toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime());
-            ev.setResponseNotes(rs.getString("responseNotes"));
-            ev.setRequestRejected(rs.getBoolean("actionRequestRejected"));
+            ev.setResponderNotes(rs.getString("responderNotes"));
+            ev.setRequestRejected(rs.getBoolean("rejeecteventrequest"));
         } 
         
         return ev;
     }
     
-    public EventWithCasePropInfo getEventWithCaseAndProp(int evid) throws IntegrationException{
-        EventWithCasePropInfo ev = null;
+    
+    
+    public EventWithCasePropInfo getEventWithCaseAndPropInfo(int eventid) throws IntegrationException{
+        EventWithCasePropInfo evcpi = null;
+        CaseIntegrator ci = getCaseIntegrator();
 
        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, ");
-        sb.append("       eventtimestamp, eventdescription, ceevent.login_userid, disclosetomunicipality, ");
-        sb.append("       disclosetopublic, activeevent, ceeventcategory.requiresviewconfirmation, hidden, ");
-        sb.append("       ceevent.notes, responsetimestamp, actionrequestedby_userid, respondernotes, \n");
-        sb.append("       responderintended_userid, requestedeventcat_catid, insertedresponseevent_eventid, \n"); 
-        sb.append("       rejeecteventrequest, responderactual_userid, responseevent_eventid");
-        sb.append("       property_propertyid ");
-        sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
-        sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
-        sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
-        sb.append("WHERE eventid = ?");
+        sb.append("SELECT eventid, cecase_caseid WHERE eventid = ?");
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -592,11 +598,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         try {
 
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, evid);
+            stmt.setInt(1, eventid);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                ev = generateEventWithCasePropInfo(rs);
+                evcpi = (EventWithCasePropInfo) getEvent(rs.getInt("eventid"));
+                evcpi.setEventCase(ci.getCECase(rs.getInt("cecase_caseid")));
             }
 
         } catch (SQLException ex) {
@@ -609,7 +616,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return ev;
+        return evcpi;
     }
 
   
@@ -621,14 +628,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         boolean notFirstCriteria = false;
 
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, ");
-        sb.append("       eventtimestamp, eventdescription, ceevent.login_userid, disclosetomunicipality, ");
-        sb.append("       disclosetopublic, activeevent, ceeventcategory.requiresviewconfirmation, hidden, ");
-        sb.append("       ceevent.notes, viewconfirmedby, viewconfirmedat,");
-        sb.append("       viewnotes, property_propertyid ");
-        sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
-        sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
-        sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
+        sb.append("SELECT eventid ");
         sb.append("WHERE ");
         // as long as this isn't an ID only search, do the normal SQL building process
         if (!params.isFilterByObjectID()) {
@@ -641,7 +641,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 if(params.isUseDateOfRecord()){
                     sb.append("dateofrecord "); 
-                } else if(params.isUseViewConfirmedAtDateRange()){
+                } else if(params.isUseRespondedAtDateRange()){
                     sb.append("viewconfirmedat ");
                 } else if(params.isUseEntryTimestamp()){
                     sb.append("entrytimestamp "); 
@@ -667,9 +667,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 sb.append("cecase_caseid = ? ");
             }
 
-            if (params.isFilterByEventOwner() && params.getOwnerUser() != null) {
+            if (params.isFilterByEventOwner() && params.getUser() != null) {
                     if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                    sb.append("ceevent.login_userid = ? ");
+                    sb.append("ceevent.owner_userid = ? ");
             }
             
             if (params.isFilterByPerson()) {
@@ -696,19 +696,19 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 }
             }
 
-            if (params.isFilterByRequiresViewConfirmation()) {
+            if (params.isFilterByrequestsAction()) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                if (params.isIsViewConfirmationRequired()) {
-                    sb.append("ceeventcategory.requiresviewconfirmation = TRUE ");
+                if (params.isRequestsAction()) {
+                    sb.append("ceeventcategory.requestsAction = TRUE ");
                 } else {
-                    sb.append("ceeventcategory.requiresviewconfirmation = FALSE ");
+                    sb.append("ceeventcategory.requestsAction = FALSE ");
                 }
             }
 
 
-            if (params.isFilterByViewed()) {
+            if (params.isFilterByHasResponseEvent()) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                if (params.isIsViewed()) {
+                if (params.isHasResponseEvent()) {
                     sb.append("viewconfirmedby IS NOT NULL ");
                 } else {
                     sb.append("viewconfirmedby IS NULL ");
@@ -744,8 +744,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setInt(++paramCounter, params.getCaseId());
                 }
 
-                if (params.isFilterByEventOwner() && params.getOwnerUser() != null) {
-                        stmt.setInt(++paramCounter, params.getOwnerUser().getUserID());
+                if (params.isFilterByEventOwner() && params.getUser() != null) {
+                        stmt.setInt(++paramCounter, params.getUser().getUserID());
                 }
 
                 if (params.isFilterByPerson()) {
@@ -768,7 +768,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                eventList.add(generateEventWithCasePropInfo(rs));
+                eventList.add(getEventWithCaseAndPropInfo(rs.getInt("eventid")));
                 counter++;
             }
 
@@ -777,8 +777,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 //            throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
 
         }// close try/catch
 
@@ -788,6 +788,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * First gen query for a single purpose: introducing SearchParams objects
      * with SQL assembly logic in the integration methods
+     * 
+     * Included for reference since the sql is complicated
      *
      * @deprecated
      * @param m
@@ -801,15 +803,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ArrayList<EventWithCasePropInfo> eventList = new ArrayList<>();
 
         String query = "SELECT ceevent.eventid, ceevent.ceeventcategory_catid, ceevent.dateofrecord, \n"
-                + "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.login_userid, ceevent.disclosetomunicipality, \n"
-                + "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requiresviewconfirmation, ceevent.hidden, \n"
+                + "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.owner_userid, ceevent.disclosetomunicipality, \n"
+                + "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requestsAction, ceevent.hidden, \n"
                 + "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, cecase.caseid, ceeventcategory.categoryid\n"
                 + " FROM ceevent 	INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid)\n"
                 + "		INNER JOIN cecase ON (cecase_caseid = caseid)\n"
                 + " WHERE categorytype = CAST ('Timeline' AS ceeventtype)\n"
                 + "		AND dateofrecord >= ? AND dateofrecord <= ? \n"
                 + "		AND activeevent = TRUE\n"
-                + "		AND ceevent.requiresviewconfirmation = TRUE\n"
+                + "		AND ceevent.requestsAction = TRUE\n"
                 + "		AND hidden = FALSE\n"
                 + "		AND viewconfirmedby IS NULL\n"
                 + "		AND municipality_municode = ?;";
@@ -844,13 +846,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 ev.setTimestamp(rs.getTimestamp("eventtimestamp").toInstant()
                         .atZone(ZoneId.systemDefault()).toLocalDateTime());
                 ev.setDescription(rs.getString("eventDescription"));
-                ev.setCreator(ui.getUser(rs.getInt("login_userid")));
+                ev.setOwner(ui.getUser(rs.getInt("owner_userid")));
                 ev.setDiscloseToMunicipality(rs.getBoolean("disclosetomunicipality"));
 
                 ev.setDiscloseToPublic(rs.getBoolean("disclosetopublic"));
                 ev.setActive(rs.getBoolean("activeevent"));
 
-                ev.setRequestedEventIDRequired(rs.getBoolean("requiresviewconfirmation"));
+                ev.setRequestedEventIDRequired(rs.getBoolean("requestsAction"));
                 Timestamp ldt = rs.getTimestamp("viewconfirmedat");
                 if (ldt != null) {
                     ev.setResponderActual(ui.getUser(rs.getInt("viewconfirmedby")));
@@ -873,46 +875,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return eventList;
-
-    }
-
-    /**
-     *
-     * @param u
-     * @return
-     * @throws IntegrationException
-     */
-    public List<EventCECase> getEventsRequiringViewConfirmation(User u) throws IntegrationException {
-        EventCECase ev = null;
-        ArrayList<EventCECase> eventList = new ArrayList<>();
-
-        String query = "";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        try {
-
-            stmt = con.prepareStatement(query);
-//            stmt.setInt(1, eventID);
-            System.out.println("EventInteegrator.getEventByEventID| sql: " + stmt.toString());
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-//                ev = generateEventFromRS(rs);
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-//            throw new IntegrationException("Cannot retrive event", ex);
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
@@ -920,6 +882,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return eventList;
 
     }
+
+   
     
     
     public void clearResponseToActionRequest(EventCECase ec) throws IntegrationException{
@@ -963,7 +927,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         try {
 
             stmt = con.prepareStatement(query);
-            stmt.setString(1, ev.getResponseNotes());
+            stmt.setString(1, ev.getResponderNotes());
             stmt.setBoolean(2, ev.isRequestRejected());
             if(ev.getResponseEventID() != 0){
                 stmt.setInt(3, ev.getResponseEventID());
@@ -983,10 +947,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public EventCECase getEventByEventID(int eventID) throws IntegrationException {
+    public EventCECase getEvent(int eventID) throws IntegrationException {
         EventCECase ev = null;
 
-        String query = "SELECT * FROM public.ceevent WHERE eventid = ?;";
+        String query = "SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n" +
+                "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
+                "       disclosetopublic, activeevent, hidden, notes, responsetimestamp, \n" +
+                "       actionrequestedby_userid, respondernotes, responderintended_userid, \n" +
+                "       requestedeventcat_catid, responseevent_eventid, rejeecteventrequest, \n" +
+                "       responderactual_userid FROM public.ceevent WHERE eventid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1018,7 +987,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     public ArrayList<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException {
         ArrayList<EventCECase> eventList = new ArrayList();
 
-        String query = "SELECT * FROM public.ceevent WHERE cecase_caseid = ?;";
+        String query = "SELECT eventid FROM public.ceevent WHERE cecase_caseid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1030,7 +999,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                eventList.add(generateEventFromRS(rs, null));
+                eventList.add(getEvent(rs.getInt("eventid")));
             }
 
         } catch (SQLException ex) {

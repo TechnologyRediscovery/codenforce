@@ -75,7 +75,7 @@
 
                                                 <p:outputLabel id="ceev-search-vconf-ol" for="ceev-search-vconf-chkbx" value="use view confirmed date field? "/>
                                                 <p:selectBooleanCheckbox id="ceev-search-vconf-chkbx" 
-                                                                         value="#{cEEventsBB.searchParams.useViewConfirmedAtDateRange}" 
+                                                                         value="#{cEEventsBB.searchParams.useRespondedAtDateRange}" 
                                                                          disabled="#{!cEEventsBB.searchParams.filterByStartEndDate}"/>
 
                                                 <p:spacer height="1px"/>
@@ -232,7 +232,7 @@
                                                 <p:spacer height="5px"/>
 
                                                 <p:selectOneMenu id="ceev-criteria-user" required="false" 
-                                                                 value="#{cEEventsBB.searchParams.ownerUser}"
+                                                                 value="#{cEEventsBB.searchParams.user}"
                                                                  disabled="#{!cEEventsBB.searchParams.filterByEventOwner}">
                                                     <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                                     <f:selectItems value="#{cEEventsBB.userList}"  var="u" itemValue="#{u}" 
@@ -295,30 +295,30 @@
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-requireview-ol" for="ceev-filter-requireview" value="filter by requiring view confirmation? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-requireview" value="#{cEEventsBB.searchParams.filterByRequiresViewConfirmation}" >
+                                                <p:selectBooleanCheckbox id="ceev-filter-requireview" value="#{cEEventsBB.searchParams.filterByrequestsAction}" >
                                                     <p:ajax update="ceev-criteria-requireview" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:selectBooleanCheckbox id="ceev-criteria-requireview" 
-                                                                         value="#{cEEventsBB.searchParams.isViewConfirmationRequired}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByRequiresViewConfirmation}" />
+                                                                         value="#{cEEventsBB.searchParams.isRequestsAction}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}" />
                                                 <p:outputLabel id="ceev-criteria-requireview-ol" for="ceev-criteria-requireview" 
                                                                value="(checked = requires view conf)" styleClass="italic"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-viewstatus-ol" for="ceev-filter-viewstatus" value="filter by viewed status? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-viewstatus" value="#{cEEventsBB.searchParams.filterByViewed}" >
+                                                <p:selectBooleanCheckbox id="ceev-filter-viewstatus" value="#{cEEventsBB.searchParams.filterByHasResponseEvent}" >
                                                     <p:ajax update="ceev-criteria-view" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:selectBooleanCheckbox id="ceev-criteria-view" 
-                                                                         value="#{cEEventsBB.searchParams.isViewed}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByViewed}" 
+                                                                         value="#{cEEventsBB.searchParams.hasResponseEvent}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByHasResponseEvent}" 
                                                                          styleClass="checkbox"/>
                                                 <p:outputLabel id="ceev-criteria-view-ol" for="ceev-criteria-view" 
                                                                value="(checked = has been viewed)" styleClass="italic"/>
@@ -444,7 +444,7 @@
                                                               #{e.hidden ? 'hidden' : ''} |
                                                               #{e.discloseToMunicipality? 'muni: viewable' : 'muni: hidden'} |
                                                               #{e.discloseToPublic? 'public: viewable' : 'public: hidden'} |
-                                                              #{e.requiresAction? 'action requested: yes' : 'action requested: no'}"/>
+                                                              #{e.requestsAction? 'action requested: yes' : 'action requested: no'}"/>
                                             </h4>
 
                                             <h3>
@@ -476,7 +476,7 @@
                                                     <p:spacer height="5px"/>
 
                                                     <h:outputText value="Creator: " styleClass="bold" />
-                                                    <h:outputText value="#{e.creator.person.firstName} #{e.creator.person.lastName}"/>
+                                                    <h:outputText value="#{e.owner.person.firstName} #{e.owner.person.lastName}"/>
                                                     <p:spacer height="5px"/>
 
                                                     <h:outputText value="Assigned to: " styleClass="bold"  />
@@ -493,7 +493,7 @@
 
                                                 <h:panelGroup>
 
-                                                    <h:panelGrid columns="2" rendered="#{e.requiresAction}"
+                                                    <h:panelGrid columns="2" rendered="#{e.requestsAction}"
                                                          columnClasses="gridTd-solid-back, gridTd-solid-back" >
 
                                                         <f:facet name="header" class="leftalign">
@@ -594,7 +594,7 @@
                                                         <f:facet name="footer" class="leftalign">
                                                             <h:outputText styleClass="bold" value="Action response notes:"/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responseNotes}"/>
+                                                                <h:outputText value="#{e.responderNotes}"/>
                                                             </div>
                                                         </f:facet>
 
@@ -675,12 +675,12 @@
                                             </f:facet>
                                             <h:outputText value="#{e.category.eventCategoryTitle}"/>
                                         </p:column>
-                                        <p:column width="5%" filterBy="#{e.creator.person.lastName}"
-                                                  sortBy="#{e.creator.person.lastName}">
+                                        <p:column width="5%" filterBy="#{e.owner.person.lastName}"
+                                                  sortBy="#{e.owner.person.lastName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator" />
                                             </f:facet>
-                                            <h:outputText value="#{e.creator.person.lastName}"/>
+                                            <h:outputText value="#{e.owner.person.lastName}"/>
                                         </p:column>
                                         <p:column width="20%" style="word-wrap: normal;">
                                             <f:facet name="header">

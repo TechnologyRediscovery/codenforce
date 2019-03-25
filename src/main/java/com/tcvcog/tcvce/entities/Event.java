@@ -37,7 +37,7 @@ public class Event extends EntityUtils implements Serializable {
     private String timestampPretty;
     
     private String description;
-    private User creator;
+    private User owner;
     private User assignedTo;
     private boolean discloseToMunicipality; 
     private boolean discloseToPublic;
@@ -47,7 +47,7 @@ public class Event extends EntityUtils implements Serializable {
     
     // utility memvar which is true if there's a requested
     // event category in requestedEventCategory
-    private boolean requiresAction;
+    private boolean requestsAction;
     
     // computed based on the business logic for
     // action request responses
@@ -65,11 +65,12 @@ public class Event extends EntityUtils implements Serializable {
     private EventCategory requestedEventCategory;
     private boolean requestedEventIDRequired;
     private User actionRequestedBy;
+    // if this is null and an action is requested, use associated muni's default code officer
     private User responderIntended;
     private User responderActual;
     private LocalDateTime responseTimestamp;
     private String responseTimePrettyDate;
-    private String responseNotes;
+    private String responderNotes;
     private boolean requestRejected;
 
     /**
@@ -117,10 +118,10 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the creator
+     * @return the owner
      */
-    public User getCreator() {
-        return creator;
+    public User getOwner() {
+        return owner;
     }
 
     /**
@@ -195,10 +196,10 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @param creator the creator to set
+     * @param owner the owner to set
      */
-    public void setCreator(User creator) {
-        this.creator = creator;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     /**
@@ -315,17 +316,17 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the responseNotes
+     * @return the responderNotes
      */
-    public String getResponseNotes() {
-        return responseNotes;
+    public String getResponderNotes() {
+        return responderNotes;
     }
 
     /**
-     * @param responseNotes the responseNotes to set
+     * @param responderNotes the responderNotes to set
      */
-    public void setResponseNotes(String responseNotes) {
-        this.responseNotes = responseNotes;
+    public void setResponderNotes(String responderNotes) {
+        this.responderNotes = responderNotes;
     }
 
     /**
@@ -446,22 +447,22 @@ public class Event extends EntityUtils implements Serializable {
 
 
     /**
-     * @return the requiresAction
+     * @return the requestsAction
      */
-    public boolean isRequiresAction() {
+    public boolean isRequestsAction() {
         if(requestedEventCategory!= null){
-            requiresAction = true;
+            requestsAction = true;
         } else {
-           requiresAction = false;
+           requestsAction = false;
         }
-        return requiresAction;
+        return requestsAction;
     }
 
     /**
-     * @param requiresAction the requiresAction to set
+     * @param requestsAction the requestsAction to set
      */
-    public void setRequiresAction(boolean requiresAction) {
-        this.requiresAction = requiresAction;
+    public void setRequestsAction(boolean requestsAction) {
+        this.requestsAction = requestsAction;
     }
 
     /**

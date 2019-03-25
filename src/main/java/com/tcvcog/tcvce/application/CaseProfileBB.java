@@ -85,13 +85,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private List<EventCECase> filteredEventList;
     private EventCECase selectedEvent;
 
-    private List<CodeViolation> fullCaseViolationList;
     private List<CodeViolation> selectedViolations;
     private CodeViolation selectedViolation;
     private int newViolationCodeBookEleID;
-
-    private List<NoticeOfViolation> noticeList;
-    
 
     private List<Citation> citationList;
     private Citation selectedCitation;
@@ -108,6 +104,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     
     private List<Person> personsToAdd;
     private Person selectedPerson;
+    
+    private boolean requestActionOnEvent;
+    private List<EventCategory> availableActionsToRequest;
+    private boolean useDefaultMuniCodeOfficer;
     
 
     /**
@@ -138,6 +138,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             caseList = retrievedCaseList;
         }
              setPersonsToAdd(new ArrayList<Person>());
+        useDefaultMuniCodeOfficer = true;
 
     }
     
@@ -218,12 +219,18 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         // category is already set from initialization sequence
         selectedEvent.setCaseID(ccase.getCaseID());
         System.out.println("EventAddBB.addEvent | CaseID: " + selectedEvent.getCaseID());
-        selectedEvent.setCreator(getSessionBean().getFacesUser());
+        selectedEvent.setOwner(getSessionBean().getFacesUser());
 //        e.setEventPersons(formSelectedPersons);
         
         // now check for persons to connect
         
         try {
+            if(requestActionOnEvent){
+                selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
+                
+                
+            }
+            
             if(selectedEvent.getCategory().getEventType() == EventType.Compliance){
                 cc.addNewComplianceEvent(ccase, selectedEvent, getSessionBean().getActiveCodeViolation());
             } else {
@@ -522,7 +529,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         if (currentCase != null) {
             if (checkViolationListForNoComplianceDates(selectedViolations)) {
                 CaseCoordinator cc = getCaseCoordinator();
-                getSessionBean().setActiveCitation(cc.generateNewCitation(fullCaseViolationList));
+                getSessionBean().setActiveCitation(cc.generateNewCitation(currentCase.getViolationList()));
                 return "citationEdit";
             } else {
                 getFacesContext().addMessage(null,
@@ -868,23 +875,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         return selectedEvent;
     }
 
-    /**
-     * @return the fullCaseViolationList
-     */
-    public List<CodeViolation> getFullCaseViolationList() {
-        ViolationCoordinator vc = getViolationCoordinator();
-        try {
-            setFullCaseViolationList((List<CodeViolation>) vc.getCodeViolations(currentCase));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to load code violation list",
-                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
-
-        }
-        return fullCaseViolationList;
-    }
+ 
 
     /**
      * @return the selectedViolation
@@ -907,13 +898,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.selectedEvent = selectedEvent;
     }
 
-    /**
-     * @param fcvll
-     */
-    public void setFullCaseViolationList(ArrayList<CodeViolation> fcvll) {
-        fullCaseViolationList = fcvll;
-    }
-
+   
     /**
      * @param svs
      */
@@ -923,20 +908,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
    
 
-    /**
-     * @return the noticeList
-     */
-    public List<NoticeOfViolation> getNoticeList() {
-        setNoticeList(getSessionBean().getcECase().getNoticeList());
-        return noticeList;
-    }
-
-    /**
-     * @param nl
-     */
-    public void setNoticeList(ArrayList<NoticeOfViolation> nl) {
-        noticeList = nl;
-    }
+  
 
     /**
      * @return the citationList
@@ -1213,13 +1185,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.filteredEventList = filteredEventList;
     }
 
-    /**
-     * @param fullCaseViolationList the fullCaseViolationList to set
-     */
-    public void setFullCaseViolationList(List<CodeViolation> fullCaseViolationList) {
-        this.fullCaseViolationList = fullCaseViolationList;
-    }
-
+   
     /**
      * @param selectedViolations the selectedViolations to set
      */
@@ -1227,13 +1193,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.selectedViolations = selectedViolations;
     }
 
-    /**
-     * @param noticeList the noticeList to set
-     */
-    public void setNoticeList(List<NoticeOfViolation> noticeList) {
-        this.noticeList = noticeList;
-    }
-
+   
     /**
      * @param citationList the citationList to set
      */
@@ -1382,5 +1342,54 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedPerson(Person selectedPerson) {
         this.selectedPerson = selectedPerson;
+    }
+
+    /**
+     * @return the requestActionOnEvent
+     */
+    public boolean isRequestActionOnEvent() {
+        return requestActionOnEvent;
+    }
+
+    /**
+     * @param requestActionOnEvent the requestActionOnEvent to set
+     */
+    public void setRequestActionOnEvent(boolean requestActionOnEvent) {
+        this.requestActionOnEvent = requestActionOnEvent;
+    }
+
+    /**
+     * @return the availableActionsToRequest
+     */
+    public List<EventCategory> getAvailableActionsToRequest() {
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            availableActionsToRequest = ei.getRequestableEventCategories();
+        } catch (IntegrationException ex) {
+            System.out.println("CaseProfileBB.getAvailableActionToRequest");
+            System.out.println(ex);
+        }
+        return availableActionsToRequest;
+    }
+
+    /**
+     * @param availableActionToRequest the availableActionsToRequest to set
+     */
+    public void setAvailableActionToRequest(ArrayList<EventCategory> availableActionToRequest) {
+        this.availableActionsToRequest = availableActionToRequest;
+    }
+
+    /**
+     * @return the useDefaultMuniCodeOfficer
+     */
+    public boolean isUseDefaultMuniCodeOfficer() {
+        return useDefaultMuniCodeOfficer;
+    }
+
+    /**
+     * @param useDefaultMuniCodeOfficer the useDefaultMuniCodeOfficer to set
+     */
+    public void setUseDefaultMuniCodeOfficer(boolean useDefaultMuniCodeOfficer) {
+        this.useDefaultMuniCodeOfficer = useDefaultMuniCodeOfficer;
     }
 }
