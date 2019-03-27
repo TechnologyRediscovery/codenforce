@@ -29,7 +29,7 @@
                             update=":violationPhotosViewForm:photoTable"
                             multiple="true"
                             fileLimit="3"
-                            sizeLimit="100000" 
+                            sizeLimit="1000000" 
                             allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
                         </h:form>
                         
@@ -44,7 +44,7 @@
                                         rowKey="#{photo.photoID}"
                                         tableStyleClass="primeDataTable"
                                         draggableRows="false" tabindex="6">
-                                        <p:column width="50%">
+                                        <p:column width="70%">
                                             <f:facet name="header">
                                                 <h:outputText value="Photo"/>
                                             </f:facet>
@@ -61,14 +61,7 @@
                                                 <p:ajax />
                                             </p:inputTextarea>
                                         </p:column>
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Save Descriptions"/>
-                                            </f:facet>
-                                            <p:commandButton icon="fa fa-disk"
-                                                             actionListener="#{violationAddBB.updateDescription(photo)}"
-                                                             update="@form"/>
-                                        </p:column>
+                                        
                                     </p:dataTable>
                                     
                             <p:spacer height="10px"/>

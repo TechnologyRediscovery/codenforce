@@ -19,15 +19,16 @@ public class EntityUtils {
     
     private final int DAYS_IN_YEAR = 365;
     
-    public String getPrettyDate(LocalDateTime ldt){
-        String formattedDateTime = null;
-        if(ldt != null){
+    protected String getPrettyDate(LocalDateTime ldtDate){
+        String formattedDateTime = "";
+        if(ldtDate != null){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-            formattedDateTime = ldt.format(formatter); 
+            formattedDateTime = ldtDate.format(formatter); 
             
         }
         return formattedDateTime;
     }
+   
     
     /**
      * Counts days between two LocalDateTimes and returns the primitive
@@ -35,14 +36,18 @@ public class EntityUtils {
      * @param to
      * @return 
      */
-    public int getTimePeriodAsDays(LocalDateTime from, LocalDateTime to){
+    public long getTimePeriodAsDays(LocalDateTime from, LocalDateTime to){
         int totalDays;
-        int days;
-        int years;
-        days = java.time.Period.between(from.toLocalDate(), to.toLocalDate()).getDays();
-        years = java.time.Period.between(from.toLocalDate(), to.toLocalDate()).getYears();
-        totalDays = days + (years * DAYS_IN_YEAR);
-        return totalDays;
+        LocalDate dStart = from.toLocalDate();
+        LocalDate dEnd = to.toLocalDate();
+        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(dStart, dEnd);
+        
+//        
+//        days = java.time.Period.between(from.toLocalDate(), to.toLocalDate()).getDays();
+//        java.time.Period.between(LocalDate.MIN, LocalDate.MAX)
+//        years = java.time.Period.between(from.toLocalDate(), to.toLocalDate()).getYears();
+//        totalDays = days + (years * DAYS_IN_YEAR);
+        return daysBetween ;
     }
     
 }

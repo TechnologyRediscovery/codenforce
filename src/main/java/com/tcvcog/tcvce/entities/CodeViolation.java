@@ -37,7 +37,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     private String dateOfCitationPretty;
     private List<Integer> citationIDList;
     private String citationsStringList;
-    private int daysUntilStipulatedComplianceDate;
+    private long daysUntilStipulatedComplianceDate;
     private LocalDateTime dateOfRecord;
     private String dateOfRecordPretty;
     private LocalDateTime entryTimeStamp;
@@ -49,6 +49,13 @@ public class CodeViolation extends EntityUtils implements Serializable{
     private double penalty;
     private String description;
     private String notes;
+    private boolean leagacyImport;
+    private LocalDateTime complianceTimeStamp;
+    private User complianceUser;
+    private EventCECase compTimeFrameComplianceEvent;
+    
+    
+    
     private List<Integer> photoList;
 
     /**
@@ -279,7 +286,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     /**
      * @return the daysUntilStipulatedComplianceDate
      */
-    public int getDaysUntilStipulatedComplianceDate() {
+    public long getDaysUntilStipulatedComplianceDate() {
         daysUntilStipulatedComplianceDate = 
                 getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
         return daysUntilStipulatedComplianceDate;
@@ -288,7 +295,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     /**
      * @param daysUntilStipulatedComplianceDate the daysUntilStipulatedComplianceDate to set
      */
-    public void setDaysUntilStipulatedComplianceDate(int daysUntilStipulatedComplianceDate) {
+    public void setDaysUntilStipulatedComplianceDate(long daysUntilStipulatedComplianceDate) {
         this.daysUntilStipulatedComplianceDate = daysUntilStipulatedComplianceDate;
     }
 
@@ -381,6 +388,62 @@ public class CodeViolation extends EntityUtils implements Serializable{
      */
     public void setPhotoList(List<Integer> photoList) {
         this.photoList = photoList;
+    }
+
+    /**
+     * @return the leagacyImport
+     */
+    public boolean isLeagacyImport() {
+        return leagacyImport;
+    }
+
+    /**
+     * @return the complianceTimeStamp
+     */
+    public LocalDateTime getComplianceTimeStamp() {
+        return complianceTimeStamp;
+    }
+
+    /**
+     * @return the complianceUser
+     */
+    public User getComplianceUser() {
+        return complianceUser;
+    }
+
+    /**
+     * @return the compTimeFrameComplianceEvent
+     */
+    public EventCECase getCompTimeFrameComplianceEvent() {
+        return compTimeFrameComplianceEvent;
+    }
+
+    /**
+     * @param leagacyImport the leagacyImport to set
+     */
+    public void setLeagacyImport(boolean leagacyImport) {
+        this.leagacyImport = leagacyImport;
+    }
+
+    /**
+     * @param complianceTimeStamp the complianceTimeStamp to set
+     */
+    public void setComplianceTimeStamp(LocalDateTime complianceTimeStamp) {
+        this.complianceTimeStamp = complianceTimeStamp;
+    }
+
+    /**
+     * @param complianceUser the complianceUser to set
+     */
+    public void setComplianceUser(User complianceUser) {
+        this.complianceUser = complianceUser;
+    }
+
+    /**
+     * @param compTimeFrameComplianceEvent the compTimeFrameComplianceEvent to set
+     */
+    public void setCompTimeFrameComplianceEvent(EventCECase compTimeFrameComplianceEvent) {
+        this.compTimeFrameComplianceEvent = compTimeFrameComplianceEvent;
     }
 
    

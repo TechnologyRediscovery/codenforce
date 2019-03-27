@@ -23,216 +23,98 @@
 
                     <h:form id="noticeBuilderForm">
                         
+                        
+                    <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                     columnClasses="gridTd, gridTd">
+                        
+                        
+                        <h:panelGroup>
+
+                            <p:dataScroller
+                                id="paragraph-scroller"
+                                value="#{noticeOfViolationBB.blockListByMuni}"
+                                    var="block" 
+                                    widgetVar="noticebuilder-ds-var">
+
+
+                                <div class="outlinedBox event-ds-box">
+                                    <h2><h:outputText  value="#{block.textBlockName}"/></h2>
+
+                                    <p:commandButton 
+                                        ajax="true"
+                                        immediate="true"
+                                        id="add-block-before-cb"
+                                        value="Add before violations"
+                                        actionListener="#{noticeOfViolationBB.addBlockBeforeViolations(block)}"
+                                        update="noticeBuilderForm:before-violations-scroller
+                                        noticeBuilderForm:paragraph-scroller"
+                                        />
+                                    <p:commandButton 
+                                        ajax="true"
+                                        immediate="true"
+                                        id="add-block-after-cb"
+                                        value="Add afterviolations"
+                                        actionListener="#{noticeOfViolationBB.addBlockAfterViolations(block)}"
+                                        update="noticeBuilderForm:after-violations-scroller
+                                        noticeBuilderForm:paragraph-scroller"
+                                        />
+                                    <p:spacer height="5px"/>
+                                    <p><h:outputText escape="false" value="#{block.textBlockText}"/> </p>
+
+                                </div>
+                            </p:dataScroller>
+
                             
-
-                                    <h2>Greeting</h2>
-                                    <p:selectOneListbox 
-                                        id="greeting"
-                                        tabindex="1"
-                                        value="#{noticeOfViolationBB.greetingBlock}">
-                                        <f:converter converterId="textBlockConverter"/>
-                                        <f:selectItems
-                                            value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                            var="block" 
-                                            itemValue="#{block}"
-                                            itemLabel="#{block.textBlockName}"/>
-                                    </p:selectOneListbox>
-                                    
-                        <ui:remove>
-                                    <p:commandButton ajax="true" update="blockListOL" 
-                                                     actionListener="#{noticeOfViolationBB.addBlockToList}"/>
-                                    
-                                    <p:orderList id="blockListOL"
-                                        value="#{noticeOfViolationBB.selectedBlockList}" var="block"
-                                        itemLabel="#{block.textBlockName}" itemValue="#{block}" 
-                                        converter="textBlockConverter">
-                                       
-                                    </p:orderList>
-                        </ui:remove>
-
-                                    <h4>Text preview:</h4>
-                                    <p><h:outputText id="greetingOT" value="#{noticeOfViolationBB.greetingBlock.textBlockText}" /> </p>
-
-                                    <h2>Introductory paragraph</h2>
-                                    <p:selectOneMenu 
-                                        id="intro"
-                                        tabindex="s"
-                                        value="#{noticeOfViolationBB.introBlock}">
-                                        <f:converter converterId="textBlockConverter"/>
-                                        <p:ajax update="noticeBuilderForm:introOT" immediate="true"/>
-                                        <f:selectItems
-                                            value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                            var="block" 
-                                            itemValue="#{block}"
-                                            itemLabel="#{block.textBlockName}"/>
-
-                                    </p:selectOneMenu>
-
-                                    <h4>Text preview:</h4>
-                                    <p><h:outputText id="introOT" value="#{noticeOfViolationBB.introBlock.textBlockText}" /> </p>
+                        </h:panelGroup>
+                        <h:panelGroup>
 
 
-                                    <p:fieldset legend="Add more paragraphs"
-                                                toggleable="true"
-                                                collapsed="true">
+                            <p:dataScroller
+                               id="before-violations-scroller"
+                               value="#{noticeOfViolationBB.blockListBeforeViolations}"
+                                   var="block" 
+                                   widgetVar="blocksbefore-ds-var">
 
-                                        <h2>Optional text block 1</h2>
-                                        <p:inputSwitch id="useOptional1" value="#{noticeOfViolationBB.useTb1}" 
-                                                       onLabel="Use Block" offLabel="Don't use" />
-                                        <p:spacer height="5px"/>
-                                        <p:selectOneMenu 
-                                            id="optional1"
-                                            tabindex="7"
-                                            value="#{noticeOfViolationBB.tb1}">
-                                            <f:converter converterId="textBlockConverter"/>
-                                            <p:ajax update="noticeBuilderForm:optional1OT" immediate="true"/>
-                                            <f:selectItems
-                                                value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                                var="block" 
-                                                itemValue="#{block}"
-                                                itemLabel="#{block.textBlockName}"/>
+                                   <p><h:outputText escape="false" value="#{block.textBlockText}"/> </p>
 
-                                        </p:selectOneMenu>
+                            </p:dataScroller>
 
-                                        <h4>Text preview:</h4>
-                                        <p><h:outputText id="optional1OT" value="#{noticeOfViolationBB.tb1.textBlockText}" /> </p>
+                           <h3>Code Violations will go here</h3>
+
+                            <p:dataScroller
+                               id="after-violations-scroller"
+                               value="#{noticeOfViolationBB.blockListAfterViolations}"
+                                   var="block" 
+                                   widgetVar="blocksafter-ds-var">
+
+                                   <p><h:outputText escape="false" value="#{block.textBlockText}"/> </p>
+
+                            </p:dataScroller>
 
 
-
-                                        <h2>Optional text block 2</h2>
-
-                                        <p:inputSwitch id="useOptional2" value="#{noticeOfViolationBB.useTb2}" 
-                                                       onLabel="Use Block" offLabel="Don't use" />
-                                        <p:spacer height="5px"/>
-                                        <p:selectOneMenu 
-                                            id="optional2"
-                                            tabindex="7"
-                                            value="#{noticeOfViolationBB.tb2}">
-                                            <f:converter converterId="textBlockConverter"/>
-                                            <p:ajax update="noticeBuilderForm:optional2OT" immediate="true"/>
-                                            <f:selectItems
-                                                value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                                var="block" 
-                                                itemValue="#{block}"
-                                                itemLabel="#{block.textBlockName}"/>
-
-                                        </p:selectOneMenu>
-
-                                        <h4>Text preview:</h4>
-                                        <p><h:outputText id="optional2OT" value="#{noticeOfViolationBB.tb2.textBlockText}" /> </p>
-
-                                    </p:fieldset>
-                                    <h2>Compliance instructions</h2>
-
-                                    <p:selectOneMenu 
-                                        id="compliance"
-                                        tabindex="7"
-                                        value="#{noticeOfViolationBB.complianceBlock}">
-                                        <f:converter converterId="textBlockConverter"/>
-                                        <p:ajax update="noticeBuilderForm:complianceOT" immediate="true"/>
-                                        <f:selectItems
-                                            value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                            var="block" 
-                                            itemValue="#{block}"
-                                            itemLabel="#{block.textBlockName}"/>
-
-                                    </p:selectOneMenu>
-
-                                    <h4>Text preview:</h4>
-                                    <p><h:outputText id="complianceOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
-
-                                    <h2>Penalty notice</h2>
-
-                                    <p:selectOneMenu 
-                                        id="penalty"
-                                        tabindex="7"
-                                        value="#{noticeOfViolationBB.penaltyBlock}">
-                                        <f:converter converterId="textBlockConverter"/>
-                                        <p:ajax update="noticeBuilderForm:penaltyOT" immediate="true"/>
-                                        <f:selectItems
-                                            value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                            var="block" 
-                                            itemValue="#{block}"
-                                            itemLabel="#{block.textBlockName}"/>
-
-                                    </p:selectOneMenu>
-
-                                    <h4>Text preview:</h4>
-                                    <p><h:outputText id="penaltyOT" value="#{noticeOfViolationBB.complianceBlock.textBlockText}" /> </p>
+                            <h2>Signature</h2>
 
 
-                                    <p:fieldset legend="Add more paragraphs" toggleable="true" collapsed="true">
+                            <p>
+                                <h:outputText id="sig1" value="#{sessionBean.facesUser.person.firstName} #{facesUser.person.lastName}"/><br/>
+                                <h:outputText id="sig2" value="#{sessionBean.facesUser.person.jobTitle}"/><br/>
+                                <h:outputText id="sig3" value="#{sessionBean.facesUser.muni.muniName}"/><br/>
+                                <h:outputText id="sig4" value="#{sessionbean.facesUser.person.phoneCell}"/><br/>
+                                <h:outputText id="sig5" value="#{sessionBean.facesUser.person.email}"/>
+                            </p>
+                            
+                        </h:panelGroup>
+                    </h:panelGrid>
 
 
-                                        <h2>Optional text block 3</h2>
-
-                                        <p:inputSwitch id="useOptional3" value="#{noticeOfViolationBB.useTb3}" 
-                                                       onLabel="Use Block" offLabel="Don't use" />
-                                        <p:spacer height="5px"/>
-
-                                        <p:selectOneMenu 
-                                            id="optional3"
-                                            tabindex="7"
-                                            value="#{noticeOfViolationBB.tb3}">
-                                            <f:converter converterId="textBlockConverter"/>
-                                            <p:ajax update="noticeBuilderForm:optional3OT" immediate="true"/>
-                                            <f:selectItems
-                                                value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                                var="block" 
-                                                itemValue="#{block}"
-                                                itemLabel="#{block.textBlockName}"/>
-
-                                        </p:selectOneMenu>
-
-                                        <h4>Text preview:</h4>
-                                        <p><h:outputText id="optional3OT" value="#{noticeOfViolationBB.tb3.textBlockText}" /> </p>
+                        <p:spacer height="15px"/>
 
 
-                                        <h2>Optional text block 4</h2>
-
-
-                                        <p:inputSwitch id="useOptional4" value="#{noticeOfViolationBB.useTb4}" 
-                                                       onLabel="Use Block" offLabel="Don't use" />
-                                        <p:spacer height="5px"/>
-
-                                        <p:selectOneMenu 
-                                            id="optional4"
-                                            tabindex="7"
-                                            value="#{noticeOfViolationBB.tb4}">
-                                            <f:converter converterId="textBlockConverter"/>
-                                            <p:ajax update="noticeBuilderForm:optional4OT" immediate="true"/>
-                                            <f:selectItems
-                                                value="#{noticeOfViolationBB.textBlockListByMuni}"
-                                                var="block" 
-                                                itemValue="#{block}"
-                                                itemLabel="#{block.textBlockName}"/>
-
-                                        </p:selectOneMenu>
-
-                                        <h4>Text preview:</h4>
-                                        <p><h:outputText id="optional4OT" value="#{noticeOfViolationBB.tb4.textBlockText}" /> </p>
-
-                                    </p:fieldset>
-
-                                <h2>Signature</h2>
-
-
-                                <p>
-                                    <h:outputText id="sig1" value="#{facesUser.FName} #{facesUser.LName}"/><br/>
-                                    <h:outputText id="sig2" value="#{facesUser.workTitle}"/><br/>
-                                    <h:outputText id="sig3" value="#{facesUser.muni.muniName}"/><br/>
-                                    <h:outputText id="sig4" value="#{facesUser.phoneCell}"/><br/>
-                                    <h:outputText id="sig5" value="#{facesUser.email}"/>
-                                </p>
-
-                                <p:spacer height="15px"/>
-
-
-                                <p:commandButton ajax="false" value="Assemble and edit draft notice" 
-                                                 action="#{noticeOfViolationBB.assembleNotice}"
-                                                 icon="fa fa-tasks"/>
-                                <p:commandButton action="ceCases" icon="fa fa-arrow-left"
-                                         value="cancel"/>
+                        <p:commandButton ajax="false" value="Assemble and edit draft notice" 
+                                         action="#{noticeOfViolationBB.assembleNotice}"
+                                         icon="fa fa-tasks"/>
+                        <p:commandButton action="ceCases" icon="fa fa-arrow-left"
+                                 value="cancel"/>
                     </h:form>
                 </div>
             </ui:define>

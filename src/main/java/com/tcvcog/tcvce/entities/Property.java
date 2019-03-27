@@ -29,7 +29,7 @@ public class Property implements Serializable{
     private String constructionType;
     private String countyCode;
     
-    private boolean multiUnit, rental;
+    private boolean multiUnit, rental, vacant;
     
     private String notes;
     
@@ -222,6 +222,20 @@ public class Property implements Serializable{
      */
     public void setRental(boolean rental) {
         this.rental = rental;
+    }
+
+    /**
+     * @return the vacant
+     */
+    public boolean isVacant() {
+        return vacant;
+    }
+
+    /**
+     * @param vacant the vacant to set
+     */
+    public void setVacant(boolean vacant) {
+        this.vacant = vacant;
     }
   
 }

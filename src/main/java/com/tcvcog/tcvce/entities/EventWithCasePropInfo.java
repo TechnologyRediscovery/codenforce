@@ -20,22 +20,9 @@ import java.io.Serializable;
  */
 public class EventWithCasePropInfo extends EventCECase implements Serializable {
     
-    private Property eventProp;
     private CECase eventCase;
 
-    /**
-     * @return the eventProp
-     */
-    public Property getEventProp() {
-        return eventProp;
-    }
-
-    /**
-     * @param eventProp the eventProp to set
-     */
-    public void setEventProp(Property eventProp) {
-        this.eventProp = eventProp;
-    }
+   
 
     /**
      * @return the eventCase

@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
@@ -100,7 +101,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         System.out.println("ActionRequestBean.ActionRequestBean");
         
         // init new, empty photo list
-        this.photoList = new ArrayList<>();
+        this.photoList = new ArrayList<>();    
     }
     
     public String getReturnValue(){
@@ -140,6 +141,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String saveConcernDescriptions(){
 //        User u = getSessionBean().getFacesUser();
 //        if(u == null){
+        if(getSessionBean().getCeactionRequestForSubmission().getPhotoList() == null){
+            getSessionBean().getCeactionRequestForSubmission().setPhotoList(new ArrayList<Integer>());
+        }
             return "photoUpload";
 //            
 //        } else {
@@ -184,9 +188,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         if(ev == null){
             System.out.println("CEActionRequestBB.handlePhotoUpload | event: null");
             return;
-        }
-        if(getSessionBean().getCeactionRequestForSubmission().getPhotoList() == null){
-            getSessionBean().getCeactionRequestForSubmission().setPhotoList(new ArrayList<Integer>());
         }
         
         ImageServices is = getImageServices();
@@ -277,10 +278,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             getSessionBean().setActiveRequest(ceari.getActionRequestByRequestID(submittedActionRequestID));
             
             // commit photos to db and link to request
-            for(Integer photoID : req.getPhotoList()){
-                is.commitPhotograph(photoID);
-                is.linkPhotoToActionRequest(photoID, submittedActionRequestID);
-            }
+            if(req.getPhotoList() == null || req.getPhotoList().isEmpty())
+                for(Integer photoID : req.getPhotoList()){
+                    is.commitPhotograph(photoID);
+                    is.linkPhotoToActionRequest(photoID, submittedActionRequestID);
+                }
                     
             // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             getFacesContext().addMessage(null,

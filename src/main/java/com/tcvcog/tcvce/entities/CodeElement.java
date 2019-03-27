@@ -47,6 +47,8 @@ public class CodeElement implements Serializable {
     
     private String resourceURL;
     private LocalDateTime dateCreated;
+    
+    private String headerString;
 
     
     /**
@@ -265,6 +267,29 @@ public class CodeElement implements Serializable {
      */
     public void setGuideEntryID(int guideEntryID) {
         this.guideEntryID = guideEntryID;
+    }
+
+    /**
+     * @return the headerString
+     */
+    public String getHeaderString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(ordchapterTitle);
+        sb.append(":");
+        sb.append(ordSecTitle);
+        sb.append("-");
+        sb.append(ordSubSecNum);
+        sb.append(":");
+        sb.append(ordSubSecTitle);
+        
+        return sb.toString();
+    }
+
+    /**
+     * @param headerString the headerString to set
+     */
+    public void setHeaderString(String headerString) {
+        this.headerString = headerString;
     }
 
 

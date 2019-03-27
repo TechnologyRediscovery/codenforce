@@ -27,41 +27,11 @@
                                 <p:commandButton ajax="false" value="Log in to mission control" 
                                                  action="#{missionControlBB.loginToMissionControl}"/>
                                                             
+                               
 
                         </h:form>
                         
-                        <ui:remove>
-                            
-                        
-                        <h2>image testing</h2>
-                        
-                        <h:form enctype="multipart/form-data">
-                            <p:fileUpload value="#{photoBB.file}" mode="simple" />
-                            <p:commandButton value="Submit" ajax="false"/>
-                        </h:form>
-                        
-                        
-                        <h:form enctype="multipart/form-data">
-                            
-                            <h3>Store photo</h3>
-                            <p:fileUpload   fileUploadListener="#{photoBB.handleFileUpload(event)}"
-                                            mode="advanced"
-                                            sizeLimit="100000"
-                                            allowTypes="/(\.|\/)(jpe?g|png)$/"/>
-                            
-                            
-                            <h3>See photo</h3>
-                                
-                            <p:graphicImage value="#{imageServices.image}">
-                                <f:param name="photoID" value="#{photoBB.photoID}" />
-                            </p:graphicImage>
-                            
-                            
-                            
-                        </h:form>
-                        
-                        </ui:remove>
-                        
+                       
                         
                     </div>
                 </f:view>

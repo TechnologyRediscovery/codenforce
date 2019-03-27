@@ -17,11 +17,16 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -36,6 +41,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import com.tcvcog.tcvce.util.Constants;
+import java.util.ArrayList;
 
 /**
  *
@@ -70,6 +76,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         UserCoordinator uc = getUserCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         PersonIntegrator persInt = getPersonIntegrator();
+        CaseIntegrator caseint = getCaseIntegrator();
         
         try {
             User extractedUser = uc.getUser(getContainerAuthenticatedUser());
@@ -77,36 +84,27 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 
                 ExternalContext ec = facesContext.getExternalContext();
                 ec.getSessionMap().put("facesUser", extractedUser);
-                System.out.println("SessionInitializer.initiateInternalSession "
-                        + "| facesUserFromDB: " + extractedUser.getLName());
+                System.out.println("SessionInitializer.initiateInternalSession ");
 
                 Municipality muni = extractedUser.getMuni();
                 
 //                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                        .getString("arbitraryPlaceholderPersonID"))));
                 getSessionBean().setFacesUser(extractedUser);
-                getSessionBean().setAccessKeyCard(extractedUser.getKeyCard());
 //                getSessionBean().setActivePersonList(persInt.getPersonHistory(extractedUser));
                 getSessionBean().setActiveMuni(muni);
-                
-                getSessionBean().setActiveProp(pi.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("arbitraryPlaceholderPropertyID"))));
-                
-                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("arbitraryPlaceholderPersonID"))));
-                
-                
                 
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
                 getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getDefaultCodeSetID()));
+                
+                populateSessionObjectQueues(extractedUser);
 
                 getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
                         Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
                          "SessionInitializer.initiateInternalSession | Created internal session", false, false);
-            
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Good morning, " + extractedUser.getFName() + "!", ""));
+
+                
             }
         
         } catch (IntegrationException ex) {
@@ -135,7 +133,41 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
         return request.getRemoteUser();
+    }
 
+    
+        
+    private void populateSessionObjectQueues(User u) throws IntegrationException{
+        PersonCoordinator persCoord = getPersonCoordinator();
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        PropertyIntegrator propI = getPropertyIntegrator();
+        PersonIntegrator persInt = getPersonIntegrator();
+        CaseIntegrator caseInt = getCaseIntegrator();
+        
+        getSessionBean().setPersonQueue(persCoord.loadPersonHistoryList(u));
+        
+        getSessionBean().setcECaseQueue(caseCoord.getOpenCECaseList(u.getMuni()));
+        
+        Property p = propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("arbitraryPlaceholderPropertyID")));
+        getSessionBean().setActiveProp(p);
+
+        getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("arbitraryPlaceholderPersonID"))));
+
+        CECase c = caseInt.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("arbitraryPlaceholderCaseID")));
+        getSessionBean().setcECase(c);
+        
+//        getSessionBean().setcECaseQueue(new ArrayList<CECase>());
+//        getSessionBean().getcECaseQueue().add(c);
+        
+        getSessionBean().setPropertyQueue(new ArrayList<Property>());
+        getSessionBean().getPropertyQueue().add(p);
+        
+
+
+        
     }
 
     

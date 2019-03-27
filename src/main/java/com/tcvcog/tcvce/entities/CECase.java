@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,6 +48,9 @@ public class CECase extends EntityUtils implements Serializable{
     
     private String caseName;
     private CasePhase casePhase;
+    private CaseStage caseStage;
+    private Icon icon;
+    
     
     private LocalDateTime originationDate;
     private String originiationDatePretty;
@@ -63,13 +67,9 @@ public class CECase extends EntityUtils implements Serializable{
     public String toString(){
         return caseName;
     }
+  
     
-    public String getCaseStage(){
-        
-        return "A";
-    }
-    
-    public int getCaseAge(){
+    public long getCaseAge(){
         return getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
     
@@ -260,8 +260,7 @@ public class CECase extends EntityUtils implements Serializable{
      * @return the originiationDatePretty
      */
     public String getOriginiationDatePretty() {
-        DateTimeFormatter f = DateTimeFormatter.ofPattern("EEE dd MM yyyy, HH:mm");
-        originiationDatePretty = originationDate.format(f);
+        originiationDatePretty = getPrettyDate(originationDate);
         return originiationDatePretty;
     }
 
@@ -355,6 +354,85 @@ public class CECase extends EntityUtils implements Serializable{
     public void setRequestList(List<CEActionRequest> requestList) {
         this.requestList = requestList;
     }
+
+    /**
+     * @return the caseStage
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
+     */
+    public CaseStage getCaseStage() throws CaseLifecyleException {
+        CaseStage stage;
+        
+         switch(casePhase){
+            
+            case PrelimInvestigationPending:
+                stage = CaseStage.Investigation;
+                break;
+            case NoticeDelivery:
+                stage = CaseStage.Investigation;
+                break;
+                // Letter marked with a send date
+            case InitialComplianceTimeframe:
+                stage = CaseStage.Enforcement;
+                break;
+                // compliance inspection
+            case SecondaryComplianceTimeframe:
+                stage = CaseStage.Enforcement;
+                break;
+                // Filing of citation
+            case AwaitingHearingDate:
+                stage = CaseStage.Citation;
+                break;
+                // hearing date scheduled
+            case HearingPreparation:
+                stage = CaseStage.Citation;
+                break;
+                // hearing not resulting in a case closing
+            case InitialPostHearingComplianceTimeframe:
+                stage = CaseStage.Citation;
+                break;
+            
+            case SecondaryPostHearingComplianceTimeframe:
+                stage = CaseStage.Citation;
+                break;
+                
+            case Closed:
+                stage = CaseStage.Closed;
+                // TODO deal with this later
+//                throw new CaseLifecyleException("Cannot advance a closed case to any other phase");
+                break;
+            case InactiveHolding:
+                stage = CaseStage.Closed;
+                break;
+                
+            default:
+                stage = CaseStage.Closed;
+        }
+        caseStage = stage;
+        return caseStage;
+    }
+
+    /**
+     * @param caseStage the caseStage to set
+     */
+    public void setCaseStage(CaseStage caseStage) {
+        this.caseStage = caseStage;
+    }
+
+    /**
+     * @return the icon
+     */
+    public Icon getIcon() {
+        return icon;
+    }
+
+    /**
+     * @param icon the icon to set
+     */
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+    }
+
+  
     
     
     

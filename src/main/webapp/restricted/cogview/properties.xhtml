@@ -25,9 +25,18 @@
 
                             <h1 class="property-blue">Properties</h1>
                             
-
+                            
+                            
                             <h:form id="propertySearchForm">
 
+                                <p:commandButton id="propertyAddButton"
+                                                 value="Add new property in #{sessionBean.activeMuni.muniName}" icon="fa fa-plus"
+                                                 action="#{propertyProfileBB.addProperty()}"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"
+                                                 
+                                                 />
+                                <p:spacer height="10px"/>
+                                
                                 <p:panelGrid columns="2" >
 
                                     <h:panelGroup>
@@ -175,6 +184,9 @@
                                                          property-info-form:prop-info-consttype-ot
                                                          property-info-form:prop-info-countycode-ot
                                                          property-info-form:prop-info-notes-ot
+                                                         property-info-form:prop-info-multiUnit-cb
+                                                         property-info-form:prop-info-vacant-cb
+                                                         property-info-form:prop-info-rental-cb
                                                          property-lists-form:prop-cases-datatable
                                                          property-lists-form:prop-persons-datatable
                                                          "/>
@@ -264,7 +276,36 @@
                                         <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.countyCode}"/>
                                     </h:panelGroup>
 
-
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-rental-cb" >
+                                            <h:outputText styleClass="uiLabel" value="Rental?" />
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
+                                        <p:selectBooleanCheckbox id="prop-info-rental-cb" value="#{propertyProfileBB.currProp.rental}" tabindex="14" disabled="true"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-multiUnit-cb" >
+                                            <h:outputText styleClass="uiLabel" value="Multi Unit?" />
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
+                                        <p:selectBooleanCheckbox id="prop-info-multiUnit-cb" value="#{propertyProfileBB.currProp.multiUnit}" tabindex="14" disabled="true"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-vacant-cb" >
+                                            <h:outputText styleClass="uiLabel" value="Vacant?" />
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup> 
+                                        <p:spacer width="5px"/>
+                                        <p:selectBooleanCheckbox id="prop-info-vacant-cb" value="#{propertyProfileBB.currProp.vacant}" tabindex="14" disabled="true"/>
+                                    </h:panelGroup>
+                                    
                                     <h:panelGroup>
                                         <h:outputLabel for="prop-info-notes-ot" >
                                             <h:outputText styleClass="uiLabel" value="Notes:" />
@@ -273,7 +314,10 @@
                                         <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.notes}"/>
                                     </h:panelGroup>
                                 </h:panelGrid>
-                                <p:commandButton ajax="false" value="Update Selected Property Info" action="#{propertyProfileBB.updateProperty}" disabled="false"/>
+                                
+                                <p:commandButton ajax="false" value="Update Selected Property Info" 
+                                                 action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"/>
                             </h:form>
 
                             <p:spacer height="10px"/>
@@ -336,7 +380,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Manager" />
                                         </f:facet>
-                                        <h:outputText value="#{c.caseManager.LName}"/>
+                                        <h:outputText value="#{c.caseManager.person.lastName}"/>
                                     </p:column>
                                     <p:column width="5%" exportable="false">
                                         <f:facet name="header">
