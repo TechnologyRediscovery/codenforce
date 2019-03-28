@@ -11,7 +11,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
+import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -39,8 +39,8 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     private List<EventCategory> eventCatList;
     private List<User> userList;
     
-    private List<EventWithCasePropInfo> eventList;
-    private List<EventWithCasePropInfo> filteredEventList;
+    private List<EventCasePropBundle> eventList;
+    private List<EventCasePropBundle> filteredEventList;
     
     /**
      * Creates a new instance of CEEventsBB
@@ -147,14 +147,14 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public void refreshCurrentEventList() {
         EventIntegrator ei = getEventIntegrator();
         EventCoordinator ec = getEventCoordinator();
-        EventWithCasePropInfo e;
-        List<EventWithCasePropInfo> refreshedList = new ArrayList<>();
-        Iterator<EventWithCasePropInfo> iter = eventList.iterator();
+        EventCasePropBundle e;
+        List<EventCasePropBundle> refreshedList = new ArrayList<>();
+        Iterator<EventCasePropBundle> iter = eventList.iterator();
         try {
             while (iter.hasNext()) {
                 e = iter.next();
-                e = ei.getEventWithCaseAndPropInfo(e.getEventID());
-                e.setCurrentUserCanTakeAction(
+                e = ei.getEventCasePropBundle(e.getEvent().getEventID());
+                e.getEvent().setCurrentUserCanTakeAction(
                         ec.determineUserActionRequestEventAuthorization(e, getSessionBean().getFacesUser()));
                 refreshedList.add(e);
             }
@@ -167,36 +167,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         eventList = refreshedList;
     }
 
-    public void logActionResponse(EventWithCasePropInfo ev){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ev.setResponderActual(getSessionBean().getFacesUser());
-            ec.logResponseToActionRequest(ev);
-            refreshCurrentEventList();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Registered view confirmation!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not confirm view, sorry.", ""));
-        }
-    }
-    
-    public void clearActionResponse(EventWithCasePropInfo ev){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ec.clearActionResponse(ev);
-            refreshCurrentEventList();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Action response: cleared!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not clear action response, sorry.", ""));
-        }
-    }
+   
     
 
    
@@ -246,7 +217,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the eventList
      */
-    public List<EventWithCasePropInfo> getEventList() {
+    public List<EventCasePropBundle> getEventList() {
         
         return eventList;
     }
@@ -254,7 +225,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventList
      */
-    public List<EventWithCasePropInfo> getFilteredEventList() {
+    public List<EventCasePropBundle> getFilteredEventList() {
         return filteredEventList;
     }
 
@@ -282,14 +253,14 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventWithCasePropInfo> eventList) {
+    public void setEventList(List<EventCasePropBundle> eventList) {
         this.eventList = eventList;
     }
 
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventWithCasePropInfo> filteredEventList) {
+    public void setFilteredEventList(List<EventCasePropBundle> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 

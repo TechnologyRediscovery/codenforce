@@ -34,7 +34,7 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
+import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -47,6 +47,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -257,16 +258,23 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setcECase(null);
     }
     
-    public String jumpToCasesToEditCEEvent(EventWithCasePropInfo ev){
+    public String jumpToCasesToEditCEEvent(EventCasePropBundle ev){
+        CaseIntegrator ci = getCaseIntegrator();
         caseList = getSessionBean().getcECaseQueue();
         List<Property> propList = getSessionBean().getPropertyQueue();
         if(caseList != null){
             caseList.add(1, caseList.remove(0));
-            caseList.add(0, ev.getEventCase());
+            try {
+                caseList.add(0, ci.generateCECase(ev.getEventCaseBare()));
+            } catch (SQLException | IntegrationException ex ) {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Unable to migrate from events to cases", 
+                "This is a non-user system-level error that must be fixed by your Sys Admin, sorry"));
+            }
         }
         if(propList != null){
             propList.add(1, propList.remove(0));
-            propList.add(0, ev.getEventCase().getProperty());
+            propList.add(0, ev.getEventCaseBare().getProperty());
         }
         return "ceCases";
     }
@@ -383,7 +391,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to write case phase changes to DB",
                             "This error must be corrected by a system administrator, sorry"));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecyleException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -670,6 +678,13 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                         "The automatic event generation associated with this action has thrown an error. "
                                 + "Please create an event manually which logs this letter being queued for mailing", ""));
             
+        } catch (ViolationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                        "Unable to queue notice of violatio. "
+                                + "Please create an event manually which logs this letter being queued for mailing", ""));
+            
         }
         
         
@@ -851,6 +866,38 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             Logger.getLogger(CaseProfileBB.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+    
+    
+     public void logActionResponse(EventCECase ev){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ev.setResponderActual(getSessionBean().getFacesUser());
+            ec.logResponseToActionRequest(ev);
+//            refreshCurrentEventList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Registered view confirmation!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not confirm view, sorry.", ""));
+        }
+    }
+    
+    public void clearActionResponse(EventCECase ev){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.clearActionResponse(ev);
+//            refreshCurrentEventList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Action response: cleared!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not clear action response, sorry.", ""));
+        }
     }
 
     /**
