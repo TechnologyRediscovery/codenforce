@@ -121,7 +121,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String storeSelectedMuni(){
         CEActionRequest cear;
         CaseCoordinator cc = getCaseCoordinator();
-        cear = cc.getNewActionRequest();
+        cear = cc.getInititalizedCEActionRequest();
         cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
         getSessionBean().setCeactionRequestForSubmission(cear);

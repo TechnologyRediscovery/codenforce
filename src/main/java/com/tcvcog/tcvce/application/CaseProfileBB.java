@@ -232,9 +232,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             }
             
             if(selectedEvent.getCategory().getEventType() == EventType.Compliance){
-                cc.addNewComplianceEvent(ccase, selectedEvent, getSessionBean().getActiveCodeViolation());
+                cc.attachNewComplianceEvent(ccase, selectedEvent, getSessionBean().getActiveCodeViolation());
             } else {
-                cc.addNewCEEvent(ccase, selectedEvent);
+                cc.attachNewEvent(ccase, selectedEvent);
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -444,7 +444,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
         }
         selectedEvent = e;
-//            cc.addNewComplianceEvent(currentCase, e, cv);
+//            cc.attachNewComplianceEvent(currentCase, e, cv);
     }
 
     public String editViolation() {
@@ -1281,7 +1281,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public List<EventType> getAvailableEventTypeList() {
         CaseCoordinator cc = getCaseCoordinator();
-        availableEventList = cc.getAvailableEvents(currentCase, 
+        availableEventList = cc.getPermittedEventTypesForCECase(currentCase, 
                 getSessionBean().getFacesUser());
         return availableEventList;
     }
@@ -1365,8 +1365,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         EventIntegrator ei = getEventIntegrator();
         try {
             availableActionsToRequest = ei.getRequestableEventCategories();
-        } catch (IntegrationException ex) {
             System.out.println("CaseProfileBB.getAvailableActionToRequest");
+        } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         return availableActionsToRequest;

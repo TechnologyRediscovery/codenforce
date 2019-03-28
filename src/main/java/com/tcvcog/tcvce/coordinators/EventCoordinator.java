@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
@@ -92,6 +93,39 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return sc.getSearchParamsComplianceEvPastMonth(m);
     }
     
+    /**
+     * Called ONLY by the EventIntegrator to set member variables based on business
+     * rules before sending the event onto its requesting method. Checks for request processing, 
+     * sets intended responder for action requests, etc.
+     * @param ev
+     * @return a nicely configured EventCEEcase
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public EventCECase configureRetrievedEvent(EventCECase ev) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        EventIntegrator ei = getEventIntegrator();
+        
+        if(ev.getRequestedEventCategory() != null){
+            ev.setRequestsAction(true);
+        }
+
+        if(ev.isRequestsAction()){
+            if(ev.isDirectRequestToDefaultMuniCEO()){
+                    ev.setResponderIntended(ci.getDefaultCodeOfficer(ev.getCaseID()));
+            }
+            if(ev.getResponseTimestamp() != null){
+                ev.setRequestClosed(true);
+            }
+            // as long as any exiting action request is complete and it was not
+            // rejected (i.e. no event created in response to the request)
+            // go get the triggering event
+            if(ev.isRequestClosed() && !ev.isRequestRejected()){
+                ev.setTriggeringEvent(ei.getActionTriggeringEvent(ev));
+            }
+        }
+        return ev;
+    }
+    
      /**
      * Pathway for injecting business logic into the event search process. Now its just a pass through.
      * @param params
@@ -125,7 +159,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         // direct event assignment allows view conf to cut across regular permissions
         // checks
-        if(ev.getAssignedTo().equals(u) || u.getKeyCard().isHasDeveloperPermissions()){
+        if(ev.getOwner().equals(u) || u.getKeyCard().isHasDeveloperPermissions()){
             return true;
             // check that the event is associated with the user's auth munis
         } else if(muniList.contains(ev.getEventCase().getProperty().getMuni())){
@@ -275,7 +309,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public void editEvent(EventCECase evcase, User u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        evcase.setAssignedTo(u);
         ei.editEvent(evcase);
     }
     

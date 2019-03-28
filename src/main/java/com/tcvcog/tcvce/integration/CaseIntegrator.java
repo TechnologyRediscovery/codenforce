@@ -248,7 +248,47 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         return caseList;
         
+    }
+    
+    /**
+     * Used by the EventCordinator to setup events by attaching default code officers
+     * to events designated for such
+     * @param cecaseid
+     * @return the code officer user associated with the given case
+     * @throws IntegrationException 
+     */
+    public User getDefaultCodeOfficer(int cecaseid) throws IntegrationException{
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        User u = null;
+        String query = "SELECT municipality_municode \n" +
+                       "FROM cecase INNER JOIN property ON (property_propertyid = propertyid) \n" +
+                       "WHERE caseid = ?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
         
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cecaseid);
+            //System.out.println("CaseIntegrator.| sql: " + stmt.toString());
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                u = mi.getDefaultCodeOfficer(rs.getInt("municipality_municode"));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get default code officer", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return u;
         
     }
     

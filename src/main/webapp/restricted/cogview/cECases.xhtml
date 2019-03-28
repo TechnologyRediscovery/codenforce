@@ -1454,13 +1454,13 @@
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
                                     
-                                    <p:selectOneListbox style="width: 300px;" id="requested-action-solb" 
+                                    <p:selectOneMenu style="width: 300px;" id="requested-action-solb" 
                                                         value="#{caseProfileBB.selectedEvent.requestedEventCategory}" tabindex="19"
                                                         disabled="#{!caseProfileBB.requestActionOnEvent}">
                                         <f:converter converterId="eventCategoryConverter"/>
                                         <f:selectItems  id="catItemsList" value="#{caseProfileBB.availableActionsToRequest}" 
                                                         var="ec" itemValue="#{ec}" itemLabel="#{ec.eventType.label}: #{ec.eventCategoryTitle}"/>
-                                    </p:selectOneListbox>
+                                    </p:selectOneMenu>>
                                     
                                     <p:spacer height="5px"/>
                                     <h:outputLabel for="request-action-usedefceo-cb">
@@ -1633,28 +1633,16 @@
                                 <h:panelGroup>
                                     <h:inputTextarea value="#{caseUpdateBB.formCaseNotes}"/>
                                 </h:panelGroup> 
-
-
                             </h:panelGrid>
-
                             <p:spacer height="10px"/>
-
                             <p:commandButton ajax="false" value="Update Case" action="#{caseUpdateBB.updateCase}"  icon="fa fa-edit"/>
-
                         </h:form>
-
                     </p:dialog>
-
-
-
                     <p:dialog    id="case-phase-dialog"
                                         height="650" width="900"
                                         widgetVar="phase-override"
                                         closable="true" >
-
-                        
                         <h2>Override case phase</h2>
-                        
                         <h:form id="casePhaseChangeForm">
                          <p:outputLabel for="override-currcase-ot">
                                 <h:outputText styleClass="bold" value="Current phase:"/>
@@ -1668,7 +1656,6 @@
                             </p:outputLabel>
                             <p:selectOneMenu value="#{caseProfileBB.selectedCasePhase}"
                                              id="casePhaseSOM">
-
                                 <f:selectItems value="#{caseProfileBB.casePhaseList}"
                                                var="cp"
                                                itemValue="#{cp}"

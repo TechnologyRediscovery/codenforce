@@ -34,6 +34,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
 
     
     private SearchParamsCEEvents searchParams;
+    private int actionRequestsUserType;
     private List<EventType> eventTypesList;
     private List<EventCategory> eventCatList;
     private List<User> userList;
@@ -290,6 +291,20 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      */
     public void setFilteredEventList(List<EventWithCasePropInfo> filteredEventList) {
         this.filteredEventList = filteredEventList;
+    }
+
+    /**
+     * @return the actionRequestsUserType
+     */
+    public int getActionRequestsUserType() {
+        return actionRequestsUserType;
+    }
+
+    /**
+     * @param actionRequestsUserType the actionRequestsUserType to set
+     */
+    public void setActionRequestsUserType(int actionRequestsUserType) {
+        this.actionRequestsUserType = actionRequestsUserType;
     }
     
     

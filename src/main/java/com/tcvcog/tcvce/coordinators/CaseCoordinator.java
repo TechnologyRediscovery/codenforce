@@ -73,8 +73,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     }
     
-    
-    
     /**
      * The temporarily hard-coded values for default search parameters for various
      * types of search Param objects
@@ -142,27 +140,32 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
     
+    /**
+     * Existed before queryCases() became the goto way to retrieve lists of cases
+     * @deprecated 
+     * @param m
+     * @return
+     * @throws IntegrationException 
+     */
     public List<CECase> getOpenCECaseList(Municipality m) throws IntegrationException{
         CaseIntegrator ci = getCaseIntegrator();
         List<CECase> cList = ci.queryCECases(getDefaultSearchParamsCECase(m));
         return cList;
     }
     
+    /**
+     * Front door for querying cases in the DB
+     * 
+     * @param params pre-configured search parameters
+     * @return
+     * @throws IntegrationException 
+     */
     public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException{
         CaseIntegrator ci = getCaseIntegrator();
         return ci.queryCECases(params);
         
     }
     
-    
-    public String generateCaseProfileMarkup(CECase c){
-        StringBuilder sb = new StringBuilder();
-        
-        
-        
-        return sb.toString();
-    }
-            
     
     public CECase getInitializedCECase(Property p, User u){
         CECase newCase = new CECase();
@@ -182,7 +185,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * Primary entry point for code enf cases. Two major pathways exist through this method:
      * - creating cases as a result of an action request submission
      * - creating cases from some other source than an action request
-     * Depending on the source, an appropriately note-ified case originiation event
+     * Depending on the source, an appropriately note-ified case origination event
      * is built and attached to the case that was just created.
      * 
      * @param newCase
@@ -243,11 +246,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationEvent.setNotes(sb.toString());
             
         }
-            System.out.println("CaseCoordinator.createNewCECase | origination event: " + originationEvent.getCategory().getEventCategoryTitle());
             originationEvent.setOwner(u);
             originationEvent.setCaseID(insertedCase.getCaseID());
             originationEvent.setDateOfRecord(LocalDateTime.now());
-            addNewCEEvent(newCase, originationEvent);
+            attachNewEvent(newCase, originationEvent);
     }
     
     /**
@@ -305,9 +307,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Primary event life cycle control method which is called
-     * each time an event is added to the case. The primary business
+     * each time an event is added to a code enf case. The primary business
      * logic related to which events can be attached to a case at any
-     * given case phase is implemented in this coordinator.
+     * given case phase is implemented in this coordinator method.
      * 
      * Its core operation is to check case and event related qualities
      * and delegate further processing to event-type specific methods
@@ -315,12 +317,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the case to which the event should be added
      * @param e the event to add to the case also included in this call
-     * @param u
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public void addNewCEEvent(CECase c, EventCECase e) 
+    public void attachNewEvent(CECase c, EventCECase e) 
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
          
@@ -330,7 +331,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 processActionEvent(c, e);
                 break;
             case Compliance:
-                // deprecated--directly call addNewComplianceEvent instead
+                // deprecated--directly call attachNewComplianceEvent instead
                 break;
             case Closing:
                 processClosingEvent(c, e);
@@ -355,7 +356,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException in the case of a DB error
      * @throws CaseLifecyleException in the case of date mismatch
      */
-    public void addNewComplianceEvent(CECase c, EventCECase e, CodeViolation viol) 
+    public void attachNewComplianceEvent(CECase c, EventCECase e, CodeViolation viol) 
             throws ViolationException, IntegrationException, CaseLifecyleException{
         
         
@@ -374,12 +375,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     } // close method
     
      /**
-     * TODO: finish
-     * @param c
-     * @param u
-     * @return 
+     * Implements business rules for determining which event types are allowed
+     * to be attached to the given CECase based on the case's phase and the
+     * user's permissions in the system.
+     * 
+     * Used for displaying the appropriate event types to the user on the
+     * cecases.xhtml page
+     * 
+     * @param c the CECase on which the event would be attached
+     * @param u the User doing the attaching
+     * @return allowed EventTypes for attaching to the given case
      */
-    public List<EventType> getAvailableEvents(CECase c, User u){
+    public List<EventType> getPermittedEventTypesForCECase(CECase c, User u){
         List<EventType> typeList = new ArrayList<>();
         RoleType role = u.getRoleType();
         
@@ -387,7 +394,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 || u.getRoleType() == RoleType.Developer){
             typeList.add(EventType.Action);
             typeList.add(EventType.Timeline);
-            
         }
         
         if(role != RoleType.MuniReader){
@@ -395,9 +401,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             typeList.add(EventType.Meeting);
             typeList.add(EventType.Custom);
         }
-        
-        
-        
         return typeList;
     }
     
@@ -457,7 +460,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                    
             complianceClosingEvent = ec.getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
-            addNewCEEvent(c, complianceClosingEvent);
+            attachNewEvent(c, complianceClosingEvent);
             
         } // close if
         
@@ -473,7 +476,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         ci.changeCECasePhase(c);
         
         c.setClosingDate(LocalDateTime.now());
-        updateCase(c);
+        updateCoreCECaseData(c);
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
@@ -714,7 +717,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         noticeEvent.setActive(true);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
-        noticeEvent.setRequestedEventIDRequired(false);
         noticeEvent.setHidden(false);
         
         ArrayList<Person> al = new ArrayList();
@@ -779,8 +781,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        StringBuilder notesBuilder = new StringBuilder();
        notesBuilder.append("Failure to comply with the following ordinances:\n");
        
-       
-       
        while(li.hasNext()){
            
            cv = li.next();
@@ -812,7 +812,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        return newCitation;
    }
    
-   public void updateCase(CECase c) throws CaseLifecyleException, IntegrationException{
+   /**
+    * Implements business logic before updating a CECase's core data (opening date,
+    * closing date, etc.). If all is well, pass to integrator.
+    * @param c the CECase to be updated
+    * @throws CaseLifecyleException
+    * @throws IntegrationException 
+    */
+   public void updateCoreCECaseData(CECase c) throws CaseLifecyleException, IntegrationException{
        CaseIntegrator ci = getCaseIntegrator();
        if(c.getClosingDate() != null){
             if(c.getClosingDate().isBefore(c.getOriginationDate())){
@@ -840,7 +847,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        
    }
    
-   public CEActionRequest getNewActionRequest(){
+   /**
+    * Factory method for our CEActionRequests - initializes the date as well
+    * @return The CEActionRequest ready for populating with user values
+    */
+   public CEActionRequest getInititalizedCEActionRequest(){
        System.out.println("CaseCoordinator.getNewActionRequest");
        CEActionRequest cear = new CEActionRequest();
        // start by writing in the current date
@@ -851,19 +862,25 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        
    }
    
+   /**
+    * Utility method for determining whether or not the panel of Code Enforcement request
+    * routing buttons can be pressed. Used by the view for setting disabled properties on buttons
+    * requests 
+    * @param req the current CE Request
+    * @param u current user
+    * @return True if the current user can route the given ce request
+    */
    public boolean determineCEActionRequestRoutingActionEnabledStatus(
                                                         CEActionRequest req,
-                                                        AccessKeyCard keyCard ){
-       if(req != null && keyCard != null){
-            System.out.println("CaseCoordinator.determineCEACtionRequestRoutingACtionEnabledStatus | income request ID: " + req.getRequestID());
+                                                        User u ){
+       if(req != null && u.getKeyCard() != null){
             if((
                     req.getRequestStatus().getStatusID() == 
                     Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                             .getString("actionRequestInitialStatusCode")))
                     && 
-                    getSessionBean().getFacesUser().getKeyCard().isHasEnfOfficialPermissions()
+                    u.getKeyCard().isHasEnfOfficialPermissions()
                 ){
-                System.out.println("Routing enabled!");
                 return true;
             }
         }

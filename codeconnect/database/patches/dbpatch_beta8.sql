@@ -329,10 +329,10 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 	ALTER TABLE ceevent ADD COLUMN responseevent_eventid INTEGER CONSTRAINT responseevent_fk REFERENCES ceevent (eventid);
 
 	ALTER TABLE ceevent RENAME COLUMN creator_userid TO owner_userid;
-	-- have run locally until here
 
 	ALTER TABLE ceeventcategory DROP COLUMN requiresviewconfirmation;
 	ALTER TABLE ceeventcategory ADD COLUMN requestable BOOLEAN DEFAULT FALSE;
+	-- have run locally until here
 
 
 COMMIT;
