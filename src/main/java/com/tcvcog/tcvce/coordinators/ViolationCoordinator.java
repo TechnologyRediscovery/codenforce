@@ -83,6 +83,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         
         CodeViolationIntegrator vi = getCodeViolationIntegrator();
         EventCoordinator ec = getEventCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         EventCECase tfEvent;
         int violationStoredDBKey;
         StringBuilder sb = new StringBuilder();
@@ -110,7 +111,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         
         if(verifyCodeViolationAttributes(v)){
             violationStoredDBKey = vi.insertCodeViolation(v);
-            ec.insertEvent(tfEvent);
+            cc.attachNewEvent(c, tfEvent);
         } else {
             throw new ViolationException("Failed violation verification");
         }

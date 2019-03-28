@@ -29,7 +29,7 @@ import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.AccessKeyCard;
-import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
+import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
@@ -61,7 +61,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<Person> personQueue;
     private List<CEActionRequest> cEActionRequestQueue;
     private List<CECase> cECaseQueue;
-    private List<EventWithCasePropInfo> cEEventWCPIQueue;
+    private List<EventCasePropBundle> cEEventWCPIQueue;
     private List<CodeViolation> violationQueue;
     private List<OccupancyInspection> inspectionQueue;
     
@@ -476,14 +476,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the cEEventWCPIQueue
      */
-    public List<EventWithCasePropInfo> getcEEventWCPIQueue() {
+    public List<EventCasePropBundle> getcEEventWCPIQueue() {
         return cEEventWCPIQueue;
     }
 
     /**
      * @param cEEventWCPIQueue the cEEventWCPIQueue to set
      */
-    public void setcEEventWCPIQueue(List<EventWithCasePropInfo> cEEventWCPIQueue) {
+    public void setcEEventWCPIQueue(List<EventCasePropBundle> cEEventWCPIQueue) {
         this.cEEventWCPIQueue = cEEventWCPIQueue;
     }
 

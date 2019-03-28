@@ -291,7 +291,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException
      * @throws CaseLifecyleException 
      */
-    public void manuallyChangeCasePhase(CECase c, CasePhase newPhase) throws IntegrationException, CaseLifecyleException{
+    public void manuallyChangeCasePhase(CECase c, CasePhase newPhase) throws IntegrationException, CaseLifecyleException, ViolationException{
         EventCoordinator ec = getEventCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         CasePhase pastPhase = c.getCasePhase();
@@ -367,7 +367,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             vc.updateCodeViolation(viol);
         
         // first insert our nice compliance event for all selected violations
-        ec.insertEvent(e);
+        attachNewEvent(c, e);
         // then look at the whole case and close if necessary
         checkForFullComplianceAndCloseCaseIfTriggered(c);
         
@@ -501,17 +501,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    private void processActionEvent(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException{
+    private void processActionEvent(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException, ViolationException{
         
         EventCoordinator ec = getEventCoordinator();
         // insert the triggering action event
-        ec.insertEvent(e); 
+        attachNewEvent(c, e);
         //then pass event to check for phase changes
         checkForAndCarryOutCasePhaseChange(c, e);
         refreshCase(c);
     }
     
-    private void checkForAndCarryOutCasePhaseChange(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException{
+    private void checkForAndCarryOutCasePhaseChange(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException, ViolationException{
         
         CaseIntegrator ci = getCaseIntegrator();
         CasePhase initialCasePhase = c.getCasePhase();
@@ -588,9 +588,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException thrown if the integrator cannot get the data
      * into the DB
      */
-    private void processGeneralEvent(CECase c, EventCECase e) throws IntegrationException{
+    private void processGeneralEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException, ViolationException{
         EventCoordinator ec = getEventCoordinator();
-        ec.insertEvent(e);
+        attachNewEvent(c, e);
         refreshCase(c);
         
     }
@@ -676,7 +676,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     
     public void queueNoticeOfViolation(CECase c, NoticeOfViolation nov) 
-            throws CaseLifecyleException, IntegrationException, EventException{
+            throws CaseLifecyleException, IntegrationException, EventException, ViolationException{
         
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         
@@ -723,7 +723,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         al.add(nov.getRecipient());
         noticeEvent.setEventPersons(al);
         
-        evCoord.insertEvent(noticeEvent);
+        attachNewEvent(c, noticeEvent);
         
         refreshCase(c);
         

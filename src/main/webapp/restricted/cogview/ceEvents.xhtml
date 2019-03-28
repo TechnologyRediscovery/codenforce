@@ -526,29 +526,29 @@
                                         <div class="outlinedBox event-ds-box">
 
                                             <h2>
-                                                <h:outputText value="#{e.category.eventType.label}:#{e.category.eventCategoryTitle}"/>
+                                                <h:outputText value="#{e.event.category.eventType.label}:#{e.event.category.eventCategoryTitle}"/>
                                             </h2>
 
                                             <h3>
-                                                <h:outputText value="#{e.dateOfRecordPretty}" styleClass="mono"/>
+                                                <h:outputText value="#{e.event.dateOfRecordPretty}" styleClass="mono"/>
 
                                             </h3>
 
                                             <h4>
-                                                <h:outputText value="id:#{e.eventID} |
-                                                              #{e.active ? 'active' : 'inactive'} |
-                                                              #{e.hidden ? 'hidden' : ''} |
-                                                              #{e.discloseToMunicipality? 'muni: viewable' : 'muni: hidden'} |
-                                                              #{e.discloseToPublic? 'public: viewable' : 'public: hidden'} |
-                                                              #{e.requestsAction? 'action requested: yes' : 'action requested: no'}"/>
+                                                <h:outputText value="id:#{e.event.eventID} |
+                                                              #{e.event.active ? 'active' : 'inactive'} |
+                                                              #{e.event.hidden ? 'hidden' : ''} |
+                                                              #{e.event.discloseToMunicipality? 'muni: viewable' : 'muni: hidden'} |
+                                                              #{e.event.discloseToPublic? 'public: viewable' : 'public: hidden'} |
+                                                              #{e.event.requestsAction? 'action requested: yes' : 'action requested: no'}"/>
                                             </h4>
 
                                             <h3>
-                                                <h:outputText value="#{e.eventCase.property.muni.muniName}: " />
-                                                <h:outputText value="#{e.eventCase.property.address} | " />
-                                                <h:outputText value="case: #{e.eventCase.caseName} | 
-                                                                    id:#{e.eventCase.caseID} | 
-                                                                    phase:#{e.eventCase.casePhase.label} " />
+                                                <h:outputText value="#{e.eventCaseBare.property.muni.muniName}: " />
+                                                <h:outputText value="#{e.eventCaseBare.property.address} | " />
+                                                <h:outputText value="case: #{e.eventCaseBare.caseName} | 
+                                                                    id:#{e.eventCaseBare.caseID} | 
+                                                                    phase:#{e.eventCaseBare.casePhase.label} " />
                                             </h3>
 
                                             <h:panelGrid columns="2" rendered="true"
@@ -557,22 +557,22 @@
                                                 <f:facet name="header" class="leftalign">
                                                     <h:outputText value="Description" />
                                                     <div class="rowExpansion">
-                                                        <h:outputText style="font-weight: normal;" value="#{e.description}"/>
+                                                        <h:outputText style="font-weight: normal;" value="#{e.event.description}"/>
                                                     </div>
                                                 </f:facet>
 
 
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="Date of record: "/>
-                                                    <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                                    <h:outputText value="#{e.event.dateOfRecordPretty}"/>
                                                     <p:spacer height="5px"/>
 
                                                     <h:outputText styleClass="bold" value="Entry timestamp: "/>
-                                                    <h:outputText value="#{e.timestampPretty}"/>
+                                                    <h:outputText value="#{e.event.timestampPretty}"/>
                                                     <p:spacer height="5px"/>
 
                                                     <h:outputText value="Owner " styleClass="bold" />
-                                                    <h:outputText value="#{e.owner.person.firstName} #{e.owner.person.lastName}"/>
+                                                    <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
                                                     <p:spacer height="5px"/>
 
                                                     <h:outputText value="Open in case explorer" />
@@ -584,21 +584,21 @@
 
                                                 <h:panelGroup>
 
-                                                    <h:panelGrid columns="2" rendered="#{e.requestsAction}"
+                                                    <h:panelGrid columns="2" rendered="#{e.event.requestsAction}"
                                                          columnClasses="gridTd-solid-back, gridTd-solid-back" >
 
                                                         <f:facet name="header" class="leftalign">
-                                                            <h:outputText value="#{empty e.responderActual? 'action required!' : 'action complete'}"
-                                                                          styleClass="viewconf-status #{empty e.responderActual? 'conf-needed' : 'conf-received'}"/>
+                                                            <h:outputText value="#{empty e.event.responderActual? 'action required!' : 'action complete'}"
+                                                                          styleClass="viewconf-status #{empty e.event.responderActual? 'conf-needed' : 'conf-received'}"/>
                                                             <p:spacer height="5px"/>
                                                              <p:commandButton   id="events-viewconf-confirmnonotes-cb" 
                                                                                 ajax="true"
                                                                                 actionListener="#{cEEventsBB.logActionResponse(e)}"
                                                                                  value="Take action without notes" 
                                                                                  styleClass="noFill"
-                                                                                 disabled="#{!(empty e.responderActual)}"
+                                                                                 disabled="#{!(empty e.event.responderActual)}"
                                                                                  icon="fa fa-check-square-o"
-                                                                                 rendered="#{e.currentUserCanTakeAction}"
+                                                                                 rendered="#{e.event.currentUserCanTakeAction}"
                                                                                  update="events-datascroller
                                                                                         events-datatable-form:events-datatable
                                                                                         ceev-form-globalmessages:ceev-globalmessages
@@ -613,7 +613,7 @@
                                                                                  styleClass="noFill"
                                                                                  disabled="true"
                                                                                  icon="fa fa-edit"
-                                                                                rendered="#{e.currentUserCanTakeAction}"
+                                                                                rendered="#{e.event.currentUserCanTakeAction}"
                                                                                  />
                                                              </ui:remove>
                                                              
@@ -622,9 +622,9 @@
                                                                                 actionListener="#{cEEventsBB.clearActionResponse(e)}"
                                                                                 value="clear action taken" 
                                                                                 styleClass="noFill"
-                                                                                disabled="#{empty e.responderActual}"
+                                                                                disabled="#{empty e.event.responderActual}"
                                                                                 icon="fa fa-eraser"
-                                                                                rendered="#{e.currentUserCanTakeAction}"
+                                                                                rendered="#{e.event.currentUserCanTakeAction}"
                                                                                 update="events-datascroller
                                                                                         events-datatable-form:events-datatable
                                                                                         ceev-form-globalmessages:ceev-globalmessages
@@ -636,56 +636,50 @@
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Requested event: "/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.requestedEventCategory.eventType.label}: #{e.requestedEventCategory.eventCategoryTitle}"/>
+                                                                <h:outputText value="#{e.event.requestedEventCategory.eventType.label}: #{e.event.requestedEventCategory.eventCategoryTitle}"/>
                                                             </div>
                                                         </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Action requested by: "/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.actionRequestedBy.person.firstName} #{e.actionRequestedBy.person.lastName}"/>
+                                                                <h:outputText value="#{e.event.actionRequestedBy.person.firstName} #{e.event.actionRequestedBy.person.lastName}"/>
                                                             </div>
                                                         </h:panelGroup>
 
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Logged event required? "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.requestedEventIDRequired ? 'Yes: logged event required' : 'No: logged event optional'}"/>
-                                                            </div>
-                                                        </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Intended user/action taker: "/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responderIntended.person.firstName} #{e.responderIntended.person.lastName}"/>
+                                                                <h:outputText value="#{e.event.responderIntended.person.firstName} #{e.event.responderIntended.person.lastName}"/>
                                                             </div>
                                                         </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Action taken by: "/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responderActual.person.firstName} #{e.responderActual.person.lastName}"/>
+                                                                <h:outputText value="#{e.event.responderActual.person.firstName} #{e.event.responderActual.person.lastName}"/>
                                                             </div>
                                                         </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Action timestamp: "/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responseTimePrettyDate}"/>
+                                                                <h:outputText value="#{e.event.responseTimePrettyDate}"/>
                                                             </div>
                                                         </h:panelGroup>
 
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Request rejected? "/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.requestRejected}"/>
+                                                                <h:outputText value="#{e.event.requestRejected}"/>
                                                             </div>
                                                         </h:panelGroup>
 
                                                         <f:facet name="footer" class="leftalign">
                                                             <h:outputText styleClass="bold" value="Action response notes:"/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responderNotes}"/>
+                                                                <h:outputText value="#{e.event.responderNotes}"/>
                                                             </div>
                                                         </f:facet>
 
@@ -695,7 +689,7 @@
                                                     <h:outputLabel styleClass="bold" style="text-align: left" value="Notes: "/>
                                                     <p:spacer height="5px"/>
                                                     <div class="rowExpansion" style="text-align: left">
-                                                        <h:outputText escape="false" value="#{e.notes}"/>
+                                                        <h:outputText escape="false" value="#{e.event.notes}"/>
                                                     </div>
                                                 </f:facet>
                                             </h:panelGrid>
@@ -710,7 +704,7 @@
                                     <p:dataTable
                                         id="events-datatable"
                                         var="e"
-                                        rowKey="#{e.eventID}"
+                                        rowKey="#{e.event.eventID}"
                                         value="#{cEEventsBB.eventList}"
                                         tableStyleClass="primeDataTable"
                                         resizableColumns="true"
@@ -728,57 +722,57 @@
                                             <p:rowToggler/>
                                         </p:column>
 
-                                        <p:column width="11%" sortBy="#{e.dateOfRecord}">
+                                        <p:column width="11%" sortBy="#{e.event.dateOfRecord}">
                                             <f:facet name="header">
                                                 <h:outputText value="Date" />
                                             </f:facet>
-                                            <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                            <h:outputText value="#{e.event.dateOfRecordPretty}"/>
                                         </p:column>
 
-                                        <p:column width="15%" sortBy="#{e.eventCase.property.address}">
+                                        <p:column width="15%" sortBy="#{e.eventCaseBare.property.address}">
                                             <f:facet name="header">
                                                 <h:outputText value="Property" />
                                             </f:facet>
-                                            <h:outputText value="#{e.eventCase.property.address} (#{e.eventCase.property.muni.muniName}"/>
+                                            <h:outputText value="#{e.eventCaseBare.property.address} (#{e.eventCaseBare.property.muni.muniName}"/>
                                         </p:column>
 
                                         <p:column width="15%">
                                             <f:facet name="header">
                                                 <h:outputText value="Case name" />
                                             </f:facet>
-                                            <h:outputText value="#{e.eventCase.caseName})" />
+                                            <h:outputText value="#{e.eventCaseBare.caseName})" />
                                         </p:column>
 
 
 
-                                        <p:column width="8%" sortBy="#{e.category.eventType.label}"
-                                                  filterBy="#{e.category.eventType.label}">
+                                        <p:column width="8%" sortBy="#{e.event.category.eventType.label}"
+                                                  filterBy="#{e.event.category.eventType.label}">
                                             <f:facet name="header">
                                                 <h:outputText value="Type" />
                                             </f:facet>
-                                            <h:outputText value="#{e.category.eventType.label}"/>
+                                            <h:outputText value="#{e.event.category.eventType.event.label}"/>
                                         </p:column>
 
-                                        <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
-                                                  filterBy="#{e.category.eventCategoryTitle}">
+                                        <p:column width="10%" sortBy="#{e.event.category.eventCategoryTitle}"
+                                                  filterBy="#{e.event.category.eventCategoryTitle}">
                                             <f:facet name="header">
                                                 <h:outputText value="Category" />
                                             </f:facet>
-                                            <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                            <h:outputText value="#{e.event.category.eventCategoryTitle}"/>
                                         </p:column>
-                                        <p:column width="5%" filterBy="#{e.owner.person.lastName}"
-                                                  sortBy="#{e.owner.person.lastName}">
+                                        <p:column width="5%" filterBy="#{e.event.owner.person.lastName}"
+                                                  sortBy="#{e.event.owner.person.lastName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator" />
                                             </f:facet>
-                                            <h:outputText value="#{e.owner.person.lastName}"/>
+                                            <h:outputText value="#{e.event.owner.person.lastName}"/>
                                         </p:column>
                                         <p:column width="20%" style="word-wrap: normal;">
                                             <f:facet name="header">
                                                 <h:outputText value="Description" />
                                             </f:facet>
                                             <div class="rowExpansion">
-                                                <h:outputText value="#{e.description}"/>
+                                                <h:outputText value="#{e.event.description}"/>
                                             </div>
                                         </p:column>
                                         <p:column width="5%" exportable="false">
@@ -794,61 +788,55 @@
                                         <p:rowExpansion>
 
                                             <div class="outlinedBox">
-                                                <h2>Event ID: <h:outputText value="#{e.eventID}"/> </h2>
+                                                <h2>Event ID: <h:outputText value="#{e.event.eventID}"/> </h2>
                                                 <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd">
 
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Description" />
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.description}"/>
+                                                            <h:outputText value="#{e.event.description}"/>
                                                         </div>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.discloseToMunicipality}"/>
+                                                            <h:outputText value="#{e.event.discloseToMunicipality}"/>
                                                         </div>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Disclose to Public?" />
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.discloseToPublic}"/>
+                                                            <h:outputText value="#{e.event.discloseToPublic}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Creation time stamp"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.timestamp}"/>
+                                                            <h:outputText value="#{e.event.timestamp}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Active Event?"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.active}"/>
+                                                            <h:outputText value="#{e.event.active}"/>
                                                         </div>
                                                     </h:panelGroup>
 
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.requireRequestedEventInsert}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
+                                                    
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed by"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.responderActual.person.lastName}"/>
+                                                            <h:outputText value="#{e.event.responderActual.person.lastName}"/>
                                                         </div>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed at"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.responseTimestamp}"/>
+                                                            <h:outputText value="#{e.event.responseTimestamp}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -858,7 +846,7 @@
                                                         <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion" style="text-align: left">
-                                                            <h:outputText escape="false" value="#{e.notes}"/>
+                                                            <h:outputText escape="false" value="#{e.event.notes}"/>
                                                         </div>
                                                     </f:facet>
 

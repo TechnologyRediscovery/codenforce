@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
+import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
@@ -531,13 +531,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException
      */
-    private EventCECase generateEventFromRS(ResultSet rs, EventWithCasePropInfo premadeEvent) throws SQLException, IntegrationException {
+    private EventCECase generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException {
         EventCECase ev;
-        if (premadeEvent != null) {
-            ev = premadeEvent;
-        } else {
             ev = new EventCECase();
-        }
         UserIntegrator ui = getUserIntegrator();
 
         ev.setEventID(rs.getInt("eventid"));
@@ -577,11 +573,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             ev.setResponderActual(ui.getUser(rs.getInt("responderactual_userid")));
             ev.setResponseTimestamp(rs.getTimestamp("responsetimestamp").toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime());
-            ev.setResponderNotes(rs.getString("responderNotes"));
+            ev.setResponderNotes(rs.getString("respondernotes"));
             ev.setRequestRejected(rs.getBoolean("rejeecteventrequest"));
-            int responseEventID = rs.getInt("responseevent_responseid");
+            int responseEventID = rs.getInt("responseevent_eventid");
             if(responseEventID != 0){
-                ev.setResponseEvent(getEvent(responseEventID, null));
+                ev.setResponseEvent(getEvent(responseEventID));
             }
         } 
         
@@ -590,8 +586,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     
     
-    public EventWithCasePropInfo getEventWithCaseAndPropInfo(int eventid) throws IntegrationException{
-        EventWithCasePropInfo evcpi = null;
+    public EventCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException{
+        EventCasePropBundle evCPBundle = null;
         CaseIntegrator ci = getCaseIntegrator();
 
        StringBuilder sb = new StringBuilder();
@@ -609,9 +605,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                evcpi = new EventWithCasePropInfo();
-                evcpi = (EventWithCasePropInfo) getEvent(rs.getInt("eventid"), evcpi);
-                evcpi.setEventCase(ci.getCECase(rs.getInt("cecase_caseid")));
+                evCPBundle = new EventCasePropBundle();
+                evCPBundle.setEvent(getEvent(rs.getInt("eventid")));
+                evCPBundle.setEventCaseBare(ci.getCECaseBare(rs.getInt("cecase_caseid")));
             }
 
         } catch (SQLException ex) {
@@ -624,7 +620,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return evcpi;
+        return evCPBundle;
     }
     
     
@@ -651,7 +647,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                ev = getEvent(rs.getInt("eventid"), null);
+                ev = getEvent(rs.getInt("eventid"));
             }
 
         } catch (SQLException ex) {
@@ -668,8 +664,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
 
   
-    public List<EventWithCasePropInfo> queryEvents(SearchParamsCEEvents params) throws IntegrationException {
-        List<EventWithCasePropInfo> eventList = new ArrayList<>();
+    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params) throws IntegrationException {
+        List<EventCasePropBundle> eventList = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
@@ -881,7 +877,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                eventList.add(getEventWithCaseAndPropInfo(rs.getInt("eventid")));
+                eventList.add(getEventCasePropBundle(rs.getInt("eventid")));
                 counter++;
             }
 
@@ -911,9 +907,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public List<EventWithCasePropInfo> getUpcomingTimelineEvents(Municipality m, LocalDateTime start, LocalDateTime end) throws IntegrationException {
+    public List<EventCasePropBundle> getUpcomingTimelineEvents(Municipality m, LocalDateTime start, LocalDateTime end) throws IntegrationException {
 
-        ArrayList<EventWithCasePropInfo> eventList = new ArrayList<>();
+        ArrayList<EventCasePropBundle> eventList = new ArrayList<>();
 
         String query = "SELECT ceevent.eventid, ceevent.ceeventcategory_catid, ceevent.dateofrecord, \n"
                 + "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.owner_userid, ceevent.disclosetomunicipality, \n"
@@ -947,7 +943,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println("EventIntegrator.getUpcomingTimelineEvents | rs size: " + rs.getFetchSize());
 
             while (rs.next()) {
-                EventWithCasePropInfo ev = new EventWithCasePropInfo();
+                EventCECase ev = new EventCECase();
 
                 ev.setEventID(rs.getInt("eventid"));
                 ev.setCategory(getEventCategory(rs.getInt("categoryid")));
@@ -976,8 +972,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 ev.setNotes(rs.getString("notes"));
 
                 // now for case and prop info
-                ev.setEventCase(ci.getCECase(rs.getInt("caseid")));
-                eventList.add(ev);
+//                ev.setCaseID(ci.getCECase(rs.getInt("caseid")));
+//                eventList.add(ev);
 
             }
 
@@ -1060,7 +1056,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public EventCECase getEvent(int eventID, EventWithCasePropInfo subtypeEvent) throws IntegrationException {
+    public EventCECase getEvent(int eventID) throws IntegrationException {
         EventCECase ev = null;
         EventCoordinator ec = getEventCoordinator();
 
@@ -1069,7 +1065,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 "       disclosetopublic, activeevent, hidden, notes, responsetimestamp, \n" +
                 "       actionrequestedby_userid, respondernotes, responderintended_userid, \n" +
                 "       requestedeventcat_catid, responseevent_eventid, rejeecteventrequest, \n" +
-                "       responderactual_userid directrequesttodefaultmuniceo "
+                "       responderactual_userid, directrequesttodefaultmuniceo "
                 + "     FROM public.ceevent WHERE eventid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1083,11 +1079,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                if(subtypeEvent != null){
-                    ev = generateEventFromRS(rs, subtypeEvent);
-                } else {
-                    ev = generateEventFromRS(rs, null);
-                }
+                    ev = generateEventFromRS(rs);
             }
 
         } catch (SQLException ex) {
@@ -1117,7 +1109,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                eventList.add(getEvent(rs.getInt("eventid"), null));
+                eventList.add(getEvent(rs.getInt("eventid")));
             }
 
         } catch (SQLException ex) {

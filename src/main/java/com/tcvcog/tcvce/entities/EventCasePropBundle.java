@@ -8,34 +8,48 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 
 /**
- * A subclass of EventCECase that contains the composing objects
- * namely the Property and Case associted with this event.
+ * A composite class that contains the composing objects
+ * namely Case associated with this event.
  * Designed to allow a list of these objects to exist all by itself
  * and the event can show the reader all of its related data.
  * 
- * Heavy for loading as each object has potentially hundreds of other objects
- gb* inside it
  * 
  * @author sylvia
  */
-public class EventWithCasePropInfo extends EventCECase implements Serializable {
+public class EventCasePropBundle implements Serializable {
     
-    private CECase eventCase;
-
-   
+    private CECaseNoLists eventCase;
+    private EventCECase event;
 
     /**
      * @return the eventCase
      */
-    public CECase getEventCase() {
+    public CECaseNoLists getEventCaseBare() {
         return eventCase;
     }
 
     /**
      * @param eventCase the eventCase to set
      */
-    public void setEventCase(CECase eventCase) {
+    public void setEventCaseBare(CECaseNoLists eventCase) {
         this.eventCase = eventCase;
     }
+
+    /**
+     * @return the event
+     */
+    public EventCECase getEvent() {
+        return event;
+    }
+
+  
+
+    /**
+     * @param event the event to set
+     */
+    public void setEvent(EventCECase event) {
+        this.event = event;
+    }
+
     
 }
