@@ -47,20 +47,19 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     
     // these search parameters are only valid for events that request
     // a follow-up action
+    
+    private boolean filterByHasResponseEvent;
+    private boolean hasResponseEvent;
 
     // use the EventCategory and EventType fields above to query the 
     // event category or type of the requested follow-up event
-    private boolean filterByRequestedResponseEventTypeCat;
-    private boolean filterByActualResponseEventTypeCat;
+    private boolean filterByRequestedResponseEventCat;
     
     // we have a User type memvar called user. These switches can
     // determine which db field the user is queried against
     private boolean filterByRequestor;
     private boolean filterByResponderIntended;
     private boolean filterByResponderActual;
-    
-    private boolean filterByHasResponseEvent;
-    private boolean hasResponseEvent;
 
     private boolean filterByRejectedRequest;
     private boolean rejectedRequest;
@@ -377,19 +376,13 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @return the filterByRequestedResponseEventTypeCat
+     * @return the filterByRequestedResponseEventCat
      */
-    public boolean isFilterByRequestedResponseEventTypeCat() {
-        return filterByRequestedResponseEventTypeCat;
+    public boolean isFilterByRequestedResponseEventCat() {
+        return filterByRequestedResponseEventCat;
     }
 
-    /**
-     * @return the filterByActualResponseEventTypeCat
-     */
-    public boolean isFilterByActualResponseEventTypeCat() {
-        return filterByActualResponseEventTypeCat;
-    }
-
+    
     
 
     /**
@@ -414,20 +407,13 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @param filterByRequestedResponseEventTypeCat the filterByRequestedResponseEventTypeCat to set
+     * @param filterByRequestedResponseEventCat the filterByRequestedResponseEventCat to set
      */
-    public void setFilterByRequestedResponseEventTypeCat(boolean filterByRequestedResponseEventTypeCat) {
-        this.filterByRequestedResponseEventTypeCat = filterByRequestedResponseEventTypeCat;
+    public void setFilterByRequestedResponseEventCat(boolean filterByRequestedResponseEventCat) {
+        this.filterByRequestedResponseEventCat = filterByRequestedResponseEventCat;
     }
 
-    /**
-     * @param filterByActualResponseEventTypeCat the filterByActualResponseEventTypeCat to set
-     */
-    public void setFilterByActualResponseEventTypeCat(boolean filterByActualResponseEventTypeCat) {
-        this.filterByActualResponseEventTypeCat = filterByActualResponseEventTypeCat;
-    }
 
-    
     /**
      * @param filterByRequestor the filterByRequestor to set
      */

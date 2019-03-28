@@ -197,7 +197,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     
-    public User getDefaultCodeOfficer(Municipality muni) throws IntegrationException{
+    public User getDefaultCodeOfficer(int  muniCode) throws IntegrationException{
         User u = null;
         UserIntegrator ui = getUserIntegrator();
        
@@ -209,7 +209,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
  
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, muni.getMuniCode());
+            stmt.setInt(1, muniCode);
             rs = stmt.executeQuery(query);
             while(rs.next()){
                 u = ui.getUser(rs.getInt("defaultcodeofficeruser"));

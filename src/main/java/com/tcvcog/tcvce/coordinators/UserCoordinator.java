@@ -57,6 +57,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
+  
+    
+    
     public void updateUser(User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         ui.updateUser(u);
