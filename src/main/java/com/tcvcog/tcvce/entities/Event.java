@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 /**
  *
@@ -52,7 +53,7 @@ public class Event extends EntityUtils implements Serializable {
     
     // computed based on the business logic for
     // action request responses - set by EventCoordinator
-    private boolean requestClosed;
+    private boolean responseComplete;
     
     // OPTIONAL: a pointer to the event whose action request
     // parameters created this event
@@ -61,7 +62,7 @@ public class Event extends EntityUtils implements Serializable {
     
     private boolean currentUserCanTakeAction;
     
-    private EventCategory requestedEventCategory;
+    private EventCategory actionEventCat;
     
 // the event object generated based on this event's
     // action request. NOTE: triggeringEvent and responseEvent
@@ -79,6 +80,8 @@ public class Event extends EntityUtils implements Serializable {
     
     private String responderNotes;
     private boolean requestRejected;
+    
+    private List<Person> personList;
 
     /**
      * @return the eventID
@@ -402,19 +405,7 @@ public class Event extends EntityUtils implements Serializable {
         this.requestRejected = requestRejected;
     }
 
-    /**
-     * @return the requestedEventCategory
-     */
-    public EventCategory getRequestedEventCategory() {
-        return requestedEventCategory;
-    }
-
-    /**
-     * @param requestedEventCategory the requestedEventCategory to set
-     */
-    public void setRequestedEventCategory(EventCategory requestedEventCategory) {
-        this.requestedEventCategory = requestedEventCategory;
-    }
+   
 
     /**
      * @return the triggeringEvent
@@ -435,7 +426,7 @@ public class Event extends EntityUtils implements Serializable {
      * @return the requestsAction
      */
     public boolean isRequestsAction() {
-        requestsAction = requestedEventCategory!= null;
+        requestsAction = actionEventCat!= null;
         return requestsAction;
     }
 
@@ -447,18 +438,19 @@ public class Event extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the requestClosed
+     * @return the responseComplete
      */
-    public boolean isRequestClosed() {
+    public boolean isResponseComplete() {
+        responseComplete = responseTimestamp != null;
         
-        return requestClosed;
+        return responseComplete;
     }
 
     /**
-     * @param requestClosed the requestClosed to set
+     * @param responseComplete the responseComplete to set
      */
-    public void setRequestClosed(boolean requestClosed) {
-        this.requestClosed = requestClosed;
+    public void setResponseComplete(boolean responseComplete) {
+        this.responseComplete = responseComplete;
     }
 
     
@@ -489,6 +481,34 @@ public class Event extends EntityUtils implements Serializable {
      */
     public void setResponseEvent(Event responseEvent) {
         this.responseEvent = responseEvent;
+    }
+
+    /**
+     * @return the personList
+     */
+    public List<Person> getPersonList() {
+        return personList;
+    }
+
+    /**
+     * @param personList the personList to set
+     */
+    public void setPersonList(List<Person> personList) {
+        this.personList = personList;
+    }
+
+    /**
+     * @return the actionEventCat
+     */
+    public EventCategory getActionEventCat() {
+        return actionEventCat;
+    }
+
+    /**
+     * @param actionEventCat the actionEventCat to set
+     */
+    public void setActionEventCat(EventCategory actionEventCat) {
+        this.actionEventCat = actionEventCat;
     }
 
    

@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -60,6 +61,8 @@ public class User implements Serializable{
      */
     public User() {
     }
+    
+    
     
     /**
      * Creates a new instance of User
@@ -360,6 +363,99 @@ public class User implements Serializable{
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + this.userID;
+        hash = 43 * hash + Objects.hashCode(this.roleType);
+        hash = 43 * hash + Objects.hashCode(this.username);
+        hash = 43 * hash + Objects.hashCode(this.password);
+        hash = 43 * hash + Objects.hashCode(this.authMunis);
+        hash = 43 * hash + Objects.hashCode(this.muni);
+        hash = 43 * hash + Objects.hashCode(this.person);
+        hash = 43 * hash + this.personID;
+        hash = 43 * hash + Objects.hashCode(this.notes);
+        hash = 43 * hash + Objects.hashCode(this.activityStartDate);
+        hash = 43 * hash + Objects.hashCode(this.activityStartDateUtilDate);
+        hash = 43 * hash + Objects.hashCode(this.activityStopDate);
+        hash = 43 * hash + Objects.hashCode(this.activityStopDateUtilDate);
+        hash = 43 * hash + (this.systemAccessPermitted ? 1 : 0);
+        hash = 43 * hash + Objects.hashCode(this.keyCard);
+        hash = 43 * hash + (this.isEnforcementOfficial ? 1 : 0);
+        hash = 43 * hash + Objects.hashCode(this.badgeNumber);
+        hash = 43 * hash + Objects.hashCode(this.oriNumber);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final User other = (User) obj;
+        if (this.userID != other.userID) {
+            return false;
+        }
+        if (this.personID != other.personID) {
+            return false;
+        }
+        if (this.systemAccessPermitted != other.systemAccessPermitted) {
+            return false;
+        }
+        if (this.isEnforcementOfficial != other.isEnforcementOfficial) {
+            return false;
+        }
+        if (!Objects.equals(this.username, other.username)) {
+            return false;
+        }
+        if (!Objects.equals(this.password, other.password)) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.badgeNumber, other.badgeNumber)) {
+            return false;
+        }
+        if (!Objects.equals(this.oriNumber, other.oriNumber)) {
+            return false;
+        }
+        if (this.roleType != other.roleType) {
+            return false;
+        }
+        if (!Objects.equals(this.authMunis, other.authMunis)) {
+            return false;
+        }
+        if (!Objects.equals(this.muni, other.muni)) {
+            return false;
+        }
+        if (!Objects.equals(this.person, other.person)) {
+            return false;
+        }
+        if (!Objects.equals(this.activityStartDate, other.activityStartDate)) {
+            return false;
+        }
+        if (!Objects.equals(this.activityStartDateUtilDate, other.activityStartDateUtilDate)) {
+            return false;
+        }
+        if (!Objects.equals(this.activityStopDate, other.activityStopDate)) {
+            return false;
+        }
+        if (!Objects.equals(this.activityStopDateUtilDate, other.activityStopDateUtilDate)) {
+            return false;
+        }
+        if (!Objects.equals(this.keyCard, other.keyCard)) {
+            return false;
+        }
+        return true;
     }
     
 }

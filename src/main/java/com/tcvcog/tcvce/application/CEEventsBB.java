@@ -168,9 +168,6 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     }
 
    
-    
-
-   
     /**
      * @return the eventTypesList
      */

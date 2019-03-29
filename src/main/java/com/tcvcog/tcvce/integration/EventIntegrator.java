@@ -66,7 +66,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        EventCategory ec = new EventCategory();
+        EventCategory ec = null;
 
         try {
 
@@ -92,7 +92,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ec;
     }
 
-    public EventCategory generateEventCategoryFromRS(ResultSet rs) throws SQLException, IntegrationException {
+    private EventCategory generateEventCategoryFromRS(ResultSet rs) throws SQLException, IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         EventCategory ec = new EventCategory();
         ec.setCategoryID(rs.getInt("categoryid"));
@@ -386,8 +386,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
             
-            if(event.getRequestedEventCategory() != null){
-                stmt.setInt(14, event.getRequestedEventCategory().getCategoryID());
+            if(event.getActionEventCat()!= null){
+                stmt.setInt(14, event.getActionEventCat().getCategoryID());
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
@@ -413,7 +413,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
         // now connect people to event that has already been logged
-        ArrayList<Person> al = event.getEventPersons();
+        List<Person> al = event.getPersonList();
         event.setEventID(insertedEventID);
 
         if (al != null) {
@@ -453,13 +453,18 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void editEvent(EventCECase event) throws IntegrationException {
-        String query = "UPDATE public.ceevent\n"
-                + "   SET ceeventcategory_catid=?, cecase_caseid=?, dateofrecord=?, \n"
-                + "       eventdescription=?, owner_userid=?, disclosetomunicipality=?, \n"
-                + "       disclosetopublic=?, activeevent=?, \n"
-                + "       hidden=?, notes=?\n"
-                + " WHERE eventid = ?;";
+    public void updateEvent(EventCECase event) throws IntegrationException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.ceevent ");
+        sb.append("   SET ceeventcategory_catid=?, cecase_caseid=?, dateofrecord=?, ");
+        sb.append("       eventdescription=?, owner_userid=?, disclosetomunicipality=?, ");
+        sb.append("       disclosetopublic=?, activeevent=?, ");
+        sb.append("       hidden=?, notes=? ");
+        
+        if(event.getActionEventCat()!= null){
+            sb.append(", requestedeventcat_catid=?, actionrequestedby_userid=?, directrequesttodefaultmuniceo=?, responderintended_userid=?  ");
+        }
+        sb.append(" WHERE eventid = ?;");
 
         // TO DO: finish clearing view confirmation
         Connection con = getPostgresCon();
@@ -467,7 +472,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
 
-            stmt = con.prepareStatement(query);
+            stmt = con.prepareStatement(sb.toString());
             stmt.setInt(1, event.getCategory().getCategoryID());
             stmt.setInt(2, event.getCaseID());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(event.getDateOfRecord()));
@@ -481,8 +486,24 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(8, event.isActive());
             stmt.setBoolean(9, event.isHidden());
             stmt.setString(10, event.getNotes());
-            stmt.setInt(11, event.getEventID());
+            int paramCounter = 10;
+        if(event.getActionEventCat()!= null){
+            System.out.println("EventIntegrator.updateEvent: found event category to update");
+            stmt.setInt(++paramCounter, event.getActionEventCat().getCategoryID());
+            stmt.setInt(++paramCounter, event.getActionRequestedBy().getUserID());
+            stmt.setBoolean(++paramCounter, event.isDirectRequestToDefaultMuniCEO());
+            User u = event.getResponderIntended();
+            if(u != null){
+                stmt.setInt(++paramCounter, event.getResponderIntended().getUserID());
+            } else {
+                stmt.setNull(++paramCounter, java.sql.Types.NULL);
+            }
+            
+        }
+            stmt.setInt(++paramCounter, event.getEventID());
+            
             stmt.executeUpdate();
+            System.out.println("EventIntegrator.updateEvent: executed event updated on ID " + event.getEventID());
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -532,9 +553,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      */
     private EventCECase generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException {
-        EventCECase ev;
-            ev = new EventCECase();
+        EventCECase ev = new EventCECase();
         UserIntegrator ui = getUserIntegrator();
+        
 
         ev.setEventID(rs.getInt("eventid"));
         ev.setCategory(getEventCategory(rs.getInt("ceeventCategory_catID")));
@@ -557,6 +578,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         ev.setHidden(rs.getBoolean("hidden"));
         ev.setNotes(rs.getString("notes"));
+        System.out.println("EventIntegrator.generateEvent | reqeventcatid: " + rs.getInt("requestedeventcat_catid"));
+        
+        ev.setActionEventCat(getEventCategory(rs.getInt("requestedeventcat_catid")));
         
         ev.setDirectRequestToDefaultMuniCEO(rs.getBoolean("directrequesttodefaultmuniceo"));
         
@@ -661,6 +685,26 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
         return ev;
+    }
+    
+    /**
+     * Convenience method for extracting the case-dependent events from their
+     * Wrapper bundle for use by the CaseManager page who just needs simple events
+     * for each case.
+     * The Params are passed through to the queryEvents method and the results
+     * are iterated over for object extraction and building a new list.
+     * 
+     * @param params
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventCECase> queryCaseDependentEvents(SearchParamsCEEvents params) throws IntegrationException{
+        List<EventCasePropBundle> wrappedEventList = queryEvents(params);
+        List<EventCECase> depList = new ArrayList<>();
+        for(EventCasePropBundle ec: wrappedEventList){
+            depList.add(ec.getEvent());
+        }
+        return depList;
     }
 
   
@@ -1092,7 +1136,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return ec.configureRetrievedEvent(ev);    }
+        return ec.configureRetrievedEvent(ev);    
+    }
 
     public ArrayList<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException {
         ArrayList<EventCECase> eventList = new ArrayList();

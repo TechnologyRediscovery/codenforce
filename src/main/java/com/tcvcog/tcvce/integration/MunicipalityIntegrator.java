@@ -210,7 +210,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, muniCode);
-            rs = stmt.executeQuery(query);
+            rs = stmt.executeQuery();
             while(rs.next()){
                 u = ui.getUser(rs.getInt("defaultcodeofficeruser"));
             }

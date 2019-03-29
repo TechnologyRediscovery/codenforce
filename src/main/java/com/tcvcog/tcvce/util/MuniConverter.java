@@ -29,7 +29,7 @@ import javax.faces.convert.FacesConverter;
  * and object types
  * @author echocharliedelta
  */
-@FacesConverter(forClass=Municipality.class, value="muniConverter")
+@FacesConverter(value="muniConverter")
 public class MuniConverter extends EntityConverter implements Converter {
     
      @Override

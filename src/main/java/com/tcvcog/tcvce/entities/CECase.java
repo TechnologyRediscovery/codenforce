@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class CECase extends CECaseNoLists{
     
     private List<CodeViolation> violationList;
     private List<EventCECase> eventList;
+    private List<EventCECase> eventListActionRequests;
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
     private List<CEActionRequest> requestList;
@@ -62,6 +64,8 @@ public class CECase extends CECaseNoLists{
      * @return the eventList
      */
     public List<EventCECase> getEventList() {
+        
+        
         return eventList;
     }
 
@@ -117,6 +121,21 @@ public class CECase extends CECaseNoLists{
         this.requestList = requestList;
     }
 
+    /**
+     * @return the eventListActionRequests
+     */
+    public List<EventCECase> getEventListActionRequests() {
+        
+        
+        return eventListActionRequests;
+    }
+
+    /**
+     * @param eventListActionRequests the eventListActionRequests to set
+     */
+    public void setEventListActionRequests(List<EventCECase> eventListActionRequests) {
+        this.eventListActionRequests = eventListActionRequests;
+    }
 
   
     
