@@ -73,6 +73,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     }
     
+    public CECase configureCECase(CECase c){
+        List<EventCECase> evList = new ArrayList();
+        // transfer any events with requests to a separate list for display at
+        // the head of the case profile
+        if(c.getEventList() !=  null && c.getEventList().size() >= 1){
+            for(EventCECase ev: c.getEventList()){
+                if(ev.getActionEventCat()!= null && !ev.isResponseComplete()){
+                    System.out.println("CaseCoordinator.configureCECase: adding event ID: " + ev.getEventID());
+                    System.out.println("CaseCoordinator.configureCECase: adding event ID: " + ev.getActionEventCat().getEventCategoryDesc());
+                    evList.add(ev);
+                }
+            }
+        }
+        c.setEventListActionRequests(evList);
+        return c;
+    }
+    
+    
     /**
      * The temporarily hard-coded values for default search parameters for various
      * types of search Param objects
@@ -317,28 +335,34 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the case to which the event should be added
      * @param e the event to add to the case also included in this call
+     * @return 
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public void attachNewEvent(CECase c, EventCECase e) 
+    public int attachNewEvent(CECase c, EventCECase e) 
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
-         
+        EventIntegrator ei = getEventIntegrator();
+        int insertedEventID = 0;
         
         switch(eventType){
             case Action:
-                processActionEvent(c, e);
+                insertedEventID = ei.insertEvent(e);
+                checkForAndCarryOutCasePhaseChange(c, e);
                 break;
             case Compliance:
                 // deprecated--directly call attachNewComplianceEvent instead
                 break;
             case Closing:
-                processClosingEvent(c, e);
+                insertedEventID = processClosingEvent(c, e);
                 break;
             default:
-                processGeneralEvent(c, e);
+                e.setCaseID(c.getCaseID());
+                insertedEventID = ei.insertEvent(e);
+                
         } // close switch
+        return insertedEventID;
     } // close method
    
     /**
@@ -467,7 +491,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
      
-    private void processClosingEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException{
+    private int processClosingEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
         
@@ -485,31 +509,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
-        ei.insertEvent(e);
+        return ei.insertEvent(e);
         
     }
     
     
     
     
-    /**
-     * Main controller method for event-related life cycle events. Requires event to be
-     * loaded up with a caseID and an eventType. No eventID is required since it
-     * has not yet been logged into the db.
-     * @param c code enforcement case
-     * @param e event to process
-     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
-     * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     */
-    private void processActionEvent(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException, ViolationException{
-        
-        EventCoordinator ec = getEventCoordinator();
-        // insert the triggering action event
-        attachNewEvent(c, e);
-        //then pass event to check for phase changes
-        checkForAndCarryOutCasePhaseChange(c, e);
-        refreshCase(c);
-    }
+   
     
     private void checkForAndCarryOutCasePhaseChange(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException, ViolationException{
         
@@ -573,7 +580,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 
         } 
         
-        refreshCase(c);
+      
         
     }
     
@@ -591,8 +598,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     private void processGeneralEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException, ViolationException{
         EventCoordinator ec = getEventCoordinator();
         attachNewEvent(c, e);
-        refreshCase(c);
-        
+       
     }
     
     /**
@@ -721,11 +727,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         ArrayList<Person> al = new ArrayList();
         al.add(nov.getRecipient());
-        noticeEvent.setEventPersons(al);
+        noticeEvent.setPersonList(al);
         
         attachNewEvent(c, noticeEvent);
         
-        refreshCase(c);
         
     }
     

@@ -948,17 +948,17 @@ div.checkBoxLabel{
     margin-bottom: 10px;
 }
 
-.viewconf-status{
+.requested-action-status {
     font-size: 1.3em;
     font-weight: bold;
 }
 
-.conf-needed{
+.action-needed{
     color:red;
     
 }
 
-.conf-received{
+.action-complete{
     color:blue;
 }
 

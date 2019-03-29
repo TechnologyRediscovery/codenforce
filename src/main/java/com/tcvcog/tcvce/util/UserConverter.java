@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.tcvcog.tcvce.util;
 
 import com.tcvcog.tcvce.entities.User;
@@ -29,32 +28,35 @@ import javax.faces.convert.FacesConverter;
  */
 @FacesConverter(value="userConverter")
 public class UserConverter extends EntityConverter implements Converter {
-    
+
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        if(titleS.isEmpty()) {
-            return null; 
+        if (titleS.isEmpty()) {
+            return null;
         }
         User o = (User) this.getViewMap(fc).get(titleS);
+        
+        System.out.println("UserConverter.getAsObject; retrieved: " + o.getUsername());
         return o;
     }
-    
-        @Override
+
+    @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        
-        if (o == null){
+
+        if (o == null) {
             return "";
         }
-        
+
         User u = (User) o;
-        String userID = Integer.toString(u.getUserID());            
-        if (userID != null){
-            this.getViewMap(fc).put(userID,o);
+        String userID = u.getUsername();
+        if (userID != null) {
+            System.out.println("UserConverter.getAsString: Putting in String: " + userID);
+            this.getViewMap(fc).put(userID, o);
             return userID;
-            
+
         } else {
-            return "muni error";
+            return "user converter error";
         }
 
-        }
+    }
 }

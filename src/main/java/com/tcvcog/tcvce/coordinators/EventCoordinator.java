@@ -105,24 +105,22 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
         
-        if(ev.getRequestedEventCategory() != null){
-            ev.setRequestsAction(true);
-        }
+       
 
-        if(ev.isRequestsAction()){
+        if(ev.getActionEventCat()!= null){
             if(ev.isDirectRequestToDefaultMuniCEO()){
                     ev.setResponderIntended(ci.getDefaultCodeOfficer(ev.getCaseID()));
-            }
-            if(ev.getResponseTimestamp() != null){
-                ev.setRequestClosed(true);
             }
             // as long as any exiting action request is complete and it was not
             // rejected (i.e. no event created in response to the request)
             // go get the triggering event
-            if(ev.isRequestClosed() && !ev.isRequestRejected()){
+            if(ev.isResponseComplete() && !ev.isRequestRejected()){
                 ev.setTriggeringEvent(ei.getActionTriggeringEvent(ev));
             }
         }
+        
+        ev.setPersonList(new ArrayList<Person>());
+        
         return ev;
     }
     
@@ -309,7 +307,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public void editEvent(EventCECase evcase, User u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.editEvent(evcase);
+        System.out.println("EventCoordinator.editEvent");
+        ei.updateEvent(evcase);
     }
     
     

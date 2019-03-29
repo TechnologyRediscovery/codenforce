@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -45,7 +46,7 @@ import javax.faces.event.ActionEvent;
 
 public class UserBB extends BackingBeanUtils implements Serializable {
 
-    private ArrayList<User> userList;
+    private List<User> userList;
     private User currentUser;
 
 //    @ManagedProperty(value="#{sessionBean}")
@@ -137,7 +138,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the userList
      */
-    public ArrayList<User> getUserList() {
+    public List<User> getUserList() {
         UserIntegrator ui = getUserIntegrator();
         try {
             userList = ui.getCompleteActiveUserList();
