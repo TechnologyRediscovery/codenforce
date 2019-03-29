@@ -459,7 +459,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return cc.configureCECase(c);
+        return cc.configureCECaseEventLists(c);
     }
     
     public CECase generateCECase(CECaseNoLists caseBare) throws SQLException, IntegrationException{

@@ -205,6 +205,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public EventCECase getInitializedEvent(CECase c, EventCategory ec) throws CaseLifecyleException{
         
+        System.out.println("EventCoordinator.getInitializedEvent: caseid " + c.getCaseID() + " ec: " + ec.getEventCategoryTitle());
         // check to make sure the case isn't closed before allowing event into the switched blocks
         if(c.getCasePhase() == CasePhase.Closed && 
                 (
@@ -397,13 +398,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
    
     
-    public void logEventResponse(EventCECase event) throws IntegrationException{
-        EventIntegrator ei = getEventIntegrator();
-        ei.logResponseToActionRequest(event);
-        
-    }
-    
-    
     
     
     
@@ -448,7 +442,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setOwner(getFacesUser());
         event.setActive(true);
         
-        cc.attachNewEvent(currentCase, event);
+        cc.attachNewEventToCECase(currentCase, event, null);
         
         getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -491,7 +485,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setOwner(getFacesUser());
         event.setActive(true);
         
-        cc.attachNewEvent(currentCase, event);
+        cc.attachNewEventToCECase(currentCase, event, null);
         
         getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO, 

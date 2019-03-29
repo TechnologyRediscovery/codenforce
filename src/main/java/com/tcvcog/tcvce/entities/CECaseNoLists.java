@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  *
@@ -331,5 +332,48 @@ public class CECaseNoLists extends EntityUtils implements Serializable {
     public void setIcon(Icon icon) {
         this.icon = icon;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + this.caseID;
+        hash = 53 * hash + this.publicControlCode;
+        hash = 53 * hash + (this.paccEnabled ? 1 : 0);
+        hash = 53 * hash + (this.allowForwardLinkedPublicAccess ? 1 : 0);
+        hash = 53 * hash + Objects.hashCode(this.property);
+        hash = 53 * hash + Objects.hashCode(this.propertyUnit);
+        hash = 53 * hash + Objects.hashCode(this.caseManager);
+        hash = 53 * hash + Objects.hashCode(this.caseName);
+        hash = 53 * hash + Objects.hashCode(this.casePhase);
+        hash = 53 * hash + Objects.hashCode(this.caseStage);
+        hash = 53 * hash + Objects.hashCode(this.icon);
+        hash = 53 * hash + Objects.hashCode(this.originationDate);
+        hash = 53 * hash + Objects.hashCode(this.originiationDatePretty);
+        hash = 53 * hash + Objects.hashCode(this.closingDate);
+        hash = 53 * hash + Objects.hashCode(this.closingDatePretty);
+        hash = 53 * hash + Objects.hashCode(this.creationTimestamp);
+        hash = 53 * hash + Objects.hashCode(this.notes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CECaseNoLists other = (CECaseNoLists) obj;
+        if (this.caseID != other.caseID) {
+            return false;
+        }
+        return true;
+    }
+    
+    
     
 }

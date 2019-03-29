@@ -53,6 +53,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     private LocalDateTime complianceTimeStamp;
     private User complianceUser;
     private EventCECase compTimeFrameComplianceEvent;
+    private int timeframeEventID;
     
     
     
@@ -444,6 +445,20 @@ public class CodeViolation extends EntityUtils implements Serializable{
      */
     public void setCompTimeFrameComplianceEvent(EventCECase compTimeFrameComplianceEvent) {
         this.compTimeFrameComplianceEvent = compTimeFrameComplianceEvent;
+    }
+
+    /**
+     * @return the timeframeEventID
+     */
+    public int getTimeframeEventID() {
+        return timeframeEventID;
+    }
+
+    /**
+     * @param timeframeEventID the timeframeEventID to set
+     */
+    public void setTimeframeEventID(int timeframeEventID) {
+        this.timeframeEventID = timeframeEventID;
     }
 
    

@@ -36,7 +36,6 @@ public class UserConverter extends EntityConverter implements Converter {
         }
         User o = (User) this.getViewMap(fc).get(titleS);
         
-        System.out.println("UserConverter.getAsObject; retrieved: " + o.getUsername());
         return o;
     }
 
@@ -50,7 +49,6 @@ public class UserConverter extends EntityConverter implements Converter {
         User u = (User) o;
         String userID = u.getUsername();
         if (userID != null) {
-            System.out.println("UserConverter.getAsString: Putting in String: " + userID);
             this.getViewMap(fc).put(userID, o);
             return userID;
 

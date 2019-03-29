@@ -48,7 +48,7 @@ public class Event extends EntityUtils implements Serializable {
     /*Case event requests fields */
     
     // utility memvar which is true if there's a requested
-    // event category in requestedEventCategory
+    // event category in actionRequestCateogry
     private boolean requestsAction;
     
     // computed based on the business logic for
@@ -82,6 +82,8 @@ public class Event extends EntityUtils implements Serializable {
     private boolean requestRejected;
     
     private List<Person> personList;
+    
+    private long daysUntilDue;
 
     /**
      * @return the eventID
@@ -509,6 +511,22 @@ public class Event extends EntityUtils implements Serializable {
      */
     public void setActionEventCat(EventCategory actionEventCat) {
         this.actionEventCat = actionEventCat;
+    }
+
+    /**
+     * @return the daysUntilDue
+     */
+    public long getDaysUntilDue() {
+        long d = getTimePeriodAsDays(LocalDateTime.now(), dateOfRecord);
+        daysUntilDue = d;
+        return daysUntilDue;
+    }
+
+    /**
+     * @param daysUntilDue the daysUntilDue to set
+     */
+    public void setDaysUntilDue(long daysUntilDue) {
+        this.daysUntilDue = daysUntilDue;
     }
 
    

@@ -86,12 +86,13 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         CaseCoordinator cc = getCaseCoordinator();
         EventCECase tfEvent;
         int violationStoredDBKey;
+        int eventID;
         StringBuilder sb = new StringBuilder();
         
-//        EventCategory eventCat = ec.getInitiatlizedEventCategory(
-//                                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
-//                                .getString("complianceTimeframeExpiry")));
-        EventCategory eventCat = ec.getInitiatlizedEventCategory(113);
+        EventCategory eventCat = ec.getInitiatlizedEventCategory(
+                                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+                                .getString("complianceTimeframeExpiry")));
+//        EventCategory eventCat = ec.getInitiatlizedEventCategory(113);
         tfEvent = ec.getInitializedEvent(c, eventCat);
         tfEvent.setDateOfRecord(v.getStipulatedComplianceDate());
         tfEvent.setOwner(c.getCaseManager());
@@ -110,8 +111,9 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         tfEvent.setDescription(sb.toString());
         
         if(verifyCodeViolationAttributes(v)){
+            eventID = cc.attachNewEventToCECase(c, tfEvent, v);
+            v.setTimeframeEventID(eventID);
             violationStoredDBKey = vi.insertCodeViolation(v);
-            cc.attachNewEvent(c, tfEvent);
         } else {
             throw new ViolationException("Failed violation verification");
         }
@@ -141,7 +143,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
      * CodeViolation should have the actual compliance date set from the user's 
      * event date of record
      * @param cv
-     * @param u the user carrying out the compliance certification
+     * @param u
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public void recordCompliance(CodeViolation cv, User u) throws IntegrationException{
@@ -154,7 +156,9 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         cvi.recordCompliance(cv);
                 
         // inactivate timeframe expiry event
-        ei.inactivateEvent(cv.getCompTimeFrameComplianceEvent().getEventID());
+        if(cv.getCompTimeFrameComplianceEvent() != null){
+            ei.inactivateEvent(cv.getCompTimeFrameComplianceEvent().getEventID());
+        }
         
     }
     

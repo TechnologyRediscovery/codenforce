@@ -58,7 +58,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
                 + "            complianceuser, compliancetfevent)"
                 + "    VALUES (DEFAULT, ?, ?,"
                 + "             ?, now(), ?,"
-                + "            NULL, ?, ?, ?, ?, NULL, NULL, NULL );";
+                + "            NULL, ?, ?, ?, ?, NULL, NULL, ? );";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -78,6 +78,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString(6, v.getDescription());
             stmt.setString(7, v.getNotes());
             stmt.setBoolean(8, v.isLeagacyImport());
+            stmt.setInt(9, v.getCompTimeFrameComplianceEvent());
 
             stmt.execute();
             
@@ -339,7 +340,11 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString((7), v.getDescription());
             stmt.setString(8, v.getNotes());
             stmt.setInt(9, v.getViolationID());
-            stmt.setInt(10, v.getCompTimeFrameComplianceEvent().getEventID());
+            if(v.getCompTimeFrameComplianceEvent() != null){
+                stmt.setInt(10, v.getCompTimeFrameComplianceEvent().getEventID());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
 
             System.out.println("CodeViolationIntegrator.updateViolation | stmt: " + stmt.toString());
 
