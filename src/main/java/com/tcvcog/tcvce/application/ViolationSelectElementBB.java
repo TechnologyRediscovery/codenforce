@@ -50,7 +50,7 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
         ViolationCoordinator vc = getViolationCoordinator();
         CodeViolation cv;
         if (selectedViolatedEnfElement != null && getSessionBean() != null) {
-             cv = vc.generateNewCodeViolation(getSessionBean().getcECase(), 
+             cv = vc.generateNewCodeViolation(getSessionBean().getcECaseQueue().get(0),
                     selectedViolatedEnfElement);
             getSessionBean().setActiveCodeViolation(cv);
 //            System.out.println("ViolationSelectElementBB.useSelectedElement | Selected Enf Element: "

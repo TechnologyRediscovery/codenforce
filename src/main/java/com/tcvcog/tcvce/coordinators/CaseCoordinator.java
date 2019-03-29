@@ -73,20 +73,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     }
     
-    public CECase configureCECase(CECase c){
+    public CECase configureCECaseEventLists(CECase c){
         List<EventCECase> evList = new ArrayList();
         // transfer any events with requests to a separate list for display at
         // the head of the case profile
         if(c.getEventList() !=  null && c.getEventList().size() >= 1){
             for(EventCECase ev: c.getEventList()){
                 if(ev.getActionEventCat()!= null && !ev.isResponseComplete()){
-                    System.out.println("CaseCoordinator.configureCECase: adding event ID: " + ev.getEventID());
-                    System.out.println("CaseCoordinator.configureCECase: adding event ID: " + ev.getActionEventCat().getEventCategoryDesc());
                     evList.add(ev);
                 }
             }
         }
         c.setEventListActionRequests(evList);
+        System.out.println("CaseCoordinator.configureCECaseEventList: set list of size: " + evList.size() 
+                + " on case ID " + c.getCaseID());
         return c;
     }
     
@@ -267,7 +267,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationEvent.setOwner(u);
             originationEvent.setCaseID(insertedCase.getCaseID());
             originationEvent.setDateOfRecord(LocalDateTime.now());
-            attachNewEvent(newCase, originationEvent);
+            attachNewEventToCECase(newCase, originationEvent, null);
     }
     
     /**
@@ -335,29 +335,42 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the case to which the event should be added
      * @param e the event to add to the case also included in this call
+     * @param viol
      * @return 
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public int attachNewEvent(CECase c, EventCECase e) 
+    public int attachNewEventToCECase(CECase c, EventCECase e, CodeViolation viol) 
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
         EventIntegrator ei = getEventIntegrator();
+        ViolationCoordinator vc = getViolationCoordinator();
         int insertedEventID = 0;
         
         switch(eventType){
             case Action:
+                System.out.println("CaseCoordinator.attachNewEventToCECase: action case");
                 insertedEventID = ei.insertEvent(e);
                 checkForAndCarryOutCasePhaseChange(c, e);
                 break;
             case Compliance:
-                // deprecated--directly call attachNewComplianceEvent instead
+                if(viol != null){
+                    System.out.println("CaseCoordinator.attachNewEventToCECase: compliance inside if");
+                    viol.setActualComplianceDate(e.getDateOfRecord());
+                    vc.recordCompliance(viol);
+                    insertedEventID = ei.insertEvent(e);
+                    checkForFullComplianceAndCloseCaseIfTriggered(c);
+                } else {
+                    throw new CaseLifecyleException("no violation was included with this event");
+                }
                 break;
             case Closing:
+                System.out.println("CaseCoordinator.attachNewEventToCECase: closing case");
                 insertedEventID = processClosingEvent(c, e);
                 break;
             default:
+                System.out.println("CaseCoordinator.attachNewEventToCECase: default case");
                 e.setCaseID(c.getCaseID());
                 insertedEventID = ei.insertEvent(e);
                 
@@ -384,16 +397,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             throws ViolationException, IntegrationException, CaseLifecyleException{
         
         
-        ViolationCoordinator vc = getViolationCoordinator();
-        EventCoordinator ec = getEventCoordinator();
-        
-            viol.setActualComplianceDate(e.getDateOfRecord());
-            vc.updateCodeViolation(viol);
-        
-        // first insert our nice compliance event for all selected violations
-        attachNewEvent(c, e);
-        // then look at the whole case and close if necessary
-        checkForFullComplianceAndCloseCaseIfTriggered(c);
         
         
     } // close method
@@ -484,7 +487,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                    
             complianceClosingEvent = ec.getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
-            attachNewEvent(c, complianceClosingEvent);
+            attachNewEventToCECase(c, complianceClosingEvent, null);
             
         } // close if
         
@@ -584,22 +587,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
-    /**
-     * A catch-the-rest method that simple adds the event to the case without
-     * any additional logic or processing. Called by the default case in the
-     * event delegator's switch method. Passes the duty of calling the integrator
-     * to the insertEvent on the EventCoordinator
-     * @param c the case to which the event should be attached
-     * @param e the event to be attached
-     * @throws IntegrationException thrown if the integrator cannot get the data
-     * into the DB
-     */
-    private void processGeneralEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException, ViolationException{
-        EventCoordinator ec = getEventCoordinator();
-        attachNewEvent(c, e);
-       
-    }
     
     /**
      * Utility method for determining which CasePhase follows any given case's CasePhase. 
@@ -729,7 +716,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         al.add(nov.getRecipient());
         noticeEvent.setPersonList(al);
         
-        attachNewEvent(c, noticeEvent);
+        attachNewEventToCECase(c, noticeEvent, null);
         
         
     }

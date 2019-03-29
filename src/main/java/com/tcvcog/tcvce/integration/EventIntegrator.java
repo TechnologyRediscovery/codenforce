@@ -1081,8 +1081,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setString(1, ev.getResponderNotes());
             stmt.setBoolean(2, ev.isRequestRejected());
-            int responseEventID = ev.getResponseEvent().getEventID();
-            if(responseEventID != 0){
+            int responseEventID;
+            if(ev.getResponseEvent() != null){
+                responseEventID = ev.getResponseEvent().getEventID();
                 stmt.setInt(3, responseEventID);
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);

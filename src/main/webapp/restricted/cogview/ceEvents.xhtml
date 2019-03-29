@@ -636,7 +636,7 @@
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Requested event: "/>
                                                             <div class="rowExpansion">
-                                                                <h:outputText value="#{e.event.requestedEventCategory.eventType.label}: #{e.event.requestedEventCategory.eventCategoryTitle}"/>
+                                                                <h:outputText value="#{e.event.actionEventCat.eventType.label}: #{e.event.actionEventCat.eventCategoryTitle}"/>
                                                             </div>
                                                         </h:panelGroup>
 
@@ -750,7 +750,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Type" />
                                             </f:facet>
-                                            <h:outputText value="#{e.event.category.eventType.event.label}"/>
+                                            <h:outputText value="#{e.event.category.eventType.label}"/>
                                         </p:column>
 
                                         <p:column width="10%" sortBy="#{e.event.category.eventCategoryTitle}"
