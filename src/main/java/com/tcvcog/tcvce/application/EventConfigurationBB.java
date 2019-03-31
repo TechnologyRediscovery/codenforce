@@ -20,11 +20,15 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -37,12 +41,14 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
 
     private EventCategory selectedEventCategory;
     private ArrayList<EventCategory> eventCategoryList;
+    private List<Icon> iconList;
      
     private EventType[] eventTypeList;
     
     private EventType formEventType;
     private String formEventCategoryTitle;
     private String formEventCategoryDescr;
+    private Icon formCatIcon;
     
     private boolean formUserdeployable;
     private boolean formMunideployable;
@@ -52,9 +58,11 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     private boolean formCasephasechangetrigger;
     private boolean formHidable;
     
+    
     private EventType newFormSelectedEventType;
     private String newFormEventCategoryTitle;
     private String newFormEventCategoryDescr;
+    private Icon newFormCatIcon;
     
     private boolean newFormUserdeployable;
     private boolean newFormMunideployable;
@@ -64,7 +72,18 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     private boolean newFormCasephasechangetrigger;
     private boolean newFormHidable;
     
+    
     public EventConfigurationBB() {
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        SystemIntegrator si = getSystemIntegrator();
+        try {
+            iconList = si.getIconList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
     
   
@@ -74,6 +93,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
             setFormEventType(getSelectedEventCategory().getEventType());
             setFormEventCategoryTitle(getSelectedEventCategory().getEventCategoryTitle());
             setFormEventCategoryDescr(getSelectedEventCategory().getEventCategoryDesc());
+            setFormCatIcon(selectedEventCategory.getIcon());
             
             setFormUserdeployable(selectedEventCategory.isUserdeployable());
             setFormMunideployable(selectedEventCategory.isMunideployable());
@@ -98,6 +118,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
        ec.setEventType(getFormEventType());
        ec.setEventCategoryTitle(getFormEventCategoryTitle());
        ec.setEventCategoryDesc(getFormEventCategoryDescr());
+       ec.setIcon(formCatIcon);
        
         ec.setUserdeployable(formUserdeployable);
         ec.setMunideployable(formMunideployable);
@@ -129,6 +150,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
         ec.setEventType(getNewFormSelectedEventType());
         ec.setEventCategoryTitle(getNewFormEventCategoryTitle());
         ec.setEventCategoryDesc(getNewFormEventCategoryDescr());
+        ec.setIcon(newFormCatIcon);
         
         ec.setUserdeployable(newFormUserdeployable);
         ec.setMunideployable(newFormMunideployable);
@@ -518,6 +540,48 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
      */
     public void setNewFormHidable(boolean newFormHidable) {
         this.newFormHidable = newFormHidable;
+    }
+
+    /**
+     * @return the formCatIcon
+     */
+    public Icon getFormCatIcon() {
+        return formCatIcon;
+    }
+
+    /**
+     * @param formCatIcon the formCatIcon to set
+     */
+    public void setFormCatIcon(Icon formCatIcon) {
+        this.formCatIcon = formCatIcon;
+    }
+
+    /**
+     * @return the newFormCatIcon
+     */
+    public Icon getNewFormCatIcon() {
+        return newFormCatIcon;
+    }
+
+    /**
+     * @param newFormCatIcon the newFormCatIcon to set
+     */
+    public void setNewFormCatIcon(Icon newFormCatIcon) {
+        this.newFormCatIcon = newFormCatIcon;
+    }
+
+    /**
+     * @return the iconList
+     */
+    public List<Icon> getIconList() {
+        return iconList;
+    }
+
+    /**
+     * @param iconList the iconList to set
+     */
+    public void setIconList(List<Icon> iconList) {
+        this.iconList = iconList;
     }
     
 }

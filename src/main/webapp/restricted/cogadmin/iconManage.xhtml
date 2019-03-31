@@ -27,7 +27,7 @@
                             <p:commandButton ajax="true" value="Add New Icon" icon="fa fa-plus" 
                                              actionListener="#{iconBB.createNewIcon}"
                                              oncomplete="PF('icon-addupdate-dialog').show()"
-                                             rendered="#{sessionBean.sessionUser.keyCard.hasSysAdminPermissions}"
+                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
                                              update="icon-add-update-form"/>
                             
                             <p:spacer height="15px"/>
@@ -98,7 +98,7 @@
                     <p:dialog      height="650" width="800"
                                    widgetVar="user-info-dialog"
                                    closable="true" 
-                                   rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}">
+                                   rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
                         
 
                     </p:dialog>
@@ -108,7 +108,7 @@
                     <p:dialog   height="750" width="1000"
                                 widgetVar="icon-addupdate-dialog"
                                 closable="true" 
-                                rendered="#{sessionBsessionUserUser.keyCard.hasSysAdminPermissions}">
+                                rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}">
                         <h:form id="icon-add-update-form">
                             
                             <h2>Add/update icon</h2>

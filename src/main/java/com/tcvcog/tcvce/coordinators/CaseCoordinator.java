@@ -73,6 +73,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     }
     
+    /**
+     * Called at the very end of the CECase creation process by the CaseIntegrator
+     * and simply checks for events that have a required eventcategory attached
+     * and places a copy of the event in the Case's member variable.
+     * 
+     * This means that every time we refresh the case, the list is automatically
+     * updated.
+     * 
+     * DESIGN NOTE: A competing possible location for this method would be on the
+     * CECase object itself--in its getEventListActionRequest method
+     * 
+     * @param c the CECase with a populated set of Events
+     * @return the CECase with the action request list ready to roll
+     */
     public CECase configureCECaseEventLists(CECase c){
         List<EventCECase> evList = new ArrayList();
         // transfer any events with requests to a separate list for display at
@@ -345,7 +359,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
         EventIntegrator ei = getEventIntegrator();
-        ViolationCoordinator vc = getViolationCoordinator();
         int insertedEventID = 0;
         
         switch(eventType){
@@ -358,7 +371,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 if(viol != null){
                     System.out.println("CaseCoordinator.attachNewEventToCECase: compliance inside if");
                     viol.setActualComplianceDate(e.getDateOfRecord());
-                    vc.recordCompliance(viol);
                     insertedEventID = ei.insertEvent(e);
                     checkForFullComplianceAndCloseCaseIfTriggered(c);
                 } else {
@@ -373,7 +385,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 System.out.println("CaseCoordinator.attachNewEventToCECase: default case");
                 e.setCaseID(c.getCaseID());
                 insertedEventID = ei.insertEvent(e);
-                
         } // close switch
         return insertedEventID;
     } // close method

@@ -28,6 +28,15 @@ public class CECase extends CECaseNoLists{
         
     }
 
+    /**
+     * Constructor used to create an instance of this object with a
+     * CECase without any lists. Transfers the member variables
+     * from the incoming object to this sublcass
+     * 
+     * ** CONSTRUCTORS ARE NOT INHERITED!
+     * 
+     * @param cnl 
+     */
     public CECase(CECaseNoLists cnl){
         this.caseID = cnl.caseID;
         this.publicControlCode = cnl.publicControlCode;
@@ -56,7 +65,7 @@ public class CECase extends CECaseNoLists{
     /**
      * @param violationList the violationList to set
      */
-    public void setViolationList(ArrayList<CodeViolation> violationList) {
+    public void setViolationList(List<CodeViolation> violationList) {
         this.violationList = violationList;
     }
 
@@ -72,7 +81,7 @@ public class CECase extends CECaseNoLists{
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(ArrayList<EventCECase> eventList) {
+    public void setEventList(List<EventCECase> eventList) {
         this.eventList = eventList;
     }
 

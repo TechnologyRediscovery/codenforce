@@ -61,7 +61,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n"
                 + "       munideployable, publicdeployable, notifycasemonitors, \n"
-                + "       casephasechangetrigger, hidable, icon_iconid"
+                + "       casephasechangetrigger, hidable, icon_iconid, requestable"
                 + "  FROM public.ceeventcategory WHERE categoryID = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -107,6 +107,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ec.setCasephasechangetrigger(rs.getBoolean("casephasechangetrigger"));
         ec.setHidable(rs.getBoolean("hidable"));
         ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
+        ec.setRequestable(rs.getBoolean("requestable"));
 
         return ec;
 
@@ -216,10 +217,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 + "categorytype, title, description, "
                 + "userdeployable, munideployable, publicdeployable, "
                 + "notifycasemonitors, casephasechangetrigger, "
-                + "hidable, icon_iconid )\n"
+                + "hidable, icon_iconid, requestable )\n"
                 + "    VALUES (DEFAULT, CAST (? as ceeventtype), ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?);";
+                + "            ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -239,6 +240,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             stmt.setBoolean(9, ec.isHidable());
             stmt.setInt(10, ec.getIcon().getIconid());
+            stmt.setBoolean(11, ec.isRequestable());
+            
 
             System.out.println("EventInteegrator.insertEventCategory| sql: " + stmt.toString());
             stmt.execute();
@@ -258,7 +261,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = "UPDATE public.ceeventcategory\n"
                 + "   SET categorytype=CAST (? as ceeventtype), title=?, description=?, userdeployable=?, \n"
                 + "       munideployable=?, publicdeployable=?, \n"
-                + "       notifycasemonitors=?, casephasechangetrigger=?, hidable=?, icon_iconid=? \n"
+                + "       notifycasemonitors=?, casephasechangetrigger=?, hidable=?, icon_iconid=?, requestable=? \n"
                 + " WHERE categoryid = ?;";
 
         Connection con = getPostgresCon();
@@ -283,7 +286,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
-            stmt.setInt(11, ec.getCategoryID());
+            stmt.setBoolean(11, ec.isRequestable());
+            stmt.setInt(12, ec.getCategoryID());
 
             stmt.executeUpdate();
 

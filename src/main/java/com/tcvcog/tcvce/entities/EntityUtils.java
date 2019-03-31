@@ -37,7 +37,6 @@ public class EntityUtils {
      * @return 
      */
     public long getTimePeriodAsDays(LocalDateTime from, LocalDateTime to){
-        int totalDays;
         LocalDate dStart = from.toLocalDate();
         LocalDate dEnd = to.toLocalDate();
         long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(dStart, dEnd);

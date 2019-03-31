@@ -711,6 +711,16 @@
                         <h2 id="event-history">Event history</h2>
                             
                             <h:form id="event-dt-form">
+                                
+                                <h:outputLabel value="Show hidden events: " for="events-showhidden-sbcb" />
+                                <p:selectBooleanCheckbox id="events-showhidden-sbcb" value="#{caseProfileBB.showHiddenEvents}">
+                                    <p:ajax listener="#{caseProfileBB.reloadEventList}" update="caseEventTable" />
+                                </p:selectBooleanCheckbox>
+                                
+                                <h:outputLabel value="Show inactive events: " for="events-inactive-sbcb" />
+                                <p:selectBooleanCheckbox id="events-inactive-sbcb" value="#{caseProfileBB.showInactiveEvents}">
+                                    <p:ajax listener="#{caseProfileBB.reloadEventList}" update="caseEventTable" />
+                                </p:selectBooleanCheckbox>
 
                                 <p:dataTable
                                     id="caseEventTable"
@@ -731,20 +741,25 @@
                                         <p:rowToggler/>
                                     </p:column>
 
-                                    <p:column width="4%" sortBy="#{e.eventID}">
-                                        <f:facet name="header">
-                                            <h:outputText value="ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{e.eventID}"/>
+                                    <p:column width="4%">
+                                        <i class="material-icons"><h:outputText value="#{e.category.icon.materialIcon}"/></i>
                                     </p:column>
 
                                     <p:column width="9%" sortBy="#{e.dateOfRecord}">
                                         <f:facet name="header">
                                             <h:outputText value="Date" />
                                         </f:facet>
-                                        <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                        </div>
                                     </p:column>
 
+                                        <p:column width="4%" sortBy="#{e.eventID}">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{e.eventID}"/>
+                                        </p:column>
                 <ui:remove>
                                         <p:column width="8%" sortBy="#{e.category.eventType.label}"
                                                   filterBy="#{e.category.eventType.label}">
@@ -760,7 +775,9 @@
                                         <f:facet name="header">
                                             <h:outputText value="Category" />
                                         </f:facet>
-                                        <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                        </div>
                                     </p:column>
                                     <p:column width="5%" filterBy="#{e.owner.person.lastName}"
                                               sortBy="#{e.owner.person.lastName}">
@@ -1186,23 +1203,15 @@
                                 
                                 <h2 id="citations">Citations</h2>
 
-                                <ui:remove>
-
                                     <p:commandButton ajax="false" action="#{caseProfileBB.createCitationForAllViolations}"
-                                                     value="Generate citation for all Violations"
+                                                     value="Create new citation"
+                                                     
                                                      icon="fa fa-warning"
                                                      disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>"/>
-
-                                    <p:commandButton ajax="false" action="#{caseProfileBB.createCitationFromSelected}"
-                                                     value="Generate citation for selected violations"
-                                                     icon="fa fa-warning"
-                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>/>
 
                                     <p:dataTable
                                         id="citation-table"
                                         var="citation"
-                                        selectionMode="single"
-                                        selection="#{caseProfileBB.selectedCitation}"
                                         rowKey="#{citation.citationID}"
                                         value="#{caseProfileBB.currentCase.citationList}"
                                         tableStyleClass="primeDataTable"
@@ -1270,9 +1279,8 @@
 
                                     <p:commandButton ajax="false" action="#{caseProfileBB.updateCitation}"
                                                      value="Updated selected citation"
+                                                     icon="fa fa-edit"
                                                      disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>/>
-                                </ui:remove>
-
                             </h:form>
 
                             <hr />

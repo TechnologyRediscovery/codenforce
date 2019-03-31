@@ -1349,6 +1349,15 @@
     <navigation-rule>
         <from-view-id>*</from-view-id>
         <navigation-case>
+            <from-outcome>iconManage</from-outcome>
+            <to-view-id>/restricted/cogadmin/iconManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
             <from-outcome>userMuniMapping</from-outcome>
             <to-view-id>/restricted/cogadmin/userAuthMuniManage.xhtml</to-view-id>
             <redirect />
@@ -1479,6 +1488,11 @@
     <managed-bean>
         <managed-bean-name>propertyAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyAddBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>iconBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.IconBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>
