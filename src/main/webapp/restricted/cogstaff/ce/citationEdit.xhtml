@@ -29,7 +29,7 @@
                                  <p:dataTable
                                         id="violationTable"
                                         selectionMode="none"
-                                        value="#{citationBB.violationList}"
+                                        value="#{citationBB.removedViolationList}"
                                         tableStyleClass="primeDataTable"
                                         expandedRow="false"
                                         rowExpandMode="multiple"
@@ -186,7 +186,7 @@
                                 
                             </h:panelGrid>
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" value="Issue Citation" action="#{citationBB.issueCitation}" disabled="#{citationBB.issueCitationDisabled}" />
+                            <p:commandButton ajax="false" value="Issue Citation" action="#{citationBB.insertCitation}" disabled="#{citationBB.issueCitationDisabled}" />
                             <p:commandButton ajax="false" value="Update Citation" action="#{citationBB.updateCitation}" disabled="#{citationBB.updateCitationDisabled}"/>
                             <p:commandButton ajax="false" value="Cancel and return to profile" action="caseProfile" />
                         </h:form>

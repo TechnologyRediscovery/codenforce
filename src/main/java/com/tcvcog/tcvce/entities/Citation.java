@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,8 +34,14 @@ public class Citation extends EntityUtils implements Serializable {
     private CourtEntity origin_courtentity;
     private CECaseNoLists ceCaseNoLists;
     private User userOwner;
+    
     private LocalDateTime dateOfRecord;
+    private java.util.Date dateOfRecordUtilDate;
+    private String dateOfRecordPretty;
+    
     private LocalDateTime timeStamp;
+    private String timeStampPretty;
+    
     private boolean isActive;
     private String notes;
     private List<CodeViolation> violationList;
@@ -153,7 +159,7 @@ public class Citation extends EntityUtils implements Serializable {
     /**
      * @param violationList the violationList to set
      */
-    public void setViolationList(ArrayList<CodeViolation> violationList) {
+    public void setViolationList(List<CodeViolation> violationList) {
         this.violationList = violationList;
     }
 
@@ -257,6 +263,42 @@ public class Citation extends EntityUtils implements Serializable {
      */
     public void setCeCaseNoLists(CECaseNoLists ceCaseNoLists) {
         this.ceCaseNoLists = ceCaseNoLists;
+    }
+
+    /**
+     * @return the dateOfRecordUtilDate
+     */
+    public java.util.Date getDateOfRecordUtilDate() {
+        if(dateOfRecord != null){
+            dateOfRecordUtilDate = java.util.Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return dateOfRecordUtilDate;
+    }
+
+    /**
+     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
+     */
+    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
+        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
+        if(dateOfRecordUtilDate != null){
+            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    /**
+     * @return the dateOfRecordPretty
+     */
+    public String getDateOfRecordPretty() {
+        dateOfRecordPretty = getPrettyDate(dateOfRecord);
+        return dateOfRecordPretty;
+    }
+
+    /**
+     * @return the timeStampPretty
+     */
+    public String getTimeStampPretty() {
+        timeStampPretty = getPrettyDate(timeStamp);
+        return timeStampPretty;
     }
     
     

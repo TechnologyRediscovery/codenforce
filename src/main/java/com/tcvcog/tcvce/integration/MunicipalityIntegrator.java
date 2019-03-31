@@ -105,29 +105,23 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
-    public Municipality getMuniFromMuniCode(int muniCode) throws IntegrationException{
+    public Municipality getMuni(int muniCode) throws IntegrationException{
         Municipality muni = null;
         PreparedStatement stmt = null;
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
-        String query = "SELECT municode, muniname, address_street, address_city, "
-                + "address_state, address_zip, phone, "
-                + "fax, email, managername, "
-                + "managerphone, population, activeinprogram, defaultcodeset, "
-                + "occpermitissuingsource_sourceid, defaultcodeofficeruser\n" +
-                "FROM public.municipality WHERE municode = ?;";
+        String query = "SELECT municode FROM public.municipality WHERE municode = ?;";
         ResultSet rs = null;
  
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, muniCode);
-            //System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | query: " + stmt.toString());
+            //System.out.println("MunicipalityIntegrator.getMuni | query: " + stmt.toString());
             rs = stmt.executeQuery();
             while(rs.next()){
-                muni = generateMuni(rs);
+                muni = getMuni(rs.getInt("municode"));
             }
-            
             
         } catch (SQLException ex) {
             System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
@@ -144,7 +138,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     
     public Municipality generateMuni(ResultSet rs) throws SQLException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();
+        CourtEntityIntegrator courtInt = getCourtEntityIntegrator();
+        
         Municipality muni = new Municipality();
+        
         muni.setMuniCode(rs.getInt("municode"));
         muni.setMuniName(rs.getString("muniname"));
         muni.setAddress_street(rs.getString("address_street"));
@@ -164,6 +161,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setDefaultCodeSetID(rs.getInt("defaultcodeset"));
         muni.setIssuingPermitCodeSourceID(rs.getInt("occpermitissuingsource_sourceid"));
         muni.setDefaultCodeOfficerUser(ui.getUser(rs.getInt("defaultcodeofficeruser")));
+        muni.setDefaultCourtEntity(courtInt.getCourtEntity(rs.getInt("defaultcourtentity")));
         
         return muni;
     }
@@ -237,7 +235,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "   SET muniname=?, address_street=?, address_city=?, address_state=?, \n" +
                         "       address_zip=?, phone=?, fax=?, email=?, managername=?, managerphone=?, \n" +
                         "       population=?, activeinprogram=?, defaultcodeset=?, "
-                        + "occpermitissuingsource_sourceid=?, defaultcodeofficeruser=? \n" +
+                        + "occpermitissuingsource_sourceid=?, defaultcodeofficeruser=?, defaultcourtentity=? \n" +
                         " WHERE municode=?;";
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -260,7 +258,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setInt(13, muni.getDefaultCodeSetID());
             stmt.setInt(14, muni.getIssuingPermitCodeSourceID());
             stmt.setInt(15, muni.getDefaultCodeOfficerUser().getUserID());
-            stmt.setInt(16, muni.getMuniCode());
+            stmt.setInt(16, muni.getDefaultCourtEntity().getCourtEntityID());
+            stmt.setInt(17, muni.getMuniCode());
             
             System.out.println("MunicipalityIntegrator.updateMuni | stmt: " + stmt.toString());
             stmt.executeUpdate();
@@ -309,7 +308,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt = con.createStatement();
             rs = stmt.executeQuery(query);
             while(rs.next()){
-                m = getMuniFromMuniCode(rs.getInt("muniCode"));
+                m = getMuni(rs.getInt("muniCode"));
                 ll.add(m);
                 
             }

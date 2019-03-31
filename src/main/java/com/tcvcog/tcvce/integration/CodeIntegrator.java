@@ -335,7 +335,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         // the key call: grab a list of all enforcable code elements in this set (large)
         set.setEnfCodeElementList(getEnforcableCodeElementList(rs.getInt("codesetid")));
         
-        set.setMuni(muniInt.getMuniFromMuniCode(rs.getInt("municipality_municode")));
+        set.setMuni(muniInt.getMuni(rs.getInt("municipality_municode")));
 
         return set;
         

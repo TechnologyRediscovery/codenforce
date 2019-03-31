@@ -248,7 +248,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         
         try{
             newOpt.setOccupancyPermitTypeID(rs.getInt("typeid"));
-            newOpt.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
+            newOpt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             newOpt.setOccupancyPermitTypeName(rs.getString("typename"));
             newOpt.setOccupancyPermitTypeDescription(rs.getString("typedescription"));
             

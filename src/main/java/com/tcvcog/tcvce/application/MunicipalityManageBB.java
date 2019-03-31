@@ -35,7 +35,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Successfully updated municipality info!", ""));
-            getSessionBean().setActiveMuni(mi.getMuniFromMuniCode(currentMuni.getMuniCode()));
+            getSessionBean().setActiveMuni(mi.getMuni(currentMuni.getMuniCode()));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 

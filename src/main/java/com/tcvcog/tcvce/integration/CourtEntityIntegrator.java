@@ -205,7 +205,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             newCourtEntity.setCourtEntityID(rs.getInt("entityid"));
             newCourtEntity.setCourtEntityOfficialNum(rs.getString("entityofficialnum"));
             newCourtEntity.setJurisdictionLevel(rs.getString("jurisdictionlevel"));
-            newCourtEntity.setMunicipality(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
+            newCourtEntity.setMunicipality(mi.getMuni(rs.getInt("muni_municode")));
             newCourtEntity.setCourtEntityName(rs.getString("name"));
             newCourtEntity.setAddressStreet(rs.getString("address_street"));
             newCourtEntity.setAddressCity(rs.getString("address_city"));

@@ -503,7 +503,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         bp.setInspectionChecklistID(rs.getInt("checklistid"));
         bp.setTitle(rs.getString("title"));
         bp.setDescription(rs.getString("description"));
-        bp.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
+        bp.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         bp.setActive(rs.getBoolean("active"));
         
         return bp;
