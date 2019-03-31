@@ -426,7 +426,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         v.setPenalty(rs.getDouble("penalty"));
         v.setDescription(rs.getString("description"));
         v.setNotes(rs.getString("notes"));
-        v.setCitationIDList(citInt.getCitationIDs(v.getViolationID()));
+        v.setCitationIDList(citInt.getCitations(v.getViolationID()));
         
         return v;
     }
@@ -566,7 +566,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         tb.setBlockID(rs.getInt("blockid"));
         tb.setTextBlockCategoryID(rs.getInt("categoryid"));
         tb.setTextBlockCategoryTitle(rs.getString("categorytitle"));
-        tb.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
+        tb.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         tb.setTextBlockName(rs.getString("blockname"));
         tb.setTextBlockText(rs.getString("blocktext"));
 

@@ -252,7 +252,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setUsername(rs.getString("username"));
             // passwords managed by Glassfish
             //user.setPassword(rs.getString("password"));
-            user.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_muniCode")));
+            user.setMuni(mi.getMuni(rs.getInt("muni_muniCode")));
             user.setNotes(rs.getString("notes"));
             
             if(rs.getTimestamp("activitystartdate") != null){
@@ -385,7 +385,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, uid);
             rs = stmt.executeQuery();
             while(rs.next()){
-                muniList.add(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
+                muniList.add(mi.getMuni(rs.getInt("muni_municode")));
             }
             
         } catch (SQLException ex) {

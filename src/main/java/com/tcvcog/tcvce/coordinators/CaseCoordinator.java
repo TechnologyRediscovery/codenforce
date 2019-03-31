@@ -777,7 +777,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    
    public Citation generateNewCitation(List<CodeViolation> violationList){
        Citation newCitation = new Citation();
-       ArrayList<CodeViolation> al = new ArrayList<>();
+       List<CodeViolation> al = new ArrayList<>();
        ListIterator<CodeViolation> li = violationList.listIterator();
        CodeViolation cv;
        

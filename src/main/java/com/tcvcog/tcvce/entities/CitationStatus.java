@@ -25,6 +25,22 @@ import java.util.Objects;
  * @author Eric C. Darsow
  */
 public class CitationStatus extends Status {
+    private boolean editsAllowed;
+
+    /**
+     * @return the editsAllowed
+     */
+    public boolean isEditsAllowed() {
+        return editsAllowed;
+    }
+
+    /**
+     * @param editsAllowed the editsAllowed to set
+     */
+    public void setEditsAllowed(boolean editsAllowed) {
+        this.editsAllowed = editsAllowed;
+    }
+    
     
     
 }

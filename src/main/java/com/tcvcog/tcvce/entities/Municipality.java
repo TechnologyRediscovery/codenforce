@@ -42,6 +42,7 @@ public class Municipality implements Serializable{
     private int defaultCodeSetID;
     private int issuingPermitCodeSourceID;
     private User defaultCodeOfficerUser;
+    private CourtEntity defaultCourtEntity;
 
     /**
      * @return the muniCode
@@ -339,6 +340,20 @@ public class Municipality implements Serializable{
      */
     public void setDefaultCodeOfficerUser(User defaultCodeOfficerUser) {
         this.defaultCodeOfficerUser = defaultCodeOfficerUser;
+    }
+
+    /**
+     * @return the defaultCourtEntity
+     */
+    public CourtEntity getDefaultCourtEntity() {
+        return defaultCourtEntity;
+    }
+
+    /**
+     * @param defaultCourtEntity the defaultCourtEntity to set
+     */
+    public void setDefaultCourtEntity(CourtEntity defaultCourtEntity) {
+        this.defaultCourtEntity = defaultCourtEntity;
     }
 
     

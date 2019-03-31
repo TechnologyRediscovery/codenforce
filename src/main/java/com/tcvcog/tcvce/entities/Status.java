@@ -17,6 +17,7 @@ public abstract class Status implements Serializable {
     protected int statusID;
     protected String statusTitle;
     protected String description;
+    private Icon icon;
 
     /**
      * @return the statusID
@@ -87,6 +88,20 @@ public abstract class Status implements Serializable {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the icon
+     */
+    public Icon getIcon() {
+        return icon;
+    }
+
+    /**
+     * @param icon the icon to set
+     */
+    public void setIcon(Icon icon) {
+        this.icon = icon;
     }
     
 }
