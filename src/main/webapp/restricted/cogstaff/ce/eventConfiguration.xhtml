@@ -55,21 +55,28 @@
                                         <h:outputText value="#{c.eventCategoryTitle}"/>
                                     </p:column>
                                     
-                                    <p:column width="3%">
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Icon" />
+                                        </f:facet>
+                                        <i class="material-icons"><h:outputText value="#{c.icon.materialIcon}"/></i>
+                                    </p:column>
+                                    
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="UD" />
                                         </f:facet>
                                         <h:outputText value="#{c.userdeployable}"/>
                                     </p:column>
                                     
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="MD" />
                                         </f:facet>
                                         <h:outputText value="#{c.munideployable}"/>
                                     </p:column>
                                     
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="PD" />
                                         </f:facet>
@@ -77,14 +84,9 @@
                                     </p:column>
                                     
                                     
-                                    <p:column width="3%">
-                                        <f:facet name="header">
-                                            <h:outputText value="PD" />
-                                        </f:facet>
-                                        <h:outputText value="#{c.publicdeployable}"/>
-                                    </p:column>
+                                  
                                     
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="REQ" />
                                         </f:facet>
@@ -93,7 +95,7 @@
                                     
                                     
                                     
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="NCM" />
                                         </f:facet>
@@ -101,7 +103,7 @@
                                     </p:column>
                                     
                                     
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="HIDE" />
                                         </f:facet>
@@ -162,6 +164,15 @@
                                 <h:message for="catDescIT" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 <p:spacer height="20px"/>
+
+                                <p:outputLabel for="icon-som">
+                                    <h:outputText value="Icon"/>
+                                </p:outputLabel>
+                                <p:spacer height="5px"/>
+                                <p:selectOneMenu id="icon-som" required="false" value="#{eventConfigurationBB.formCatIcon}" tabindex="8">
+                                    <f:selectItems value="#{eventConfigurationBB.iconList}" var="i" itemLabel="#{i.name}" itemValue="#{i}" />
+                                    <f:converter converterId="iconConverter" />
+                                </p:selectOneMenu>
                                 
                                    <h:panelGrid columns="3" cellpadding="5" border="0" frame="false" columnClasses="gridTd, gridTd, gridTd">
                                 
@@ -258,6 +269,15 @@
                                 <h:message for="newCatDescIT" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 <p:spacer height="20px"/>
+                                
+                                <p:outputLabel for="icon-som-new">
+                                    <h:outputText value="Icon"/>
+                                </p:outputLabel>
+                                <p:spacer height="5px"/>
+                                <p:selectOneMenu id="icon-som-new" required="false" value="#{eventConfigurationBB.newFormCatIcon}" tabindex="8">
+                                    <f:selectItems value="#{eventConfigurationBB.iconList}" var="i" itemLabel="#{i.name}" itemValue="#{i}" />
+                                    <f:converter converterId="iconConverter" />
+                                </p:selectOneMenu>
                                 
                                  <h:panelGrid columns="3" cellpadding="5" border="0" frame="false" columnClasses="gridTd, gridTd, gridTd">
                                 

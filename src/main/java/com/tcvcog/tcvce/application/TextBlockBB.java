@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -35,8 +36,8 @@ import javax.faces.application.FacesMessage;
  */
 public class TextBlockBB extends BackingBeanUtils implements Serializable{
 
-    private ArrayList<TextBlock> blockList;
-    private ArrayList<TextBlock> filteredBlockList;
+    private List<TextBlock> blockList;
+    private List<TextBlock> filteredBlockList;
     
     private TextBlock selectedBlock;
     
@@ -125,7 +126,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the blockList
      */
-    public ArrayList<TextBlock> getBlockList() {
+    public List<TextBlock> getBlockList() {
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         if(blockList == null){
             try {
@@ -140,7 +141,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the filteredBlockList
      */
-    public ArrayList<TextBlock> getFilteredBlockList() {
+    public List<TextBlock> getFilteredBlockList() {
         return filteredBlockList;
     }
 

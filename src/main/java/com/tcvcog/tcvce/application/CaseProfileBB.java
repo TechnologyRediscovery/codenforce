@@ -17,7 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
@@ -38,7 +37,6 @@ import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -48,7 +46,6 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -83,11 +80,13 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private EventCECase eventForTriggeringCasePhaseAdvancement;
     private EventCECase triggeringEventForRequestedCaseAction;
 
-    private List<EventCECase> eventList;
     private List<EventCECase> filteredEventList;
+    private List<EventCECase> removedEventList;
     private EventCECase selectedEvent;
     private boolean allowedToClearActionResponse;
     private int rejectedEventListIndex;
+    private boolean showHiddenEvents;
+    private boolean showInactiveEvents;
 
     private List<CodeViolation> selectedViolations;
     private CodeViolation selectedViolation;
@@ -136,11 +135,65 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         searchParams = cc.getDefaultSearchParamsCECase(getSessionBean().getActiveMuni());
         List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
+        removedEventList = new ArrayList<>();
+        showHiddenEvents = false;
+        showInactiveEvents = false;
         if(retrievedCaseList != null){
             currentCase = retrievedCaseList.get(0);
             caseList = retrievedCaseList;
             refreshCurrentCase();
+            trimEventList();
         }
+    }
+    
+    /**
+     * Pass through method for calling trimEventList when any of the two
+     * boolean check boxes above the event list on ceCases.xhtml are pressed
+     */
+    public void reloadEventList(){
+        System.out.println("CaseProfileBB.reloadEventList");
+        trimEventList();
+    }
+    
+    /**
+     * Used by the UI to adjust the events shown in the event history list
+     * and responds to changes in the two boolean check boxes for showing
+     * hidden and inactive events
+     */
+    public void trimEventList(){
+        
+        if(currentCase.getEventList() != null){
+            for(EventCECase ev: currentCase.getEventList()){
+                System.out.println("CaseProfileBB.trimEventList | inspecting ev " + ev.getEventID());
+                if(!ev.isActive() && !showInactiveEvents){
+                    System.out.println("CaseProfileBB.trimEventList | found inactive; adding to removed list ev " + ev.getEventID());
+                    removedEventList.add(ev);
+                }
+                if(ev.isHidden() && !showHiddenEvents){
+                    System.out.println("CaseProfileBB.trimEventList | found hidden; adding to removed list ev " + ev.getEventID());
+                    removedEventList.add(ev);
+                }
+            } // close for   
+            for(EventCECase ev: removedEventList){
+                System.out.println("CaseProfileBB.trimEventList | removing ev " + ev.getEventID());
+                currentCase.getEventList().remove(ev);
+            }
+            
+            if(showHiddenEvents){
+                for(EventCECase ev: removedEventList){
+                    if(ev.isHidden()){
+                        currentCase.getEventList().add(ev);
+                    }
+                }
+            }
+            if(showInactiveEvents){
+                for(EventCECase ev: removedEventList){
+                    if(!ev.isActive()){
+                        currentCase.getEventList().add(ev);
+                    }
+                }
+            }
+        } // close if
     }
     
     public void deletePhoto(int photoID){
@@ -159,6 +212,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    /**
+     * Responder to the query button on the UI
+     * @param ev 
+     */
     public void executeQuery(ActionEvent ev){
         System.out.println("CaseProfileBB.executeQuery");
         CaseCoordinator cc = getCaseCoordinator();
@@ -177,13 +234,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
         }
-        
     }
     
     public String printCase(){
         getSessionBean().getcECaseQueue().add(0, currentCase);
         return "printCase";
-        
     }
     
     public void rejectRequestedEvent(EventCECase ev){
@@ -191,13 +246,21 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         rejectedEventListIndex = currentCase.getEventListActionRequests().indexOf(ev);
     }
     
+    /**
+     * Called when the user clicks the take requested action button 
+     * @param ev 
+     */
     public void initiateNewRequestedEvent(EventCECase ev){
         selectedEventCategory = ev.getActionEventCat();
         triggeringEventForRequestedCaseAction = ev;
         initiateNewEvent();
-        
     }
     
+    /**
+     * Called when the user selects their own EventCategory to add to the case
+     * and is a pass-through method to the initiateNewEvent method
+     * @param ev 
+     */
     public void initiateUserChosenEventCreation(ActionEvent ev){
         initiateNewEvent();
     }
@@ -224,6 +287,16 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     
+    /**
+     * All Code Enforcement case events are funneled through this method
+     * which has to carry out a number of checks based on the
+     * type of event being created. The event is then passed to
+     * the attachNewEventToCECase on the CaseCoordinator who will do some more
+     * checking about the event before writing it to the DB
+     * 
+     * @param ev unused
+     * @throws ViolationException 
+     */
     public void attachEventToCase(ActionEvent ev) throws ViolationException{
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -239,6 +312,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             // writing null in here is fine if the event wasn't triggered
             selectedEvent.setTriggeringEvent(triggeringEventForRequestedCaseAction);
             
+            // main entry point for handing the new event off to the CaseCoordinator
+            // only the compliance events need to pass in another object--the violation
+            // otherwise just the case and the event go to the coordinator
             if(selectedEvent.getCategory().getEventType() == EventType.Compliance){
                 selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, selectedViolation));
             } else {
@@ -246,9 +322,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Successfully logged event!", ""));
+                            "Successfully logged event with an ID " + selectedEvent.getEventID(), ""));
             
             // now update the triggering event with the newly inserted event's ID
+            // (We saved the triggering event when the take action button was clicked, before the event
+            // add dialog was displayed and event-specific data is entered by the user
             if(triggeringEventForRequestedCaseAction != null){
                 triggeringEventForRequestedCaseAction.setResponseEvent(selectedEvent);
                 triggeringEventForRequestedCaseAction.setResponderActual(getSessionBean().getFacesUser());
@@ -258,7 +336,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                                 "Updated triggering event ID + "
                                         + triggeringEventForRequestedCaseAction.getEventID() +
                                  " with response info!", ""));
-                // reset our holding var
+                // reset our holding var since we're done processing the event
                 triggeringEventForRequestedCaseAction = null;
             }
             
@@ -278,8 +356,15 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         // nullify the session's case so that the reload of currentCase
         // no the cecaseProfile.xhtml will trigger a new DB read
         refreshCurrentCase();
+        trimEventList();
     }
     
+    /**
+     * Called by pages that aren't ceCases.xhtml to bring up the 
+     * proper case for viewing
+     * @param ev
+     * @return 
+     */
     public String jumpToCasesToEditCEEvent(EventCasePropBundle ev){
         CaseIntegrator ci = getCaseIntegrator();
         caseList = getSessionBean().getcECaseQueue();
@@ -338,9 +423,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 "Could not insert the action request rejection event.", 
                 "This is a non-user system-level error that must be fixed by your Sys Admin, sorry!"));
-            
         }
-        
     }
    
     public void queueSelectedPerson(ActionEvent ev){
@@ -351,7 +434,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Please select one or more people to attach to this event", 
                     "This is a non-user system-level error that must be fixed by your Sys Admin"));
-            
         }
     }
     
@@ -366,7 +448,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         selectedEvent = ev;
     }
 
-    
 /**
  * Primary injection point for setting the case which will be displayed in the right
  * column (the manage object column) on cECases.xhtml
@@ -381,6 +462,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
         }
         currentCase = c;
+        removedEventList.clear();
     }
 
     public void changePACCAccess() {
@@ -401,11 +483,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-  
-    /**
-     *
-     * @param ev
-     */
     public void overrideCasePhase(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
@@ -432,6 +509,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    /**
+     * Designed to update the case phase or name in the master case list
+     * in ceCases.xhtml when a case is updated. Prevents rebuilding all the 
+     * cases in the entire list, which could be massive
+     * @param c 
+     */
     private void updateCaseInCaseList(CECase c){
         CaseIntegrator ci = getCaseIntegrator();
         Iterator<CECase> it = caseList.iterator();
@@ -453,10 +536,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         } // end while
     }
     
-   
-
-   
-    
+    /**
+     * Pass through method for clicks of the refresh case data button
+     * on cECases.xhtml
+     * @param ev 
+     */
     public void refreshCurrentCase(ActionEvent ev){
         refreshCurrentCase();
     }
@@ -481,7 +565,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     
     public void recordCompliance(CodeViolation cv) {
         EventCoordinator ec = getEventCoordinator();
-        ViolationCoordinator vi = getViolationCoordinator();
         ViolationCoordinator vc = getViolationCoordinator();
         selectedViolation = cv;
         // build event details package
@@ -494,8 +577,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        // the user is then shown the add event dialog, and when the
+        // event is added to the case, the CaseCoordinator will
+        // set the date of record on the violation to match that chosen
+        // for the event
         selectedEvent = e;
-//            cc.attachNewComplianceEvent(currentCase, e, cv);
+        
     }
     
 //    Procedural vs. OO code
@@ -947,14 +1034,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.currentCase = currentCase;
     }
 
-    /**
-     * @return the eventList
-     */
-    public List<EventCECase> getEventList() {
-        setEventList(currentCase.getEventList());
-        return eventList;
-    }
-
+   
     /**
      * @return the selectedEvent
      */
@@ -971,12 +1051,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         return selectedViolations;
     }
 
-    /**
-     * @param el
-     */
-    public void setEventList(ArrayList<EventCECase> el) {
-        eventList = el;
-    }
+    
 
     /**
      * @param selectedEvent the selectedEvent to set
@@ -1258,12 +1333,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.muniPeopleList = muniPeopleList;
     }
 
-    /**
-     * @param eventList the eventList to set
-     */
-    public void setEventList(List<EventCECase> eventList) {
-        this.eventList = eventList;
-    }
+    
 
     /**
      * @param filteredEventList the filteredEventList to set
@@ -1491,6 +1561,48 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setTriggeringEventForRequestedCaseAction(EventCECase triggeringEventForRequestedCaseAction) {
         this.triggeringEventForRequestedCaseAction = triggeringEventForRequestedCaseAction;
+    }
+
+    /**
+     * @return the showHiddenEvents
+     */
+    public boolean isShowHiddenEvents() {
+        return showHiddenEvents;
+    }
+
+    /**
+     * @param showHiddenEvents the showHiddenEvents to set
+     */
+    public void setShowHiddenEvents(boolean showHiddenEvents) {
+        this.showHiddenEvents = showHiddenEvents;
+    }
+
+    /**
+     * @return the showInactiveEvents
+     */
+    public boolean isShowInactiveEvents() {
+        return showInactiveEvents;
+    }
+
+    /**
+     * @param showInactiveEvents the showInactiveEvents to set
+     */
+    public void setShowInactiveEvents(boolean showInactiveEvents) {
+        this.showInactiveEvents = showInactiveEvents;
+    }
+
+    /**
+     * @return the removedEventList
+     */
+    public List<EventCECase> getRemovedEventList() {
+        return removedEventList;
+    }
+
+    /**
+     * @param removedEventList the removedEventList to set
+     */
+    public void setRemovedEventList(List<EventCECase> removedEventList) {
+        this.removedEventList = removedEventList;
     }
 
     

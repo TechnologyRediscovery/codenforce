@@ -20,25 +20,25 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class Citation implements Serializable {
+public class Citation extends EntityUtils implements Serializable {
     private int citationID;
     private String citationNo;
     private CitationStatus status;
     private CourtEntity origin_courtentity;
-    private CECase ceCase;
+    private CECaseNoLists ceCaseNoLists;
     private User userOwner;
     private LocalDateTime dateOfRecord;
     private LocalDateTime timeStamp;
     private boolean isActive;
     private String notes;
-    private ArrayList<CodeViolation> violationList;
+    private List<CodeViolation> violationList;
 
     /**
      * @return the citationID
@@ -55,13 +55,7 @@ public class Citation implements Serializable {
     }
 
    
-    /**
-     * @return the ceCase
-     */
-    public CECase getCeCase() {
-        return ceCase;
-    }
-
+    
     /**
      * @return the userOwner
      */
@@ -112,12 +106,7 @@ public class Citation implements Serializable {
     }
 
 
-    /**
-     * @param ceCase the ceCase to set
-     */
-    public void setCeCase(CECase ceCase) {
-        this.ceCase = ceCase;
-    }
+    
 
     /**
      * @param userOwner the userOwner to set
@@ -157,7 +146,7 @@ public class Citation implements Serializable {
     /**
      * @return the violationList
      */
-    public ArrayList<CodeViolation> getViolationList() {
+    public List<CodeViolation> getViolationList() {
         return violationList;
     }
 
@@ -173,7 +162,7 @@ public class Citation implements Serializable {
         int hash = 7;
         hash = 71 * hash + this.citationID;
         hash = 71 * hash + Objects.hashCode(this.citationNo);
-        hash = 71 * hash + Objects.hashCode(this.ceCase);
+        hash = 71 * hash + Objects.hashCode(this.ceCaseNoLists);
         hash = 71 * hash + Objects.hashCode(this.userOwner);
         hash = 71 * hash + Objects.hashCode(this.dateOfRecord);
         hash = 71 * hash + Objects.hashCode(this.timeStamp);
@@ -210,7 +199,7 @@ public class Citation implements Serializable {
         if (!Objects.equals(this.notes, other.notes)) {
             return false;
         }
-        if (!Objects.equals(this.ceCase, other.ceCase)) {
+        if (!Objects.equals(this.ceCaseNoLists, other.ceCaseNoLists)) {
             return false;
         }
         if (!Objects.equals(this.userOwner, other.userOwner)) {
@@ -254,6 +243,20 @@ public class Citation implements Serializable {
      */
     public void setOrigin_courtentity(CourtEntity origin_courtentity) {
         this.origin_courtentity = origin_courtentity;
+    }
+
+    /**
+     * @return the ceCaseNoLists
+     */
+    public CECaseNoLists getCeCaseNoLists() {
+        return ceCaseNoLists;
+    }
+
+    /**
+     * @param ceCaseNoLists the ceCaseNoLists to set
+     */
+    public void setCeCaseNoLists(CECaseNoLists ceCaseNoLists) {
+        this.ceCaseNoLists = ceCaseNoLists;
     }
     
     

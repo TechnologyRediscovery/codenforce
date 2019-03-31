@@ -33,6 +33,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -79,6 +80,54 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    public void updateIcon(Icon i) throws IntegrationException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.icon SET name=?, styleclass=?, fontawesome=?, materialicons=? ");
+        sb.append(" WHERE iconid = ?;");
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, i.getName());
+            stmt.setString(2, i.getStyleClass());
+            stmt.setString(3, i.getFontAwesome());
+            stmt.setString(4, i.getMaterialIcon());
+            stmt.setInt(5, i.getIconid());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to update icon", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public void insertIcon(Icon i) throws IntegrationException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO public.icon(");
+        sb.append("iconid, name, styleclass, fontawesome, materialicons) ");
+        sb.append("VALUES (DEFAULT, ?, ?, ?, ?);");
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, i.getName());
+            stmt.setString(2, i.getStyleClass());
+            stmt.setString(3, i.getFontAwesome());
+            stmt.setString(4, i.getMaterialIcon());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to insert icon", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
     public Icon getIcon(CasePhase casephase) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -105,6 +154,31 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         return i;
         
+    }
+    
+    public List<Icon> getIconList() throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT iconid FROM public.icon;");
+        List<Icon> iList = new ArrayList<>();
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                iList.add(getIcon(rs.getInt("iconid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate icon", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return iList;
     }
     
     public void insertImprovementSuggestion(ImprovementSuggestion is) throws IntegrationException{

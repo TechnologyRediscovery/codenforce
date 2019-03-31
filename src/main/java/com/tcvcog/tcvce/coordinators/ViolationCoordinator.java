@@ -151,15 +151,15 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         EventIntegrator ei = getEventIntegrator();
         // update violation record for compliance
-        cv.setComplianceTimeStamp(LocalDateTime.now());
         cv.setComplianceUser(u);
         cvi.recordCompliance(cv);
                 
         // inactivate timeframe expiry event
         if(cv.getCompTimeFrameComplianceEvent() != null){
-            ei.inactivateEvent(cv.getCompTimeFrameComplianceEvent().getEventID());
+            int vev = cv.getCompTimeFrameComplianceEvent().getEventID();
+            System.out.println("ViolationCoordinator.recordCompliance | invalidating event id: " + vev);
+            ei.inactivateEvent(vev);
         }
-        
     }
     
     public NoticeOfViolation getNewNoticeOfViolation(){

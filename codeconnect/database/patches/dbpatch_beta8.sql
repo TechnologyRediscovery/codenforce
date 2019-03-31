@@ -33,14 +33,6 @@ BEGIN;
 	       notifycasemonitors=FALSE, casephasechangetrigger=FALSE, hidable=TRUE
 	 WHERE categoryid=122;
 
-	 -- Notice violation returned
-	 INSERT INTO public.ceeventcategory(
-	            categoryid, categorytype, title, description, userdeployable, 
-	            munideployable, publicdeployable, requiresviewconfirmation, notifycasemonitors, 
-	            casephasechangetrigger, hidable)
-	    VALUES (131, CAST('CaseAdmin' as ceeventtype), 'Notice of violation returned', 'A previously mailed notice of violation letter was returned to sender', TRUE, 
-	            TRUE, FALSE, TRUE, TRUE, 
-	            FALSE, TRUE);
 
 	 -- Citation issued
 	 UPDATE public.ceeventcategory
