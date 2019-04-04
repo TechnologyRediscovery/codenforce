@@ -40,6 +40,7 @@ import java.util.Map;
  */
 public class MunicipalityIntegrator extends BackingBeanUtils implements Serializable {
 
+    
     /**
      * Creates a new instance of MunicipalityIntegrator
      */
@@ -132,9 +133,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     public Municipality generateMuni(ResultSet rs) throws SQLException, IntegrationException{
-        UserIntegrator ui = getUserIntegrator();
-        CourtEntityIntegrator courtInt = getCourtEntityIntegrator();
-        
         Municipality muni = new Municipality();
         
         muni.setMuniCode(rs.getInt("municode"));
@@ -156,8 +154,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setActiveInProgram(rs.getBoolean("activeinprogram"));             
         muni.setDefaultCodeSetID(rs.getInt("defaultcodeset"));
         muni.setIssuingPermitCodeSourceID(rs.getInt("occpermitissuingsource_sourceid"));
-        muni.setDefaultCodeOfficerUser(ui.getUser(rs.getInt("defaultcodeofficeruser")));
-//        muni.setDefaultCourtEnti        muni.setAddress_state(rs.getString("address_state"));ty(courtInt.getCourtEntity(rs.getInt("defaultcourtentity")));
+        muni.setDefaultCodeOfficerUserID(rs.getInt("defaultcodeofficeruser"));
+        muni.setDefaultCourtEntityID(rs.getInt("defaultcourtentity"));
         
         return muni;
     }
@@ -255,8 +253,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setBoolean(12, muni.isActiveInProgram());
             stmt.setInt(13, muni.getDefaultCodeSetID());
             stmt.setInt(14, muni.getIssuingPermitCodeSourceID());
-            stmt.setInt(15, muni.getDefaultCodeOfficerUser().getUserID());
-            stmt.setInt(16, muni.getDefaultCourtEntity().getCourtEntityID());
+            stmt.setInt(15, muni.getDefaultCodeOfficerUserID());
+            stmt.setInt(16, muni.getDefaultCourtEntityID());
             stmt.setInt(17, muni.getMuniCode());
             
             System.out.println("MunicipalityIntegrator.updateMuni | stmt: " + stmt.toString());
@@ -273,9 +271,37 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         } // close finally
         
     }
-   
-
     
+    public Map<Integer, String> getMunicipalityMap() throws IntegrationException{
+        Map<Integer, String> muniMap = null;
+            
+        muniMap = new HashMap<>();
 
+        Connection con = getPostgresCon();
+
+        String query = "SELECT muniCode, muniName FROM municipality;";
+        ResultSet rs = null;
+        Statement stmt = null;
+
+        try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(query);
+            
+            while(rs.next()){
+                muniMap.put(rs.getInt("muniCode"),rs.getString("muniName"));
+                System.out.println("MunicipalityIntegrator.getMunicipalityMap | got: " + muniMap.get(rs.getInt("muniCode")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.generateCompleteMuniNameIDMap", ex);
+
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return muniMap;
+    }
     
 }

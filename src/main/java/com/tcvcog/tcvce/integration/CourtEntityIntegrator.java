@@ -53,7 +53,6 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             stmt = con.prepareStatement(query);
             stmt.setString(1, courtEntity.getCourtEntityOfficialNum());
             stmt.setString(2, courtEntity.getJurisdictionLevel());
-            stmt.setInt(3, courtEntity.getMunicipality().getMuniCode());
             stmt.setString(4, courtEntity.getCourtEntityName());
             stmt.setString(5, courtEntity.getAddressStreet());
             stmt.setString(6, courtEntity.getAddressCity());
@@ -120,7 +119,6 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             stmt = con.prepareStatement(query);
             stmt.setString(1, courtEntity.getCourtEntityOfficialNum());
             stmt.setString(2, courtEntity.getJurisdictionLevel());
-            stmt.setInt(3, courtEntity.getMunicipality().getMuniCode());
             stmt.setString(4, courtEntity.getCourtEntityName());
             stmt.setString(5, courtEntity.getAddressStreet());
             stmt.setString(6, courtEntity.getAddressCity());
@@ -199,13 +197,11 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
     
     private CourtEntity generateCourtEntity(ResultSet rs) throws IntegrationException {
         CourtEntity newCourtEntity = new CourtEntity();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
     
         try {
             newCourtEntity.setCourtEntityID(rs.getInt("entityid"));
             newCourtEntity.setCourtEntityOfficialNum(rs.getString("entityofficialnum"));
             newCourtEntity.setJurisdictionLevel(rs.getString("jurisdictionlevel"));
-            newCourtEntity.setMunicipality(mi.getMuni(rs.getInt("muni_municode")));
             newCourtEntity.setCourtEntityName(rs.getString("name"));
             newCourtEntity.setAddressStreet(rs.getString("address_street"));
             newCourtEntity.setAddressCity(rs.getString("address_city"));

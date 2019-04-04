@@ -29,6 +29,10 @@ import java.util.List;
 public class Event extends EntityUtils implements Serializable {
     
     private int eventID;
+    
+    private int muniCode;
+    private String muniName;
+    private int propertyID;
     private EventCategory category;
     
     private LocalDateTime dateOfRecord;
@@ -71,7 +75,7 @@ public class Event extends EntityUtils implements Serializable {
     
     private User actionRequestedBy;
     
-    private boolean directRequestToDefaultMuniCEO;
+    private boolean requestActionByDefaultMuniCEO;
     private User responderIntended;
     private User responderActual;
     
@@ -458,17 +462,17 @@ public class Event extends EntityUtils implements Serializable {
     
 
     /**
-     * @return the directRequestToDefaultMuniCEO
+     * @return the requestActionByDefaultMuniCEO
      */
-    public boolean isDirectRequestToDefaultMuniCEO() {
-        return directRequestToDefaultMuniCEO;
+    public boolean isRequestActionByDefaultMuniCEO() {
+        return requestActionByDefaultMuniCEO;
     }
 
     /**
-     * @param directRequestToDefaultMuniCEO the directRequestToDefaultMuniCEO to set
+     * @param requestActionByDefaultMuniCEO the requestActionByDefaultMuniCEO to set
      */
-    public void setDirectRequestToDefaultMuniCEO(boolean directRequestToDefaultMuniCEO) {
-        this.directRequestToDefaultMuniCEO = directRequestToDefaultMuniCEO;
+    public void setRequestActionByDefaultMuniCEO(boolean requestActionByDefaultMuniCEO) {
+        this.requestActionByDefaultMuniCEO = requestActionByDefaultMuniCEO;
     }
 
     /**
@@ -527,6 +531,48 @@ public class Event extends EntityUtils implements Serializable {
      */
     public void setDaysUntilDue(long daysUntilDue) {
         this.daysUntilDue = daysUntilDue;
+    }
+
+    /**
+     * @return the muniCode
+     */
+    public int getMuniCode() {
+        return muniCode;
+    }
+
+    /**
+     * @param muniCode the muniCode to set
+     */
+    public void setMuniCode(int muniCode) {
+        this.muniCode = muniCode;
+    }
+
+    /**
+     * @return the propertyID
+     */
+    public int getPropertyID() {
+        return propertyID;
+    }
+
+    /**
+     * @param propertyID the propertyID to set
+     */
+    public void setPropertyID(int propertyID) {
+        this.propertyID = propertyID;
+    }
+
+    /**
+     * @return the muniName
+     */
+    public String getMuniName() {
+        return muniName;
+    }
+
+    /**
+     * @param muniName the muniName to set
+     */
+    public void setMuniName(String muniName) {
+        this.muniName = muniName;
     }
 
    

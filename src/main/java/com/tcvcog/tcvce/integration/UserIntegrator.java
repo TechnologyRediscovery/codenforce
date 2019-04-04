@@ -109,12 +109,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         ResultSet rs = null;
         String query = "SELECT muni_municode FROM public.loginmuni "
-                + "WHERE userid=100 AND defaultmuni=?;";
+                + "WHERE userid=? AND defaultmuni=?;";
         Municipality m = null;
         PreparedStatement stmt = null;
         
         try {
-            stmt = con.prepareStatement(query);
+            stmt = con.prepareStatement(query, 
+                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setInt(1, u.getUserID());
             stmt.setBoolean(2, true);
             rs = stmt.executeQuery();
@@ -124,7 +125,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             if(!rs.first()){
                 stmt = con.prepareStatement(query);
                 stmt.setInt(1, u.getUserID());
-                stmt.setBoolean(2, false);
+                stmt.setBoolean(2, true);
                 rs = stmt.executeQuery();
                 while(rs.next()){
                     m = mi.getMuni(rs.getInt("muni_municode"));
@@ -342,7 +343,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      */   
     public User getUser(String userName) throws IntegrationException{
         
-        System.out.println("UserIntegrator.getUserByID");
+        System.out.println("UserIntegrator.getUser");
         Connection con = getPostgresCon();
         ResultSet rs = null;
         User newUser = null;

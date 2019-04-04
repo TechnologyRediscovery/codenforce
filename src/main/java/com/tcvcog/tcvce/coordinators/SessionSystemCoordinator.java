@@ -18,17 +18,53 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class SessionSystemCoordinator extends BackingBeanUtils {
+public class SessionSystemCoordinator extends BackingBeanUtils implements Serializable{
 
+    private Map<Integer, String> muniCodeNameMap;
+    
     /**
      * Creates a new instance of LoggingCoordinator
      */
     public SessionSystemCoordinator() {
+    }
+    
+
+    /**
+     * @return the muniCodeNameMap
+     */
+    public Map<Integer, String> getMuniCodeNameMap() {
+        if(muniCodeNameMap == null){
+            
+            Map<Integer, String> m = null;
+            MunicipalityIntegrator mi = getMunicipalityIntegrator();
+            try {
+                m = mi.getMunicipalityMap();
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+            muniCodeNameMap = m;
+            System.out.println("SessionSystemCoordinator.getMuniCodeNameMap: Map isempty " + muniCodeNameMap.isEmpty());
+        }
+        return muniCodeNameMap;
+    }
+
+    /**
+     * @param muniCodeNameMap the muniCodeNameMap to set
+     */
+    public void setMuniCodeNameMap(Map<Integer, String> muniCodeNameMap) {
+        this.muniCodeNameMap = muniCodeNameMap;
     }
     
     

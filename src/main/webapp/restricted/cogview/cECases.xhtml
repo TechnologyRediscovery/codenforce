@@ -49,7 +49,7 @@
                                                                      disabled="#{!caseProfileBB.searchParams.filterByMuni}">
                                                         <f:converter converterId="muniConverter"/>
                                                         <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                        <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                                     </p:selectOneMenu>
                                                     <h:message for="cecases-search-muni-som" showDetail="true" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1627,7 +1627,7 @@
                                         <h:outputText value="Assign request to default muni code officer"/>
                                     </h:outputLabel>
                                      <p:selectBooleanCheckbox tabindex="18" id="request-action-usedefceo-cb" 
-                                                              value="#{caseProfileBB.selectedEvent.directRequestToDefaultMuniCEO}"
+                                                              value="#{caseProfileBB.selectedEvent.requestActionByDefaultMuniCEO}"
                                                              disabled="#{!caseProfileBB.includeActionRequest 
                                                                          or caseProfileBB.selectedEvent.responseComplete
                                                                          or !(empty caseProfileBB.triggeringEventForRequestedCaseAction)}">
@@ -1641,7 +1641,7 @@
                                     <p:spacer height="5px"/>
                                     <p:selectOneMenu id="event-responder-intended"
                                                      value="#{caseProfileBB.selectedEvent.responderIntended}"
-                                                     disabled="#{caseProfileBB.selectedEvent.directRequestToDefaultMuniCEO 
+                                                     disabled="#{caseProfileBB.selectedEvent.requestActionByDefaultMuniCEO 
                                                                  or !caseProfileBB.includeActionRequest 
                                                                  or caseProfileBB.selectedEvent.responseComplete
                                                                  or !(empty caseProfileBB.triggeringEventForRequestedCaseAction)}"

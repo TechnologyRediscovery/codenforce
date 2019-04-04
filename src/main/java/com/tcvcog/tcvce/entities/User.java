@@ -34,8 +34,6 @@ public class User implements Serializable{
     private String username;
     private String password;
     
-    private List<Municipality> authMunis;
-    
     private Person person;
     private int personID;
     
@@ -76,15 +74,7 @@ public class User implements Serializable{
     
     
     
-    /**
-     * Creates a new instance of User
-     * @param munis The municipality objects for the munis this user
-     * can search and manipulate data within
-     */
-    public User(LinkedList<Municipality> munis) {
-        authMunis = munis;
-    }
-
+    
 
     /**
      * @return the userID
@@ -162,22 +152,6 @@ public class User implements Serializable{
 
    
     
-
-    /**
-     * @return the authMunis
-     */
-    public List<Municipality> getAuthMunis() {
-        return authMunis;
-    }
-
-    /**
-     * 
-     * @param ml 
-     */
-    public void setAuthMuis(List<Municipality> ml) {
-        authMunis = ml;
-    }
-
     
     // no setters for access permissions private variables!!
 
@@ -355,7 +329,6 @@ public class User implements Serializable{
         hash = 43 * hash + Objects.hashCode(this.roleType);
         hash = 43 * hash + Objects.hashCode(this.username);
         hash = 43 * hash + Objects.hashCode(this.password);
-        hash = 43 * hash + Objects.hashCode(this.authMunis);
         hash = 43 * hash + Objects.hashCode(this.person);
         hash = 43 * hash + this.personID;
         hash = 43 * hash + Objects.hashCode(this.notes);
@@ -386,54 +359,7 @@ public class User implements Serializable{
         if (this.userID != other.userID) {
             return false;
         }
-        if (this.personID != other.personID) {
-            return false;
-        }
-        if (this.systemAccessPermitted != other.systemAccessPermitted) {
-            return false;
-        }
-        if (this.isEnforcementOfficial != other.isEnforcementOfficial) {
-            return false;
-        }
-        if (!Objects.equals(this.username, other.username)) {
-            return false;
-        }
-        if (!Objects.equals(this.password, other.password)) {
-            return false;
-        }
-        if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.badgeNumber, other.badgeNumber)) {
-            return false;
-        }
-        if (!Objects.equals(this.oriNumber, other.oriNumber)) {
-            return false;
-        }
-        if (this.roleType != other.roleType) {
-            return false;
-        }
-        if (!Objects.equals(this.authMunis, other.authMunis)) {
-            return false;
-        }
-        if (!Objects.equals(this.person, other.person)) {
-            return false;
-        }
-        if (!Objects.equals(this.activityStartDate, other.activityStartDate)) {
-            return false;
-        }
-        if (!Objects.equals(this.activityStartDateUtilDate, other.activityStartDateUtilDate)) {
-            return false;
-        }
-        if (!Objects.equals(this.activityStopDate, other.activityStopDate)) {
-            return false;
-        }
-        if (!Objects.equals(this.activityStopDateUtilDate, other.activityStopDateUtilDate)) {
-            return false;
-        }
-        if (!Objects.equals(this.keyCard, other.keyCard)) {
-            return false;
-        }
+       
         return true;
     }
     

@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -175,9 +176,9 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         cvi.deleteCodeViolation(cv);
     }
     
-    public ArrayList getCodeViolations(CECase ceCase) throws IntegrationException{
+    public List getCodeViolations(CECase ceCase) throws IntegrationException{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        ArrayList al = cvi.getCodeViolations(ceCase);
+        List al = cvi.getCodeViolations(ceCase);
         return al;
     }
     

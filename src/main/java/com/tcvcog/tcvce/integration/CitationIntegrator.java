@@ -237,7 +237,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
     
     private List<CodeViolation> getCodeViolations(Citation cid) throws IntegrationException{
         
-        String query =  "SELECT codeviolation.violationid FROM public.citationviolation 	\n" +
+        String query =  "SELECT codeviolation_violationid FROM public.citationviolation 	\n" +
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
                         "	INNER JOIN public.codeviolation on codeviolation.violationid = citationviolation.codeviolation_violationid\n" +
                         "	WHERE citation.citationid=?;";
@@ -253,7 +253,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                violationList.add(cvi.getCodeViolation(rs.getInt("violationid")));
+                violationList.add(cvi.getCodeViolation(rs.getInt("codeviolation_violationid")));
                 
             }
             

@@ -28,6 +28,7 @@ import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,24 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return newUserID;
         
         
+    }
+    
+    /**
+     * The COGBot is a user that exists only in cyberspace and is used 
+     * as the owner of events created by the public and can also make requests
+     * to users at various times for various reasons. No human should ever
+     * attempt to take on the role of the COGBot for risk of becoming a cyborg
+     * is, indeed, very great.
+     * @return
+     * @throws IntegrationException 
+     */
+    public User getCogBotUser() throws IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        User u;
+        u = ui.getUser(Integer.parseInt(
+                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("cogRobotUserID")));
+        return u;
     }
     
   

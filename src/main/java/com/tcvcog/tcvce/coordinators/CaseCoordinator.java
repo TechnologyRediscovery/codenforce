@@ -462,7 +462,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         
         
-        ArrayList caseViolationList = cvi.getCodeViolations(c);
+        List caseViolationList = cvi.getCodeViolations(c);
         boolean complianceWithAllViolations = false;
         ListIterator<CodeViolation> fullViolationLi = caseViolationList.listIterator();
         CodeViolation cv;
@@ -662,8 +662,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public ArrayList retrieveViolationList(CECase ceCase) throws IntegrationException{
-        ArrayList<CodeViolation> al;
+    public List retrieveViolationList(CECase ceCase) throws IntegrationException{
+        List<CodeViolation> al;
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         al = cvi.getCodeViolations(ceCase);
         return al;

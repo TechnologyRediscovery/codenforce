@@ -69,7 +69,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private User facesUser;
     private Property activeProp;
     private Person activePerson;
-    private List<Person> activePersonList;
     private PropertyWithLists activePropWithList;
     
     /* *** Municipal Code Session Shelves ***  */
