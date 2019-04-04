@@ -24,17 +24,14 @@
 
                         <h:form id="requestCEActionFlowFormChooseMuni">
 
-                            <p:outputLabel for="muniSM" value="Choose your municipality:"/>
+                            <p:outputLabel for="muniSelectMenu" value="Choose your municipality:"/>
                             <p:spacer height="5px"/>
-                            <p:selectOneMenu
-                                id="muniSM" tabindex="1"
-                                value="#{cEActionRequestSubmitBB.selectedMuni}">
-                                
+                            
+                            <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{cEActionRequestSubmitBB.selectedMuni}">
                                 <f:converter converterId="muniConverter"/>
-                                <f:selectItems id="muniNameList" value="#{cEActionRequestSubmitBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                
+                                <f:selectItem itemLabel="select a municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                             </p:selectOneMenu>
-
                             <p:spacer height="10px"/>
 
                             <p:commandButton ajax="false" value="Next step: Choose a property" 

@@ -242,7 +242,8 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 
 	CREATE TABLE codeviolationseverityclass
 	(
-		classid 			INTEGER DEFAULT nextval('codeviolationseverityclass_seq') CONSTRAINT codeviolationseverityclass_pk PRIMARY KEY,
+		classid 			INTEGER DEFAULT nextval('codeviolationseverityclass_seq') 
+									CONSTRAINT codeviolationseverityclass_pk PRIMARY KEY,
 		title 				TEXT,
 		muni_municode 		INTEGER,
 		numericrating		INTEGER,
@@ -251,11 +252,19 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 		icon_iconid 		INTEGER
 	);
 
-	ALTER TABLE codeviolationseverityclass ADD CONSTRAINT cvclass_fk FOREIGN KEY ( muni_muniCode ) REFERENCES municipality ( muniCode ) ;
-	ALTER TABLE codeviolationseverityclass ADD CONSTRAINT cvclass_iconid_fk FOREIGN KEY (icon_iconid) REFERENCES icon (iconid);
+	ALTER TABLE codeviolationseverityclass ADD 
+		CONSTRAINT cvclass_fk FOREIGN KEY ( muni_muniCode ) 
+		REFERENCES municipality ( muniCode ) ;
 
-	-- now link a code violation to its classification table we just made
-	ALTER TABLE codeviolation ADD COLUMN severity_classid INTEGER CONSTRAINT codeviolationseverityclass_fk REFERENCES codeviolationseverityclass (classid);
+	ALTER TABLE codeviolationseverityclass ADD 
+		CONSTRAINT cvclass_iconid_fk FOREIGN KEY (icon_iconid) 
+		REFERENCES icon (iconid);
+
+	ALTER TABLE codeviolation ADD COLUMN severity_classid INTEGER 
+		CONSTRAINT codeviolationseverityclass_fk 
+		REFERENCES codeviolationseverityclass (classid);
+
+
 
 	CREATE SEQUENCE IF NOT EXISTS codesetelementclass_seq
 	    START WITH 10

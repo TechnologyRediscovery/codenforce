@@ -31,8 +31,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import javax.faces.bean.ManagedProperty;
 
 /**
  *
@@ -40,18 +40,10 @@ import javax.faces.bean.ManagedProperty;
  */
 public class MunicipalityIntegrator extends BackingBeanUtils implements Serializable {
 
-    // this is a test injected bean -- not currently working as of 19-OCT-18
-    @ManagedProperty(value="#{codeIntegrator}")
-    private CodeIntegrator ci;
-   
-    
-    private HashMap municipalityMap;
     /**
      * Creates a new instance of MunicipalityIntegrator
      */
     public MunicipalityIntegrator() {
-        
-        
     }
     
     public Map<String, Integer> getCaseCountsByPhase(int muniCode) throws IntegrationException{
@@ -66,7 +58,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         phaseValuesArray[6] = CasePhase.InitialPostHearingComplianceTimeframe;
         phaseValuesArray[7] = CasePhase.SecondaryPostHearingComplianceTimeframe;
         //CasePhase[] phaseValuesArray = CasePhase.values();
-        
         
         Map<String, Integer> caseCountMap = new LinkedHashMap<>();
         PreparedStatement stmt = null;
@@ -110,7 +101,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         PreparedStatement stmt = null;
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
-        String query = "SELECT municode FROM public.municipality WHERE municode = ?;";
+        String query = "SELECT municode, muniname, address_street, address_city, address_state, \n" +
+                        "       address_zip, phone, fax, email, managername, managerphone, population, \n" +
+                        "       activeinprogram, defaultcodeset, occpermitissuingsource_sourceid, \n" +
+                        "       defaultcodeofficeruser, defaultcourtentity FROM public.municipality WHERE municode = ?;";
         ResultSet rs = null;
  
         try {
@@ -120,12 +114,13 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             //System.out.println("MunicipalityIntegrator.getMuni | query: " + stmt.toString());
             rs = stmt.executeQuery();
             while(rs.next()){
-                muni = getMuni(rs.getInt("municode"));
+                System.out.println("MuniIntegrator.getMuni| inside while having at least one row");
+                muni = generateMuni(rs);
             }
             
         } catch (SQLException ex) {
-            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuniFromMuniCode", ex);
+            System.out.println("MunicipalityIntegrator.getMuni | " + ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuni", ex);
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
@@ -146,6 +141,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setMuniName(rs.getString("muniname"));
         muni.setAddress_street(rs.getString("address_street"));
         muni.setAddress_city(rs.getString("address_city"));
+        
 
         muni.setAddress_state(rs.getString("address_state"));
         muni.setAddress_zip(rs.getString("address_zip"));
@@ -161,29 +157,29 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setDefaultCodeSetID(rs.getInt("defaultcodeset"));
         muni.setIssuingPermitCodeSourceID(rs.getInt("occpermitissuingsource_sourceid"));
         muni.setDefaultCodeOfficerUser(ui.getUser(rs.getInt("defaultcodeofficeruser")));
-        muni.setDefaultCourtEntity(courtInt.getCourtEntity(rs.getInt("defaultcourtentity")));
+//        muni.setDefaultCourtEnti        muni.setAddress_state(rs.getString("address_state"));ty(courtInt.getCourtEntity(rs.getInt("defaultcourtentity")));
         
         return muni;
     }
     
-    public void generateCompleteMuniNameIDMap() throws IntegrationException{
-        HashMap<String, Integer> muniMap = new HashMap<>();
-       
-        Connection con = getPostgresCon();
-        
-        String query = "SELECT muniCode, muniName FROM municipality;";
+    public List<Municipality> getMuniList() throws IntegrationException{
+        List<Municipality> mList = new ArrayList<>();
+        String query = "SELECT municode FROM municipality;";
         ResultSet rs = null;
         Statement stmt = null;
+        System.out.println("MunicipalityIntegrator.getMuniList | about to get pgcon");
+        Connection con = getPostgresCon();
  
         try {
             stmt = con.createStatement();
             rs = stmt.executeQuery(query);
             while(rs.next()){
-                muniMap.put(rs.getString("muniName"), rs.getInt("muniCode"));
+                System.out.println("MunicipalityIntegrator.getMuniList | added muni to list");
+                mList.add(getMuni(rs.getInt("municode")));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.generateCompleteMuniNameIDMap", ex);
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuniList", ex);
 
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
@@ -191,9 +187,11 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        municipalityMap = muniMap;
+        return mList;
+        
     }
     
+   
     
     public User getDefaultCodeOfficer(int  muniCode) throws IntegrationException{
         User u = null;
@@ -214,7 +212,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.generateCompleteMuniNameIDMap", ex);
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getDefaultCodeOfficer", ex);
 
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
@@ -266,7 +264,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.generateCompleteMuniNameIDMap", ex);
+            throw new IntegrationException("Exception in MunicipalityIntegrator.updateMuni", ex);
 
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
@@ -277,66 +275,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
    
 
-    /**
-     * @return the municipalityMap
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public HashMap getMunicipalityMap() throws IntegrationException{
-        generateCompleteMuniNameIDMap();
-        return municipalityMap;
-    }
-
-    /**
-     * @param municipalityMap the municipalityMap to set
-     */
-    public void setMunicipalityMap(HashMap municipalityMap) {
-        this.municipalityMap = municipalityMap;
-    }
     
-    public ArrayList<Municipality> getCompleteMuniList() throws IntegrationException{
-        ArrayList<Municipality> ll = new ArrayList<>();
-        Municipality m;
-        Connection con = getPostgresCon();
-        String query = "SELECT muniCode, muniName FROM municipality;";
-        ResultSet rs = null;
-        Statement stmt = null;
- 
-        
-        System.out.println("MunicipalityIntegrator.gnerateCompleteMuniNameIDMap: con chars: " + con.toString());
-        
-        try {
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(query);
-            while(rs.next()){
-                m = getMuni(rs.getInt("muniCode"));
-                ll.add(m);
-                
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.generateCompleteMuniNameIDMap", ex);
 
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return ll;
-    }
-
-    /**
-     * @return the ci
-     */
-    public CodeIntegrator getCi() {
-        return ci;
-    }
-
-    /**
-     * @param ci the ci to set
-     */
-    public void setCi(CodeIntegrator ci) {
-        this.ci = ci;
-    }
     
 }

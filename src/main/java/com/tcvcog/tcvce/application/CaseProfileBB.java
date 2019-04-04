@@ -663,58 +663,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
    
 
-    public String createCitationForAllViolations() {
+    public String createNewCitation() {
         System.out.println("CaseManageBB.createCitationForAllViolations | current case tostring: "
                 + currentCase);
-//        if(!currentCase.getViolationList().isEmpty()){
-        if (currentCase != null) {
-            if (checkViolationListForNoComplianceDates(selectedViolations)) {
-                CaseCoordinator cc = getCaseCoordinator();
-                getSessionBean().setActiveCitation(cc.generateNewCitation(currentCase.getViolationList()));
-                return "citationEdit";
-            } else {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Yikes! You may not cite a violation with a compliance date!", ""));
-                return "";
-            }
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Please select a violation and try again", ""));
-        return "";
+        getSessionBean().setActiveCitation(null);
+        getSessionBean().getcECaseQueue().remove(currentCase);
+        getSessionBean().getcECaseQueue().add(0, currentCase);
+        return "citationEdit";
     }
 
-    public String createCitationFromSelected() {
-        System.out.println("CaseManageBB.createCitationFromSelected");
-        if (!selectedViolations.isEmpty()) {
-            if (checkViolationListForNoComplianceDates(selectedViolations)) {
-                CaseCoordinator cc = getCaseCoordinator();
-                getSessionBean().setActiveCitation(cc.generateNewCitation(selectedViolations));
-                return "citationEdit";
-            } else {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Yikes! You may not cite a violation with a compliance date!", ""));
-                return "";
-            }
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Please select a violation and try again", ""));
-        return "";
-    }
-
-    public String updateCitation() {
-        if (selectedCitation != null) {
-
-            getSessionBean().setActiveCitation(selectedCitation);
-            return "citationEdit";
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Please select a citation and try again", ""));
-        return "";
+    public String updateCitation(Citation cit) {
+        getSessionBean().setActiveCitation(cit);
+        getSessionBean().getcECaseQueue().remove(currentCase);
+        getSessionBean().getcECaseQueue().add(0, currentCase);
+        return "citationEdit";
     }
 
     public String deleteCitation() {

@@ -268,7 +268,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         sb.append("<br>");
         sb.append(u.getPerson().getJobTitle());
         sb.append("<br>");
-        sb.append(u.getMuni().getMuniName());
+        sb.append(getSessionBean().getActiveMuni().getMuniName());
         sb.append("<br>");
         sb.append(u.getPerson().getPhoneWork());
         sb.append("<br>");

@@ -34,7 +34,6 @@ import javax.faces.event.ActionEvent;
 public class OccPermitApplicationBB extends BackingBeanUtils implements Serializable{
 
     private Municipality selectedMuni;
-    private List<Municipality> muniList;
     private Date form_dateOfRecord;
     
     private boolean multiUnit;
@@ -93,9 +92,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         this.form_dateOfRecord = form_dateOfRecord;
     }
     
-    public void setMuniList(List<Municipality> muniList){
-        this.muniList = muniList;
-    }
+   
 
     public String getHouseNum() {
         return houseNum;
@@ -260,15 +257,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "addReason";
         }
     
-    public List<Municipality> getMuniList() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            muniList = mi.getCompleteMuniList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return muniList;
-    }
+    
     
     public void removeSelectedUnit(PropertyUnit selectedUnit){
         propUnitsToAdd.remove(selectedUnit);

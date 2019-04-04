@@ -198,20 +198,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         this.currentMuni = currentMuni;
     }
 
-    /**
-     * @return the muniList
-     */
-    public ArrayList<Municipality> getMuniList() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        if(muniList == null){
-            try {
-                muniList = mi.getCompleteMuniList();
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-        }
-        return muniList;
-    }
+    
 
     /**
      * @param muniList the muniList to set
