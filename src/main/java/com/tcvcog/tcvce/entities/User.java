@@ -33,10 +33,8 @@ public class User implements Serializable{
     private RoleType roleType;
     private String username;
     private String password;
-    private List<Municipality> authMunis;
     
-    // To be deprecated 
-    private Municipality muni;
+    private List<Municipality> authMunis;
     
     private Person person;
     private int personID;
@@ -61,8 +59,6 @@ public class User implements Serializable{
      */
     public User() {
     }
-    
-    
     
     /**
      * Creates a new instance of User
@@ -118,20 +114,7 @@ public class User implements Serializable{
         this.username = username;
     }
 
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
-    }
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
-
+    
    
     /**
      * @return the notes
@@ -373,7 +356,6 @@ public class User implements Serializable{
         hash = 43 * hash + Objects.hashCode(this.username);
         hash = 43 * hash + Objects.hashCode(this.password);
         hash = 43 * hash + Objects.hashCode(this.authMunis);
-        hash = 43 * hash + Objects.hashCode(this.muni);
         hash = 43 * hash + Objects.hashCode(this.person);
         hash = 43 * hash + this.personID;
         hash = 43 * hash + Objects.hashCode(this.notes);
@@ -432,9 +414,6 @@ public class User implements Serializable{
             return false;
         }
         if (!Objects.equals(this.authMunis, other.authMunis)) {
-            return false;
-        }
-        if (!Objects.equals(this.muni, other.muni)) {
             return false;
         }
         if (!Objects.equals(this.person, other.person)) {

@@ -402,18 +402,7 @@ public class CourtEntityBB extends BackingBeanUtils implements Serializable {
         this.formNotes = fomrNotes;
     }
 
-    /**
-     * @return the muniList
-     */
-    public ArrayList<Municipality> getMuniList() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            muniList = mi.getCompleteMuniList();
-        } catch (IntegrationException ex) {
-            System.out.println("ex");
-        }
-        return muniList;
-    }
+    
 
     /**
      * @param muniList the muniList to set

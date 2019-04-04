@@ -104,6 +104,11 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         removedViolationList.add(v);
     }
     
+    public void returnViolation(CodeViolation v){
+        currentCitation.getViolationList().add(v);
+        removedViolationList.remove(v);
+    }
+    
     public String updateCitation(){
         System.out.println("CitationBB.updateCitation");
         CaseCoordinator cc = getCaseCoordinator();

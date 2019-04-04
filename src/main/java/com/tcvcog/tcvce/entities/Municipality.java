@@ -260,42 +260,7 @@ public class Municipality implements Serializable{
         if (this.muniCode != other.muniCode) {
             return false;
         }
-        if (this.population != other.population) {
-            return false;
-        }
-        if (this.activeInProgram != other.activeInProgram) {
-            return false;
-        }
-        if (!Objects.equals(this.muniName, other.muniName)) {
-            return false;
-        }
-        if (!Objects.equals(this.address_street, other.address_street)) {
-            return false;
-        }
-        if (!Objects.equals(this.address_city, other.address_city)) {
-            return false;
-        }
-        if (!Objects.equals(this.address_state, other.address_state)) {
-            return false;
-        }
-        if (!Objects.equals(this.address_zip, other.address_zip)) {
-            return false;
-        }
-        if (!Objects.equals(this.phone, other.phone)) {
-            return false;
-        }
-        if (!Objects.equals(this.fax, other.fax)) {
-            return false;
-        }
-        if (!Objects.equals(this.email, other.email)) {
-            return false;
-        }
-        if (!Objects.equals(this.managerName, other.managerName)) {
-            return false;
-        }
-        if (!Objects.equals(this.managerPhone, other.managerPhone)) {
-            return false;
-        }
+       
         return true;
     }
 

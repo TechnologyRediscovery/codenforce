@@ -4,6 +4,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
@@ -60,10 +61,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private List<Property> filteredPropList;
     private UIInput addressInput;
     
-    private ArrayList<CEActionRequest> ceActionRequestList;
-
-    private int selectedMuniCode;
-    private CECase selectedCECase;
+    private Municipality selectedMuni;
 
 
     
@@ -224,12 +222,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return addressInput;
     }
 
-    /**
-     * @return the selectedMuniCode
-     */
-    public int getSelectedMuniCode() {
-        return selectedMuniCode;
-    }
+   
 
     /**
      * @param parid the parid to set
@@ -287,24 +280,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.filteredPropList = filteredPropList;
     }
 
-    /**
-     * @param addressInput the addressInput to set
-     */
-
-    public void setSelectedCECase(CECase selectedCECase) {
-        this.selectedCECase = selectedCECase;
-    }
+    
 
     public void setAddressInput(UIInput addressInput) {
         this.addressInput = addressInput;
     }
 
-    /**
-     * @param selectedMuniCode the selectedMuniCode to set
-     */
-    public void setSelectedMuniCode(int selectedMuniCode) {
-        this.selectedMuniCode = selectedMuniCode;
-    }
+   
 
    
 
@@ -329,7 +311,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public ArrayList<Person> getpList() throws IntegrationException {
             PropertyIntegrator pi = getPropertyIntegrator();
         if(pList == null || currProp == null){
-            pList= pi.getPersonIntegrator().getPersonList(selectedMuniCode);
+            pList= pi.getPersonIntegrator().getPersonList(selectedMuni.getMuniCode());
         }
         return pList;
     }
@@ -339,6 +321,20 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setpList(ArrayList<Person> pList) {
         this.pList = pList;
+    }
+
+    /**
+     * @return the selectedMuni
+     */
+    public Municipality getSelectedMuni() {
+        return selectedMuni;
+    }
+
+    /**
+     * @param selectedMuni the selectedMuni to set
+     */
+    public void setSelectedMuni(Municipality selectedMuni) {
+        this.selectedMuni = selectedMuni;
     }
 
    

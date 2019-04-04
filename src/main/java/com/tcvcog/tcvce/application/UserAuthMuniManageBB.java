@@ -18,13 +18,13 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -33,42 +33,34 @@ import javax.faces.application.FacesMessage;
  */
 public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializable {
     
-    private ArrayList<Municipality> muniList;    
-    private ArrayList<Municipality> authMuniList;
-    private ArrayList<Municipality> unauthorizedMuniList;    
-    private ArrayList<User> userList;
+    private List<Municipality> muniList;    
+    private List<Municipality> authMuniList;
+    private List<Municipality> unauthorizedMuniList;    
+    private List<User> userList;
     
-    private ArrayList<Municipality> selectedMunis;
+    private List<Municipality> selectedMunis;
     private Municipality selectedMuni;
     private User selectedUser;
- 
+
     public UserAuthMuniManageBB() {
         
     }
     
-    public ArrayList<Municipality> getMuniList() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            muniList = mi.getCompleteMuniList();
-        } catch (IntegrationException ex) {
-            System.out.println("UserAuthMuniManageBB.getMuniList | " + ex.toString());
-        }
-        return muniList;
-    }
+   
     
-    public void setMuniList(ArrayList<Municipality> muniList) {        
+    public void setMuniList(List<Municipality> muniList) {        
         this.muniList = muniList;
     }
     
-    public ArrayList<Municipality> getAuthMuniList() {
+    public List<Municipality> getAuthMuniList() {
         return authMuniList;
     }
 
-    public void setAuthMuniList(ArrayList<Municipality> authMuniList) {
+    public void setAuthMuniList(List<Municipality> authMuniList) {
         this.authMuniList = authMuniList;
     }
     
-    public ArrayList<Municipality> getUnauthorizedMuniList() {
+    public List<Municipality> getUnauthorizedMuniList() {
         if (selectedUser == null) {
             return unauthorizedMuniList;
         }
@@ -84,11 +76,11 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
         return unauthorizedMuniList;
     }
 
-    public void setUnauthorizedMuniList(ArrayList<Municipality> unauthorizedMuniList) {
+    public void setUnauthorizedMuniList(List<Municipality> unauthorizedMuniList) {
         this.unauthorizedMuniList = unauthorizedMuniList;
     }
 
-    public ArrayList<User> getUserList() {
+    public List<User> getUserList() {
         UserIntegrator ui = getUserIntegrator();
         try {
             if (userList == null) {
@@ -105,15 +97,15 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
         return userList;
     }
     
-    public void setUserList(ArrayList<User> userList) {
+    public void setUserList(List<User> userList) {
         this.userList = userList;
     }
 
-    public ArrayList<Municipality> getSelectedMunis() {
+    public List<Municipality> getSelectedMunis() {
         return selectedMunis;
     }
 
-    public void setSelectedMunis(ArrayList<Municipality> selectedMunis) {
+    public void setSelectedMunis(List<Municipality> selectedMunis) {
         this.selectedMunis = selectedMunis;
     }
     

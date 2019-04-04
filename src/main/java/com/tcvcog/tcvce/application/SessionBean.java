@@ -65,7 +65,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     /* *** System Core Objects Session Shelves ***  */
     private Municipality activeMuni;
-    private List<Municipality> availableMuniList;
+    private List<Municipality> userAuthMuniList;
     private User facesUser;
     private Property activeProp;
     private Person activePerson;
@@ -401,17 +401,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the availableMuniList
+     * @return the userAuthMuniList
      */
-    public List<Municipality> getAvailableMuniList() {
-        return availableMuniList;
+    public List<Municipality> getUserAuthMuniList() {
+        return userAuthMuniList;
     }
 
     /**
-     * @param availableMuniList the availableMuniList to set
+     * @param userAuthMuniList the userAuthMuniList to set
      */
-    public void setAvailableMuniList(List<Municipality> availableMuniList) {
-        this.availableMuniList = availableMuniList;
+    public void setUserAuthMuniList(List<Municipality> userAuthMuniList) {
+        this.userAuthMuniList = userAuthMuniList;
     }
 
     /**
