@@ -41,9 +41,9 @@ public class Municipality implements Serializable{
     private boolean activeInProgram;
     private int defaultCodeSetID;
     private int issuingPermitCodeSourceID;
-    private User defaultCodeOfficerUser;
-    private CourtEntity defaultCourtEntity;
-
+    private int defaultCodeOfficerUserID;
+    private int defaultCourtEntityID;
+    
     /**
      * @return the muniCode
      */
@@ -293,32 +293,34 @@ public class Municipality implements Serializable{
         this.issuingPermitCodeSourceID = issuingPermitCodeSourceID;
     }
 
+    
+
     /**
-     * @return the defaultCodeOfficerUser
+     * @return the defaultCodeOfficerUserID
      */
-    public User getDefaultCodeOfficerUser() {
-        return defaultCodeOfficerUser;
+    public int getDefaultCodeOfficerUserID() {
+        return defaultCodeOfficerUserID;
     }
 
     /**
-     * @param defaultCodeOfficerUser the defaultCodeOfficerUser to set
+     * @param defaultCodeOfficerUserID the defaultCodeOfficerUserID to set
      */
-    public void setDefaultCodeOfficerUser(User defaultCodeOfficerUser) {
-        this.defaultCodeOfficerUser = defaultCodeOfficerUser;
+    public void setDefaultCodeOfficerUserID(int defaultCodeOfficerUserID) {
+        this.defaultCodeOfficerUserID = defaultCodeOfficerUserID;
     }
 
     /**
-     * @return the defaultCourtEntity
+     * @return the defaultCourtEntityID
      */
-    public CourtEntity getDefaultCourtEntity() {
-        return defaultCourtEntity;
+    public int getDefaultCourtEntityID() {
+        return defaultCourtEntityID;
     }
 
     /**
-     * @param defaultCourtEntity the defaultCourtEntity to set
+     * @param defaultCourtEntityID the defaultCourtEntityID to set
      */
-    public void setDefaultCourtEntity(CourtEntity defaultCourtEntity) {
-        this.defaultCourtEntity = defaultCourtEntity;
+    public void setDefaultCourtEntityID(int defaultCourtEntityID) {
+        this.defaultCourtEntityID = defaultCourtEntityID;
     }
 
     

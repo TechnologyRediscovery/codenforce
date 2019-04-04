@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
 import java.time.LocalDateTime;
@@ -93,25 +94,38 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return sc.getSearchParamsComplianceEvPastMonth(m);
     }
     
+    
+    public List<EventCasePropBundle> configureEventBundleList(List<EventCasePropBundle> evList, User user, List<Municipality> userAuthMuniList) throws IntegrationException{
+        Iterator<EventCasePropBundle> iter = evList.iterator();
+        while(iter.hasNext()){
+            configureEvent(iter.next().getEvent(), user, userAuthMuniList);
+        }
+        return evList;
+    }
+    
+    
+    
     /**
-     * Called ONLY by the EventIntegrator to set member variables based on business
-     * rules before sending the event onto its requesting method. Checks for request processing, 
+     * Called by the EventIntegrator and other getEventCECase methods to set member variables based on business
+ rules before sending the event onto its requesting method. Checks for request processing, 
      * sets intended responder for action requests, etc.
      * @param ev
+     * @param user
+     * @param userAuthMuniList
      * @return a nicely configured EventCEEcase
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public EventCECase configureRetrievedEvent(EventCECase ev) throws IntegrationException{
+    public EventCECase configureEvent(EventCECase ev, User user, List<Municipality> userAuthMuniList) throws IntegrationException{
         CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
         
        
-
+        ev.setCurrentUserCanTakeAction(canUserTakeRequestedAction(ev, user, userAuthMuniList));
         if(ev.getActionEventCat()!= null){
-            if(ev.isDirectRequestToDefaultMuniCEO()){
+            if(ev.isRequestActionByDefaultMuniCEO()){
                     ev.setResponderIntended(ci.getDefaultCodeOfficer(ev.getCaseID()));
             }
-            // as long as any exiting action request is complete and it was not
+            // as long as any existing action request is complete and it was not
             // rejected (i.e. no event created in response to the request)
             // go get the triggering event
             if(ev.isResponseComplete() && !ev.isRequestRejected()){
@@ -128,18 +142,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * Pathway for injecting business logic into the event search process. Now its just a pass through.
      * @param params
      * @param user the current user
+     * @param userAuthMuniList
      * @return
      * @throws IntegrationException 
      */
-    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params, User user) throws IntegrationException{
+    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params, User user, List<Municipality> userAuthMuniList) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        EventCasePropBundle ev;
-        List<EventCasePropBundle> evList = ei.queryEvents(params);
-        Iterator<EventCasePropBundle> iter = evList.iterator();
-        while(iter.hasNext()){
-            ev = iter.next();
-            ev.getEvent().setCurrentUserCanTakeAction(determineUserActionRequestEventAuthorization(ev, user));
-        }        
+        List<EventCasePropBundle> evList = configureEventBundleList(ei.queryEvents(params),user,userAuthMuniList);
         return evList;
     }
     
@@ -148,19 +157,19 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * at the event level by user
      * @param ev
      * @param u the User viewing the list of CEEvents
+     * @param muniList
      * @return 
      */
-    public boolean determineUserActionRequestEventAuthorization(EventCasePropBundle ev, User u){
+    public boolean canUserTakeRequestedAction(EventCECase ev, User u, List<Municipality> muniList){
         boolean canDoRequestedEvent = false;
-        EventType evType = ev.getEvent().getCategory().getEventType();
-        List<Municipality> muniList = u.getAuthMunis();
+        EventType evType = ev.getCategory().getEventType();
         
         // direct event assignment allows view conf to cut across regular permissions
         // checks
-        if(ev.getEvent().getOwner().equals(u) || u.getKeyCard().isHasDeveloperPermissions()){
+        if(ev.getOwner().equals(u) || u.getKeyCard().isHasDeveloperPermissions()){
             return true;
             // check that the event is associated with the user's auth munis
-        } else if(muniList.contains(ev.getEventCaseBare().getProperty().getMuni())){
+        } else if(isMunicodeInMuniList(ev.getMuniCode(), muniList)){
             // sys admins for a muni can confirm everything
             if(u.getKeyCard().isHasSysAdminPermissions()){
                 return true;
@@ -285,7 +294,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public void attachPublicMessagToCECase(int caseID, String message) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        
+        UserCoordinator uc = getUserCoordinator();
         
         int publicMessageEventCategory = Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("publicCECaseMessage"));
         EventCategory ec = getInitiatlizedEventCategory(publicMessageEventCategory);
@@ -295,7 +304,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setOwner(getSystemRobotUser());
+        event.setOwner(uc.getCogBotUser());
         event.setDiscloseToMunicipality(true);
         event.setDiscloseToPublic(true);
         event.setActive(true);

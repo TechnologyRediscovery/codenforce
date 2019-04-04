@@ -30,6 +30,7 @@ import javax.faces.application.Application;
 import java.sql.Connection;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -61,11 +62,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.el.ValueExpression;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -164,21 +164,20 @@ public class BackingBeanUtils implements Serializable{
         return bundle;
     }
     
-    /**
-     * A hacky way of creating a temporary User object who only
-     * has an ID number and no access permissions or ID info. Used for inserting
-     * events by public folks who don't have an actual User in the system.
-     * The ID of this user is pulled from the message bundles.
-     * @return the system robot user with only an ID number
-     */
-    public User getSystemRobotUser(){
-        User u = new User();
-        u.setUserID(Integer.parseInt(
-                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("cogRobotUserID")));
         
-        return u;
+    public boolean isMunicodeInMuniList(int muniCode, List<Municipality> muniList){
+        Municipality m;
+        boolean isInList = false;
+        Iterator<Municipality> iter = muniList.iterator();
+        while(iter.hasNext()){
+            m = iter.next();
+            if(m.getMuniCode() == muniCode){
+                isInList = true;
+            }
+        }
+        return isInList;
     }
+    
     
     
     public void setUserCoordinator(UserCoordinator userCoordinator){

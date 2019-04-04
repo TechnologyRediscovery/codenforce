@@ -209,10 +209,11 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
-    public NoticeOfViolation getNoticeOfViolation(int violationID) throws IntegrationException {
-        String query = "SELECT noticeid, caseid, lettertext, insertiontimestamp, dateofrecord, \n"
-                + "       requesttosend, lettersenddate, letterreturneddate\n"
-                + "  FROM public.noticeofviolation;";
+    public NoticeOfViolation getNoticeOfViolation(int noticeID) throws IntegrationException {
+        String query = "SELECT noticeid, caseid, lettertext, insertiontimestamp, dateofrecord, \n" +
+                        "       requesttosend, lettersent, lettersenddate, letterreturneddate, \n" +
+                        "       personid_recipient\n" +
+                        "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -220,7 +221,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, violationID);
+            stmt.setInt(1, noticeID);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -463,10 +464,41 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
     }
 
     public List<CodeViolation> getCodeViolations(int caseID) throws IntegrationException {
-        CECase tinyCase = new CECase();
-        // this case is created to store a set of code violations
-        tinyCase.setCaseID(caseID);
-        return CodeViolationIntegrator.this.getCodeViolations(tinyCase);
+        String query = "SELECT violationid FROM codeviolation WHERE cecase_caseid = ?";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<CodeViolation> cvList = new ArrayList();
+        CodeViolation cv;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, caseID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                cv = getCodeViolation(rs.getInt("violationid"));
+                loadViolationPhotoList(cv);
+                cvList.add(cv);
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot fetch code violation by ID, sorry.", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return cvList;
+       
+    }
+    
+
+    public List<CodeViolation> getCodeViolations(CECase c) throws IntegrationException {
+        return getCodeViolations(c.getCaseID());
     }
     
     public void loadViolationPhotoList(CodeViolation cv) throws IntegrationException{
@@ -498,38 +530,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
     }
-
-    public ArrayList<CodeViolation> getCodeViolations(CECase c) throws IntegrationException {
-        String query = "SELECT violationid WHERE cecase_caseid = ?";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        ArrayList<CodeViolation> cvList = new ArrayList();
-        CodeViolation cv;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, c.getCaseID());
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                cv = getCodeViolation(rs.getInt("violationid"));
-                loadViolationPhotoList(cv);
-                cvList.add(cv);
-
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot fetch code violation by ID, sorry.", ex);
-
-        } finally {
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return cvList;
-    }
+    
     
     public HashMap<String, Integer> getTextBlockCategoryMap() throws IntegrationException{
         String query =  "SELECT categoryid, categorytitle\n" +

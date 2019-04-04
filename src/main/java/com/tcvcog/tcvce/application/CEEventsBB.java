@@ -59,7 +59,9 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         System.out.println("CEEventsBB.executeQuery");
         EventCoordinator ec = getEventCoordinator();
         try {
-            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            eventList = ec.queryEvents(searchParams, 
+                        getSessionBean().getFacesUser(), 
+                        getSessionBean().getUserAuthMuniList());
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -94,7 +96,9 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         searchParams = ec.getSearchParamsCEEventsRequiringAction(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
         try {
-            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            eventList = ec.queryEvents(searchParams, 
+                        getSessionBean().getFacesUser(), 
+                        getSessionBean().getUserAuthMuniList());
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -111,7 +115,9 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         searchParams = ec.getSearchParamsOfficerActibityPastWeek(getSessionBean().getFacesUser(),
                 getSessionBean().getActiveMuni());
         try {
-            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            eventList = ec.queryEvents(searchParams, 
+                        getSessionBean().getFacesUser(), 
+                        getSessionBean().getUserAuthMuniList());
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -126,7 +132,9 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
         searchParams = ec.getSearchParamsComplianceEvPastMonth(getSessionBean().getActiveMuni());
         try {
-            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            eventList = ec.queryEvents(searchParams, 
+                        getSessionBean().getFacesUser(), 
+                        getSessionBean().getUserAuthMuniList());
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -138,6 +146,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
+     * Not used
      * @param searchParams the searchParams to set
      */
     public void setSearchParams(SearchParamsCEEvents searchParams) {
@@ -154,8 +163,6 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
             while (iter.hasNext()) {
                 e = iter.next();
                 e = ei.getEventCasePropBundle(e.getEvent().getEventID());
-                e.getEvent().setCurrentUserCanTakeAction(
-                        ec.determineUserActionRequestEventAuthorization(e, getSessionBean().getFacesUser()));
                 refreshedList.add(e);
             }
         } catch (IntegrationException ex) {

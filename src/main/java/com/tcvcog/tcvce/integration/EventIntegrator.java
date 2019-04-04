@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.EventExceptionDeprecated;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -382,7 +383,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(11, java.sql.Types.NULL);
             }
             
-            stmt.setBoolean(12, event.isDirectRequestToDefaultMuniCEO());
+            stmt.setBoolean(12, event.isRequestActionByDefaultMuniCEO());
             
             if(event.getResponderIntended() != null){
                 stmt.setInt(13, event.getResponderIntended().getUserID());
@@ -495,7 +496,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println("EventIntegrator.updateEvent: found event category to update");
             stmt.setInt(++paramCounter, event.getActionEventCat().getCategoryID());
             stmt.setInt(++paramCounter, event.getActionRequestedBy().getUserID());
-            stmt.setBoolean(++paramCounter, event.isDirectRequestToDefaultMuniCEO());
+            stmt.setBoolean(++paramCounter, event.isRequestActionByDefaultMuniCEO());
             User u = event.getResponderIntended();
             if(u != null){
                 stmt.setInt(++paramCounter, event.getResponderIntended().getUserID());
@@ -559,7 +560,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     private EventCECase generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException {
         EventCECase ev = new EventCECase();
         UserIntegrator ui = getUserIntegrator();
+        SessionSystemCoordinator ssc = getSsCoordinator();
         
+        ev.setPropertyID(rs.getInt("property_propertyid"));
+        ev.setMuniCode(rs.getInt("municipality_municode"));
+        ev.setMuniName(ssc.getMuniCodeNameMap().get(rs.getInt("municipality_municode")));
 
         ev.setEventID(rs.getInt("eventid"));
         ev.setCategory(getEventCategory(rs.getInt("ceeventCategory_catID")));
@@ -582,11 +587,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         ev.setHidden(rs.getBoolean("hidden"));
         ev.setNotes(rs.getString("notes"));
-        System.out.println("EventIntegrator.generateEvent | reqeventcatid: " + rs.getInt("requestedeventcat_catid"));
         
         ev.setActionEventCat(getEventCategory(rs.getInt("requestedeventcat_catid")));
         
-        ev.setDirectRequestToDefaultMuniCEO(rs.getBoolean("directrequesttodefaultmuniceo"));
+        ev.setRequestActionByDefaultMuniCEO(rs.getBoolean("directrequesttodefaultmuniceo"));
         
         if(rs.getInt("actionrequestedby_userid")!=0){
             ev.setActionRequestedBy(ui.getUser(rs.getInt("actionrequestedby_userid")));
@@ -605,9 +609,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             ev.setRequestRejected(rs.getBoolean("rejeecteventrequest"));
             int responseEventID = rs.getInt("responseevent_eventid");
             if(responseEventID != 0){
-                ev.setResponseEvent(getEvent(responseEventID));
+                ev.setResponseEvent(getEventCECase(responseEventID));
             }
         } 
+
         
         return ev;
     }
@@ -634,7 +639,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             while (rs.next()) {
                 evCPBundle = new EventCasePropBundle();
-                evCPBundle.setEvent(getEvent(rs.getInt("eventid")));
+                evCPBundle.setEvent(getEventCECase(rs.getInt("eventid")));
                 evCPBundle.setEventCaseBare(ci.getCECaseBare(rs.getInt("cecase_caseid")));
             }
 
@@ -675,7 +680,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                ev = getEvent(rs.getInt("eventid"));
+                ev = getEventCECase(rs.getInt("eventid"));
             }
 
         } catch (SQLException ex) {
@@ -1105,17 +1110,19 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public EventCECase getEvent(int eventID) throws IntegrationException {
+    public EventCECase getEventCECase(int eventID) throws IntegrationException {
         EventCECase ev = null;
         EventCoordinator ec = getEventCoordinator();
 
         String query = "SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n" +
                 "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
-                "       disclosetopublic, activeevent, hidden, notes, responsetimestamp, \n" +
+                "       disclosetopublic, activeevent, hidden, ceevent.notes, responsetimestamp, \n" +
                 "       actionrequestedby_userid, respondernotes, responderintended_userid, \n" +
                 "       requestedeventcat_catid, responseevent_eventid, rejeecteventrequest, \n" +
-                "       responderactual_userid, directrequesttodefaultmuniceo "
-                + "     FROM public.ceevent WHERE eventid = ?;";
+                "       responderactual_userid, directrequesttodefaultmuniceo, property_propertyid,  municipality_municode " +
+                "       FROM public.ceevent INNER JOIN public.cecase ON (cecase_caseid = caseid)\n" +
+                "                           INNER JOIN public.property on (property_propertyid = propertyid) " +
+                "       WHERE eventid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1141,7 +1148,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return ec.configureRetrievedEvent(ev);    
+        return ev;    
     }
 
     public ArrayList<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException {
@@ -1159,7 +1166,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                eventList.add(getEvent(rs.getInt("eventid")));
+                eventList.add(getEventCECase(rs.getInt("eventid")));
             }
 
         } catch (SQLException ex) {

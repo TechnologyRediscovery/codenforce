@@ -31,6 +31,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -50,13 +52,14 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         CitationIntegrator citInt = getCitationIntegrator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        
         try {
             citationStatusList = citInt.getCitationStatusList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         
-        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         try {
             courtEntityList = cei.getCourtEntityList();
         } catch (IntegrationException ex) {
@@ -74,7 +77,11 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
             currentCitation.setDateOfRecord(LocalDateTime.now());
             currentCitation.setUserOwner(getSessionBean().getFacesUser());
             currentCitation.setIsActive(true);
-            currentCitation.setOrigin_courtentity(getSessionBean().getActiveMuni().getDefaultCourtEntity());
+            try {
+                currentCitation.setOrigin_courtentity(cei.getCourtEntity(getSessionBean().getActiveMuni().getDefaultCourtEntityID()));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
             List<CodeViolation> l = new ArrayList<>();
             for(CodeViolation v: ceCase.getViolationList()){
                 if(v.getActualComplianceDate() == null){

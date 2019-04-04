@@ -179,7 +179,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private void setupPersonEntry(){
         PersonCoordinator pc = getPersonCoordinator();
         Person p = pc.getNewPersonSkeleton(getSessionBean().getCeactionRequestForSubmission().getMuni());
-        p.setMuni(getSessionBean().getCeactionRequestForSubmission().getMuni());
+        p.setMuniCode(getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
         getSessionBean().setPersonForCEActionRequestSubmission(p);
     }
     

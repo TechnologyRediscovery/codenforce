@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -150,16 +151,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     private Person generatePersonFromResultSet(ResultSet rs) throws IntegrationException {
         // Instantiates the new person object
         Person newPerson = new Person();
-        MunicipalityIntegrator muniIntegrator = getMunicipalityIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        SessionSystemCoordinator ssc = getSsCoordinator();
         
         try {
             newPerson.setPersonID(rs.getInt("personid"));
             newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
-            Municipality m = muniIntegrator.getMuni(rs.getInt("muni_muniCode"));
-            newPerson.setMuni(m);
-            
-            
+            newPerson.setMuniCode(rs.getInt("muni_municode"));
+            newPerson.setMuniName(ssc.getMuniCodeNameMap().get(rs.getInt("muni_municode")));
+
             newPerson.setFirstName(rs.getString("fName"));
             newPerson.setLastName(rs.getString("lName"));
             newPerson.setJobTitle(rs.getString("jobtitle"));
@@ -186,13 +185,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             newPerson.setActive(rs.getBoolean("isactive"));
 
             newPerson.setUnder18(rs.getBoolean("isunder18"));
-            newPerson.setVerifiedBy(ui.getUser(rs.getInt("humanverifiedby")));
+            newPerson.setVerifiedByUserID(rs.getInt("humanverifiedby"));
             newPerson.setCompositeLastName(rs.getBoolean("compositelname"));
 
             newPerson.setSourceID(rs.getInt("sourceid"));
             newPerson.setSourceTitle(rs.getString("title"));
             
-            newPerson.setCreator(ui.getUser(rs.getInt("creator")));
+            newPerson.setCreatorUserID(rs.getInt("creator"));
             newPerson.setBusinessEntity(rs.getBoolean("businessentity"));
 
             newPerson.setMailingAddressStreet(rs.getString("mailing_address_street"));
@@ -208,12 +207,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 newPerson.setCreationTimeStamp(null);
             }
             newPerson.setCanExpire(rs.getBoolean("canexpire"));
+            newPerson.setLinkedUserID(rs.getInt("userlink"));
             
-            if(!(rs.getInt("userlink")==0)){
-                newPerson.setUserLink(ui.getUser(rs.getInt("userlink")));
-            } else {
-                newPerson.setUserLink(null);
-            }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -428,7 +423,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(1, java.sql.Types.NULL);
                 
             }
-            stmt.setInt(2, personToStore.getMuni().getMuniCode());
+            stmt.setInt(2, personToStore.getMuniCode());
 
             stmt.setString(3, personToStore.getFirstName());
             stmt.setString(4, personToStore.getLastName());
@@ -458,11 +453,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             
             stmt.setBoolean(18, personToStore.isUnder18());
-            if(personToStore.getVerifiedBy() != null){
-                stmt.setInt(19, personToStore.getVerifiedBy().getUserID());
-            } else {
-                stmt.setNull(19, java.sql.Types.NULL);
-            }
+            stmt.setInt(19, personToStore.getVerifiedByUserID());
             stmt.setBoolean(20, personToStore.isCompositeLastName());
             
             
@@ -471,12 +462,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setInt(21, unknownPersonSourceID);
             }
-            if(personToStore.getCreator() != null){
-                stmt.setInt(22, personToStore.getCreator().getUserID());
-            } else {
-                stmt.setNull(22, java.sql.Types.NULL);
-                
-            }
+            stmt.setInt(22, personToStore.getCreatorUserID());
             stmt.setBoolean(23, personToStore.isBusinessEntity());
             
             stmt.setString(24, personToStore.getMailingAddressStreet());
@@ -489,12 +475,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(29, personToStore.getExpiryNotes());
             stmt.setTimestamp(30, java.sql.Timestamp.valueOf(LocalDateTime.now()));
             stmt.setBoolean(31, personToStore.isCanExpire());
-            if(personToStore.getUserLink() != null){
-                stmt.setInt(32, personToStore.getUserLink().getUserID());
-            } else {
-                stmt.setNull(32, java.sql.Types.NULL);
-                
-            }
+            stmt.setInt(32, personToStore.getLinkedUserID());
 
             stmt.execute();
 
@@ -606,7 +587,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             // default ID generated by sequence in PostGres
             stmt.setString(1, personToUpdate.getPersonType().toString());
-            stmt.setInt(2, personToUpdate.getMuni().getMuniCode());
+            stmt.setInt(2, personToUpdate.getMuniCode());
 
             stmt.setString(3, personToUpdate.getFirstName());
             stmt.setString(4, personToUpdate.getLastName());

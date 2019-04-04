@@ -28,7 +28,6 @@ public class CourtEntity implements Serializable {
     private int courtEntityID;
     private String courtEntityOfficialNum;
     private String jurisdictionLevel;
-    private Municipality municipality;
     private String courtEntityName;
     private String addressStreet;
     private String addressCity;
@@ -45,7 +44,6 @@ public class CourtEntity implements Serializable {
         hash = 37 * hash + this.courtEntityID;
         hash = 37 * hash + Objects.hashCode(this.courtEntityOfficialNum);
         hash = 37 * hash + Objects.hashCode(this.jurisdictionLevel);
-        hash = 37 * hash + Objects.hashCode(this.municipality);
         hash = 37 * hash + Objects.hashCode(this.courtEntityName);
         hash = 37 * hash + Objects.hashCode(this.addressStreet);
         hash = 37 * hash + Objects.hashCode(this.addressCity);
@@ -73,42 +71,7 @@ public class CourtEntity implements Serializable {
         if (this.courtEntityID != other.courtEntityID) {
             return false;
         }
-        if (!Objects.equals(this.courtEntityOfficialNum, other.courtEntityOfficialNum)) {
-            return false;
-        }
-        if (!Objects.equals(this.jurisdictionLevel, other.jurisdictionLevel)) {
-            return false;
-        }
-        if (!Objects.equals(this.courtEntityName, other.courtEntityName)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressStreet, other.addressStreet)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressCity, other.addressCity)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressZip, other.addressZip)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressState, other.addressState)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressCounty, other.addressCounty)) {
-            return false;
-        }
-        if (!Objects.equals(this.phone, other.phone)) {
-            return false;
-        }
-        if (!Objects.equals(this.url, other.url)) {
-            return false;
-        }
-        if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.municipality, other.municipality)) {
-            return false;
-        }
+        
         return true;
     }
 
@@ -154,19 +117,7 @@ public class CourtEntity implements Serializable {
         this.jurisdictionLevel = jurisdictionLevel;
     }
 
-    /**
-     * @return the municipality
-     */
-    public Municipality getMunicipality() {
-        return municipality;
-    }
-
-    /**
-     * @param municipality the municipality to set
-     */
-    public void setMunicipality(Municipality municipality) {
-        this.municipality = municipality;
-    }
+   
 
     /**
      * @return the courtEntityName
