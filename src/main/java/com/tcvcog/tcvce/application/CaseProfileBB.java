@@ -46,6 +46,7 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -110,6 +111,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private boolean includeActionRequest;
     private List<EventCategory> availableActionsToRequest;
     
+    private String styleClassStatusIcon;
+    private String styleClassInvestigation;
+    private String styleClassEnforcement;
+    private String sytleClassCitation;
+    private String sytleClassClosed;
+    private String styleClassActionRequestIcon;
     
 
     /**
@@ -274,6 +281,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             EventCoordinator ec = getEventCoordinator();
             try {
                 selectedEvent = ec.getInitializedEvent(currentCase, selectedEventCategory);
+                selectedEvent.setDateOfRecord(LocalDateTime.now());
             } catch (CaseLifecyleException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -573,6 +581,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             selectedViolation.setComplianceUser(getSessionBean().getFacesUser());
             e = ec.generateViolationComplianceEvent(selectedViolation);
             e.setOwner(getSessionBean().getFacesUser());
+            e.setDateOfRecord(LocalDateTime.now());
+            cv.setActualComplianceDate(LocalDateTime.now());
             vc.recordCompliance(cv, getSessionBean().getFacesUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -664,7 +674,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
    
 
     public String createNewCitation() {
-        System.out.println("CaseManageBB.createCitationForAllViolations | current case tostring: "
+        System.out.println("CaseProfileBB.createNewCitation  | current case tostring: "
                 + currentCase);
         getSessionBean().setActiveCitation(null);
         getSessionBean().getcECaseQueue().remove(currentCase);
@@ -1565,6 +1575,139 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setRemovedEventList(List<EventCECase> removedEventList) {
         this.removedEventList = removedEventList;
+    }
+
+    /**
+     * @return the styleClassInvestigation
+     */
+    public String getStyleClassInvestigation() {
+        String style = null;
+        try {
+            if(currentCase.getCaseStage() == CaseStage.Investigation){
+                style = currentCase.getCasePhaseIcon().getStyleClass();
+                
+            } else {
+                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
+            }
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        styleClassInvestigation = style;
+        return styleClassInvestigation;
+    }
+
+    /**
+     * @return the styleClassEnforcement
+     */
+    public String getStyleClassEnforcement() {
+        String style = null;
+        try {
+            if(currentCase.getCaseStage() == CaseStage.Enforcement){
+                style = currentCase.getCasePhaseIcon().getStyleClass();
+                
+            } else {
+                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
+            }
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        styleClassEnforcement = style;
+        return styleClassEnforcement;
+    }
+
+    /**
+     * @return the sytleClassCitation
+     */
+    public String getSytleClassCitation() {
+        String style = null;
+        try {
+            if(currentCase.getCaseStage() == CaseStage.Citation){
+                style = currentCase.getCasePhaseIcon().getStyleClass();
+                
+            } else {
+                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
+            }
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        sytleClassCitation = style;
+        return sytleClassCitation;
+    }
+
+    /**
+     * @return the sytleClassClosed
+     */
+    public String getSytleClassClosed() {
+        String style = null;
+        try {
+            if(currentCase.getCaseStage() == CaseStage.Closed){
+                style = currentCase.getCasePhaseIcon().getStyleClass();
+                
+            } else {
+                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
+            }
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        sytleClassClosed = style;
+        return sytleClassClosed;
+    }
+
+    /**
+     * @param styleClassInvestigation the styleClassInvestigation to set
+     */
+    public void setStyleClassInvestigation(String styleClassInvestigation) {
+        this.styleClassInvestigation = styleClassInvestigation;
+    }
+
+    /**
+     * @param styleClassEnforcement the styleClassEnforcement to set
+     */
+    public void setStyleClassEnforcement(String styleClassEnforcement) {
+        this.styleClassEnforcement = styleClassEnforcement;
+    }
+
+    /**
+     * @param sytleClassCitation the sytleClassCitation to set
+     */
+    public void setSytleClassCitation(String sytleClassCitation) {
+        this.sytleClassCitation = sytleClassCitation;
+    }
+
+    /**
+     * @param sytleClassClosed the sytleClassClosed to set
+     */
+    public void setSytleClassClosed(String sytleClassClosed) {
+        this.sytleClassClosed = sytleClassClosed;
+    }
+
+    /**
+     * @return the styleClassStatusIcon
+     */
+    public String getStyleClassStatusIcon() {
+        styleClassStatusIcon = currentCase.getCasePhaseIcon().getStyleClass();
+        return styleClassStatusIcon;
+    }
+
+    /**
+     * @param styleClassStatusIcon the styleClassStatusIcon to set
+     */
+    public void setStyleClassStatusIcon(String styleClassStatusIcon) {
+        this.styleClassStatusIcon = styleClassStatusIcon;
+    }
+
+    /**
+     * @return the styleClassActionRequestIcon
+     */
+    public String getStyleClassActionRequestIcon() {
+        return styleClassActionRequestIcon;
+    }
+
+    /**
+     * @param styleClassActionRequestIcon the styleClassActionRequestIcon to set
+     */
+    public void setStyleClassActionRequestIcon(String styleClassActionRequestIcon) {
+        this.styleClassActionRequestIcon = styleClassActionRequestIcon;
     }
 
     

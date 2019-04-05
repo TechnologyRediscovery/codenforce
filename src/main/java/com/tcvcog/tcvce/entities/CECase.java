@@ -47,7 +47,7 @@ public class CECase extends CECaseNoLists{
         this.caseManager = cnl.caseManager;
         this.caseName = cnl.caseName;
         this.casePhase = cnl.casePhase;
-        this.icon = cnl.icon;
+        this.casePhaseIcon = cnl.casePhaseIcon;
         this.originationDate = cnl.originationDate;
         this.closingDate = cnl.closingDate;
         this.creationTimestamp = cnl.creationTimestamp;

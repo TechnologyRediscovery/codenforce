@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
@@ -45,6 +46,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -87,7 +89,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param c the CECase with a populated set of Events
      * @return the CECase with the action request list ready to roll
      */
-    public CECase configureCECaseEventLists(CECase c){
+    public CECase configureCECase(CECase c){
         List<EventCECase> evList = new ArrayList();
         // transfer any events with requests to a separate list for display at
         // the head of the case profile
@@ -99,9 +101,35 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         c.setEventListActionRequests(evList);
-        System.out.println("CaseCoordinator.configureCECaseEventList: set list of size: " + evList.size() 
-                + " on case ID " + c.getCaseID());
+        
+        // check to make sure we have empty lists on all of our list objects
+        if(c.getViolationList() == null){
+            c.setViolationList(new ArrayList<CodeViolation>());
+        }
+        
+        if(c.getEventListActionRequests() == null){
+            c.setEventListActionRequests(new ArrayList<EventCECase>());
+        }
+        
+        if(c.getCitationList() == null){
+            c.setCitationList(new ArrayList<Citation>());
+        }
+        
+        if(c.getNoticeList() == null){
+            c.setNoticeList(new ArrayList<NoticeOfViolation>());
+        }
+        
+        if(c.getRequestList() == null){
+            c.setRequestList(new ArrayList<CEActionRequest>());
+        }
+        
         return c;
+    }
+    
+    public Icon getIconByCasePhase(CasePhase phase) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        return si.getIcon(phase);
+        
     }
     
     
@@ -527,10 +555,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
-    
-    
-   
     
     private void checkForAndCarryOutCasePhaseChange(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException, ViolationException{
         

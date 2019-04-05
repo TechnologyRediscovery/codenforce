@@ -84,6 +84,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         
         CodeViolationIntegrator vi = getCodeViolationIntegrator();
         EventCoordinator ec = getEventCoordinator();
+        UserCoordinator uc = getUserCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         EventCECase tfEvent;
         int violationStoredDBKey;
@@ -97,6 +98,12 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         tfEvent = ec.getInitializedEvent(c, eventCat);
         tfEvent.setDateOfRecord(v.getStipulatedComplianceDate());
         tfEvent.setOwner(c.getCaseManager());
+        tfEvent.setRequestActionByDefaultMuniCEO(true);
+        eventCat = ec.getInitiatlizedEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+                .getString("propertyInspection")));
+        tfEvent.setActionEventCat(eventCat);
+        tfEvent.setActionRequestedBy(uc.getCogBotUser());
         
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
                         .getString("complianceTimeframeEndEventDesc"));
@@ -113,11 +120,13 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         
         if(verifyCodeViolationAttributes(v)){
             eventID = cc.attachNewEventToCECase(c, tfEvent, v);
-            v.setTimeframeEventID(eventID);
+            v.setComplianceTimeframeEventID(eventID);
             violationStoredDBKey = vi.insertCodeViolation(v);
         } else {
             throw new ViolationException("Failed violation verification");
         }
+        
+        
         return violationStoredDBKey;
         
     }
@@ -156,8 +165,14 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         cvi.recordCompliance(cv);
                 
         // inactivate timeframe expiry event
-        if(cv.getCompTimeFrameComplianceEvent() != null){
-            int vev = cv.getCompTimeFrameComplianceEvent().getEventID();
+        if(cv.getCompTimeFrameComplianceEvent() != null || cv.getComplianceTimeframeEventID() != 0){
+            int vev;
+            if(cv.getCompTimeFrameComplianceEvent() != null){
+                 vev = cv.getCompTimeFrameComplianceEvent().getEventID();
+                
+            } else {
+                vev = cv.getComplianceTimeframeEventID();
+            }
             System.out.println("ViolationCoordinator.recordCompliance | invalidating event id: " + vev);
             ei.inactivateEvent(vev);
         }
@@ -181,5 +196,6 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         List al = cvi.getCodeViolations(ceCase);
         return al;
     }
+    
     
 }

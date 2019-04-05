@@ -925,7 +925,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             int counter = 0;
             int maxResults;
             if (params.isLimitResultCountTo100()) {
-                maxResults = 20;
+                maxResults = 100;
             } else {
                 maxResults = Integer.MAX_VALUE;
             }

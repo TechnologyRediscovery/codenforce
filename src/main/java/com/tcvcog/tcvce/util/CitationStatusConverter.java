@@ -27,7 +27,7 @@ import javax.faces.convert.FacesConverter;
  *
  * @author Eric C. Darsow
  */
-@FacesConverter(forClass=CitationStatus.class, value="citationStatusConverter")
+@FacesConverter(value="citationStatusConverter")
 public class CitationStatusConverter extends EntityConverter implements Converter{
     
      @Override
@@ -55,7 +55,7 @@ public class CitationStatusConverter extends EntityConverter implements Converte
             return title;
             
         } else {
-            return "muni error";
+            return "status error";
         }
         
     }

@@ -60,7 +60,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
                 + "            complianceuser, compliancetfevent)"
                 + "    VALUES (DEFAULT, ?, ?,"
                 + "             ?, now(), ?,"
-                + "            NULL, ?, ?, ?, ?, NULL, NULL, NULL );";
+                + "            NULL, ?, ?, ?, ?, NULL, NULL, ? );";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -80,6 +80,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString(6, v.getDescription());
             stmt.setString(7, v.getNotes());
             stmt.setBoolean(8, v.isLeagacyImport());
+            stmt.setInt(9, v.getComplianceTimeframeEventID());
             stmt.execute();
             
             String idNumQuery = "SELECT currval('codeviolation_violationid_seq');";

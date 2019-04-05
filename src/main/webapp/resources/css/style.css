@@ -85,6 +85,22 @@ h4{
     
 }
 
+.action-request-header{
+    display: block;
+    font-weight: bold;
+    font-size: 1.6em;
+    
+    
+    
+}
+
+.action-request-subheader{
+    display: block;
+    clear: both;
+    font-size: 1.3em;
+    
+}
+
 
 
 
@@ -536,6 +552,93 @@ div.headerLinkCont{
 
 /* *********END MAIN PAGE LAYOUT BOXES ***************/
 
+/* --------- BUSINESS OBJECTS AND STATUS ------------------- */
+.mced-status-investigation{
+    font-weight: bold;
+    color:blue;
+}
+.mced-status-enforcement{
+    font-weight: bold;
+    color: blueviolet;
+    
+}
+.mced-status-citation{
+    font-weight: bold;
+    color: red;
+    
+}
+.mced-status-closed{
+    font-weight: bold;
+    color: black;
+}
+.mced-status-holding{
+    
+}
+
+.status-list{
+    list-style-type: none;
+    padding-top: 0px;
+    padding-left: 0px;
+    margin-left: 10px;
+    margin-top: 0px;
+    
+}
+
+i.status-display-icon-i{
+    color: inherit;
+}
+
+.status-display-container{
+	display: flex;
+	flex-direction: row;
+	flex-basis: auto;
+
+}
+
+.status-display-icon-container{
+	width: auto;
+	margin-right: 5px;
+
+
+}
+
+.action-request-icon i.material-icons{
+    font-size: 3em;
+    display: block;
+    margin-right: 15px;
+}
+
+
+.status-display-icon-container i.material-icons{
+        font-size: 5em;
+}
+
+
+.status-display-status-list-container{
+	flex-grow: 1;
+	flex-basis: auto;
+
+
+}
+
+.status-item{
+	font-size: 1em;
+        color: gray;
+        font-weight: normal;
+    
+}
+
+.stage-inactive{
+    font-weight: normal;
+    color:grey;
+}
+
+
+
+
+
+/* ********* end BUSINESS OBJECTS AND STATUS *******************
+
 /*----------------  TEXT AND SPANS ----------------------------*/
 
 
@@ -563,6 +666,10 @@ div.headerLinkCont{
     font-weight: normal;
 }
 
+.weight-normal{
+    font-weight:normal;
+}
+
 
 /***************** CLOSE TEXT AND SPANS ***********************/
 
@@ -578,6 +685,10 @@ div.headerLinkCont{
     white-space: normal;
     overflow-wrap: normal;
     word-break: break-all;
+}
+
+.roomy-top-margin{
+    margin-top: 15px;
 }
 
 .outlinedBox{
@@ -601,6 +712,10 @@ div.headerLinkCont{
     font-size:small;
     display: inline-block;
     
+    
+}
+.compact-violation-list-container{
+    margin-top: 5px;
     
 }
 
@@ -627,6 +742,11 @@ div.headerLinks{
     /*height: 100px;*/
     margin: 10px 10px 10px 10px;
 }
+
+
+
+
+
 
 
 /*will be deprecated when Adams public pages come online*/
@@ -697,6 +817,16 @@ img.headerImg{
 
 
 /* ------------------TABLE STYLES ----------------------*/
+
+.object-info-box thead{
+    text-align: left;
+    font-weight: normal;
+}
+
+.no-border{
+    border: none;
+    
+}
 
 .ui-expanded-row-content{
     background-color: #04284A;
