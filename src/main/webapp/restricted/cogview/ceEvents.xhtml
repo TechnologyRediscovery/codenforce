@@ -46,7 +46,7 @@
                                                                  disabled="#{!cEEventsBB.searchParams.filterByMuni}">
                                                     <f:converter converterId="muniConverter"/>
                                                     <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                    <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                    <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                                 </p:selectOneMenu>
                                                 <h:message for="ceev-search-muni-som" showDetail="true" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -517,6 +517,8 @@
                         
                                 <h:form id="events-datascroller-form">
                                   
+                                    
+
                                     <p:dataScroller
                                         id="events-datascroller"
                                         var="e"
@@ -525,174 +527,115 @@
 
                                         <div class="outlinedBox event-ds-box">
 
-                                            <h2>
-                                                <h:outputText value="#{e.event.category.eventType.label}:#{e.event.category.eventCategoryTitle}"/>
-                                            </h2>
+                                        <div class="status-display-container">
+                                            <div class="action-request-icon">
+                                                <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.event.category.icon.materialIcon}"/></i>
+                                            </div>
+                                            <div class="status-display-status-list-container">
+                                                <div class="action-request-header">
+                                                    <h:outputText value="#{e.event.category.eventType.label}: #{e.event.category.eventCategoryTitle} "/>
+                                                </div>
+                                                <div class="action-request-subheader">
+                                                    <h:outputText value="#{e.eventCaseBare.property.address} " />
+                                                    <h:outputText value=" (#{e.eventCaseBare.property.muni.muniName}) | " />
+                                                    <h:outputText value="CE Case: #{e.eventCaseBare.caseName}  
+                                                                        (id:#{e.eventCaseBare.caseID}) " /><br />
+                                                    <h:outputText value="#{e.event.dateOfRecordPretty}"/>
+                                                     <p:commandButton icon="fa fa-edit"
+                                                                      action="#{cEEventsBB.editEventInCaseManager(e)}" 
+                                                                     ajax="false" styleClass="noFill button-size-small"
+                                                                     style="background-color: white; font-size: small; margin-left: 5px;"
+                                                                     />
+                                                </div>
+                                            </div>
+                                        </div>
+                                            
+                                             <h:panelGrid columns="3" cellpadding="10" footerClass="gridFooter" headerClass="gridHeader"
+                                                         columnClasses="gridTd, gridTd, gridTd">
 
-                                            <h3>
-                                                <h:outputText value="#{e.event.dateOfRecordPretty}" styleClass="mono"/>
-
-                                            </h3>
-
-                                            <h4>
-                                                <h:outputText value="id:#{e.event.eventID} |
-                                                              #{e.event.active ? 'active' : 'inactive'} |
-                                                              #{e.event.hidden ? 'hidden' : ''} |
-                                                              #{e.event.discloseToMunicipality? 'muni: viewable' : 'muni: hidden'} |
-                                                              #{e.event.discloseToPublic? 'public: viewable' : 'public: hidden'} |
-                                                              #{e.event.requestsAction? 'action requested: yes' : 'action requested: no'}"/>
-                                            </h4>
-
-                                            <h3>
-                                                <h:outputText value="#{e.eventCaseBare.property.muni.muniName}: " />
-                                                <h:outputText value="#{e.eventCaseBare.property.address} | " />
-                                                <h:outputText value="case: #{e.eventCaseBare.caseName} | 
-                                                                    id:#{e.eventCaseBare.caseID} | 
-                                                                    phase:#{e.eventCaseBare.casePhase.label} " />
-                                            </h3>
-
-                                            <h:panelGrid columns="2" rendered="true"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back" >
-
-                                                <f:facet name="header" class="leftalign">
-                                                    <h:outputText value="Description" />
+                                                <f:facet name="header">
                                                     <div class="rowExpansion">
-                                                        <h:outputText style="font-weight: normal;" value="#{e.event.description}"/>
+                                                        <h:outputText styleClass="bold" value="Description: " />
+                                                        <h:outputText styleClass="weight-normal" value="#{e.event.description}"/>
                                                     </div>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText styleClass="bold" value="Notes: " />
+                                                        <h:outputText styleClass="weight-normal" value="#{e.event.responderNotes}"/>
+                                                    </div>
+                                                    
                                                 </f:facet>
 
-
                                                 <h:panelGroup>
+                                                    
+                                                    <h:outputText value="Owner: " styleClass="bold" />
+                                                    <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
+                                                    <p:spacer height="5px"/>
                                                     <h:outputText styleClass="bold" value="Date of record: "/>
                                                     <h:outputText value="#{e.event.dateOfRecordPretty}"/>
                                                     <p:spacer height="5px"/>
-
-                                                    <h:outputText styleClass="bold" value="Entry timestamp: "/>
+                                                    <h:outputText styleClass="bold" value="Creation time stamp: "/>
                                                     <h:outputText value="#{e.event.timestampPretty}"/>
+                                                </h:panelGroup>
+                                                
+                                                 <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Disclose to Municipality Staff: " />
+                                                    <h:outputText value="#{e.event.discloseToMunicipality}"/>
+                                                    
                                                     <p:spacer height="5px"/>
-
-                                                    <h:outputText value="Owner " styleClass="bold" />
-                                                    <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Disclose to Public: " />
+                                                    <h:outputText value="#{e.event.discloseToPublic}"/>
                                                     <p:spacer height="5px"/>
-
-                                                    <h:outputText value="Open in case explorer" />
-                                                    <p:commandButton icon="fa fa-edit"
-                                                                     action="#{caseProfileBB.editEvent(e)}" 
-                                                                     ajax="false"/>
-
+                                                    
+                                                    <h:outputText styleClass="bold" value="Active: "/>
+                                                    <h:outputText value="#{e.event.active}"/>
+                                                    
+                                                    <p:spacer height="5px"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Hidden: "/>
+                                                    <h:outputText value="#{e.event.hidden}"/>
+                                                    
                                                 </h:panelGroup>
 
-                                                <h:panelGroup>
-
-                                                    <h:panelGrid columns="2" rendered="#{e.event.requestsAction}"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back" >
-
-                                                        <f:facet name="header" class="leftalign">
-                                                            <h:outputText value="#{empty e.event.responderActual? 'action required!' : 'action complete'}"
-                                                                          styleClass="viewconf-status #{empty e.event.responderActual? 'conf-needed' : 'conf-received'}"/>
-                                                            <p:spacer height="5px"/>
-                                                             <p:commandButton   id="events-viewconf-confirmnonotes-cb" 
-                                                                                ajax="true"
-                                                                                actionListener="#{cEEventsBB.logActionResponse(e)}"
-                                                                                 value="Take action without notes" 
-                                                                                 styleClass="noFill"
-                                                                                 disabled="#{!(empty e.event.responderActual)}"
-                                                                                 icon="fa fa-check-square-o"
-                                                                                 rendered="#{e.event.currentUserCanTakeAction}"
-                                                                                 update="events-datascroller
-                                                                                        events-datatable-form:events-datatable
-                                                                                        ceev-form-globalmessages:ceev-globalmessages
-                                                                                        "
-                                                                                 />
-                                                             
-                                                             <ui:remove>
-                                                                 
-                                                             <p:commandButton   id="events-viewconf-confirmwithnotes-cb" 
-                                                                                ajax="true"
-                                                                                 value="Confirm with notes" 
-                                                                                 styleClass="noFill"
-                                                                                 disabled="true"
-                                                                                 icon="fa fa-edit"
-                                                                                rendered="#{e.event.currentUserCanTakeAction}"
-                                                                                 />
-                                                             </ui:remove>
-                                                             
-                                                             <p:commandButton   id="events-viewconf-clearconf-cb" 
-                                                                                ajax="true"
-                                                                                actionListener="#{cEEventsBB.clearActionResponse(e)}"
-                                                                                value="clear action taken" 
-                                                                                styleClass="noFill"
-                                                                                disabled="#{empty e.event.responderActual}"
-                                                                                icon="fa fa-eraser"
-                                                                                rendered="#{e.event.currentUserCanTakeAction}"
-                                                                                update="events-datascroller
-                                                                                        events-datatable-form:events-datatable
-                                                                                        ceev-form-globalmessages:ceev-globalmessages
-                                                                                        "
-                                                                                />
-                                                            
-                                                        </f:facet>
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Requested event: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.event.actionEventCat.eventType.label}: #{e.event.actionEventCat.eventCategoryTitle}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Action requested by: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.event.actionRequestedBy.person.firstName} #{e.event.actionRequestedBy.person.lastName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Intended user/action taker: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.event.responderIntended.person.firstName} #{e.event.responderIntended.person.lastName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Action taken by: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.event.responderActual.person.firstName} #{e.event.responderActual.person.lastName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Action timestamp: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.event.responseTimePrettyDate}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Request rejected? "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.event.requestRejected}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <f:facet name="footer" class="leftalign">
-                                                            <h:outputText styleClass="bold" value="Action response notes:"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.event.responderNotes}"/>
-                                                            </div>
-                                                        </f:facet>
-
-                                                    </h:panelGrid>
-                                                </h:panelGroup>
-                                                <f:facet name="footer" class="leftalign">
-                                                    <h:outputLabel styleClass="bold" style="text-align: left" value="Notes: "/>
+                                                 <h:panelGroup rendered="#{e.event.requestsAction}">
+                                                    <h:outputText styleClass="bold" value="Requests action: "/>
+                                                    <h:outputText value="#{e.event.requestsAction}"/>
+                                                    
                                                     <p:spacer height="5px"/>
-                                                    <div class="rowExpansion" style="text-align: left">
-                                                        <h:outputText escape="false" value="#{e.event.notes}"/>
-                                                    </div>
-                                                </f:facet>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Requested event: "/>
+                                                    <h:outputText value="#{e.event.actionEventCat.eventType.label}: #{e.event.actionEventCat.eventCategoryTitle}"/>
+
+                                                    <p:spacer height="5px"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Action requested by: "/>
+                                                    <h:outputText value="#{e.event.actionRequestedBy.person.firstName} #{e.event.actionRequestedBy.person.lastName}"/>
+
+                                                    <p:spacer height="5px"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Intended user/action taker: "/>
+                                                    <h:outputText value="#{(empty e.event.responderIntended) ? 'default code officer' : e.event.responderIntended.person.lastName}"/>                                   
+
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText styleClass="bold" value="Action taken by: "/>
+                                                    <h:outputText value="#{e.event.responderActual.person.firstName} #{e.event.responderActual.person.lastName}"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Action timestamp: "/>
+                                                    <h:outputText value="#{e.event.responseTimePrettyDate}"/>
+
+                                                    <h:outputText styleClass="bold" value="Request rejected? "/>
+                                                    <h:outputText value="#{e.event.requestRejected}"/>
+
+                                                    <h:outputText styleClass="bold" value="Action response notes:"/>
+                                                    <h:outputText value="#{e.event.responderNotes}"/>
+                                                </h:panelGroup>
+
+                                                
+
                                             </h:panelGrid>
+                                                   
+
+                                               
                                         </div>
 
                                     </p:dataScroller>

@@ -16,11 +16,13 @@
  */
 package com.tcvcog.tcvce.util;
 
+import java.io.Serializable;
+
 /**
  *
  * @author cedba
  */
-public class Constants {
+public class Constants implements Serializable {
 
     /**
      * Creates a new instance of Constants
@@ -49,6 +51,9 @@ public class Constants {
     public final static String EVENT_CATEGORY_BUNDLE = "eventCategories";
     public final static String DB_FIXED_VALUE_BUNDLE = "dbFixedValueLookup";
     public final static String DB_CONNECTION_PARAMS = "dbConnectionParams";
+    
+    public final static String STYLE_CLASS_INACTIVE_CASE_PHASE = "stage-inactive";
+    
     
     
     

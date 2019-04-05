@@ -44,8 +44,6 @@ public enum CasePhase {
     public String getLabel(){
         return label;
     }
-
-    
 }
 
 

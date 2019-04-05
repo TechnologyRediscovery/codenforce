@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -33,29 +34,37 @@ public class CodeViolation extends EntityUtils implements Serializable{
     private EnforcableCodeElement violatedEnfElement;
     private int ceCaseID;
     private int citationID;
+    
+    private String statusString;
+
+   
+    
+    private double penalty;
+    private String description;
+    private String notes;
+    
     private LocalDateTime dateOfCitation;
     private String dateOfCitationPretty;
     private List<Integer> citationIDList;
     private String citationsStringList;
-    private long daysUntilStipulatedComplianceDate;
+    
     private LocalDateTime dateOfRecord;
     private String dateOfRecordPretty;
     private LocalDateTime entryTimeStamp;
     private String entryTimeStampPretty;
+    
+    private long daysUntilStipulatedComplianceDate;
     private LocalDateTime stipulatedComplianceDate;
     private String stipulatedComplianceDatePretty;
+    
     private LocalDateTime actualComplianceDate;
     private String actualComplianceDatePretty;
-    private double penalty;
-    private String description;
-    private String notes;
+    
     private boolean leagacyImport;
     private LocalDateTime complianceTimeStamp;
     private User complianceUser;
     private EventCECase compTimeFrameComplianceEvent;
-    private int timeframeEventID;
-    
-    
+    private int complianceTimeframeEventID;
     
     private List<Integer> photoList;
 
@@ -448,19 +457,115 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the timeframeEventID
+     * @return the complianceTimeframeEventID
      */
-    public int getTimeframeEventID() {
-        return timeframeEventID;
+    public int getComplianceTimeframeEventID() {
+        return complianceTimeframeEventID;
     }
 
     /**
-     * @param timeframeEventID the timeframeEventID to set
+     * @param complianceTimeframeEventID the complianceTimeframeEventID to set
      */
-    public void setTimeframeEventID(int timeframeEventID) {
-        this.timeframeEventID = timeframeEventID;
+    public void setComplianceTimeframeEventID(int complianceTimeframeEventID) {
+        this.complianceTimeframeEventID = complianceTimeframeEventID;
+    }
+    
+    /**
+     * Violations can print themselves on a single line
+     * @return 
+     */
+    @Override
+    public String toString(){
+        return getStrElement();
+    }
+    
+    private String getStrElement(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(violatedEnfElement.getCodeElement().getOrdSubSecNum());
+        sb.append(": ");
+        sb.append(violatedEnfElement.getCodeElement().getOrdSubSecTitle());
+        return sb.toString();
+        
+    }
+    
+    /**
+     * @return the statusString
+     */
+    public String getStatusString() {
+        StringBuilder sb = new StringBuilder();
+        if(actualComplianceDate == null){
+            sb.append("Unresolved");
+            sb.append("; Compliance due on: ");
+            sb.append(getStipulatedComplianceDatePretty());
+            
+            
+        } else {
+            sb.append("Compliance achieved on ");
+            sb.append(getActualComplianceDatePretty());
+        }
+        statusString = sb.toString();
+        return statusString;
     }
 
+    /**
+     * @param statusString the statusString to set
+     */
+    public void setStatusString(String statusString) {
+        
+        this.statusString = statusString;
+    }
    
-   
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + this.violationID;
+        hash = 53 * hash + Objects.hashCode(this.violatedEnfElement);
+        hash = 53 * hash + this.ceCaseID;
+        hash = 53 * hash + this.citationID;
+        hash = 53 * hash + (int) (Double.doubleToLongBits(this.penalty) ^ (Double.doubleToLongBits(this.penalty) >>> 32));
+        hash = 53 * hash + Objects.hashCode(this.description);
+        hash = 53 * hash + Objects.hashCode(this.notes);
+        hash = 53 * hash + Objects.hashCode(this.dateOfCitation);
+        hash = 53 * hash + Objects.hashCode(this.dateOfCitationPretty);
+        hash = 53 * hash + Objects.hashCode(this.citationIDList);
+        hash = 53 * hash + Objects.hashCode(this.citationsStringList);
+        hash = 53 * hash + Objects.hashCode(this.dateOfRecord);
+        hash = 53 * hash + Objects.hashCode(this.dateOfRecordPretty);
+        hash = 53 * hash + Objects.hashCode(this.entryTimeStamp);
+        hash = 53 * hash + Objects.hashCode(this.entryTimeStampPretty);
+        hash = 53 * hash + (int) (this.daysUntilStipulatedComplianceDate ^ (this.daysUntilStipulatedComplianceDate >>> 32));
+        hash = 53 * hash + Objects.hashCode(this.stipulatedComplianceDate);
+        hash = 53 * hash + Objects.hashCode(this.stipulatedComplianceDatePretty);
+        hash = 53 * hash + Objects.hashCode(this.actualComplianceDate);
+        hash = 53 * hash + Objects.hashCode(this.actualComplianceDatePretty);
+        hash = 53 * hash + (this.leagacyImport ? 1 : 0);
+        hash = 53 * hash + Objects.hashCode(this.complianceTimeStamp);
+        hash = 53 * hash + Objects.hashCode(this.complianceUser);
+        hash = 53 * hash + Objects.hashCode(this.compTimeFrameComplianceEvent);
+        hash = 53 * hash + this.complianceTimeframeEventID;
+        hash = 53 * hash + Objects.hashCode(this.photoList);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CodeViolation other = (CodeViolation) obj;
+        if (this.violationID != other.violationID) {
+            return false;
+        }
+        if (!Objects.equals(this.actualComplianceDatePretty, other.actualComplianceDatePretty)) {
+            return false;
+        }
+        return true;
+    }
+
 }

@@ -110,10 +110,6 @@ public class SearchParams implements Serializable{
      * @return the startDate
      */
     public LocalDateTime getStartDate() {
-        if(useRelativeDates){
-            startDate = LocalDateTime.now().plusDays(startDateRelativeDays);
-        }
-        
         return startDate;
     }
 
@@ -121,9 +117,6 @@ public class SearchParams implements Serializable{
      * @return the endDate
      */
     public LocalDateTime getEndDate() {
-        if(useRelativeDates){
-            endDate = LocalDateTime.now().plusDays(endDateRelativeDays);
-        }
         return endDate;
     }
 
@@ -145,8 +138,13 @@ public class SearchParams implements Serializable{
      * @return the startDateSQLDate
      */
     public java.sql.Timestamp getStartDateSQLDate() {
-        if(startDate != null){
-            startDateSQLDate = java.sql.Timestamp.valueOf(getStartDate());
+        if(useRelativeDates){
+            startDateSQLDate = java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(startDateRelativeDays));
+            System.out.println("SearchParams.getStartDateSQLDate | usereldates:true | starddate str: " + startDateSQLDate.toString());
+        } else {
+            if(startDate != null){
+                startDateSQLDate = java.sql.Timestamp.valueOf(getStartDate());
+            }
         }
         return startDateSQLDate;
     }
@@ -155,8 +153,13 @@ public class SearchParams implements Serializable{
      * @return the endDateSQLDate
      */
     public java.sql.Timestamp getEndDateSQLDate() {
-        if(endDate != null){
-            endDateSQLDate = java.sql.Timestamp.valueOf(getEndDate());
+        if(useRelativeDates){
+            endDateSQLDate = java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(endDateRelativeDays));
+            System.out.println("SearchParams.getEndDateSQLDate | usereldates:true | starddate str: " + endDateSQLDate.toString());
+        } else {
+            if(endDate != null){
+                endDateSQLDate = java.sql.Timestamp.valueOf(getEndDate());
+            }
         }
         return endDateSQLDate;
     }

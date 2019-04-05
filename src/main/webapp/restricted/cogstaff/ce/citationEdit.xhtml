@@ -17,14 +17,14 @@
                     
                     <f:view>
                          <h:form id="citationAdd">
-                            <h1>Citation Editor: Citation ID: <h:outputText value="Citation ID: #{citationBB.currentCitation.citationID}"/></h1>
+                            <h1>Citation Editor: Citation ID: <h:outputText value="#{citationBB.currentCitation.citationID}"/></h1>
                             
                             <p>Populate fields for a new citation and updated an existing citation.</p>
                                                     
                             <p:spacer height="15px"/>
                             
                             <h2>Outstanding code violations on Case ID <h:outputText value="#{citationBB.currentCase.caseID}" />
-                                at <h:outputText value="#{citationBB.currentCase.property.address}" </h2>
+                                at <h:outputText value="#{citationBB.currentCase.property.address}" /></h2>
                             
                                  <p:dataTable
                                         id="violationTable"
@@ -61,18 +61,22 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Remove" />
                                             </f:facet>
-                                            <p:commandButton id="remove-violation-cb"
+                                            <p:commandButton id="remove-violation-from-violationtable-cb"
+                                                             ajax="true"
                                                              actionListener="#{citationBB.removeViolationFromCitation(v)}"
-                                                             icon="fa fa-stop">
-                                                <p:ajax update="violationTable
-                                                        removedViolationTable"
+                                                             icon="fa fa-delete"
+                                                             immediate="true"
+                                                             update="citationAdd:violationTable
+                                                             citationAdd:removed-violations-table">
                                             </p:commandButton>
                                                              
                                         </p:column>
                                     </p:dataTable> 
+                            
                             <h2>Removed violations</h2>
+                            
                                  <p:dataTable
-                                        id="removedViolationTable"
+                                        id="removed-violations-table"
                                         selectionMode="none"
                                         value="#{citationBB.removedViolationList}"
                                         tableStyleClass="primeDataTable"
@@ -82,7 +86,8 @@
                                         reflow="true"
                                         var="v"
                                         rowKey="#{v.violationID}">
-                                    <p:column>
+                                     
+                                        <p:column>
                                             <f:facet name="header">
                                                 <h:outputText value="Code Element" />
                                             </f:facet>
@@ -106,10 +111,13 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Remove" />
                                             </f:facet>
-                                            <p:commandButton id="remove-violation-cb"
+                                            <p:commandButton id="restore-violation-cb"
+                                                             ajax="true"
                                                              actionListener="#{citationBB.returnViolation(v)}"
-                                                             icon="fa fa-stop">
-                                                <p:ajax update="violationTable"
+                                                             icon="fa fa-plus"
+                                                             immediate="true"
+                                                             update="citationAdd:violationTable
+                                                                    citationAdd:removed-violations-table" >
                                             </p:commandButton>
                                                              
                                         </p:column>
@@ -124,12 +132,11 @@
                                 <h:outputLabel value="Citation Status" for="citationStatusMenu"/>
                                 <h:panelGroup>
                                     
-                                    <p:selectOneMenu id="citationStatusMenu" required="true" value="#{citationBB.currentCitation.status}">
+                                    <p:selectOneMenu id="citationStatusMenu" required="false" value="#{citationBB.currentCitation.status}">
                                         <f:converter converterId="citationStatusConverter"/>
                                         <f:selectItems value="#{citationBB.citationStatusList}"
                                                        var="cs" itemValue="#{cs}" itemLabel="#{cs.statusTitle}"/>
                                     </p:selectOneMenu>
-                                    
                                     <h:message for="citationStatusMenu" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -188,6 +195,8 @@
                                                style="width: 100%;" tabindex="15" required="true" styleClass="inputText"/>
                                         <h:message for="formNotes" showDetail="false" showSummary="true" 
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        <p class="italic">note: each of the violations included in the upper table are permanently 
+                                            linked with this citation and need not be enumerated in these notes</p>
                                     </h:panelGroup>
                                     
                                 </f:facet>

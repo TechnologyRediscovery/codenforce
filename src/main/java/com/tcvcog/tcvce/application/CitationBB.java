@@ -120,11 +120,9 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         System.out.println("CitationBB.updateCitation");
         CaseCoordinator cc = getCaseCoordinator();
         
-        Citation c= getSessionBean().getActiveCitation();
-        c.setUserOwner(getSessionBean().getFacesUser());
         
         try {
-            cc.updateCitation(c);
+            cc.updateCitation(currentCitation);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -161,7 +159,6 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
      * @return the currentCitation
      */
     public Citation getCurrentCitation() {
-        currentCitation = getSessionBean().getActiveCitation();
         return currentCitation;
     }
 

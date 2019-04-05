@@ -8,15 +8,19 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseNoLists;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -81,6 +85,22 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
                         "Your query completed with " + listSize + " results", ""));
         
         
+    }
+    
+    public String editEventInCaseManager(EventCasePropBundle ev){
+        CaseIntegrator ci = getCaseIntegrator();
+        CECase c = getSessionBean().getcECaseQueue().remove(0);
+        CECaseNoLists caseNoLists = ev.getEventCaseBare();
+        try {
+            getSessionBean().getcECaseQueue().set(0, ci.generateCECase(caseNoLists));
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        getSessionBean().getcECaseQueue().add(c);
+        
+        return "ceCases";
     }
 
     /**

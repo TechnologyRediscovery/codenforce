@@ -33,7 +33,9 @@ public class CECaseNoLists extends EntityUtils implements Serializable {
     protected String caseName;
     protected CasePhase casePhase;
     protected CaseStage caseStage;
-    protected Icon icon;
+    private String caseOpenClosed;
+    
+    protected Icon casePhaseIcon;
     protected LocalDateTime originationDate;
     protected String originiationDatePretty;
     protected LocalDateTime closingDate;
@@ -320,17 +322,17 @@ public class CECaseNoLists extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the icon
+     * @return the casePhaseIcon
      */
-    public Icon getIcon() {
-        return icon;
+    public Icon getCasePhaseIcon() {
+        return casePhaseIcon;
     }
 
     /**
-     * @param icon the icon to set
+     * @param casePhaseIcon the casePhaseIcon to set
      */
-    public void setIcon(Icon icon) {
-        this.icon = icon;
+    public void setCasePhaseIcon(Icon casePhaseIcon) {
+        this.casePhaseIcon = casePhaseIcon;
     }
 
     @Override
@@ -346,7 +348,7 @@ public class CECaseNoLists extends EntityUtils implements Serializable {
         hash = 53 * hash + Objects.hashCode(this.caseName);
         hash = 53 * hash + Objects.hashCode(this.casePhase);
         hash = 53 * hash + Objects.hashCode(this.caseStage);
-        hash = 53 * hash + Objects.hashCode(this.icon);
+        hash = 53 * hash + Objects.hashCode(this.casePhaseIcon);
         hash = 53 * hash + Objects.hashCode(this.originationDate);
         hash = 53 * hash + Objects.hashCode(this.originiationDatePretty);
         hash = 53 * hash + Objects.hashCode(this.closingDate);
@@ -372,6 +374,29 @@ public class CECaseNoLists extends EntityUtils implements Serializable {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the caseOpenClosed
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
+     */
+    public String getCaseOpenClosed() throws CaseLifecyleException {
+        String stat = null;
+        if(getCaseStage() != CaseStage.Closed){
+            stat = "Open";
+        } else {
+            stat = "Closed";
+        }
+        
+        caseOpenClosed = stat;
+        return caseOpenClosed;
+    }
+
+    /**
+     * @param caseOpenClosed the caseOpenClosed to set
+     */
+    public void setCaseOpenClosed(String caseOpenClosed) {
+        this.caseOpenClosed = caseOpenClosed;
     }
     
     

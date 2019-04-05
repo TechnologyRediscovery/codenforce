@@ -393,7 +393,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
     }
     
     public List<CitationStatus> getCitationStatusList() throws IntegrationException{
-        String query =  "SELECT statusid, statusname, description from citationStatus;";
+        String query =  "SELECT statusid FROM citationStatus;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -405,7 +405,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                csList.add(generateCitationStatus(rs));
+                csList.add(getCitationStatus(rs.getInt("statusid")));
                 
             }
             
