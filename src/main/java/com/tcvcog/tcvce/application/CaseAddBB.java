@@ -66,7 +66,6 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
         // to this new case
         CEActionRequest cear = getSessionBean().getCeactionRequestForSubmission();
         newCase = cc.getInitializedCECase(caseProperty, getFacesUser());
-      
         newCase.setCaseName(formCaseName);
         newCase.setOriginationDate(formOriginationDate.toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());

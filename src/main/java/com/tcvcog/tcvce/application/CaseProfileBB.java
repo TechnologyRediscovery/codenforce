@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -117,6 +118,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private String sytleClassCitation;
     private String sytleClassClosed;
     private String styleClassActionRequestIcon;
+    
+//    reports
+    
+    private ReportConfigCECase reportCECase;
     
 
     /**
@@ -243,9 +248,26 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public String printCase(){
+    public String generateReportCECase(){
+        getSessionBean().getcECaseQueue().remove(currentCase);
         getSessionBean().getcECaseQueue().add(0, currentCase);
-        return "printCase";
+        
+        reportCECase.setCeCase(currentCase);
+        
+        reportCECase.setCreator(getSessionBean().getFacesUser());
+        reportCECase.setMuni(getSessionBean().getActiveMuni());
+        reportCECase.setGenerationTimestamp(LocalDateTime.now());
+        
+        getSessionBean().setReportConfigCECase(reportCECase);
+        
+        return "reportCECase";
+    }
+    
+    public void prepareReportCECase(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        reportCECase = cc.getDefaultReportConfigCECase(currentCase);
+        System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + reportCECase);
+        
     }
     
     public void rejectRequestedEvent(EventCECase ev){
@@ -1708,6 +1730,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setStyleClassActionRequestIcon(String styleClassActionRequestIcon) {
         this.styleClassActionRequestIcon = styleClassActionRequestIcon;
+    }
+
+    /**
+     * @return the reportCECase
+     */
+    public ReportConfigCECase getReportCECase() {
+        return reportCECase;
+    }
+
+    /**
+     * @param reportCECase the reportCECase to set
+     */
+    public void setReportCECase(ReportConfigCECase reportCECase) {
+        this.reportCECase = reportCECase;
     }
 
     

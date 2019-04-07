@@ -445,6 +445,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, eventIdToInactivate);
 
             stmt.executeUpdate();
+            System.out.println("EventIntegrator.inactivateEvent | inactivating event ID: " + eventIdToInactivate);
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -518,9 +519,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-
     }
-
 
     public void deleteEvent(EventCECase event) throws IntegrationException {
         String query = "DELETE FROM public.ceevent WHERE eventid = ?;";

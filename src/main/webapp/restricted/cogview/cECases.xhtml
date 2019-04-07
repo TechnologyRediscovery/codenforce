@@ -282,7 +282,8 @@
                                     <p:commandButton    id="queryButton"
                                                         ajax="true" value="Run query" actionListener="#{caseProfileBB.executeQuery}"
                                                         process="@form"
-                                                        oncomplete="PF('case-phase-dialog').show()"
+                                                        update="caseListForm:caseTable"
+                                                        
                                                         />
                                 </p:fieldset>
                             </h:form>
@@ -479,7 +480,7 @@
                                                         "
                                                         />
                                     
-                                    <p:commandButton   id="print-case-cb" 
+                                    <p:commandButton    id="case-settings-cb" 
                                                         ajax="true"
                                                         icon="fa fa-gears" styleClass="noFill"
                                                         value="case settings" />
@@ -493,10 +494,12 @@
                                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                                 update="casePhaseChangeForm"
                                                                 />
-                                    <p:commandButton   id="editcase-cb" 
-                                                        ajax="false" action="#{caseProfileBB.printCase}"
+                                    <p:commandButton   id="print-case-cb" 
+                                                       ajax="true" actionListener="#{caseProfileBB.prepareReportCECase}"
                                                         icon="fa fa-print" styleClass="noFill"
-                                                        value="print case profile" />
+                                                        oncomplete="PF('report-case-profile-diaglog-var').show()"
+                                                        value="print case profile" 
+                                                        update="report-case-profile-form"/>
                                      
 
                                 </div>
@@ -1960,7 +1963,74 @@
                                                  onclick="PF('reject-requested-action-diaglog-var').hide()"/>
                             </h:form>
                         </p:confirmDialog>
+                    
+                        <p:confirmDialog message="Create case profile report" 
+                                         severity="alert" widgetVar="report-case-profile-diaglog-var"
+                                         closable="true" responsive="true"
+                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
 
+                            <h:form id="report-case-profile-form">
+                                <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+                                <p:spacer height="15px"/>
+                                <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{caseProfileBB.reportCECase.title}"/>
+                                <p:spacer height="2px"/>
+                                <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+                                <p:spacer height="5px"/>
+                                
+                                <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                <p:spacer height="15px"/>
+                                <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{caseProfileBB.reportCECase.notes}"/>
+                                <p:spacer height="5px"/>
+                                
+                                <h3>Case event history report options</h3>
+                                
+                                <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
+                                <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{caseProfileBB.reportCECase.includeHiddenEvents}" />
+                                
+                                <p:spacer height="5px"/>
+                                
+                                <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
+                                <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{caseProfileBB.reportCECase.includeInactiveEvents}" />
+                                
+                                <p:spacer height="5px"/>
+                                
+                                <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
+                                <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{caseProfileBB.reportCECase.includeEventNotes}" />
+                                
+                                <p:spacer height="5px"/>
+                                
+                                <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
+                                <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{caseProfileBB.reportCECase.includeRequestedActionFields}" />
+                                
+                                <h3>Other options</h3>
+                                
+                                <h:outputLabel class="bold" value="Include full text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
+                                <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{caseProfileBB.reportCECase.includeNoticeFullText}" />
+                                
+                                <p:spacer height="5px"/>
+                                
+                                <h:outputLabel class="bold" value="Include all notices of violation: " for="report-case-profile-allnotices-chkbox" />
+                                <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{caseProfileBB.reportCECase.includeAllNotices}" />
+                                
+                                <p:spacer height="5px"/>
+                                
+                                <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
+                                <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{caseProfileBB.reportCECase.includeFullOrdinanceText}" />
+                                
+                                <p:spacer height="5px"/>
+                                
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('report-case-profile-diaglog-var').hide()"/>
+                                
+                                <p:commandButton ajax="true" action="#{caseProfileBB.generateReportCECase}"
+                                                 value="Generate" icon="fa fa-print" 
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 />
+                                
+                            </h:form>
+                        </p:confirmDialog>
+                    
 
                 </f:view>
             </ui:define>
