@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
+import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
@@ -96,6 +97,9 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Public Data Session Shelves ***  */
     private List<PublicInfoBundle> infoBundleList;
     private PublicInfoBundleCECase pibCECase;
+
+    /* *** Reporting *** */
+    private ReportConfigCECase reportConfigCECase;
     
     
     /* *** Occupancy Permit Application Session Shelves *** */
@@ -103,6 +107,9 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
     private OccPermitApplicationReason occPermitApplicationReason;
+
+
+
     /**
      * Creates a new instance of getSessionBean()
      */
@@ -511,6 +518,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setInspectionQueue(List<OccupancyInspection> inspectionQueue) {
         this.inspectionQueue = inspectionQueue;
+    }
+
+    /**
+     * @return the reportConfigCECase
+     */
+    public ReportConfigCECase getReportConfigCECase() {
+        return reportConfigCECase;
+    }
+
+    /**
+     * @param reportConfigCECase the reportConfigCECase to set
+     */
+    public void setReportConfigCECase(ReportConfigCECase reportConfigCECase) {
+        this.reportConfigCECase = reportConfigCECase;
     }
     
 }

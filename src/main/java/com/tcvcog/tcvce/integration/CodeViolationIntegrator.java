@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -406,6 +407,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         CodeViolation v = new CodeViolation();
         CodeIntegrator ci = getCodeIntegrator();
         CitationIntegrator citInt = getCitationIntegrator();
+        UserIntegrator ui = getUserIntegrator();
 
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
@@ -428,6 +430,14 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         v.setPenalty(rs.getDouble("penalty"));
         v.setDescription(rs.getString("description"));
         v.setNotes(rs.getString("notes"));
+        v.setLeagacyImport(rs.getBoolean("legacyimport"));
+        if(rs.getTimestamp("compliancetimestamp") != null){
+            v.setComplianceTimeStamp(rs.getTimestamp("compliancetimestamp").toLocalDateTime());
+            v.setComplianceUser(ui.getUser("complianceUser"));
+            
+        }
+        v.setComplianceTimeframeEventID(rs.getInt("compliancetfevent"));
+        
         v.setCitationIDList(citInt.getCitations(v.getViolationID()));
         
         return v;
@@ -436,7 +446,8 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
     public CodeViolation getCodeViolation(int violationID) throws IntegrationException {
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n"
                 + "       entrytimestamp, stipulatedcompliancedate, actualcompliancdate, \n"
-                + "       penalty, description, notes\n"
+                + "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
+"       complianceuser, compliancetfevent, severity_classid \n"
                 + "  FROM public.codeviolation WHERE violationid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;

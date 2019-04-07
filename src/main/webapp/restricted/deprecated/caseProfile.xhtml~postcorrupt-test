@@ -24,7 +24,7 @@
                         
                         <h:outputText value="#{caseProfileBB.currentCase.caseName}"/>
                         <span> @ </span>
-                        <h:outputText value="#{sessionBean.activeProp.address}"/>
+                        <h:outputText value="#{sessionBean.sessionProperty.address}"/>
                         <span> in </span>
                         <h:outputText value="#{caseProfileBB.currentCase.property.muni.muniName}"/>
                         <span> (case ID#: </span>
@@ -705,7 +705,7 @@
                                         selectionMode="single"
                                         selection="#{caseProfileBB.selectedActionRequest}"
                                         rowKey="#{r.requestID}"
-                                        value="#{caseProfileBB.currentCase.requestList}"
+                                        value="#{caseProfileBB.currentCase.ceActionRequestList}"
                                         tableStyleClass="primeDataTable"
                                         expandedRow="false"
                                         rowExpandMode="multiple"
@@ -819,15 +819,15 @@
                                                     <h:panelGroup>
 
                                                         <div class="wrapText">
-                                                            <h:outputLabel styleClass="bold" value="Requestor (#{r.actionRequestorPerson.personType.label}): "/>
+                                                            <h:outputLabel styleClass="bold" value="Requestor (#{r.requestor.personType.label}): "/>
                                                             <p:spacer height="5px"/>
 
-                                                            <h:outputText value="#{r.actionRequestorPerson.firstName} "/> 
-                                                            <h:outputText value="#{r.actionRequestorPerson.lastName}"/><br/> 
-                                                            <h:outputText value="#{r.actionRequestorPerson.addressStreet}"/> <br/>
-                                                            <h:outputText value="#{r.actionRequestorPerson.addressCity}, "/> 
-                                                            <h:outputText value="#{r.actionRequestorPerson.addressState} "/> 
-                                                            <h:outputText value="#{r.actionRequestorPerson.addressZip}"/> 
+                                                            <h:outputText value="#{r.requestor.firstName} "/> 
+                                                            <h:outputText value="#{r.requestor.lastName}" />
+                                                            <h:outputText value="#{r.requestor.addressStreet}" />
+                                                            <h:outputText value="#{r.requestor.addressCity}" />
+                                                            <h:outputText value="#{r.requestor.addressState} "/> 
+                                                            <h:outputText value="#{r.requestor.addressZip}"/> 
                                                         </div>
                                                     </h:panelGroup>
 
@@ -836,13 +836,12 @@
                                                         <p:spacer height="5px"/>
                                                         <div class="wrapText"> 
                                                             <h:outputText value="Phone (cell): "/>
-                                                            <h:outputText value="#{r.actionRequestorPerson.phoneCell}"/> <br/>
+                                                            <h:outputText value="#{r.requestor.phoneCell}"/> <br />
                                                             <h:outputText value="Phone (work): "/>
-                                                            <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> <br/>
+                                                            <h:outputText value="#{r.requestor.phoneWork}"/>
                                                             <h:outputText value="Phone (home): "/>
-                                                            <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br/>
-                                                            <h:outputText value="Email: "/>
-                                                            <h:outputText value="#{r.actionRequestorPerson.email}"/>
+                                                            <h:outputText value="#{r.requestor.phoneHome}"/> <br />
+                                                            <h:outputText value="#{r.requestor.email}"/>
                                                         </div>
                                                     </h:panelGroup>
 

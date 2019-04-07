@@ -9,10 +9,24 @@ and open the template in the editor.
 */
 
 /* colors
+
+// original dark blue/green, and orange
+
 COG green: #7fb337
 COG red: #a0270f
 COG blue: #2d66cd
 COG yellow: #e3b73d
+
+// new TCVCOG logo colors
+
+// yellow-ish
+#cde162
+
+// skyish blue
+#00b5ec
+
+//earthy:
+#5a5754
 
 
 */
@@ -33,19 +47,19 @@ body{
 h1{
     font-family: 'roboto', sans-serif;
     font-size: 1.5em;
-    color: #46C92A;
+    color: #5a5754;
     font-weight: normal;
-    display: box;
+    display: block;
     border-top: none;
     border-right: none;
     border-left: none;
-    border-bottom: 3px solid #46C92A;
+    border-bottom: 3px solid #5a5754;
     
 }
 
 h2{
     font-size: 1.2em;
-    color: #46C92A;
+    color: #00b5ec;
     font-weight: normal;
 }
 
@@ -53,7 +67,7 @@ h3{
     font-size: 1em;
     font-style: italic;
     font-weight: bold;
-    color: #F18732;
+    color: #4F361E;
     font-weight: normal;
     
     
@@ -63,6 +77,32 @@ h4{
     color: darkgray;
     font-style: italic;
 }
+
+
+.logoBox{
+    float:left;
+    clear:none;
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 10px;
+       
+}
+
+.logoBox h2{
+    color: white;
+}
+
+.sys-title{
+    font-size: 1.3em;
+    color: #cde162;
+}
+
+.sys-title-sub{
+    font-size: 1.1em;
+    font-style: italic;
+    color: #00b5ec;
+}
+
 
 .darkFont{
     color:#163F8A;
@@ -221,11 +261,11 @@ i.material-icons{
 
 a:link{
     text-decoration: none;
-    color: #2C5F90;
+    color: #181F36;
 }
 
 a:visited{
-    color: #2C5F90;
+    color: #181F36;
 }
 
 a:hover{
@@ -382,7 +422,7 @@ div.headerLink a:before, a:visited{
     flex-shrink: 1;
     
     height: 65px;
-    background-color: #2C5F90;
+    background-color: #5a5754;
     
 }
 
@@ -406,7 +446,7 @@ div.headerLink a:before, a:visited{
     flex-shrink: 1;
     height: 50px;
     
-    background-color: #163F8A;
+    background-color: #181F36;
     margin-left: 0px;
     margin-right: 0px;
     margin-top: 0px;
@@ -501,19 +541,6 @@ div.headerLink a:before, a:visited{
 
 .foot{
     height: 100px;
-}
-
-.logoBox{
-    float:left;
-    clear:none;
-    display: inline-block;
-    margin-left: 10px;
-    margin-top: 10px;
-       
-}
-
-.logoBox h2{
-    color: white;
 }
 
 
@@ -945,7 +972,7 @@ gridTd-bignum{
 }
 
 .gridTd-mccontainer{
-    background-color: #163F8A;
+    background-color: #181F36;
     
 }
 
