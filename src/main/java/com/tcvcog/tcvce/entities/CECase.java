@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Sylvia Baskem
  */
-public class CECase extends CECaseNoLists{
+public class CECase extends CECaseNoLists implements Cloneable{
     
     
     private List<CodeViolation> violationList;
@@ -52,6 +52,17 @@ public class CECase extends CECaseNoLists{
         this.closingDate = cnl.closingDate;
         this.creationTimestamp = cnl.creationTimestamp;
         this.notes = cnl.notes;
+    }
+    
+    /**
+     *
+     * @return
+     * @throws CloneNotSupportedException
+     */
+    @Override
+    public CECase clone() throws CloneNotSupportedException{
+        super.clone();
+        return null;
     }
     
     

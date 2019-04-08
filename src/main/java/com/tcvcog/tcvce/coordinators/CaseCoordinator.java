@@ -53,6 +53,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
@@ -926,10 +927,42 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         rpt.setIncludeInactiveEvents(false);
         rpt.setIncludeNoticeFullText(true);
         rpt.setIncludeRequestedActionFields(false);
-       
+        rpt.setIncludeMunicipalityDiclosedEvents(true);
+        rpt.setIncludeOfficeOnlyEvents(false);
        return rpt;
+   }
    
+   public ReportConfigCECase transformCECaseForReport(ReportConfigCECase rptCse) throws IntegrationException{
+       CaseIntegrator ci = getCaseIntegrator();
+       CECase c = ci.getCECase(rptCse.getCse().getCaseID());
        
+       List<EventCECase> evList =  new ArrayList<>();
+       Iterator<EventCECase> iter = c.getEventList().iterator();
+       while(iter.hasNext()){
+            EventCECase ev = iter.next();
+            if(ev.isHidden() && !rptCse.isIncludeHiddenEvents()) continue;
+            if(!ev.isActive()&& !rptCse.isIncludeInactiveEvents()) continue;
+            if(!ev.isDiscloseToMunicipality() && !rptCse.isIncludeMunicipalityDiclosedEvents()) continue;
+            if((!ev.isDiscloseToMunicipality() && !ev.isDiscloseToPublic()) 
+                    && !rptCse.isIncludeOfficeOnlyEvents()) continue;
+            evList.add(ev);
+       }
+       c.setEventList(evList);
+       
+       
+       List<NoticeOfViolation> noticeList = new ArrayList<>();
+       Iterator<NoticeOfViolation> iterNotice = c.getNoticeList().iterator();
+       while(iterNotice.hasNext()){
+           NoticeOfViolation nov = iterNotice.next();
+           if((nov.getLetterSentDate() != null && nov.getLetterReturnedDate() == null) 
+                   && !rptCse.isIncludeAllNotices()) continue;
+           noticeList.add(nov);
+       }
+       c.setNoticeList(noticeList);
+       
+       
+       
+       return rptCse;
    }
    
    
