@@ -13,10 +13,14 @@ import java.io.Serializable;
  */
 public class ReportConfigCECase extends ReportConfig{
     
-    private CECase ceCase;
+    private CECase cse;
     
     private boolean includeHiddenEvents;
     private boolean includeInactiveEvents;
+    
+    private boolean includeMunicipalityDiclosedEvents;
+    private boolean includeOfficeOnlyEvents;
+    
     private boolean includeEventNotes;
     private boolean includeRequestedActionFields;
     
@@ -26,10 +30,10 @@ public class ReportConfigCECase extends ReportConfig{
     private boolean includeFullOrdinanceText;
 
     /**
-     * @return the ceCase
+     * @return the cse
      */
-    public CECase getCeCase() {
-        return ceCase;
+    public CECase getCse() {
+        return cse;
     }
 
     /**
@@ -75,10 +79,10 @@ public class ReportConfigCECase extends ReportConfig{
     }
 
     /**
-     * @param ceCase the ceCase to set
+     * @param cse the cse to set
      */
-    public void setCeCase(CECase ceCase) {
-        this.ceCase = ceCase;
+    public void setCse(CECase cse) {
+        this.cse = cse;
     }
 
     /**
@@ -135,6 +139,34 @@ public class ReportConfigCECase extends ReportConfig{
      */
     public void setIncludeAllNotices(boolean includeAllNotices) {
         this.includeAllNotices = includeAllNotices;
+    }
+
+    /**
+     * @return the includeMunicipalityDiclosedEvents
+     */
+    public boolean isIncludeMunicipalityDiclosedEvents() {
+        return includeMunicipalityDiclosedEvents;
+    }
+
+    /**
+     * @param includeMunicipalityDiclosedEvents the includeMunicipalityDiclosedEvents to set
+     */
+    public void setIncludeMunicipalityDiclosedEvents(boolean includeMunicipalityDiclosedEvents) {
+        this.includeMunicipalityDiclosedEvents = includeMunicipalityDiclosedEvents;
+    }
+
+    /**
+     * @return the includeOfficeOnlyEvents
+     */
+    public boolean isIncludeOfficeOnlyEvents() {
+        return includeOfficeOnlyEvents;
+    }
+
+    /**
+     * @param includeOfficeOnlyEvents the includeOfficeOnlyEvents to set
+     */
+    public void setIncludeOfficeOnlyEvents(boolean includeOfficeOnlyEvents) {
+        this.includeOfficeOnlyEvents = includeOfficeOnlyEvents;
     }
     
     

@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class CECaseNoLists extends EntityUtils implements Serializable {
+public class CECaseNoLists extends EntityUtils implements Serializable, Cloneable {
     
     protected int caseID;
     protected int publicControlCode;
@@ -46,6 +46,19 @@ public class CECaseNoLists extends EntityUtils implements Serializable {
     @Override
     public String toString() {
         return caseName;
+    }
+    
+    /**
+     *
+     * @return
+     * @throws CloneNotSupportedException
+     */
+    @Override
+    public CECaseNoLists clone() throws CloneNotSupportedException{
+        super.clone();
+        return null;
+        
+        
     }
 
     public long getCaseAge() {

@@ -66,7 +66,7 @@
                                                     </p:selectBooleanCheckbox>
 
                                                     <h4 style="margin-bottom: 2px;">case date search options:</h4>
-                                                    
+
                                                     <p:selectOneRadio id="datetosearch-sor" layout="pageDirection" value="#{caseProfileBB.searchParams.dateToSearchCECases}"
                                                                       disabled="#{(!caseProfileBB.searchParams.filterByStartEndDate)}">
                                                         <f:selectItems value="#{caseProfileBB.searchParams.dateSearchOptions}"/>
@@ -133,8 +133,8 @@
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                                 </h:panelGroup>
-                                                
-                                                 <h:panelGroup>
+
+                                                <h:panelGroup>
                                                     <p:outputLabel id="cecases-filter-phase-ol" for="cecases-filter-phase" value="filter by case phase? "/>
                                                     <p:selectBooleanCheckbox id="cecases-filter-phase" value="#{caseProfileBB.searchParams.useCasePhase}" >
                                                         <p:ajax update="casePhaseSOM" />
@@ -143,7 +143,7 @@
                                                 <h:panelGroup>
                                                     <p:outputLabel id="cecases-critera-phase" for="casePhaseSOM" value="case phases? "/>
                                                     <p:selectOneMenu value="#{caseProfileBB.searchParams.casePhase}"
-                                                        id="casePhaseSOM">
+                                                                     id="casePhaseSOM">
 
                                                         <f:selectItems value="#{caseProfileBB.casePhaseList}"
                                                                        var="cp"
@@ -151,8 +151,8 @@
                                                                        itemLabel="#{cp.label}"/>
                                                     </p:selectOneMenu>
                                                 </h:panelGroup>
-                                                
-                                                 <h:panelGroup>
+
+                                                <h:panelGroup>
                                                     <p:outputLabel id="cecases-filter-stage-ol" for="cecases-filter-stage" value="filter by case stage? "/>
                                                     <p:selectBooleanCheckbox id="cecases-filter-stage" value="#{caseProfileBB.searchParams.useCaseStage}" >
                                                         <p:ajax update="cecases-criteria-user" />
@@ -161,7 +161,7 @@
                                                 <h:panelGroup>
                                                     <p:outputLabel id="cecases-criteria-stage-ol" for="case-stage-som" value="case stages:"/>
                                                     <p:selectOneMenu value="#{caseProfileBB.searchParams.caseStage}"
-                                                        id="case-stage-som">
+                                                                     id="case-stage-som">
 
                                                         <f:selectItems value="#{caseProfileBB.caseStageArray}"
                                                                        var="cs"
@@ -177,7 +177,7 @@
                                                         <p:ajax update="cecases-criteria-caseid" />
                                                     </p:selectBooleanCheckbox>
                                                 </h:panelGroup>
-                                                
+
 
                                                 <h:panelGroup>
                                                     <p:outputLabel id="cecases-criteria-caseid-ol" for="cecases-criteria-caseid" value="ce case ID:"/>
@@ -210,7 +210,7 @@
                                                         <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                                         <f:selectItems value="#{userBB.userList}"  var="u" itemValue="#{u}" 
                                                                        itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
-                                                         <f:converter converterId="userConverter"/>
+                                                        <f:converter converterId="userConverter"/>
                                                     </p:selectOneMenu>
                                                 </h:panelGroup>
 
@@ -230,12 +230,12 @@
                                                     <p:selectOneMenu id="cecases-criteria-property-som" required="false" 
                                                                      value="#{caseProfileBB.searchParams.property}"
                                                                      disabled="#{!caseProfileBB.searchParams.useProperty}">
-                                                        
+
                                                         <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
                                                         <f:selectItems value="#{sessionBean.propertyQueue}"  var="p" itemValue="#{p}" 
                                                                        itemLabel="#{p.address} (#{p.muni.managerName})"/>
                                                         <f:converter converterId="propertyConverter"/>
-                                                        
+
                                                     </p:selectOneMenu>
                                                 </h:panelGroup>
 
@@ -274,7 +274,7 @@
                                                     <p:selectBooleanCheckbox id="cecases-query-limit" value="#{caseProfileBB.searchParams.limitResultCountTo100}" />
                                                 </h:panelGroup>
                                                 <h:panelGroup>
-                                                    
+
                                                 </h:panelGroup>
                                             </h:panelGrid>                                        
                                         </h:panelGroup>
@@ -283,11 +283,11 @@
                                                         ajax="true" value="Run query" actionListener="#{caseProfileBB.executeQuery}"
                                                         process="@form"
                                                         update="caseListForm:caseTable"
-                                                        
+
                                                         />
                                 </p:fieldset>
                             </h:form>
-                            
+
                             <h2>CE Case docket</h2>
 
                             <h:form id="caseListForm">
@@ -329,7 +329,7 @@
                                         </div>
                                     </p:column>
 
-                                  
+
 
                                     <p:column width="5%" sortBy="#{c.caseAge}">
                                         <f:facet name="header">
@@ -363,8 +363,8 @@
                             </h:form>
                         </div>
                         <div class="object-column">
-                            
-                            
+
+
                             <h:form id="case-profile-messages-form">
                                 <h:messages id="case-profile-messages-global"
                                             globalOnly="true" showDetail="true" showSummary="true"
@@ -375,71 +375,71 @@
                             <h:form id="case-details-form">
                                 <div class="outlinedBox">
 
-                                <h1>
-                                    <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName}"/> 
-                                    <h:outputText id="header-id-ot" value="Case ID: #{caseProfileBB.currentCase.caseID}"/><br/>
-                                </h1>
-                                <h2>
-                                    <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
-                                    <h:outputText id="header-muni-ot" value="(#{caseProfileBB.currentCase.property.muni.muniName})"/>  
-                                </h2>
-                                    
+                                    <h1>
+                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName}"/> 
+                                        <h:outputText id="header-id-ot" value="Case ID: #{caseProfileBB.currentCase.caseID}"/><br/>
+                                    </h1>
+                                    <h2>
+                                        <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
+                                        <h:outputText id="header-muni-ot" value="(#{caseProfileBB.currentCase.property.muni.muniName})"/>  
+                                    </h2>
 
-                                <p:commandButton    id="view-property-cb" 
-                                                    ajax="false"
-                                                    disabled="trye"
-                                                    icon="fa fa-home" styleClass="noFill button-size-small"
-                                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
-                                                    value="view property profile" />
-                                
-                                <p>
-                                    <a href="#action-requests">next actions <h:outputText value=" (#{caseProfileBB.currentCase.eventListActionRequests.size()})" /> </a> | 
-                                    <a href="#add-event">new event</a> | 
-                                    <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.eventList.size()})" /></a> | 
-                                    <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
-                                    <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
-                                    <a href="#citations">citations <h:outputText value=" (#{caseProfileBB.currentCase.citationList.size()})" /></a> | 
-                                    <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.requestList.size()})" /></a>  
-                                </p>
-                                    
-                                    
-                                 <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
-                                     columnClasses="gridTd, gridTd">
-                                     <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.caseOpenClosed}" />
-                                        <div class="status-display-container">
-                                            <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
-                                                <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{caseProfileBB.currentCase.casePhaseIcon.materialIcon}"/></i>
+
+                                    <p:commandButton    id="view-property-cb" 
+                                                        ajax="false"
+                                                        disabled="trye"
+                                                        icon="fa fa-home" styleClass="noFill button-size-small"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                        value="view property profile" />
+
+                                    <p>
+                                        <a href="#action-requests">next actions <h:outputText value=" (#{caseProfileBB.currentCase.eventListActionRequests.size()})" /> </a> | 
+                                        <a href="#add-event">new event</a> | 
+                                        <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.eventList.size()})" /></a> | 
+                                        <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
+                                        <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
+                                        <a href="#citations">citations <h:outputText value=" (#{caseProfileBB.currentCase.citationList.size()})" /></a> | 
+                                        <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.requestList.size()})" /></a>  
+                                    </p>
+
+
+                                    <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                                 columnClasses="gridTd, gridTd">
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.caseOpenClosed}" />
+                                            <div class="status-display-container">
+                                                <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
+                                                    <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{caseProfileBB.currentCase.casePhaseIcon.materialIcon}"/></i>
+                                                </div>
+                                                <div class="status-display-status-list-container">
+                                                    <ul class="status-list">
+
+                                                        <li><h:outputText value="Stage 1: Investigation" styleClass="#{caseProfileBB.styleClassInvestigation}"/></li>
+                                                        <li><h:outputText value="Stage 2: Enforcement" styleClass="#{caseProfileBB.styleClassEnforcement}"/></li>
+                                                        <li><h:outputText value="Stage 3: Citation" styleClass="#{caseProfileBB.sytleClassCitation}"/></li>
+                                                        <li><h:outputText value="Closed" styleClass="#{caseProfileBB.sytleClassClosed}"/></li>
+                                                    </ul>
+                                                </div>
+
                                             </div>
-                                            <div class="status-display-status-list-container">
-                                                <ul class="status-list">
+                                        </h:panelGroup>      
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Opening Date: "/>
+                                            <h:outputText id="selcase-odate-it" value="#{caseProfileBB.currentCase.originiationDatePretty}"/>
+                                            <h:outputText id="selcase-age-it" 
+                                                          value=" (#{caseProfileBB.currentCase.caseAge} days ago)" 
+                                                          rendered="#{empty caseProfileBB.currentCase.closingDate}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Closing Date:"/>
+                                            <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.currentCase.closingDatePretty}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Case Manager: "/>
+                                            <h:outputText id="selcase-manager-it" 
+                                                          value="#{caseProfileBB.currentCase.caseManager.person.firstName} 
+                                                          #{caseProfileBB.currentCase.caseManager.person.lastName} 
+                                                          (#{caseProfileBB.currentCase.caseManager.username})"/>  
+                                        </h:panelGroup>      
 
-                                                    <li><h:outputText value="Stage 1: Investigation" styleClass="#{caseProfileBB.styleClassInvestigation}"/></li>
-                                                    <li><h:outputText value="Stage 2: Enforcement" styleClass="#{caseProfileBB.styleClassEnforcement}"/></li>
-                                                    <li><h:outputText value="Stage 3: Citation" styleClass="#{caseProfileBB.sytleClassCitation}"/></li>
-                                                    <li><h:outputText value="Closed" styleClass="#{caseProfileBB.sytleClassClosed}"/></li>
-                                                </ul>
-                                            </div>
-
-                                        </div>
-                                     </h:panelGroup>      
-                                     <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Opening Date: "/>
-                                        <h:outputText id="selcase-odate-it" value="#{caseProfileBB.currentCase.originiationDatePretty}"/>
-                                        <h:outputText id="selcase-age-it" 
-                                                      value=" (#{caseProfileBB.currentCase.caseAge} days ago)" 
-                                                      rendered="#{empty caseProfileBB.currentCase.closingDate}"/>
-                                        <p:spacer height="5px"/>
-                                        <h:outputLabel styleClass="bold" value="Closing Date:"/>
-                                        <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.currentCase.closingDatePretty}"/>
-                                        <p:spacer height="5px"/>
-                                        <h:outputLabel styleClass="bold" value="Case Manager: "/>
-                                        <h:outputText id="selcase-manager-it" 
-                                                      value="#{caseProfileBB.currentCase.caseManager.person.firstName} 
-                                                      #{caseProfileBB.currentCase.caseManager.person.lastName} 
-                                                      (#{caseProfileBB.currentCase.caseManager.username})"/>  
-                                     </h:panelGroup>      
-                                        
                                         <f:facet name="footer" class="leftalign">
                                             <h:outputLabel styleClass="bold" value="Case notes: "/>
                                             <div class="rowExpansion">
@@ -453,16 +453,16 @@
                                                 value="#{caseProfileBB.currentCase.violationList}"
                                                 var="v"
                                                 widgetVar="violation-compactlist-widgetvar">
-                                            
+
                                                 <div class="compact-violation-list-container">
                                                     <h:outputText id="violation-compactlist-line-ot" value="#{v}"/>
                                                     <h:outputText id="sep-compactlist-line-ot" value=" | "/>
                                                     <h:outputText id="status-compactlist-line-ot" value="#{v.statusString}"/>
                                                 </div>
                                             </p:dataScroller>
-                                                
-                                                                                
-                                            
+
+
+
                                         </f:facet>
                                     </h:panelGrid>
 
@@ -479,142 +479,142 @@
                                                         case-profile-messages-form:case-profile-messages-global
                                                         "
                                                         />
-                                    
+
                                     <p:commandButton    id="case-settings-cb" 
                                                         ajax="true"
                                                         icon="fa fa-gears" styleClass="noFill"
                                                         value="case settings" />
-                                     
-                                        <p:commandButton    id="overridephase-cb" 
-                                                                ajax="true"
-                                                                immediate="true"
-                                                                value="change stage"
-                                                                onclick="PF('phase-override').show()"
-                                                                icon="fa fa-tachometer" styleClass="noFill"
-                                                                rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                                update="casePhaseChangeForm"
-                                                                />
+
+                                    <p:commandButton    id="overridephase-cb" 
+                                                        ajax="true"
+                                                        immediate="true"
+                                                        value="change stage"
+                                                        onclick="PF('phase-override').show()"
+                                                        icon="fa fa-tachometer" styleClass="noFill"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                        update="casePhaseChangeForm"
+                                                        />
                                     <p:commandButton   id="print-case-cb" 
                                                        ajax="true" actionListener="#{caseProfileBB.prepareReportCECase}"
-                                                        icon="fa fa-print" styleClass="noFill"
-                                                        oncomplete="PF('report-case-profile-diaglog-var').show()"
-                                                        value="print case profile" 
-                                                        update="report-case-profile-form"/>
-                                     
+                                                       icon="fa fa-print" styleClass="noFill"
+                                                       oncomplete="PF('report-case-profile-diaglog-var').show()"
+                                                       value="print case profile" 
+                                                       update="report-case-profile-form"/>
+
 
                                 </div>
 
                             </h:form>
-                            
-                            <hr />
-                            
-                            <h2 id="action-requests">Requested actions:</h2>
-                            
-                            
-                                <h:form id="events-datascroller-form">
-                                  
-                                    <p:dataScroller
-                                        id="events-datascroller"
-                                        var="e"
-                                        value="#{caseProfileBB.currentCase.eventListActionRequests}"
-                                        widgetVar="events-requiredactions-ds">
 
-                                        <div class="outlinedBox event-ds-box">
-                                            
-                                            <div class="status-display-container">
-                                                <div class="action-request-icon">
-                                                    <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.category.icon.materialIcon}"/></i>
-                                                </div>
+                            <hr />
+
+                            <h2 id="action-requests">Requested actions:</h2>
+
+
+                            <h:form id="events-datascroller-form">
+
+                                <p:dataScroller
+                                    id="events-datascroller"
+                                    var="e"
+                                    value="#{caseProfileBB.currentCase.eventListActionRequests}"
+                                    widgetVar="events-requiredactions-ds">
+
+                                    <div class="outlinedBox event-ds-box">
+
+                                        <div class="status-display-container">
+                                            <div class="action-request-icon">
+                                                <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.category.icon.materialIcon}"/></i>
+                                            </div>
                                             <div class="status-display-status-list-container">
                                                 <div class="action-request-header">
                                                     <h:outputText value="Requested Action: #{e.actionEventCat.eventCategoryTitle}"/>
                                                 </div>
-                                                
+
                                                 <div class="action-request-subheader">
                                                     <h:outputText value="#{e.dateOfRecordPretty} (#{e.daysUntilDue} days from now) "/>
                                                 </div>
-                                                
+
                                             </div>
 
                                         </div>
-                                            
-                                            <h:panelGrid columns="2" rendered="true"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back"
-                                                         footerClass="no-border">
 
-                                                <f:facet name="header" class="leftalign">
-                                                    <div class="wrapText roomy-top-margin">
-                                                        <h:outputText value="Description: " styleClass="bold" />
-                                                        <h:outputText style="font-weight: normal;" value="#{e.description}"/>
-                                                    </div>
-                                                </f:facet>
-                                                
-                                                
-                                                
-                                                
+                                        <h:panelGrid columns="2" rendered="true"
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                                     footerClass="no-border">
 
-                                                <h:panelGroup>
-                                                    <p:spacer height="5px"/>
-                                                    <h:outputText styleClass="bold" value="Action requested by: "/>
-                                                    <h:outputText value="#{e.actionRequestedBy.person.firstName} #{e.actionRequestedBy.person.lastName}"/>
-                                                    <p:spacer height="5px"/>
-                                                    <h:outputText styleClass="bold" value="Addressed to: "/>
-                                                        <h:outputText value="#{(empty e.responderIntended) ? 'default code officer' : e.responderIntended.person.lastName}"/>
-                                                </h:panelGroup>
-                                                   
-                                                <h:panelGroup>
-                                                    <h:outputText styleClass="bold" value="Triggering event: "/>
-                                                    <h:outputText value="#{e.category.eventCategoryTitle} (id: #{e.eventID})"/>
-                                                    <p:spacer height="5px"/>
-                                                    <h:outputText styleClass="bold" value="Event timestamp: "/>
-                                                    <h:outputText value="#{e.timestampPretty}"/>
+                                            <f:facet name="header" class="leftalign">
+                                                <div class="wrapText roomy-top-margin">
+                                                    <h:outputText value="Description: " styleClass="bold" />
+                                                    <h:outputText style="font-weight: normal;" value="#{e.description}"/>
+                                                </div>
+                                            </f:facet>
 
-                                                </h:panelGroup>
 
-                                                <f:facet name="footer">
-                                                
-                                                    <p:commandButton   id="action-requests-take-requested-action-cb" 
-                                                                       ajax="true"
-                                                                       actionListener="#{caseProfileBB.initiateNewRequestedEvent(e)}"
-                                                                       value="take action: #{e.actionEventCat.eventCategoryTitle}" 
-                                                                        styleClass="noFill"
-                                                                        disabled="#{e.responseComplete}"
-                                                                        icon="fa fa-play-circle-o"
-                                                                        oncomplete="PF('add-event-dialog-var').show()"
-                                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                                        update="addNewEventForm
-                                                                               events-datascroller-form
-                                                                               "
-                                                                        />
-                                                    <p:commandButton   id="action-requests-reject-requested-action-cb" 
-                                                                       actionListener="#{caseProfileBB.rejectRequestedEvent(e)}"
-                                                                       ajax="true"
-                                                                       value="reject requested action" 
-                                                                       oncomplete="PF('reject-requested-action-diaglog-var').show()"
-                                                                       styleClass="noFill"
-                                                                       disabled="#{e.responseComplete}"
-                                                                       icon="fa fa-hand-stop-o"
-                                                                       rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                                       update="events-datascroller-form
-                                                                               case-profile-messages-form:case-profile-messages-global"
-                                                                        />
-                                                    <p:commandButton   id="action-requests-edit-event-cb" 
-                                                                       ajax="true"
-                                                                       actionListener="#{caseProfileBB.editEvent(e)}"
-                                                                       value="edit event" 
-                                                                       styleClass="noFill"
-                                                                       icon="fa fa-edit"
-                                                                       rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                                       oncomplete="PF('add-event-dialog-var').show()"
-                                                                       update="addNewEventForm"
-                                                                       />
-                                                </f:facet>
-                                            </h:panelGrid>
-                                        </div>
 
-                                    </p:dataScroller>
-                                </h:form>
-                            
+
+
+                                            <h:panelGroup>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText styleClass="bold" value="Action requested by: "/>
+                                                <h:outputText value="#{e.actionRequestedBy.person.firstName} #{e.actionRequestedBy.person.lastName}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText styleClass="bold" value="Addressed to: "/>
+                                                <h:outputText value="#{(empty e.responderIntended) ? 'default code officer' : e.responderIntended.person.lastName}"/>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText styleClass="bold" value="Triggering event: "/>
+                                                <h:outputText value="#{e.category.eventCategoryTitle} (id: #{e.eventID})"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText styleClass="bold" value="Event timestamp: "/>
+                                                <h:outputText value="#{e.timestampPretty}"/>
+
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer">
+
+                                                <p:commandButton   id="action-requests-take-requested-action-cb" 
+                                                                   ajax="true"
+                                                                   actionListener="#{caseProfileBB.initiateNewRequestedEvent(e)}"
+                                                                   value="take action: #{e.actionEventCat.eventCategoryTitle}" 
+                                                                   styleClass="noFill"
+                                                                   disabled="#{e.responseComplete}"
+                                                                   icon="fa fa-play-circle-o"
+                                                                   oncomplete="PF('add-event-dialog-var').show()"
+                                                                   rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                                   update="addNewEventForm
+                                                                   events-datascroller-form
+                                                                   "
+                                                                   />
+                                                <p:commandButton   id="action-requests-reject-requested-action-cb" 
+                                                                   actionListener="#{caseProfileBB.rejectRequestedEvent(e)}"
+                                                                   ajax="true"
+                                                                   value="reject requested action" 
+                                                                   oncomplete="PF('reject-requested-action-diaglog-var').show()"
+                                                                   styleClass="noFill"
+                                                                   disabled="#{e.responseComplete}"
+                                                                   icon="fa fa-hand-stop-o"
+                                                                   rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                                   update="events-datascroller-form
+                                                                   case-profile-messages-form:case-profile-messages-global"
+                                                                   />
+                                                <p:commandButton   id="action-requests-edit-event-cb" 
+                                                                   ajax="true"
+                                                                   actionListener="#{caseProfileBB.editEvent(e)}"
+                                                                   value="edit event" 
+                                                                   styleClass="noFill"
+                                                                   icon="fa fa-edit"
+                                                                   rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                                   oncomplete="PF('add-event-dialog-var').show()"
+                                                                   update="addNewEventForm"
+                                                                   />
+                                            </f:facet>
+                                        </h:panelGrid>
+                                    </div>
+
+                                </p:dataScroller>
+                            </h:form>
+
                             <hr />
 
                             <h2 id="add-event">Add new event</h2>
@@ -663,7 +663,7 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                         <h:outputLabel styleClass="bold" for="newEventTypeMenu">
+                                        <h:outputLabel styleClass="bold" for="newEventTypeMenu">
                                             <h:outputText value="Step 3: Create"/>
                                         </h:outputLabel>
                                         <p:spacer height="5px"/>
@@ -692,18 +692,18 @@
                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                 </h:messages>
                             </h:form>
-                            
-                           <hr />
-                            
-                        <h2 id="event-history">Event history</h2>
-                            
+
+                            <hr />
+
+                            <h2 id="event-history">Event history</h2>
+
                             <h:form id="event-dt-form">
-                                
+
                                 <h:outputLabel value="Show hidden events: " for="events-showhidden-sbcb" />
                                 <p:selectBooleanCheckbox id="events-showhidden-sbcb" value="#{caseProfileBB.showHiddenEvents}">
                                     <p:ajax listener="#{caseProfileBB.reloadEventList}" update="caseEventTable" />
                                 </p:selectBooleanCheckbox>
-                                
+
                                 <h:outputLabel value="Show inactive events: " for="events-inactive-sbcb" />
                                 <p:selectBooleanCheckbox id="events-inactive-sbcb" value="#{caseProfileBB.showInactiveEvents}">
                                     <p:ajax listener="#{caseProfileBB.reloadEventList}" update="caseEventTable" />
@@ -741,13 +741,13 @@
                                         </div>
                                     </p:column>
 
-                                        <p:column width="4%" sortBy="#{e.eventID}">
-                                            <f:facet name="header">
-                                                <h:outputText value="ID" />
-                                            </f:facet>
-                                            <h:outputText value="#{e.eventID}"/>
-                                        </p:column>
-                <ui:remove>
+                                    <p:column width="4%" sortBy="#{e.eventID}">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{e.eventID}"/>
+                                    </p:column>
+                                    <ui:remove>
                                         <p:column width="8%" sortBy="#{e.category.eventType.label}"
                                                   filterBy="#{e.category.eventType.label}">
                                             <f:facet name="header">
@@ -755,7 +755,7 @@
                                             </f:facet>
                                             <h:outputText value="#{e.category.eventType.label}"/>
                                         </p:column>
-                </ui:remove>
+                                    </ui:remove>
 
                                     <p:column width="12%" sortBy="#{e.category.eventCategoryTitle}"
                                               filterBy="#{e.category.eventCategoryTitle}">
@@ -768,12 +768,12 @@
                                     </p:column>
                                     <p:column width="5%" filterBy="#{e.owner.person.lastName}"
                                               sortBy="#{e.owner.person.lastName}">
-                                                        
+
                                         <f:facet name="header">
                                             <h:outputText value="Owner" />
                                         </f:facet>
                                         <h:outputText value="#{e.owner.person.lastName}"/>
-                                </p:column>
+                                    </p:column>
                                     <p:column width="20%" style="word-wrap: normal;">
                                         <f:facet name="header">
                                             <h:outputText value="Description" />
@@ -846,55 +846,55 @@
                                                 </h:panelGroup>
 
                                                 <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Requested event: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.actionEventCat.eventType.label}: #{e.actionEventCat.eventCategoryTitle}"/>
-                                                            </div>
-                                                        </h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Requested event: "/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.actionEventCat.eventType.label}: #{e.actionEventCat.eventCategoryTitle}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Action requested by: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.actionRequestedBy.person.firstName} #{e.actionRequestedBy.person.lastName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Action requested by: "/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.actionRequestedBy.person.firstName} #{e.actionRequestedBy.person.lastName}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                                       
 
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Intended user/action taker: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responderIntended.person.firstName} #{e.responderIntended.person.lastName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
 
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Action taken by: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responderActual.person.firstName} #{e.responderActual.person.lastName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Intended user/action taker: "/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.responderIntended.person.firstName} #{e.responderIntended.person.lastName}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Action timestamp: "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responseTimePrettyDate}"/>
-                                                            </div>
-                                                        </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Action taken by: "/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.responderActual.person.firstName} #{e.responderActual.person.lastName}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Request rejected? "/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.requestRejected}"/>
-                                                            </div>
-                                                        </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Action timestamp: "/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.responseTimePrettyDate}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="Action response notes:"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.responderNotes}"/>
-                                                            </div>
-                                                        </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Request rejected? "/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.requestRejected}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Action response notes:"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.responderNotes}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
                                                 <f:facet name="footer" class="leftalign">
                                                     <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
@@ -1053,7 +1053,7 @@
                             <hr />
 
 
-                        <h2 id="notices">Notices of violation</h2>
+                            <h2 id="notices">Notices of violation</h2>
 
                             <h:form id="notices-messages-form">
 
@@ -1180,116 +1180,116 @@
                                     <hr />
                                 </p:dataScroller>
                             </h:form>
-                        
+
                             <hr />
 
 
                             <p:spacer height="15px"/>
 
                             <h:form id="citation-form">
-                                
+
                                 <h2 id="citations">Citations</h2>
 
                                 <p:commandButton ajax="false" action="#{caseProfileBB.createNewCitation}"
-                                                     value="Create new citation"
-                                                     
-                                                     icon="fa fa-warning"
-                                                     disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                 value="Create new citation"
+
+                                                 icon="fa fa-warning"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
                                 <p:spacer height="5px" />
 
-                                    <p:dataTable
-                                        id="citation-table"
-                                        var="citation"
-                                        rowKey="#{citation.citationID}"
-                                        value="#{caseProfileBB.currentCase.citationList}"
-                                        tableStyleClass="primeDataTable"
-                                        expandedRow="false"
-                                        rowExpandMode="multiple"
-                                        draggableColumns="true"
-                                        reflow="true">
+                                <p:dataTable
+                                    id="citation-table"
+                                    var="citation"
+                                    rowKey="#{citation.citationID}"
+                                    value="#{caseProfileBB.currentCase.citationList}"
+                                    tableStyleClass="primeDataTable"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    draggableColumns="true"
+                                    reflow="true">
 
-                                        <p:column width="4%">
-                                            <p:rowToggler />
-                                        </p:column>
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Citation ID" />
-                                            </f:facet>
-                                            <h:outputText value="#{citation.citationID}"/>
-                                        </p:column>
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Citation No." />
-                                            </f:facet>
-                                            <h:outputText value="#{citation.citationNo}"/>
-                                        </p:column>
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Court Entity ID" />
-                                            </f:facet>
-                                            <h:outputText value="#{citation.origin_courtentity.courtEntityName}"/>
-                                        </p:column>
-                                        <p:column width="15%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Issuer" />
-                                            </f:facet>
-                                            <h:outputText value="#{citation.userOwner.person.lastName}"/>
-                                        </p:column>
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Date of record" />
-                                            </f:facet>
-                                            <h:outputText value="#{citation.dateOfRecord}"/>
-                                        </p:column>
-                                        <p:column width="10%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Status" />
-                                            </f:facet>
-                                            <h:outputText value="#{citation.status.statusTitle}"/>
-                                        </p:column>
-                                        <p:column width="10%">
-                                            <f:facet name="edit">
-                                                
-                                            </f:facet>
-                                            <p:commandButton ajax="false" 
-                                                             action="#{caseProfileBB.updateCitation(citation)}"
-                                                             value="edit"
-                                                             icon="fa fa-edit"
-                                                             disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
-                                        </p:column>
+                                    <p:column width="4%">
+                                        <p:rowToggler />
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Citation ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{citation.citationID}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Citation No." />
+                                        </f:facet>
+                                        <h:outputText value="#{citation.citationNo}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Court Entity ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{citation.origin_courtentity.courtEntityName}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Issuer" />
+                                        </f:facet>
+                                        <h:outputText value="#{citation.userOwner.person.lastName}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Date of record" />
+                                        </f:facet>
+                                        <h:outputText value="#{citation.dateOfRecord}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Status" />
+                                        </f:facet>
+                                        <h:outputText value="#{citation.status.statusTitle}"/>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="edit">
 
-                                        <p:rowExpansion>
-                                            <div class="outlinedBox">
-                                                <h:outputLabel value="violations: "/>
-                                                <p:dataScroller 
-                                                    id="citation-violations-datascroller"
-                                                    value="#{citation.violationList}"
-                                                    var="v"
-                                                    widgetVar="citation-violation-compactlist-widgetvar">
+                                        </f:facet>
+                                        <p:commandButton ajax="false" 
+                                                         action="#{caseProfileBB.updateCitation(citation)}"
+                                                         value="edit"
+                                                         icon="fa fa-edit"
+                                                         disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                    </p:column>
 
-                                                    <h:outputText id="violation-compactlist-line-ot" value="#{v}"/>
-                                                    <h:outputText id="v-source-name-compactlist-ot" value="(#{v.violatedEnfElement.codeElement.source.sourceName}" />
-                                                    <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
-                                                    <h:outputText id="v-source-year-compactlist-ot" value="#{v.violatedEnfElement.codeElement.source.sourceYear})"/>
-                                                    <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                                    <h:outputText id="status-compactlist-line-ot" value="#{v.statusString}"/>
-                                                
-                                                 </p:dataScroller>
-                                                
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+                                            <h:outputLabel value="violations: "/>
+                                            <p:dataScroller 
+                                                id="citation-violations-datascroller"
+                                                value="#{citation.violationList}"
+                                                var="v"
+                                                widgetVar="citation-violation-compactlist-widgetvar">
 
-                                                <h:outputLabel value="Notes: "/>
-                                                <h:outputText value="#{citation.notes}"/>
-                                                <p:spacer height="10px"/>
-                                                <h:outputLabel value="Active: "/>
-                                                <h:outputText value="#{citation.isActive}"/>
-                                                <p:spacer height="10px"/>
-                                                <h:outputLabel value="Entry Timestamp: "/>
-                                                <h:outputText value="#{citation.timeStamp}"/>
-                                                <p:spacer height="10px"/>
-                                            </div>
-                                        </p:rowExpansion>
+                                                <h:outputText id="violation-compactlist-line-ot" value="#{v}"/>
+                                                <h:outputText id="v-source-name-compactlist-ot" value="(#{v.violatedEnfElement.codeElement.source.sourceName}" />
+                                                <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
+                                                <h:outputText id="v-source-year-compactlist-ot" value="#{v.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                <h:outputText id="sep-compactlist-line-ot" value=" | "/>
+                                                <h:outputText id="status-compactlist-line-ot" value="#{v.statusString}"/>
 
-                                    </p:dataTable>
+                                            </p:dataScroller>
+
+
+                                            <h:outputLabel value="Notes: "/>
+                                            <h:outputText value="#{citation.notes}"/>
+                                            <p:spacer height="10px"/>
+                                            <h:outputLabel value="Active: "/>
+                                            <h:outputText value="#{citation.isActive}"/>
+                                            <p:spacer height="10px"/>
+                                            <h:outputLabel value="Entry Timestamp: "/>
+                                            <h:outputText value="#{citation.timeStamp}"/>
+                                            <p:spacer height="10px"/>
+                                        </div>
+                                    </p:rowExpansion>
+
+                                </p:dataTable>
 
                             </h:form>
 
@@ -1389,7 +1389,7 @@
                                                         <h:outputText value="#{r.requestProperty.address}"/>
                                                     </div>
                                                 </h:panelGroup>
-                                                
+
                                                 <h:panelGroup>
                                                     <h:outputLabel class="bold" value="Date Submitted" />
                                                     <p:spacer height="5px"/>
@@ -1480,23 +1480,23 @@
                                 <h:outputText styleClass="bold" value="Event:"/>
                             </p:outputLabel>
                             <h:outputText id="add-event-ec-ot" value="#{caseProfileBB.selectedEvent.category.eventCategoryTitle} (ID:#{caseProfileBB.selectedEvent.eventID})"/>
-                            
+
                             <p:spacer height="5px"/>
-                            
+
                             <p:outputLabel for="add-event-currcase-ot">
                                 <h:outputText styleClass="bold" value="Case:"/>
                             </p:outputLabel>
                             <h:outputText id="add-event-currcase-ot" value="#{caseProfileBB.currentCase.caseName} (ID:#{caseProfileBB.currentCase.caseID}) "/>
-                            
+
                             <p:spacer height="5px"/>
-                            
+
                             <p:outputLabel for="add-event-et-ot">
                                 <h:outputText styleClass="bold" value="Event type:"/>
                             </p:outputLabel>
                             <h:outputText id="add-event-et-ot" value="#{caseProfileBB.selectedEvent.category.eventType.label}"/>
-                            
+
                             <p:spacer height="5px"/>
-                            
+
                             <p:outputLabel for="add-event-cd-ot">
                                 <h:outputText styleClass="bold" value="Cateogry description:"/>
                             </p:outputLabel>
@@ -1569,23 +1569,23 @@
                                     <h:outputLabel for="request-action-cb">
                                         <h:outputText value="Request an action with this event"/>
                                     </h:outputLabel>
-                                    
+
                                     <p:spacer height="5px"/>
-                                    
+
                                     <p:selectBooleanCheckbox tabindex="18" id="eventedit-requestaction-action-cb" 
                                                              value="#{caseProfileBB.includeActionRequest}"
                                                              disabled="#{caseProfileBB.selectedEvent.responseComplete or !(empty caseProfileBB.triggeringEventForRequestedCaseAction)}">
                                         <p:ajax update="event-responder-intended
-                                                        requested-action-solb
-                                                        request-action-usedefceo-cb" />
+                                                requested-action-solb
+                                                request-action-usedefceo-cb" />
                                     </p:selectBooleanCheckbox>
-                                    
+
                                     <p:spacer height="5px"/>
-                                    
+
                                     <h:outputText id="eventedit-explain-no-action-request-ot"
                                                   rendered="#{!(empty caseProfileBB.triggeringEventForRequestedCaseAction)}"
                                                   value="This event is already a response to event id #{caseProfileBB.triggeringEventForRequestedCaseAction.eventID}"/>
-                                    
+
                                     <h:outputText id="eventedit-actionresponse-status-ot"
                                                   rendered="#{caseProfileBB.selectedEvent.requestsAction}"
                                                   value="#{caseProfileBB.selectedEvent.responseComplete ? 'action response complete' : 'still awating action by'}" />
@@ -1593,9 +1593,9 @@
                                     <h:outputText   id="eventedit-actionresponse-responsedetails-ot"
                                                     rendered="#{caseProfileBB.selectedEvent.responseComplete and caseProfileBB.selectedEvent.requestsAction}" 
                                                     value="Action taken by #{caseProfileBB.selectedEvent.responderActual.person.firstName} 
-                                                            #{caseProfileBB.selectedEvent.responderActual.person.lastName}
-                                                            on #{caseProfileBB.selectedEvent.responseTimePrettyDate}"
-                                                  />
+                                                    #{caseProfileBB.selectedEvent.responderActual.person.lastName}
+                                                    on #{caseProfileBB.selectedEvent.responseTimePrettyDate}"
+                                                    />
                                     <p:spacer height="5px"/>
                                     <p:commandButton id="clear-action-response-cb"
                                                      ajax="true"
@@ -1610,41 +1610,41 @@
                                                      events-datascroller-form
                                                      "
                                                      />
-                                    
-                                    
+
+
                                 </h:panelGroup>
-                                
-                                
+
+
 
                                 <h:panelGroup>
                                     <h:outputLabel for="request-action-cb">
                                         <h:outputText value="Requested event category"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    
+
                                     <p:selectOneMenu style="width: 300px;" id="requested-action-solb" 
                                                      value="#{caseProfileBB.selectedEvent.actionEventCat}" tabindex="19"
-                                                        disabled="#{!caseProfileBB.includeActionRequest 
-                                                                    or caseProfileBB.selectedEvent.responseComplete
-                                                                    or !(empty caseProfileBB.triggeringEventForRequestedCaseAction)}">
+                                                     disabled="#{!caseProfileBB.includeActionRequest 
+                                                                 or caseProfileBB.selectedEvent.responseComplete
+                                                                 or !(empty caseProfileBB.triggeringEventForRequestedCaseAction)}">
                                         <f:converter converterId="eventCategoryConverter"/>
                                         <f:selectItems  id="catItemsList" value="#{caseProfileBB.availableActionsToRequest}" 
                                                         var="ec" itemValue="#{ec}" itemLabel="#{ec.eventType.label}: #{ec.eventCategoryTitle}"/>
                                     </p:selectOneMenu>
-                                    
+
                                     <p:spacer height="5px"/>
                                     <h:outputLabel for="request-action-usedefceo-cb">
                                         <h:outputText value="Assign request to default muni code officer"/>
                                     </h:outputLabel>
-                                     <p:selectBooleanCheckbox tabindex="18" id="request-action-usedefceo-cb" 
-                                                              value="#{caseProfileBB.selectedEvent.requestActionByDefaultMuniCEO}"
+                                    <p:selectBooleanCheckbox tabindex="18" id="request-action-usedefceo-cb" 
+                                                             value="#{caseProfileBB.selectedEvent.requestActionByDefaultMuniCEO}"
                                                              disabled="#{!caseProfileBB.includeActionRequest 
                                                                          or caseProfileBB.selectedEvent.responseComplete
                                                                          or !(empty caseProfileBB.triggeringEventForRequestedCaseAction)}">
                                         <p:ajax update="event-responder-intended" />
                                     </p:selectBooleanCheckbox>
                                     <p:spacer height="5px"/>
-                                    
+
                                     <h:outputLabel for="event-responder-intended">
                                         <h:outputText value="Assign request to a specific user..."/>
                                     </h:outputLabel>
@@ -1660,15 +1660,15 @@
                                         <f:selectItems id="users-selitems" value="#{userBB.userList}"  var="unus" itemValue="#{unus}" 
                                                        itemLabel="#{unus.person.firstName} #{unus.person.lastName} (#{unus.username})"/>
                                     </p:selectOneMenu>
-                                    
+
                                     <h:message for="event-responder-intended" />
-                                    
-                                    
-                                    
+
+
+
                                 </h:panelGroup>
-                                
+
                                 <f:facet name="footer">
-                                        
+
                                     <h:outputLabel for="eventNotes">
                                         <h:outputText value="Event Notes:"/>
                                     </h:outputLabel>
@@ -1685,11 +1685,11 @@
                                 </f:facet>
 
                             </h:panelGrid>
-                            
+
                             <h2>Connect persons to event</h2>
-                                
+
                             <h:form id="add-person-to-event-form">
-                                
+
                                 <h:panelGroup>
                                     <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
                                     <p:selectOneMenu id="person-list-menu" required="false" value="#{caseProfileBB.selectedPerson}">
@@ -1701,12 +1701,12 @@
                                     <h:message for="person-list-menu" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
-                            
-                            <p:commandButton    ajax="true" actionListener="#{caseProfileBB.queueSelectedPerson}"
+
+                                <p:commandButton    ajax="true" actionListener="#{caseProfileBB.queueSelectedPerson}"
                                                     value="Add selected person to event"
                                                     update="persons-to-add-ds"/>
                                 <p:spacer height="5px"/>
-                            
+
                                 <p:dataScroller     id="persons-to-add-ds"
                                                     value="#{caseProfileBB.selectedEvent.personList}"
                                                     var="pers">
@@ -1716,52 +1716,52 @@
                                                         actionListener="#{caseProfileBB.deQueuePersonFromEvent(pers)}"
                                                         update="persons-to-add-ds"/>
                                 </p:dataScroller>
-                                                 
-                            <h2>Submit form</h2>
 
-                            <p:commandButton ajax="true" 
-                                             value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('add-event-dialog-var').hide()"/>
+                                <h2>Submit form</h2>
 
-                            <p:commandButton ajax="true" actionListener="#{caseProfileBB.attachEventToCase}"
-                                             value="Create new event" icon="fa fa-plus"
-                                             oncomplete="PF('add-event-dialog-var').hide()"
-                                             disabled="#{!(caseProfileBB.selectedEvent.eventID == 0)}"
-                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
-                                             update="
-                                             case-details-form
-                                             events-datascroller-form
-                                             event-dt-form:caseEventTable
-                                             violation-form
-                                             case-profile-messages-form:case-profile-messages-global
-                                             event-messages-form:cecases-events-messages"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('add-event-dialog-var').hide()"/>
 
-                            <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitEventEdits}"
-                                             value="Edit event" icon="fa fa-edit"
-                                             disabled="#{caseProfileBB.selectedEvent.eventID == 0}"
-                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
-                                             oncomplete="PF('add-event-dialog-var').hide()"
-                                             update="
-                                             case-details-form
-                                             events-datascroller-form
-                                             event-dt-form:caseEventTable
-                                             violation-form
-                                             case-details-form:selcase-cdate-it
-                                             case-profile-messages-form:case-profile-messages-global
-                                             event-messages-form:cecases-events-messages"/>
-                            
-                            <p:commandButton ajax="true" actionListener="#{caseProfileBB.deleteSelectedEvent}"
-                                             value="Nuke event" icon="fa fa-bomb"
-                                             oncomplete="PF('add-event-dialog-var').hide()"
-                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
-                                             update="event-dt-form:caseEventTable
-                                             case-details-form
-                                             violation-form:violation-table
-                                             case-profile-messages-form:case-profile-messages-global
-                                             event-messages-form:cecases-events-messages"/>
+                                <p:commandButton ajax="true" actionListener="#{caseProfileBB.attachEventToCase}"
+                                                 value="Create new event" icon="fa fa-plus"
+                                                 oncomplete="PF('add-event-dialog-var').hide()"
+                                                 disabled="#{!(caseProfileBB.selectedEvent.eventID == 0)}"
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                 update="
+                                                 case-details-form
+                                                 events-datascroller-form
+                                                 event-dt-form:caseEventTable
+                                                 violation-form
+                                                 case-profile-messages-form:case-profile-messages-global
+                                                 event-messages-form:cecases-events-messages"/>
+
+                                <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitEventEdits}"
+                                                 value="Edit event" icon="fa fa-edit"
+                                                 disabled="#{caseProfileBB.selectedEvent.eventID == 0}"
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                 oncomplete="PF('add-event-dialog-var').hide()"
+                                                 update="
+                                                 case-details-form
+                                                 events-datascroller-form
+                                                 event-dt-form:caseEventTable
+                                                 violation-form
+                                                 case-details-form:selcase-cdate-it
+                                                 case-profile-messages-form:case-profile-messages-global
+                                                 event-messages-form:cecases-events-messages"/>
+
+                                <p:commandButton ajax="true" actionListener="#{caseProfileBB.deleteSelectedEvent}"
+                                                 value="Nuke event" icon="fa fa-bomb"
+                                                 oncomplete="PF('add-event-dialog-var').hide()"
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                                 update="event-dt-form:caseEventTable
+                                                 case-details-form
+                                                 violation-form:violation-table
+                                                 case-profile-messages-form:case-profile-messages-global
+                                                 event-messages-form:cecases-events-messages"/>
                             </h:form>
-                            
-                                
+
+
                         </h:form>
                     </p:dialog>
 
@@ -1814,44 +1814,44 @@
                                 <h:panelGroup>
                                     <h:inputTextarea value="#{caseUpdateBB.formCaseNotes}"/>
                                 </h:panelGroup> 
-                                    <h:panelGroup>
-                                        <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
-                                        <h:outputText id="selcase-pacc" value="#{caseProfileBB.currentCase.publicControlCode}"/>
-                                        <p:spacer height="5px"/>
-                                        <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
-                                        <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
-                                                                 disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
-                                            <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
-                                        </p:selectBooleanCheckbox>
-                                        <p:spacer height="5px"/>
-                                        <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
-                                        <h:outputText value=" "/>
-                                        <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
-                                                                 disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
-                                            <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
-                                        </p:selectBooleanCheckbox>
-                                        <p:spacer height="5px"/>
-                                    </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
+                                    <h:outputText id="selcase-pacc" value="#{caseProfileBB.currentCase.publicControlCode}"/>
+                                    <p:spacer height="5px"/>
+                                    <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
+                                    <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
+                                                             disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                        <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                    </p:selectBooleanCheckbox>
+                                    <p:spacer height="5px"/>
+                                    <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
+                                    <h:outputText value=" "/>
+                                    <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{caseProfileBB.currentCase.paccEnabled}"
+                                                             disabled="#{!sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                        <p:ajax listener="#{caseProfileBB.changePACCAccess()}" update="cecases-messages-form:cecases-messages-global" />
+                                    </p:selectBooleanCheckbox>
+                                    <p:spacer height="5px"/>
+                                </h:panelGroup>
                             </h:panelGrid>
                             <p:spacer height="10px"/>
                             <p:commandButton ajax="false" value="Update Case" action="#{caseUpdateBB.updateCase}"  icon="fa fa-edit"/>
                         </h:form>
                     </p:dialog>
-                    
+
                     <p:dialog    id="case-phase-dialog"
-                                        height="650" width="900"
-                                        widgetVar="phase-override"
-                                        closable="true" >
+                                 height="650" width="900"
+                                 widgetVar="phase-override"
+                                 closable="true" >
                         <h2>Override case phase</h2>
                         <h:form id="casePhaseChangeForm">
-                         <p:outputLabel for="override-currcase-ot">
+                            <p:outputLabel for="override-currcase-ot">
                                 <h:outputText styleClass="bold" value="Current phase:"/>
                             </p:outputLabel>
-                        <h:outputText id="override-currcase-ot" value="#{caseProfileBB.currentCase.casePhase.label} (case ID:#{caseProfileBB.currentCase.caseID}) "/>
-                            
-                        <p:spacer height="5px"/>
+                            <h:outputText id="override-currcase-ot" value="#{caseProfileBB.currentCase.casePhase.label} (case ID:#{caseProfileBB.currentCase.caseID}) "/>
 
-                         <p:outputLabel for="casePhaseSOM">
+                            <p:spacer height="5px"/>
+
+                            <p:outputLabel for="casePhaseSOM">
                                 <h:outputText styleClass="bold" value="Choose new phase:"/>
                             </p:outputLabel>
                             <p:selectOneMenu value="#{caseProfileBB.selectedCasePhase}"
@@ -1882,155 +1882,177 @@
 
 
                     </p:dialog>
-                    
-                    
+
+
                     <p:confirmDialog message="Photos attached to violation #{caseProfileBB.selectedViolation.violationID}" 
-                                         severity="alert" widgetVar="photo-dialog"
-                                         closable="true"
-                                        
-                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                                     severity="alert" widgetVar="photo-dialog"
+                                     closable="true"
 
-                            <h:form id="photo-form">
-                                <p:scrollPanel style="width:1000px; height:400px" mode="native">
-                                    <p:dataTable
-                                                    id="photoTable"
-                                                    var="photoid"
-                                                    value="#{caseProfileBB.selectedViolation.photoList}"
-                                                    rowKey="#{photoid}"
-                                                    tableStyleClass="primeDataTable"
-                                                    draggableRows="false" tabindex="6">
-                                        <p:column width="10%">
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Manage"/>
-                                                        </f:facet>
-                                                        <p:commandButton ajax="true" 
-                                                                         actionListener="#{caseProfileBB.deletePhoto(photoid)}"
-                                                                         value="Delete" 
-                                                                         icon="fa fa-bomb"
-                                                                         rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
-                                                                         update=":photo-form:photoTable"/>
-                                                    </p:column>
-                                                    <p:column>
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Photo"/>
-                                                        </f:facet>
-                                                        <p:graphicImage width="100%" value="#{imageServices.image}">
-                                                            <f:param name="photoID" value="#{photoid}"/>
-                                                        </p:graphicImage>
-                                                    </p:column>
-                                                    <p:column width="20%">
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Description"/>
-                                                        </f:facet>
-                                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
-                                                    </p:column>
-                                    </p:dataTable>
-                                </p:scrollPanel>
-                                <p:spacer height="15px"/>
-                                <p:commandButton ajax="true" 
-                                                 value="Continue" 
-                                                 update=":violation-form:violation-table"
-                                                 onclick="PF('photo-dialog').hide()"/>
-                            </h:form>
-                        </p:confirmDialog>
-                    
-                    
-                        <p:confirmDialog message="Reject action request" 
-                                         severity="alert" widgetVar="reject-requested-action-diaglog-var"
-                                         closable="true" responsive="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+                                     rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
 
-                            <h:form id="muni-message-form">
-                                <h:outputLabel for="rejection-reason" value="Reason for rejecting request:"/>
-                                <p:spacer height="15px"/>
-                                <p:inputTextarea id="rejection-reason" style="width: 300px; height: 200px;" value="#{caseProfileBB.selectedEvent.responderNotes}"/>
-                                <p:spacer height="15px"/>
-                                <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
-                                              and attached to event ID #{caseProfileBB.selectedEvent.eventID}"/>
-                                <p:spacer height="15px"/>
-                                
-                                <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitActionRequestRejection}"
-                                                 value="Submit" icon="fa fa-thumbs-down" oncomplete="PF('reject-requested-action-diaglog-var').hide()"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                 update="event-dt-form:caseEventTable
-                                                 case-profile-messages-form:case-profile-messages-global
-                                                 event-messages-form
-                                                 events-datascroller-form
-                                                 "/>
-                                
-                                <p:commandButton ajax="true" 
-                                                 value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('reject-requested-action-diaglog-var').hide()"/>
-                            </h:form>
-                        </p:confirmDialog>
-                    
-                        <p:confirmDialog message="Create case profile report" 
-                                         severity="alert" widgetVar="report-case-profile-diaglog-var"
-                                         closable="true" responsive="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                        <h:form id="photo-form">
+                            <p:scrollPanel style="width:1000px; height:400px" mode="native">
+                                <p:dataTable
+                                    id="photoTable"
+                                    var="photoid"
+                                    value="#{caseProfileBB.selectedViolation.photoList}"
+                                    rowKey="#{photoid}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6">
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Manage"/>
+                                        </f:facet>
+                                        <p:commandButton ajax="true" 
+                                                         actionListener="#{caseProfileBB.deletePhoto(photoid)}"
+                                                         value="Delete" 
+                                                         icon="fa fa-bomb"
+                                                         rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                                         update=":photo-form:photoTable"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Photo"/>
+                                        </f:facet>
+                                        <p:graphicImage width="100%" value="#{imageServices.image}">
+                                            <f:param name="photoID" value="#{photoid}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Description"/>
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:scrollPanel>
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" 
+                                             value="Continue" 
+                                             update=":violation-form:violation-table"
+                                             onclick="PF('photo-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
 
-                            <h:form id="report-case-profile-form">
+
+                    <p:confirmDialog message="Reject action request" 
+                                     severity="alert" widgetVar="reject-requested-action-diaglog-var"
+                                     closable="true" responsive="true"
+                                     rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+
+                        <h:form id="muni-message-form">
+                            <h:outputLabel for="rejection-reason" value="Reason for rejecting request:"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="rejection-reason" style="width: 300px; height: 200px;" value="#{caseProfileBB.selectedEvent.responderNotes}"/>
+                            <p:spacer height="15px"/>
+                            <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                          and attached to event ID #{caseProfileBB.selectedEvent.eventID}"/>
+                            <p:spacer height="15px"/>
+
+                            <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitActionRequestRejection}"
+                                             value="Submit" icon="fa fa-thumbs-down" oncomplete="PF('reject-requested-action-diaglog-var').hide()"
+                                             rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                             update="event-dt-form:caseEventTable
+                                             case-profile-messages-form:case-profile-messages-global
+                                             event-messages-form
+                                             events-datascroller-form
+                                             "/>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('reject-requested-action-diaglog-var').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+                    <p:confirmDialog message="Create case profile report" 
+                                     severity="alert" widgetVar="report-case-profile-diaglog-var"
+                                     closable="true" responsive="true"
+                                     rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+
+                        <h:form id="report-case-profile-form">
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+                                    
+
                                 <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
                                 <p:spacer height="15px"/>
                                 <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{caseProfileBB.reportCECase.title}"/>
                                 <p:spacer height="2px"/>
                                 <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
                                 <p:spacer height="5px"/>
-                                
+
                                 <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
                                 <p:spacer height="15px"/>
                                 <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{caseProfileBB.reportCECase.notes}"/>
                                 <p:spacer height="5px"/>
-                                
-                                <h3>Case event history report options</h3>
-                                
-                                <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
-                                <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{caseProfileBB.reportCECase.includeHiddenEvents}" />
-                                
-                                <p:spacer height="5px"/>
-                                
-                                <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
-                                <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{caseProfileBB.reportCECase.includeInactiveEvents}" />
-                                
-                                <p:spacer height="5px"/>
-                                
-                                <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
-                                <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{caseProfileBB.reportCECase.includeEventNotes}" />
-                                
-                                <p:spacer height="5px"/>
-                                
-                                <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
-                                <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{caseProfileBB.reportCECase.includeRequestedActionFields}" />
-                                
-                                <h3>Other options</h3>
-                                
-                                <h:outputLabel class="bold" value="Include full text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
-                                <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{caseProfileBB.reportCECase.includeNoticeFullText}" />
-                                
-                                <p:spacer height="5px"/>
-                                
-                                <h:outputLabel class="bold" value="Include all notices of violation: " for="report-case-profile-allnotices-chkbox" />
-                                <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{caseProfileBB.reportCECase.includeAllNotices}" />
-                                
-                                <p:spacer height="5px"/>
-                                
-                                <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
-                                <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{caseProfileBB.reportCECase.includeFullOrdinanceText}" />
-                                
-                                <p:spacer height="5px"/>
-                                
-                                <p:commandButton ajax="true" 
-                                                 value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('report-case-profile-diaglog-var').hide()"/>
-                                
-                                <p:commandButton ajax="true" action="#{caseProfileBB.generateReportCECase}"
-                                                 value="Generate" icon="fa fa-print" 
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
-                                                 />
-                                
-                            </h:form>
-                        </p:confirmDialog>
-                    
+
+                                <h:panelGroup>
+                                    <h3>Case event history report options</h3>
+
+                                    <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{caseProfileBB.reportCECase.includeHiddenEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{caseProfileBB.reportCECase.includeInactiveEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{caseProfileBB.reportCECase.includeEventNotes}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{caseProfileBB.reportCECase.includeRequestedActionFields}" />
+                                    
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{caseProfileBB.reportCECase.includeMunicipalityDiclosedEvents}" />
+                                    
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{caseProfileBB.reportCECase.includeOfficeOnlyEvents}" />
+
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    
+                                    <h3>Other options</h3>
+
+                                        <h:outputLabel class="bold" value="Include full text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
+                                        <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{caseProfileBB.reportCECase.includeNoticeFullText}" />
+
+                                        <p:spacer height="5px"/>
+
+                                        <h:outputLabel class="bold" value="Include all notices of violation: " for="report-case-profile-allnotices-chkbox" />
+                                        <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{caseProfileBB.reportCECase.includeAllNotices}" />
+
+                                        <p:spacer height="5px"/>
+
+                                        <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
+                                        <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{caseProfileBB.reportCECase.includeFullOrdinanceText}" />
+
+                                        <p:spacer height="5px"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('report-case-profile-diaglog-var').hide()"/>
+
+                            <p:commandButton ajax="true" action="#{caseProfileBB.generateReportCECase}"
+                                             value="Generate" icon="fa fa-print" 
+                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                             />
+
+                        </h:form>
+                    </p:confirmDialog>
+
 
                 </f:view>
             </ui:define>

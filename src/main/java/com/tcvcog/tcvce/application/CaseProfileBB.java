@@ -249,16 +249,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
     
     public String generateReportCECase(){
+        CaseCoordinator cc = getCaseCoordinator();
         getSessionBean().getcECaseQueue().remove(currentCase);
         getSessionBean().getcECaseQueue().add(0, currentCase);
         
-        reportCECase.setCeCase(currentCase);
+        reportCECase.setCse(currentCase);
         
         reportCECase.setCreator(getSessionBean().getFacesUser());
         reportCECase.setMuni(getSessionBean().getActiveMuni());
         reportCECase.setGenerationTimestamp(LocalDateTime.now());
         
+        reportCECase = cc.transformCECaseForReport(reportCECase);
+        
         getSessionBean().setReportConfigCECase(reportCECase);
+        
         
         return "reportCECase";
     }
