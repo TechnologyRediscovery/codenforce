@@ -2,6 +2,11 @@
 ALTER TABLE citationstatus ADD COLUMN editsallowed BOOLEAN DEFAULT TRUE;
 ALTER TABLE municipality ADD COLUMN defaultcourtentity INTEGER CONSTRAINT muni_defcourtentity_fk REFERENCES courtentity (entityid);
 ALTER TABLE loginmuni ADD COLUMN default BOOLEAN DEFAULT FALSE;
+ALTER TABLE ceevent ADD COLUMN directrequesttodefaultmuniceo boolean DEFAULT false;
+
+
+
+
 
 BEGIN;
 INSERT INTO public.dbpatch(

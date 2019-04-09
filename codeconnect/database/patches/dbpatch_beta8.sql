@@ -329,6 +329,7 @@ ALTER TABLE ceevent ADD COLUMN rejeecteventrequest BOOLEAN DEFAULT FALSE;
 	ALTER TABLE ceevent RENAME COLUMN actionrequestnotes TO respondernotes;
 	ALTER TABLE ceevent ADD COLUMN responseevent_eventid INTEGER CONSTRAINT responseevent_fk REFERENCES ceevent (eventid);
 
+	ALTER TABLE ceevent RENAME COLUMN login_userid TO owner_userid;
 	ALTER TABLE ceevent RENAME COLUMN creator_userid TO owner_userid;
 
 	ALTER TABLE ceeventcategory DROP COLUMN requiresviewconfirmation;
