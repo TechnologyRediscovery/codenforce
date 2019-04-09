@@ -259,7 +259,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         reportCECase.setMuni(getSessionBean().getActiveMuni());
         reportCECase.setGenerationTimestamp(LocalDateTime.now());
         
-        reportCECase = cc.transformCECaseForReport(reportCECase);
+        try {
+            reportCECase = cc.transformCECaseForReport(reportCECase);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         
         getSessionBean().setReportConfigCECase(reportCECase);
         
