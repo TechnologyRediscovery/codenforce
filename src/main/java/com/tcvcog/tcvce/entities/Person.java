@@ -34,8 +34,8 @@ public class Person extends EntityUtils implements Serializable{
     private int personID;
     
     private PersonType personType;
-    private String MuniName;
-    private int MuniCode;
+    private int muniCode;
+    private String muniName;
     
     private int sourceID;
     private String sourceTitle;
@@ -643,34 +643,7 @@ public class Person extends EntityUtils implements Serializable{
         this.lastUpdatedString = lastUpdatedString;
     }
 
-    /**
-     * @return the MuniCode
-     */
-    public int getMuniCode() {
-        return MuniCode;
-    }
-
-    /**
-     * @param MuniCode the MuniCode to set
-     */
-    public void setMuniCode(int MuniCode) {
-        this.MuniCode = MuniCode;
-    }
-
-    /**
-     * @return the MuniName
-     */
-    public String getMuniName() {
-        return MuniName;
-    }
-
-    /**
-     * @param MuniName the MuniName to set
-     */
-    public void setMuniName(String MuniName) {
-        this.MuniName = MuniName;
-    }
-
+  
    
 
     /**
@@ -713,6 +686,34 @@ public class Person extends EntityUtils implements Serializable{
      */
     public void setCreatorUserID(int creatorUserID) {
         this.creatorUserID = creatorUserID;
+    }
+
+    /**
+     * @return the muniName
+     */
+    public String getMuniName() {
+        return muniName;
+    }
+
+    /**
+     * @param muniName the muniName to set
+     */
+    public void setMuniName(String muniName) {
+        this.muniName = muniName;
+    }
+
+    /**
+     * @return the muniCode
+     */
+    public int getMuniCode() {
+        return muniCode;
+    }
+
+    /**
+     * @param muniCode the muniCode to set
+     */
+    public void setMuniCode(int muniCode) {
+        this.muniCode = muniCode;
     }
     
 
