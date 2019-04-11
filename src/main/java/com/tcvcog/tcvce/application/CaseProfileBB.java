@@ -113,6 +113,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private List<EventCategory> availableActionsToRequest;
     
     private String styleClassStatusIcon;
+    
     private String styleClassInvestigation;
     private String styleClassEnforcement;
     private String sytleClassCitation;
