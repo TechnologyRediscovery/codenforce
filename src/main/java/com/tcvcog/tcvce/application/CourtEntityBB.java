@@ -67,7 +67,6 @@ public class CourtEntityBB extends BackingBeanUtils implements Serializable {
             setFormCourtEntityID(selectedCourtEntity.getCourtEntityID());
             setFormCourtEntityOfficialNum(selectedCourtEntity.getCourtEntityOfficialNum());
             setFormJurisdictionLevel(selectedCourtEntity.getJurisdictionLevel());
-            setFormMunicipality(selectedCourtEntity.getMunicipality());
             setFormCourtEntityName(selectedCourtEntity.getCourtEntityName());
             setFormAddressStreet(selectedCourtEntity.getAddressStreet());
             setFormAddressCity(selectedCourtEntity.getAddressCity());
@@ -92,7 +91,6 @@ public class CourtEntityBB extends BackingBeanUtils implements Serializable {
         
         ce.setCourtEntityOfficialNum(formCourtEntityOfficialNum);
         ce.setJurisdictionLevel(formJurisdictionLevel);
-        ce.setMunicipality(formMunicipality);
         ce.setCourtEntityName(formCourtEntityName);
         ce.setAddressStreet(formAddressStreet);
         ce.setAddressCity(formAddressCity);
@@ -126,7 +124,6 @@ public class CourtEntityBB extends BackingBeanUtils implements Serializable {
         courtEntity.setCourtEntityID(formCourtEntityID);
         courtEntity.setCourtEntityOfficialNum(formCourtEntityOfficialNum);
         courtEntity.setJurisdictionLevel(formJurisdictionLevel);
-        courtEntity.setMunicipality(getFormMunicipality());
         courtEntity.setCourtEntityName(formCourtEntityName);
         courtEntity.setAddressStreet(formAddressStreet);
         courtEntity.setAddressCity(formAddressCity);
@@ -402,18 +399,7 @@ public class CourtEntityBB extends BackingBeanUtils implements Serializable {
         this.formNotes = fomrNotes;
     }
 
-    /**
-     * @return the muniList
-     */
-    public ArrayList<Municipality> getMuniList() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            muniList = mi.getCompleteMuniList();
-        } catch (IntegrationException ex) {
-            System.out.println("ex");
-        }
-        return muniList;
-    }
+    
 
     /**
      * @param muniList the muniList to set

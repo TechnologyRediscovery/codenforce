@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -83,17 +84,26 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         
         CodeViolationIntegrator vi = getCodeViolationIntegrator();
         EventCoordinator ec = getEventCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         EventCECase tfEvent;
         int violationStoredDBKey;
+        int eventID;
         StringBuilder sb = new StringBuilder();
         
-//        EventCategory eventCat = ec.getInitiatlizedEventCategory(
-//                                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
-//                                .getString("complianceTimeframeExpiry")));
-        EventCategory eventCat = ec.getInitiatlizedEventCategory(113);
+        EventCategory eventCat = ec.getInitiatlizedEventCategory(
+                                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+                                .getString("complianceTimeframeExpiry")));
+//        EventCategory eventCat = ec.getInitiatlizedEventCategory(113);
         tfEvent = ec.getInitializedEvent(c, eventCat);
         tfEvent.setDateOfRecord(v.getStipulatedComplianceDate());
-        tfEvent.setCreator(c.getCaseManager());
+        tfEvent.setOwner(c.getCaseManager());
+        tfEvent.setRequestActionByDefaultMuniCEO(true);
+        eventCat = ec.getInitiatlizedEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+                .getString("propertyInspection")));
+        tfEvent.setActionEventCat(eventCat);
+        tfEvent.setActionRequestedBy(uc.getCogBotUser());
         
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
                         .getString("complianceTimeframeEndEventDesc"));
@@ -109,11 +119,14 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         tfEvent.setDescription(sb.toString());
         
         if(verifyCodeViolationAttributes(v)){
+            eventID = cc.attachNewEventToCECase(c, tfEvent, v);
+            v.setComplianceTimeframeEventID(eventID);
             violationStoredDBKey = vi.insertCodeViolation(v);
-            ec.insertEvent(tfEvent);
         } else {
             throw new ViolationException("Failed violation verification");
         }
+        
+        
         return violationStoredDBKey;
         
     }
@@ -140,7 +153,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
      * CodeViolation should have the actual compliance date set from the user's 
      * event date of record
      * @param cv
-     * @param u the user carrying out the compliance certification
+     * @param u
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public void recordCompliance(CodeViolation cv, User u) throws IntegrationException{
@@ -148,13 +161,21 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         EventIntegrator ei = getEventIntegrator();
         // update violation record for compliance
-        cv.setComplianceTimeStamp(LocalDateTime.now());
         cv.setComplianceUser(u);
         cvi.recordCompliance(cv);
                 
         // inactivate timeframe expiry event
-        ei.inactivateEvent(cv.getCompTimeFrameComplianceEvent().getEventID());
-        
+        if(cv.getCompTimeFrameComplianceEvent() != null || cv.getComplianceTimeframeEventID() != 0){
+            int vev;
+            if(cv.getCompTimeFrameComplianceEvent() != null){
+                 vev = cv.getCompTimeFrameComplianceEvent().getEventID();
+                
+            } else {
+                vev = cv.getComplianceTimeframeEventID();
+            }
+            System.out.println("ViolationCoordinator.recordCompliance | invalidating event id: " + vev);
+            ei.inactivateEvent(vev);
+        }
     }
     
     public NoticeOfViolation getNewNoticeOfViolation(){
@@ -170,10 +191,11 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         cvi.deleteCodeViolation(cv);
     }
     
-    public ArrayList getCodeViolations(CECase ceCase) throws IntegrationException{
+    public List getCodeViolations(CECase ceCase) throws IntegrationException{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        ArrayList al = cvi.getCodeViolations(ceCase);
+        List al = cvi.getCodeViolations(ceCase);
         return al;
     }
+    
     
 }

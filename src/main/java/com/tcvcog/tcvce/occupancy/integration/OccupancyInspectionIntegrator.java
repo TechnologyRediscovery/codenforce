@@ -364,7 +364,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     
         try {
             newOif.setOccupancyInspectionFeeID(rs.getInt("feeid"));
-            newOif.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
+            newOif.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             newOif.setOccupancyInspectionFeeName(rs.getString("feename"));
             newOif.setOccupancyInspectionFeeAmount(rs.getDouble("feeamount"));
             java.sql.Timestamp eff = rs.getTimestamp("effectivedate");

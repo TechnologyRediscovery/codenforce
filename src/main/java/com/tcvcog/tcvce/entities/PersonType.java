@@ -21,6 +21,7 @@ package com.tcvcog.tcvce.entities;
  * @author Eric C. Darsow
  */
 public enum PersonType{
+    User("System user"),
     CogStaff("TCVCOG Staff"),
     NonCogOfficial("Non-TCVCOG Official"),
     MuniStaff("Municipality Staff"),

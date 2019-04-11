@@ -34,11 +34,12 @@ public class Person extends EntityUtils implements Serializable{
     private int personID;
     
     private PersonType personType;
-    private Municipality muni;
+    private int muniCode;
+    private String muniName;
     
     private int sourceID;
     private String sourceTitle;
-    private User creator;
+    private int creatorUserID;
     private LocalDateTime creationTimeStamp;
     
     // for backwards compatability
@@ -83,13 +84,13 @@ public class Person extends EntityUtils implements Serializable{
     private java.util.Date expiryDateUtilDate;
     private String expiryNotes;
     private boolean active;
-    private User userLink;
+    private int linkedUserID;
     
     /**
      * Tenancy tracking
      */
     private boolean under18;
-    private User verifiedBy;
+    private int verifiedByUserID;
     
 
     /**
@@ -317,19 +318,7 @@ public class Person extends EntityUtils implements Serializable{
         this.under18 = under18;
     }
 
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
-    }
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
+  
 
     /**
      * @return the firstName
@@ -380,13 +369,7 @@ public class Person extends EntityUtils implements Serializable{
         return sourceTitle;
     }
 
-    /**
-     * @return the creator
-     */
-    public User getCreator() {
-        return creator;
-    }
-
+   
     /**
      * @return the businessEntity
      */
@@ -454,12 +437,7 @@ public class Person extends EntityUtils implements Serializable{
         this.sourceTitle = sourceTitle;
     }
 
-    /**
-     * @param creator the creator to set
-     */
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
+   
 
     /**
      * @param businessEntity the businessEntity to set
@@ -526,29 +504,15 @@ public class Person extends EntityUtils implements Serializable{
         this.compositeLastName = compositeLastName;
     }
 
-    /**
-     * @return the verifiedBy
-     */
-    public User getVerifiedBy() {
-        return verifiedBy;
-    }
-
-    /**
-     * @param verifiedBy the verifiedBy to set
-     */
-    public void setVerifiedBy(User verifiedBy) {
-        this.verifiedBy = verifiedBy;
-    }
+   
 
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 79 * hash + this.personID;
         hash = 79 * hash + Objects.hashCode(this.personType);
-        hash = 79 * hash + Objects.hashCode(this.muni);
         hash = 79 * hash + this.sourceID;
         hash = 79 * hash + Objects.hashCode(this.sourceTitle);
-        hash = 79 * hash + Objects.hashCode(this.creator);
         hash = 79 * hash + Objects.hashCode(this.firstName);
         hash = 79 * hash + Objects.hashCode(this.lastName);
         hash = 79 * hash + (this.compositeLastName ? 1 : 0);
@@ -573,7 +537,6 @@ public class Person extends EntityUtils implements Serializable{
         hash = 79 * hash + Objects.hashCode(this.expiryNotes);
         hash = 79 * hash + (this.active ? 1 : 0);
         hash = 79 * hash + (this.under18 ? 1 : 0);
-        hash = 79 * hash + Objects.hashCode(this.verifiedBy);
         return hash;
     }
 
@@ -592,97 +555,7 @@ public class Person extends EntityUtils implements Serializable{
         if (this.personID != other.personID) {
             return false;
         }
-        if (this.sourceID != other.sourceID) {
-            return false;
-        }
-        if (this.compositeLastName != other.compositeLastName) {
-            return false;
-        }
-        if (this.businessEntity != other.businessEntity) {
-            return false;
-        }
-        if (this.useSeparateMailingAddress != other.useSeparateMailingAddress) {
-            return false;
-        }
-        
-        if (this.active != other.active) {
-            return false;
-        }
-        if (this.under18 != other.under18) {
-            return false;
-        }
-        if (!Objects.equals(this.sourceTitle, other.sourceTitle)) {
-            return false;
-        }
-        if (!Objects.equals(this.firstName, other.firstName)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastName, other.lastName)) {
-            return false;
-        }
-        if (!Objects.equals(this.jobTitle, other.jobTitle)) {
-            return false;
-        }
-        if (!Objects.equals(this.phoneCell, other.phoneCell)) {
-            return false;
-        }
-        if (!Objects.equals(this.phoneHome, other.phoneHome)) {
-            return false;
-        }
-        if (!Objects.equals(this.phoneWork, other.phoneWork)) {
-            return false;
-        }
-        if (!Objects.equals(this.email, other.email)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressStreet, other.addressStreet)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressCity, other.addressCity)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressZip, other.addressZip)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressState, other.addressState)) {
-            return false;
-        }
-        if (!Objects.equals(this.mailingAddressStreet, other.mailingAddressStreet)) {
-            return false;
-        }
-        if (!Objects.equals(this.mailingAddressCity, other.mailingAddressCity)) {
-            return false;
-        }
-        if (!Objects.equals(this.mailingAddressZip, other.mailingAddressZip)) {
-            return false;
-        }
-        if (!Objects.equals(this.mailingAddressState, other.mailingAddressState)) {
-            return false;
-        }
-        if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.expiryNotes, other.expiryNotes)) {
-            return false;
-        }
-        if (this.personType != other.personType) {
-            return false;
-        }
-        if (!Objects.equals(this.muni, other.muni)) {
-            return false;
-        }
-        if (!Objects.equals(this.creator, other.creator)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastUpdated, other.lastUpdated)) {
-            return false;
-        }
-        if (!Objects.equals(this.expiryDate, other.expiryDate)) {
-            return false;
-        }
-        if (!Objects.equals(this.verifiedBy, other.verifiedBy)) {
-            return false;
-        }
+       
         return true;
     }
 
@@ -701,19 +574,7 @@ public class Person extends EntityUtils implements Serializable{
         this.canExpire = canExpire;
     }
 
-    /**
-     * @return the userLink
-     */
-    public User getUserLink() {
-        return userLink;
-    }
-
-    /**
-     * @param userLink the userLink to set
-     */
-    public void setUserLink(User userLink) {
-        this.userLink = userLink;
-    }
+    
 
     /**
      * @return the creationTimeStamp
@@ -780,6 +641,79 @@ public class Person extends EntityUtils implements Serializable{
      */
     public void setLastUpdatedString(String lastUpdatedString) {
         this.lastUpdatedString = lastUpdatedString;
+    }
+
+  
+   
+
+    /**
+     * @return the verifiedByUserID
+     */
+    public int getVerifiedByUserID() {
+        return verifiedByUserID;
+    }
+
+    /**
+     * @param verifiedByUserID the verifiedByUserID to set
+     */
+    public void setVerifiedByUserID(int verifiedByUserID) {
+        this.verifiedByUserID = verifiedByUserID;
+    }
+
+    /**
+     * @return the linkedUserID
+     */
+    public int getLinkedUserID() {
+        return linkedUserID;
+    }
+
+    /**
+     * @param linkedUserID the linkedUserID to set
+     */
+    public void setLinkedUserID(int linkedUserID) {
+        this.linkedUserID = linkedUserID;
+    }
+
+    /**
+     * @return the creatorUserID
+     */
+    public int getCreatorUserID() {
+        return creatorUserID;
+    }
+
+    /**
+     * @param creatorUserID the creatorUserID to set
+     */
+    public void setCreatorUserID(int creatorUserID) {
+        this.creatorUserID = creatorUserID;
+    }
+
+    /**
+     * @return the muniName
+     */
+    public String getMuniName() {
+        return muniName;
+    }
+
+    /**
+     * @param muniName the muniName to set
+     */
+    public void setMuniName(String muniName) {
+        this.muniName = muniName;
+    }
+
+    /**
+     * @return the muniCode
+     */
+    public int getMuniCode() {
+        return muniCode;
+    }
+
+    /**
+     * @param muniCode the muniCode to set
+     */
+    public void setMuniCode(int muniCode) {
+        this.muniCode = muniCode;
     }
     
 

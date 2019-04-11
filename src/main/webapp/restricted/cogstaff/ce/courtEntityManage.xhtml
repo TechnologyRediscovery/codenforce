@@ -57,13 +57,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     
                                     <p:column width="10%">
                                         <f:facet name="header">
-                                            <h:outputText value="Muni" />
-                                        </f:facet>
-                                        <h:outputText value="#{c.municipality.muniName}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="10%">
-                                        <f:facet name="header">
                                             <h:outputText value="Name" />
                                         </f:facet>
                                         <h:outputText value="#{c.courtEntityName}"/>
@@ -169,20 +162,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                  style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
                                     <h:message for="newCourtEntityName" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <p:outputLabel for="muniSelectMenu">
-                                    <h:outputText value="Municipality:"/>
-                                </p:outputLabel>
-                                <h:panelGroup>
-                                    <p:selectOneListbox id="muniSelectMenu" tabindex="5" value="#{courtEntityBB.formMunicipality}">
-                                        <f:converter converterId="muniConverter"/>
-                                        <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" 
-                                                       var="muni" itemValue="#{muni}" itemLabel="#{muni.muniName}"/>
-                                    </p:selectOneListbox>
-                                    <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    
                                 </h:panelGroup>
                                 
                                 <h:outputLabel value="Official Num:" for="officialNum"/>

@@ -27,28 +27,23 @@ import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCECase;
-import com.tcvcog.tcvce.entities.AccessKeyCard;
-import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
+import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
+import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
-import com.tcvcog.tcvce.occupancy.entities.OccPermitType;
 import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
 import java.io.Serializable;
 import java.util.List;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
 
 /**
  *
@@ -65,17 +60,16 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<Person> personQueue;
     private List<CEActionRequest> cEActionRequestQueue;
     private List<CECase> cECaseQueue;
-    private List<EventWithCasePropInfo> cEEventWCPIQueue;
+    private List<EventCasePropBundle> cEEventWCPIQueue;
     private List<CodeViolation> violationQueue;
     private List<OccupancyInspection> inspectionQueue;
     
     /* *** System Core Objects Session Shelves ***  */
     private Municipality activeMuni;
-    private List<Municipality> availableMuniList;
+    private List<Municipality> userAuthMuniList;
     private User facesUser;
     private Property activeProp;
     private Person activePerson;
-    private List<Person> activePersonList;
     private PropertyWithLists activePropWithList;
     
     /* *** Municipal Code Session Shelves ***  */
@@ -104,6 +98,9 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Public Data Session Shelves ***  */
     private List<PublicInfoBundle> infoBundleList;
     private PublicInfoBundleCECase pibCECase;
+
+    /* *** Reporting *** */
+    private ReportConfigCECase reportConfigCECase;
     
     
     /* *** Occupancy Permit Application Session Shelves *** */
@@ -111,6 +108,9 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
     private OccPermitApplicationReason occPermitApplicationReason;
+
+
+
     /**
      * Creates a new instance of getSessionBean()
      */
@@ -407,17 +407,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the availableMuniList
+     * @return the userAuthMuniList
      */
-    public List<Municipality> getAvailableMuniList() {
-        return availableMuniList;
+    public List<Municipality> getUserAuthMuniList() {
+        return userAuthMuniList;
     }
 
     /**
-     * @param availableMuniList the availableMuniList to set
+     * @param userAuthMuniList the userAuthMuniList to set
      */
-    public void setAvailableMuniList(List<Municipality> availableMuniList) {
-        this.availableMuniList = availableMuniList;
+    public void setUserAuthMuniList(List<Municipality> userAuthMuniList) {
+        this.userAuthMuniList = userAuthMuniList;
     }
 
     /**
@@ -540,14 +540,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /*
      * @return the cEEventWCPIQueue
      */
-    public List<EventWithCasePropInfo> getcEEventWCPIQueue() {
+    public List<EventCasePropBundle> getcEEventWCPIQueue() {
         return cEEventWCPIQueue;
     }
 
     /**
      * @param cEEventWCPIQueue the cEEventWCPIQueue to set
      */
-    public void setcEEventWCPIQueue(List<EventWithCasePropInfo> cEEventWCPIQueue) {
+    public void setcEEventWCPIQueue(List<EventCasePropBundle> cEEventWCPIQueue) {
         this.cEEventWCPIQueue = cEEventWCPIQueue;
     }
 
@@ -577,6 +577,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setInspectionQueue(List<OccupancyInspection> inspectionQueue) {
         this.inspectionQueue = inspectionQueue;
+    }
+
+    /**
+     * @return the reportConfigCECase
+     */
+    public ReportConfigCECase getReportConfigCECase() {
+        return reportConfigCECase;
+    }
+
+    /**
+     * @param reportConfigCECase the reportConfigCECase to set
+     */
+    public void setReportConfigCECase(ReportConfigCECase reportConfigCECase) {
+        this.reportConfigCECase = reportConfigCECase;
     }
     
 }

@@ -17,17 +17,20 @@ import java.io.Serializable;
  */
 public class SearchParamsCEEvents extends SearchParams implements Serializable{
     
+    private boolean useRespondedAtDateRange;
+    
     private boolean filterByEventCategory;
     private EventCategory eventCategory;
     
     private boolean filterByEventType;
     private EventType evtType;
     
+    
     private boolean filterByCaseID;
     private int caseId;
     
     private boolean filterByEventOwner;
-    private User ownerUser;
+    private User user;
   
     private boolean filterByPerson;
     private Person person;
@@ -35,17 +38,33 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     private boolean filterByActive;
     private boolean isActive;
     
-    private boolean filterByRequiresViewConfirmation;
-    private boolean isViewConfirmationRequired;
-    
     private boolean filterByHidden;
     private boolean isHidden;
     
-    private boolean filterByViewed;
-    private boolean isViewed;
+    // main control for follow-up event request parameter activation
+    private boolean filterByrequestsAction;
+    private boolean requestsAction;
+    
+    // these search parameters are only valid for events that request
+    // a follow-up action
+    
+    private boolean filterByHasResponseEvent;
+    private boolean hasResponseEvent;
+
+    // use the EventCategory and EventType fields above to query the 
+    // event category or type of the requested follow-up event
+    private boolean filterByRequestedResponseEventCat;
+    
+    // we have a User type memvar called user. These switches can
+    // determine which db field the user is queried against
+    private boolean filterByRequestor;
+    private boolean filterByResponderIntended;
+    private boolean filterByResponderActual;
+
+    private boolean filterByRejectedRequest;
+    private boolean rejectedRequest;
     
     
-    private boolean useViewConfirmedAtDateRange;
     
    public SearchParamsCEEvents(){
        
@@ -89,8 +108,8 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     /**
      * @return the ownerUserID
      */
-    public User getOwnerUser() {
-        return ownerUser;
+    public User getUser() {
+        return user;
     }
 
     /**
@@ -108,17 +127,17 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @return the filterByRequiresViewConfirmation
+     * @return the filterByrequestsAction
      */
-    public boolean isFilterByRequiresViewConfirmation() {
-        return filterByRequiresViewConfirmation;
+    public boolean isFilterByrequestsAction() {
+        return filterByrequestsAction;
     }
 
     /**
-     * @return the isViewConfirmationRequired
+     * @return the requestsAction
      */
-    public boolean isIsViewConfirmationRequired() {
-        return isViewConfirmationRequired;
+    public boolean isRequestsAction() {
+        return requestsAction;
     }
 
     /**
@@ -144,10 +163,10 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
 
     
     /**
-     * @return the useViewConfirmedAtDateRange
+     * @return the useRespondedAtDateRange
      */
-    public boolean isUseViewConfirmedAtDateRange() {
-        return useViewConfirmedAtDateRange;
+    public boolean isUseRespondedAtDateRange() {
+        return useRespondedAtDateRange;
     }
 
     /**
@@ -189,7 +208,7 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
      * @param ownerUserID the ownerUserID to set
      */
     public void setOwnerUserID(User ownerUserID) {
-        this.setOwnerUser(ownerUserID);
+        this.setUser(ownerUserID);
     }
 
     /**
@@ -207,17 +226,17 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @param filterByRequiresViewConfirmation the filterByRequiresViewConfirmation to set
+     * @param filterByrequestsAction the filterByrequestsAction to set
      */
-    public void setFilterByRequiresViewConfirmation(boolean filterByRequiresViewConfirmation) {
-        this.filterByRequiresViewConfirmation = filterByRequiresViewConfirmation;
+    public void setFilterByrequestsAction(boolean filterByrequestsAction) {
+        this.filterByrequestsAction = filterByrequestsAction;
     }
 
     /**
-     * @param isViewConfirmationRequired the isViewConfirmationRequired to set
+     * @param requestsAction the requestsAction to set
      */
-    public void setIsViewConfirmationRequired(boolean isViewConfirmationRequired) {
-        this.isViewConfirmationRequired = isViewConfirmationRequired;
+    public void setRequestsAction(boolean requestsAction) {
+        this.requestsAction = requestsAction;
     }
 
     /**
@@ -243,10 +262,10 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
 
    
     /**
-     * @param useViewConfirmedAtDateRange the useViewConfirmedAtDateRange to set
+     * @param useRespondedAtDateRange the useRespondedAtDateRange to set
      */
-    public void setUseViewConfirmedAtDateRange(boolean useViewConfirmedAtDateRange) {
-        this.useViewConfirmedAtDateRange = useViewConfirmedAtDateRange;
+    public void setUseRespondedAtDateRange(boolean useRespondedAtDateRange) {
+        this.useRespondedAtDateRange = useRespondedAtDateRange;
     }
 
     /**
@@ -264,31 +283,31 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @return the filterByViewed
+     * @return the filterByHasResponseEvent
      */
-    public boolean isFilterByViewed() {
-        return filterByViewed;
+    public boolean isFilterByHasResponseEvent() {
+        return filterByHasResponseEvent;
     }
 
     /**
-     * @return the isViewed
+     * @return the hasResponseEvent
      */
-    public boolean isIsViewed() {
-        return isViewed;
+    public boolean isHasResponseEvent() {
+        return hasResponseEvent;
     }
 
     /**
-     * @param filterByViewed the filterByViewed to set
+     * @param filterByHasResponseEvent the filterByHasResponseEvent to set
      */
-    public void setFilterByViewed(boolean filterByViewed) {
-        this.filterByViewed = filterByViewed;
+    public void setFilterByHasResponseEvent(boolean filterByHasResponseEvent) {
+        this.filterByHasResponseEvent = filterByHasResponseEvent;
     }
 
     /**
-     * @param isViewed the isViewed to set
+     * @param hasResponseEvent the hasResponseEvent to set
      */
-    public void setIsViewed(boolean isViewed) {
-        this.isViewed = isViewed;
+    public void setHasResponseEvent(boolean hasResponseEvent) {
+        this.hasResponseEvent = hasResponseEvent;
     }
 
     /**
@@ -320,10 +339,100 @@ public class SearchParamsCEEvents extends SearchParams implements Serializable{
     }
 
     /**
-     * @param ownerUser the ownerUser to set
+     * @param user the user to set
      */
-    public void setOwnerUser(User ownerUser) {
-        this.ownerUser = ownerUser;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+   
+
+    /**
+     * @return the filterByRejectedRequest
+     */
+    public boolean isFilterByRejectedRequest() {
+        return filterByRejectedRequest;
+    }
+
+    /**
+     * @param filterByRejectedRequest the filterByRejectedRequest to set
+     */
+    public void setFilterByRejectedRequest(boolean filterByRejectedRequest) {
+        this.filterByRejectedRequest = filterByRejectedRequest;
+    }
+
+    /**
+     * @return the rejectedRequest
+     */
+    public boolean isRejectedRequest() {
+        return rejectedRequest;
+    }
+
+    /**
+     * @param rejectedRequest the rejectedRequest to set
+     */
+    public void setRejectedRequest(boolean rejectedRequest) {
+        this.rejectedRequest = rejectedRequest;
+    }
+
+    /**
+     * @return the filterByRequestedResponseEventCat
+     */
+    public boolean isFilterByRequestedResponseEventCat() {
+        return filterByRequestedResponseEventCat;
+    }
+
+    
+    
+
+    /**
+     * @return the filterByRequestor
+     */
+    public boolean isFilterByRequestor() {
+        return filterByRequestor;
+    }
+
+    /**
+     * @return the filterByResponderIntended
+     */
+    public boolean isFilterByResponderIntended() {
+        return filterByResponderIntended;
+    }
+
+    /**
+     * @return the filterByResponderActual
+     */
+    public boolean isFilterByResponderActual() {
+        return filterByResponderActual;
+    }
+
+    /**
+     * @param filterByRequestedResponseEventCat the filterByRequestedResponseEventCat to set
+     */
+    public void setFilterByRequestedResponseEventCat(boolean filterByRequestedResponseEventCat) {
+        this.filterByRequestedResponseEventCat = filterByRequestedResponseEventCat;
+    }
+
+
+    /**
+     * @param filterByRequestor the filterByRequestor to set
+     */
+    public void setFilterByRequestor(boolean filterByRequestor) {
+        this.filterByRequestor = filterByRequestor;
+    }
+
+    /**
+     * @param filterByResponderIntended the filterByResponderIntended to set
+     */
+    public void setFilterByResponderIntended(boolean filterByResponderIntended) {
+        this.filterByResponderIntended = filterByResponderIntended;
+    }
+
+    /**
+     * @param filterByResponderActual the filterByResponderActual to set
+     */
+    public void setFilterByResponderActual(boolean filterByResponderActual) {
+        this.filterByResponderActual = filterByResponderActual;
     }
    
    

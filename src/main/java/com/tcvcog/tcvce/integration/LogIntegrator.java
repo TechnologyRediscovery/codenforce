@@ -42,7 +42,6 @@ public class LogIntegrator extends BackingBeanUtils {
     
     public void makeLogEntry(int uid, String sid, int cat, String notes, 
             boolean error, boolean reqview) throws IntegrationException{
-        System.out.println("UserIntegrator.getUserByID");
         Connection con = getPostgresCon();
         String query = "INSERT INTO public.genlog(\n" +
             "            logentryid, timeofentry, user_userid, sessionid, category, notes, \n" +

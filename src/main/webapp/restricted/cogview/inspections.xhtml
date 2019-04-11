@@ -337,7 +337,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h:panelGroup>
                                         <h:outputText value="Event Cateogry Description: #{eventManageBB.selectedEventCategory.eventCategoryDesc}" id="selectedEventCategoryDescription"/>
                                         <p:spacer height="10px"/>
-                                        <h:outputText value="Requires View Confirmation: #{eventManageBB.selectedEventCategory.requiresviewconfirmation}" id="selectedEventCateogryRequiresViewConfirm"/>
+                                        <h:outputText value="Requires View Confirmation: #{eventManageBB.selectedEventCategory.requestsAction}" id="selectedEventCateogryRequiresViewConfirm"/>
                                         <p:spacer height="10px"/>
                                         <h:outputText value="Triggers notification of case monitor subscribers: #{eventManageBB.selectedEventCategory.notifycasemonitors}" id="selectedEventCateogryNotifiesCaseMonitors"/>
 
@@ -464,7 +464,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.category.requiresviewconfirmation}"/>
+                                                        <h:outputText value="#{e.category.requestsAction}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -1118,7 +1118,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText value="Require view confirmation by case manager"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventManageBB.eventInProcess.requiresViewConfirmation}" onLabel="Yes" offLabel="No" />
+                                    <p:inputSwitch tabindex="18" id="requireViewConfirmationSwitch" value="#{eventManageBB.eventInProcess.requestsAction}" onLabel="Yes" offLabel="No" />
                                 </h:panelGroup>
 
                                 <f:facet name="footer">

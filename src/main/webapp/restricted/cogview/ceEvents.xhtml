@@ -46,7 +46,7 @@
                                                                  disabled="#{!cEEventsBB.searchParams.filterByMuni}">
                                                     <f:converter converterId="muniConverter"/>
                                                     <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                    <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                    <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                                 </p:selectOneMenu>
                                                 <h:message for="ceev-search-muni-som" showDetail="true" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -54,7 +54,10 @@
 
 
                                             <h:panelGroup>
-                                                <p:outputLabel id="ceev-search-startend-chkbx-ol" for="ceev-search-startend-chkbx" value="filter by date range? "/>
+                                                <p:outputLabel id="ceev-search-startend-chkbx-ol" 
+                                                               for="ceev-search-startend-chkbx" 
+                                                               styleClass="bold"
+                                                               value="filter by date range? "/>
                                                 <p:selectBooleanCheckbox id="ceev-search-startend-chkbx" value="#{cEEventsBB.searchParams.filterByStartEndDate}" >
                                                     <p:ajax update="ceev-search-usedor-chkbx
                                                             ceev-search-vconf-chkbx 
@@ -75,7 +78,7 @@
 
                                                 <p:outputLabel id="ceev-search-vconf-ol" for="ceev-search-vconf-chkbx" value="use view confirmed date field? "/>
                                                 <p:selectBooleanCheckbox id="ceev-search-vconf-chkbx" 
-                                                                         value="#{cEEventsBB.searchParams.useViewConfirmedAtDateRange}" 
+                                                                         value="#{cEEventsBB.searchParams.useRespondedAtDateRange}" 
                                                                          disabled="#{!cEEventsBB.searchParams.filterByStartEndDate}"/>
 
                                                 <p:spacer height="1px"/>
@@ -192,14 +195,6 @@
                                                 <h:message for="ceev-criteria-cat" showDetail="false" showSummary="true"  
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                             </h:panelGroup>
-
-                                        </h:panelGrid>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-
-                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="topbottom-lines-left, topbottom-lines-right">
-
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-id-ol" for="ceev-filter-id" value="filter by ce case ID? "/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-id" value="#{cEEventsBB.searchParams.filterByCaseID}" 
@@ -232,7 +227,7 @@
                                                 <p:spacer height="5px"/>
 
                                                 <p:selectOneMenu id="ceev-criteria-user" required="false" 
-                                                                 value="#{cEEventsBB.searchParams.ownerUser}"
+                                                                 value="#{cEEventsBB.searchParams.user}"
                                                                  disabled="#{!cEEventsBB.searchParams.filterByEventOwner}">
                                                     <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                                     <f:selectItems value="#{cEEventsBB.userList}"  var="u" itemValue="#{u}" 
@@ -262,6 +257,14 @@
                                                 <h:message for="ceev-criteria-person" showDetail="false" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                             </h:panelGroup>
+
+                                        </h:panelGrid>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="topbottom-lines-left, topbottom-lines-right">
+
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-active-ol" for="ceev-filter-active" value="filter by active? "/>
@@ -294,37 +297,6 @@
                                             </h:panelGroup>
 
                                             <h:panelGroup>
-                                                <p:outputLabel id="ceev-filter-requireview-ol" for="ceev-filter-requireview" value="filter by requiring view confirmation? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-requireview" value="#{cEEventsBB.searchParams.filterByRequiresViewConfirmation}" >
-                                                    <p:ajax update="ceev-criteria-requireview" />
-                                                </p:selectBooleanCheckbox>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <p:selectBooleanCheckbox id="ceev-criteria-requireview" 
-                                                                         value="#{cEEventsBB.searchParams.isViewConfirmationRequired}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByRequiresViewConfirmation}" />
-                                                <p:outputLabel id="ceev-criteria-requireview-ol" for="ceev-criteria-requireview" 
-                                                               value="(checked = requires view conf)" styleClass="italic"/>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <p:outputLabel id="ceev-filter-viewstatus-ol" for="ceev-filter-viewstatus" value="filter by viewed status? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-viewstatus" value="#{cEEventsBB.searchParams.filterByViewed}" >
-                                                    <p:ajax update="ceev-criteria-view" />
-                                                </p:selectBooleanCheckbox>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <p:selectBooleanCheckbox id="ceev-criteria-view" 
-                                                                         value="#{cEEventsBB.searchParams.isViewed}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByViewed}" 
-                                                                         styleClass="checkbox"/>
-                                                <p:outputLabel id="ceev-criteria-view-ol" for="ceev-criteria-view" 
-                                                               value="(checked = has been viewed)" styleClass="italic"/>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-eventid-ol" for="ceev-filter-eventid" value="filter by event ID? "/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-eventid" 
                                                                          value="#{cEEventsBB.searchParams.filterByObjectID}" 
@@ -345,8 +317,132 @@
                                                 <p:outputLabel id="ceev-query-limit-ol" for="ceev-query-limit" value="limit results to 100? "/>
                                                 <p:selectBooleanCheckbox id="ceev-query-limit" value="#{cEEventsBB.searchParams.limitResultCountTo100}" />
                                             </h:panelGroup>
+                                            
+                                            <h:panelGroup></h:panelGroup>
+                                            
                                             <h:panelGroup>
+                                                <h3>Case action request events:</h3>
+                                            </h:panelGroup>
+                                            <h:panelGroup></h:panelGroup>
 
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                <p:outputLabel id="ceev-filter-requests-action-ol" 
+                                                               for="ceev-filter-requestsaction-cb" 
+                                                               value="filter by requests action? "
+                                                               styleClass="bold"
+                                                               />
+                                                <p:selectBooleanCheckbox id="ceev-filter-requestsaction-cb" value="#{cEEventsBB.searchParams.filterByrequestsAction}" >
+                                                    <p:ajax update="ceev-criteria-requests-action-cb
+                                                                    ceev-filter-requested-action-status-cb
+                                                                    ceev-criteria-requested-action-status-cb
+                                                                    ceev-filter-requests-typecat-reqaction-cb
+                                                                    ceev-filter-requests-rejected-cb
+                                                                    ceev-criteria-requests-rejected-cb
+                                                                    ceev-filter-requests-user-requestor-cb
+                                                                    ceev-filter-requests-user-responder-intended-cb
+                                                                    ceev-filter-requests-user-responder-actual-cb
+                                                                    " />
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                <p:selectBooleanCheckbox id="ceev-criteria-requests-action-cb" 
+                                                                         value="#{cEEventsBB.searchParams.requestsAction}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}" />
+                                                <p:outputLabel id="ceev-criteria-requireview-info-ol" for="ceev-criteria-requests-action-cb" 
+                                                               value="(checked = requests action)" styleClass="italic"/>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                <p:outputLabel id="ceev-filter-requested-action-ol" 
+                                                               for="ceev-filter-requested-action-status-cb" 
+                                                               value="filter by requested action status? "/>
+                                                <p:selectBooleanCheckbox id="ceev-filter-requested-action-status-cb" 
+                                                                         value="#{cEEventsBB.searchParams.filterByHasResponseEvent}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                    <p:ajax update="ceev-criteria-requested-action-status-cb" />
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                <p:selectBooleanCheckbox id="ceev-criteria-requested-action-status-cb" 
+                                                                         value="#{cEEventsBB.searchParams.hasResponseEvent}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByHasResponseEvent or !cEEventsBB.searchParams.filterByrequestsAction}" 
+                                                                         styleClass="checkbox"/>
+                                                <p:outputLabel id="ceev-filter-requested-action-status-info-ol" 
+                                                               for="ceev-criteria-requested-action-status-cb" 
+                                                               value="(checked = has a response)" styleClass="italic"/>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                <p:outputLabel id="ceev-filter-requests-typecat-reqaction-ol" 
+                                                               for="ceev-filter-requests-typecat-reqaction-cb" 
+                                                               value="filter by requested action category"/>
+                                                <p:selectBooleanCheckbox id="ceev-filter-requests-typecat-reqaction-cb" 
+                                                                         value="#{cEEventsBB.searchParams.filterByRequestedResponseEventCat}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                    <p:ajax update="ceev-criteria-requests-action-cb" />
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                <p class="italic">when enabled, this switch assigns <br />
+                                                    the chosen event category (not type alone) <br />
+                                                    selection box at left to requested case events</p>
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                 <p:outputLabel id="ceev-filter-requests-user-requestor-ol" 
+                                                               for="ceev-filter-requests-user-requestor-cb" 
+                                                               value="filter by requestor"/>
+                                                <p:selectBooleanCheckbox id="ceev-filter-requests-user-requestor-cb" 
+                                                                         value="#{cEEventsBB.searchParams.filterByRequestor}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                </p:selectBooleanCheckbox>
+                                                <p:spacer height="5px" />
+                                                <p:outputLabel id="ceev-filter-requests-user-responder-intended-ol" 
+                                                               for="ceev-filter-requests-user-responder-intended-cb" 
+                                                               value="filter by intended responder"/>
+                                                <p:selectBooleanCheckbox id="ceev-filter-requests-user-responder-intended-cb" 
+                                                                         value="#{cEEventsBB.searchParams.filterByResponderIntended}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                </p:selectBooleanCheckbox>
+                                                <p:spacer height="5px" />
+                                                <p:outputLabel id="ceev-filter-requests-user-responder-actual-ol" 
+                                                               for="ceev-filter-requests-user-responder-actual-cb" 
+                                                               value="filter by actual responder"/>
+                                                <p:selectBooleanCheckbox id="ceev-filter-requests-user-responder-actual-cb" 
+                                                                         value="#{cEEventsBB.searchParams.filterByResponderActual}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                </p:selectBooleanCheckbox>
+                                                
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                 <p class="italic">these filters, when enabled, assign <br />
+                                                    the chosen user selected in the filter above called <br />
+                                                    "filter by event owner" to requested case events <br />
+                                                    instead of the primary event</p>
+                                                
+                                            </h:panelGroup>
+                                            
+
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                <p:outputLabel id="ceev-filter-requests-rejected-ol" 
+                                                               for="ceev-filter-requests-rejected-cb" 
+                                                               value="filter by rejected request?"/>
+                                                <p:selectBooleanCheckbox id="ceev-filter-requests-rejected-cb" 
+                                                                         value="#{cEEventsBB.searchParams.filterByRejectedRequest}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                    <p:ajax update="ceev-criteria-requests-rejected-cb" />
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup styleClass="action-requests-search">
+                                                <p:selectBooleanCheckbox id="ceev-criteria-requests-rejected-cb" 
+                                                                         value="#{cEEventsBB.searchParams.rejectedRequest}" 
+                                                                         disabled="#{!cEEventsBB.searchParams.filterByRejectedRequest or !cEEventsBB.searchParams.filterByrequestsAction }" />
+                                                <p:outputLabel id="ceev-criteria-requests-rejected-ol" for="ceev-criteria-requests-rejected-cb" 
+                                                               value="(checked = rejected)" styleClass="italic"/>
                                             </h:panelGroup>
                                         </h:panelGrid>                                        
                                     </h:panelGroup>
@@ -370,9 +466,9 @@
 
                             <p:commandButton    id="event-preset-eventsreqviewconf" 
                                                 ajax="true"
-                                                 value="events requiring view confirmation" 
+                                                 value="Required actions" 
                                                  styleClass="noFill"
-                                                 actionListener="#{cEEventsBB.loadEventsRequiringViewConf(ev)}"
+                                                 actionListener="#{cEEventsBB.loadEventsRequiringAction(ev)}"
                                                  disabled="false"
                                                  icon="fa fa-tasks"
                                                  rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
@@ -421,6 +517,8 @@
                         
                                 <h:form id="events-datascroller-form">
                                   
+                                    
+
                                     <p:dataScroller
                                         id="events-datascroller"
                                         var="e"
@@ -429,157 +527,110 @@
 
                                         <div class="outlinedBox event-ds-box">
 
-                                            <h2>
-                                                <h:outputText value="#{e.category.eventType.label}:#{e.category.eventCategoryTitle}"/>
-                                            </h2>
+                                        <div class="status-display-container">
+                                            <div class="action-request-icon">
+                                                <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.event.category.icon.materialIcon}"/></i>
+                                            </div>
+                                            <div class="status-display-status-list-container">
+                                                <div class="action-request-header">
+                                                    <h:outputText value="#{e.event.category.eventType.label}: #{e.event.category.eventCategoryTitle} "/>
+                                                </div>
+                                                <div class="action-request-subheader">
+                                                    <h:outputText value="#{e.eventCaseBare.property.address} " />
+                                                    <h:outputText value=" (#{e.eventCaseBare.property.muni.muniName}) | " />
+                                                    <h:outputText value="CE Case: #{e.eventCaseBare.caseName}  
+                                                                        (id:#{e.eventCaseBare.caseID}) " /><br />
+                                                    <h:outputText value="#{e.event.dateOfRecordPretty}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                            
+                                             <h:panelGrid columns="3" cellpadding="10" footerClass="gridFooter" headerClass="gridHeader"
+                                                         columnClasses="gridTd, gridTd, gridTd">
 
-                                            <h3>
-                                                <h:outputText value="#{e.dateOfRecordPretty}" styleClass="mono"/>
-
-                                            </h3>
-
-                                            <h4>
-                                                <h:outputText value="id:#{e.eventID} |
-                                                              #{e.active ? 'active' : 'inactive'} |
-                                                              #{e.hidden ? 'hidden' : ''} |
-                                                              #{e.discloseToMunicipality? 'muni:viewable' : 'muni:hidden'} |
-                                                              #{e.discloseToPublic? 'public:viewable' : 'public:hidden'} |
-                                                              #{e.requiresViewConfirmation? 'viewconf:yes' : 'viewconf:no'}"/>
-                                            </h4>
-
-                                            <h3>
-                                                <h:outputText value="#{e.eventCase.property.muni.muniName}: " />
-                                                <h:outputText value="#{e.eventCase.property.address} | " />
-                                                <h:outputText value="case: #{e.eventCase.caseName} | 
-                                                                    id:#{e.eventCase.caseID} | 
-                                                                    phase:#{e.eventCase.casePhase.label} " />
-                                            </h3>
-
-                                            <h:panelGrid columns="2" rendered="true"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back" >
-
-                                                <f:facet name="header" class="leftalign">
-                                                    <h:outputText value="Description" />
+                                                <f:facet name="header">
                                                     <div class="rowExpansion">
-                                                        <h:outputText style="font-weight: normal;" value="#{e.description}"/>
+                                                        <h:outputText styleClass="bold" value="Description: " />
+                                                        <h:outputText styleClass="weight-normal" value="#{e.event.description}"/>
                                                     </div>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText styleClass="bold" value="Notes: " />
+                                                        <h:outputText styleClass="weight-normal" value="#{e.event.responderNotes}"/>
+                                                    </div>
+                                                    
                                                 </f:facet>
 
-
                                                 <h:panelGroup>
+                                                    
+                                                    <h:outputText value="Owner: " styleClass="bold" />
+                                                    <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
+                                                    <p:spacer height="5px"/>
                                                     <h:outputText styleClass="bold" value="Date of record: "/>
-                                                    <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                                    <h:outputText value="#{e.event.dateOfRecordPretty}"/>
                                                     <p:spacer height="5px"/>
-
-                                                    <h:outputText styleClass="bold" value="Entry timestamp: "/>
-                                                    <h:outputText value="#{e.timestampPretty}"/>
+                                                    <h:outputText styleClass="bold" value="Creation time stamp: "/>
+                                                    <h:outputText value="#{e.event.timestampPretty}"/>
+                                                </h:panelGroup>
+                                                
+                                                 <h:panelGroup>
+                                                    <h:outputText styleClass="bold" value="Disclose to Municipality Staff: " />
+                                                    <h:outputText value="#{e.event.discloseToMunicipality}"/>
+                                                    
                                                     <p:spacer height="5px"/>
-
-                                                    <h:outputText value="Creator: " styleClass="bold" />
-                                                    <h:outputText value="#{e.creator.person.firstName} #{e.creator.person.lastName}"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Disclose to Public: " />
+                                                    <h:outputText value="#{e.event.discloseToPublic}"/>
                                                     <p:spacer height="5px"/>
-
-                                                    <h:outputText value="Assigned to: " styleClass="bold"  />
-                                                    <h:outputText value="#{e.assignedTo.person.firstName} #{e.assignedTo.person.lastName}"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Active: "/>
+                                                    <h:outputText value="#{e.event.active}"/>
+                                                    
                                                     <p:spacer height="5px"/>
-
-
-                                                    <h:outputText value="Open in case explorer" />
-                                                    <p:commandButton icon="fa fa-edit"
-                                                                     action="#{caseProfileBB.editEvent(e)}" 
-                                                                     ajax="false"/>
-
+                                                    
+                                                    <h:outputText styleClass="bold" value="Hidden: "/>
+                                                    <h:outputText value="#{e.event.hidden}"/>
+                                                    
                                                 </h:panelGroup>
 
-                                                <h:panelGroup>
-
-                                                    <h:panelGrid columns="2" rendered="#{e.requiresViewConfirmation}"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back" >
-
-                                                        <f:facet name="header" class="leftalign">
-                                                            <h:outputText value="#{empty e.viewConfirmedBy? 'View confirmation required!' : 'View confirmation received'}"
-                                                                          styleClass="viewconf-status #{empty e.viewConfirmedBy? 'conf-needed' : 'conf-received'}"/>
-                                                            <p:spacer height="5px"/>
-                                                             <p:commandButton   id="events-viewconf-confirmnonotes-cb" 
-                                                                                ajax="true"
-                                                                                actionListener="#{cEEventsBB.confirmViewWithoutNotes(e)}"
-                                                                                 value="Confirm without notes" 
-                                                                                 styleClass="noFill"
-                                                                                 disabled="#{!(empty e.viewConfirmedBy)}"
-                                                                                 icon="fa fa-check-square-o"
-                                                                                 rendered="#{e.currentUserCanConfirm}"
-                                                                                 update="events-datascroller
-                                                                                        events-datatable-form:events-datatable
-                                                                                        ceev-form-globalmessages:ceev-globalmessages
-                                                                                        "
-                                                                                 />
-                                                             
-                                                             <ui:remove>
-                                                                 
-                                                             <p:commandButton   id="events-viewconf-confirmwithnotes-cb" 
-                                                                                ajax="true"
-                                                                                 value="Confirm with notes" 
-                                                                                 styleClass="noFill"
-                                                                                 disabled="true"
-                                                                                 icon="fa fa-edit"
-                                                                                rendered="#{e.currentUserCanConfirm}"
-                                                                                 />
-                                                             </ui:remove>
-                                                             
-                                                             <p:commandButton   id="events-viewconf-clearconf-cb" 
-                                                                                ajax="true"
-                                                                                actionListener="#{cEEventsBB.clearViewconfirmation(e)}"
-                                                                                value="clear view conf" 
-                                                                                styleClass="noFill"
-                                                                                disabled="#{empty e.viewConfirmedBy}"
-                                                                                icon="fa fa-eraser"
-                                                                                rendered="#{e.currentUserCanConfirm}"
-                                                                                 update="events-datascroller
-                                                                                        events-datatable-form:events-datatable
-                                                                                        ceev-form-globalmessages:ceev-globalmessages
-                                                                                        "
-                                                                                />
-                                                            
-                                                        </f:facet>
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="View requested by"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.viewConfRequestedBy.person.firstName} #{e.viewConfRequestedBy.person.lastName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="View confirmed by"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.viewConfirmedBy.person.firstName} #{e.viewConfirmedBy.person.lastName}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputText styleClass="bold" value="View confirmed at"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.viewConfAtPrettyDate}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <f:facet name="footer" class="leftalign">
-                                                            <h:outputText styleClass="bold" value="View confirmation notes:"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText value="#{e.viewNotes}"/>
-                                                            </div>
-                                                        </f:facet>
-
-                                                    </h:panelGrid>
-                                                </h:panelGroup>
-                                                <f:facet name="footer" class="leftalign">
-                                                    <h:outputLabel styleClass="bold" style="text-align: left" value="Notes: "/>
+                                                 <h:panelGroup rendered="#{e.event.requestsAction}">
+                                                    <h:outputText styleClass="bold" value="Requests action: "/>
+                                                    <h:outputText value="#{e.event.requestsAction}"/>
+                                                    
                                                     <p:spacer height="5px"/>
-                                                    <div class="rowExpansion" style="text-align: left">
-                                                        <h:outputText escape="false" value="#{e.notes}"/>
-                                                    </div>
-                                                </f:facet>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Requested event: "/>
+                                                    <h:outputText value="#{e.event.actionEventCat.eventType.label}: #{e.event.actionEventCat.eventCategoryTitle}"/>
+
+                                                    <p:spacer height="5px"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Action requested by: "/>
+                                                    <h:outputText value="#{e.event.actionRequestedBy.person.firstName} #{e.event.actionRequestedBy.person.lastName}"/>
+
+                                                    <p:spacer height="5px"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Intended user/action taker: "/>
+                                                    <h:outputText value="#{(empty e.event.responderIntended) ? 'default code officer' : e.event.responderIntended.person.lastName}"/>                                   
+
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText styleClass="bold" value="Action taken by: "/>
+                                                    <h:outputText value="#{e.event.responderActual.person.firstName} #{e.event.responderActual.person.lastName}"/>
+                                                    
+                                                    <h:outputText styleClass="bold" value="Action timestamp: "/>
+                                                    <h:outputText value="#{e.event.responseTimePrettyDate}"/>
+
+                                                    <h:outputText styleClass="bold" value="Request rejected? "/>
+                                                    <h:outputText value="#{e.event.requestRejected}"/>
+
+                                                    <h:outputText styleClass="bold" value="Action response notes:"/>
+                                                    <h:outputText value="#{e.event.responderNotes}"/>
+                                                </h:panelGroup>
+
+                                                
+
                                             </h:panelGrid>
+                                                   
+
+                                               
                                         </div>
 
                                     </p:dataScroller>
@@ -591,7 +642,7 @@
                                     <p:dataTable
                                         id="events-datatable"
                                         var="e"
-                                        rowKey="#{e.eventID}"
+                                        rowKey="#{e.event.eventID}"
                                         value="#{cEEventsBB.eventList}"
                                         tableStyleClass="primeDataTable"
                                         resizableColumns="true"
@@ -609,57 +660,57 @@
                                             <p:rowToggler/>
                                         </p:column>
 
-                                        <p:column width="11%" sortBy="#{e.dateOfRecord}">
+                                        <p:column width="11%" sortBy="#{e.event.dateOfRecord}">
                                             <f:facet name="header">
                                                 <h:outputText value="Date" />
                                             </f:facet>
-                                            <h:outputText value="#{e.dateOfRecordPretty}"/>
+                                            <h:outputText value="#{e.event.dateOfRecordPretty}"/>
                                         </p:column>
 
-                                        <p:column width="15%" sortBy="#{e.eventCase.property.address}">
+                                        <p:column width="15%" sortBy="#{e.eventCaseBare.property.address}">
                                             <f:facet name="header">
                                                 <h:outputText value="Property" />
                                             </f:facet>
-                                            <h:outputText value="#{e.eventCase.property.address} (#{e.eventCase.property.muni.muniName}"/>
+                                            <h:outputText value="#{e.eventCaseBare.property.address} (#{e.eventCaseBare.property.muni.muniName}"/>
                                         </p:column>
 
                                         <p:column width="15%">
                                             <f:facet name="header">
                                                 <h:outputText value="Case name" />
                                             </f:facet>
-                                            <h:outputText value="#{e.eventCase.caseName})" />
+                                            <h:outputText value="#{e.eventCaseBare.caseName})" />
                                         </p:column>
 
 
 
-                                        <p:column width="8%" sortBy="#{e.category.eventType.label}"
-                                                  filterBy="#{e.category.eventType.label}">
+                                        <p:column width="8%" sortBy="#{e.event.category.eventType.label}"
+                                                  filterBy="#{e.event.category.eventType.label}">
                                             <f:facet name="header">
                                                 <h:outputText value="Type" />
                                             </f:facet>
-                                            <h:outputText value="#{e.category.eventType.label}"/>
+                                            <h:outputText value="#{e.event.category.eventType.label}"/>
                                         </p:column>
 
-                                        <p:column width="10%" sortBy="#{e.category.eventCategoryTitle}"
-                                                  filterBy="#{e.category.eventCategoryTitle}">
+                                        <p:column width="10%" sortBy="#{e.event.category.eventCategoryTitle}"
+                                                  filterBy="#{e.event.category.eventCategoryTitle}">
                                             <f:facet name="header">
                                                 <h:outputText value="Category" />
                                             </f:facet>
-                                            <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                            <h:outputText value="#{e.event.category.eventCategoryTitle}"/>
                                         </p:column>
-                                        <p:column width="5%" filterBy="#{e.creator.person.lastName}"
-                                                  sortBy="#{e.creator.person.lastName}">
+                                        <p:column width="5%" filterBy="#{e.event.owner.person.lastName}"
+                                                  sortBy="#{e.event.owner.person.lastName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Creator" />
                                             </f:facet>
-                                            <h:outputText value="#{e.creator.person.lastName}"/>
+                                            <h:outputText value="#{e.event.owner.person.lastName}"/>
                                         </p:column>
                                         <p:column width="20%" style="word-wrap: normal;">
                                             <f:facet name="header">
                                                 <h:outputText value="Description" />
                                             </f:facet>
                                             <div class="rowExpansion">
-                                                <h:outputText value="#{e.description}"/>
+                                                <h:outputText value="#{e.event.description}"/>
                                             </div>
                                         </p:column>
                                         <p:column width="5%" exportable="false">
@@ -675,61 +726,55 @@
                                         <p:rowExpansion>
 
                                             <div class="outlinedBox">
-                                                <h2>Event ID: <h:outputText value="#{e.eventID}"/> </h2>
+                                                <h2>Event ID: <h:outputText value="#{e.event.eventID}"/> </h2>
                                                 <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd">
 
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Description" />
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.description}"/>
+                                                            <h:outputText value="#{e.event.description}"/>
                                                         </div>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.discloseToMunicipality}"/>
+                                                            <h:outputText value="#{e.event.discloseToMunicipality}"/>
                                                         </div>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Disclose to Public?" />
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.discloseToPublic}"/>
+                                                            <h:outputText value="#{e.event.discloseToPublic}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Creation time stamp"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.timestamp}"/>
+                                                            <h:outputText value="#{e.event.timestamp}"/>
                                                         </div>
                                                     </h:panelGroup>
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="Active Event?"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.active}"/>
+                                                            <h:outputText value="#{e.event.active}"/>
                                                         </div>
                                                     </h:panelGroup>
 
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Requires View Confirmation?"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{e.requiresViewConfirmation}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
+                                                    
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed by"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.viewConfirmedBy.person.lastName}"/>
+                                                            <h:outputText value="#{e.event.responderActual.person.lastName}"/>
                                                         </div>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed at"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{e.viewConfirmedAt}"/>
+                                                            <h:outputText value="#{e.event.responseTimestamp}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -739,7 +784,7 @@
                                                         <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion" style="text-align: left">
-                                                            <h:outputText escape="false" value="#{e.notes}"/>
+                                                            <h:outputText escape="false" value="#{e.event.notes}"/>
                                                         </div>
                                                     </f:facet>
 

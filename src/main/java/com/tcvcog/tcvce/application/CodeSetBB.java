@@ -173,15 +173,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    /**
-     * @return the muniMap
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public HashMap getMuniMap() throws IntegrationException {
-        MunicipalityIntegrator muniInt = getMunicipalityIntegrator();
-        muniMap = muniInt.getMunicipalityMap();
-        return muniMap;
-    }
+   
 
     /**
      * @param muniMap the muniMap to set

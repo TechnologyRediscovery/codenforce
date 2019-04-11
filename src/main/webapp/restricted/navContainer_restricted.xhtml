@@ -9,7 +9,7 @@
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <h:outputStylesheet name="css/style.css"/>
-        <title>Code Enforcement</title>
+        <title>CCOGConnect</title>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
 
     </h:head>
@@ -19,7 +19,8 @@
                 <div class="flexing-box-topbar">
                     <f:view id="navview">
                         <div class="logoBox">
-                            <h2 id="logoHeader" style="font-weight: bold;"><span class="mono"> Municipal Code Enforcement Database [MCED]</span> <br />Turtle Creek Valley Council of Governments</h2>
+                                <div class="sys-title" style="font-weight: bold;">COG Connect: Municipal code enforcement data platform</div>
+                                <div class="sys-title-sub">Turtle Creek Valley Council of Governments</div>
                         </div>
                     </f:view>
                 </div>
@@ -105,6 +106,7 @@
                                     <p:menuitem value="User-Munis" action="userMuniMapping" ajax="false" icon="fa fa-id-card" />
                                     <p:menuitem value="Muni info" action="muniManage" ajax="false" icon="fa fa-univsity" disabled="false"/>
                                     <p:menuitem value="Request list changes" action="selectItemListChange" ajax="false" icon="fa fa-list" />
+                                    <p:menuitem value="Mange icons" action="iconManage" ajax="false" icon="fa fa-list" />
                                 </p:submenu>
                                 <p:submenu label="Help" icon="fa fa-question-circle">
                                     <p:menuitem value="Report a bug" action="bugReporting" ajax="false" icon="ui-icon-arrowthick-1-s" />

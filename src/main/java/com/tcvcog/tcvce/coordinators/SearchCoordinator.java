@@ -60,7 +60,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return propParams;
     }
     
-    public SearchParamsCEEvents getSearchParamsEventsRequiringView(User u, Municipality muni){
+    public SearchParamsCEEvents getSearchParamsEventsRequiringAction(User u, Municipality muni){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory
@@ -88,14 +88,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByRequiresViewConfirmation(true);
-        eventParams.setIsViewConfirmationRequired(true);
+        eventParams.setFilterByrequestsAction(true);
+        eventParams.setRequestsAction(true);
         
-        eventParams.setFilterByViewed(true);
-        eventParams.setIsViewed(false);
+        eventParams.setFilterByHasResponseEvent(true);
+        eventParams.setHasResponseEvent(false);
         
         eventParams.setFilterByPerson(false);
-        eventParams.setUseViewConfirmedAtDateRange(false);
+        eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
         
@@ -112,11 +112,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(m);
         
-        eventParams.setFilterByStartEndDate(false);
-        eventParams.setUseRelativeDates(false);
-        eventParams.setUseDateOfRecord(false);
+        eventParams.setFilterByStartEndDate(true);
+        eventParams.setUseRelativeDates(true);
+        
+        eventParams.setUseDateOfRecord(true);
         // query from a week ago to now
-        eventParams.setStartDateRelativeDays(-400);
+        eventParams.setStartDateRelativeDays(-30);
         eventParams.setEndDateRelativeDays(0);
         
         eventParams.setFilterByObjectID(false);
@@ -127,19 +128,19 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         eventParams.setFilterByCaseID(false);
         
-        eventParams.setFilterByEventOwner(false);
+        eventParams.setFilterByEventOwner(true);
         eventParams.setOwnerUserID(u);
         
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByRequiresViewConfirmation(false);
+        eventParams.setFilterByrequestsAction(false);
         
-        eventParams.setFilterByViewed(false);
-        eventParams.setIsViewed(false);
+        eventParams.setFilterByHasResponseEvent(false);
+        eventParams.setHasResponseEvent(false);
         
         eventParams.setFilterByPerson(false);
-        eventParams.setUseViewConfirmedAtDateRange(false);
+        eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
         
@@ -182,13 +183,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByRequiresViewConfirmation(false);
+        eventParams.setFilterByrequestsAction(false);
         
-        eventParams.setFilterByViewed(false);
-        eventParams.setIsViewed(false);
+        eventParams.setFilterByHasResponseEvent(false);
+        eventParams.setHasResponseEvent(false);
         
         eventParams.setFilterByPerson(false);
-        eventParams.setUseViewConfirmedAtDateRange(false);
+        eventParams.setUseRespondedAtDateRange(false);
         
         eventParams.setFilterByHidden(false);
         

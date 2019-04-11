@@ -55,21 +55,28 @@
                                         <h:outputText value="#{c.eventCategoryTitle}"/>
                                     </p:column>
                                     
-                                    <p:column width="3%">
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Icon" />
+                                        </f:facet>
+                                        <i class="material-icons"><h:outputText value="#{c.icon.materialIcon}"/></i>
+                                    </p:column>
+                                    
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="UD" />
                                         </f:facet>
                                         <h:outputText value="#{c.userdeployable}"/>
                                     </p:column>
                                     
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="MD" />
                                         </f:facet>
                                         <h:outputText value="#{c.munideployable}"/>
                                     </p:column>
                                     
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="PD" />
                                         </f:facet>
@@ -77,24 +84,18 @@
                                     </p:column>
                                     
                                     
-                                    <p:column width="3%">
+                                  
+                                    
+                                    <p:column width="5%">
                                         <f:facet name="header">
-                                            <h:outputText value="PD" />
+                                            <h:outputText value="REQ" />
                                         </f:facet>
-                                        <h:outputText value="#{c.publicdeployable}"/>
+                                        <h:outputText value="#{c.requestable}"/>
                                     </p:column>
                                     
                                     
                                     
-                                    <p:column width="3%">
-                                        <f:facet name="header">
-                                            <h:outputText value="RVC" />
-                                        </f:facet>
-                                        <h:outputText value="#{c.requiresviewconfirmation}"/>
-                                    </p:column>
-                                    
-                                    
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="NCM" />
                                         </f:facet>
@@ -102,7 +103,7 @@
                                     </p:column>
                                     
                                     
-                                    <p:column width="3%">
+                                    <p:column width="5%">
                                         <f:facet name="header">
                                             <h:outputText value="HIDE" />
                                         </f:facet>
@@ -132,7 +133,7 @@
                              <p:fieldset legend="Update event category"
                                          toggleable="true" collapsed="false" tabindex="4">
                                  
-                                 <h:form id="updateCategoryForm">
+                            <h:form id="updateCategoryForm">
                                      
                                  
                                 <h:outputLabel for="eventTypeMenu">
@@ -163,6 +164,15 @@
                                 <h:message for="catDescIT" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 <p:spacer height="20px"/>
+
+                                <p:outputLabel for="icon-som">
+                                    <h:outputText value="Icon"/>
+                                </p:outputLabel>
+                                <p:spacer height="5px"/>
+                                <p:selectOneMenu id="icon-som" required="false" value="#{eventConfigurationBB.formCatIcon}" tabindex="8">
+                                    <f:selectItems value="#{eventConfigurationBB.iconList}" var="i" itemLabel="#{i.name}" itemValue="#{i}" />
+                                    <f:converter converterId="iconConverter" />
+                                </p:selectOneMenu>
                                 
                                    <h:panelGrid columns="3" cellpadding="5" border="0" frame="false" columnClasses="gridTd, gridTd, gridTd">
                                 
@@ -191,13 +201,14 @@
                                         
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <p:outputLabel for="requireViewConf">
-                                            <h:outputText value="Require case manager view confirmation"/>
+                                        <p:outputLabel for="requestable-is">
+                                            <h:outputText value="Requestable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="requireViewConf" value="#{eventConfigurationBB.formRequiresviewconfirmation}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="requestable-is" value="#{eventConfigurationBB.formRequestable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
+                                   
                                     <h:panelGroup>
                                         <p:outputLabel for="notifyCaseMonitors">
                                             <h:outputText value="Notify Case Monitors"/>
@@ -259,6 +270,15 @@
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 <p:spacer height="20px"/>
                                 
+                                <p:outputLabel for="icon-som-new">
+                                    <h:outputText value="Icon"/>
+                                </p:outputLabel>
+                                <p:spacer height="5px"/>
+                                <p:selectOneMenu id="icon-som-new" required="false" value="#{eventConfigurationBB.newFormCatIcon}" tabindex="8">
+                                    <f:selectItems value="#{eventConfigurationBB.iconList}" var="i" itemLabel="#{i.name}" itemValue="#{i}" />
+                                    <f:converter converterId="iconConverter" />
+                                </p:selectOneMenu>
+                                
                                  <h:panelGrid columns="3" cellpadding="5" border="0" frame="false" columnClasses="gridTd, gridTd, gridTd">
                                 
                                     <h:panelGroup>
@@ -277,22 +297,24 @@
                                         <p:inputSwitch id="munideploy" value="#{eventConfigurationBB.newFormMunideployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                   
+                                     <h:panelGroup>
                                         <p:outputLabel for="publicDeploy">
                                             <h:outputText value="Public deployable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
                                         <p:inputSwitch id="publicDeploy" value="#{eventConfigurationBB.newFormPublicdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
-                                        
                                     </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:outputLabel for="requireViewConf">
-                                            <h:outputText value="Require case manager view confirmation"/>
+                                   
+                                   
+                                     <h:panelGroup>
+                                        <p:outputLabel for="new-requestable-is">
+                                            <h:outputText value="Requestable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="requireViewConf" value="#{eventConfigurationBB.newFormRequiresviewconfirmation}" onLabel="Yes" offLabel="No" tabindex="2"/>
-                                        
+                                        <p:inputSwitch id="new-requestable-is" value="#{eventConfigurationBB.newFormRequestable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                     </h:panelGroup>
+                                   
                                     <h:panelGroup>
                                         <p:outputLabel for="notifyCaseMonitors">
                                             <h:outputText value="Notify Case Monitors"/>

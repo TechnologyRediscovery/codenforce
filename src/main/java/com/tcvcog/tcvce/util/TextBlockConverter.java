@@ -29,12 +29,11 @@ import javax.faces.convert.FacesConverter;
  * and object types
  * @author echocharliedelta
  */
-@FacesConverter(forClass=TextBlock.class, value="textBlockConverter")
+@FacesConverter(value="textBlockConverter")
 public class TextBlockConverter extends EntityConverter implements Converter {
     
      @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        System.out.println("TextBlockConverter.getAsObject | title: " + titleS);
         if(titleS.isEmpty()) {
             return null; 
         }
@@ -44,7 +43,6 @@ public class TextBlockConverter extends EntityConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        System.out.println("TextBlockConverter.getAsString");
         
         if (o == null){
             return "";

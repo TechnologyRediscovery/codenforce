@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -32,10 +33,6 @@ public class User implements Serializable{
     private RoleType roleType;
     private String username;
     private String password;
-    private List<Municipality> authMunis;
-    
-    // To be deprecated 
-    private Municipality muni;
     
     private Person person;
     private int personID;
@@ -77,15 +74,7 @@ public class User implements Serializable{
     
     
     
-    /**
-     * Creates a new instance of User
-     * @param munis The municipality objects for the munis this user
-     * can search and manipulate data within
-     */
-    public User(LinkedList<Municipality> munis) {
-        authMunis = munis;
-    }
-
+    
 
     /**
      * @return the userID
@@ -115,20 +104,7 @@ public class User implements Serializable{
         this.username = username;
     }
 
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
-    }
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
-
+    
    
     /**
      * @return the notes
@@ -176,22 +152,6 @@ public class User implements Serializable{
 
    
     
-
-    /**
-     * @return the authMunis
-     */
-    public List<Municipality> getAuthMunis() {
-        return authMunis;
-    }
-
-    /**
-     * 
-     * @param ml 
-     */
-    public void setAuthMuis(List<Municipality> ml) {
-        authMunis = ml;
-    }
-
     
     // no setters for access permissions private variables!!
 
@@ -360,6 +320,47 @@ public class User implements Serializable{
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + this.userID;
+        hash = 43 * hash + Objects.hashCode(this.roleType);
+        hash = 43 * hash + Objects.hashCode(this.username);
+        hash = 43 * hash + Objects.hashCode(this.password);
+        hash = 43 * hash + Objects.hashCode(this.person);
+        hash = 43 * hash + this.personID;
+        hash = 43 * hash + Objects.hashCode(this.notes);
+        hash = 43 * hash + Objects.hashCode(this.activityStartDate);
+        hash = 43 * hash + Objects.hashCode(this.activityStartDateUtilDate);
+        hash = 43 * hash + Objects.hashCode(this.activityStopDate);
+        hash = 43 * hash + Objects.hashCode(this.activityStopDateUtilDate);
+        hash = 43 * hash + (this.systemAccessPermitted ? 1 : 0);
+        hash = 43 * hash + Objects.hashCode(this.keyCard);
+        hash = 43 * hash + (this.isEnforcementOfficial ? 1 : 0);
+        hash = 43 * hash + Objects.hashCode(this.badgeNumber);
+        hash = 43 * hash + Objects.hashCode(this.oriNumber);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final User other = (User) obj;
+        if (this.userID != other.userID) {
+            return false;
+        }
+       
+        return true;
     }
     
 }
