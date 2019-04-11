@@ -28,10 +28,6 @@ public enum PersonType{
     Tenant("Tenant"),
     OwnerOccupant("Owner-Occupant"),
     OwnerNonOccupant("Owner-Non Occupant"),
-<<<<<<< HEAD
-    Owner("Owner"),
-=======
->>>>>>> 3eb12064772c30c1888e2cd3d7e187694b3d92da
     FutureOwner("Future owner"),
     Manager("Property Manager"),
     ElectedOfficial("Elected Official"),
