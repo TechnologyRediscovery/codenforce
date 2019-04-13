@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.entities.ReportConfig;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import java.io.Serializable;
@@ -16,8 +17,10 @@ import javax.annotation.PostConstruct;
  */
 public class ReportingBB extends BackingBeanUtils implements Serializable{
     
-    private ReportConfigCEEventList rptCEEvent;
-    private ReportConfigCECase rptCECase;
+    private ReportConfigCEEventList reportCEEvent;
+    private ReportConfigCECase reportCECase;
+    
+    private ReportConfig currentReport;
     
    
 
@@ -30,36 +33,50 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        rptCECase = getSessionBean().getReportConfigCECase();
+        reportCECase = getSessionBean().getReportConfigCECase();
     }
     
 
     /**
-     * @return the rptCEEvent
+     * @return the reportCEEvent
      */
-    public ReportConfigCEEventList getRptCEEvent() {
-        return rptCEEvent;
+    public ReportConfigCEEventList getReportCEEvent() {
+        return reportCEEvent;
     }
 
     /**
-     * @return the rptCECase
+     * @return the reportCECase
      */
-    public ReportConfigCECase getRptCECase() {
-        return rptCECase;
+    public ReportConfigCECase getReportCECase() {
+        return reportCECase;
     }
 
     /**
-     * @param rptCEEvent the rptCEEvent to set
+     * @param reportCEEvent the reportCEEvent to set
      */
-    public void setRptCEEvent(ReportConfigCEEventList rptCEEvent) {
-        this.rptCEEvent = rptCEEvent;
+    public void setReportCEEvent(ReportConfigCEEventList reportCEEvent) {
+        this.reportCEEvent = reportCEEvent;
     }
 
     /**
-     * @param rptCECase the rptCECase to set
+     * @param reportCECase the reportCECase to set
      */
-    public void setRptCECase(ReportConfigCECase rptCECase) {
-        this.rptCECase = rptCECase;
+    public void setReportCECase(ReportConfigCECase reportCECase) {
+        this.reportCECase = reportCECase;
+    }
+
+    /**
+     * @return the currentReport
+     */
+    public ReportConfig getCurrentReport() {
+        return currentReport;
+    }
+
+    /**
+     * @param currentReport the currentReport to set
+     */
+    public void setCurrentReport(ReportConfig currentReport) {
+        this.currentReport = currentReport;
     }
     
 }
