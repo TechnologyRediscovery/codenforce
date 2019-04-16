@@ -361,7 +361,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
     
     public CitationStatus getCitationStatus(int statusID) throws IntegrationException{
             
-        String query =  "SELECT statusid, statusname, description, icon_iconid, editsallowed "
+        String query =  "SELECT statusid, statusname, description, icon_iconid, editsforbidden, triggeredeventcat_catid "
                 + "FROM citationStatus WHERE statusid=?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -424,15 +424,17 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
-    public CitationStatus generateCitationStatus(ResultSet rs) throws IntegrationException{
+    private CitationStatus generateCitationStatus(ResultSet rs) throws IntegrationException{
         CitationStatus cs = new CitationStatus();
         SystemIntegrator si = getSystemIntegrator();
+        EventIntegrator ei = getEventIntegrator();
         try {
             cs.setStatusID(rs.getInt("statusid"));
             cs.setStatusTitle(rs.getString("statusname"));
             cs.setDescription(rs.getString("description"));
             cs.setIcon(si.getIcon(rs.getInt("icon_iconid")));
-            cs.setEditsAllowed(rs.getBoolean("editsallowed"));
+            cs.setEditsAllowed(rs.getBoolean("editsforbidden"));
+            cs.setTriggeredEventCategory(ei.getEventCategory(rs.getInt("triggeredeventcat_catid")));
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Cannot Generate citation status object, sorry", ex);
@@ -444,8 +446,8 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         
         
         String query =  "INSERT INTO public.citationstatus(\n" +
-                        "            statusid, statusname, description, icon_iconid, editsallowed)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, ?);";
+                        "            statusid, statusname, description, icon_iconid, editsforbidden, triggeredeventcat_catid)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         
@@ -455,6 +457,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(2, cs.getDescription());
             stmt.setInt(3, cs.getIcon().getIconid());
             stmt.setBoolean(4, cs.isEditsAllowed());
+            stmt.setInt(5, cs.getTriggeredEventCategory().getCategoryID());
             stmt.execute();
             
         } catch (SQLException ex) {
@@ -497,7 +500,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
     public void updateCitationStatus(CitationStatus cs) throws IntegrationException{
         
         String query =  "UPDATE public.citationstatus\n" +
-                        "   SET statusname=?, description=?, icon_iconid=?, editsallowed=?\n" +
+                        "   SET statusname=?, description=?, icon_iconid=?, editsforbidden=?, triggeredeventcat_catid=?\n" +
                         " WHERE statusid=?;";
         
         Connection con = getPostgresCon();
@@ -509,6 +512,8 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(2, cs.getDescription());
             stmt.setInt(3, cs.getIcon().getIconid());
             stmt.setBoolean(4, cs.isEditsAllowed());
+            stmt.setInt(5, cs.getTriggeredEventCategory().getCategoryID());
+            
             stmt.execute();
 
             

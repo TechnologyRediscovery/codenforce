@@ -203,11 +203,89 @@
                                 
                                 
                             </h:panelGrid>
+                            
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" value="Save Citation" action="#{citationBB.insertCitation}" disabled="#{citationBB.currentCitation.citationID != 0}" />
-                            <p:commandButton ajax="false" value="Commit updates" action="#{citationBB.updateCitation}" disabled="#{citationBB.currentCitation.citationID == 0 }"/>
-                            <p:commandButton ajax="false" value="Cancel and return to profile" process="@none" immediate="true" action="ceCases" icon="fa fa-stop" />
+                            
+                            <p:commandButton ajax="false" 
+                                             value="Cancel and return to profile" 
+                                             process="@none" immediate="true" 
+                                             action="ceCases" icon="fa fa-arrow-left" />
+                            
                         </h:form>
+
+                        <p:confirmDialog message="Citiation submission review for case: #{citationBB.currentCase.caseName}" 
+                                         severity="alert" widgetVar="citation-review-var"
+                                         closable="true"
+                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="citation-review-form">
+                                
+                                <h:outputLabel for="citation-update-event-text-ita" value="Reason for updates:"/>
+                                <p:spacer height="10px"/>
+                                <p:inputTextarea id="citation-update-event-text-ita" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.muniMessageText}"/>
+                                <p:spacer height="15px"/>
+                                <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                              and attached to #{cEActionRequestsBB.selectedRequest.requestID}"/>
+                                <p:spacer height="15px"/>
+                                
+                                
+                                
+                                
+                                <p:commandButton ajax="true" icon="fa fa-stop"
+                                                 value="Cancel" 
+                                                 onclick="PF('citation-review-var').hide()"/>
+
+                                <p:commandButton ajax="false" value="Commit updates" icon="fa fa-edit" 
+                                                 action="#{citationBB.updateCitation}" 
+                                                 rendered="#{citationBB.currentCitation.citationID != 0}"/>
+
+                                <p:commandButton ajax="false" value="Submit" icon="fa fa-exclamation-triangle" 
+                                                 action="#{citationBB.insertCitation}" 
+                                                 rendered="#{citationBB.currentCitation.citationID == 0}" />
+                                
+                                <p:spacer height="15px"/>
+                            </h:form>
+                        </p:confirmDialog>
+                        
+
+                        <p:confirmDialog message="Citiation submission review for case: #{citationBB.currentCase.caseName}" 
+                                         severity="alert" widgetVar="citation-review-var"
+                                         closable="true"
+                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+
+                            <h:form id="citation-review-form">
+                                
+                                <h:outputLabel for="citation-update-event-text-ita" value="Reason for updates:"/>
+                                <p:spacer height="10px"/>
+                                <p:inputTextarea id="citation-update-event-text-ita" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.muniMessageText}"/>
+                                <p:spacer height="15px"/>
+                                <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                              and attached to #{cEActionRequestsBB.selectedRequest.requestID}"/>
+                                <p:spacer height="15px"/>
+                                
+                                
+                                
+                                
+                                <p:commandButton ajax="true" icon="fa fa-stop"
+                                                 value="Cancel" 
+                                                 onclick="PF('citation-review-var').hide()"/>
+
+                                <p:commandButton ajax="false" value="Commit updates" icon="fa fa-edit" 
+                                                 action="#{citationBB.updateCitation}" 
+                                                 rendered="#{citationBB.currentCitation.citationID != 0}"/>
+
+                                <p:commandButton ajax="false" value="Submit" icon="fa fa-exclamation-triangle" 
+                                                 action="#{citationBB.insertCitation}" 
+                                                 rendered="#{citationBB.currentCitation.citationID == 0}" />
+                                
+                                <p:spacer height="15px"/>
+                            </h:form>
+                        </p:confirmDialog>
+
+
+
+
+                        
                     </f:view>
                 </div>
             </ui:define>

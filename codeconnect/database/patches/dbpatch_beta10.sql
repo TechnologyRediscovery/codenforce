@@ -1,4 +1,6 @@
 
+
+
 ALTER TABLE citationstatus RENAME COLUMN editsallowed TO editsforbidden;
 
 
@@ -36,8 +38,6 @@ ALTER TABLE cecasephasechangerule ADD COLUMN description text;
 ALTER TABLE cecasephasechangerule ADD COLUMN triggeredeventcatreqcat INTEGER 
 	CONSTRAINT phasechangerule_triggeredevcatreqcat_fk REFERENCES ceeventcategory (categoryid);
 
-ALTER TABLE ceeventcategory DROP COLUMN casephasechangetrigger;
-
 
 ALTER TABLE ceeventcategory ADD COLUMN phasechangerule_ruleid INTEGER 
 	CONSTRAINT ceeventcat_phasechange_fk REFERENCES cecasephasechangerule (ruleid);
@@ -54,7 +54,7 @@ INSERT INTO public.cecasephasechangerule(
             description, triggeredeventcatreqcat)
     VALUES (1000, 'condemation', 'Closed'::casephase, NULL , 'Closed'::casephase, 
             NULL, NULL, 122, 
-            128, 128, TRUE, FALSE,
+            128, 128, TRUE, FALSE
             FALSE, FALSE, TRUE,
             'Checks that a case is not closed and case has not previously condemned this property', NULL);
 
@@ -82,44 +82,18 @@ INSERT INTO public.cecasephasechangerule(
             description, triggeredeventcatreqcat)
     VALUES (1002, 'schedule a hearing', 'HearingPreparation'::casephase, 'AwaitingHearingDate'::casephase, 'Closed'::casephase, 
             NULL, NULL, 124, -- requires that a citation exist on the case
-            NULL, 120, TRUE, FALSE, -- triggers officer action: attend court hearing
+            NULL, 135, TRUE, FALSE, -- triggers a property inspection
             TRUE, FALSE, FALSE, 
             'to schedule a hearing, the case must have at least a single citation and not be closed; triggers ',
             NULL); -- prop inspection isn't chained to anything
 
-INSERT INTO public.cecasephasechangerule(
-            ruleid, title, targetcasephase, requiredcurrentcasephase, forbiddencurrentcasephase, 
-            requiredextanteventtype, forbiddenextanteventtype, requiredextanteventcat, 
-            forbiddenextanteventcat, triggeredeventcat, active, mandatory, 
-            treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, 
-            description, triggeredeventcatreqcat)
-    VALUES (1003, 'hearing outcome: new timeframe', 'InitialPostHearingComplianceTimeframe'::casephase, 'HearingPreparation'::casephase, 'Closed'::casephase, 
-            NULL, NULL, 120, 
-            NULL, 113, TRUE, FALSE,  -- spawns a new compliance timeframe event
-            TRUE, FALSE, FALSE, 
-            'be sure to edit each code violation for which the defendant was given an extended compliance timeframe by updated 
-            the compliance timeframe expiry; your change will be logged along with the violation', NULL);
-
-INSERT INTO public.cecasephasechangerule(
-            ruleid, title, targetcasephase, requiredcurrentcasephase, forbiddencurrentcasephase, 
-            requiredextanteventtype, forbiddenextanteventtype, requiredextanteventcat, 
-            forbiddenextanteventcat, triggeredeventcat, active, mandatory, 
-            treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, 
-            description, triggeredeventcatreqcat)
-    VALUES (1004, 'hearing outcome: penalty stands', 'Closed'::casephase , 'HearingPreparation'::casephase, 'Closed'::casephase,  
-            NULL, NULL, 132, -- at least one violation must have been added to the case to have the penalty staned 
-            NULL, 126, TRUE, TRUE,  -- closed with penalties paid
-            TRUE, FALSE, FALSE, 
-            'coordinates a case outcome with a penalty that is undreduced by magistrate', NULL);
 
 
 
 
-
-ALTER TABLE person ADD COLUMN mailing_address_thirdline text;
 
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (10, 'database/patches/dbpatch_beta10.sql', '04-17-2019', 'ecd', 'case reports, citations, phase change rules');
+    VALUES (10, 'database/patches/dbpatch_beta10.sql', '04-16-2019', 'ecd', 'case reports and citation lifecycle');
 

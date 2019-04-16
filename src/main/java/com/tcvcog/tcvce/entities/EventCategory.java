@@ -56,14 +56,13 @@ public class EventCategory implements Serializable {
     private boolean publicdeployable;
     
     private boolean notifycasemonitors;
-    private boolean casephasechangetrigger;
+    
+    private CasePhaseChangeRule casePhaseChangeRule;
+    
     private boolean hidable;
     private boolean requestable;
     
     private Icon icon;
-    
-    
-    
 
     /**
      * @return the eventType
@@ -187,12 +186,7 @@ public class EventCategory implements Serializable {
         return notifycasemonitors;
     }
 
-    /**
-     * @return the casephasechangetrigger
-     */
-    public boolean isCasephasechangetrigger() {
-        return casephasechangetrigger;
-    }
+   
 
     /**
      * @return the hidable
@@ -230,12 +224,7 @@ public class EventCategory implements Serializable {
         this.notifycasemonitors = notifycasemonitors;
     }
 
-    /**
-     * @param casephasechangetrigger the casephasechangetrigger to set
-     */
-    public void setCasephasechangetrigger(boolean casephasechangetrigger) {
-        this.casephasechangetrigger = casephasechangetrigger;
-    }
+    
 
     /**
      * @param hidable the hidable to set
@@ -270,6 +259,20 @@ public class EventCategory implements Serializable {
      */
     public void setRequestable(boolean requestable) {
         this.requestable = requestable;
+    }
+
+    /**
+     * @return the casePhaseChangeRule
+     */
+    public CasePhaseChangeRule getCasePhaseChangeRule() {
+        return casePhaseChangeRule;
+    }
+
+    /**
+     * @param casePhaseChangeRule the casePhaseChangeRule to set
+     */
+    public void setCasePhaseChangeRule(CasePhaseChangeRule casePhaseChangeRule) {
+        this.casePhaseChangeRule = casePhaseChangeRule;
     }
 
     

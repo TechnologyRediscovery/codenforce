@@ -217,7 +217,6 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
             // of the assocaited event and not the entire object
             if(cv.getCompTimeFrameComplianceEvent() != null){
                  vev = cv.getCompTimeFrameComplianceEvent().getEventID();
-                
             } else {
                 vev = cv.getComplianceTimeframeEventID();
             }

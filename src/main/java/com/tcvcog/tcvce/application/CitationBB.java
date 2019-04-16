@@ -42,6 +42,20 @@ import javax.faces.application.FacesMessage;
  */
 public class CitationBB extends BackingBeanUtils implements Serializable{
 
+    
+    private Citation currentCitation;
+    private CECase currentCase;
+    
+    private List<CitationStatus> citationStatusList;
+    private List<CourtEntity> courtEntityList;
+    
+    private boolean issueCitationDisabled;
+    private boolean updateCitationDisabled;
+    
+    private List<CodeViolation> removedViolationList;
+    private String citationEditEventDescription;
+    
+    
     /**
      * Creates a new instance of CitationBB
      */
@@ -94,17 +108,6 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    
-    private Citation currentCitation;
-    private CECase currentCase;
-    
-    private List<CitationStatus> citationStatusList;
-    private List<CourtEntity> courtEntityList;
-    
-    private boolean issueCitationDisabled;
-    private boolean updateCitationDisabled;
-    
-    private List<CodeViolation> removedViolationList;
     
     public void removeViolationFromCitation(CodeViolation v){
         currentCitation.getViolationList().remove(v);
@@ -262,6 +265,20 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
      */
     public void setCurrentCase(CECase currentCase) {
         this.currentCase = currentCase;
+    }
+
+    /**
+     * @return the citationEditEventDescription
+     */
+    public String getCitationEditEventDescription() {
+        return citationEditEventDescription;
+    }
+
+    /**
+     * @param citationEditEventDescription the citationEditEventDescription to set
+     */
+    public void setCitationEditEventDescription(String citationEditEventDescription) {
+        this.citationEditEventDescription = citationEditEventDescription;
     }
 
     

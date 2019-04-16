@@ -26,6 +26,7 @@ import java.util.Objects;
  */
 public class CitationStatus extends Status {
     private boolean editsAllowed;
+    private EventCategory triggeredEventCategory;
 
     /**
      * @return the editsAllowed
@@ -39,6 +40,22 @@ public class CitationStatus extends Status {
      */
     public void setEditsAllowed(boolean editsAllowed) {
         this.editsAllowed = editsAllowed;
+    }
+
+    
+
+    /**
+     * @return the triggeredEventCategory
+     */
+    public EventCategory getTriggeredEventCategory() {
+        return triggeredEventCategory;
+    }
+
+    /**
+     * @param triggeredEventCategory the triggeredEventCategory to set
+     */
+    public void setTriggeredEventCategory(EventCategory triggeredEventCategory) {
+        this.triggeredEventCategory = triggeredEventCategory;
     }
     
     
