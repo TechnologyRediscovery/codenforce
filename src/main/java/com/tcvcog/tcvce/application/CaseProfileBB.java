@@ -38,6 +38,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
+import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -123,6 +124,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 //    reports
     
     private ReportConfigCECase reportCECase;
+    private ReportConfigCECaseList reportCECaseList;
     
 
     /**
@@ -163,6 +165,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             reportCECase = rpt;
         }
         
+        ReportConfigCECaseList listRpt = getSessionBean().getReportConfigCECaseList();
+        if(listRpt != null){
+            reportCECaseList = listRpt;
+        } else {
+            reportCECaseList = cc.getDefaultReportConfigCECaseList();
+        }
     }
     
     /**
@@ -276,9 +284,34 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         // this is for use by the report header to have a super class with only
         // the basic info. reportingBB exposes it to the faces page
         getSessionBean().setActiveReport(reportCECase);
+        // force our reportingBB to choose the right bundle
+        getSessionBean().setReportConfigCECaseList(null);
         
         
         return "reportCECase";
+    }
+    
+    public void prepareReportCECaseList(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(reportCECaseList == null){
+            reportCECaseList = cc.getDefaultReportConfigCECaseList();
+        }
+        System.out.println("CaseProfileBB.prepareCaseListReport");
+        
+        
+    }
+    
+    public String generateReportCECaseList(){
+        reportCECaseList.setCreator(getSessionBean().getFacesUser());
+        reportCECaseList.setMuni(getSessionBean().getActiveMuni());
+        reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
+        getSessionBean().setReportConfigCECaseList(reportCECaseList);
+        getSessionBean().setReportConfigCECase(null);
+        getSessionBean().setcECaseQueue(caseList);
+        getSessionBean().setActiveReport(reportCECaseList);
+        return "reportCECaseList";
+        
     }
     
     public void prepareReportCECase(ActionEvent ev){
@@ -1762,6 +1795,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setReportCECase(ReportConfigCECase reportCECase) {
         this.reportCECase = reportCECase;
+    }
+
+    /**
+     * @return the reportCECaseList
+     */
+    public ReportConfigCECaseList getReportCECaseList() {
+        return reportCECaseList;
+    }
+
+    /**
+     * @param reportCECaseList the reportCECaseList to set
+     */
+    public void setReportCECaseList(ReportConfigCECaseList reportCECaseList) {
+        this.reportCECaseList = reportCECaseList;
     }
 
     

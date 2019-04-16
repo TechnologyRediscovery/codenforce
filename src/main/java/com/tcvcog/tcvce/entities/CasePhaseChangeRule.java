@@ -24,6 +24,18 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
     private EventType requiredExtantEventType;
     private EventType forbiddenExtantEventType;
     
+    
+    private int requiredExtantEventCatID;
+    private int forbiddenExtantEventCatID;
+    
+    private int triggeredEventCategoryID;
+    private int triggeredEventCategoryRequestedEventID;
+    
+    
+    
+    // These four are deprecated due to object creation cycles
+    // use only IDs and grab the complete object separate from
+    // these ChangeRule ogjects
     private EventCategory requiredExtantEventCat;
     private EventCategory forbiddenExtantEventCat;
     
@@ -331,6 +343,62 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * @return the triggeredEventCategoryID
+     */
+    public int getTriggeredEventCategoryID() {
+        return triggeredEventCategoryID;
+    }
+
+    /**
+     * @param triggeredEventCategoryID the triggeredEventCategoryID to set
+     */
+    public void setTriggeredEventCategoryID(int triggeredEventCategoryID) {
+        this.triggeredEventCategoryID = triggeredEventCategoryID;
+    }
+
+    /**
+     * @return the requiredExtantEventCatID
+     */
+    public int getRequiredExtantEventCatID() {
+        return requiredExtantEventCatID;
+    }
+
+    /**
+     * @return the forbiddenExtantEventCatID
+     */
+    public int getForbiddenExtantEventCatID() {
+        return forbiddenExtantEventCatID;
+    }
+
+    /**
+     * @return the triggeredEventCategoryRequestedEventID
+     */
+    public int getTriggeredEventCategoryRequestedEventID() {
+        return triggeredEventCategoryRequestedEventID;
+    }
+
+    /**
+     * @param requiredExtantEventCatID the requiredExtantEventCatID to set
+     */
+    public void setRequiredExtantEventCatID(int requiredExtantEventCatID) {
+        this.requiredExtantEventCatID = requiredExtantEventCatID;
+    }
+
+    /**
+     * @param forbiddenExtantEventCatID the forbiddenExtantEventCatID to set
+     */
+    public void setForbiddenExtantEventCatID(int forbiddenExtantEventCatID) {
+        this.forbiddenExtantEventCatID = forbiddenExtantEventCatID;
+    }
+
+    /**
+     * @param triggeredEventCategoryRequestedEventID the triggeredEventCategoryRequestedEventID to set
+     */
+    public void setTriggeredEventCategoryRequestedEventID(int triggeredEventCategoryRequestedEventID) {
+        this.triggeredEventCategoryRequestedEventID = triggeredEventCategoryRequestedEventID;
     }
 
     

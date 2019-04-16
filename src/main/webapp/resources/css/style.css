@@ -357,6 +357,12 @@ div.headerLink a:before, a:visited{
 }
 
 /************** END LINKS ******************/
+
+
+/************** START PAGE LAYOUT  ******************/
+
+
+
 .two-column-page-flex-container{
     display: flex;
     flex-direction: row;
@@ -404,6 +410,12 @@ div.headerLink a:before, a:visited{
 
 .printing-page-break-after{
     page-break-after: always;
+}
+
+
+div.printer-friendly-report .ui-widget-content{
+    border: none;
+    
 }
 
 
@@ -741,6 +753,7 @@ i.status-display-icon-i{
 .rowExpansion{
     white-space: normal;
     overflow-wrap: normal;
+    text-align: left;
 }
 
 .wrapText{
@@ -888,6 +901,13 @@ img.headerImg{
 
 
 /* ------------------TABLE STYLES ----------------------*/
+
+.cases-report-citations-2cols{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
 
 .object-info-box thead{
     text-align: left;

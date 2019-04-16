@@ -26,7 +26,8 @@ import java.util.Objects;
  */
 public class CitationStatus extends Status {
     private boolean editsAllowed;
-    private EventCategory triggeredEventCategory;
+    private CasePhaseChangeRule phaseChangeRule;
+    
 
     /**
      * @return the editsAllowed
@@ -42,21 +43,20 @@ public class CitationStatus extends Status {
         this.editsAllowed = editsAllowed;
     }
 
-    
-
     /**
-     * @return the triggeredEventCategory
+     * @return the phaseChangeRule
      */
-    public EventCategory getTriggeredEventCategory() {
-        return triggeredEventCategory;
+    public CasePhaseChangeRule getPhaseChangeRule() {
+        return phaseChangeRule;
     }
 
     /**
-     * @param triggeredEventCategory the triggeredEventCategory to set
+     * @param phaseChangeRule the phaseChangeRule to set
      */
-    public void setTriggeredEventCategory(EventCategory triggeredEventCategory) {
-        this.triggeredEventCategory = triggeredEventCategory;
+    public void setPhaseChangeRule(CasePhaseChangeRule phaseChangeRule) {
+        this.phaseChangeRule = phaseChangeRule;
     }
+
     
     
     
