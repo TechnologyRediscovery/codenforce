@@ -14,11 +14,10 @@ import java.util.Objects;
  */
 public class CasePhaseChangeRule extends EntityUtils implements Serializable {
     
-    private String ruleID;
+    private int ruleID;
     private String title;
         
     private CasePhase targetCasePhase;
-    
     private CasePhase requiredCurrentCasePhase;
     private CasePhase forbiddenCurrentCasePhase;
     
@@ -27,6 +26,17 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
     
     private EventCategory requiredExtantEventCat;
     private EventCategory forbiddenExtantEventCat;
+    
+    private EventCategory triggeredEventCategory;
+    private EventCategory triggeredEventCategoryRequestedEvent;
+    
+    private boolean active;
+    private boolean mandatory;
+    private boolean treatRequiredPhaseAsThreshold;
+    private boolean treatForbiddenPhaseAsThreshold;
+    private boolean rejectRuleHostIfRuleFails;
+    private String description;
+   
 
     /**
      * @return the targetCasePhase
@@ -45,7 +55,7 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
     /**
      * @return the ruleID
      */
-    public String getRuleID() {
+    public int getRuleID() {
         return ruleID;
     }
 
@@ -101,7 +111,7 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
     /**
      * @param ruleID the ruleID to set
      */
-    public void setRuleID(String ruleID) {
+    public void setRuleID(int ruleID) {
         this.ruleID = ruleID;
     }
 
@@ -209,6 +219,118 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the triggeredEventCategory
+     */
+    public EventCategory getTriggeredEventCategory() {
+        return triggeredEventCategory;
+    }
+
+    /**
+     * @return the triggeredEventCategoryRequestedEvent
+     */
+    public EventCategory getTriggeredEventCategoryRequestedEvent() {
+        return triggeredEventCategoryRequestedEvent;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @return the mandatory
+     */
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    /**
+     * @return the treatRequiredPhaseAsThreshold
+     */
+    public boolean isTreatRequiredPhaseAsThreshold() {
+        return treatRequiredPhaseAsThreshold;
+    }
+
+    /**
+     * @return the treatForbiddenPhaseAsThreshold
+     */
+    public boolean isTreatForbiddenPhaseAsThreshold() {
+        return treatForbiddenPhaseAsThreshold;
+    }
+
+    /**
+     * @return the rejectRuleHostIfRuleFails
+     */
+    public boolean isRejectRuleHostIfRuleFails() {
+        return rejectRuleHostIfRuleFails;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param triggeredEventCategory the triggeredEventCategory to set
+     */
+    public void setTriggeredEventCategory(EventCategory triggeredEventCategory) {
+        this.triggeredEventCategory = triggeredEventCategory;
+    }
+
+    /**
+     * @param triggeredEventCategoryRequestedEvent the triggeredEventCategoryRequestedEvent to set
+     */
+    public void setTriggeredEventCategoryRequestedEvent(EventCategory triggeredEventCategoryRequestedEvent) {
+        this.triggeredEventCategoryRequestedEvent = triggeredEventCategoryRequestedEvent;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    /**
+     * @param mandatory the mandatory to set
+     */
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
+
+    /**
+     * @param treatRequiredPhaseAsThreshold the treatRequiredPhaseAsThreshold to set
+     */
+    public void setTreatRequiredPhaseAsThreshold(boolean treatRequiredPhaseAsThreshold) {
+        this.treatRequiredPhaseAsThreshold = treatRequiredPhaseAsThreshold;
+    }
+
+    /**
+     * @param treatForbiddenPhaseAsThreshold the treatForbiddenPhaseAsThreshold to set
+     */
+    public void setTreatForbiddenPhaseAsThreshold(boolean treatForbiddenPhaseAsThreshold) {
+        this.treatForbiddenPhaseAsThreshold = treatForbiddenPhaseAsThreshold;
+    }
+
+    /**
+     * @param rejectRuleHostIfRuleFails the rejectRuleHostIfRuleFails to set
+     */
+    public void setRejectRuleHostIfRuleFails(boolean rejectRuleHostIfRuleFails) {
+        this.rejectRuleHostIfRuleFails = rejectRuleHostIfRuleFails;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     

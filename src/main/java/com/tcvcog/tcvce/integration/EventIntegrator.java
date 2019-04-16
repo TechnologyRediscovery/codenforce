@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.EventExceptionDeprecated;
@@ -96,6 +97,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     private EventCategory generateEventCategoryFromRS(ResultSet rs) throws SQLException, IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         EventCategory ec = new EventCategory();
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        
         ec.setCategoryID(rs.getInt("categoryid"));
         ec.setEventType(EventType.valueOf(rs.getString("categoryType")));
         ec.setEventCategoryTitle(rs.getString("title"));
@@ -105,7 +109,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ec.setMunideployable(rs.getBoolean("munideployable"));
         ec.setPublicdeployable(rs.getBoolean("publicdeployable"));
         ec.setNotifycasemonitors(rs.getBoolean("notifycasemonitors"));
-        ec.setCasephasechangetrigger(rs.getBoolean("casephasechangetrigger"));
+        ec.setCasePhaseChangeRule(cc.getCasePhaseChangeRule(ec));
         ec.setHidable(rs.getBoolean("hidable"));
         ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         ec.setRequestable(rs.getBoolean("requestable"));
@@ -217,7 +221,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 + "categoryid, "
                 + "categorytype, title, description, "
                 + "userdeployable, munideployable, publicdeployable, "
-                + "notifycasemonitors, casephasechangetrigger, "
+                + "notifycasemonitors, phasechangerule_ruleid"
                 + "hidable, icon_iconid, requestable )\n"
                 + "    VALUES (DEFAULT, CAST (? as ceeventtype), ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
@@ -237,7 +241,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(6, ec.isPublicdeployable());
 
             stmt.setBoolean(7, ec.isNotifycasemonitors());
-            stmt.setBoolean(8, ec.isCasephasechangetrigger());
+            stmt.setInt(8, ec.getCasePhaseChangeRule().getRuleID());
 
             stmt.setBoolean(9, ec.isHidable());
             stmt.setInt(10, ec.getIcon().getIconid());
@@ -262,7 +266,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = "UPDATE public.ceeventcategory\n"
                 + "   SET categorytype=CAST (? as ceeventtype), title=?, description=?, userdeployable=?, \n"
                 + "       munideployable=?, publicdeployable=?, \n"
-                + "       notifycasemonitors=?, casephasechangetrigger=?, hidable=?, icon_iconid=?, requestable=? \n"
+                + "       notifycasemonitors=?, phasechangerule_ruleid=?, hidable=?, icon_iconid=?, requestable=? \n"
                 + " WHERE categoryid = ?;";
 
         Connection con = getPostgresCon();
@@ -279,7 +283,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(6, ec.isPublicdeployable());
 
             stmt.setBoolean(7, ec.isNotifycasemonitors());
-            stmt.setBoolean(8, ec.isCasephasechangetrigger());
+            stmt.setInt(8, ec.getCasePhaseChangeRule().getRuleID());
 
             stmt.setBoolean(9, ec.isHidable());
             if(ec.getIcon() != null){
