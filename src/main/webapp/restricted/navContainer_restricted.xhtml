@@ -8,7 +8,8 @@
 
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        
+        <h:outputStylesheet name="css/style.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
         <title>CCOGConnect</title>
       
 
@@ -19,9 +20,13 @@
                 <div class="flexing-box-topbar">
                     <f:view id="navview">
                         <div class="logoBox">
-                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="75"/>
+                            <div class="logo-image-wrapper">
+                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
+                            </div>
+                            <div class="logo-title-wrapper">
                                 <div class="sys-title" style="font-weight: bold;">COG Connect: Municipal code enforcement data platform</div>
                                 <div class="sys-title-sub">Turtle Creek Valley Council of Governments</div>
+                            </div>
                         </div>
                     </f:view>
                 </div>

@@ -35,7 +35,7 @@
                                      <h:outputLabel id="report-muni-ol" for="report-muni-ot" styleClass="bold" value="municipality: "/>
                                     <h:outputText id="report-muini-ot"  value="#{reportingBB.currentReport.muni.muniName}, #{reportingBB.currentReport.muni.address_state}"/>
                                     <br />
-                                    <h:outputLabel id="report-muni-ol" for="report-creator-ot" styleClass="bold" value="creator name: " />
+                                    <h:outputLabel id="report-creator-ol" for="report-creator-ot" styleClass="bold" value="creator name: " />
                                     <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.person.firstName} 
                                                   #{reportingBB.currentReport.creator.person.firstName} 
                                                   (user: #{reportingBB.currentReport.creator.username})"/>
@@ -47,14 +47,13 @@
                             </h:panelGroup>
                              <h:panelGroup>
                                  <p>
-                                    <h:outputLabel id="report-muni-ol" for="report-muni-ot" styleClass="bold" />
-                                    <h:outputText id="report-muini-ot"  value="#{reportingBB.currentReport.muni.muniName}"/>
+                                     <h:outputLabel id="report-timestamp-ol" for="report-timestamp-ot" styleClass="bold" value="created on: " />
+                                     <h:outputText id="report-timestamp-ot"  value="#{reportingBB.currentReport.generationTimestampPretty}"/>
                                     <br />
-                                    <h:outputLabel id="report-muni-ol" for="report-muni-ot" styleClass="bold" />
-                                    <h:outputText id="report-muini-ot"  value="#{reportingBB.currentReport.muni.muniName}"/>
+                                    <h:outputLabel id="report-muni-ol" for="report-muni-ot" styleClass="bold" value="notes: "/>
+                                    <h:outputText id="report-muini-ot"  value="#{reportingBB.currentReport.notes}"/>
                                  </p>
                             </h:panelGroup>
-                            <h1><h:outputText id="report-notes"  value="#{reportingBB.currentReport.notes}"/></h1>
                         
                          </h:panelGrid>
                             

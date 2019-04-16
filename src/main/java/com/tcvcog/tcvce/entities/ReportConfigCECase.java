@@ -15,19 +15,23 @@ public class ReportConfigCECase extends ReportConfig{
     
     private CECase cse;
     
+    private boolean includeCaseName; // add to ui
+    
     private boolean includeHiddenEvents;
     private boolean includeInactiveEvents;
     
     private boolean includeMunicipalityDiclosedEvents;
-    private boolean includeOfficeOnlyEvents;
+    private boolean includeOfficerOnlyEvents;
     
     private boolean includeEventNotes;
     private boolean includeRequestedActionFields;
+    private boolean includeEventMetadata; // add to ui
     
     private boolean includeAllNotices;
     private boolean includeNoticeFullText;
      
     private boolean includeFullOrdinanceText;
+    private boolean includeViolationPhotos;  // add to 
 
     /**
      * @return the cse
@@ -156,17 +160,59 @@ public class ReportConfigCECase extends ReportConfig{
     }
 
     /**
-     * @return the includeOfficeOnlyEvents
+     * @return the includeOfficerOnlyEvents
      */
-    public boolean isIncludeOfficeOnlyEvents() {
-        return includeOfficeOnlyEvents;
+    public boolean isIncludeOfficerOnlyEvents() {
+        return includeOfficerOnlyEvents;
     }
 
     /**
-     * @param includeOfficeOnlyEvents the includeOfficeOnlyEvents to set
+     * @param includeOfficerOnlyEvents the includeOfficerOnlyEvents to set
      */
-    public void setIncludeOfficeOnlyEvents(boolean includeOfficeOnlyEvents) {
-        this.includeOfficeOnlyEvents = includeOfficeOnlyEvents;
+    public void setIncludeOfficerOnlyEvents(boolean includeOfficerOnlyEvents) {
+        this.includeOfficerOnlyEvents = includeOfficerOnlyEvents;
+    }
+
+    /**
+     * @return the includeCaseName
+     */
+    public boolean isIncludeCaseName() {
+        return includeCaseName;
+    }
+
+    /**
+     * @param includeCaseName the includeCaseName to set
+     */
+    public void setIncludeCaseName(boolean includeCaseName) {
+        this.includeCaseName = includeCaseName;
+    }
+
+    /**
+     * @return the includeEventMetadata
+     */
+    public boolean isIncludeEventMetadata() {
+        return includeEventMetadata;
+    }
+
+    /**
+     * @param includeEventMetadata the includeEventMetadata to set
+     */
+    public void setIncludeEventMetadata(boolean includeEventMetadata) {
+        this.includeEventMetadata = includeEventMetadata;
+    }
+
+    /**
+     * @return the includeViolationPhotos
+     */
+    public boolean isIncludeViolationPhotos() {
+        return includeViolationPhotos;
+    }
+
+    /**
+     * @param includeViolationPhotos the includeViolationPhotos to set
+     */
+    public void setIncludeViolationPhotos(boolean includeViolationPhotos) {
+        this.includeViolationPhotos = includeViolationPhotos;
     }
     
     

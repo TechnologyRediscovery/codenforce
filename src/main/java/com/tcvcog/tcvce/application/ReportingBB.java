@@ -69,6 +69,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      * @return the currentReport
      */
     public ReportConfig getCurrentReport() {
+        currentReport = getSessionBean().getActiveReport();
         return currentReport;
     }
 
@@ -76,6 +77,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      * @param currentReport the currentReport to set
      */
     public void setCurrentReport(ReportConfig currentReport) {
+        
         this.currentReport = currentReport;
     }
     

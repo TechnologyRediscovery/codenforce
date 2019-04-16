@@ -53,6 +53,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -104,6 +105,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         }
         c.setEventListActionRequests(evList);
         
+        Collections.sort(c.getEventListActionRequests());
+        
+        Collections.sort(c.getEventList());
+        Collections.reverse(c.getEventList());
+        
         // check to make sure we have empty lists on all of our list objects
         if(c.getViolationList() == null){
             c.setViolationList(new ArrayList<CodeViolation>());
@@ -124,6 +130,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         if(c.getRequestList() == null){
             c.setRequestList(new ArrayList<CEActionRequest>());
         }
+        
+        
         
         return c;
     }
@@ -920,50 +928,70 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    public ReportConfigCECase getDefaultReportConfigCECase(CECase c){
         ReportConfigCECase rpt = new ReportConfigCECase();
         
-        rpt.setIncludeAllNotices(false);
+        // general
+        rpt.setIncludeCaseName(false);
+        
+        // events
         rpt.setIncludeEventNotes(true);
-        rpt.setIncludeFullOrdinanceText(true);
         rpt.setIncludeHiddenEvents(false);
         rpt.setIncludeInactiveEvents(false);
-        rpt.setIncludeNoticeFullText(true);
         rpt.setIncludeRequestedActionFields(false);
         rpt.setIncludeMunicipalityDiclosedEvents(true);
-        rpt.setIncludeOfficeOnlyEvents(false);
+        rpt.setIncludeOfficerOnlyEvents(false);
+        
+        // notices of violation
+        rpt.setIncludeAllNotices(false);
+        rpt.setIncludeNoticeFullText(true);
+        // violations
+        rpt.setIncludeFullOrdinanceText(true);
+        rpt.setIncludeViolationPhotos(true);
+        
        return rpt;
    }
    
+   /**
+    * Primary configuration mechanism for customizing report data from the 
+    * ceCases.xhtml display. Called by the CECasesBB.
+    * 
+    * @param rptCse
+    * @return
+    * @throws IntegrationException 
+    */
    public ReportConfigCECase transformCECaseForReport(ReportConfigCECase rptCse) throws IntegrationException{
        CaseIntegrator ci = getCaseIntegrator();
+       // we actually get an entirely new object instead of editing the 
+       // one we used throughout the ceCases.xhtml
        CECase c = ci.getCECase(rptCse.getCse().getCaseID());
        
        List<EventCECase> evList =  new ArrayList<>();
        Iterator<EventCECase> iter = c.getEventList().iterator();
        while(iter.hasNext()){
             EventCECase ev = iter.next();
+            
+            // toss out hidden events unless the user wants them
             if(ev.isHidden() && !rptCse.isIncludeHiddenEvents()) continue;
+            // toss out inactive events unless user wants them
             if(!ev.isActive()&& !rptCse.isIncludeInactiveEvents()) continue;
+            // toss out events only available internally to the muni users unless user wants them
             if(!ev.isDiscloseToMunicipality() && !rptCse.isIncludeMunicipalityDiclosedEvents()) continue;
+            // toss out officer only events unless the user wants them
             if((!ev.isDiscloseToMunicipality() && !ev.isDiscloseToPublic()) 
-                    && !rptCse.isIncludeOfficeOnlyEvents()) continue;
+                    && !rptCse.isIncludeOfficerOnlyEvents()) continue;
             evList.add(ev);
        }
        c.setEventList(evList);
-       
-       
        List<NoticeOfViolation> noticeList = new ArrayList<>();
        Iterator<NoticeOfViolation> iterNotice = c.getNoticeList().iterator();
        while(iterNotice.hasNext()){
            NoticeOfViolation nov = iterNotice.next();
-           if((nov.getLetterSentDate() != null && nov.getLetterReturnedDate() == null) 
-                   && !rptCse.isIncludeAllNotices()) continue;
+           // skip unsent notices
+           if(nov.getLetterSentDate() == null) continue;
+           // if the user dones't want all notices, skip returned notices
+           if(!rptCse.isIncludeAllNotices() && nov.getLetterReturnedDate() != null  ) continue;
            noticeList.add(nov);
        }
        c.setNoticeList(noticeList);
-       
-       
-       
        return rptCse;
    }
-   
    
 } // close class
