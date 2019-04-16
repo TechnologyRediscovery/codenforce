@@ -388,7 +388,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the case to which the event should be added
      * @param e the event to add to the case also included in this call
-     * @param viol
+     * @param viol the CodeViolation object associated with this event, can be null
      * @return 
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
@@ -413,7 +413,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                     insertedEventID = ei.insertEvent(e);
                     checkForFullComplianceAndCloseCaseIfTriggered(c);
                 } else {
-                    throw new CaseLifecyleException("no violation was included with this event");
+                    throw new CaseLifecyleException("no violation was included with this compliance event");
                 }
                 break;
             case Closing:
@@ -428,28 +428,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return insertedEventID;
     } // close method
    
-    /**
-     * Core business logic method for recording compliance for CodeViolations
-     * Checks for timeline fidelity before updating each violation.
-     * If all is well, a call to updateViolation on the ViolationCoordinato is called.
-     * After the violations have been marked with compliance, a review of the entire case
-     * is conducted and if all violations on the case have a compliance date, 
-     * the case phase is automatically changed to closed due to compliance
-     * 
-     * @param c the current case
-     * @param e the Compliance event
-     * @param viol
-     * @throws ViolationException in the case of a malformed violation
-     * @throws IntegrationException in the case of a DB error
-     * @throws CaseLifecyleException in the case of date mismatch
-     */
-    public void attachNewComplianceEvent(CECase c, EventCECase e, CodeViolation viol) 
-            throws ViolationException, IntegrationException, CaseLifecyleException{
-        
-        
-        
-        
-    } // close method
+   
     
      /**
      * Implements business rules for determining which event types are allowed
@@ -500,7 +479,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         
-        
         List caseViolationList = cvi.getCodeViolations(c);
         boolean complianceWithAllViolations = false;
         ListIterator<CodeViolation> fullViolationLi = caseViolationList.listIterator();
@@ -509,32 +487,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         while(fullViolationLi.hasNext())
         {
             cv = fullViolationLi.next();
-                   
             // if there are any outstanding code violations, toggle switch to 
             // false and exit the loop. Phase change will not occur
             if(cv.getActualComplianceDate() != null){
                 complianceWithAllViolations = true;
-                
-                System.out.println("CaseCoordinator.processComplianceEvent | "
-                    + "Found violation with a compliance date and toggled to true: " + cv.getActualComplianceDate());
-                
             } else {
                 complianceWithAllViolations = false;
-                
-                System.out.println("CaseCoordinator.processComplianceEvent | Found uncomplied violations, toggling to false and breaking out of while");
-                
                 break;
             }
-            System.out.println("CaseCoordinator.processComplianceEvent | "
-                    + "inside while loop for compliance check with all violations: " + complianceWithAllViolations);
         } // close while
         
         EventCECase complianceClosingEvent;
-        
         if (complianceWithAllViolations){
-            System.out.println("CaseCoordinator.processComplianceEvent | "
-                    + "Inside clase closing if");
-                   
             complianceClosingEvent = ec.getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
             attachNewEventToCECase(c, complianceClosingEvent, null);
@@ -763,8 +727,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         noticeEvent.setPersonList(al);
         
         attachNewEventToCECase(c, noticeEvent, null);
-        
-        
     }
     
     public void refreshCase(CECase c) throws IntegrationException{
@@ -772,7 +734,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         CaseIntegrator ci = getCaseIntegrator();
         
         getSessionBean().setcECase(ci.getCECase(c.getCaseID()));
-        
     }
     
     public void markNoticeOfViolationAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
@@ -781,7 +742,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         nov.setLetterSentDatePretty(getPrettyDate(LocalDateTime.now()));
         cvi.updateViolationLetter(nov);   
         //advanceToNextCasePhase(ceCase);
-            
     }
     
     public void processReturnedNotice(CECase c, NoticeOfViolation nov) throws IntegrationException{
