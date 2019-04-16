@@ -142,17 +142,15 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
      */
     public CodeViolation configureCodeViolation(CodeViolation cv) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
-        
         if(cv.getActualComplianceDate() == null){
             // violation still within compliance timeframe
             if(cv.getDaysUntilStipulatedComplianceDate() >= 0){
                 cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_withincompliancetimeframe_statusstring"));
+                        .getString("codeviolation_unresolved_withincomptimeframe_statusstring"));
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_withincompliancetimeframe_iconid"))));
+                        .getString("codeviolation_unresolved_withincomptimeframe_iconid"))));
                 cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_withincompliancetimeframe_ageleadtext"));
-                
+                        .getString("codeviolation_unresolved_withincomptimeframe_ageleadtext"));
                 
             } else if(cv.getCitationIDList().isEmpty()) {
                 cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
@@ -161,7 +159,6 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
                         .getString("codeviolation_unresolved_overdue_iconid"))));
                 cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString("codeviolation_unresolved_overdue_ageleadtext"));
-                
             } else {
                 cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString("codeviolation_unresolved_citation_statusstring"));

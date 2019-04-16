@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -405,6 +406,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
     private CodeViolation generateCodeViolationFromRS(ResultSet rs) throws SQLException, IntegrationException {
 
         CodeViolation v = new CodeViolation();
+        ViolationCoordinator vc = getViolationCoordinator();
         CodeIntegrator ci = getCodeIntegrator();
         CitationIntegrator citInt = getCitationIntegrator();
         UserIntegrator ui = getUserIntegrator();
@@ -439,7 +441,7 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         v.setComplianceTimeframeEventID(rs.getInt("compliancetfevent"));
         
         v.setCitationIDList(citInt.getCitations(v.getViolationID()));
-        
+        vc.configureCodeViolation(v);
         return v;
     }
 
@@ -630,8 +632,6 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         Connection con = null;
         ArrayList<TextBlock> ll = new ArrayList();
         TextBlock tb = null;
-        
-        
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
@@ -643,19 +643,15 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
                 tb = getTextBlock(rs.getInt("blockid"));
                 ll.add(tb);
             }
-            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Code Violation Integrator: cannot retrive text blocks by municipality", ex);
-            
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-          
          return ll;
-         
      }
      
      public List<TextBlock> getAllTextBlocks() throws IntegrationException{
