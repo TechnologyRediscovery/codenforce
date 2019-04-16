@@ -17,15 +17,9 @@
                     
                     <h:form id="cases-summary-stats-form">
                         <h1>Code enforcement case docket overview</h1>
-                        <h2>Case counts by stage</h2>
                         
-                        <p:chart type="bar" model="#{reportingBB.caseCountByStage}" style="width:800px; height:800px"/>
                         
-                        <ui:remove>
-                            <h2>Case counts by phase</h2>
-                            <p:chart type="bar" model="#{reportingBB.caseCountByPhase}" style="width:1000px; height:1000px"/>
-                            
-                        </ui:remove>
+                        
                         
                         
                     </h:form>
@@ -40,7 +34,11 @@
                                 <p>
                                     <h:outputLabel id="report-creator-ol" for="report-creator-ot" styleClass="bold" value="report creator name: " />
                                     <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.person.firstName} 
-                                                  #{reportingBB.currentReport.creator.person.lastName} "/>
+                                                  #{reportingBB.currentReport.creator.person.firstName} "/>
+                                    <br />
+                                    <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="creator credentials: " />
+                                    <h:outputText id="report-creator-cred-ot"  value="User: #{reportingBB.currentReport.creator.username}, #{reportingBB.currentReport.creator.roleType.label} 
+                                                  (ID: #{reportingBB.currentReport.creator.userID})"/>
                                 </p>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -60,7 +58,7 @@
                             value="#{caseProfileBB.caseList}"
                             var="cse">
 
-                            <h1 class="printing-page-break-before">
+                            <h1>
                                 <h:outputText id="header-addr-ot" value="#{cse.property.address} "/>  
                                 <h:outputText id="header-muni-ot" value="(#{cse.property.muni.muniName})"/>  
                             </h1>
@@ -71,18 +69,20 @@
                             </h2>
 
                             <p>
-                                <a href="#event-history">event history <h:outputText value=" (#{cse.visibleEventList.size()})" /></a> | 
+                                <a href="#action-requests">next actions <h:outputText value=" (#{cse.eventListActionRequests.size()})" /> </a> | 
+                                <a href="#add-event">new event</a> | 
+                                <a href="#event-history">event history <h:outputText value=" (#{cse.eventList.size()})" /></a> | 
                                 <a href="#violations">violations <h:outputText value=" (#{cse.violationList.size()})" /></a> | 
                                 <a href="#notices">notices <h:outputText value=" (#{cse.noticeList.size()})" /></a> | 
                                 <a href="#citations">citations <h:outputText value=" (#{cse.citationList.size()})" /></a> | 
-                                <a href="#requests">enforcement requests <h:outputText value=" (#{cse.ceActionRequestList.size()})" /></a>  
+                                <a href="#requests">enforcement requests <h:outputText value=" (#{cse.requestList.size()})" /></a>  
                             </p>
 
 
                             <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                          columnClasses="gridTd, gridTd">
                                 <h:panelGroup>
-                                    <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
+                                    <h:outputLabel styleClass="bold" value="Case Status: #{cse.caseOpenClosed}" />
                                     <div class="status-display-container">
                                         <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
                                             <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{cse.casePhaseIcon.materialIcon}"/></i>
@@ -161,7 +161,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="Status" />
                                     </f:facet>
-                                    <h:outputText id="violation-status-ot" value="#{v.status.label}"/>
+                                    <h:outputText id="violation-status-ot" value="#{v.statusString}"/>
                                 </p:column>
 
                                 <p:column width="15%">
@@ -182,7 +182,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="Compliance timeframe" />
                                     </f:facet>
-                                    <h:outputText value="Compliance due in #{v.daysUntilStipulatedComplianceDate} days on #{v.stipulatedComplianceDatePretty}" 
+                                    <h:outputText value="Compliance due in #{v.daysUntilStipulatedComplianceDate} days on #{v.stipulatedComplianceDate}" 
                                                   rendered="#{empty v.actualComplianceDate}"/>
                                     <h:outputText value="Compliance achieved on #{v.actualComplianceDatePretty}" 
                                                   rendered="#{!(empty v.actualComplianceDate)}"/>
@@ -191,12 +191,12 @@
                                     <f:facet name="header">
                                         <h:outputText value="Citations" />
                                     </f:facet>
-                                    <h:outputText value="#{v.citationListAsString}" />
+                                    <h:outputText value="#{v.citationsStringList}" />
                                 </p:column>
                             </p:dataTable>
 
 
-                            <h2 id="notices" >Notices of violation</h2>
+                            <h2 id="notices" class="printing-page-break-before" >Notices of violation</h2>
 
                             <p:dataTable
                                 id="notices-datatable"
@@ -223,19 +223,19 @@
                                     <f:facet name="header">
                                         <h:outputText styleClass="bold"   value="Queued for Mailing: " />
                                     </f:facet>
-                                    <h:outputText id="nov-queued-ot" value="#{notice.lockedAndQueuedTSPretty}"/>
+                                    <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
                                 </p:column>
                                 <p:column width="5%">
                                     <f:facet name="header">
                                         <h:outputText styleClass="bold"  value="Sent Date: " />
                                     </f:facet>
-                                    <h:outputText id="nov-sent-date" value="#{notice.sentTSPretty}"/>
+                                    <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
                                 </p:column>
                                 <p:column width="5%">
                                     <f:facet name="header">
                                         <h:outputText styleClass="bold"  value="Returned? " />
                                     </f:facet>
-                                    <h:outputText id="nov-returned-date" value="#{notice.returnedTSPretty}"/>
+                                    <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
                                 </p:column>
 
                             </p:dataTable>
@@ -303,7 +303,7 @@
                                             <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                             <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.codeElement.source.sourceYear})"/>
                                             <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.status.label}"/>
+                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.statusString}"/>
                                         </p:dataScroller>
                                     </h:panelGroup>
                                 </h:panelGrid>

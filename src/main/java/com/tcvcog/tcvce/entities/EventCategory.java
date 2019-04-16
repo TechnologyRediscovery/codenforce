@@ -20,28 +20,8 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
-/**
- *
- * 
-CREATE TABLE public.ceeventcategory
-(
-  categoryid integer NOT NULL DEFAULT nextval('ceeventcategory_categoryid_seq'::regclass),
-  categorytype ceeventtype NOT NULL,
-  title text,
-  description text,
-  userdeployable boolean DEFAULT true,
-  munideployable boolean DEFAULT false,
-  publicdeployable boolean DEFAULT false,
-  requestsAction boolean DEFAULT false,
-  notifycasemonitors boolean DEFAULT false,
-  casephasechangetrigger boolean DEFAULT false,
-  hidable boolean DEFAULT false,
-  CONSTRAINT ceeventcategory_categoryid_pk PRIMARY KEY (categoryid)
-)
-WITH (
-  OIDS=FALSE
-);
- * 
+
+ /**s 
  * @author Eric Darsow
  */
 public class EventCategory implements Serializable {

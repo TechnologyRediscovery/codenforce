@@ -761,7 +761,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         cpcr.setTitle(rs.getString("title"));
         
         if(rs.getString("targetcasephase") != null) 
-            cpcr.setTargetCasePhase(CasePhase.valueOf(rs.getString("tartgetCasePhase")));
+            cpcr.setTargetCasePhase(CasePhase.valueOf(rs.getString("targetcasephase")));
         if(rs.getString("requiredcurrentcasephase") != null) 
             cpcr.setRequiredCurrentCasePhase(CasePhase.valueOf(rs.getString("requiredcurrentcasephase")));
         if(rs.getString("forbiddencurrentcasephase") != null) 
@@ -772,15 +772,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         if(rs.getString("forbiddenextanteventtype") != null)
             cpcr.setForbiddenExtantEventType(EventType.valueOf(rs.getString("forbiddenextanteventtype")));
         
-        if(rs.getString("requiredextanteventcat") != null)
-            cpcr.setRequiredExtantEventCat(ei.getEventCategory(rs.getInt("requiredextanteventcat")));
-        if(rs.getString("forbiddenextanteventcat") != null)
-            cpcr.setForbiddenExtantEventCat(ei.getEventCategory(rs.getInt("forbiddenextanteventcat")));
+        cpcr.setRequiredExtantEventCatID(rs.getInt("requiredextanteventcat"));
+        cpcr.setForbiddenExtantEventCatID(rs.getInt("forbiddenextanteventcat"));
 
-        if(rs.getString("triggeredeventcat") != null)
-            cpcr.setTriggeredEventCategory(ei.getEventCategory(rs.getInt("triggeredeventcat")));
-        if(rs.getString("triggeredeventcatreqcat") != null)
-            cpcr.setTriggeredEventCategory(ei.getEventCategory(rs.getInt("triggeredeventcatreqcat")));
+        cpcr.setTriggeredEventCategoryID(rs.getInt("triggeredeventcat"));
+        cpcr.setTriggeredEventCategoryID(rs.getInt("triggeredeventcatreqcat"));
         
         cpcr.setActive(rs.getBoolean("active"));
         cpcr.setMandatory(rs.getBoolean("mandatory"));
@@ -813,7 +809,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                         "       forbiddenextanteventcat, triggeredeventcat, active, mandatory, \n" +
                         "       treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, \n" +
                         "       description, triggeredeventcatreqcat\n" +
-                        "  FROM public.cecasephasechangerule WHERE rulid = ?;";
+                        "  FROM public.cecasephasechangerule WHERE ruleid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, ruleid);
 

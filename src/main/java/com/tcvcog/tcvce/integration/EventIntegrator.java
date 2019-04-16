@@ -61,9 +61,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public EventCategory getEventCategory(int catID) throws IntegrationException {
 
-        String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n"
-                + "       munideployable, publicdeployable, notifycasemonitors, \n"
-                + "       casephasechangetrigger, hidable, icon_iconid, requestable"
+        String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n" +
+                        "       munideployable, publicdeployable, notifycasemonitors, hidable, \n" +
+                        "       icon_iconid, requestable, phasechangerule_ruleid"
                 + "  FROM public.ceeventcategory WHERE categoryID = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -97,7 +97,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     private EventCategory generateEventCategoryFromRS(ResultSet rs) throws SQLException, IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         EventCategory ec = new EventCategory();
-        CaseCoordinator cc = getCaseCoordinator();
+        CaseIntegrator ci = getCaseIntegrator();
         
         
         ec.setCategoryID(rs.getInt("categoryid"));
@@ -109,19 +109,18 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ec.setMunideployable(rs.getBoolean("munideployable"));
         ec.setPublicdeployable(rs.getBoolean("publicdeployable"));
         ec.setNotifycasemonitors(rs.getBoolean("notifycasemonitors"));
-        ec.setCasePhaseChangeRule(cc.getCasePhaseChangeRule(ec));
         ec.setHidable(rs.getBoolean("hidable"));
         ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         ec.setRequestable(rs.getBoolean("requestable"));
+        
+        ec.setCasePhaseChangeRule(ci.getPhaseChangeRule(rs.getInt("phasechangerule_ruleid")));
 
         return ec;
 
     }
 
     public ArrayList<EventCategory> getEventCategoryList() throws IntegrationException {
-        String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n" +
-                        "       munideployable, publicdeployable, notifycasemonitors, casephasechangetrigger, \n" +
-                        "       hidable, icon_iconid, requestable FROM public.ceeventcategory;";
+        String query = "SELECT categoryid FROM public.ceeventcategory;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -133,7 +132,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                categoryList.add(generateEventCategoryFromRS(rs));
+                categoryList.add(getEventCategory(rs.getInt("categoryid")));
             }
 
         } catch (SQLException ex) {
@@ -182,10 +181,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
 
     public ArrayList<EventCategory> getEventCategoryList(EventType et) throws IntegrationException {
-        String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n" +
-                "       munideployable, publicdeployable, notifycasemonitors, casephasechangetrigger, \n" +
-                "       hidable, icon_iconid, requestable"
-                + " FROM public.ceeventcategory WHERE categorytype = cast (? as ceeventtype);";
+        String query = "SELECT categoryid FROM public.ceeventcategory WHERE categorytype = cast (? as ceeventtype);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -199,7 +195,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println("EventIntegrator.getEventCategoryList | SQL: " + stmt.toString());
 
             while (rs.next()) {
-                categoryList.add(generateEventCategoryFromRS(rs));
+                categoryList.add(getEventCategory(rs.getInt("categoryid")));
             }
 
         } catch (SQLException ex) {

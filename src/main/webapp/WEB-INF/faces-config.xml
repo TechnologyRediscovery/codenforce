@@ -920,6 +920,12 @@
             <to-view-id>/restricted/reports/reportCECase.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>reportCECaseList</from-outcome>
+            <to-view-id>/restricted/reports/reportCECaseList.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
 
         <navigation-case>
             <from-outcome>ceEvents</from-outcome>

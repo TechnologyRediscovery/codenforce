@@ -289,8 +289,16 @@
                             </h:form>
 
                             <h2>CE Case docket</h2>
-
                             <h:form id="caseListForm">
+
+                                <p:commandButton   id="print-case-list-cb" 
+                                                   ajax="true" actionListener="#{caseProfileBB.prepareReportCECaseList}"
+                                                   icon="fa fa-print" styleClass="noFill"
+                                                   oncomplete="PF('report-caselist-profile-diaglog-var').show()"
+                                                   value="generate case list report" 
+                                                   update="report-caselist-profile-form"/>
+                                <p:spacer height="5px" />
+
                                 <p:spacer height="15px"/>
                                 <p:dataTable
                                     id="caseTable"
@@ -346,18 +354,15 @@
                                                          ajax="true"
                                                          update="
                                                          case-details-form
-                                                         events-datascroller-form
+                                                         event-dt-form
                                                          violation-form
                                                          notices-form:notices-ds
                                                          action-requests-form:actionRequestTable
-                                                         event-dt-form
+                                                         events-datascroller-form
                                                          "/>
                                     </p:column>
                                 </p:dataTable>
 
-                                <p:commandLink value="Export case docket as pdf" ajax="false">
-                                    <p:dataExporter type="pdf" target="caseTable" fileName="openCases_#{sessionBean.activeMuni.muniName}"/>
-                                </p:commandLink>
 
                                 <p:spacer height="10px"/>
                             </h:form>
@@ -446,7 +451,7 @@
 
                                                 <h:outputText id="selcase-notes-ot" value="#{caseProfileBB.currentCase.notes}"/>
                                             </div>
-                                            
+
                                             <p:spacer height="5px"/>
 
 
@@ -464,6 +469,7 @@
                                                         notices-form:notices-ds
                                                         action-requests-form:actionRequestTable
                                                         event-dt-form:caseEventTable
+                                                        events-datascroller-form
                                                         case-profile-messages-form:case-profile-messages-global
                                                         "
                                                         />
@@ -493,8 +499,8 @@
                                 </div>
 
                             </h:form>
-                            
-                            
+
+
                             <h:form id="violation-form">
 
 
@@ -509,16 +515,16 @@
                                                #{caseProfileBB.currentCase.violationListResolved.size()} 
                                                / #{caseProfileBB.currentCase.violationList.size()}"/> 
                                 <p:spacer height="5px"/>
-                                
+
                                 <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
                                                  value="Add new code violation"
                                                  icon="fa fa-plus"
                                                  disabled="#{!sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"/>
                                 <p:spacer height="15px"/>
 
-                              
-                                
-                                
+
+
+
                                 <p:dataTable
                                     id="violation-table"
                                     var="v"
@@ -536,26 +542,26 @@
                                     <p:column width="4%">
                                         <p:rowToggler />
                                     </p:column>
-                                    
-                                    
+
+
                                     <p:column width="5%">
                                         <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
                                     </p:column>
-                                    
-                                    
+
+
                                     <p:column width="8%">
                                         <f:facet name="header">
                                             <h:outputText value="Status" />
                                         </f:facet>
                                         <h:outputText id="violation-status-ot" value="#{v.statusString}"/>
                                     </p:column>
-                                    
+
                                     <p:column width="15%">
                                         <f:facet name="header">
                                             <h:outputText value="Ordinance" />
                                         </f:facet>
                                         <div class="rowExpansion">
-                                            
+
                                             <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
                                         </div>
                                     </p:column>
@@ -595,155 +601,12 @@
                                                             value="Mark compliance"  
                                                             update="addNewEventForm"/>
                                     </p:column>
-
-
-
-
-                                    <p:rowExpansion>
-
-                                        <div class="outlinedBox">
-                                            
-
-                                                <h:panelGrid columns="2" rendered="true"
-                                                                        columnClasses="gridTd-solid-back, gridTd-solid-back"
-                                                                        headerClass="no-border"
-                                                                        footerClass="no-border">
-
-                                                    <f:facet name="header">
-                                                       <h:outputLabel styleClass="bold" value="Ordindance: "  />
-                                                       <p:spacer height="5px" />
-                                                       <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.codeElement.source.sourceName} 
-                                                                     (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
-                                                       <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
-                                                       <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
-                                                       <p:spacer height="2px" />
-                                                       <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
-                                                       <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
-                                                       <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                                       <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
-
-                                                       <p:spacer height="2px" />
-                                                       <h:outputLabel styleClass="bold" value="Description of violation: "/>
-                                                       <h:outputText styleClass="weight-normal" value="#{v.description}"/>
-
-                                                    </f:facet>
-
-                                                    <h:panelGroup>
-                                                       <h:outputText styleClass="bold" value="Violation ID: " />
-                                                       <h:outputText value="#{v.violationID}"/>
-
-                                                       <p:spacer height="5px"/>
-
-                                                       <h:outputText styleClass="bold" value="Date of record: " />
-                                                       <h:outputText value="#{v.dateOfRecordPretty}"/>
-                                                       <p:spacer height="5px"/>
-
-                                                       <h:outputText styleClass="bold" value="Stipulated Compliance Date: " />
-                                                       <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
-                                                       <p:spacer height="5px"/>
-
-                                                       <h:outputText styleClass="bold" value="Days left: " />
-                                                       <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
-                                                       <p:spacer height="5px"/>
-
-                                                       <h:outputText styleClass="bold" value="Actual Comp Date: " />
-                                                       <h:outputText value="#{v.actualComplianceDatePretty}"/>
-
-
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-
-                                                       <h:outputText value="Photo count: " />
-                                                       <h:outputText value="#{empty v.photoList ? '0' : v.photoList.size()}"/>
-
-                                                       <p:spacer height="5px"/>
-
-                                                       <h:outputText class="bold" value="Citations: " />
-                                                       <h:outputText value="#{v.citationsStringList}"/>
-                                                       <p:spacer height="5px"/>
-
-                                                       <h:outputLabel styleClass="bold" value="Penalty:"/>
-                                                       <h:outputText value="#{v.penalty}"/>
-
-
-                                                       <p:spacer height="5px"/>
-
-                                                       <h:outputLabel styleClass="bold" value="Officer Notes: "/>
-                                                       <h:outputText value="#{v.notes}" escape="false"/>
-                                                    </h:panelGroup>
-
-                                                    <f:facet name="footer">
-                                                        
-                                                       <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTD" >
-                                                           <h:panelGroup>
-                                                               <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
-                                                               <div class="ord-text">
-                                                                   <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
-                                                               </div>
-                                                           </h:panelGroup>
-
-                                                       </h:panelGrid>
-                                                    </f:facet>
-
-                                                </h:panelGrid>
-
-                            
-
-
-                                            <h3>Violation details</h3>
-                                            <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
-                                                             value="Edit violation details"
-                                                             icon="fa fa-edit"/>
-
-                                            <h:outputText value="ID: " />
-                                            <h:outputText value="#{v.violationID}"/>
-
-                                            <h:outputText value="Citations: " />
-                                            <h:outputText value="#{v.citationsStringList}"/>
-                                            
-                                            <h:outputText value="Actual Comp Date" />
-                                            <h:outputText value="#{v.actualComplianceDatePretty}"/>
-
-                                            <h:outputText value="re-link" />
-                                            
-                                            <p:commandButton icon="fa fa-link"
-                                                             actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
-                                                             ajax="true" oncomplete="PF('linkDialog').show()"/>
-
-                                            <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
-                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
-                                            <p:spacer height="5px"/>
-
-                                            <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
-
-                                            <p:spacer height="5px"/>
-
-                                            <h:outputLabel styleClass="bold" value="Penalty:"/>
-                                            <h:outputText value="#{v.penalty}"/>
-                                            <p:spacer height="5px"/>
-
-                                            <h:outputLabel styleClass="bold" value="Description: "/>
-                                            <h:outputText value="#{v.description}"/>
-
-                                            <p:spacer height="5px"/>
-
-                                            <h:outputLabel styleClass="bold" value="Violation Notes: "/>
-                                            <h:outputText value="#{v.notes}" escape="false"/>
-                                        </div>
-                                    </p:rowExpansion>
-
-                                </p:dataTable> 
+                                </p:dataTable>
 
                             </h:form>
-
-
-                            <hr />
-
+                            
+                            
+                            
                             <h2 id="action-requests">Requested actions:</h2>
 
 
@@ -930,6 +793,8 @@
                             </h:form>
 
                             <hr />
+
+
 
                             <h2 id="event-history">Event history</h2>
 
@@ -1145,20 +1010,11 @@
                                     </p:rowExpansion>
 
                                 </p:dataTable>
-
-                                <ui:remove>
-                                    <p:commandLink value="Export event history as pdf" ajax="false">
-                                        <p:dataExporter type="pdf" target="caseEventTable" fileName="case_#{caseProfileBB.currentCase.caseID}_idnoeventHistory"/>
-                                    </p:commandLink>
-                                </ui:remove>
+                                
                             </h:form>
-
-
                             
-
                             <hr />
-
-
+                            
                             <h2 id="notices">Notices of violation</h2>
 
                             <h:form id="notices-messages-form">
@@ -1399,6 +1255,7 @@
 
                             </h:form>
 
+
                             <hr />
                             <h:form id="action-requests-form">
 
@@ -1566,7 +1423,6 @@
                                 </p:dataTable>
 
                             </h:form>
-
 
                         </div>
                     </div>
@@ -1836,11 +1692,10 @@
                                                  rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
                                                  update="
                                                  case-details-form
-                                                 events-datascroller-form
                                                  event-dt-form:caseEventTable
                                                  violation-form
                                                  case-profile-messages-form:case-profile-messages-global
-                                                 event-messages-form:cecases-events-messages"/>
+                                                 events-datascroller-form"/>
 
                                 <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitEventEdits}"
                                                  value="Edit event" icon="fa fa-edit"
@@ -1849,12 +1704,12 @@
                                                  oncomplete="PF('add-event-dialog-var').hide()"
                                                  update="
                                                  case-details-form
-                                                 events-datascroller-form
                                                  event-dt-form:caseEventTable
                                                  violation-form
                                                  case-details-form:selcase-cdate-it
                                                  case-profile-messages-form:case-profile-messages-global
-                                                 event-messages-form:cecases-events-messages"/>
+                                                 events-datascroller-form
+                                                 "/>
 
                                 <p:commandButton ajax="true" actionListener="#{caseProfileBB.deleteSelectedEvent}"
                                                  value="Nuke event" icon="fa fa-bomb"
@@ -1864,7 +1719,8 @@
                                                  case-details-form
                                                  violation-form:violation-table
                                                  case-profile-messages-form:case-profile-messages-global
-                                                 event-messages-form:cecases-events-messages"/>
+                                                 events-datascroller-form
+                                                 "/>
                             </h:form>
 
 
@@ -1980,6 +1836,7 @@
                                              event-dt-form
                                              caseListForm:caseTable
                                              case-profile-messages-form:case-profile-messages-global
+                                             events-datascroller-form
                                              "/>
 
                         </h:form>
@@ -2059,8 +1916,7 @@
                                              value="Submit" icon="fa fa-thumbs-down" oncomplete="PF('reject-requested-action-diaglog-var').hide()"
                                              rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                              update="event-dt-form:caseEventTable
-                                             case-profile-messages-form:case-profile-messages-global
-                                             event-messages-form
+                                             case-profile-messages-form:case-profile-messages-global    
                                              events-datascroller-form
                                              "/>
 
@@ -2080,9 +1936,9 @@
                             <h:panelGrid columns="2" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd"
                                          footerClass="gridFooter">
-                                    
+
                                 <f:facet name="header">
-                                    
+
 
                                     <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
 
@@ -2124,46 +1980,46 @@
 
                                     <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
                                     <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{caseProfileBB.reportCECase.includeRequestedActionFields}" />
-                                    
+
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
                                     <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{caseProfileBB.reportCECase.includeMunicipalityDiclosedEvents}" />
-                                    
+
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
                                     <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{caseProfileBB.reportCECase.includeOfficerOnlyEvents}" />
-                                    
+
                                     <p:spacer height="5px"/>
-                                    
+
                                     <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
                                     <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{caseProfileBB.reportCECase.includeEventMetadata}" />
 
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    
+
                                     <h3>Other options</h3>
 
-                                        <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
-                                        <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{caseProfileBB.reportCECase.includeNoticeFullText}" />
+                                    <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{caseProfileBB.reportCECase.includeNoticeFullText}" />
 
-                                        <p:spacer height="5px"/>
+                                    <p:spacer height="5px"/>
 
-                                        <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
-                                        <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{caseProfileBB.reportCECase.includeAllNotices}" />
+                                    <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{caseProfileBB.reportCECase.includeAllNotices}" />
 
-                                        <p:spacer height="5px"/>
+                                    <p:spacer height="5px"/>
 
-                                        <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
-                                        <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{caseProfileBB.reportCECase.includeFullOrdinanceText}" />
+                                    <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{caseProfileBB.reportCECase.includeFullOrdinanceText}" />
 
-                                        <p:spacer height="5px"/>
-                                        
-                                        <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
-                                        <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{caseProfileBB.reportCECase.includeViolationPhotos}" />
+                                    <p:spacer height="5px"/>
 
-                                        <p:spacer height="5px"/>
+                                    <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{caseProfileBB.reportCECase.includeViolationPhotos}" />
+
+                                    <p:spacer height="5px"/>
                                 </h:panelGroup>
                             </h:panelGrid>
 
@@ -2172,6 +2028,79 @@
                                              onclick="PF('report-case-profile-diaglog-var').hide()"/>
 
                             <p:commandButton ajax="true" action="#{caseProfileBB.generateReportCECase}"
+                                             value="Generate" icon="fa fa-print" 
+                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                             />
+
+                        </h:form>
+                    </p:confirmDialog>
+
+
+                    <p:confirmDialog message="Create case list report" 
+                                     severity="alert" widgetVar="report-caselist-profile-diaglog-var"
+                                     closable="true" responsive="true"
+                                     rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+
+                        <h:form id="report-caselist-profile-form">
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <f:facet name="header">
+
+
+                                    <h:outputLabel for="report-caselist-profile-title-it" value="Report title"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{caseProfileBB.reportCECaseList.title}"/>
+                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{caseProfileBB.reportCECaseList.includeCaseNames}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
+                                    <p:spacer height="5px"/>
+                                    <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{caseProfileBB.reportCECaseList.notes}"/>
+                                    <p:spacer height="5px"/>
+                                </f:facet>
+
+                                <h:panelGroup>
+                                    <h3>Additional case list report options</h3>
+
+                                    <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{caseProfileBB.reportCECaseList.includeListSummaryFigures}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{caseProfileBB.reportCECaseList.includeViolationList}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{caseProfileBB.reportCECaseList.includeEventSummaryByCase}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
+                                    <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{caseProfileBB.reportCECaseList.includeExtendedPropertyDetails}" />
+
+
+                                </h:panelGroup>
+
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" immediate="true"
+                                             onclick="PF('report-caselist-profile-diaglog-var').hide()"/>
+
+                            <p:commandButton ajax="true" action="#{caseProfileBB.generateReportCECaseList}"
                                              value="Generate" icon="fa fa-print" 
                                              rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
                                              />

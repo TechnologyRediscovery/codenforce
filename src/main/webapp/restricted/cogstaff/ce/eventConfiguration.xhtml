@@ -32,23 +32,30 @@
                                     selection="#{eventConfigurationBB.selectedEventCategory}"
                                     rowKey="#{c.categoryID}"
                                     value="#{eventConfigurationBB.eventCategoryList}"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    draggableColumns="true"
                                     tableStyleClass="primeDataTable"
+                                    
                                     tabindex="1">
                                     <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
+                                    <p:column width="4%">
+                                        <p:rowToggler />
+                                    </p:column>
                                     <p:column width="3%">
                                         <f:facet name="header">
                                             <h:outputText value="ID" />
                                         </f:facet>
                                         <h:outputText value="#{c.categoryID}"/>
                                     </p:column>
-                                    <p:column width="10%" sortBy="#{c.eventType.label}">
+                                    <p:column width="8%" sortBy="#{c.eventType.label}">
                                         <f:facet name="header">
                                             <h:outputText value="Event Type" />
                                         </f:facet>
                                         <h:outputText value="#{c.eventType.label}"/>
                                     </p:column>
-                                    <p:column width="15%" sortBy="#{c.eventCategoryTitle}">
+                                    <p:column width="8%" sortBy="#{c.eventCategoryTitle}">
                                         <f:facet name="header">
                                             <h:outputText value="Category" />
                                         </f:facet>
@@ -56,6 +63,13 @@
                                     </p:column>
                                     
                                     <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Phase Change Rule" />
+                                        </f:facet>
+                                        <h:outputText value="ID: #{c.casePhaseChangeRule.ruleID}:#{c.casePhaseChangeRule.title}" />
+                                    </p:column>
+                                    
+                                    <p:column width="4%">
                                         <f:facet name="header">
                                             <h:outputText value="Icon" />
                                         </f:facet>
@@ -110,13 +124,104 @@
                                         <h:outputText value="#{c.hidable}"/>
                                     </p:column>
                                     
-                                    <p:column >
+                                    <p:column width="15%">
                                         <f:facet name="header">
                                             <h:outputText value="Description" />
                                         </f:facet>
                                         <h:outputText value="#{c.eventCategoryDesc}"/>
                                     </p:column>
                                     
+                                       <p:rowExpansion>
+
+                                        <div class="outlinedBox">
+                                            
+
+                                                <h:panelGrid columns="3" rendered="true"
+                                                                        columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                                                        headerClass="no-border"
+                                                                        footerClass="no-border">
+                                                    
+                                                    <f:facet name="header">
+                                                        <div class="rowExpansion">
+                                                            
+                                                            <h2><h:outputText styleClass="bold" value="Rule: " />
+                                                            <h:outputText value="ID: #{c.casePhaseChangeRule.ruleID}:#{c.casePhaseChangeRule.title}" /></h2>
+                                                            
+                                                            <p:spacer height="5px"/>
+                                                            <h3><h:outputText styleClass="bold" value="Description " />
+                                                            <h:outputText value="ID: #{c.casePhaseChangeRule.description}" /></h3>
+                                                        </div>
+                                                        
+                                                    </f:facet>
+
+                                                    <h:panelGroup>
+
+
+                                                       <h:outputText styleClass="bold" value="Target case phase: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.targetCasePhase.label}"/>
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputText styleClass="bold" value="Required current case phase: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.requiredCurrentCasePhase.label}"/>
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputText styleClass="bold" value="Forbidden current case phase: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.forbiddenCurrentCasePhase.label}"/>
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputText styleClass="bold" value="Required existing event type: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.requiredExtantEventType.label}"/>
+
+                                                       <p:spacer height="5px"/>
+                                                       <h:outputText styleClass="bold" value="Forbidden existing event type: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.forbiddenExtantEventType.label}"/>
+
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                       <h:outputText styleClass="bold" value="Required existing category ID: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.requiredExtantEventCatID}"/>
+
+                                                       <p:spacer height="5px"/>
+                                                       <h:outputText styleClass="bold" value="Forbidden existing category ID: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.forbiddenExtantEventCatID}"/>
+                                                       
+                                                       <p:spacer height="5px"/>
+                                                       <h:outputText styleClass="bold" value="Triggered event category ID: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.triggeredEventCategoryID}"/>
+                                                       
+                                                       <p:spacer height="5px"/>
+                                                       <h:outputText styleClass="bold" value="Triggered event category requested event cat ID: " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.triggeredEventCategoryRequestedEventID}"/>
+                                                    
+                                                    </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+
+                                                       <h:outputText class="bold" value="Active rule? " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.active}"/>
+                                                       <p:spacer height="5px"/>
+                                                       
+                                                       <h:outputText class="bold" value="Mandatory? " />
+                                                       <h:outputText value="#{c.casePhaseChangeRule.mandatory}"/>
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputLabel styleClass="bold" value="Required phase as threshold? "/>
+                                                       <h:outputText value="#{c.casePhaseChangeRule.treatRequiredPhaseAsThreshold}"/>
+                                                       <p:spacer height="5px"/>
+                                                       
+                                                       <h:outputLabel styleClass="bold" value="Forbidden phase as threshold? "/>
+                                                       <h:outputText value="#{c.casePhaseChangeRule.treatForbiddenPhaseAsThreshold}"/>
+                                                       <p:spacer height="5px"/>
+                                                       
+                                                       <h:outputLabel styleClass="bold" value="Reject event if rule fails? "/>
+                                                       <h:outputText value="#{c.casePhaseChangeRule.rejectRuleHostIfRuleFails}"/>
+
+                                                    </h:panelGroup>
+                                                </h:panelGrid>
+                                            </div>  
+                                       </p:rowExpansion>
                                 </p:dataTable>
                             <p:spacer height="10px"/>
                             

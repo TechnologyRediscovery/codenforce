@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.ReportConfig;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
+import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
@@ -101,6 +102,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
 
     /* *** Reporting *** */
     private ReportConfigCECase reportConfigCECase;
+    private ReportConfigCECaseList reportConfigCECaseList;
     private ReportConfig activeReport;
     
     
@@ -548,6 +550,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setActiveReport(ReportConfig activeReport) {
         this.activeReport = activeReport;
+    }
+
+    /**
+     * @return the reportConfigCECaseList
+     */
+    public ReportConfigCECaseList getReportConfigCECaseList() {
+        return reportConfigCECaseList;
+    }
+
+    /**
+     * @param reportConfigCECaseList the reportConfigCECaseList to set
+     */
+    public void setReportConfigCECaseList(ReportConfigCECaseList reportConfigCECaseList) {
+        this.reportConfigCECaseList = reportConfigCECaseList;
     }
     
 }

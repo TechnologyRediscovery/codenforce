@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
+import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
@@ -905,6 +906,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
        return rpt;
    }
+   
+   public ReportConfigCECaseList getDefaultReportConfigCECaseList(){
+       ReportConfigCECaseList listRpt = new ReportConfigCECaseList();
+       listRpt.setIncludeListSummaryFigures(true);
+       listRpt.setIncludeCaseNames(true);
+       listRpt.setIncludeFullOwnerContactInfo(true);
+       listRpt.setIncludeViolationList(true);
+       listRpt.setIncludeEventSummaryByCase(false);
+       return listRpt;
+       
+       
+   }
+   
    
    /**
     * Primary configuration mechanism for customizing report data from the 
