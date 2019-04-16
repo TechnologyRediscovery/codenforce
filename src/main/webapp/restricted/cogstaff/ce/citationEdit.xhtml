@@ -206,7 +206,7 @@
                             <p:spacer height="10px"/>
                             <p:commandButton ajax="false" value="Save Citation" action="#{citationBB.insertCitation}" disabled="#{citationBB.currentCitation.citationID != 0}" />
                             <p:commandButton ajax="false" value="Commit updates" action="#{citationBB.updateCitation}" disabled="#{citationBB.currentCitation.citationID == 0 }"/>
-                            <p:commandButton ajax="false" value="Cancel and return to profile" action="ceCases" icon="fa fa-stop" />
+                            <p:commandButton ajax="false" value="Cancel and return to profile" process="@none" immediate="true" action="ceCases" icon="fa fa-stop" />
                         </h:form>
                     </f:view>
                 </div>

@@ -448,40 +448,6 @@
                                             </div>
                                             
                                             <p:spacer height="5px"/>
-                                            
-                                            <h:outputLabel styleClass="bold" value="Unresolved code violations: 
-                                                           #{caseProfileBB.currentCase.violationListUnresolved.size()} 
-                                                           / #{caseProfileBB.currentCase.violationList.size()}"/> 
-                                            <p:dataScroller 
-                                                id="violations-datascroller-unresolved"
-                                                value="#{caseProfileBB.currentCase.violationListUnresolved}"
-                                                var="v"
-                                                widgetVar="violation-compactlist-widgetvar-unresolved">
-
-                                                <div class="compact-violation-list-container">
-                                                    <h:outputText id="violation-compactlist-line-ot-unresolved" value="#{v}"/>
-                                                    <h:outputText id="sep-compactlist-line-ot-unresolved" value=" | "/>
-                                                    <h:outputText id="status-compactlist-line-ot-unresolved" value="#{v.statusString}"/>
-                                                </div>
-                                            </p:dataScroller>
-                                            
-                                            <p:spacer height="10px" />
-                                            
-                                            <h:outputLabel styleClass="bold" value="Violations with compliance achieved: 
-                                                           #{caseProfileBB.currentCase.violationListResolved.size()} 
-                                                           / #{caseProfileBB.currentCase.violationList.size()}"/> 
-                                            <p:dataScroller 
-                                                id="violations-datascroller-resolved"
-                                                value="#{caseProfileBB.currentCase.violationListResolved}"
-                                                var="v"
-                                                widgetVar="violation-compactlist-widgetvar-resolved">
-
-                                                <div class="compact-violation-list-container">
-                                                    <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
-                                                    <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
-                                                    <h:outputText id="status-compactlist-line-ot-resolved" value="#{v.statusString}"/>
-                                                </div>
-                                            </p:dataScroller>
 
 
 
@@ -527,6 +493,254 @@
                                 </div>
 
                             </h:form>
+                            
+                            
+                            <h:form id="violation-form">
+
+
+                                <h2 id="violations">Code violations  </h2>
+
+                                <h:outputLabel styleClass="bold" value="Unresolved code violations: 
+                                               #{caseProfileBB.currentCase.violationListUnresolved.size()} 
+                                               / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Violations with compliance achieved: 
+                                               #{caseProfileBB.currentCase.violationListResolved.size()} 
+                                               / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                <p:spacer height="5px"/>
+                                
+                                <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
+                                                 value="Add new code violation"
+                                                 icon="fa fa-plus"
+                                                 disabled="#{!sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"/>
+                                <p:spacer height="15px"/>
+
+                              
+                                
+                                
+                                <p:dataTable
+                                    id="violation-table"
+                                    var="v"
+                                    rowKey="#{v.violationID}"
+                                    value="#{caseProfileBB.currentCase.violationList}"
+                                    tableStyleClass="primeDataTable"
+                                    expandedRow="false"
+                                    rowExpandMode="multiple"
+                                    draggableColumns="true"
+                                    reflow="true">
+
+
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                    <p:column width="4%">
+                                        <p:rowToggler />
+                                    </p:column>
+                                    
+                                    
+                                    <p:column width="5%">
+                                        <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
+                                    </p:column>
+                                    
+                                    
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Status" />
+                                        </f:facet>
+                                        <h:outputText id="violation-status-ot" value="#{v.statusString}"/>
+                                    </p:column>
+                                    
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Ordinance" />
+                                        </f:facet>
+                                        <div class="rowExpansion">
+                                            
+                                            <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Photos" />
+                                        </f:facet>
+                                        <p:commandButton value="View #{empty v.photoList ? '0' : v.photoList.size()} photo(s)" icon="fa fa-search"
+                                                         onclick="PF('photo-dialog').show()"
+                                                         actionListener="#{caseProfileBB.setSelectedViolation(v)}"
+                                                         disabled="#{empty v.photoList}"
+                                                         update=":photo-form"/>
+                                    </p:column>
+                                    <p:column width="30">
+                                        <f:facet name="header">
+                                            <h:outputText value="Stip Comp Date" />
+                                        </f:facet>
+                                        <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                    </p:column>
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Days left" />
+                                        </f:facet>
+                                        <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+
+                                    </p:column>
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Compliance!" />
+                                        </f:facet>
+                                        <p:commandButton    id="violation-compliance-cb" 
+                                                            ajax="true" action="#{caseProfileBB.recordCompliance(v)}"
+                                                            icon="fa fa-check"
+                                                            disabled="#{!(empty v.actualComplianceDate)}"
+                                                            oncomplete="PF('add-event-dialog-var').show()"
+                                                            value="Mark compliance"  
+                                                            update="addNewEventForm"/>
+                                    </p:column>
+
+
+
+
+                                    <p:rowExpansion>
+
+                                        <div class="outlinedBox">
+                                            
+
+                                                <h:panelGrid columns="2" rendered="true"
+                                                                        columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                                                        headerClass="no-border"
+                                                                        footerClass="no-border">
+
+                                                    <f:facet name="header">
+                                                       <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                                       <p:spacer height="5px" />
+                                                       <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                                     (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
+                                                       <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                                       <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                                       <p:spacer height="2px" />
+                                                       <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
+                                                       <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
+                                                       <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                                       <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                                       <p:spacer height="2px" />
+                                                       <h:outputLabel styleClass="bold" value="Description of violation: "/>
+                                                       <h:outputText styleClass="weight-normal" value="#{v.description}"/>
+
+                                                    </f:facet>
+
+                                                    <h:panelGroup>
+                                                       <h:outputText styleClass="bold" value="Violation ID: " />
+                                                       <h:outputText value="#{v.violationID}"/>
+
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputText styleClass="bold" value="Date of record: " />
+                                                       <h:outputText value="#{v.dateOfRecordPretty}"/>
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputText styleClass="bold" value="Stipulated Compliance Date: " />
+                                                       <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputText styleClass="bold" value="Days left: " />
+                                                       <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputText styleClass="bold" value="Actual Comp Date: " />
+                                                       <h:outputText value="#{v.actualComplianceDatePretty}"/>
+
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+
+                                                       <h:outputText value="Photo count: " />
+                                                       <h:outputText value="#{empty v.photoList ? '0' : v.photoList.size()}"/>
+
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputText class="bold" value="Citations: " />
+                                                       <h:outputText value="#{v.citationsStringList}"/>
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputLabel styleClass="bold" value="Penalty:"/>
+                                                       <h:outputText value="#{v.penalty}"/>
+
+
+                                                       <p:spacer height="5px"/>
+
+                                                       <h:outputLabel styleClass="bold" value="Officer Notes: "/>
+                                                       <h:outputText value="#{v.notes}" escape="false"/>
+                                                    </h:panelGroup>
+
+                                                    <f:facet name="footer">
+                                                        
+                                                       <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTD" >
+                                                           <h:panelGroup>
+                                                               <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+                                                               <div class="ord-text">
+                                                                   <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                               </div>
+                                                           </h:panelGroup>
+
+                                                       </h:panelGrid>
+                                                    </f:facet>
+
+                                                </h:panelGrid>
+
+                            
+
+
+                                            <h3>Violation details</h3>
+                                            <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
+                                                             value="Edit violation details"
+                                                             icon="fa fa-edit"/>
+
+                                            <h:outputText value="ID: " />
+                                            <h:outputText value="#{v.violationID}"/>
+
+                                            <h:outputText value="Citations: " />
+                                            <h:outputText value="#{v.citationsStringList}"/>
+                                            
+                                            <h:outputText value="Actual Comp Date" />
+                                            <h:outputText value="#{v.actualComplianceDatePretty}"/>
+
+                                            <h:outputText value="re-link" />
+                                            
+                                            <p:commandButton icon="fa fa-link"
+                                                             actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
+                                                             ajax="true" oncomplete="PF('linkDialog').show()"/>
+
+                                            <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
+                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Penalty:"/>
+                                            <h:outputText value="#{v.penalty}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Description: "/>
+                                            <h:outputText value="#{v.description}"/>
+
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Violation Notes: "/>
+                                            <h:outputText value="#{v.notes}" escape="false"/>
+                                        </div>
+                                    </p:rowExpansion>
+
+                                </p:dataTable> 
+
+                            </h:form>
+
 
                             <hr />
 
@@ -940,137 +1154,7 @@
                             </h:form>
 
 
-                            <hr />
-
-                            <h:form id="violation-form">
-
-
-                                <h2 id="violations">Code violations  </h2>
-
-
-                                <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
-                                                 value="Add new code violation"
-                                                 icon="fa fa-plus"
-                                                 disabled="#{!sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"/>
-                                <p:spacer height="15px"/>
-
-                                <p:dataTable
-                                    id="violation-table"
-                                    var="v"
-                                    rowKey="#{v.violationID}"
-                                    value="#{caseProfileBB.currentCase.violationList}"
-                                    tableStyleClass="primeDataTable"
-                                    expandedRow="false"
-                                    rowExpandMode="multiple"
-                                    draggableColumns="true"
-                                    reflow="true">
-
-
-                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
-
-                                    <p:column width="4%">
-                                        <p:rowToggler />
-                                    </p:column>
-                                    <p:column width="12%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Ordinance" />
-                                        </f:facet>
-                                        <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
-                                    </p:column>
-                                    <p:column width="8%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Photos" />
-                                        </f:facet>
-                                        <h:outputText value="Photos: #{empty v.photoList ? '0' : v.photoList.size()}"/>
-                                        <p:commandButton value="view" icon="fa fa-search"
-                                                         onclick="PF('photo-dialog').show()"
-                                                         actionListener="#{caseProfileBB.setSelectedViolation(v)}"
-                                                         update=":photo-form"/>
-                                    </p:column>
-                                    <p:column width="30">
-                                        <f:facet name="header">
-                                            <h:outputText value="Stip Comp Date" />
-                                        </f:facet>
-                                        <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
-                                    </p:column>
-                                    <p:column width="5%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Days left" />
-                                        </f:facet>
-                                        <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
-
-                                    </p:column>
-
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Compliance!" />
-                                        </f:facet>
-                                        <p:commandButton    id="violation-compliance-cb" 
-                                                            ajax="true" action="#{caseProfileBB.recordCompliance(v)}"
-                                                            icon="fa fa-check"
-                                                            disabled="#{!(empty v.actualComplianceDate)}"
-                                                            oncomplete="PF('add-event-dialog-var').show()"
-                                                            value="Mark compliance"  
-                                                            update="addNewEventForm"/>
-                                    </p:column>
-
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Actual Comp Date" />
-                                        </f:facet>
-                                        <h:outputText value="#{v.actualComplianceDatePretty}"/>
-                                    </p:column>
-
-
-
-                                    <p:rowExpansion>
-
-                                        <div class="outlinedBox">
-                                            <h3>Violation details</h3>
-                                            <p:commandButton ajax="false" action="#{caseProfileBB.editViolation}"
-                                                             value="Edit violation details"
-                                                             icon="fa fa-edit"/>
-
-                                            <h:outputText value="ID: " />
-                                            <h:outputText value="#{v.violationID}"/>
-
-                                            <h:outputText value="Citations: " />
-                                            <h:outputText value="#{v.citationsStringList}"/>
-
-                                            <h:outputText value="re-link" />
-                                            <p:commandButton icon="fa fa-link"
-                                                             actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
-                                                             ajax="true" oncomplete="PF('linkDialog').show()"/>
-
-                                            <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
-                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
-                                            <p:spacer height="5px"/>
-
-                                            <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
-
-                                            <p:spacer height="5px"/>
-
-                                            <h:outputLabel styleClass="bold" value="Penalty:"/>
-                                            <h:outputText value="#{v.penalty}"/>
-                                            <p:spacer height="5px"/>
-
-                                            <h:outputLabel styleClass="bold" value="Description: "/>
-                                            <h:outputText value="#{v.description}"/>
-
-                                            <p:spacer height="5px"/>
-
-                                            <h:outputLabel styleClass="bold" value="Violation Notes: "/>
-                                            <h:outputText value="#{v.notes}" escape="false"/>
-                                        </div>
-                                    </p:rowExpansion>
-
-                                </p:dataTable> 
-
-                            </h:form>
+                            
 
                             <hr />
 
