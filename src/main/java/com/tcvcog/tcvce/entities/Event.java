@@ -21,12 +21,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class Event extends EntityUtils implements Serializable {
+public class Event extends EntityUtils implements Serializable, Comparable<Event> {
     
     private int eventID;
     
@@ -89,6 +90,10 @@ public class Event extends EntityUtils implements Serializable {
     
     private long daysUntilDue;
 
+    
+   
+    
+    
     /**
      * @return the eventID
      */
@@ -575,8 +580,70 @@ public class Event extends EntityUtils implements Serializable {
         this.muniName = muniName;
     }
 
-   
-  
+    @Override
+    public int compareTo(Event e) {
+        int c = this.dateOfRecord.compareTo(e.getDateOfRecord());
+        return c;
+        
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + this.eventID;
+        hash = 97 * hash + this.muniCode;
+        hash = 97 * hash + Objects.hashCode(this.muniName);
+        hash = 97 * hash + this.propertyID;
+        hash = 97 * hash + Objects.hashCode(this.category);
+        hash = 97 * hash + Objects.hashCode(this.dateOfRecord);
+        hash = 97 * hash + Objects.hashCode(this.dateOfRecordPretty);
+        hash = 97 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
+        hash = 97 * hash + Objects.hashCode(this.timestamp);
+        hash = 97 * hash + Objects.hashCode(this.timestampPretty);
+        hash = 97 * hash + Objects.hashCode(this.description);
+        hash = 97 * hash + Objects.hashCode(this.owner);
+        hash = 97 * hash + (this.discloseToMunicipality ? 1 : 0);
+        hash = 97 * hash + (this.discloseToPublic ? 1 : 0);
+        hash = 97 * hash + (this.active ? 1 : 0);
+        hash = 97 * hash + (this.hidden ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.notes);
+        hash = 97 * hash + (this.requestsAction ? 1 : 0);
+        hash = 97 * hash + (this.responseComplete ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.triggeringEvent);
+        hash = 97 * hash + (this.currentUserCanTakeAction ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.actionEventCat);
+        hash = 97 * hash + Objects.hashCode(this.responseEvent);
+        hash = 97 * hash + Objects.hashCode(this.actionRequestedBy);
+        hash = 97 * hash + (this.requestActionByDefaultMuniCEO ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.responderIntended);
+        hash = 97 * hash + Objects.hashCode(this.responderActual);
+        hash = 97 * hash + Objects.hashCode(this.responseTimestamp);
+        hash = 97 * hash + Objects.hashCode(this.responseTimePrettyDate);
+        hash = 97 * hash + Objects.hashCode(this.responderNotes);
+        hash = 97 * hash + (this.requestRejected ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.personList);
+        hash = 97 * hash + (int) (this.daysUntilDue ^ (this.daysUntilDue >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Event other = (Event) obj;
+        if (this.eventID != other.eventID) {
+            return false;
+        }
+        return true;
+    }
+    
 
     
 }

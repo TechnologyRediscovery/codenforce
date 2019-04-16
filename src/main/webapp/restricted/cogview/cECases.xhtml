@@ -446,18 +446,40 @@
 
                                                 <h:outputText id="selcase-notes-ot" value="#{caseProfileBB.currentCase.notes}"/>
                                             </div>
+                                            
                                             <p:spacer height="5px"/>
-                                            <h:outputLabel styleClass="bold" value="Violations: " /> 
+                                            
+                                            <h:outputLabel styleClass="bold" value="Unresolved code violations: 
+                                                           #{caseProfileBB.currentCase.violationListUnresolved.size()} 
+                                                           / #{caseProfileBB.currentCase.violationList.size()}"/> 
                                             <p:dataScroller 
-                                                id="violations-datascroller"
-                                                value="#{caseProfileBB.currentCase.violationList}"
+                                                id="violations-datascroller-unresolved"
+                                                value="#{caseProfileBB.currentCase.violationListUnresolved}"
                                                 var="v"
-                                                widgetVar="violation-compactlist-widgetvar">
+                                                widgetVar="violation-compactlist-widgetvar-unresolved">
 
                                                 <div class="compact-violation-list-container">
-                                                    <h:outputText id="violation-compactlist-line-ot" value="#{v}"/>
-                                                    <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                                    <h:outputText id="status-compactlist-line-ot" value="#{v.statusString}"/>
+                                                    <h:outputText id="violation-compactlist-line-ot-unresolved" value="#{v}"/>
+                                                    <h:outputText id="sep-compactlist-line-ot-unresolved" value=" | "/>
+                                                    <h:outputText id="status-compactlist-line-ot-unresolved" value="#{v.statusString}"/>
+                                                </div>
+                                            </p:dataScroller>
+                                            
+                                            <p:spacer height="10px" />
+                                            
+                                            <h:outputLabel styleClass="bold" value="Violations with compliance achieved: 
+                                                           #{caseProfileBB.currentCase.violationListResolved.size()} 
+                                                           / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                            <p:dataScroller 
+                                                id="violations-datascroller-resolved"
+                                                value="#{caseProfileBB.currentCase.violationListResolved}"
+                                                var="v"
+                                                widgetVar="violation-compactlist-widgetvar-resolved">
+
+                                                <div class="compact-violation-list-container">
+                                                    <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
+                                                    <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
+                                                    <h:outputText id="status-compactlist-line-ot-resolved" value="#{v.statusString}"/>
                                                 </div>
                                             </p:dataScroller>
 
@@ -1975,18 +1997,28 @@
                                          cellpadding="5" columnClasses="gridTd, gridTd"
                                          footerClass="gridFooter">
                                     
+                                <f:facet name="header">
+                                    
 
-                                <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
-                                <p:spacer height="15px"/>
-                                <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{caseProfileBB.reportCECase.title}"/>
-                                <p:spacer height="2px"/>
-                                <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
-                                <p:spacer height="5px"/>
+                                    <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
 
-                                <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
-                                <p:spacer height="15px"/>
-                                <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{caseProfileBB.reportCECase.notes}"/>
-                                <p:spacer height="5px"/>
+                                    <p:spacer height="5px"/>
+
+                                    <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{caseProfileBB.reportCECase.title}"/>
+                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include case name" for="report-case-profile-casename-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{caseProfileBB.reportCECase.includeCaseName}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                    <p:spacer height="5px"/>
+                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{caseProfileBB.reportCECase.notes}"/>
+                                    <p:spacer height="5px"/>
+                                </f:facet>
 
                                 <h:panelGroup>
                                     <h3>Case event history report options</h3>
@@ -2017,25 +2049,35 @@
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{caseProfileBB.reportCECase.includeOfficeOnlyEvents}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{caseProfileBB.reportCECase.includeOfficerOnlyEvents}" />
+                                    
+                                    <p:spacer height="5px"/>
+                                    
+                                    <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{caseProfileBB.reportCECase.includeEventMetadata}" />
 
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     
                                     <h3>Other options</h3>
 
-                                        <h:outputLabel class="bold" value="Include full text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
+                                        <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
                                         <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{caseProfileBB.reportCECase.includeNoticeFullText}" />
 
                                         <p:spacer height="5px"/>
 
-                                        <h:outputLabel class="bold" value="Include all notices of violation: " for="report-case-profile-allnotices-chkbox" />
+                                        <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
                                         <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{caseProfileBB.reportCECase.includeAllNotices}" />
 
                                         <p:spacer height="5px"/>
 
                                         <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
                                         <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{caseProfileBB.reportCECase.includeFullOrdinanceText}" />
+
+                                        <p:spacer height="5px"/>
+                                        
+                                        <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
+                                        <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{caseProfileBB.reportCECase.includeViolationPhotos}" />
 
                                         <p:spacer height="5px"/>
                                 </h:panelGroup>

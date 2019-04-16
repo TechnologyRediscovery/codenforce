@@ -1,4 +1,4 @@
-<<?xml version='1.0' encoding='UTF-8' ?>
+<?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
@@ -10,9 +10,9 @@
         <title>Report</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../util/page_htmlonly_template.xhtml">
-            <ui:define name="print-content">
+        <ui:composition template="./../report_template.xhtml">
 
+            <ui:define name="print-content">
 
                 <h:form id="case-details-form">
                     <div class="outlinedBox report">
@@ -82,31 +82,87 @@
                                     <h:outputText id="selcase-notes-ot" value="#{caseProfileBB.currentCase.notes}"/>
                                 </div>
                                 <p:spacer height="5px"/>
-                                <h:outputLabel styleClass="bold" value="Violations: " /> 
+                                
+                                 <h:outputLabel styleClass="bold" value="Unresolved code violations: 
+                                                           #{caseProfileBB.currentCase.violationListUnresolved.size()} 
+                                                           / #{caseProfileBB.currentCase.violationList.size()}"/> 
                                 <p:dataScroller 
-                                    id="violations-datascroller"
-                                    value="#{caseProfileBB.currentCase.violationList}"
+                                    id="violations-datascroller-unresolved"
+                                    value="#{caseProfileBB.currentCase.violationListUnresolved}"
                                     var="v"
-                                    widgetVar="violation-compactlist-widgetvar">
+                                    widgetVar="violation-compactlist-widgetvar-unresolved">
 
                                     <div class="compact-violation-list-container">
-                                        <h:outputText id="violation-compactlist-line-ot" value="#{v}"/>
-                                        <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                        <h:outputText id="status-compactlist-line-ot" value="#{v.statusString}"/>
+                                        <h:outputText id="violation-compactlist-line-ot-unresolved" value="#{v}"/>
+                                        <h:outputText id="sep-compactlist-line-ot-unresolved" value=" | "/>
+                                        <h:outputText id="status-compactlist-line-ot-unresolved" styleClass="italic" value="#{v.statusString}"/>
                                     </div>
                                 </p:dataScroller>
 
+                                <p:spacer height="10px" />
+
+                                <h:outputLabel styleClass="bold" value="Compliance achieved: 
+                                               #{caseProfileBB.currentCase.violationListResolved.size()} 
+                                               / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                <p:dataScroller 
+                                    id="violations-datascroller-resolved"
+                                    value="#{caseProfileBB.currentCase.violationListResolved}"
+                                    var="v"
+                                    widgetVar="violation-compactlist-widgetvar-resolved">
+
+                                    <div class="compact-violation-list-container">
+                                        <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
+                                        <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
+                                        <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.statusString}"/>
+                                    </div>
+                                </p:dataScroller>
+                                
+                                
 
 
                             </f:facet>
                         </h:panelGrid>
+                        
+                        
+                         <h:panelGrid columns="2" rendered="true"
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                                     footerClass="no-border">
+                                                         
+                             <h:panelGroup>
+                                 <h3>report generation notes:</h3>
+                                 <p>
+                                    <h:outputLabel id="report-creator-ol" for="report-creator-ot" styleClass="bold" value="creator name: " />
+                                    <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.person.firstName} 
+                                                  #{reportingBB.currentReport.creator.person.firstName} 
+                                                  (user: #{reportingBB.currentReport.creator.username})"/>
+                                    <br />
+                                    <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="creator credentials: " />
+                                    <h:outputText id="report-creator-cred-ot"  value="#{reportingBB.currentReport.creator.roleType.label} 
+                                                  (ID: #{reportingBB.currentReport.creator.userID})"/>
+                                 </p>
+                            </h:panelGroup>
+                             <h:panelGroup>
+                                 <p>
+                                     <h:outputLabel id="report-timestamp-ol" for="report-timestamp-ot" styleClass="bold" value="created on: " />
+                                     <h:outputText id="report-timestamp-ot"  value="#{reportingBB.currentReport.generationTimestampPretty}"/>
+                                    <br />
+                                    <h:outputLabel id="report-notes-ol" for="report-notes-ot" styleClass="bold" value="notes: "/>
+                                    <h:outputText id="report-notes-ot"  value="#{reportingBB.currentReport.notes}"/>
+                                 </p>
+                            </h:panelGroup>
+                        
+                         </h:panelGrid>
+                            
+                            
+                        
+                        
                     </div>
 
 
                     <hr />
 
 
-                    <h2 id="event-history">Event history</h2>
+                    <h2 id="event-history" class="printing-page-break-before">Event history</h2>
 
 
                     <p:dataScroller
@@ -134,26 +190,22 @@
                                     <div class="rowExpansion">
                                         <h:outputText styleClass="weight-normal" value="#{e.description}"/>
                                     </div>
-                                    <div class="rowExpansion">
-                                        <h:outputText styleClass="bold" value="Notes: " />
-                                        <h:outputText styleClass="weight-normal" value="#{e.responderNotes}"/>
-                                    </div>
                                 </f:facet>
                                 <h:panelGroup>
                                     <p>
                                         <h:outputText value="Owner: " styleClass="bold" />
-                                        <h:outputText value="#{e.owner.person.firstName} #{e.owner.person.lastName}"/>
+                                        <h:outputText value="#{e.owner.person.firstName} #{e.owner.person.lastName} (user: #{e.owner.username}, ID: #{e.owner.userID})"/>
                                         <br />
                                         <h:outputText styleClass="bold" value="Date of record: "/>
                                         <h:outputText value="#{e.dateOfRecordPretty}"/>
                                         <br />
-                                        <h:outputText styleClass="bold" value="Creation time stamp: "/>
+                                        <h:outputText styleClass="bold" value="Event ID: "/>
+                                        <h:outputText value="#{e.eventID}"/>
                                         <br />
-                                        <h:outputText value="#{e.timestampPretty}"/>
                                     </p>
                                 </h:panelGroup>
 
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{caseProfileBB.reportCECase.includeEventMetadata}">
                                     <h:outputText styleClass="bold" value="Disclose to Municipality Staff: " />
                                     <h:outputText value="#{e.discloseToMunicipality}"/>
                                     <br />
@@ -165,13 +217,16 @@
                                     <h:outputText value="#{e.active}"/>
                                     <br />
 
-
                                     <h:outputText styleClass="bold" value="Hidden: "/>
                                     <h:outputText value="#{e.hidden}"/>
+                                    <br />
 
+                                    <h:outputText styleClass="bold" value="Creation time stamp: "/>
+                                    <h:outputText value="#{e.timestampPretty}"/>
+                                    
                                 </h:panelGroup>
 
-                                <h:panelGroup rendered="#{e.requestsAction}">
+                                <h:panelGroup rendered="#{e.requestsAction} and #{caseProfileBB.reportCECase.includeRequestedActionFields}">
 
                                     <div class="status-display-container">
                                         <div class="action-request-icon">
@@ -222,19 +277,17 @@
 
 
                                 </h:panelGroup>
-
-
-
-                                <f:facet name="footer" class="leftalign">
-                                    <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
+                                <h:panelGroup>
+                                    
+                                    <h:outputLabel styleClass="bold" style="text-align: left" value="Event notes"/>
                                     <p:spacer height="15px"/>
                                     <div class="rowExpansion" style="text-align: left">
                                         <h:outputText escape="false" value="#{e.notes}"/>
                                     </div>
-                                </f:facet>
-
+                                    
+                                    
+                                </h:panelGroup>
                             </h:panelGrid>
-                            <hr />
                         </div>
                     </p:dataScroller>
 
@@ -243,7 +296,7 @@
                     <hr />
 
 
-                    <h2 id="violations">Code violations  </h2>
+                    <h2 id="violations" class="printing-page-break-before">Code violations  </h2>
 
 
                     <p:spacer height="15px"/>
@@ -255,58 +308,127 @@
 
                         <div class="outlinedBox">
 
-                            <h:outputText value="Ordinance" />
-                            <h3><h:outputText value="#{v.violatedEnfElement.codeElement.ordSubSecNum}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/></h3>
-                            <p>
+                            <h2><h:outputText value="Violation ID:  #{v.violationID}"/><h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
+                                        <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
+                                        <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.statusString}"/></h2>
+                            
 
-                                <h:outputText value="ID: " />
-                                <h:outputText value="#{v.violationID}"/>
-                                <br />
-                                <h:outputText value="Stip Comp Date: " />
-                                <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
-                                <br />
-                                <h:outputText value="Days left: " />
-                                <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
-                                <br />
-                                <h:outputText value="Actual Comp Date: " />
-                                <h:outputText value="#{v.actualComplianceDatePretty}"/>
-                                <br />
-                                <h:outputText value="Photos" />
-                                <h:outputText value="Photos: #{empty v.photoList ? '0' : v.photoList.size()}"/>
+                                        
+                             <h:panelGrid columns="2" rendered="true"
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                                     headerClass="no-border"
+                                                     footerClass="no-border">
+                                 
+                                 <f:facet name="header">
+                                    <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                    <p:spacer height="5px" />
+                                    <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                  (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
+                                    <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                    <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                    <p:spacer height="2px" />
+                                    <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
+                                    <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
+                                    <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                    <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                    
+                                    <p:spacer height="2px" />
+                                    
+                                    <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTD" 
+                                                    rendered="#{caseProfileBB.reportCECase.includeFullOrdinanceText}">
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+                                            <div class="ord-text">
+                                                <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                            </div>
+                                        </h:panelGroup>
+                                        
+                                    </h:panelGrid>
+                                     
+                                    <p:spacer height="5px"/>
+                                    <h:outputLabel styleClass="bold" value="Description of violation: "/>
+                                    <h:outputText styleClass="weight-normal" value="#{v.description}"/>
+                                    
+                                 </f:facet>
+                                                         
+                                 <h:panelGroup>
+                                    <h:outputText styleClass="bold" value="Violation ID: " />
+                                    <h:outputText value="#{v.violationID}"/>
+                                    
+                                    <p:spacer height="5px"/>
+                                    
+                                    <h:outputText styleClass="bold" value="Date of record: " />
+                                    <h:outputText value="#{v.dateOfRecordPretty}"/>
+                                    <p:spacer height="5px"/>
 
-                                <br />
+                                    <h:outputText styleClass="bold" value="Stipulated Compliance Date: " />
+                                    <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                    <p:spacer height="5px"/>
 
-                                <h:outputText value="Citations: " />
-                                <h:outputText value="#{v.citationsStringList}"/>
-                                <br />
+                                    <h:outputText styleClass="bold" value="Days left: " />
+                                    <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+                                    <p:spacer height="5px"/>
 
-                                <h:outputLabel styleClass="bold" value="Penalty:"/>
-                                <h:outputText value="#{v.penalty}"/>
-                                <br />
+                                    <h:outputText styleClass="bold" value="Actual Comp Date: " />
+                                    <h:outputText value="#{v.actualComplianceDatePretty}"/>
+                                     
+                                     
+                                 </h:panelGroup>
+                                 
+                                 <h:panelGroup>
 
-                                <h:outputLabel styleClass="bold" value="Description: "/>
-                                <h:outputText value="#{v.description}"/>
-                                <br />
+                                    <h:outputText value="Photo count: " />
+                                    <h:outputText value="#{empty v.photoList ? '0' : v.photoList.size()}"/>
+                                     
+                                    <p:spacer height="5px"/>
+                                     
+                                    <h:outputText class="bold" value="Citations: " />
+                                    <h:outputText value="#{v.citationsStringList}"/>
+                                    <p:spacer height="5px"/>
 
-                                <p:spacer height="5px"/>
+                                    <h:outputLabel styleClass="bold" value="Penalty:"/>
+                                    <h:outputText value="#{v.penalty}"/>
+                                    
 
-                                <h:outputLabel styleClass="bold" value="Violation Notes: "/>
-                                <h:outputText value="#{v.notes}" escape="false"/>
-                                <br />
+                                    <p:spacer height="5px"/>
 
-                                <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
-                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                               #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                               #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                               #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                               #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
-                            </p>
+                                    <h:outputLabel styleClass="bold" value="Officer Notes: "/>
+                                    <h:outputText value="#{v.notes}" escape="false"/>
+                                 </h:panelGroup>
+                                 
+                                 
+                             </h:panelGrid>
 
-                            <p>
-                                <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
-                            </p>
+                            
 
-                            <p:spacer height="5px"/>
+
+                                
+                                
+                            
+                            <p:dataTable
+                                    id="violation-photo-table"
+                                    var="photoid"
+                                    value="#{v.photoList}"
+                                    rowKey="#{photoid}"
+                                    rendered="#{caseProfileBB.reportCECase.includeViolationPhotos and v.photoList.size()>0}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6">
+                                    <p:column width="80%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Photo"/>
+                                        </f:facet>
+                                        <p:graphicImage width="100%" value="#{imageServices.image}">
+                                            <f:param name="photoID" value="#{photoid}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Description"/>
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                    </p:column>
+                                </p:dataTable>
+
                         </div>
 
                     </p:dataScroller>
@@ -315,7 +437,7 @@
                     <hr />
 
 
-                    <h2 id="notices">Notices of violation</h2>
+                    <h2 id="notices" class="printing-page-break-before" >Notices of violation</h2>
 
 
                     <p:dataScroller
@@ -347,7 +469,15 @@
 
                         <p:spacer height="5px"/>
 
-                        <h:panelGrid    id="notice-rowexpand-pg" columns="4" columnClasses="gridTD, gridTD, gridTD, gridTD" >
+                        <h:panelGrid    id="notice-text-pg" columns="1" columnClasses="gridTD" 
+                                        rendered="#{caseProfileBB.reportCECase.includeNoticeFullText}"
+                                        styleClass="printing-page-break-after">
+                            <h:panelGroup>
+
+                                <div class="rowExpansion">
+                                    <h:outputText id="notice-text-ot" value="#{notice.noticeText}" escape="false"/>
+                                </div>
+                            </h:panelGroup>
                         </h:panelGrid>
                     </p:dataScroller>
 
@@ -357,7 +487,7 @@
                     <p:spacer height="15px"/>
 
 
-                    <h2 id="citations">Citations</h2>
+                    <h2 id="citations" class="printing-page-break-before">Citations</h2>
 
                     <p:dataScroller
                         id="citation-table"
@@ -365,50 +495,67 @@
                         value="#{caseProfileBB.currentCase.citationList}">
 
                         <div class="outlinedBox">
-                            <h:outputText value="Citation ID" />
-                            <h:outputText value="#{citation.citationID}"/>
-                            <h:outputText value="Citation No." />
-                            <h:outputText value="#{citation.citationNo}"/>
-                            <h:outputText value="Court Entity ID" />
-                            <h:outputText value="#{citation.origin_courtentity.courtEntityName}"/>
-                            <h:outputText value="Issuer" />
-                            <h:outputText value="#{citation.userOwner.person.lastName}"/>
-                            <h:outputText value="Date of record" />
-                            <h:outputText value="#{citation.dateOfRecord}"/>
-                            <h:outputText value="Status" />
-                            <h:outputText value="#{citation.status.statusTitle}"/>
-                            <h:outputLabel value="violations: "/>
-                            <p:dataScroller 
-                                id="citation-violations-datascroller"
-                                value="#{citation.violationList}"
-                                var="v"
-                                widgetVar="citation-violation-compactlist-widgetvar">
+                            <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                         columnClasses="gridTd, gridTd">
+                                <h:panelGroup>
+                                    <h:outputText value="Filing date: " />
+                                    <h:outputText value="#{citation.dateOfRecordPretty}"/>
+                                    <p:spacer height="5px" />
+                                    <h:outputText value="Status: " />
+                                    <h:outputText value="#{citation.status.statusTitle}"/>
+                                    <p:spacer height="5px" />
+                                    <h:outputText value="Issued by: " />
+                                    <h:outputText value="#{citation.userOwner.person.lastName}"/>
+                                    <p:spacer height="5px" />
+                                    <h:outputText value="Court entity: " />
+                                    <h:outputText value="#{citation.origin_courtentity.courtEntityName}"/>
 
-                                <h:outputText id="violation-compactlist-line-ot" value="#{v}"/>
-                                <h:outputText id="v-source-name-compactlist-ot" value="(#{v.violatedEnfElement.codeElement.source.sourceName}" />
-                                <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
-                                <h:outputText id="v-source-year-compactlist-ot" value="#{v.violatedEnfElement.codeElement.source.sourceYear})"/>
-                                <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                <h:outputText id="status-compactlist-line-ot" value="#{v.statusString}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputText value="Citation Number (external): " />
+                                    <h:outputText value="#{citation.citationNo}"/>
+                                    <p:spacer height="5px" />
+                                    <h:outputText value="Citation ID (internal)" />
+                                    <h:outputText value="#{citation.citationID}"/>
+                                    <p:spacer height="5px" />
 
-                            </p:dataScroller>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel value="Citation text: "/>
+                                    <div class="rowExpansion">
+                                        <h:outputText value="#{citation.notes}"/>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup>
+
+                                </h:panelGroup>
+
+                                <f:facet name="footer">
+
+                                    <div class="outlinedBox">
+                                        <h:outputLabel value="Violations: "/>
+                                        <p:dataScroller 
+                                            id="citation-violations-datascroller"
+                                            value="#{citation.violationList}"
+                                            var="citv"
+                                            widgetVar="citation-violation-compactlist-widgetvar">
 
 
-                            <h:outputLabel value="Notes: "/>
-                            <h:outputText value="#{citation.notes}"/>
-                            <p:spacer height="10px"/>
-                            <h:outputLabel value="Active: "/>
-                            <h:outputText value="#{citation.isActive}"/>
-                            <p:spacer height="10px"/>
-                            <h:outputLabel value="Entry Timestamp: "/>
-                            <h:outputText value="#{citation.timeStamp}"/>
-                            <p:spacer height="10px"/>
+                                            <h:outputText id="violation-compactlist-line-ot" value="#{citv}"/>
+                                            <h:outputText id="v-source-name-compactlist-ot" value="(#{citv.violatedEnfElement.codeElement.source.sourceName}" />
+                                            <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
+                                            <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                            <h:outputText id="sep-compactlist-line-ot" value=" | "/>
+                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.statusString}"/>
+                                        </p:dataScroller>
+                                    </div>
+                                </f:facet>
+                            </h:panelGrid>
                         </div>
-
                     </p:dataScroller>
 
 
-                    <h2 id="requests">Action Requests</h2>    
+                    <h2 id="requests" class="printing-page-break-before">Action Requests</h2>    
 
                     <p:dataScroller
                         id="actionRequestTable"
@@ -416,16 +563,6 @@
                         value="#{caseProfileBB.currentCase.requestList}">
                         <div class="outlinedBox">
 
-                            <h:outputText value="ID" />
-                            <h:outputText value="#{r.requestID}"/>
-                            <h:outputText value="Issue Type" />
-                            <h:outputText value="#{r.issueTypeString}"/>
-                            <h:outputText value="Address" />
-                            <h:outputText value="#{r.requestProperty.address}"/>
-                            <h:outputText value="Submitted" />
-                            <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
-                            <h:outputText value="Age" />
-                            <h:outputText value="#{r.daysSinceDateOfRecord}"/>
                             <h3>Code Enforcement Action Request</h3>
                             <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                          columnClasses="gridTd, gridTd">
@@ -468,6 +605,9 @@
                                         <p:spacer height="5px"/>
                                         <h:outputText value="#{r.isUrgent}"/>
                                     </div>
+                                    <p:spacer height="5px"/>
+                                    <h:outputText value="Age: " />
+                                    <h:outputText value="#{r.daysSinceDateOfRecord}"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup>
@@ -509,6 +649,9 @@
                                         <h:outputText escape="false" value="#{r.requestDescription}"/>
                                     </div>
                                 </f:facet>
+                                
+                                
+                                
                             </h:panelGrid>
                         </div>
                     </p:dataScroller>

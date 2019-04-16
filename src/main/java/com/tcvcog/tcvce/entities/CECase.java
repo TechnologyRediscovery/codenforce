@@ -17,6 +17,10 @@ public class CECase extends CECaseNoLists implements Cloneable{
     
     
     private List<CodeViolation> violationList;
+    private List<CodeViolation> violationListResolved;
+    private List<CodeViolation> violationListUnresolved;
+    
+    
     private List<EventCECase> eventList;
     private List<EventCECase> eventListActionRequests;
     private List<Citation> citationList;
@@ -155,6 +159,54 @@ public class CECase extends CECaseNoLists implements Cloneable{
      */
     public void setEventListActionRequests(List<EventCECase> eventListActionRequests) {
         this.eventListActionRequests = eventListActionRequests;
+    }
+
+    /**
+     * @return the violationListUnresolved
+     */
+    public List<CodeViolation> getViolationListUnresolved() {
+        
+        violationListUnresolved = new ArrayList<>();
+        if(violationList != null && violationList.size() > 0){
+            for(CodeViolation v: violationList){
+                if(v.getActualComplianceDate() == null){
+                    violationListUnresolved.add(v);
+                }
+            }
+        }
+        
+
+        return violationListUnresolved;
+    }
+
+    /**
+     * @param violationListUnresolved the violationListUnresolved to set
+     */
+    public void setViolationListUnresolved(List<CodeViolation> violationListUnresolved) {
+        this.violationListUnresolved = violationListUnresolved;
+    }
+
+    /**
+     * @return the violationListResolved
+     */
+    public List<CodeViolation> getViolationListResolved() {
+        violationListResolved = new ArrayList<>();
+        if(violationList != null && violationList.size() > 0){
+            for(CodeViolation v: violationList){
+                if(v.getActualComplianceDate() != null){
+                    violationListResolved.add(v);
+                }
+            }
+        }
+        
+        return violationListResolved;
+    }
+
+    /**
+     * @param violationListResolved the violationListResolved to set
+     */
+    public void setViolationListResolved(List<CodeViolation> violationListResolved) {
+        this.violationListResolved = violationListResolved;
     }
 
   
