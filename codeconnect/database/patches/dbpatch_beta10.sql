@@ -38,6 +38,8 @@ ALTER TABLE cecasephasechangerule ADD COLUMN description text;
 ALTER TABLE cecasephasechangerule ADD COLUMN triggeredeventcatreqcat INTEGER 
 	CONSTRAINT phasechangerule_triggeredevcatreqcat_fk REFERENCES ceeventcategory (categoryid);
 
+ALTER TABLE ceeventcategory DROP COLUMN casephasechangetrigger;
+
 
 ALTER TABLE ceeventcategory ADD COLUMN phasechangerule_ruleid INTEGER 
 	CONSTRAINT ceeventcat_phasechange_fk REFERENCES cecasephasechangerule (ruleid);
@@ -82,11 +84,47 @@ INSERT INTO public.cecasephasechangerule(
             description, triggeredeventcatreqcat)
     VALUES (1002, 'schedule a hearing', 'HearingPreparation'::casephase, 'AwaitingHearingDate'::casephase, 'Closed'::casephase, 
             NULL, NULL, 124, -- requires that a citation exist on the case
-            NULL, 135, TRUE, FALSE, -- triggers a property inspection
+            NULL, 120, TRUE, FALSE, -- triggers officer action: attend court hearing
             TRUE, FALSE, FALSE, 
             'to schedule a hearing, the case must have at least a single citation and not be closed; triggers ',
             NULL); -- prop inspection isn't chained to anything
 
+INSERT INTO public.cecasephasechangerule(
+            ruleid, title, targetcasephase, requiredcurrentcasephase, forbiddencurrentcasephase, 
+            requiredextanteventtype, forbiddenextanteventtype, requiredextanteventcat, 
+            forbiddenextanteventcat, triggeredeventcat, active, mandatory, 
+            treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, 
+            description, triggeredeventcatreqcat)
+    VALUES (1003, 'hearing outcome: new timeframe', 'InitialPostHearingComplianceTimeframe'::casephase, 'HearingPreparation'::casephase, 'Closed'::casephase, 
+            NULL, NULL, 120, 
+            NULL, 113, TRUE, FALSE,  -- spawns a new compliance timeframe event
+            TRUE, FALSE, FALSE, 
+            'be sure to edit each code violation for which the defendant was given an extended compliance timeframe by updated 
+            the compliance timeframe expiry; your change will be logged along with the violation', NULL);
+
+INSERT INTO public.cecasephasechangerule(
+            ruleid, title, targetcasephase, requiredcurrentcasephase, forbiddencurrentcasephase, 
+            requiredextanteventtype, forbiddenextanteventtype, requiredextanteventcat, 
+            forbiddenextanteventcat, triggeredeventcat, active, mandatory, 
+            treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, 
+            description, triggeredeventcatreqcat)
+    VALUES (1004, 'hearing outcome: penalty stands', 'Closed'::casephase , 'HearingPreparation'::casephase, 'Closed'::casephase,  
+            NULL, NULL, 132, -- at least one violation must have been added to the case to have the penalty staned 
+            NULL, 126, TRUE, TRUE,  -- closed with penalties paid
+            TRUE, FALSE, FALSE, 
+            'coordinates a case outcome with a penalty that is undreduced by magistrate', NULL);
+
+INSERT INTO public.cecasephasechangerule(
+            ruleid, title, targetcasephase, requiredcurrentcasephase, forbiddencurrentcasephase, 
+            requiredextanteventtype, forbiddenextanteventtype, requiredextanteventcat, 
+            forbiddenextanteventcat, triggeredeventcat, active, mandatory, 
+            treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, 
+            description, triggeredeventcatreqcat)
+    VALUES (?, ?, ?, ?, ?, 
+            ?, ?, ?, 
+            ?, ?, ?, ?, 
+            ?, ?, ?, 
+            ?, ?);
 
 
 

@@ -22,10 +22,10 @@ import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.AccessKeyCard;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
@@ -41,7 +41,6 @@ import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
@@ -57,8 +56,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -952,6 +949,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        }
        c.setNoticeList(noticeList);
        return rptCse;
+   }
+   
+   /**
+    * Currently a pass-through method for object creation
+    * @param ec
+    * @return
+    * @throws IntegrationException 
+    */
+   public CasePhaseChangeRule getCasePhaseChangeRule(EventCategory ec) throws IntegrationException{
+       CaseIntegrator ci = getCaseIntegrator();
+       return ci.getPhaseChangeRule(ec.getCasePhaseChangeRule().getRuleID());
+       
    }
    
 } // close class
