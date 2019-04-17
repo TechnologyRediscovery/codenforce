@@ -17,9 +17,12 @@
                     
                     <h:form id="cases-summary-stats-form">
                         <h1>Code enforcement case docket overview</h1>
+                        <h2>Case counts by stage</h2>
                         
+                        <p:chart type="bar" model="#{reportingBB.caseCountByStage}" style="width:800px; height:800px"/>
                         
-                        
+                        <h2>Case counts by phase</h2>
+                        <p:chart type="bar" model="#{reportingBB.caseCountByPhase}" style="width:1000px; height:1000px"/>
                         
                         
                     </h:form>

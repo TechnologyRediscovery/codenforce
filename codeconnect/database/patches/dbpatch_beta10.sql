@@ -1,6 +1,4 @@
 
-
-
 ALTER TABLE citationstatus RENAME COLUMN editsallowed TO editsforbidden;
 
 
@@ -114,24 +112,14 @@ INSERT INTO public.cecasephasechangerule(
             TRUE, FALSE, FALSE, 
             'coordinates a case outcome with a penalty that is undreduced by magistrate', NULL);
 
-INSERT INTO public.cecasephasechangerule(
-            ruleid, title, targetcasephase, requiredcurrentcasephase, forbiddencurrentcasephase, 
-            requiredextanteventtype, forbiddenextanteventtype, requiredextanteventcat, 
-            forbiddenextanteventcat, triggeredeventcat, active, mandatory, 
-            treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, 
-            description, triggeredeventcatreqcat)
-    VALUES (?, ?, ?, ?, ?, 
-            ?, ?, ?, 
-            ?, ?, ?, ?, 
-            ?, ?, ?, 
-            ?, ?);
 
 
 
 
+ALTER TABLE person ADD COLUMN mailing_address_thirdline text;
 
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (10, 'database/patches/dbpatch_beta10.sql', '04-16-2019', 'ecd', 'case reports and citation lifecycle');
+    VALUES (10, 'database/patches/dbpatch_beta10.sql', '04-17-2019', 'ecd', 'case reports, citations, phase change rules');
 

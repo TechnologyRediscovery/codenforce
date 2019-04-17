@@ -5,13 +5,28 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.ReportConfig;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import org.primefaces.model.chart.Axis;
+import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
+import org.primefaces.model.chart.ChartSeries;
+import org.primefaces.model.chart.HorizontalBarChartModel;
 
 /**
  *
@@ -26,8 +41,13 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
    
     private ReportConfigCEEventList reportCEEvent;
     
-    private BarChartModel caseCountByStage;
+    private HorizontalBarChartModel caseCountByPhase;
+    private HorizontalBarChartModel caseCountByStage;
+    
     private BarChartModel violationCountByOrdinance;
+    
+    private List<CECase> caseList;
+    private Map<CasePhase, Integer> cPhaseMap;
      
 
     /**
@@ -39,6 +59,18 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
+        SessionSystemCoordinator ssc = getSsCoordinator();
+        caseList = getSessionBean().getcECaseQueue();
+        
+        try {
+            cPhaseMap = ssc.getCaseCountsByPhase(caseList);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        
+        
+        
         reportCECase = getSessionBean().getReportConfigCECase();
         reportCECaseList = getSessionBean().getReportConfigCECaseList();
         if(reportCECase != null){
@@ -46,7 +78,83 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         } else {
             currentReport = reportCECaseList;
         }
+        
+        generateModelCaseCountByPhase();
+        generateModelCaseCountsByStage();
     }
+    
+     private void generateModelCaseCountByPhase() {
+        
+        caseCountByPhase = new HorizontalBarChartModel();
+        
+        ChartSeries caseCountSeries = new ChartSeries();
+        caseCountSeries.setLabel("Count of CE cases");
+        Set<CasePhase> phaseSet = cPhaseMap.keySet();
+        Integer max = 0;
+        for(CasePhase p : phaseSet) {
+            Integer cnt = cPhaseMap.get(p);
+            if(cnt > max){
+                max = cnt;
+            }
+            caseCountSeries.set(p,cnt);
+        }
+              
+        caseCountByPhase.addSeries(caseCountSeries);
+        caseCountByPhase.setTitle("Case count by phase");
+        caseCountByPhase.setLegendPosition("ne");
+        caseCountByPhase.getAxis(AxisType.Y).setTickAngle(-45);
+        
+        Axis yAxis = caseCountByPhase.getAxis(AxisType.Y);
+        yAxis.setLabel("Case Phase");
+        
+        Axis xAxis = caseCountByPhase.getAxis(AxisType.X);
+        xAxis.setLabel("Num of open cases");
+        xAxis.setMin(0);
+        // add 2 for spacing
+        xAxis.setMax(max + 1);
+        
+    }
+     
+     public void generateModelCaseCountsByStage(){
+         caseCountByStage = new HorizontalBarChartModel();
+        SessionSystemCoordinator ssc = getSsCoordinator();
+        ChartSeries caseCountSeries = new ChartSeries();
+        caseCountSeries.setLabel("Count of CE cases");
+        Map<CaseStage, Integer> stageMap = null;
+        try {
+             stageMap = ssc.getCaseCountsByStage(caseList);
+        } catch (IntegrationException ex) {
+            Logger.getLogger(ReportingBB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CaseLifecyleException ex) {
+            Logger.getLogger(ReportingBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        Set<CaseStage> stageSet = stageMap.keySet();
+        Integer max = 0;
+        for(CaseStage s : stageSet) {
+            Integer cnt = stageMap.get(s);
+            if(cnt > max){
+                max = cnt;
+            }
+            caseCountSeries.set(s,cnt);
+        }
+              
+        caseCountByStage.addSeries(caseCountSeries);
+        caseCountByStage.setTitle("Case count by stage");
+        caseCountByStage.setLegendPosition("ne");
+        caseCountByStage.getAxis(AxisType.Y).setTickAngle(-45);
+        
+        Axis yAxis = caseCountByStage.getAxis(AxisType.Y);
+        yAxis.setLabel("Case Stage");
+        
+        Axis xAxis = caseCountByStage.getAxis(AxisType.X);
+        xAxis.setLabel("Num of open cases");
+        xAxis.setMin(0);
+        // add 1 to breathe
+        xAxis.setMax(max + 1);
+     }
+     
+     
     
 
     /**
@@ -108,17 +216,17 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the caseCountByStage
+     * @return the caseCountByPhase
      */
-    public BarChartModel getCaseCountByStage() {
-        return caseCountByStage;
+    public HorizontalBarChartModel getCaseCountByPhase() {
+        return caseCountByPhase;
     }
 
     /**
-     * @param caseCountByStage the caseCountByStage to set
+     * @param caseCountByPhase the caseCountByPhase to set
      */
-    public void setCaseCountByStage(BarChartModel caseCountByStage) {
-        this.caseCountByStage = caseCountByStage;
+    public void setCaseCountByPhase(HorizontalBarChartModel caseCountByPhase) {
+        this.caseCountByPhase = caseCountByPhase;
     }
 
     /**
@@ -133,6 +241,48 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      */
     public void setViolationCountByOrdinance(BarChartModel violationCountByOrdinance) {
         this.violationCountByOrdinance = violationCountByOrdinance;
+    }
+
+    /**
+     * @return the caseList
+     */
+    public List<CECase> getCaseList() {
+        return caseList;
+    }
+
+    /**
+     * @param caseList the caseList to set
+     */
+    public void setCaseList(List<CECase> caseList) {
+        this.caseList = caseList;
+    }
+
+    /**
+     * @return the cPhaseMap
+     */
+    public Map<CasePhase, Integer> getcPhaseMap() {
+        return cPhaseMap;
+    }
+
+    /**
+     * @param cPhaseMap the cPhaseMap to set
+     */
+    public void setcPhaseMap(Map<CasePhase, Integer> cPhaseMap) {
+        this.cPhaseMap = cPhaseMap;
+    }
+
+    /**
+     * @return the caseCountByStage
+     */
+    public HorizontalBarChartModel getCaseCountByStage() {
+        return caseCountByStage;
+    }
+
+    /**
+     * @param caseCountByStage the caseCountByStage to set
+     */
+    public void setCaseCountByStage(HorizontalBarChartModel caseCountByStage) {
+        this.caseCountByStage = caseCountByStage;
     }
     
 }
