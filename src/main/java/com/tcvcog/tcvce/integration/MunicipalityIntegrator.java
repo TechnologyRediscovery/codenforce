@@ -47,55 +47,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     public MunicipalityIntegrator() {
     }
     
-    public Map<String, Integer> getCaseCountsByPhase(int muniCode) throws IntegrationException{
-        
-        CasePhase[] phaseValuesArray = new CasePhase[8];
-        phaseValuesArray[0] = CasePhase.PrelimInvestigationPending;
-        phaseValuesArray[1] = CasePhase.NoticeDelivery;
-        phaseValuesArray[2] = CasePhase.InitialComplianceTimeframe;
-        phaseValuesArray[3] = CasePhase.SecondaryComplianceTimeframe;
-        phaseValuesArray[4] = CasePhase.AwaitingHearingDate;
-        phaseValuesArray[5] = CasePhase.HearingPreparation;
-        phaseValuesArray[6] = CasePhase.InitialPostHearingComplianceTimeframe;
-        phaseValuesArray[7] = CasePhase.SecondaryPostHearingComplianceTimeframe;
-        //CasePhase[] phaseValuesArray = CasePhase.values();
-        
-        Map<String, Integer> caseCountMap = new LinkedHashMap<>();
-        PreparedStatement stmt = null;
-        Connection con = null;
-        String query = "SELECT count(caseid) FROM cecase join property "
-                + "ON property.propertyid = cecase.property_propertyid "
-                + "WHERE property.municipality_municode = ? "
-                + "AND casephase = CAST(? AS casephase) ;";
-        ResultSet rs = null;
- 
-        try {
-            con = getPostgresCon();
-            for(CasePhase c: phaseValuesArray){
-                stmt = con.prepareStatement(query);
-                stmt.setInt(1, muniCode);
-                String phaseString = c.toString();
-                stmt.setString(2, phaseString);
-                rs = stmt.executeQuery();
-                while(rs.next()){
-                    caseCountMap.put(phaseString, rs.getInt(1));
-                }
-            
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.getCaseCountsByPhase", ex);
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return caseCountMap;
-        
-        
-    }
+  
     
     public Municipality getMuni(int muniCode) throws IntegrationException{
         Municipality muni = null;
