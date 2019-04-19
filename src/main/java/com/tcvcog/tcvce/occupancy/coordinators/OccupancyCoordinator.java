@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.occupancy.entities.InspectedSpace;
 import com.tcvcog.tcvce.occupancy.entities.LocationDescriptor;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
+import com.tcvcog.tcvce.occupancy.entities.PersonsRequirement;
 import com.tcvcog.tcvce.occupancy.entities.Space;
 import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
 import java.io.Serializable;
@@ -71,5 +72,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccPermitApplication occpermitapp = new OccPermitApplication();        
         occpermitapp.setSubmissionDate(LocalDateTime.now());        
         return occpermitapp;       
+    }
+    
+    public PersonsRequirement verifyOccPermitPersonsRequirement (PersonsRequirement pr){
+        // this will verify that this requirement has been satisfied based on the state of the application
+        return;
     }
 }
