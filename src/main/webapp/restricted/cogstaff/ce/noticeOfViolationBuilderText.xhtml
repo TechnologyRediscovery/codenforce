@@ -26,20 +26,14 @@
                         
                     <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                      columnClasses="gridTd, gridTd">
-                        
-                        
                         <h:panelGroup>
-
                             <p:dataScroller
                                 id="paragraph-scroller"
                                 value="#{noticeOfViolationBB.blockListByMuni}"
                                     var="block" 
                                     widgetVar="noticebuilder-ds-var">
-
-
                                 <div class="outlinedBox event-ds-box">
                                     <h2><h:outputText  value="#{block.textBlockName}"/></h2>
-
                                     <p:commandButton 
                                         ajax="true"
                                         immediate="true"
@@ -63,12 +57,8 @@
 
                                 </div>
                             </p:dataScroller>
-
-                            
                         </h:panelGroup>
                         <h:panelGroup>
-
-
                             <p:dataScroller
                                id="before-violations-scroller"
                                value="#{noticeOfViolationBB.blockListBeforeViolations}"
@@ -91,25 +81,18 @@
 
                             </p:dataScroller>
 
-
                             <h2>Signature</h2>
-
 
                             <p>
                                 <h:outputText id="sig1" value="#{sessionBean.facesUser.person.firstName} #{facesUser.person.lastName}"/><br/>
                                 <h:outputText id="sig2" value="#{sessionBean.facesUser.person.jobTitle}"/><br/>
-                                <h:outputText id="sig3" value="#{sessionBean.facesUser.muni.muniName}"/><br/>
-                                <h:outputText id="sig4" value="#{sessionbean.facesUser.person.phoneCell}"/><br/>
+                                <h:outputText id="sig3" value="#{sessionBean.activeMuni.muniName}"/><br/>
+                                <h:outputText id="sig4" value="#{sessionbean.facesUser.person.phoneWork}"/><br/>
                                 <h:outputText id="sig5" value="#{sessionBean.facesUser.person.email}"/>
                             </p>
                             
                         </h:panelGroup>
                     </h:panelGrid>
-
-
-                        <p:spacer height="15px"/>
-
-
                         <p:commandButton ajax="false" value="Assemble and edit draft notice" 
                                          action="#{noticeOfViolationBB.assembleNotice}"
                                          icon="fa fa-tasks"/>

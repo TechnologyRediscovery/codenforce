@@ -106,7 +106,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         Collections.sort(c.getEventListActionRequests());
         
         Collections.sort(c.getEventList());
-        Collections.reverse(c.getEventList());
+        Collections.reverse(c.getEventList()); 
         
         // check to make sure we have empty lists on all of our list objects
         if(c.getViolationList() == null){
@@ -172,8 +172,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         return sps;
     }
-    
-    
     
      /**
      * Returns a SearchParams subclass for retrieving all open

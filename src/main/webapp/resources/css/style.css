@@ -58,9 +58,12 @@ h1{
 }
 
 h2{
-    font-size: 1.2em;
-    color: #00b5ec;
-    font-weight: normal;
+    font-size: 1.4em;
+    /* color: #00b5ec;  sky blue*/
+    
+    /*darker sky*/
+    color: #00637F; 
+    font-weight: bold;
 }
 
 h3{

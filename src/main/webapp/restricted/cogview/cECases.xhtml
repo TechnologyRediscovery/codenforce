@@ -25,10 +25,6 @@
                             </h:form>
 
                             <h1><h:outputText value="Code enforcement case manager"/></h1>
-                            <h3>List builder:</h3>
-                            <h:outputText value="Filer#{caseProfileBB.searchParams.useIsOpen}"/>
-                            <h:outputText value="#{caseProfileBB.searchParams.isOpen}"/>
-
 
                             <h:form id="cecases-search-form">
                                 <p:fieldset legend="search options" 
@@ -356,6 +352,7 @@
                                                          case-details-form
                                                          event-dt-form
                                                          violation-form
+                                                         sessionInfoForm
                                                          notices-form:notices-ds
                                                          action-requests-form:actionRequestTable
                                                          events-datascroller-form
@@ -381,7 +378,7 @@
                                 <div class="outlinedBox">
 
                                     <h1>
-                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName}"/> 
+                                        <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName} | "/> 
                                         <h:outputText id="header-id-ot" value="Case ID: #{caseProfileBB.currentCase.caseID}"/><br/>
                                     </h1>
                                     <h2>
@@ -506,21 +503,27 @@
 
                                 <h2 id="violations">Code violations  </h2>
 
-                                <h:outputLabel styleClass="bold" value="Unresolved code violations: 
-                                               #{caseProfileBB.currentCase.violationListUnresolved.size()} 
-                                               / #{caseProfileBB.currentCase.violationList.size()}"/> 
-                                <p:spacer height="5px"/>
-
-                                <h:outputLabel styleClass="bold" value="Violations with compliance achieved: 
-                                               #{caseProfileBB.currentCase.violationListResolved.size()} 
-                                               / #{caseProfileBB.currentCase.violationList.size()}"/> 
-                                <p:spacer height="5px"/>
-
                                 <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
                                                  value="Add new code violation"
                                                  icon="fa fa-plus"
                                                  disabled="#{!sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"/>
                                 <p:spacer height="15px"/>
+                                
+                                <h:outputLabel styleClass="bold" value="Unresolved code violations: 
+                                               #{caseProfileBB.currentCase.violationListUnresolved.size()} 
+                                               / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                <p:spacer height="5px"/>
+                                
+                                <ui:remove >
+                                    
+
+                                <h:outputLabel styleClass="bold" value="Violations with compliance achieved: 
+                                               #{caseProfileBB.currentCase.violationListResolved.size()} 
+                                               / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                <p:spacer height="5px"/>
+                                
+                                </ui:remove>
+
 
 
 
@@ -539,24 +542,24 @@
 
                                     <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                                    <p:column width="4%">
+                                    <p:column width="2%">
                                         <p:rowToggler />
                                     </p:column>
 
 
-                                    <p:column width="5%">
+                                    <p:column width="4%">
                                         <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
                                     </p:column>
 
 
-                                    <p:column width="8%">
+                                    <p:column width="8%" sortBy="#{v.statusString}">
                                         <f:facet name="header">
                                             <h:outputText value="Status" />
                                         </f:facet>
                                         <h:outputText id="violation-status-ot" value="#{v.statusString}"/>
                                     </p:column>
 
-                                    <p:column width="15%">
+                                    <p:column width="13%">
                                         <f:facet name="header">
                                             <h:outputText value="Ordinance" />
                                         </f:facet>
@@ -575,7 +578,7 @@
                                                          disabled="#{empty v.photoList}"
                                                          update=":photo-form"/>
                                     </p:column>
-                                    <p:column width="30">
+                                    <p:column width="10%">
                                         <f:facet name="header">
                                             <h:outputText value="Stip Comp Date" />
                                         </f:facet>
@@ -601,6 +604,37 @@
                                                             value="Mark compliance"  
                                                             update="addNewEventForm"/>
                                     </p:column>
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+                                            <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                            <p:spacer height="5px" />
+                                            <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                          (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
+                                            <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                            <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                            <p:spacer height="2px" />
+                                            <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
+                                            <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
+                                            <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                            <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                            <p:spacer height="2px" />
+
+                                            <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTD" 
+                                                            rendered="true">
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+                                                    <div class="ord-text">
+                                                        <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                            </h:panelGrid>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Description of violation: "/>
+                                            <h:outputText styleClass="weight-normal" value="#{v.description}"/>
+                                        </div>
+                                    </p:rowExpansion>
                                 </p:dataTable>
 
                             </h:form>

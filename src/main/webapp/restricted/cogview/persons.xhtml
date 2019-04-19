@@ -103,6 +103,7 @@
                                                     update="change-person-form:personTable
                                                     messages-left-form:persons-messages-global"
                                                     icon="fa fa-history"/>
+                                
                                 <p:spacer height="2px"/>
 
                                 <p:dataTable
@@ -169,9 +170,6 @@
                                                          update="selected-person-info-form:selected-person-info-ds"/>
                                
                                     </p:column>
-
-                                    <p:rowExpansion>
-                                    </p:rowExpansion>
                                 </p:dataTable>
                             </h:form>
                         </div>
@@ -466,9 +464,11 @@
                                 <h:outputText value="#{p.firstName} #{p.lastName} (#{p.muni.muniName})"/>, Person ID:<h:outputText value="#{p.personID}"/>
 
                                 <p:spacer height="15px"/>
+                                
                                 <p:commandButton ajax="true" tabindex="2"
                                                  value="Cancel" icon="fa fa-stop" 
                                                  onclick="PF('person-note-dialog').hide()"/>
+                                
                                 <p:commandButton    ajax="true" actionListener="#{personsBB.attachNoteToPerson}" tabindex="3"
                                                     value="Submit" icon="fa fa-link" oncomplete="PF('person-note-dialog').hide()"
                                                     rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"

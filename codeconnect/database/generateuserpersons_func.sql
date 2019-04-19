@@ -26,7 +26,7 @@ BEGIN
 
 	    
 
-	    RETURN ;
+	    RETURN newpersonid;
 
 
 END;

@@ -139,7 +139,7 @@
                                 <h:panelGroup>
                                     <p:selectOneMenu id="muniSelectMenuUpdate" tabindex="5" value="#{textBlockBB.selectedBlock.muni}">
                                         <f:converter converterId="muniConverter"/>
-                                        <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                        <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                     </p:selectOneMenu>
                                     <h:message for="muniSelectMenuUpdate" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -214,7 +214,7 @@
                                 <h:panelGroup>
                                     <p:selectOneMenu id="muniSelectMenuadd" tabindex="5" value="#{textBlockBB.formMuni}">
                                         <f:converter converterId="muniConverter"/>
-                                        <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                        <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                     </p:selectOneMenu>
                                     <h:message for="muniSelectMenuadd" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />

@@ -70,7 +70,6 @@ public class Person extends EntityUtils implements Serializable{
     private String mailingAddressZip;
     
     private String mailingAddressState;
-    // postgres defaults this to true
     
     private String notes;
     

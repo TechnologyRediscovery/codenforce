@@ -54,7 +54,7 @@ INSERT INTO public.cecasephasechangerule(
             description, triggeredeventcatreqcat)
     VALUES (1000, 'condemation', 'Closed'::casephase, NULL , 'Closed'::casephase, 
             NULL, NULL, 122, 
-            128, 128, TRUE, FALSE
+            128, 128, TRUE, FALSE,
             FALSE, FALSE, TRUE,
             'Checks that a case is not closed and case has not previously condemned this property', NULL);
 
