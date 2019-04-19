@@ -21,8 +21,11 @@
                         
                         <p:chart type="bar" model="#{reportingBB.caseCountByStage}" style="width:800px; height:800px"/>
                         
-                        <h2>Case counts by phase</h2>
-                        <p:chart type="bar" model="#{reportingBB.caseCountByPhase}" style="width:1000px; height:1000px"/>
+                        <ui:remove>
+                            <h2>Case counts by phase</h2>
+                            <p:chart type="bar" model="#{reportingBB.caseCountByPhase}" style="width:1000px; height:1000px"/>
+                            
+                        </ui:remove>
                         
                         
                     </h:form>
@@ -61,7 +64,7 @@
                             value="#{caseProfileBB.caseList}"
                             var="cse">
 
-                            <h1>
+                            <h1 class="printing-page-break-before">
                                 <h:outputText id="header-addr-ot" value="#{cse.property.address} "/>  
                                 <h:outputText id="header-muni-ot" value="(#{cse.property.muni.muniName})"/>  
                             </h1>
@@ -199,7 +202,7 @@
                             </p:dataTable>
 
 
-                            <h2 id="notices" class="printing-page-break-before" >Notices of violation</h2>
+                            <h2 id="notices" >Notices of violation</h2>
 
                             <p:dataTable
                                 id="notices-datatable"

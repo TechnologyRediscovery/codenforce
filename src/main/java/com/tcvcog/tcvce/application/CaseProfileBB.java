@@ -543,6 +543,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
         }
         currentCase = c;
+        getSessionBean().setActiveProp(c.getProperty());
         removedEventList.clear();
     }
 

@@ -69,8 +69,6 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
         // the selected person should be initiated using logic in getSelectedPerson
         selectedPerson = getSessionBean().getActivePerson();
-        
-        
     }
     
     public String viewPersonAssociatedProperty(Property p){
@@ -91,7 +89,6 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
                     , "Unable to update notes, sorry!"
                     , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
-        
     }
     
     
@@ -115,8 +112,6 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             
         }
         return "persons";
-        
-        
     }
     
     public String initiatePersonUpdate(){
