@@ -32,7 +32,7 @@ public class OccPermitApplication {
     private OccPermitApplicationReason reason;
     private boolean multiUnit;
     private LocalDateTime submissionDate;
-    private java.util.Date submissionDateUtilDate;;
+    private Date submissionDateUtilDate;;
     private String submissionNotes;
     private String internalNotes;
     private Property applicationProperty;
