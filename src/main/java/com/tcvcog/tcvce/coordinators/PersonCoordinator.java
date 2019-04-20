@@ -138,17 +138,31 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    public int createChostPerson(Person p, User u) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        int newGhostID = pi.createGhost(p, u);
+        return newGhostID;        
+        
+    }
+    
+    public int createClonedPerson(Person p, User u) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        int newCloneID = pi.createClone(p, u);
+        return newCloneID;
+    }
+    
     public List<Person> loadPersonHistoryList(User u) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         return pi.getPersonHistory(u);
         
     }
+    
+    
 
     /**
      * @return the personTypes
      */
     public PersonType[] getPersonTypes() {
-        ArrayList<PersonType> al = new ArrayList<>();
         personTypes = PersonType.values();
         return personTypes;
     }

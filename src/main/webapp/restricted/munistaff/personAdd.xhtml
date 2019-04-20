@@ -59,7 +59,7 @@
                                     <h:outputLabel styleClass="bold" value="Municipality" for="personMuniSelectMenu"/>
                                     <p:spacer height="3px"/>
                                     <p:selectOneMenu
-                                        id="muniSM" tabindex="1"
+                                        id="muniSM" tabindex="1" var=""
                                         value="#{personsBB.selectedPerson.muni}">
                                         <f:converter converterId="muniConverter"/>
                                         <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
