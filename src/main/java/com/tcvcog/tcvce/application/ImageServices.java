@@ -26,7 +26,7 @@ import org.primefaces.model.StreamedContent;
 
 /**
  *
- * @author sylvia
+ * @author noah
  */
 public class ImageServices extends BackingBeanUtils implements Serializable{
 
@@ -55,6 +55,8 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
     
     public void deletePhotograph(int photoID) throws IntegrationException{
         // TODO: delete from linker tables as they are added
+        
+        //actionrequest linker table
         Connection con = getPostgresCon();
         String query = "DELETE" +
                         "  FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ?;";
@@ -70,6 +72,20 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
             throw new IntegrationException("Error deleting photo", ex);
         }
         
+        //violation linker table
+        query = "DELETE FROM public.codeviolationphotodoc WHERE photodoc_photodocid = ?";
+        stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photoID);
+            stmt.executeQuery();
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error deleting photo", ex);
+        }
+        
+        //delete the main photodoc entry
         query = "DELETE FROM public.photodoc WHERE photodocid = ?;";
         
         stmt = null;
