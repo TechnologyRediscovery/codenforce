@@ -41,8 +41,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.createghostperson(person, integer)
-  OWNER TO sylvia;
 
 
 
