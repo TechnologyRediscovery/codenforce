@@ -101,6 +101,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         newP.setBusinessEntity(false);
         newP.setCompositeLastName(false);
         newP.setUseSeparateMailingAddress(false);
+        newP.setMuniCode(m.getMuniCode());
         newP.setAddressState("PA");
         return newP;
         
