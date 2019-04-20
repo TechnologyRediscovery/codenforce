@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -38,6 +39,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -343,8 +345,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    
-
     public void connectPersonToProperty(Person person, Property prop) throws IntegrationException {
 
         String query = "INSERT INTO public.propertyperson(\n"
@@ -534,6 +534,79 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
     }
+    
+    public void connectPersonToMunicipalities(List<Municipality> munuiList, Person p) throws IntegrationException {
+
+        Iterator<Municipality> iter = munuiList.iterator();
+        while (iter.hasNext()) {
+            connectPersonToMunicipality( (Municipality) iter.next(), p);
+        }
+    }
+    
+    
+    public void connectPersonToMunicipality(Municipality munui, Person p) throws IntegrationException {
+
+        String query =  "INSERT INTO public.personmunilink(\n" +
+                        "            muni_municode, person_personid)\n" +
+                        "    VALUES (?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, munui.getMuniCode());
+            stmt.setInt(2, p.getPersonID());
+
+            System.out.println("PersonIntegrator.connectPersonToMunicipality | sql: " + stmt.toString());
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to connect person to muni ", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
+    
+    public void connectPersonsToCitation(Citation c, List<Person> persList) throws IntegrationException {
+        Iterator<Person> iter = persList.iterator();
+        while (iter.hasNext()) {
+            connectPersonToCitation( c, (Person) iter.next());
+        }
+    }
+    
+    
+    public void connectPersonToCitation(Citation c, Person p) throws IntegrationException {
+
+        String query =  "INSERT INTO public.citationperson(\n" +
+                        "    citation_citationid, person_personid)\n" +
+                        "    VALUES (?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, c.getCitationID());
+            stmt.setInt(2, p.getPersonID());
+
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to connect person to citation ", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
+    
 
     /**
      * Generates a linked list of Person objects given an array of person ID
@@ -713,6 +786,70 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         System.out.println("PersonIntegrator Retrieved history of size: " + al.size());
         return al;
+
+    }
+
+    public int createGhost(Person p, User u) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int newGhostID = 0;
+
+        try {
+            String s = "select createghostperson(p.*, ? ) from person AS p where personid = ?;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, p.getPersonID());
+            stmt.setInt(1, u.getUserID());
+
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                newGhostID = rs.getInt("createghostperson");
+                System.out.println("PersonIntegrator.createGhostPerson | new ghost ID: " + newGhostID );
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getGhost | Unable create ghost person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return newGhostID;
+
+    }
+
+    public int createClone(Person p, User u) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int newGhostID = 0;
+
+        try {
+            String s = "select creatClonedperson(p.*, ? ) from person AS p where personid = ?;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, p.getPersonID());
+            stmt.setInt(1, u.getUserID());
+
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                newGhostID = rs.getInt("createClonedperson");
+                System.out.println("PersonIntegrator.createClone| new clone ID: " + newGhostID );
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.createClone | Unable to make Clone person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return newGhostID;
 
     }
     

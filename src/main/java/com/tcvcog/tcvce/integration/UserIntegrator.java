@@ -307,7 +307,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         User newUser = new User();
         // broken query
-        String query = "SELECT userid, userrole, username, muni_municode, notes, activitystartdate, \n" +
+        String query = "SELECT userid, userrole, username, notes, activitystartdate, \n" +
                         "       activitystopdate, accesspermitted, enforcementofficial, badgenumber, \n" +
                         "       orinumber, personlink "
                 + "FROM login where userid = ?;";
