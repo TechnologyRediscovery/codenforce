@@ -16,17 +16,66 @@ import java.util.ArrayList;
  * @author Dominic Pimpinella and Eric Darsow
  */
 public class PersonsRequirement extends EntityUtils implements Serializable {
-    
+   
     private boolean requirementSatisfied;
     private ArrayList<PersonType> requiredPersons;
     private ArrayList<PersonType> optionalPersons;
-   
-    /**
-     * This will contain either existing Person objects, new Person objects created by user, or clones of existing Person 
-     * objects whose reference persons data was changed as part of the application. The occupancy coordinator will digest this
-     * list to determine if the requirements have been satisfied.
-     */
-    private ArrayList<Person> attachedPersons;
     private String requirementExplanation;
+    
+    /**
+     * @return the requirementSatisfied
+     */
+    public boolean isRequirementSatisfied() {
+        return requirementSatisfied;
+    }
+
+    /**
+     * @param requirementSatisfied the requirementSatisfied to set
+     */
+    public void setRequirementSatisfied(boolean requirementSatisfied) {
+        this.requirementSatisfied = requirementSatisfied;
+    }
+
+    /**
+     * @return the requiredPersons
+     */
+    public ArrayList<PersonType> getRequiredPersons() {
+        return requiredPersons;
+    }
+
+    /**
+     * @param requiredPersons the requiredPersons to set
+     */
+    public void setRequiredPersons(ArrayList<PersonType> requiredPersons) {
+        this.requiredPersons = requiredPersons;
+    }
+
+    /**
+     * @return the optionalPersons
+     */
+    public ArrayList<PersonType> getOptionalPersons() {
+        return optionalPersons;
+    }
+
+    /**
+     * @param optionalPersons the optionalPersons to set
+     */
+    public void setOptionalPersons(ArrayList<PersonType> optionalPersons) {
+        this.optionalPersons = optionalPersons;
+    }
+
+    /**
+     * @return the requirementExplanation
+     */
+    public String getRequirementExplanation() {
+        return requirementExplanation;
+    }
+
+    /**
+     * @param requirementExplanation the requirementExplanation to set
+     */
+    public void setRequirementExplanation(String requirementExplanation) {
+        this.requirementExplanation = requirementExplanation;
+    }
     
 }

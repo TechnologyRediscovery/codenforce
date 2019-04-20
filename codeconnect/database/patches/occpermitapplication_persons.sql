@@ -4,12 +4,13 @@ BEGIN;
 an occupancy permit application */
 
 ALTER TABLE occpermitapplicationperson
-ADD isapplicant boolean;
+ADD COLUMN isapplicant boolean;
 
 -- Add optionalpersontypes to occpermitapplicationreason
 
 ALTER TABLE occpermitapplicationreason
-ADD optionalpersontypes persontype[];
+ADD COLUMN optionalpersontypes persontype[],
+ADD COLUMN personfriendlydescription text;
 
 -- Populate optionalpersontypes 
 
@@ -26,6 +27,26 @@ WHERE reasonid = '3';
 UPDATE occpermitapplicationreason
 SET requiredpersontypes = '{Owner}'
 WHERE reasonid = '1';
+
+
+-- Add person friendly descriptions
+
+/*
+***********************
+WE HAVE A DESCREPANCY BETWEEN OWNER, FUTUREOWNER, OWNERNONOCCUPANT, OWNEROCCUPANT ETC
+IS FUTURE OWNER REALLY NEW OWNER, CURRENT OWNER REALLY OLD OWNER?
+***********************
+*/
+
+UPDATE occpermitapplicationreason
+SET personfriendlydescription = description.descriptiontext
+FROM (VALUES 
+	(1, 'An owner must be added to an occupancy permit application for a new rental property. Optionally, a property manager and the tenants who will be renting the property can also be added.'),
+	(2, 'Both the current owner and future owner must be added to an occupancy permit application that is being created due to the sale of a property.'),
+	(3, 'An owner, plus all incoming tenants must be added to an occupancy permit application created due to a change in tenants. Optionally, a property manager can also be added.'),
+	(4, 'An owner must be added to an occupancy permit application in the case of change of use.')
+	) as description(id, descriptiontext)
+WHERE description.id = occpermitapplicationreason.reasonid;
 
 COMMIT;
 

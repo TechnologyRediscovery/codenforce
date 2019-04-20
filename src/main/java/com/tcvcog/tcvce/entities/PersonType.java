@@ -34,7 +34,7 @@ public enum PersonType{
     Public("Public"),
     LawEnforcement("Law Enforcement"),
     Other("Other"),
-    ownercntylookup("Owner from county databse"),
+    ownercntylookup("Owner from county database"),
     LegacyOwner("Legacy owner"),
     LegacyAgent("Legacy Agent");
     

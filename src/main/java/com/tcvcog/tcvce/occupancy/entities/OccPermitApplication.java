@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -37,6 +38,12 @@ public class OccPermitApplication {
     private String internalNotes;
     private Property applicationProperty;
     private Person applicantPerson;
+        /**
+     * This will contain either existing Person objects, new Person objects created by user, or clones of existing Person 
+     * objects whose reference persons data was changed as part of the application. The occupancy coordinator will digest this
+     * list to determine if the requirements have been satisfied.
+     */
+    private ArrayList<Person> attachedPersons;
 
     /**
      * @return the id
@@ -152,6 +159,20 @@ public class OccPermitApplication {
      */
     public void setApplicantPerson(Person applicantPerson) {
         this.applicantPerson = applicantPerson;
+    }
+
+    /**
+     * @return the attachedPersons
+     */
+    public ArrayList<Person> getAttachedPersons() {
+        return attachedPersons;
+    }
+
+    /**
+     * @param attachedPersons the attachedPersons to set
+     */
+    public void setAttachedPersons(ArrayList<Person> attachedPersons) {
+        this.attachedPersons = attachedPersons;
     }
     
 }
