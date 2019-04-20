@@ -76,6 +76,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     public PersonsRequirement verifyOccPermitPersonsRequirement (PersonsRequirement pr){
         // this will verify that this requirement has been satisfied based on the state of the application
-        return;
+        return pr;
     }
 }

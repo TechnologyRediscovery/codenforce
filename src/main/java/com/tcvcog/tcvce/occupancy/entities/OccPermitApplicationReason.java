@@ -103,7 +103,6 @@ public class OccPermitApplicationReason {
      */
     public void setPersonsRequirement(PersonsRequirement personsRequirement) {
         this.personsRequirement = personsRequirement;
-    }
-    
+    }    
     
 }
