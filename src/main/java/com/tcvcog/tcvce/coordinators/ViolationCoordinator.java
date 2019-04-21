@@ -103,7 +103,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         eventCat = ec.getInitiatlizedEventCategory(
                 Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
                 .getString("propertyInspection")));
-        tfEvent.setActionEventCat(eventCat);
+        tfEvent.setRequestedEventCat(eventCat);
         tfEvent.setActionRequestedBy(uc.getCogBotUser());
         
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT)

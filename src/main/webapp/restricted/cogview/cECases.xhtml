@@ -657,11 +657,11 @@
 
                                         <div class="status-display-container">
                                             <div class="action-request-icon">
-                                                <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.actionEventCat.icon.materialIcon}"/></i>
+                                                <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.requestedEventCat.icon.materialIcon}"/></i>
                                             </div>
                                             <div class="status-display-status-list-container">
                                                 <div class="action-request-header">
-                                                    <h:outputText value="Requested Action: #{e.actionEventCat.eventCategoryTitle}"/>
+                                                    <h:outputText value="Requested Action: #{e.requestedEventCat.eventCategoryTitle}"/>
                                                 </div>
 
                                                 <div class="action-request-subheader">
@@ -710,7 +710,7 @@
                                                 <p:commandButton   id="action-requests-take-requested-action-cb" 
                                                                    ajax="true"
                                                                    actionListener="#{caseProfileBB.initiateNewRequestedEvent(e)}"
-                                                                   value="take action: #{e.actionEventCat.eventCategoryTitle}" 
+                                                                   value="take action: #{e.requestedEventCat.eventCategoryTitle}" 
                                                                    styleClass="noFill"
                                                                    disabled="#{e.responseComplete}"
                                                                    icon="fa fa-play-circle-o"
@@ -984,7 +984,7 @@
                                                 <h:panelGroup>
                                                     <h:outputText styleClass="bold" value="Requested event: "/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.actionEventCat.eventType.label}: #{e.actionEventCat.eventCategoryTitle}"/>
+                                                        <h:outputText value="#{e.requestedEventCat.eventType.label}: #{e.requestedEventCat.eventCategoryTitle}"/>
                                                     </div>
                                                 </h:panelGroup>
 
@@ -1650,7 +1650,7 @@
                                     <p:spacer height="5px"/>
 
                                     <p:selectOneMenu style="width: 300px;" id="requested-action-solb" 
-                                                     value="#{caseProfileBB.selectedEvent.actionEventCat}" tabindex="19"
+                                                     value="#{caseProfileBB.selectedEvent.requestedEventCat}" tabindex="19"
                                                      disabled="#{!caseProfileBB.includeActionRequest 
                                                                  or caseProfileBB.selectedEvent.responseComplete
                                                                  or !(empty caseProfileBB.triggeringEventForRequestedCaseAction)}">

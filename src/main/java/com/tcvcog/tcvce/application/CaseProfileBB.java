@@ -331,7 +331,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @param ev 
      */
     public void initiateNewRequestedEvent(EventCECase ev){
-        selectedEventCategory = ev.getActionEventCat();
+        selectedEventCategory = ev.getRequestedEventCat();
         triggeringEventForRequestedCaseAction = ev;
         initiateNewEvent();
     }
@@ -473,7 +473,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
 //        currentCase.getEventList().remove(selectedEvent);
         try {
-            if(selectedEvent.getActionEventCat()!= null){
+            if(selectedEvent.getRequestedEventCat()!= null){
                 selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
             }
             ec.editEvent(selectedEvent, getSessionBean().getFacesUser());

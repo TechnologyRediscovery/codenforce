@@ -9,45 +9,103 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * Ushering a code enforcement case through these phases is driven by a set of rules which are encapsulated in an object called the `CasePhaseChangeRule`. These objects live on `EventCategory` objects and, when present on a given `Event`, are used by the `CaseCoordinator` during event processing to make two distinct but related determinations:
+ * 
+ * 1) Should this case's phase be changed? If so, to what?
+ * 2) Do I need to create an Event that requests an action from a user? If so, what `EventCategory` should be requested?
  *
+ * Information for making both of these determinations is bundled in the single `CasePhaseChangeRule` object because many requested event categories themselves trigger case phase changes, so designing the relationships together and writing them to a single object simplifies what is already a somewhat convoluted determination process.
  * @author sylvia
  */
 public class CasePhaseChangeRule extends EntityUtils implements Serializable {
     
+    /**
+     * Rule's unique ID pulled from DB
+     */
     private int ruleID;
+    /**
+     * Human-friendly title of rule
+     */
     private String title;
+    /**
+     * Human friendly description of this rule
+     */
+    private String description;
         
+    /**
+     * The case to which the Code Enforcent case will be assigned if the rule
+     * passes. 
+     */
     private CasePhase targetCasePhase;
+    /**
+     * For rule to pass, the case  must currently be in this CasePhase
+     */
     private CasePhase requiredCurrentCasePhase;
+    /**
+     * CasePhases are ordered. If this memvar is true, consider 
+     * requiredCurrentCasePhase value as the UPPER END boundary
+     * of a rang of CasePhases extending from the initial phase to the specified
+     * CasePhase
+     * 
+     */
+    private boolean treatRequiredPhaseAsThreshold;
+    
+    /**
+     * For rule to pass, the case must NOT be in this CasePhase
+     */
     private CasePhase forbiddenCurrentCasePhase;
+    /**
+     * CasePhases are ordered. If this memvar is true, consider the 
+     * forbiddenCurrentCasePhase value the LOWER END of a range of CasePhases
+     * extending to the highest ordinal CasePhase, which is CasePhase.Closed
+     */
+    private boolean treatForbiddenPhaseAsThreshold;
     
+    /**
+     * For the rule to pass, an event of this EventTYpe must exist on the case 
+     */
     private EventType requiredExtantEventType;
+    /**
+     * For the rule to pass, an event of this EventType may NOT exist on the case.
+     * This is handy to avoid adding multiple Events triggered by the presence of 
+     * a different event. E.g. create a rule that says "Add a reminder to create a 
+     * NOV as long as there is a CodeViolation attachment event not BUT 
+     * a NoticeQueued event
+     */
     private EventType forbiddenExtantEventType;
-    
-    
+    /**
+     * For the rule to pass, an event of this EventCategory id MUST exist on the case 
+     */
     private int requiredExtantEventCatID;
+    /**
+     * For the rule to pass, an event of this EventCategory id MUST NOT exist on the case 
+     */
     private int forbiddenExtantEventCatID;
     
+    /**
+     * If the rule passes, create an Event with this category ID
+     */
     private int triggeredEventCategoryID;
-    private int triggeredEventCategoryRequestedEventID;
+    /**
+     * If the rule passes and a triggeredEventCategoryID is specified, 
+     * load up that Event with an EventCategory with this ID
+     */
+    private int triggeredEventCategoryRequestedEventCatID;
     
-    
-    
-    // These four are deprecated due to object creation cycles
-    // use only IDs and grab the complete object separate from
-    // these ChangeRule ogjects
-    private EventCategory requiredExtantEventCat;
-    private EventCategory forbiddenExtantEventCat;
-    
-    private EventCategory triggeredEventCategory;
-    private EventCategory triggeredEventCategoryRequestedEvent;
-    
+    /**
+     * Declares the rule active or inactive; inactiev rules are completely ignored
+     */
     private boolean active;
+    /**
+     * Objects containing this rule must have the rule processes
+     */
     private boolean mandatory;
-    private boolean treatRequiredPhaseAsThreshold;
-    private boolean treatForbiddenPhaseAsThreshold;
+    /**
+     * If toggled to true, if this rule failes, trigger an exception and do not
+     * process any actions assocaited with the Event or CitationStatus object
+     */
     private boolean rejectRuleHostIfRuleFails;
-    private String description;
+    
    
 
     /**
@@ -106,19 +164,7 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
         return forbiddenExtantEventType;
     }
 
-    /**
-     * @return the requiredExtantEventCat
-     */
-    public EventCategory getRequiredExtantEventCat() {
-        return requiredExtantEventCat;
-    }
-
-    /**
-     * @return the forbiddenExtantEventCat
-     */
-    public EventCategory getForbiddenExtantEventCat() {
-        return forbiddenExtantEventCat;
-    }
+   
 
     /**
      * @param ruleID the ruleID to set
@@ -162,20 +208,7 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
         this.forbiddenExtantEventType = forbiddenExtantEventType;
     }
 
-    /**
-     * @param requiredExtantEventCat the requiredExtantEventCat to set
-     */
-    public void setRequiredExtantEventCat(EventCategory requiredExtantEventCat) {
-        this.requiredExtantEventCat = requiredExtantEventCat;
-    }
-
-    /**
-     * @param forbiddenExtantEventCat the forbiddenExtantEventCat to set
-     */
-    public void setForbiddenExtantEventCat(EventCategory forbiddenExtantEventCat) {
-        this.forbiddenExtantEventCat = forbiddenExtantEventCat;
-    }
-
+   
     @Override
     public int hashCode() {
         int hash = 5;
@@ -186,8 +219,6 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
         hash = 11 * hash + Objects.hashCode(this.forbiddenCurrentCasePhase);
         hash = 11 * hash + Objects.hashCode(this.requiredExtantEventType);
         hash = 11 * hash + Objects.hashCode(this.forbiddenExtantEventType);
-        hash = 11 * hash + Objects.hashCode(this.requiredExtantEventCat);
-        hash = 11 * hash + Objects.hashCode(this.forbiddenExtantEventCat);
         return hash;
     }
 
@@ -224,28 +255,11 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
         if (this.forbiddenExtantEventType != other.forbiddenExtantEventType) {
             return false;
         }
-        if (!Objects.equals(this.requiredExtantEventCat, other.requiredExtantEventCat)) {
-            return false;
-        }
-        if (!Objects.equals(this.forbiddenExtantEventCat, other.forbiddenExtantEventCat)) {
-            return false;
-        }
+      
         return true;
     }
 
-    /**
-     * @return the triggeredEventCategory
-     */
-    public EventCategory getTriggeredEventCategory() {
-        return triggeredEventCategory;
-    }
-
-    /**
-     * @return the triggeredEventCategoryRequestedEvent
-     */
-    public EventCategory getTriggeredEventCategoryRequestedEvent() {
-        return triggeredEventCategoryRequestedEvent;
-    }
+   
 
     /**
      * @return the active
@@ -289,19 +303,7 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
         return description;
     }
 
-    /**
-     * @param triggeredEventCategory the triggeredEventCategory to set
-     */
-    public void setTriggeredEventCategory(EventCategory triggeredEventCategory) {
-        this.triggeredEventCategory = triggeredEventCategory;
-    }
-
-    /**
-     * @param triggeredEventCategoryRequestedEvent the triggeredEventCategoryRequestedEvent to set
-     */
-    public void setTriggeredEventCategoryRequestedEvent(EventCategory triggeredEventCategoryRequestedEvent) {
-        this.triggeredEventCategoryRequestedEvent = triggeredEventCategoryRequestedEvent;
-    }
+    
 
     /**
      * @param active the active to set
@@ -374,10 +376,10 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the triggeredEventCategoryRequestedEventID
+     * @return the triggeredEventCategoryRequestedEventCatID
      */
-    public int getTriggeredEventCategoryRequestedEventID() {
-        return triggeredEventCategoryRequestedEventID;
+    public int getTriggeredEventCategoryRequestedEventCatID() {
+        return triggeredEventCategoryRequestedEventCatID;
     }
 
     /**
@@ -395,10 +397,10 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
     }
 
     /**
-     * @param triggeredEventCategoryRequestedEventID the triggeredEventCategoryRequestedEventID to set
+     * @param triggeredEventCategoryRequestedEventCatID the triggeredEventCategoryRequestedEventCatID to set
      */
-    public void setTriggeredEventCategoryRequestedEventID(int triggeredEventCategoryRequestedEventID) {
-        this.triggeredEventCategoryRequestedEventID = triggeredEventCategoryRequestedEventID;
+    public void setTriggeredEventCategoryRequestedEventCatID(int triggeredEventCategoryRequestedEventCatID) {
+        this.triggeredEventCategoryRequestedEventCatID = triggeredEventCategoryRequestedEventCatID;
     }
 
     

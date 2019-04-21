@@ -128,7 +128,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
        
         ev.setCurrentUserCanTakeAction(canUserTakeRequestedAction(ev, user, userAuthMuniList));
-        if(ev.getActionEventCat()!= null){
+        if(ev.getRequestedEventCat()!= null){
             if(ev.isRequestActionByDefaultMuniCEO()){
                     ev.setResponderIntended(ci.getDefaultCodeOfficer(ev.getCaseID()));
             }
@@ -261,9 +261,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * Factory method for event categories.
-     * Whoever calls this method will still need to do basic setup of the event 
-     * before sending to the CaseCoordinator processEvent(CEEvent e) method
+     * Factory method for creating bare event categories.
+     * This is used when creating search parameter objects where we want event
+     * types without a specific category, but we need a EventCategory shell
+     * in which to insert the EventType
+     * 
      * @return an EventCategory container with basic properties set
      */
     public EventCategory getInitializedEventCateogry(){
