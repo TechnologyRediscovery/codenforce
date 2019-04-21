@@ -96,7 +96,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // the head of the case profile
         if(c.getEventList() !=  null && c.getEventList().size() >= 1){
             for(EventCECase ev: c.getEventList()){
-                if(ev.getActionEventCat()!= null && !ev.isResponseComplete()){
+                if(ev.getRequestedEventCat()!= null && !ev.isResponseComplete()){
                     evList.add(ev);
                 }
             }

@@ -391,8 +391,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
             
-            if(event.getActionEventCat()!= null){
-                stmt.setInt(14, event.getActionEventCat().getCategoryID());
+            if(event.getRequestedEventCat()!= null){
+                stmt.setInt(14, event.getRequestedEventCat().getCategoryID());
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
@@ -467,7 +467,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("       disclosetopublic=?, activeevent=?, ");
         sb.append("       hidden=?, notes=? ");
         
-        if(event.getActionEventCat()!= null){
+        if(event.getRequestedEventCat()!= null){
             sb.append(", requestedeventcat_catid=?, actionrequestedby_userid=?, directrequesttodefaultmuniceo=?, responderintended_userid=?  ");
         }
         sb.append(" WHERE eventid = ?;");
@@ -493,9 +493,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(9, event.isHidden());
             stmt.setString(10, event.getNotes());
             int paramCounter = 10;
-        if(event.getActionEventCat()!= null){
+        if(event.getRequestedEventCat()!= null){
             System.out.println("EventIntegrator.updateEvent: found event category to update");
-            stmt.setInt(++paramCounter, event.getActionEventCat().getCategoryID());
+            stmt.setInt(++paramCounter, event.getRequestedEventCat().getCategoryID());
             stmt.setInt(++paramCounter, event.getActionRequestedBy().getUserID());
             stmt.setBoolean(++paramCounter, event.isRequestActionByDefaultMuniCEO());
             User u = event.getResponderIntended();
@@ -587,7 +587,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ev.setHidden(rs.getBoolean("hidden"));
         ev.setNotes(rs.getString("notes"));
         
-        ev.setActionEventCat(getEventCategory(rs.getInt("requestedeventcat_catid")));
+        ev.setRequestedEventCat(getEventCategory(rs.getInt("requestedeventcat_catid")));
         
         ev.setRequestActionByDefaultMuniCEO(rs.getBoolean("directrequesttodefaultmuniceo"));
         

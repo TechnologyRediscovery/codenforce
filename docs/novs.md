@@ -11,20 +11,20 @@ The typical workflow for NOVs proceeds as follows:
 11. CEO chooses template text blocks to create the body of the notice text (before and after the violation list). CEO also configures violation printing options (such as whether to include full text, human friendly text, and any photos of violation)
 11. When the NOV is in ship shape, CEO then locks and queues the NOV, which triggers the following system actions:
 
-    * Shift the case's phase to `CasePhase.NoticeDelivery`
-    * Create a ghost person out of the selected recipient, and address the NOV to the ghost, meaning the contact     info for that particular Person at that particular time becomes read only.    
-    * Declare the notice text and associated violations read only (and disable     the NOV edit button)    
-    * Allow printing of the NOV (i.e. loading the in a plain HTML page minus nav bars)    
-    * Attach an `Event` documenting the locking and queuing of the NOV
-    * On the lock and queue event, request an event category for printing and mailing notice
+* Shift the case's phase to `CasePhase.NoticeDelivery`
+* Create a ghost person out of the selected recipient, and address the NOV to the ghost, meaning the contact info for that particular Person at that particular time becomes read only.
+* Declare the notice text and associated violations read only (and disable the NOV edit button)
+* Allow printing of the NOV (i.e. loading the in a plain HTML page minus nav bars)
+* Attach an `Event` documenting the locking and queuing of the NOV
+* On the lock and queue event, request an event category for printing and mailing notice
 
 11. Any user with MuniStaff+ permissions for the NOV's muni actually prints and mails the NOV and indicates mailing complete by clicking the appropriate command button in the NOV's listing on Cases. This triggers the following system actions:
 
-    * Shift the case's phase to `CasePhase.InitialComplianceTimeframe`
-    * Attach an `Event` documenting the mailing of the notice
+* Shift the case's phase to `CasePhase.InitialComplianceTimeframe`
+* Attach an `Event` documenting the mailing of the notice
 
 11. For NOVs which are successfully delivered to the addressee, the NOV life cycle ends here. IF a NOV is returned, any user with MuniStaff+ permission for the NOV's muni can declare the notice as returned. This triggers the following system actions:
 
-    * Attach an `Event` documenting the returned notice
-    * On the returned notice event, request an event category for reviewing notice recipients address
-    * Attach a note to the recipient ghost `Person`'s reference `Person` object, noting an undeliverable address
+* Attach an `Event` documenting the returned notice
+* On the returned notice event, request an event category for reviewing notice recipients address
+* Attach a note to the recipient ghost `Person`'s reference `Person` object, noting an undeliverable address

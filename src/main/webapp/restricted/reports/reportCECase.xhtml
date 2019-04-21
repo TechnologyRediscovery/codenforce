@@ -234,7 +234,7 @@
                                         </div>
                                         <div class="status-display-status-list-container">
                                             <div class="action-request-header">
-                                                <h:outputText value="Requested Action: #{e.actionEventCat.eventCategoryTitle}"/>
+                                                <h:outputText value="Requested Action: #{e.requestedEventCat.eventCategoryTitle}"/>
                                             </div>
 
                                             <div class="action-request-subheader">
@@ -250,7 +250,7 @@
                                     <p:spacer height="5px"/>
 
                                     <h:outputText styleClass="bold" value="Requested event: "/>
-                                    <h:outputText value="#{e.actionEventCat.eventType.label}: #{e.actionEventCat.eventCategoryTitle}"/>
+                                    <h:outputText value="#requestedEventCatCat.eventType.label}: #requestedEventCatCat.eventCategoryTitle}"/>
 
                                     <p:spacer height="5px"/>
 
