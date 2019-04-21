@@ -512,7 +512,7 @@
                                 </h:panelGroup>
                             </h:panelGrid>
                             
-                            <p>This record was last updated on: <h:outputText id="pers-form-lastupdated" value="#{personsBB.selectedPerson.lastUpdatedString}"/></p>
+                            <p>This record was last updated on: <h:outputText id="pers-form-lastupdated" value="#{personsBB.selectedPerson.lastUpdatedPretty}"/></p>
 
                             <f:subview id="cond-header-pers-update-form" rendered="#{personsBB.selectedPerson.personID == 0}">
                                 <h2>Create a new Person</h2>

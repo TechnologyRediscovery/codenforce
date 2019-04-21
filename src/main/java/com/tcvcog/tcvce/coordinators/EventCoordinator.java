@@ -26,7 +26,6 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
@@ -95,6 +94,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
+    /**
+     * Utility method for calling configureEvent on all EventCECase objects
+     * in a list passed back from a call to Query events
+     * @param evList
+     * @param user
+     * @param userAuthMuniList
+     * @return
+     * @throws IntegrationException 
+     */
     public List<EventCasePropBundle> configureEventBundleList(List<EventCasePropBundle> evList, User user, List<Municipality> userAuthMuniList) throws IntegrationException{
         Iterator<EventCasePropBundle> iter = evList.iterator();
         while(iter.hasNext()){
@@ -118,7 +126,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public EventCECase configureEvent(EventCECase ev, User user, List<Municipality> userAuthMuniList) throws IntegrationException{
         CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
-        
        
         ev.setCurrentUserCanTakeAction(canUserTakeRequestedAction(ev, user, userAuthMuniList));
         if(ev.getActionEventCat()!= null){
@@ -133,6 +140,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         
+        // TODO: event persons
         ev.setPersonList(new ArrayList<Person>());
         
         return ev;
@@ -214,7 +222,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public EventCECase getInitializedEvent(CECase c, EventCategory ec) throws CaseLifecyleException{
         
-        System.out.println("EventCoordinator.getInitializedEvent: caseid " + c.getCaseID() + " ec: " + ec.getEventCategoryTitle());
         // check to make sure the case isn't closed before allowing event into the switched blocks
         if(c.getCasePhase() == CasePhase.Closed && 
                 (
@@ -225,9 +232,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                     ec.getEventType() == EventType.Compliance
                 )
         ){
-            
             throw new CaseLifecyleException("This event cannot be attached to a closed case");
-            
         }
         
         // the moment of event instantiaion!!!!
@@ -237,8 +242,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setActive(true);
         event.setHidden(false);
         event.setCaseID(c.getCaseID());
-        System.out.println("EventCoordinator.getInitalizedEvent | eventCat: " 
-                + event.getCategory().getEventCategoryTitle());
         return event;
     }
     

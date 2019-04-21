@@ -664,7 +664,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return al;
     }
     
-    public void resetNOVMailing(CECase cs, NoticeOfViolation nov) throws IntegrationException{
+    public void noticeOfViolationResetMailing(CECase cs, NoticeOfViolation nov) throws IntegrationException{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setRequestToSend(false);
         nov.setLetterSentDate(null);
@@ -674,7 +674,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public void queueNoticeOfViolation(CECase c, NoticeOfViolation nov) 
+    public void noticeOfViolationLockAndQueue(CECase c, NoticeOfViolation nov) 
             throws CaseLifecyleException, IntegrationException, EventException, ViolationException{
         
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
@@ -701,22 +701,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             
         }
         
-        EventCECase noticeEvent = new EventCECase();
-        EventCategory ec = new EventCategory();
-        ec.setCategoryID(Integer.parseInt(getResourceBundle(
-                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued")));
-        noticeEvent.setCategory(ec);
-        noticeEvent.setCaseID(c.getCaseID());
-        noticeEvent.setDateOfRecord(LocalDateTime.now());
+        EventCECase noticeEvent = evCoord.getInitializedEvent(c, evCoord.getInitiatlizedEventCategory(Integer.parseInt(getResourceBundle(
+                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
         
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setDescription(queuedNoticeEventNotes);
         
         noticeEvent.setOwner(getFacesUser());
-        noticeEvent.setActive(true);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
-        noticeEvent.setHidden(false);
         
         ArrayList<Person> al = new ArrayList();
         al.add(nov.getRecipient());
@@ -732,7 +725,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         getSessionBean().setcECase(ci.getCECase(c.getCaseID()));
     }
     
-    public void markNoticeOfViolationAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
+    public void noticeOfViolationMarkAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setLetterSentDate(LocalDateTime.now());
         nov.setLetterSentDatePretty(getPrettyDate(LocalDateTime.now()));
@@ -740,14 +733,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         //advanceToNextCasePhase(ceCase);
     }
     
-    public void processReturnedNotice(CECase c, NoticeOfViolation nov) throws IntegrationException{
+    public void noticeOfViolationMarkAsReturned(CECase c, NoticeOfViolation nov) throws IntegrationException{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setLetterReturnedDate(LocalDateTime.now());
         cvi.updateViolationLetter(nov);
         refreshCase(c);
     } 
     
-    public void deleteNoticeOfViolation(NoticeOfViolation nov) throws CaseLifecyleException{
+    public void noticeOfViolationDelete(NoticeOfViolation nov) throws CaseLifecyleException{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
 
         //cannot delete a letter that was already sent
