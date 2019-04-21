@@ -732,7 +732,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         try {
-            cc.resetNOVMailing(getSessionBean().getcECase(), nov);
+            cc.noticeOfViolationResetMailing(getSessionBean().getcECase(), nov);
             //reset case
             getSessionBean().setcECase(ci.getCECase(currentCase.getCaseID()));
             getFacesContext().addMessage(null,
@@ -829,7 +829,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             
-            caseCoord.queueNoticeOfViolation(currentCase, nov);
+            caseCoord.noticeOfViolationLockAndQueue(currentCase, nov);
             
         } catch (CaseLifecyleException ex) {
             System.out.println(ex);
@@ -874,7 +874,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setActiveNotice(nov);
         try {
 
-            caseCoord.deleteNoticeOfViolation(nov);
+            caseCoord.noticeOfViolationDelete(nov);
             caseCoord.refreshCase(currentCase);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -900,7 +900,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         try {
                 if (nov.getLetterSentDate() == null
                         && nov.isRequestToSend() == true) {
-                    caseCoord.markNoticeOfViolationAsSent(currentCase, nov);
+                    caseCoord.noticeOfViolationMarkAsSent(currentCase, nov);
                     caseCoord.refreshCase(currentCase);
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -949,7 +949,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             if (nov.getLetterSentDate() != null
                     && nov.getLetterReturnedDate() == null) {
 
-                caseCoord.processReturnedNotice(currentCase, nov);
+                caseCoord.noticeOfViolationMarkAsReturned(currentCase, nov);
                 caseCoord.refreshCase(currentCase);
 
                 getFacesContext().addMessage(null,

@@ -613,6 +613,7 @@
                                             <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
                                             <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
                                             <p:spacer height="2px" />
+                                            
                                             <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
                                             <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
                                             <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
@@ -1072,31 +1073,61 @@
                                     value="#{caseProfileBB.currentCase.noticeList}"
                                     var="notice"
                                     rendered="true">
+                                    
+                                    <div class="action-request-header">
+                                        <h:outputText styleClass="bold"   value="Notice dated: " />
+                                        <h:outputText value="#{notice.dateOfRecordPretty}"/>
+                                    </div>
+                                    
+                                    <h:panelGrid columns="2" rendered="true"
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                        footerClass="no-border">
+                                                         
+                                        <h:panelGroup>
+                                            <h:outputText styleClass="bold" value="Notice ID:" />
+                                            <h:outputText style="font-size:1.5em;"   value="#{notice.noticeID}"/>
 
-                                    <h:outputText styleClass="bold" style="font-size:1.5em;"  value="Notice ID:" />
-                                    <h:outputText style="font-size:1.5em;"   value="#{notice.noticeID}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputText styleClass="bold"   value="Queued for Mailing: " />
+                                            <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputText styleClass="bold"  value="Sent Date: " />
+                                            <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
+
+                                            <p:spacer height="5px"/>
+                                            <h:outputText styleClass="bold"  value="Returned? " />
+                                            <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
+                                        </h:panelGroup>
+                                        
+                                        <h:panelGroup rendered="#{!notice.recipient.useSeparateMailingAddress}">
+                                            <h:outputLabel styleClass="bold" value="Recipient:"/>
+                                            <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
+                                            <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText escape="false" value="#{notice.recipient.addressStreet}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{notice.recipient.addressCity}, #{notice.recipient.addressState} #{notice.recipient.addressZip}"/>
+                                        </h:panelGroup>
+                                        
+                                        <h:panelGroup rendered="#{notice.recipient.useSeparateMailingAddress}">
+                                            <h:outputLabel styleClass="bold" value="Recipient (using separate mailing address):"/>
+                                            <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
+                                            <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText escape="false" value="#{notice.recipient.mailingAddressStreet}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{notice.recipient.mailingAddressCity}, #{notice.recipient.mailingAddressState} #{notice.recipient.mailingAddressZip}"/>
+                                        </h:panelGroup>
+                                    
+                                    </h:panelGrid>
 
                                     <p:spacer height="5px"/>
 
-                                    <h:outputText styleClass="bold"   value="Date of Record: " />
-                                    <h:outputText value="#{notice.dateOfRecordPretty}"/>
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputText styleClass="bold"   value="Queued for Mailing: " />
-                                    <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputText styleClass="bold"  value="Sent Date: " />
-                                    <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
-
-                                    <p:spacer height="5px"/>
-                                    <h:outputText styleClass="bold"  value="Returned? " />
-                                    <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:panelGrid    id="notice-rowexpand-pg" columns="4" columnClasses="gridTD, gridTD, gridTD, gridTD" >
+                                    <h:panelGrid    id="notice-rowexpand-pg" 
+                                                    columns="4" 
+                                                    columnClasses="gridTd-solid-back, gridTd-solid-back, gridTd-solid-back, gridTd-solid-back" >
 
                                         <h:panelGroup>
                                             <p:commandButton ajax="false" action="#{caseProfileBB.printNotice(notice)}"
