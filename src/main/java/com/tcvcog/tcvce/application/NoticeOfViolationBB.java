@@ -221,7 +221,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
         // finally, extract the String from the StringBuilder and add to our
         // current notice, which we'll make the active notice for editing
-        currentNotice.setNoticeText(sb.toString());
+        currentNotice.setNoticeTextBeforeViolations(sb.toString());
         getSessionBean().setActiveNotice(currentNotice);
         
         return "noticeOfViolationEditor";
@@ -304,13 +304,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
         CodeViolationIntegrator ci = getCodeViolationIntegrator();
         
-        notice.setNoticeText(formLetterText);
+        notice.setNoticeTextBeforeViolations(formLetterText);
         notice.setDateOfRecord(formDateOfRecord.toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         try {
         
             // new notices won't have insertion time stamps
-            if(currentNotice.getInsertionTimeStamp() == null){
+            if(currentNotice.getCreationTS() == null){
                 ci.insertNoticeOfViolation(c, currentNotice);
                 
             } else {
@@ -336,7 +336,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * @return the formLetterText
      */
     public String getFormLetterText() {
-        formLetterText = currentNotice.getNoticeText();
+        formLetterText = currentNotice.getNoticeTextBeforeViolations();
         
         return formLetterText;
     }

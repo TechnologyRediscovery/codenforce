@@ -19,7 +19,7 @@
 
                         <h1>
                             <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName}"/>
-                            <h:outputText id="header-type-ot" value=" | "/>
+                            <h:outputText id="header-type-ot-sep" value=" | "/>
                             <h:outputText id="header-id-ot" value=" Code enf. case ID: #{caseProfileBB.currentCase.caseID}"/>
                         </h1>
                         <h2>
@@ -461,11 +461,11 @@
                         <p:spacer height="5px"/>
 
                         <h:outputText styleClass="bold"  value="Sent Date: " />
-                        <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
+                        <h:outputText id="nov-sent-date" value="#{notice.sentTSPretty}"/>
 
                         <p:spacer height="5px"/>
                         <h:outputText styleClass="bold"  value="Returned? " />
-                        <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
+                        <h:outputText id="nov-returned-date" value="#{notice.returnedTSPretty}"/>
 
                         <p:spacer height="5px"/>
 
@@ -475,7 +475,7 @@
                             <h:panelGroup>
 
                                 <div class="rowExpansion">
-                                    <h:outputText id="notice-text-ot" value="#{notice.noticeText}" escape="false"/>
+                                    <h:outputText id="notice-text-ot" value="#{notice.noticeTextBeforeViolations}" escape="false"/>
                                 </div>
                             </h:panelGroup>
                         </h:panelGrid>

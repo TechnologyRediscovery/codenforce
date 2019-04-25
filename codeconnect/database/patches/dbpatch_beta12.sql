@@ -80,9 +80,79 @@ BEGIN
 	    RETURN newpersonid;
 
 END;
-
 $BODY$
   LANGUAGE plpgsql VOLATILE;
+
+  -- Forgot FK in citationviolation table
+ALTER TABLE citationviolation ADD CONSTRAINT citationviolation_violationid_fk FOREIGN KEY (codeviolation_violationid)
+      REFERENCES public.codeviolation (violationid);
+
+ -- Facelift of NOVs
+ CREATE TABLE public.noticeofviolationcodeviolation
+(
+  	noticeofviolation_noticeid integer NOT NULL,
+  	codeviolation_violationid integer NOT NULL,
+	includeordtext BOOLEAN DEFAULT TRUE,
+	includehumanfriendlyordtext BOOLEAN DEFAULT FALSE,
+	includeviolationphoto BOOLEAN DEFAULT FALSE,
+
+  CONSTRAINT noticeofviolationcodeviolation_pk PRIMARY KEY (noticeofviolation_noticeid, codeviolation_violationid),
+  CONSTRAINT codeviolation_violationid_fk FOREIGN KEY (codeviolation_violationid)
+      REFERENCES public.codeviolation (violationid),
+  CONSTRAINT noticeofviolation_noticeid_fk FOREIGN KEY (noticeofviolation_noticeid)
+      REFERENCES public.noticeofviolation (noticeid)
+);
+
+
+DROP TABLE public.noticeofviolation;
+
+CREATE TABLE public.noticeofviolation
+(
+  noticeid integer NOT NULL DEFAULT nextval('noticeofviolation_noticeid_seq'::regclass),
+  caseid integer NOT NULL,
+  lettertextbeforeviolations text,
+  creationtimestamp timestamp with time zone NOT NULL,
+  dateofrecord timestamp with time zone NOT NULL,
+  sentdate timestamp with time zone,
+  returneddate timestamp with time zone,
+  personid_recipient integer NOT NULL,
+  lettertextafterviolations text,
+  lockedandqueuedformailingdate timestamp with time zone,
+  lockedandqueuedformailingby integer,
+  sentby integer,
+  returnedby integer,
+  notes text,
+  CONSTRAINT noticeviolation_noticeid_pk PRIMARY KEY (noticeid),
+  CONSTRAINT "noticeOfViolation_recipient_fk" FOREIGN KEY (personid_recipient)
+      REFERENCES public.person (personid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT noticeofviolationcaseid_fk FOREIGN KEY (caseid)
+      REFERENCES public.cecase (caseid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT nov_lockedandqueued_fk FOREIGN KEY (personid_recipient)
+      REFERENCES public.person (personid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT nov_returnedby_fk FOREIGN KEY (personid_recipient)
+      REFERENCES public.person (personid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT nov_sentby_fk FOREIGN KEY (personid_recipient)
+      REFERENCES public.person (personid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.noticeofviolation
+  OWNER TO sylvia;
+
+-- Index: public."fki_noticeOfViolation_recipient_fk"
+
+-- DROP INDEX public."fki_noticeOfViolation_recipient_fk";
+
+CREATE INDEX "fki_noticeOfViolation_recipient_fk"
+  ON public.noticeofviolation
+  USING btree
+  (personid_recipient);
 
 
 INSERT INTO public.dbpatch(

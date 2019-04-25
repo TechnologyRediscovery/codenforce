@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -28,33 +29,42 @@ public class NoticeOfViolation extends EntityUtils {
     private int noticeID;
     private Person recipient;
     
-    private String noticeText;
-    private LocalDateTime insertionTimeStamp;
-    private String insertionTimeStampPretty;
+    private String noticeTextBeforeViolations;
+    private List<CodeViolation> violationList;
+    private String noticeTextAfterViolations;
     
     private LocalDateTime dateOfRecord;
     private String dateOfRecordPretty;
     
-    private boolean requestToSend;
+    private LocalDateTime creationTS;
+    private String creationTSPretty;
+
+    private LocalDateTime lockedAndqueuedTS;
+    private String lockedAndQueuedTSPretty;
+    private Person lockedAndQueuedBy;
     
-    private LocalDateTime letterSentDate;
-    private String letterSentDatePretty;
+    private LocalDateTime sentTS;
+    private String sentTSPretty;
+    private Person sentBy;
     
-    private LocalDateTime letterReturnedDate;
-    private String letterReturnedDatePretty;
+    private LocalDateTime returnedTS;
+    private String returnedTSPretty;
+    private Person returnedBy;
+    
+    private String notes;
 
     /**
-     * @return the noticeText
+     * @return the noticeTextBeforeViolations
      */
-    public String getNoticeText() {
-        return noticeText;
+    public String getNoticeTextBeforeViolations() {
+        return noticeTextBeforeViolations;
     }
 
     /**
-     * @param noticeText the noticeText to set
+     * @param noticeTextBeforeViolations the noticeTextBeforeViolations to set
      */
-    public void setNoticeText(String noticeText) {
-        this.noticeText = noticeText;
+    public void setNoticeTextBeforeViolations(String noticeTextBeforeViolations) {
+        this.noticeTextBeforeViolations = noticeTextBeforeViolations;
     }
 
     /**
@@ -65,10 +75,10 @@ public class NoticeOfViolation extends EntityUtils {
     }
 
     /**
-     * @return the insertionTimeStamp
+     * @return the creationTS
      */
-    public LocalDateTime getInsertionTimeStamp() {
-        return insertionTimeStamp;
+    public LocalDateTime getCreationTS() {
+        return creationTS;
     }
 
     /**
@@ -79,17 +89,10 @@ public class NoticeOfViolation extends EntityUtils {
     }
 
     /**
-     * @return the requestToSend
+     * @return the sentTS
      */
-    public boolean isRequestToSend() {
-        return requestToSend;
-    }
-
-    /**
-     * @return the letterSentDate
-     */
-    public LocalDateTime getLetterSentDate() {
-        return letterSentDate;
+    public LocalDateTime getSentTS() {
+        return sentTS;
     }
 
     /**
@@ -100,10 +103,10 @@ public class NoticeOfViolation extends EntityUtils {
     }
 
     /**
-     * @param insertionTimeStamp the insertionTimeStamp to set
+     * @param creationTS the creationTS to set
      */
-    public void setInsertionTimeStamp(LocalDateTime insertionTimeStamp) {
-        this.insertionTimeStamp = insertionTimeStamp;
+    public void setCreationTS(LocalDateTime creationTS) {
+        this.creationTS = creationTS;
     }
 
     /**
@@ -113,25 +116,19 @@ public class NoticeOfViolation extends EntityUtils {
         this.dateOfRecord = dateOfRecord;
     }
 
+
     /**
-     * @param requestToSend the requestToSend to set
+     * @param sentTS the sentTS to set
      */
-    public void setRequestToSend(boolean requestToSend) {
-        this.requestToSend = requestToSend;
+    public void setSentTS(LocalDateTime sentTS) {
+        this.sentTS = sentTS;
     }
 
     /**
-     * @param letterSentDate the letterSentDate to set
+     * @return the creationTSPretty
      */
-    public void setLetterSentDate(LocalDateTime letterSentDate) {
-        this.letterSentDate = letterSentDate;
-    }
-
-    /**
-     * @return the insertionTimeStampPretty
-     */
-    public String getInsertionTimeStampPretty() {
-        return insertionTimeStampPretty;
+    public String getCreationTSPretty() {
+        return creationTSPretty;
     }
 
     /**
@@ -142,17 +139,17 @@ public class NoticeOfViolation extends EntityUtils {
     }
 
     /**
-     * @return the letterSentDatePretty
+     * @return the sentTSPretty
      */
-    public String getLetterSentDatePretty() {
-        return letterSentDatePretty;
+    public String getSentTSPretty() {
+        return sentTSPretty;
     }
 
     /**
-     * @param insertionTimeStampPretty the insertionTimeStampPretty to set
+     * @param creationTSPretty the creationTSPretty to set
      */
-    public void setInsertionTimeStampPretty(String insertionTimeStampPretty) {
-        this.insertionTimeStampPretty = insertionTimeStampPretty;
+    public void setCreationTSPretty(String creationTSPretty) {
+        this.creationTSPretty = creationTSPretty;
     }
 
     /**
@@ -163,42 +160,42 @@ public class NoticeOfViolation extends EntityUtils {
     }
 
     /**
-     * @param letterSentDatePretty the letterSentDatePretty to set
+     * @param sentTSPretty the sentTSPretty to set
      */
-    public void setLetterSentDatePretty(String letterSentDatePretty) {
-        this.letterSentDatePretty = letterSentDatePretty;
+    public void setSentTSPretty(String sentTSPretty) {
+        this.sentTSPretty = sentTSPretty;
     }
 
     /**
-     * @return the letterReturnedDate
+     * @return the returnedTS
      */
-    public LocalDateTime getLetterReturnedDate() {
-        return letterReturnedDate;
+    public LocalDateTime getReturnedTS() {
+        return returnedTS;
     }
 
     /**
-     * @param letterReturnedDate the letterReturnedDate to set
+     * @param returnedTS the returnedTS to set
      */
-    public void setLetterReturnedDate(LocalDateTime letterReturnedDate) {
-        this.letterReturnedDate = letterReturnedDate;
+    public void setReturnedTS(LocalDateTime returnedTS) {
+        this.returnedTS = returnedTS;
     }
 
     /**
-     * @return the letterReturnedDatePretty
+     * @return the returnedTSPretty
      */
-    public String getLetterReturnedDatePretty() {
-        if(letterReturnedDate != null){
-            letterReturnedDatePretty = getPrettyDate(letterReturnedDate);
+    public String getReturnedTSPretty() {
+        if(returnedTS != null){
+            returnedTSPretty = getPrettyDate(returnedTS);
             
         }
-        return letterReturnedDatePretty;
+        return returnedTSPretty;
     }
 
     /**
-     * @param letterReturnedDatePretty the letterReturnedDatePretty to set
+     * @param returnedTSPretty the returnedTSPretty to set
      */
-    public void setLetterReturnedDatePretty(String letterReturnedDatePretty) {
-        this.letterReturnedDatePretty = letterReturnedDatePretty;
+    public void setReturnedTSPretty(String returnedTSPretty) {
+        this.returnedTSPretty = returnedTSPretty;
     }
 
     /**
@@ -213,6 +210,118 @@ public class NoticeOfViolation extends EntityUtils {
      */
     public void setRecipient(Person recipient) {
         this.recipient = recipient;
+    }
+
+    /**
+     * @return the noticeTextAfterViolations
+     */
+    public String getNoticeTextAfterViolations() {
+        return noticeTextAfterViolations;
+    }
+
+    /**
+     * @param noticeTextAfterViolations the noticeTextAfterViolations to set
+     */
+    public void setNoticeTextAfterViolations(String noticeTextAfterViolations) {
+        this.noticeTextAfterViolations = noticeTextAfterViolations;
+    }
+
+    /**
+     * @return the violationList
+     */
+    public List<CodeViolation> getViolationList() {
+        return violationList;
+    }
+
+    /**
+     * @param violationList the violationList to set
+     */
+    public void setViolationList(List<CodeViolation> violationList) {
+        this.violationList = violationList;
+    }
+
+    /**
+     * @return the lockedAndqueuedTS
+     */
+    public LocalDateTime getLockedAndqueuedTS() {
+        return lockedAndqueuedTS;
+    }
+
+    /**
+     * @return the lockedAndQueuedTSPretty
+     */
+    public String getLockedAndQueuedTSPretty() {
+        return lockedAndQueuedTSPretty;
+    }
+
+    /**
+     * @return the lockedAndQueuedBy
+     */
+    public Person getLockedAndQueuedBy() {
+        return lockedAndQueuedBy;
+    }
+
+    /**
+     * @return the sentBy
+     */
+    public Person getSentBy() {
+        return sentBy;
+    }
+
+    /**
+     * @return the returnedBy
+     */
+    public Person getReturnedBy() {
+        return returnedBy;
+    }
+
+    /**
+     * @param lockedAndqueuedTS the lockedAndqueuedTS to set
+     */
+    public void setLockedAndqueuedTS(LocalDateTime lockedAndqueuedTS) {
+        this.lockedAndqueuedTS = lockedAndqueuedTS;
+    }
+
+    /**
+     * @param lockedAndQueuedTSPretty the lockedAndQueuedTSPretty to set
+     */
+    public void setLockedAndQueuedTSPretty(String lockedAndQueuedTSPretty) {
+        this.lockedAndQueuedTSPretty = lockedAndQueuedTSPretty;
+    }
+
+    /**
+     * @param lockedAndQueuedBy the lockedAndQueuedBy to set
+     */
+    public void setLockedAndQueuedBy(Person lockedAndQueuedBy) {
+        this.lockedAndQueuedBy = lockedAndQueuedBy;
+    }
+
+    /**
+     * @param sentBy the sentBy to set
+     */
+    public void setSentBy(Person sentBy) {
+        this.sentBy = sentBy;
+    }
+
+    /**
+     * @param returnedBy the returnedBy to set
+     */
+    public void setReturnedBy(Person returnedBy) {
+        this.returnedBy = returnedBy;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
     
 }
