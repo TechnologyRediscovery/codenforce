@@ -1094,11 +1094,11 @@
                                             <p:spacer height="5px"/>
 
                                             <h:outputText styleClass="bold"  value="Sent Date: " />
-                                            <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
+                                            <h:outputText id="nov-sent-date" value="#{notice.sentTSPretty}"/>
 
                                             <p:spacer height="5px"/>
                                             <h:outputText styleClass="bold"  value="Returned? " />
-                                            <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
+                                            <h:outputText id="nov-returned-date" value="#{notice.returnedTSPretty}"/>
                                         </h:panelGroup>
                                         
                                         <h:panelGroup rendered="#{!notice.recipient.useSeparateMailingAddress}">
@@ -1169,7 +1169,7 @@
                                             <p:commandButton id="nov-sent-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
                                                              value="Mark notice: Mailed!" styleClass="noFill"
-                                                             icon="fa fa-paper-plane" disabled="#{!(notice.requestToSend) || (!(empty notice.letterSentDate) and notice.requestToSend)}"
+                                                             icon="fa fa-paper-plane" disabled="#{!(notice.requestToSend) || (!(empty notice.sentTS) and notice.requestToSend)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-sent-date
                                                              nov-returned-cb
@@ -1181,7 +1181,7 @@
                                             <p:commandButton id="nov-returned-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
                                                              value="Mark notice: returned" styleClass="noFill"
-                                                             icon="fa fa-mail-reply" disabled="#{(empty notice.letterSentDate) || !(empty notice.letterReturnedDate)}"
+                                                             icon="fa fa-mail-reply" disabled="#{(empty notice.sentTS) || !(empty notice.letterReturnedDate)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-returned-date
                                                              nov-returned-cb"/>

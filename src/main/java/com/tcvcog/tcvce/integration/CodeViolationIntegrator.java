@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -120,19 +120,19 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             stmt = con.prepareStatement(query);
             stmt.setInt(1, c.getCaseID());
             stmt.setInt(2, notice.getRecipient().getPersonID());
-            stmt.setString(3, notice.getNoticeText());
+            stmt.setString(3, notice.getNoticeTextBeforeViolations());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
             stmt.setBoolean(5, notice.isRequestToSend());
-            if(notice.getLetterSentDate() == null){
+            if(notice.getSentTS() == null){
                 stmt.setNull(6, java.sql.Types.NULL);
             } else {
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(notice.getLetterSentDate()));
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(notice.getSentTS()));
             }
             
-            if(notice.getLetterReturnedDate() == null){
+            if(notice.getReturnedTS() == null){
                 stmt.setNull(7, java.sql.Types.NULL);
             } else {
-                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(notice.getLetterReturnedDate()));   
+                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(notice.getReturnedTS()));   
             }
 
             stmt.execute();
@@ -159,17 +159,17 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, notice.getRecipient().getPersonID());
-            stmt.setString(2, notice.getNoticeText());
+            stmt.setString(2, notice.getNoticeTextBeforeViolations());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
             stmt.setBoolean(4, notice.isRequestToSend());
-            if (notice.getLetterSentDate() != null) {
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(notice.getLetterSentDate()));
+            if (notice.getSentTS() != null) {
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(notice.getSentTS()));
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
 
-            if (notice.getLetterReturnedDate() != null) {
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(notice.getLetterReturnedDate()));
+            if (notice.getReturnedTS() != null) {
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(notice.getReturnedTS()));
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
                 
@@ -281,31 +281,31 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
 
         notice.setNoticeID(rs.getInt("noticeid"));
         
-        notice.setRecipient(pi.getPerson(rs.getInt("personid_recipient")));
+        notice.setRecipient(pi.getPerson(rs.getInt("personidsetNoticeTextBeforeViolations);
 
         notice.setNoticeText(rs.getString("lettertext"));
 
-        notice.setInsertionTimeStamp(rs.getTimestamp("insertiontimestamp").toLocalDateTime());
-        notice.setInsertionTimeStampPretty(getPrettyDate(rs.getTimestamp("insertiontimestamp").toLocalDateTime()));
+        notice.setCreationTS(rs.getTimestamp("insertiontimestamp").toLocalDateTime());
+        notice.setCreationTSPretty(getPrettyDate(rs.getTimestamp("insertiontimestamp").toLocalDateTime()));
 
         notice.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
         notice.setDateOfRecordPretty(getPrettyDate(rs.getTimestamp("dateofrecord").toLocalDateTime()));
 
         notice.setRequestToSend(rs.getBoolean("requesttosend"));
         if (rs.getTimestamp("lettersenddate") != null) {
-            notice.setLetterSentDate(rs.getTimestamp("lettersenddate").toLocalDateTime());
-            notice.setLetterSentDatePretty(getPrettyDate(rs.getTimestamp("lettersenddate").toLocalDateTime()));
+            notice.setSentTS(rs.getTimestamp("lettersenddate").toLocalDateTime());
+            notice.setSentTSPretty(getPrettyDate(rs.getTimestamp("lettersenddate").toLocalDateTime()));
             
         } else {
-            notice.setLetterSentDate(null);
+            notice.setSentTS(null);
         }
 
         if (rs.getTimestamp("letterreturneddate") != null) {
-            notice.setLetterReturnedDate(rs.getTimestamp("letterreturneddate").toLocalDateTime());
-            notice.setLetterSentDatePretty(getPrettyDate(rs.getTimestamp("letterreturneddate").toLocalDateTime()));
+            notice.setReturnedTS(rs.getTimestamp("letterreturneddate").toLocalDateTime());
+            notice.setSentTSPretty(getPrettyDate(rs.getTimestamp("letterreturneddate").toLocalDateTime()));
             
         } else {
-            notice.setLetterReturnedDate(null);
+            notice.setReturnedTS(null);
 
         }
 
@@ -406,11 +406,12 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
     private CodeViolation generateCodeViolationFromRS(ResultSet rs) throws SQLException, IntegrationException {
 
         CodeViolation v = new CodeViolation();
-        ViolationCoordinator vc = getViolationCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         CodeIntegrator ci = getCodeIntegrator();
         CitationIntegrator citInt = getCitationIntegrator();
         UserIntegrator ui = getUserIntegrator();
 
+        
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
         v.setCeCaseID(rs.getInt("cecase_caseid"));

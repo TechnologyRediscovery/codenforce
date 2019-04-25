@@ -647,7 +647,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     
     public void recordCompliance(CodeViolation cv) {
         EventCoordinator ec = getEventCoordinator();
-        ViolationCoordinator vc = getViolationCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         selectedViolation = cv;
         // build event details package
         EventCECase e = null;
@@ -657,7 +657,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             e.setOwner(getSessionBean().getFacesUser());
             e.setDateOfRecord(LocalDateTime.now());
             cv.setActualComplianceDate(LocalDateTime.now());
-            vc.recordCompliance(cv, getSessionBean().getFacesUser());
+            cc.recordCompliance(cv, getSessionBean().getFacesUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -898,7 +898,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
-                if (nov.getLetterSentDate() == null
+                if (nov.getSentTS() == null
                         && nov.isRequestToSend() == true) {
                     caseCoord.noticeOfViolationMarkAsSent(currentCase, nov);
                     caseCoord.refreshCase(currentCase);
@@ -946,8 +946,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         try {
             // check to make sure that the nootice has both been sent and not
             // marked as retuned
-            if (nov.getLetterSentDate() != null
-                    && nov.getLetterReturnedDate() == null) {
+            if (nov.getSentTS() != null
+                    && nov.getReturnedTS() == null) {
 
                 caseCoord.noticeOfViolationMarkAsReturned(currentCase, nov);
                 caseCoord.refreshCase(currentCase);
