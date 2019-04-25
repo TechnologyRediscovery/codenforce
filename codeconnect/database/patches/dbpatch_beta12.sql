@@ -122,21 +122,31 @@ CREATE TABLE public.noticeofviolation
   sentby integer,
   returnedby integer,
   notes text,
+  creationby integer,
   CONSTRAINT noticeviolation_noticeid_pk PRIMARY KEY (noticeid),
-  CONSTRAINT "noticeOfViolation_recipient_fk" FOREIGN KEY (personid_recipient)
-      REFERENCES public.person (personid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+
   CONSTRAINT noticeofviolationcaseid_fk FOREIGN KEY (caseid)
       REFERENCES public.cecase (caseid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
+
   CONSTRAINT nov_lockedandqueued_fk FOREIGN KEY (personid_recipient)
-      REFERENCES public.person (personid) MATCH SIMPLE
+      REFERENCES person (personid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT nov_returnedby_fk FOREIGN KEY (personid_recipient)
-      REFERENCES public.person (personid) MATCH SIMPLE
+
+  CONSTRAINT nov_creationby_userid_fk FOREIGN KEY (creationby)
+      REFERENCES login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION, 
+
+  CONSTRAINT nov_returnedby_fk FOREIGN KEY (lockedandqueuedformailingby)
+      REFERENCES login (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT nov_sentby_fk FOREIGN KEY (personid_recipient)
-      REFERENCES public.person (personid) MATCH SIMPLE
+
+  CONSTRAINT nov_sentby_fk FOREIGN KEY (sentby)
+      REFERENCES login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+
+  CONSTRAINT nov_lockedandqueuedby_userid_fk FOREIGN KEY (lockedandqueuedformailingby)
+      REFERENCES login (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
@@ -153,6 +163,18 @@ CREATE INDEX "fki_noticeOfViolation_recipient_fk"
   ON public.noticeofviolation
   USING btree
   (personid_recipient);
+
+
+
+
+ALTER TABLE codeviolation ADD COLUMN creationby INTEGER;
+
+ALTER TABLE codeviolation ADD CONSTRAINT violation_creationby_userid_fk FOREIGN KEY ( creationby ) REFERENCES login ( userid ) ;
+
+
+
+
+
 
 
 INSERT INTO public.dbpatch(

@@ -9,7 +9,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseNoLists;
+import com.tcvcog.tcvce.entities.CECaseBaseClass;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
@@ -90,7 +90,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public String editEventInCaseManager(EventCasePropBundle ev){
         CaseIntegrator ci = getCaseIntegrator();
         CECase c = getSessionBean().getcECaseQueue().remove(0);
-        CECaseNoLists caseNoLists = ev.getEventCaseBare();
+        CECaseBaseClass caseNoLists = ev.getEventCaseBare();
         try {
             getSessionBean().getcECaseQueue().set(0, ci.generateCECase(caseNoLists));
         } catch (SQLException ex) {

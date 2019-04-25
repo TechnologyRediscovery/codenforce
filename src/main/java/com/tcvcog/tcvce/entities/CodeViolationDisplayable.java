@@ -28,16 +28,16 @@ public class CodeViolationDisplayable extends CodeViolation {
 
         this.violatedEnfElement = cv.violatedEnfElement;
         this.icon = cv.icon;
-        this.blobIDList = cv.blobIDList;
+        this.photoList = cv.photoList;
         this.citationIDList = cv.citationIDList;
         this.complianceUser = cv.complianceUser;
         this.compTimeFrameComplianceEvent = cv.compTimeFrameComplianceEvent;
 
-        this.status = cv.status;
         this.ageLeadText = cv.ageLeadText;
+        this.statusString = cv.statusString;
         this.description = cv.description;
         this.notes = cv.notes;
-        this.citationListAsString = cv.citationListAsString;
+        this.citationsListAsString = cv.citationsListAsString;
 
         this.stipulatedComplianceDate = cv.stipulatedComplianceDate;
         this.dateOfRecord = cv.dateOfRecord;
@@ -51,7 +51,7 @@ public class CodeViolationDisplayable extends CodeViolation {
 
     private boolean includeOrdinanceText;
     private boolean includeHumanFriendlyText;
-    private boolean includeViolationPhotos = true;
+    private boolean includeViolationPhotos;
 
     /**
      * @return the includeOrdinanceText

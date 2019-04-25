@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
+import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
@@ -46,7 +47,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
-import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -91,7 +92,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param c the CECase with a populated set of Events
      * @return the CECase with the action request list ready to roll
      */
-    public CECase configureCECase(CECase c){
+    public CECase configureCECase(CECase c) throws CaseLifecyleException{
+        
+        setCaseStage(c);
+        
         List<EventCECase> evList = new ArrayList();
         // transfer any events with requests to a separate list for display at
         // the head of the case profile
@@ -457,6 +461,60 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return typeList;
     }
     
+    /**
+     * A CECase's Stage is derived from its Phase based on the set of business
+     * rules encoded in this method.
+     * @param cs which needs its StageConfigured
+     * @return the same CECas passed in with the CaseStage configured
+     * @throws CaseLifecyleException 
+     */
+     private CECase setCaseStage(CECase cs) throws CaseLifecyleException {
+        CaseStage stage;
+        switch (cs.getCasePhase()) {
+            case PrelimInvestigationPending:
+                stage = CaseStage.Investigation;
+                break;
+            case NoticeDelivery:
+                stage = CaseStage.Investigation;
+                break;
+        // Letter marked with a send date
+            case InitialComplianceTimeframe:
+                stage = CaseStage.Enforcement;
+                break;
+        // compliance inspection
+            case SecondaryComplianceTimeframe:
+                stage = CaseStage.Enforcement;
+                break;
+        // Filing of citation
+            case AwaitingHearingDate:
+                stage = CaseStage.Citation;
+                break;
+        // hearing date scheduled
+            case HearingPreparation:
+                stage = CaseStage.Citation;
+                break;
+        // hearing not resulting in a case closing
+            case InitialPostHearingComplianceTimeframe:
+                stage = CaseStage.Citation;
+                break;
+            case SecondaryPostHearingComplianceTimeframe:
+                stage = CaseStage.Citation;
+                break;
+            case Closed:
+                stage = CaseStage.Closed;
+                // TODO deal with this later
+                //                throw new CaseLifecyleException("Cannot advance a closed case to any other phase");
+                break;
+            case InactiveHolding:
+                stage = CaseStage.Closed;
+                break;
+            default:
+                stage = CaseStage.Closed;
+        }
+        cs.setCaseStage(stage);
+        return cs;
+    }
+    
     
     
     /**
@@ -474,7 +532,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         
         List caseViolationList = cvi.getCodeViolations(c);
         boolean complianceWithAllViolations = false;
@@ -660,13 +718,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public List retrieveViolationList(CECase ceCase) throws IntegrationException{
         List<CodeViolation> al;
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         al = cvi.getCodeViolations(ceCase);
         return al;
     }
     
     public void noticeOfViolationResetMailing(CECase cs, NoticeOfViolation nov) throws IntegrationException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setRequestToSend(false);
         nov.setSentTS(null);
         nov.setReturnedTS(null);
@@ -678,7 +736,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     public void noticeOfViolationLockAndQueue(CECase c, NoticeOfViolation nov) 
             throws CaseLifecyleException, IntegrationException, EventException, ViolationException{
         
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         
         EventCoordinator evCoord = getEventCoordinator();
         
@@ -727,7 +785,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public void noticeOfViolationMarkAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setSentTS(LocalDateTime.now());
         nov.setSentTSPretty(getPrettyDate(LocalDateTime.now()));
         cvi.updateViolationLetter(nov);   
@@ -735,14 +793,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public void noticeOfViolationMarkAsReturned(CECase c, NoticeOfViolation nov) throws IntegrationException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setReturnedTS(LocalDateTime.now());
         cvi.updateViolationLetter(nov);
         refreshCase(c);
     } 
     
     public void noticeOfViolationDelete(NoticeOfViolation nov) throws CaseLifecyleException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
 
         //cannot delete a letter that was already sent
         if(nov != null && nov.getSentTS() != null){
@@ -1003,7 +1061,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      */
     public int attachViolationToCaseAndInsertTimeFrameEvent(CodeViolation v, CECase c) throws IntegrationException, ViolationException, CaseLifecyleException{
         
-        CodeViolationIntegrator vi = getCodeViolationIntegrator();
+        ViolationIntegrator vi = getCodeViolationIntegrator();
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -1072,6 +1130,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString("codeviolation_unresolved_withincomptimeframe_ageleadtext"));
                 
+            // violation has not been cited, but is past compliance timeframe end date
             } else if(cv.getCitationIDList().isEmpty()) {
                 cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString("codeviolation_unresolved_overdue_statusstring"));
@@ -1079,6 +1138,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                         .getString("codeviolation_unresolved_overdue_iconid"))));
                 cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString("codeviolation_unresolved_overdue_ageleadtext"));
+            // violation has been cited on at least one citation
             } else {
                 cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString("codeviolation_unresolved_citation_statusstring"));
@@ -1109,7 +1169,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public void updateCodeViolation(CodeViolation cv) throws ViolationException, IntegrationException{
         
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         if(verifyCodeViolationAttributes(cv)){
             cvi.updateCodeViolation(cv);
         }
@@ -1124,7 +1184,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      */
     public void recordCompliance(CodeViolation cv, User u) throws IntegrationException{
         
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         EventIntegrator ei = getEventIntegrator();
         // update violation record for compliance
         cv.setComplianceUser(u);
@@ -1154,12 +1214,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public void deleteViolation(CodeViolation cv) throws IntegrationException{
         //TODO: delete photos and photo links
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         cvi.deleteCodeViolation(cv);
     }
     
     public List getCodeViolations(CECase ceCase) throws IntegrationException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         List al = cvi.getCodeViolations(ceCase);
         return al;
     }

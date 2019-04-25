@@ -29,14 +29,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
 import java.sql.Connection;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -97,8 +96,7 @@ public class BackingBeanUtils implements Serializable{
     private EventCoordinator eventCoordinator;
     private EventIntegrator eventIntegrator;
     
-    private CodeViolationIntegrator codeViolationIntegrator;
-    private ViolationCoordinator violationCoordinator;
+    private ViolationIntegrator codeViolationIntegrator;
     private CitationIntegrator citationIntegrator;
     private CourtEntityIntegrator courtEntityIntegrator;
     
@@ -219,22 +217,26 @@ public class BackingBeanUtils implements Serializable{
     public String appendNoteBlock(MessageBuilderParams mcc){
         StringBuilder sb = new StringBuilder();
         sb.append(mcc.existingContent);
-        sb.append("<br/><br/>**************************************<br/>");
+        sb.append("<br/>*********************NOTE*********************<br/>");
         sb.append(mcc.header);
         sb.append("<br/>");
         sb.append(mcc.explanation);
         sb.append("<br/>");
-        sb.append(mcc.newMessageContent);
-        sb.append("<br/>");
-        sb.append("--------------------------------------<br/>");
-        sb.append(getResourceBundle(Constants.MESSAGE_TEXT).getString("signatureLeader"));
-        sb.append(getFacesUser().getPerson().getFirstName());
+        sb.append("creatd by: ");
+        sb.append(mcc.user.getPerson().getFirstName());
         sb.append(" ");
-        sb.append(getFacesUser().getPerson().getLastName());
+        sb.append(mcc.user.getPerson().getLastName());
+        sb.append(" (username:  ");
+        sb.append(mcc.user.getUsername());
+        sb.append(", id#: ");
+        sb.append(mcc.user.getUserID());
+        sb.append(")");
+        sb.append("<br/>");
         sb.append(" at ");
         sb.append(getPrettyDate(LocalDateTime.now()));
-        sb.append("<br/>");
-        sb.append("**************************************<br/>");
+        sb.append("<br/>----------------note-text-----------------<br/>");
+        sb.append(mcc.newMessageContent);
+        sb.append("<br/>****************END_NOTE******************<br/>");
         return sb.toString();
     }
     
@@ -489,11 +491,11 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @return the codeViolationIntegrator
      */
-    public CodeViolationIntegrator getCodeViolationIntegrator() {
+    public ViolationIntegrator getCodeViolationIntegrator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{codeViolationIntegrator}", CodeViolationIntegrator.class);
-        codeViolationIntegrator = (CodeViolationIntegrator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{codeViolationIntegrator}", ViolationIntegrator.class);
+        codeViolationIntegrator = (ViolationIntegrator) ve.getValue(context.getELContext());
         
         return codeViolationIntegrator;
     }
@@ -501,27 +503,11 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @param codeViolationIntegrator the codeViolationIntegrator to set
      */
-    public void setCodeViolationIntegrator(CodeViolationIntegrator codeViolationIntegrator) {
+    public void setCodeViolationIntegrator(ViolationIntegrator codeViolationIntegrator) {
         this.codeViolationIntegrator = codeViolationIntegrator;
     }
 
-    /**
-     * @return the violationCoordinator
-     */
-    public ViolationCoordinator getViolationCoordinator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{violationCoordinator}", ViolationCoordinator.class);
-        violationCoordinator = (ViolationCoordinator) ve.getValue(context.getELContext());
-        return violationCoordinator;
-    }
-
-    /**
-     * @param violationCoordinator the violationCoordinator to set
-     */
-    public void setViolationCoordinator(ViolationCoordinator violationCoordinator) {
-        this.violationCoordinator = violationCoordinator;
-    }
+   
     
    
    

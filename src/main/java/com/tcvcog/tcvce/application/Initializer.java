@@ -25,12 +25,11 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -132,14 +131,11 @@ public class Initializer implements ServletContextListener{
         PublicInfoCoordinator picor = new PublicInfoCoordinator();
         servletContext.setAttribute("publicInfoCoordinator", picor);
         
-        CodeViolationIntegrator cvi = new CodeViolationIntegrator();
+        ViolationIntegrator cvi = new ViolationIntegrator();
         servletContext.setAttribute("codeViolationIntegrator", cvi);
         
         CitationIntegrator citint = new CitationIntegrator();
         servletContext.setAttribute("citationIntegrator", citint);
-        
-        ViolationCoordinator vc = new ViolationCoordinator();
-        servletContext.setAttribute("violationCoordinator", vc);
         
         CourtEntityIntegrator cei = new CourtEntityIntegrator();
         servletContext.setAttribute("courtEntityIntegrator", cei);
