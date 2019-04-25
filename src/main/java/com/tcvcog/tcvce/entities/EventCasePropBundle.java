@@ -18,20 +18,20 @@ import java.io.Serializable;
  */
 public class EventCasePropBundle implements Serializable {
     
-    private CECaseNoLists eventCase;
+    private CECaseBaseClass eventCase;
     private EventCECase event;
 
     /**
      * @return the eventCase
      */
-    public CECaseNoLists getEventCaseBare() {
+    public CECaseBaseClass getEventCaseBare() {
         return eventCase;
     }
 
     /**
      * @param eventCase the eventCase to set
      */
-    public void setEventCaseBare(CECaseNoLists eventCase) {
+    public void setEventCaseBare(CECaseBaseClass eventCase) {
         this.eventCase = eventCase;
     }
 

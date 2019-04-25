@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.TextBlock;
-import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String updateTextBlock(){
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         if(selectedBlock != null){
             try {
                 cvi.updateTextBlock(selectedBlock);
@@ -81,7 +81,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String addNewTextBlock(){
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         TextBlock newBlock = new TextBlock();
         newBlock.setMuni(formMuni);
         newBlock.setTextBlockCategoryID(formCategoryID);
@@ -103,7 +103,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     }
     
     public String nukeTextBlock(){
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         if(selectedBlock != null){
             try {
                 cvi.deleteTextBlock(selectedBlock);
@@ -127,7 +127,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
      * @return the blockList
      */
     public List<TextBlock> getBlockList() {
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         if(blockList == null){
             try {
                 blockList = cvi.getAllTextBlocks();
@@ -159,7 +159,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
      * @return the categoryList
      */
     public HashMap<String, Integer> getCategoryList() {
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         try {
             categoryList = cvi.getTextBlockCategoryMap();
             System.out.println("TextBlockBB.getCategoryMap | isempty: " + categoryList.isEmpty());

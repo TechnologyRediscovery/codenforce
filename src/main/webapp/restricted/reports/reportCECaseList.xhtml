@@ -188,7 +188,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="Compliance timeframe" />
                                     </f:facet>
-                                    <h:outputText value="Compliance due in #{v.daysUntilStipulatedComplianceDate} days on #{v.stipulatedComplianceDate}" 
+                                    <h:outputText value="Compliance due in #{v.daysUntilStipulatedComplianceDate} days on #{v.stipulatedComplianceDatePretty}" 
                                                   rendered="#{empty v.actualComplianceDate}"/>
                                     <h:outputText value="Compliance achieved on #{v.actualComplianceDatePretty}" 
                                                   rendered="#{!(empty v.actualComplianceDate)}"/>

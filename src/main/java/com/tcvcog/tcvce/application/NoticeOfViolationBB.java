@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -32,7 +31,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
@@ -138,7 +137,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
     
     public String setupNewNotice(){
-        ViolationCoordinator vc = getViolationCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         if(activeVList.isEmpty()){
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -146,7 +145,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             
             return "";
         }
-        currentNotice = vc.getNewNoticeOfViolation();
+        currentNotice = cc.getNewNoticeOfViolation();
         getSessionBean().setActiveNotice(currentNotice);
         return "noticeOfViolationBuilderPersons";
     }
@@ -302,7 +301,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         NoticeOfViolation notice = getSessionBean().getActiveNotice();
         CaseIntegrator csi = getCaseIntegrator();
         
-        CodeViolationIntegrator ci = getCodeViolationIntegrator();
+        ViolationIntegrator ci = getCodeViolationIntegrator();
         
         notice.setNoticeTextBeforeViolations(formLetterText);
         notice.setDateOfRecord(formDateOfRecord.toInstant()
@@ -388,7 +387,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * @return the textBlockListByMuni
      */
     public List<TextBlock> getBlockListByMuni() {
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         Municipality m = getSessionBean().getActiveMuni();
         if(blockListByMuni == null){
             try {

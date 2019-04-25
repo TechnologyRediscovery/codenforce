@@ -30,7 +30,7 @@ public class NoticeOfViolation extends EntityUtils {
     private Person recipient;
     
     private String noticeTextBeforeViolations;
-    private List<CodeViolation> violationList;
+    private List<CodeViolationDisplayable> violationList;
     private String noticeTextAfterViolations;
     
     private LocalDateTime dateOfRecord;
@@ -38,18 +38,19 @@ public class NoticeOfViolation extends EntityUtils {
     
     private LocalDateTime creationTS;
     private String creationTSPretty;
+    private User creationBy;
 
     private LocalDateTime lockedAndqueuedTS;
     private String lockedAndQueuedTSPretty;
-    private Person lockedAndQueuedBy;
+    private User lockedAndQueuedBy;
     
     private LocalDateTime sentTS;
     private String sentTSPretty;
-    private Person sentBy;
+    private User sentBy;
     
     private LocalDateTime returnedTS;
     private String returnedTSPretty;
-    private Person returnedBy;
+    private User returnedBy;
     
     private String notes;
 
@@ -229,14 +230,14 @@ public class NoticeOfViolation extends EntityUtils {
     /**
      * @return the violationList
      */
-    public List<CodeViolation> getViolationList() {
+    public List<CodeViolationDisplayable> getViolationList() {
         return violationList;
     }
 
     /**
      * @param violationList the violationList to set
      */
-    public void setViolationList(List<CodeViolation> violationList) {
+    public void setViolationList(List<CodeViolationDisplayable> violationList) {
         this.violationList = violationList;
     }
 
@@ -257,21 +258,21 @@ public class NoticeOfViolation extends EntityUtils {
     /**
      * @return the lockedAndQueuedBy
      */
-    public Person getLockedAndQueuedBy() {
+    public User getLockedAndQueuedBy() {
         return lockedAndQueuedBy;
     }
 
     /**
      * @return the sentBy
      */
-    public Person getSentBy() {
+    public User getSentBy() {
         return sentBy;
     }
 
     /**
      * @return the returnedBy
      */
-    public Person getReturnedBy() {
+    public User getReturnedBy() {
         return returnedBy;
     }
 
@@ -292,21 +293,21 @@ public class NoticeOfViolation extends EntityUtils {
     /**
      * @param lockedAndQueuedBy the lockedAndQueuedBy to set
      */
-    public void setLockedAndQueuedBy(Person lockedAndQueuedBy) {
+    public void setLockedAndQueuedBy(User lockedAndQueuedBy) {
         this.lockedAndQueuedBy = lockedAndQueuedBy;
     }
 
     /**
      * @param sentBy the sentBy to set
      */
-    public void setSentBy(Person sentBy) {
+    public void setSentBy(User sentBy) {
         this.sentBy = sentBy;
     }
 
     /**
      * @param returnedBy the returnedBy to set
      */
-    public void setReturnedBy(Person returnedBy) {
+    public void setReturnedBy(User returnedBy) {
         this.returnedBy = returnedBy;
     }
 
@@ -322,6 +323,20 @@ public class NoticeOfViolation extends EntityUtils {
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the creationBy
+     */
+    public User getCreationBy() {
+        return creationBy;
+    }
+
+    /**
+     * @param creationBy the creationBy to set
+     */
+    public void setCreationBy(User creationBy) {
+        this.creationBy = creationBy;
     }
     
 }

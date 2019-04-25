@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Sylvia Baskem
  */
-public class CECase extends CECaseNoLists implements Cloneable{
+public class CECase extends CECaseBaseClass implements Cloneable{
     
     
     private List<CodeViolation> violationList;
@@ -38,10 +38,11 @@ public class CECase extends CECaseNoLists implements Cloneable{
      * from the incoming object to this sublcass
      * 
      * ** CONSTRUCTORS ARE NOT INHERITED!
+     * ** but member variables and methods sure are!
      * 
      * @param cnl 
      */
-    public CECase(CECaseNoLists cnl){
+    public CECase(CECaseBaseClass cnl){
         this.caseID = cnl.caseID;
         this.publicControlCode = cnl.publicControlCode;
         this.paccEnabled = cnl.paccEnabled;
@@ -56,6 +57,7 @@ public class CECase extends CECaseNoLists implements Cloneable{
         this.closingDate = cnl.closingDate;
         this.creationTimestamp = cnl.creationTimestamp;
         this.notes = cnl.notes;
+        
     }
     
     /**

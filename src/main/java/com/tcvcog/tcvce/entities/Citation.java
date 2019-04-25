@@ -32,7 +32,7 @@ public class Citation extends EntityUtils implements Serializable {
     private String citationNo;
     private CitationStatus status;
     private CourtEntity origin_courtentity;
-    private CECaseNoLists ceCaseNoLists;
+    private CECaseBaseClass ceCaseNoLists;
     private User userOwner;
     
     private LocalDateTime dateOfRecord;
@@ -44,6 +44,10 @@ public class Citation extends EntityUtils implements Serializable {
     
     private boolean isActive;
     private String notes;
+    
+    // notice that to avoid cycles, the Citation is allowed to have actual CodeViolation
+    // objects in its LinkedList but CodeViolation only gets the citation IDs which
+    // it can use to look up a Citation if needs be
     private List<CodeViolation> violationList;
 
     /**
@@ -254,14 +258,14 @@ public class Citation extends EntityUtils implements Serializable {
     /**
      * @return the ceCaseNoLists
      */
-    public CECaseNoLists getCeCaseNoLists() {
+    public CECaseBaseClass getCeCaseNoLists() {
         return ceCaseNoLists;
     }
 
     /**
      * @param ceCaseNoLists the ceCaseNoLists to set
      */
-    public void setCeCaseNoLists(CECaseNoLists ceCaseNoLists) {
+    public void setCeCaseNoLists(CECaseBaseClass ceCaseNoLists) {
         this.ceCaseNoLists = ceCaseNoLists;
     }
 

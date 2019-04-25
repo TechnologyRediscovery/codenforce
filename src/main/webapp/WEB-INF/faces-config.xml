@@ -103,9 +103,9 @@
 
     <managed-bean>
         <managed-bean-name>violationIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.CodeViolationIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.integration.ViolationIntegrator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
 
     <managed-bean>
         <managed-bean-name>userIntegrator</managed-bean-name>
@@ -161,12 +161,7 @@
         <managed-bean-class>com.tcvcog.tcvce.coordinators.SessionSystemCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
-    <managed-bean>
-        <description>Interfaces between code violation related objects and integration layer objects</description>
-        <managed-bean-name>violationCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.ViolationCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+   
     
     <managed-bean>
         <managed-bean-name>codeCoordinator</managed-bean-name>

@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.TextBlock;
@@ -43,12 +44,12 @@ import java.util.Set;
  *
  * @author Eric C. Darsow
  */
-public class CodeViolationIntegrator extends BackingBeanUtils implements Serializable {
+public class ViolationIntegrator extends BackingBeanUtils implements Serializable {
 
     /**
      * Creates a new instance of ViolationIntegrator
      */
-    public CodeViolationIntegrator() {
+    public ViolationIntegrator() {
     }
 
     public int insertCodeViolation(CodeViolation v) throws IntegrationException {
@@ -213,9 +214,10 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
     }
 
     public NoticeOfViolation getNoticeOfViolation(int noticeID) throws IntegrationException {
-        String query = "SELECT noticeid, caseid, lettertext, insertiontimestamp, dateofrecord, \n" +
-                        "       requesttosend, lettersent, lettersenddate, letterreturneddate, \n" +
-                        "       personid_recipient\n" +
+        String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
+                        "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
+                        "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
+                        "       returnedby, notes\n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -275,44 +277,87 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
     }
 
     private NoticeOfViolation generateNoticeOfViolation(ResultSet rs) throws SQLException, IntegrationException {
+//SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, 
+//       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, 
+//       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, 
+//       returnedby, notes
+//  FROM public.noticeofviolation;
 
         PersonIntegrator pi = getPersonIntegrator();
+        UserIntegrator ui = getUserIntegrator();
+        
+        // the magical moment of notice instantiation
         NoticeOfViolation notice = new NoticeOfViolation();
 
         notice.setNoticeID(rs.getInt("noticeid"));
-        
-        notice.setRecipient(pi.getPerson(rs.getInt("personidsetNoticeTextBeforeViolations);
-
-        notice.setNoticeText(rs.getString("lettertext"));
-
-        notice.setCreationTS(rs.getTimestamp("insertiontimestamp").toLocalDateTime());
-        notice.setCreationTSPretty(getPrettyDate(rs.getTimestamp("insertiontimestamp").toLocalDateTime()));
-
+        notice.setRecipient(pi.getPerson(rs.getInt("personid_recipient")));
         notice.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
-        notice.setDateOfRecordPretty(getPrettyDate(rs.getTimestamp("dateofrecord").toLocalDateTime()));
 
-        notice.setRequestToSend(rs.getBoolean("requesttosend"));
-        if (rs.getTimestamp("lettersenddate") != null) {
-            notice.setSentTS(rs.getTimestamp("lettersenddate").toLocalDateTime());
-            notice.setSentTSPretty(getPrettyDate(rs.getTimestamp("lettersenddate").toLocalDateTime()));
-            
-        } else {
-            notice.setSentTS(null);
+        notice.setNoticeTextBeforeViolations(rs.getString("lettertextbeforeviolations"));
+        populateCodeViolations(notice);
+        notice.setNoticeTextAfterViolations(rs.getString("lettertextafterviolations"));
+
+        notice.setCreationTS(rs.getTimestamp("creationtimestamp").toLocalDateTime());
+        notice.setCreationBy(ui.getUser(rs.getInt("creationby")));
+        
+        if (rs.getTimestamp("lockedandqueuedformailingdate") != null) {
+            notice.setLockedAndqueuedTS(rs.getTimestamp("lockedandqueuedformailingdate").toLocalDateTime());
+            notice.setLockedAndQueuedBy(ui.getUser(rs.getInt("lockedandqueuedformailingby")));
         }
-
-        if (rs.getTimestamp("letterreturneddate") != null) {
+        
+        if (rs.getTimestamp("sentdate") != null) {
+            notice.setSentTS(rs.getTimestamp("sentdate").toLocalDateTime());
+            notice.setSentBy(ui.getUser(rs.getInt("sentby")));
+        } 
+        
+        if (rs.getTimestamp("returneddate") != null) {
             notice.setReturnedTS(rs.getTimestamp("letterreturneddate").toLocalDateTime());
-            notice.setSentTSPretty(getPrettyDate(rs.getTimestamp("letterreturneddate").toLocalDateTime()));
-            
-        } else {
-            notice.setReturnedTS(null);
-
-        }
-
+            notice.setReturnedBy(ui.getUser(rs.getInt("returedby")));
+        } 
+        
+        notice.setNotes(rs.getString("notes"));
 
         return notice;
 
     }
+    
+    private NoticeOfViolation populateCodeViolations(NoticeOfViolation nov) throws IntegrationException{
+        String query =  "  SELECT noticeofviolation_noticeid, codeviolation_violationid, includeordtext, \n" +
+                        "       includehumanfriendlyordtext, includeviolationphoto\n" +
+                        "  FROM public.noticeofviolationcodeviolation WHERE noticeofviolation_noticeid = ?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        CodeViolation viol;
+        List<CodeViolationDisplayable> codeViolationList = new ArrayList<>();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, nov.getNoticeID() );
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                codeViolationList.add(
+                        new CodeViolationDisplayable(getCodeViolation(rs.getInt("codeviolation_violationid"))));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot fetch code violation by ID, sorry.", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        nov.setViolationList(codeViolationList);
+        
+        return nov;
+        
+    }
+    
+    
 
     public void updateCodeViolation(CodeViolation v) throws IntegrationException {
         String query = "UPDATE public.codeviolation\n"
@@ -414,16 +459,18 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
+        v.setCreatedBy(ui.getUser(rs.getString("createdby")));
         v.setCeCaseID(rs.getInt("cecase_caseid"));
         v.setDateOfRecord(rs.getTimestamp("dateofrecord").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
 
-        v.setEntryTimeStamp(rs.getTimestamp("entrytimestamp").toInstant()
+        v.setCreationTS(rs.getTimestamp("entrytimestamp").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
 
         v.setStipulatedComplianceDate(rs.getTimestamp("stipulatedcompliancedate").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
-
+                
+                
         if (!(rs.getTimestamp("actualcompliancdate") == null)) {
             v.setActualComplianceDate(rs.getTimestamp("actualcompliancdate").toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime());
@@ -439,10 +486,11 @@ public class CodeViolationIntegrator extends BackingBeanUtils implements Seriali
             v.setComplianceUser(ui.getUser("complianceUser"));
             
         }
+        
         v.setComplianceTimeframeEventID(rs.getInt("compliancetfevent"));
         
         v.setCitationIDList(citInt.getCitations(v.getViolationID()));
-        vc.configureCodeViolation(v);
+        cc.configureCodeViolation(v);
         return v;
     }
 
