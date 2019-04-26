@@ -35,21 +35,23 @@
 
                         <p:dataTable
                             id="newRecipientPersonTD"
-                            var="p"
-                            rowKey="#{p.personID}"
+                            var="person"
+                            rowKey="#{person.personID}"
                             value="#{noticeOfViolationBB.personCandidateList}"
                             tableStyleClass="primeDataTable"
                             expandedRow="false"
                             rowExpandMode="single"
                             rowIndexVar="rowIndex">
 
-                            <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
+                             <p:column width="2%">
+                                <p:rowToggler />
+                            </p:column>
                             <p:column width="8%">
                                 <f:facet name="header">
                                     <h:outputText value="Person Type" />
                                 </f:facet>
-                                <h:outputText value="#{p.personType.label}"/>
+                                <h:outputText value="#{person.personType.label}"/>
                             </p:column>
                             <p:column width="8%">
                                 <p:commandButton id="use-person-from-table-cb"
@@ -63,126 +65,129 @@
                                 <f:facet name="header">
                                     <h:outputText value="Person ID" />
                                 </f:facet>
-                                <h:outputText value="#{p.personID}"/>
+                                <h:outputText value="#{person.personID}"/>
                             </p:column>
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputText value="Municipality" />
                                 </f:facet>
-                                <h:outputText value="#{p.muniName}"/>
+                                <h:outputText value="#{person.muniName}"/>
                             </p:column>
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputText value="First" />
                                 </f:facet>
-                                <h:outputText value="#{p.firstName}"/>
+                                <h:outputText value="#{person.firstName}"/>
                             </p:column>
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputText value="Last" />
                                 </f:facet>
-                                <h:outputText value="#{p.lastName}"/>
+                                <h:outputText value="#{person.lastName}"/>
                             </p:column>
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputText value="Address" />
                                 </f:facet>
-                                <h:outputText value="#{p.addressStreet}"/>
+                                <h:outputText value="#{person.addressStreet}"/>
                             </p:column>
 
                             <p:rowExpansion>
-                                <h2><h:outputText value="#{p.firstName} #{p.lastName}"/>, Person ID:<h:outputText value="#{p.personID}"/> </h2>
-                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Person Type: "/>
-                                        <h:outputText value="#{p.personType.label}"/>
+                                <div class="rowExpansion">
 
-                                        <p:spacer height="5px"/>
+                                    <h2><h:outputText value="#{person.firstName} #{person.lastName}"/>, Person ID:<h:outputText value="#{person.personID}"/> </h2>
+                                    <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Person Type: "/>
+                                            <h:outputText value="#{person.personType.label}"/>
 
-                                        <h:outputLabel styleClass="bold" value="Job Title: "/>
-                                        <h:outputText value="#{p.jobTitle}"/>
+                                            <p:spacer height="5px"/>
 
-                                        <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Job Title: "/>
+                                            <h:outputText value="#{person.jobTitle}"/>
 
-                                        <h:outputLabel styleClass="bold" value="Email: "/>
-                                        <h:outputText value="#{p.email}"/>
-                                    </h:panelGroup>
+                                            <p:spacer height="5px"/>
 
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Last Updated: "/>
-                                        <h:outputText value="#{p.lastUpdatedPretty}"/>
-                                    </h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Email: "/>
+                                            <h:outputText value="#{person.email}"/>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Address: "/>
-                                        <p:spacer height="5px"/>
-                                        <h:outputText escape="false" value="#{p.addressStreet}"/>
-                                        <p:spacer height="5px"/>
-                                        <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
-                                    </h:panelGroup>
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Last Updated: "/>
+                                            <h:outputText value="#{person.lastUpdatedPretty}"/>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
-                                        <h:outputText value="#{p.useSeparateMailingAddress ? 'Yes':'No'}"/>
-                                        <p:spacer height="5px"/>
-                                        <h:outputText escape="false" value="#{p.mailingAddressStreet}"/>
-                                        <p:spacer height="5px"/>
-                                        <h:outputText value="#{p.mailingAddressCity}, #{p.mailingAddressState} #{p.mailingAddressZip}"/>
-                                    </h:panelGroup>
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Address: "/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText escape="false" value="#{person.addressStreet}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Under 18? "/>
-                                        <h:outputText value="#{p.under18 ? 'Yes':'No'}"/>
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
+                                            <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
+                                        </h:panelGroup>
 
-                                        <p:spacer height="5px"/>
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Under 18? "/>
+                                            <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
 
-                                        <h:outputLabel styleClass="bold" value="Active? "/>
-                                        <h:outputText value="#{p.active ? 'Yes':'No'}"/>
+                                            <p:spacer height="5px"/>
 
-                                        <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Active? "/>
+                                            <h:outputText value="#{person.active ? 'Yes':'No'}"/>
 
-                                        <h:outputLabel styleClass="bold" value="Composite last name? "/>
-                                        <h:outputText value="#{p.compositeLastName? 'Yes':'No'}"/>
-                                    </h:panelGroup>
+                                            <p:spacer height="5px"/>
+
+                                            <h:outputLabel styleClass="bold" value="Composite last name? "/>
+                                            <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
+                                        </h:panelGroup>
 
 
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
-                                        <h:outputText value="#{p.canExpire ? 'Yes':'No'}"/>
-                                        <p:spacer height="5px"/>
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
+                                            <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
+                                            <p:spacer height="5px"/>
 
-                                        <h:outputLabel styleClass="bold" value="Expires: "/>
-                                        <h:outputText value="#{p.expireString}"/>
+                                            <h:outputLabel styleClass="bold" value="Expires: "/>
+                                            <h:outputText value="#{person.expireString}"/>
 
-                                        <p:spacer height="5px"/>
-                                        <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
-                                        <div class="rowExpansion">
-                                            <h:outputText value="#{p.expiryNotes}"/>
-                                        </div>
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
+                                            <div class="rowExpansion">
+                                                <h:outputText value="#{person.expiryNotes}"/>
+                                            </div>
 
-                                    </h:panelGroup>
+                                        </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Phone(h): "/>
-                                        <h:outputText value="#{p.phoneHome}"/>
-                                        <p:spacer height="5px"/>
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Phone(h): "/>
+                                            <h:outputText value="#{person.phoneHome}"/>
+                                            <p:spacer height="5px"/>
 
-                                        <h:outputLabel styleClass="bold" value="Phone(w): "/>
-                                        <h:outputText value="#{p.phoneWork}"/>
-                                        <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Phone(w): "/>
+                                            <h:outputText value="#{person.phoneWork}"/>
+                                            <p:spacer height="5px"/>
 
-                                        <h:outputLabel styleClass="bold" value="Phone(m): "/>
-                                        <h:outputText value="#{p.phoneCell}"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Linked to user? "/>
-                                        <h:outputText value="#{p.linkedUserID == 0 ? 'No':'Yes'}"/>
-                                        <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Phone(m): "/>
+                                            <h:outputText value="#{person.phoneCell}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Linked to user? "/>
+                                            <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
+                                            <p:spacer height="5px"/>
 
-                                    </h:panelGroup>
-                                </h:panelGrid>
+                                        </h:panelGroup>
+                                    </h:panelGrid>
 
+                                </div>
                             </p:rowExpansion>
 
                         </p:dataTable>
@@ -316,11 +321,6 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column>
-                    <p:rowEditor />
-                </p:column>
-
-
 
                 <p:rowExpansion>
                     <div class="outlinedBox">

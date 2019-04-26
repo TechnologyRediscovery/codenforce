@@ -174,21 +174,8 @@
                                                          actionListener="#{propertyProfileBB.manageProperty(prop)}" 
                                                          ajax="true"
                                                          update="
-                                                         property-info-form:header-ot
-                                                         property-info-form:prop-info-addr-ot
-                                                         property-info-form:prop-info-muni-ot
-                                                         property-info-form:prop-info-parcelid-ot
-                                                         property-info-form:prop-info-lotandblock-ot
-                                                         property-info-form:prop-info-usetype-ot
-                                                         property-info-form:prop-info-usegroup-ot
-                                                         property-info-form:prop-info-consttype-ot
-                                                         property-info-form:prop-info-countycode-ot
-                                                         property-info-form:prop-info-notes-ot
-                                                         property-info-form:prop-info-multiUnit-cb
-                                                         property-info-form:prop-info-vacant-cb
-                                                         property-info-form:prop-info-rental-cb
-                                                         property-lists-form:prop-cases-datatable
-                                                         property-lists-form:prop-persons-datatable
+                                                         property-info-form
+                                                         property-lists-form
                                                          "/>
                                     </p:column>
                                 </p:dataTable>
@@ -391,23 +378,6 @@
                                                          ajax="false"/>
                                     </p:column>
 
-                    <ui:remove>
-                                        
-                                    <p:rowExpansion>
-                                        <div class="outlinedBox">
-
-                                            <h:panelGrid
-                                                columns="3" border="0" 
-                                                cellpadding="5" columnClasses="gridTd, gridTd"
-                                                footerClass="gridFooter" style="vertical-align: top;">
-                                                <h:panelGroup>
-                                                </h:panelGroup>
-                                            </h:panelGrid>
-                                            <h:outputText value="Public access control Code: #{c.publicControlCode}"/>
-                                        </div>
-                                    </p:rowExpansion>
-                    </ui:remove>
-                                    
                                     
                                 </p:dataTable>
 
@@ -421,15 +391,14 @@
 
                                     <p:dataTable
                                         id="prop-persons-datatable"
-                                        var="p"
+                                        var="person"
                                         value="#{propertyProfileBB.currProp.personList}"
-                                        rowKey="#{p.personID}"
+                                        rowKey="#{person.personID}"
                                         tableStyleClass="primeDataTable"
                                         rowExpandMode="single"
                                         expandedRow="false"
                                         filteredValue="#{propertyProfileBB.filteredPersonList}"
-                                        widgetVar="personSelectListTable">
-                                        <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+                                        >
 
                                         <p:column width="3%">
                                             <f:facet name="header">
@@ -441,40 +410,40 @@
                                             <f:facet name="header">
                                                 <h:outputText value="ID" />
                                             </f:facet>
-                                            <h:outputText value="#{p.personID}"/>
+                                            <h:outputText value="#{person.personID}"/>
                                         </p:column>
 
 
-                                        <p:column width="10%" sortBy="#{p.personType.label}"
-                                                  filterBy="#{p.personType.label}">
+                                        <p:column width="10%" sortBy="#{person.personType.label}"
+                                                  filterBy="#{person.personType.label}">
                                             <f:facet name="header">
                                                 <h:outputText value="Person Type" />
                                             </f:facet>
-                                            <h:outputText value="#{p.personType.label}"/>
+                                            <h:outputText value="#{person.personType.label}"/>
                                         </p:column>
 
-                                        <p:column width="10%" sortBy="#{p.muniName}"
-                                                  filterBy="#{p.muniName}">
+                                        <p:column width="10%" sortBy="#{person.muniName}"
+                                                  filterBy="#{person.muniName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Municipality" />
                                             </f:facet>
-                                            <h:outputText value="#{p.muniName}"/>
+                                            <h:outputText value="#{person.muniName}"/>
                                         </p:column>
 
-                                        <p:column width="10%" sortBy="#{p.firstName}"
-                                                  filterBy="#{p.firstName}">
+                                        <p:column width="10%" sortBy="#{person.firstName}"
+                                                  filterBy="#{person.firstName}">
                                             <f:facet name="header">
                                                 <h:outputText value="First" />
                                             </f:facet>
-                                            <h:outputText value="#{p.firstName}"/>
+                                            <h:outputText value="#{person.firstName}"/>
                                         </p:column>
 
-                                        <p:column width="15%" filterBy="#{p.lastName}"
-                                                  sortBy="#{p.lastName}">
+                                        <p:column width="15%" filterBy="#{person.lastName}"
+                                                  sortBy="#{person.lastName}">
                                             <f:facet name="header">
                                                 <h:outputText value="Last" />
                                             </f:facet>
-                                            <h:outputText value="#{p.lastName}"/>
+                                            <h:outputText value="#{person.lastName}"/>
                                         </p:column>
                                        
                                         <p:column width="8%" exportable="false">
@@ -487,7 +456,7 @@
                                         </p:column>
                                         <p:rowExpansion>
                                             <div class="outlinedBox">
-                                                <h2>Full person listing for <h:outputText value="#{p.firstName} #{p.lastName}"/> </h2>
+                                                <h2>Full person listing for <h:outputText value="#{person.firstName} #{person.lastName}"/> </h2>
                                                 <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd">
 
@@ -495,7 +464,7 @@
                                                         <h:outputLabel styleClass="bold" value="First Name"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.firstName}"/>
+                                                            <h:outputText value="#{person.firstName}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -504,7 +473,7 @@
                                                         <h:outputLabel styleClass="bold" value="Last Name"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.lastName}"/>
+                                                            <h:outputText value="#{person.lastName}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -512,7 +481,7 @@
                                                         <h:outputLabel styleClass="bold" value="Muni"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.muni.muniName}"/>
+                                                            <h:outputText value="#{person.muniName}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -520,7 +489,7 @@
                                                         <h:outputLabel styleClass="bold" value="Type"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.personType.label}"/>
+                                                            <h:outputText value="#{person.personType.label}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -528,7 +497,7 @@
                                                         <h:outputLabel styleClass="bold" value="Job Title"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.jobTitle}"/>
+                                                            <h:outputText value="#{person.jobTitle}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -536,7 +505,7 @@
                                                         <h:outputLabel styleClass="bold" value="Email"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.email}"/>
+                                                            <h:outputText value="#{person.email}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -544,9 +513,9 @@
                                                         <h:outputLabel styleClass="bold" value="Address"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{p.addressStreet}"/>
+                                                            <h:outputText escape="false" value="#{person.addressStreet}"/>
                                                             <p:spacer height="5px"/>
-                                                            <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
+                                                            <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -554,7 +523,7 @@
                                                         <h:outputLabel styleClass="bold" value="Under 19"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.under18}"/>
+                                                            <h:outputText value="#{person.under18}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -562,7 +531,7 @@
                                                         <h:outputLabel styleClass="bold" value="Active?"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.active}"/>
+                                                            <h:outputText value="#{person.active}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -570,7 +539,7 @@
                                                         <h:outputLabel styleClass="bold" value="Last Updated"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.lastUpdated}"/>
+                                                            <h:outputText value="#{person.lastUpdated}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -578,7 +547,7 @@
                                                         <h:outputLabel styleClass="bold" value="Expires"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.expiryDate.toString}"/>
+                                                            <h:outputText value="#{person.expiryDate.toString}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -586,7 +555,7 @@
                                                         <h:outputLabel styleClass="bold" value="Phone home"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.phoneHome}"/>
+                                                            <h:outputText value="#{person.phoneHome}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -594,7 +563,7 @@
                                                         <h:outputLabel styleClass="bold" value="Phone work"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.phoneWork}"/>
+                                                            <h:outputText value="#{person.phoneWork}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -602,7 +571,7 @@
                                                         <h:outputLabel styleClass="bold" value="Phone cell"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText value="#{p.phoneCell}"/>
+                                                            <h:outputText value="#{person.phoneCell}"/>
                                                         </div>
                                                     </h:panelGroup>
 
@@ -610,7 +579,7 @@
                                                         <h:outputLabel styleClass="bold" value="Person notes"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{p.notes}"/>
+                                                            <h:outputText escape="false" value="#{person.notes}"/>
                                                         </div>
                                                     </f:facet>
                                                 </h:panelGrid>

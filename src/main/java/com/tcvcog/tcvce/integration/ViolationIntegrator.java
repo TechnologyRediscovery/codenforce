@@ -124,10 +124,11 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
                         "    VALUES (DEFAULT, ?, ?, now(), \n" +
                         "            ?, NULL, NULL, ?, ?, \n" +
                         "            NULL, NULL, NULL, \n" +
-                        "            NULL, ?, ?";
+                        "            NULL, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
+        ResultSet rs = null;
 
         try {
             stmt = con.prepareStatement(query);
@@ -142,6 +143,16 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
                     
             stmt.execute();
             
+            String retrievalQuery = "SELECT currval('noticeofviolation_noticeid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            int insertedNOVId = 0;
+            while(rs.next()){
+                insertedNOVId = rs.getInt(1);
+            }
+            
+            notice.setNoticeID(insertedNOVId);
+            
             List<CodeViolationDisplayable> cvList = notice.getViolationList();
             Iterator<CodeViolationDisplayable> iter = cvList.iterator();
             while(iter.hasNext()){
@@ -155,6 +166,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
     } // close method
@@ -214,8 +226,9 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
 
     public void novLockAndQueueForMailing(NoticeOfViolation nov) throws IntegrationException{
         String query =  "UPDATE public.noticeofviolation\n" +
-                        "   SET lockedandqueuedformailingdate=?, lockedandqueuedformailingby=?" +
-                        "  WHERE noticeid=?;";
+                        "   SET lockedandqueuedformailingdate=?, lockedandqueuedformailingby=?, " +
+                        "   personid_recipient=?" +
+                        "   WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
         Connection con = getPostgresCon();
@@ -226,7 +239,8 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
             
             stmt.setTimestamp(1, java.sql.Timestamp.valueOf(nov.getLockedAndqueuedTS()));
             stmt.setInt(2, nov.getLockedAndQueuedBy().getUserID());
-            stmt.setInt(3, nov.getNoticeID());
+            stmt.setInt(3, nov.getRecipient().getPersonID());
+            stmt.setInt(4, nov.getNoticeID());
 
             stmt.execute();
         } catch (SQLException ex) {

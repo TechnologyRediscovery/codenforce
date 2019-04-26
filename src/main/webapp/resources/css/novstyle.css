@@ -16,6 +16,7 @@ Styling for notices of violation printing only
 }
 
 .header{
+    display: block;
     
 }
 
@@ -24,11 +25,24 @@ Styling for notices of violation printing only
 }
 
 .addressee{
+    display: block;
     
     
 }
 
+.ui-datascroller-content{
+    border:none;
+}
+
 .date-of-record{
+    margin-top: 15px;
+    margin-bottom: 15px;
+    
+}
+
+.property-of-concern{
+    margin-top: 15px;
+    margin-bottom: 15px;
     
 }
 

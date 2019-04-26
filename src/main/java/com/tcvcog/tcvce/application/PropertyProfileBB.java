@@ -48,8 +48,7 @@ Council of Governments, PA
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     private PropertyWithLists currProp;
-    private ArrayList<Person> filteredPersonList;
-    private ArrayList<Person> pList;
+    private List<Person> filteredPersonList;
     
     private String parid;
     private String address;
@@ -295,40 +294,18 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the photoList
      */
-    public ArrayList<Photograph> getPhotoList() {
-        ImageServices is = getImageServices();
-        try {
-            return is.getAllPhotographs();
-        } catch (IntegrationException ex) {
-            Logger.getLogger(PropertyProfileBB.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
+    public List<Person> getFilteredPersonList() {
+        return filteredPersonList;
     }
 
     /**
      * @param photoList the photoList to set
      */
-    public void setPhotoList(ArrayList<Photograph> photoList) {
-        this.photoList = photoList;
+    public void setFilteredPersonList(List<Person> filteredPersonList) {
+        this.filteredPersonList = filteredPersonList;
     }
 
-    /**
-     * @return the pList
-     */
-    public ArrayList<Person> getpList() throws IntegrationException {
-            PropertyIntegrator pi = getPropertyIntegrator();
-        if(pList == null || currProp == null){
-            pList= pi.getPersonIntegrator().getPersonList(selectedMuni.getMuniCode());
-        }
-        return pList;
-    }
-
-    /**
-     * @param pList the pList to set
-     */
-    public void setpList(ArrayList<Person> pList) {
-        this.pList = pList;
-    }
+    
 
     /**
      * @return the selectedMuni
