@@ -1090,7 +1090,7 @@
                                             <p:spacer height="5px"/>
 
                                             <h:outputText styleClass="bold"   value="Queued for Mailing: " />
-                                            <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
+                                            <h:outputText id="nov-queued-ot" value="#{notice.lockedAndQueuedTSPretty}"/>
                                             <p:spacer height="5px"/>
 
                                             <h:outputText styleClass="bold"  value="Sent Date: " />
@@ -1132,7 +1132,7 @@
                                         <h:panelGroup>
                                             <p:commandButton ajax="false" action="#{caseProfileBB.printNotice(notice)}"
                                                              value="Print/View" styleClass="noFill button-size-small"
-                                                             icon="fa fa-print" disabled="#{(empty notice) or !(empty notice.lockedAndQueuedTS)}" />
+                                                             icon="fa fa-print" disabled="#{(empty notice) or !(empty notice.lockedAndqueuedTS)}" />
                                         </h:panelGroup>
 
                                         <h:panelGroup>
@@ -1146,8 +1146,8 @@
                                             <p:commandButton id="nov-delete-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
                                                              value="Nuke notice" styleClass="noFill"
-                                                             icon="fa fa-bomb" disabled="#{notice.l}"
-                                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                                             icon="fa fa-bomb" disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                              update="notices-messages-form:notices-messages-global
                                                              notices-ds"/>
                                         </h:panelGroup>
@@ -1157,7 +1157,7 @@
                                             <p:commandButton id="nov-queuenotice-cb"
                                                              ajax="true" action="#{caseProfileBB.lockNoticeAndQueueForMailing(notice)}"
                                                              value="Lock notice: ready to print and mail" styleClass="noFill"
-                                                             icon="fa fa-edit" disabled="#{notice.requestToSend}"
+                                                             icon="fa fa-edit" disabled="#{!(empty notice.lockedAndqueuedTS)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-queuenotice-cb
                                                              nov-queued-ot
@@ -1170,7 +1170,7 @@
                                             <p:commandButton id="nov-sent-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
                                                              value="Mark notice as mailed!" styleClass="noFill"
-                                                             icon="fa fa-paper-plane" disabled="#{!(notice.requestToSend) || (!(empty notice.sentTS) and notice.requestToSend)}"
+                                                             icon="fa fa-paper-plane" disabled="#{!(notice.lockedAndqueuedTS) || (!(empty notice.sentTS) and notice.lockedAndqueuedTS)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-sent-date
                                                              nov-returned-cb
@@ -1182,7 +1182,7 @@
                                             <p:commandButton id="nov-returned-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
                                                              value="Mark notice as returned" styleClass="noFill"
-                                                             icon="fa fa-mail-reply" disabled="#{(empty notice.sentTS) || !(empty notice.letterReturnedDate)}"
+                                                             icon="fa fa-mail-reply" disabled="#{(empty notice.sentTS) || !(empty notice.returnedTS)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-returned-date
                                                              nov-returned-cb"/>

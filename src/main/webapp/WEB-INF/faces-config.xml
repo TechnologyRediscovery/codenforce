@@ -984,16 +984,6 @@
         </navigation-case>
 
         <navigation-case>
-            <from-outcome>noticeOfViolationBuilderPersons</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilderPersons.xhtml</to-view-id>
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>noticeOfViolationBuilderText</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilderText.xhtml</to-view-id>
-        </navigation-case>
- 
-        <navigation-case>
             <from-outcome>noticeOfViolationEditor</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/noticeOfViolationEditor.xhtml</to-view-id>
         </navigation-case>

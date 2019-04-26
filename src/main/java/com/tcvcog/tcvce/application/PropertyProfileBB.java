@@ -1,6 +1,7 @@
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
@@ -122,7 +123,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         try {
             currProp = pi.getPropertyWithLists(prop.getPropertyID());
             System.out.println("PropertyProfileBB.manageProperty | curr Prop: " + currProp.getAddress());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
     }
@@ -136,7 +137,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             if(currProp == null){
                 currProp = pi.getPropertyWithLists(getSessionBean().getActiveProp().getPropertyID());
             }
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
         return currProp;

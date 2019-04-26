@@ -687,10 +687,15 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     public String createNewNotice() {
+        NoticeOfViolation nov;
+        CaseCoordinator cc = getCaseCoordinator();
             if (!currentCase.getViolationListUnresolved().isEmpty()) {
                 getSessionBean().getPropertyQueue().add(0, currentCase.getProperty());
                 getSessionBean().setActiveProp(currentCase.getProperty());
                 positionCurrentCaseAtHeadOfQueue();
+                nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getActiveMuni());
+                nov.setCreationBy(getSessionBean().getFacesUser());
+                getSessionBean().setActiveNotice(nov);
                 return "noticeOfViolationBuilder";
             } else {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1172,7 +1177,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             try {
                 System.out.println("CaseProfileBB.getCaseList | getting list for : " + getSessionBean().getActiveMuni().getMuniName());
                 caseList = ci.queryCECases(searchParams);
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException | CaseLifecyleException ex) {
                 System.out.println(ex);
             }
         }
@@ -1519,15 +1524,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String getStyleClassInvestigation() {
         String style = null;
-        try {
-            if (currentCase.getCaseStage() == CaseStage.Investigation) {
-                style = currentCase.getCasePhaseIcon().getStyleClass();
-
-            } else {
-                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
-            }
-        } catch (CaseLifecyleException ex) {
-            System.out.println(ex);
+        if (currentCase.getCaseStage() == CaseStage.Investigation) {
+            style = currentCase.getCasePhaseIcon().getStyleClass();
+            
+        } else {
+            style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
         }
         styleClassInvestigation = style;
         return styleClassInvestigation;
@@ -1538,15 +1539,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String getStyleClassEnforcement() {
         String style = null;
-        try {
-            if (currentCase.getCaseStage() == CaseStage.Enforcement) {
-                style = currentCase.getCasePhaseIcon().getStyleClass();
-
-            } else {
-                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
-            }
-        } catch (CaseLifecyleException ex) {
-            System.out.println(ex);
+        if (currentCase.getCaseStage() == CaseStage.Enforcement) {
+            style = currentCase.getCasePhaseIcon().getStyleClass();
+            
+        } else {
+            style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
         }
         styleClassEnforcement = style;
         return styleClassEnforcement;
@@ -1557,15 +1554,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String getSytleClassCitation() {
         String style = null;
-        try {
-            if (currentCase.getCaseStage() == CaseStage.Citation) {
-                style = currentCase.getCasePhaseIcon().getStyleClass();
-
-            } else {
-                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
-            }
-        } catch (CaseLifecyleException ex) {
-            System.out.println(ex);
+        if (currentCase.getCaseStage() == CaseStage.Citation) {
+            style = currentCase.getCasePhaseIcon().getStyleClass();
+            
+        } else {
+            style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
         }
         sytleClassCitation = style;
         return sytleClassCitation;
@@ -1576,15 +1569,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public String getSytleClassClosed() {
         String style = null;
-        try {
-            if (currentCase.getCaseStage() == CaseStage.Closed) {
-                style = currentCase.getCasePhaseIcon().getStyleClass();
-
-            } else {
-                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
-            }
-        } catch (CaseLifecyleException ex) {
-            System.out.println(ex);
+        if (currentCase.getCaseStage() == CaseStage.Closed) {
+            style = currentCase.getCasePhaseIcon().getStyleClass();
+            
+        } else {
+            style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
         }
         sytleClassClosed = style;
         return sytleClassClosed;

@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -355,7 +356,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     } // close getProperty()
     
-    public PropertyWithLists getPropertyWithLists(int propertyID) throws IntegrationException{
+    public PropertyWithLists getPropertyWithLists(int propertyID) throws IntegrationException, CaseLifecyleException{
         PropertyWithLists p = new PropertyWithLists();
         String query = "SELECT * from property WHERE propertyid = ?;";
         

@@ -11,6 +11,7 @@ Styling for notices of violation printing only
 }
 
 .nov-container{
+    margin: 0px;
     
 }
 
@@ -27,6 +28,14 @@ Styling for notices of violation printing only
     
 }
 
+.date-of-record{
+    
+}
+
+.text-insert{
+    
+}
+
 .signature{
     
 }
@@ -37,6 +46,10 @@ Styling for notices of violation printing only
 
 .violation{
     
+    
+}
+
+.compliance-date{
     
 }
 
@@ -51,6 +64,15 @@ Styling for notices of violation printing only
 
 p{
     
+    
+}
+
+.violation-photo-attachments{
+    page-break-before: always;
+    
+}
+
+.violation-photo{
     
 }
 

@@ -18,6 +18,8 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -34,6 +36,7 @@ public class NoticeOfViolation extends EntityUtils {
     private String noticeTextAfterViolations;
     
     private LocalDateTime dateOfRecord;
+    private java.util.Date dateOfRecordUtilDate;
     private String dateOfRecordPretty;
     
     private LocalDateTime creationTS;
@@ -60,6 +63,8 @@ public class NoticeOfViolation extends EntityUtils {
     
     private boolean useCustomMuniHeaderImage;
     private boolean useSignatureImage;
+    
+    private boolean includeViolationPhotoAttachment;
     
     
 
@@ -416,6 +421,48 @@ public class NoticeOfViolation extends EntityUtils {
      */
     public void setUseSignatureImage(boolean useSignatureImage) {
         this.useSignatureImage = useSignatureImage;
+    }
+
+    /**
+     * @return the includeViolationPhotoAttachment
+     */
+    public boolean isIncludeViolationPhotoAttachment() {
+        includeViolationPhotoAttachment = false;
+        if(!violationList.isEmpty()){
+            Iterator<CodeViolationDisplayable> iter = violationList.iterator();
+            while(iter.hasNext()){
+                CodeViolationDisplayable cvd = iter.next();
+                if(cvd.isIncludeViolationPhotos()){
+                    includeViolationPhotoAttachment = true;
+                }
+            }
+        }
+        return includeViolationPhotoAttachment;
+    }
+
+    /**
+     * @param includeViolationPhotoAttachment the includeViolationPhotoAttachment to set
+     */
+    public void setIncludeViolationPhotoAttachment(boolean includeViolationPhotoAttachment) {
+        this.includeViolationPhotoAttachment = includeViolationPhotoAttachment;
+    }
+
+    /**
+     * @return the dateOfRecordUtilDate
+     */
+    public java.util.Date getDateOfRecordUtilDate() {
+        dateOfRecordUtilDate = java.util.Date.from(getDateOfRecord().atZone(ZoneId.systemDefault()).toInstant());
+        return dateOfRecordUtilDate;
+    }
+
+    /**
+     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
+     */
+    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
+        if(dateOfRecordUtilDate != null){
+            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
     }
     
 }

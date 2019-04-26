@@ -7,6 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <link rel="stylesheet" type="text/css" href="css/novstyle.css"></link>
         <title>Violation Editor</title>
     </h:head>
     <h:body>  
@@ -20,35 +21,39 @@
                         <h2>Notice of Violation editor</h2>
                         
                         <p>Current Notice ID (0 for new notice): <h:outputText value="#{noticeOfViolationBB.currentNotice.noticeID}"/> </p>
-                        
-                        
-                        <h:outputLabel for="noticeDateOfRecord">
-                            <h:outputText value="Letter's Date of Record"/>
-                        </h:outputLabel>
-                        <p:calendar value="#{noticeOfViolationBB.formDateOfRecord}" 
-                                            mode="popup" tabindex="13"
-                                            id="noticeDateOfRecord"
-                                            showOn="button"
-                                            pattern="EEE, dd MMM, yyyy"
-                                            navigator="true"
-                                            showButtonPanel="true"
-                                            showTodayButton="true"
-                                            required="true"/>
+                                               
+                        <div class="date-of-record">
+                            <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                        </div> 
 
-                                    <h:message for="noticeDateOfRecord" showDetail="true" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                        
-                        
-                        <h3>Notice of violation letter text:</h3>
-
-                        <p:editor value="#{noticeOfViolationBB.formLetterText}"
+                        <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
                                   controls="bold italic underline strikethrough font size style color 
                                   bullets numbering center undo redo rule link removeformat outdent 
                                   indent link unlink copy cut paste rule alignleft center alignright"
                                   width="1000"
                                   height="400"/>
                         
-                        <p:spacer height="15px"/>
+                        <h3>Violations</h3>
+
+                        <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
+                                  controls="bold italic underline strikethrough font size style color 
+                                  bullets numbering center undo redo rule link removeformat outdent 
+                                  indent link unlink copy cut paste rule alignleft center alignright"
+                                  width="1000"
+                        
+                                  height="400"/>
+                        
+                         <div class="signature">
+                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
+                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
+                            <br />
+                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
+                            <br />
+                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
+                            <h:outputText value=" | " />
+                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
+                        </div>
+
                         
                         <p:commandButton action="ceCases" icon="fa fa-arrow-left"
                                          value="cancel without saving"/>

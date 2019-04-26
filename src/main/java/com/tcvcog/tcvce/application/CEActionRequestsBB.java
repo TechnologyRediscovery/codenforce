@@ -661,6 +661,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
             } catch (IntegrationException ex) {
                 System.out.println(ex);
+            } catch (CaseLifecyleException ex) {
+                System.out.println(ex);
             }
         }
         return caseListForSelectedProperty;

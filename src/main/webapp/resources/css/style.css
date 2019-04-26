@@ -1123,6 +1123,12 @@ gridTd-bignum{
 
 /* -------------------- MISC --------------------------------- */
 
+.nov-chosen-recipeint{
+    margin: 10px;
+    font-family: monospace;
+}
+
+
 p.footer{
     font-style: italic;
     size: 0.8em;

@@ -167,22 +167,28 @@ CREATE INDEX "fki_noticeOfViolation_recipient_fk"
 
 
 
-ALTER TABLE codeviolation ADD COLUMN creationby INTEGER;
-ALTER TABLE codeviolation ADD CONSTRAINT violation_creationby_userid_fk FOREIGN KEY ( creationby ) REFERENCES login ( userid ) ;
+ALTER TABLE codeviolation ADD COLUMN createdby INTEGER;
+ALTER TABLE codeviolation ADD CONSTRAINT violation_creationby_userid_fk FOREIGN KEY ( createdby ) REFERENCES login ( userid ) ;
 
-ALTER TABLE municipalitycipality ADD COLUMN novtopmargin INTEGER;
-ALTER TABLE municipalitycipality ADD COLUMN novaddresseleftmargin INTEGER;
-ALTER TABLE municipalitycipality ADD COLUMN novaddressetopmargin INTEGER;
-ALTER TABLE municipalitycipality ADD COLUMN novaddresseleftmargin INTEGER;
 
-ALTER TABLE municipalitycipality ADD COLUMN usecustommunicipalityheaderimage BOOLEAN;
-ALTER TABLE municipalitycipality ADD COLUMN usesignatureimage BOOLEAN;
+
+
+ALTER TABLE municipality ADD COLUMN novtopmargin INTEGER;
+ALTER TABLE municipality ADD COLUMN novaddresseleftmargin INTEGER;
+ALTER TABLE municipality ADD COLUMN novaddressetopmargin INTEGER;
+ALTER TABLE municipality ADD COLUMN headerimage INTEGER;
+ALTER TABLE municipality ADD CONSTRAINT muni_headerimage_fk FOREIGN KEY (headerimage) REFERENCES photodoc (photoDocID);
+
+UPDATE municipality SET novtopmargin=10;
+UPDATE municipality SET novaddresseleftmargin=10;
+UPDATE municipality SET novaddressetopmargin=10;
+
 
 
 CREATE TABLE municipalitycipalityphotodoc
   (
     photodoc_photodocid INTEGER NOT NULL ,
-    municipalitycipality_municipalitycode INTEGER NOT NULL
+    municipalitycipality_municipalitycode INTEGER NOT NULL,
   ) ;
 
 ALTER TABLE municipalityphotodoc ADD CONSTRAINT municipalityphotodoc_pk PRIMARY KEY ( photoDoc_photoDocID, municipalitycipality_municipalitycode ) ;
