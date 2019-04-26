@@ -1132,14 +1132,14 @@
                                         <h:panelGroup>
                                             <p:commandButton ajax="false" action="#{caseProfileBB.printNotice(notice)}"
                                                              value="Print/View" styleClass="noFill button-size-small"
-                                                             icon="fa fa-print" disabled="#{(empty notice)}" />
+                                                             icon="fa fa-print" disabled="#{(empty notice) or !(empty notice.lockedAndQueuedTS)}" />
                                         </h:panelGroup>
 
                                         <h:panelGroup>
                                             <p:commandButton id="nov-edit-cb"
                                                              ajax="false" action="#{caseProfileBB.editNoticeOfViolation(notice)}"
                                                              value="Edit notice" styleClass="noFill"
-                                                             icon="fa fa-edit " disabled="#{notice.requestToSend}" />
+                                                             icon="fa fa-edit " disabled="#{notice.lockedAndqueuedTS}" />
                                         </h:panelGroup>
 
                                         <h:panelGroup>
@@ -1147,6 +1147,7 @@
                                                              ajax="true" actionListener="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
                                                              value="Nuke notice" styleClass="noFill"
                                                              icon="fa fa-bomb" disabled="#{notice.l}"
+                                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
                                                              update="notices-messages-form:notices-messages-global
                                                              notices-ds"/>
                                         </h:panelGroup>
@@ -1154,8 +1155,8 @@
 
                                         <h:panelGroup>
                                             <p:commandButton id="nov-queuenotice-cb"
-                                                             ajax="true" action="#{caseProfileBB.queueNotice(notice)}"
-                                                             value="Mark notice: Ready-to-mail" styleClass="noFill"
+                                                             ajax="true" action="#{caseProfileBB.lockNoticeAndQueueForMailing(notice)}"
+                                                             value="Lock notice: ready to print and mail" styleClass="noFill"
                                                              icon="fa fa-edit" disabled="#{notice.requestToSend}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-queuenotice-cb
@@ -1168,7 +1169,7 @@
                                         <h:panelGroup>
                                             <p:commandButton id="nov-sent-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
-                                                             value="Mark notice: Mailed!" styleClass="noFill"
+                                                             value="Mark notice as mailed!" styleClass="noFill"
                                                              icon="fa fa-paper-plane" disabled="#{!(notice.requestToSend) || (!(empty notice.sentTS) and notice.requestToSend)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-sent-date
@@ -1180,7 +1181,7 @@
                                         <h:panelGroup>
                                             <p:commandButton id="nov-returned-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
-                                                             value="Mark notice: returned" styleClass="noFill"
+                                                             value="Mark notice as returned" styleClass="noFill"
                                                              icon="fa fa-mail-reply" disabled="#{(empty notice.sentTS) || !(empty notice.letterReturnedDate)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-returned-date
@@ -1192,6 +1193,7 @@
                                                              ajax="true" actionListener="#{caseProfileBB.resetNotice(notice)}"
                                                              value="Reset mailing status" styleClass="noFill"
                                                              icon="fa fa-window-close-o" disabled="false"
+                                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-returned-date
                                                              nov-returned-cb

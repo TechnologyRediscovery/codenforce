@@ -13,7 +13,7 @@ BEGIN
        
 
 	INSERT INTO public.person(
-		    personid, persontype, muni_municode, fname, lname, jobtitle, 
+		    personid, persontype, municipality_municipalitycode, fname, lname, jobtitle, 
 		    phonecell, phonehome, phonework, email, address_street, address_city, 
 		    address_state, address_zip, notes, lastupdated, expirydate, isactive, 
 		    isunder18, humanverifiedby, compositelname, sourceid, creator, 
@@ -22,7 +22,7 @@ BEGIN
 		    expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline, 
             ghostof, ghostby, ghosttimestamp, cloneof, clonedby, clonetimestamp, 
             referenceperson)
-	    VALUES (DEFAULT, person_row.persontype, person_row.muni_municode, person_row.fname, person_row.lname, person_row.jobtitle, 
+	    VALUES (DEFAULT, person_row.persontype, person_row.municipality_municipalitycode, person_row.fname, person_row.lname, person_row.jobtitle, 
 		    person_row.phonecell, person_row.phonehome, person_row.phonework, person_row.email, person_row.address_street, person_row.address_city, 
 		    person_row.address_state, person_row.address_zip, person_row.notes, now(), NULL, TRUE, 
 		    person_row.isunder18, NULL, person_row.compositelname, person_row.sourceid , person_row.creator, 
@@ -56,7 +56,7 @@ BEGIN
        
 
 	INSERT INTO public.person(
-		    personid, persontype, muni_municode, fname, lname, jobtitle, 
+		    personid, persontype, municipality_municipalitycode, fname, lname, jobtitle, 
 		    phonecell, phonehome, phonework, email, address_street, address_city, 
 		    address_state, address_zip, notes, lastupdated, expirydate, isactive, 
 		    isunder18, humanverifiedby, compositelname, sourceid, creator, 
@@ -65,7 +65,7 @@ BEGIN
 		    expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline, 
             ghostof, ghostby, ghosttimestamp, cloneof, clonedby, clonetimestamp, 
             referenceperson)
-	    VALUES (DEFAULT, person_row.persontype, person_row.muni_municode, person_row.fname, person_row.lname, person_row.jobtitle, 
+	    VALUES (DEFAULT, person_row.persontype, person_row.municipality_municipalitycode, person_row.fname, person_row.lname, person_row.jobtitle, 
 		    person_row.phonecell, person_row.phonehome, person_row.phonework, person_row.email, person_row.address_street, person_row.address_city, 
 		    person_row.address_state, person_row.address_zip, person_row.notes, now(), NULL, TRUE, 
 		    person_row.isunder18, NULL, person_row.compositelname, person_row.sourceid , person_row.creator, 
@@ -168,13 +168,28 @@ CREATE INDEX "fki_noticeOfViolation_recipient_fk"
 
 
 ALTER TABLE codeviolation ADD COLUMN creationby INTEGER;
-
 ALTER TABLE codeviolation ADD CONSTRAINT violation_creationby_userid_fk FOREIGN KEY ( creationby ) REFERENCES login ( userid ) ;
 
+ALTER TABLE municipalitycipality ADD COLUMN novtopmargin INTEGER;
+ALTER TABLE municipalitycipality ADD COLUMN novaddresseleftmargin INTEGER;
+ALTER TABLE municipalitycipality ADD COLUMN novaddressetopmargin INTEGER;
+ALTER TABLE municipalitycipality ADD COLUMN novaddresseleftmargin INTEGER;
+
+ALTER TABLE municipalitycipality ADD COLUMN usecustommunicipalityheaderimage BOOLEAN;
+ALTER TABLE municipalitycipality ADD COLUMN usesignatureimage BOOLEAN;
 
 
+CREATE TABLE municipalitycipalityphotodoc
+  (
+    photodoc_photodocid INTEGER NOT NULL ,
+    municipalitycipality_municipalitycode INTEGER NOT NULL
+  ) ;
 
+ALTER TABLE municipalityphotodoc ADD CONSTRAINT municipalityphotodoc_pk PRIMARY KEY ( photoDoc_photoDocID, municipalitycipality_municipalitycode ) ;
 
+ALTER TABLE municipalityphotodoc ADD CONSTRAINT municipalityphotodoc_pdid_fk FOREIGN KEY (photodoc_photoDocID) REFERENCES photodoc (photoDocID);
+
+ALTER TABLE municipalityphotodoc ADD CONSTRAINT municipalityphotodoc_muni_fk FOREIGN KEY (municipalitycipality_municipalitycode) REFERENCES municipality (municode);
 
 
 INSERT INTO public.dbpatch(

@@ -428,6 +428,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCaseID
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
      */
     public CECase getCECase(int ceCaseID) throws IntegrationException, CaseLifecyleException{
         CaseCoordinator cc = getCaseCoordinator();
@@ -476,7 +477,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
         // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
         c.setEventList(ei.getEventsByCaseID(c.getCaseID()));
-        c.setNoticeList(cvi.getNoticeOfViolationList(c));
+        c.setNoticeList(cvi.novGetList(c));
         c.setCitationList(ci.getCitations(c));
         c.setViolationList(cvi.getCodeViolations(c.getCaseID()));
         c.setRequestList(ceari.getCEActionRequestListByCase(c.getCaseID()));

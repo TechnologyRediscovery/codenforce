@@ -37,12 +37,13 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 /**
- *
- * @author Eric C. Darsow
+ * Connects the postgres database to java land in all directions.
+ * @author Ms. L. Darsow
  */
 public class ViolationIntegrator extends BackingBeanUtils implements Serializable {
 
@@ -105,38 +106,49 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         return lastID;
 
     }
+    
+    
+    /**
+     * Writes a new Notice of Violation to the DB
+     * @param c associated CECase
+     * @param notice the Notice to write
+     * @throws IntegrationException 
+     */
+    public void novInsert(CECase c, NoticeOfViolation notice) throws IntegrationException {
 
-    public void insertNoticeOfViolation(CECase c, NoticeOfViolation notice) throws IntegrationException {
-
-        String query = "INSERT INTO public.noticeofviolation(\n"
-                + " noticeid, caseid, personid_recipient, lettertext, insertiontimestamp, dateofrecord, \n"
-                + " requesttosend, lettersenddate, letterReturnedDate)\n"
-                + " VALUES (DEFAULT, ?, ?, ?, now(), ?, \n"
-                + " ?, ?, ?);";
+        String query =  "INSERT INTO public.noticeofviolation(\n" +
+                        "            noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
+                        "            dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
+                        "            lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
+                        "            returnedby, notes, creationby)\n" +
+                        "    VALUES (DEFAULT, ?, ?, now(), \n" +
+                        "            ?, NULL, NULL, ?, ?, \n" +
+                        "            NULL, NULL, NULL, \n" +
+                        "            NULL, ?, ?";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
+            
             stmt.setInt(1, c.getCaseID());
-            stmt.setInt(2, notice.getRecipient().getPersonID());
-            stmt.setString(3, notice.getNoticeTextBeforeViolations());
-            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
-            stmt.setBoolean(5, notice.isRequestToSend());
-            if(notice.getSentTS() == null){
-                stmt.setNull(6, java.sql.Types.NULL);
-            } else {
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(notice.getSentTS()));
+            stmt.setString(2, notice.getNoticeTextBeforeViolations());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
+            stmt.setInt(4, notice.getRecipient().getPersonID());
+            stmt.setString(5, notice.getNoticeTextAfterViolations());
+            stmt.setString(6, notice.getNotes());
+            stmt.setInt(7, notice.getCreationBy().getUserID());
+                    
+            stmt.execute();
+            
+            List<CodeViolationDisplayable> cvList = notice.getViolationList();
+            Iterator<CodeViolationDisplayable> iter = cvList.iterator();
+            while(iter.hasNext()){
+                CodeViolationDisplayable cvd = iter.next();
+                novConnectNoticeToCodeViolation(notice, cvd);
             }
             
-            if(notice.getReturnedTS() == null){
-                stmt.setNull(7, java.sql.Types.NULL);
-            } else {
-                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(notice.getReturnedTS()));   
-            }
-
-            stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot insert notice of violation letter at this time, sorry.", ex);
@@ -146,11 +158,171 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
 
     } // close method
+    
+    private void novConnectNoticeToCodeViolation(NoticeOfViolation nov, CodeViolationDisplayable cv) throws IntegrationException{
+        String query =  "INSERT INTO public.noticeofviolationcodeviolation(\n" +
+                        "            noticeofviolation_noticeid, codeviolation_violationid, includeordtext, \n" +
+                        "            includehumanfriendlyordtext, includeviolationphoto)\n" +
+                        "    VALUES (?, ?, ?, \n" +
+                        "            ?, ?);";
+        // note that original time stamp is not altered on an update
 
-    public void updateViolationLetter(NoticeOfViolation notice) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, nov.getNoticeID());
+            stmt.setInt(2, cv.getViolationID());
+            stmt.setBoolean(3, cv.isIncludeOrdinanceText());
+            stmt.setBoolean(4, cv.isIncludeHumanFriendlyText());
+            stmt.setBoolean(5, cv.isIncludeViolationPhotos());
+
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to connect notice and violation in database", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    private void novClearNoticeCodeViolationConnections(NoticeOfViolation nov) throws IntegrationException{
+         String query =     "DELETE FROM public.noticeofviolationcodeviolation\n" +
+                            " WHERE noticeofviolation_noticeid=?;";
+        // note that original time stamp is not altered on an update
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, nov.getNoticeID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to clear connections between NOVs and code violations", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+
+    public void novLockAndQueueForMailing(NoticeOfViolation nov) throws IntegrationException{
+        String query =  "UPDATE public.noticeofviolation\n" +
+                        "   SET lockedandqueuedformailingdate=?, lockedandqueuedformailingby=?" +
+                        "  WHERE noticeid=?;";
+        // note that original time stamp is not altered on an update
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(nov.getLockedAndqueuedTS()));
+            stmt.setInt(2, nov.getLockedAndQueuedBy().getUserID());
+            stmt.setInt(3, nov.getNoticeID());
+
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to write NOV lock to database", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public void novRecordMailing(NoticeOfViolation nov) throws IntegrationException{
+        String query =  "UPDATE public.noticeofviolation\n" +
+                        "   SET sentdate=?, sentby=? " +
+                        "  WHERE noticeid=?;";
+        // note that original time stamp is not altered on an update
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(nov.getSentTS()));
+            stmt.setInt(2, nov.getSentBy().getUserID());
+            stmt.setInt(3, nov.getNoticeID());
+
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to record NOV mailing in database", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void novRecordReturnedNotice(NoticeOfViolation nov) throws IntegrationException{
+        String query =  "UPDATE public.noticeofviolation\n" +
+                        "   SET returneddate=? returnedby=? " +
+                        "  WHERE noticeid=?;";
+        // note that original time stamp is not altered on an update
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(nov.getReturnedTS()));
+            stmt.setInt(2, nov.getReturnedBy().getUserID());
+            stmt.setInt(3, nov.getNoticeID());
+
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot record notice as returned in database", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void novUpdateNoticeNotes(NoticeOfViolation nov) throws IntegrationException{
+        String query =  "UPDATE public.noticeofviolation\n" +
+                        "   SET notes=? " +
+                        "  WHERE noticeid=?;";
+        // note that original time stamp is not altered on an update
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, nov.getNotes());
+            stmt.setInt(2, nov.getNoticeID());
+
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot record notice as returned in database", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    public void novUpdate(NoticeOfViolation notice) throws IntegrationException {
         String query = "UPDATE public.noticeofviolation\n"
-                + "   SET personid_recipient=?, lettertext=?,  dateofrecord=?, \n"
-                + "   requesttosend=?, lettersenddate=?, letterreturneddate=?\n"
+                + "   SET lettertextbeforeviolations=?, \n" +
+                "       dateofrecord=?, personid_recipient=?, \n" +
+                "       lettertextafterviolations=?"
                 + " WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
@@ -159,26 +331,24 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, notice.getRecipient().getPersonID());
-            stmt.setString(2, notice.getNoticeTextBeforeViolations());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
-            stmt.setBoolean(4, notice.isRequestToSend());
-            if (notice.getSentTS() != null) {
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(notice.getSentTS()));
-            } else {
-                stmt.setNull(5, java.sql.Types.NULL);
-            }
-
-            if (notice.getReturnedTS() != null) {
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(notice.getReturnedTS()));
-            } else {
-                stmt.setNull(6, java.sql.Types.NULL);
-                
-            }
             
-            stmt.setInt(7, notice.getNoticeID());
+            stmt.setString(1, notice.getNoticeTextBeforeViolations());
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
+            stmt.setInt(3, notice.getRecipient().getPersonID());
+            stmt.setString(4, notice.getNoticeTextAfterViolations());
+            stmt.setInt(5, notice.getNoticeID());
 
             stmt.executeUpdate();
+            
+            novClearNoticeCodeViolationConnections(notice);
+            
+            List<CodeViolationDisplayable> cvList = notice.getViolationList();
+            Iterator<CodeViolationDisplayable> iter = cvList.iterator();
+            while(iter.hasNext()){
+                CodeViolationDisplayable cvd = iter.next();
+                novConnectNoticeToCodeViolation(notice, cvd);
+            }
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("cannot update notice of violation letter at this time, sorry.", ex);
@@ -189,7 +359,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
 
     }
 
-    public void deleteViolationLetter(NoticeOfViolation notice) throws IntegrationException {
+    public void novDelete(NoticeOfViolation notice) throws IntegrationException {
         String query = "DELETE FROM public.noticeofviolation\n"
                 + "  WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
@@ -201,7 +371,6 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
             stmt = con.prepareStatement(query);
             stmt.setInt(1, notice.getNoticeID());
 
-            System.out.println("CodeViolationIntegrator.updateNoticeOfViolation| sql: " + stmt.toString());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -212,8 +381,32 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
 
     }
+    
+     public void novResetMailingFieldsToNull(NoticeOfViolation notice) throws IntegrationException {
+        String query = "UPDATE public.noticeofviolation\n" +
+                        "   SET sentdate=NULL, sentby=NULL, returneddate=NULL, returnedby=NULL,\n" +
+                        "       lockedandqueuedformailingdate=NULL, lockedandqueuedformailingby=NULL"
+                        + "  WHERE noticeid=?;";
+        // note that original time stamp is not altered on an update
 
-    public NoticeOfViolation getNoticeOfViolation(int noticeID) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, notice.getNoticeID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("cannot clear nov of mailing data.", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+
+    public NoticeOfViolation novGet(int noticeID) throws IntegrationException {
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
@@ -230,7 +423,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                notice = generateNoticeOfViolation(rs);
+                notice = novGenerate(rs);
 
             }
 
@@ -247,7 +440,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         return notice;
     }
 
-    public List<NoticeOfViolation> getNoticeOfViolationList(CECase ceCase) throws IntegrationException {
+    public List<NoticeOfViolation> novGetList(CECase ceCase) throws IntegrationException {
         String query = "SELECT noticeid FROM public.noticeofviolation WHERE caseid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -260,7 +453,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                al.add(getNoticeOfViolation(rs.getInt("noticeid")));
+                al.add(novGet(rs.getInt("noticeid")));
             }
 
         } catch (SQLException ex) {
@@ -276,7 +469,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         return al;
     }
 
-    private NoticeOfViolation generateNoticeOfViolation(ResultSet rs) throws SQLException, IntegrationException {
+    private NoticeOfViolation novGenerate(ResultSet rs) throws SQLException, IntegrationException {
 //SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, 
 //       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, 
 //       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, 
@@ -328,7 +521,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        CodeViolation viol;
+        CodeViolationDisplayable viol;
         List<CodeViolationDisplayable> codeViolationList = new ArrayList<>();
 
         try {
@@ -337,8 +530,11 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                codeViolationList.add(
-                        new CodeViolationDisplayable(getCodeViolation(rs.getInt("codeviolation_violationid"))));
+                viol = new CodeViolationDisplayable(getCodeViolation(rs.getInt("codeviolation_violationid")));
+                viol.setIncludeOrdinanceText(rs.getBoolean("includeordtext"));
+                viol.setIncludeHumanFriendlyText(rs.getBoolean("includehumanfriendlyordtext"));
+                viol.setIncludeViolationPhotos(rs.getBoolean("includeviolationphoto"));
+                codeViolationList.add(viol);
             }
 
         } catch (SQLException ex) {

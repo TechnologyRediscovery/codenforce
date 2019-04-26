@@ -145,7 +145,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             
             return "";
         }
-        currentNotice = cc.getNewNoticeOfViolation();
+        currentNotice = cc.novGetNewNOVSkeleton();
         getSessionBean().setActiveNotice(currentNotice);
         return "noticeOfViolationBuilderPersons";
     }
@@ -300,6 +300,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CECase c = getSessionBean().getcECase();
         NoticeOfViolation notice = getSessionBean().getActiveNotice();
         CaseIntegrator csi = getCaseIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
         
         ViolationIntegrator ci = getCodeViolationIntegrator();
         
@@ -310,10 +311,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
             // new notices won't have insertion time stamps
             if(currentNotice.getCreationTS() == null){
-                ci.insertNoticeOfViolation(c, currentNotice);
+                cc.(currentNotice, currentNotice);
                 
             } else {
-                ci.updateViolationLetter(currentNotice);
+                ci.novUpdate(currentNotice);
             }
             // refresh case
             getSessionBean().setcECase(
@@ -327,6 +328,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                         "Unable to saveDraft of notice letter due to a database error. "
                                 + "This must be corrected by Eric.", ""));
             return "";
+        } catch (CaseLifecyleException ex) {
+            Logger.getLogger(NoticeOfViolationBB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return "ceCases";
     } // close method

@@ -21,27 +21,9 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.PermissionsException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
-import com.tcvcog.tcvce.entities.CaseStage;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.EventCECase;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Icon;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.ReportConfigCECase;
-import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
-import com.tcvcog.tcvce.entities.RoleType;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -218,7 +200,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<CECase> getOpenCECaseList(Municipality m) throws IntegrationException{
+    public List<CECase> getOpenCECaseList(Municipality m) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
         List<CECase> cList = ci.queryCECases(getDefaultSearchParamsCECase(m));
         return cList;
@@ -231,7 +213,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException{
+    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
         return ci.queryCECases(params);
         
@@ -716,90 +698,81 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public List retrieveViolationList(CECase ceCase) throws IntegrationException{
-        List<CodeViolation> al;
+   
+    
+    public void novResetMailing(NoticeOfViolation nov, User user) throws IntegrationException, PermissionsException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
-        al = cvi.getCodeViolations(ceCase);
-        return al;
+        if(user.getKeyCard().isHasSysAdminPermissions()){
+            cvi.novResetMailingFieldsToNull(nov);
+        } else {
+            throw new PermissionsException("User does not have sufficient acces righst to clear notice mailing fields");
+        }
     }
     
-    public void noticeOfViolationResetMailing(CECase cs, NoticeOfViolation nov) throws IntegrationException{
-        ViolationIntegrator cvi = getCodeViolationIntegrator();
-        nov.setRequestToSend(false);
-        nov.setSentTS(null);
-        nov.setReturnedTS(null);
-        cvi.updateViolationLetter(nov);
+        
+    public NoticeOfViolation novGetNewNOVSkeleton(){
+        NoticeOfViolation nov = new NoticeOfViolation();
+        nov.setDateOfRecord(LocalDateTime.now());
+        return nov;
         
     }
     
     
-    public void noticeOfViolationLockAndQueue(CECase c, NoticeOfViolation nov) 
+    public void novLockAndQueue(CECase c, NoticeOfViolation nov, User user) 
             throws CaseLifecyleException, IntegrationException, EventException, ViolationException{
         
         ViolationIntegrator cvi = getCodeViolationIntegrator();
-        
         EventCoordinator evCoord = getEventCoordinator();
         
-        // togglign this switch puts the notice in the queue for sending
-        // flag violation letter as ready to send
-        // this will also need to trigger a letter mailing process that hasn't been implemented as
-        // of 2 March 2018
-        if(nov.isRequestToSend() == false){
-            nov.setRequestToSend(true);
+        if(nov.getLockedAndqueuedTS() == null){
+            cvi.novLockAndQueueForMailing(nov);
         } else {
-            throw new CaseLifecyleException("Notice is already queued for sending");
-        }
-        
-        // new letters won't have a LocalDateTime object
-        // so insert instead of update in this case
-        if(nov.getCreationTS() == null){
-            cvi.insertNoticeOfViolation(c, nov);
-            
-        } else {
-            cvi.updateViolationLetter(nov);
-            
+            throw new CaseLifecyleException("Notice is already locked and queued for sending");
         }
         
         EventCECase noticeEvent = evCoord.getInitializedEvent(c, evCoord.getInitiatlizedEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
-        
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setDescription(queuedNoticeEventNotes);
-        
-        noticeEvent.setOwner(getFacesUser());
+        noticeEvent.setOwner(user);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
-        
         ArrayList<Person> al = new ArrayList();
         al.add(nov.getRecipient());
         noticeEvent.setPersonList(al);
-        
         attachNewEventToCECase(c, noticeEvent, null);
     }
     
-    public void refreshCase(CECase c) throws IntegrationException{
+    public void refreshCase(CECase c) throws IntegrationException, CaseLifecyleException{
         System.out.println("CaseCoordinator.refreshCase");
         CaseIntegrator ci = getCaseIntegrator();
         
         getSessionBean().setcECase(ci.getCECase(c.getCaseID()));
     }
     
-    public void noticeOfViolationMarkAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
+    public int novInsertNotice(NoticeOfViolation nov, CECase cse, User usr){
+        
+        
+        
+        return 0;
+    }
+    
+    public void novMarkAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setSentTS(LocalDateTime.now());
         nov.setSentTSPretty(getPrettyDate(LocalDateTime.now()));
-        cvi.updateViolationLetter(nov);   
+        cvi.novUpdate(nov);   
         //advanceToNextCasePhase(ceCase);
     }
     
-    public void noticeOfViolationMarkAsReturned(CECase c, NoticeOfViolation nov) throws IntegrationException{
+    public void novMarkAsReturned(CECase c, NoticeOfViolation nov, User user) throws IntegrationException, CaseLifecyleException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setReturnedTS(LocalDateTime.now());
-        cvi.updateViolationLetter(nov);
+        cvi.novUpdate(nov);
         refreshCase(c);
     } 
     
-    public void noticeOfViolationDelete(NoticeOfViolation nov) throws CaseLifecyleException{
+    public void novDelete(NoticeOfViolation nov) throws CaseLifecyleException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
 
         //cannot delete a letter that was already sent
@@ -807,7 +780,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             throw new CaseLifecyleException("Cannot delete a letter that has been sent");
         } else {
             try {
-                cvi.deleteViolationLetter(nov);
+                cvi.novDelete(nov);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
                  getFacesContext().addMessage(null,
@@ -978,7 +951,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     * @return
     * @throws IntegrationException 
     */
-   public ReportConfigCECase transformCECaseForReport(ReportConfigCECase rptCse) throws IntegrationException{
+   public ReportConfigCECase transformCECaseForReport(ReportConfigCECase rptCse) throws IntegrationException, CaseLifecyleException{
        CaseIntegrator ci = getCaseIntegrator();
        // we actually get an entirely new object instead of editing the 
        // one we used throughout the ceCases.xhtml
@@ -1204,13 +1177,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             ei.inactivateEvent(vev);
         }
     }
-    
-    public NoticeOfViolation getNewNoticeOfViolation(){
-        NoticeOfViolation nov = new NoticeOfViolation();
-        nov.setDateOfRecord(LocalDateTime.now());
-        return nov;
-        
-    }
+
     
     public void deleteViolation(CodeViolation cv) throws IntegrationException{
         //TODO: delete photos and photo links

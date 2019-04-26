@@ -6,11 +6,117 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Notice of violation</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="css/style.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <title>Notice of Violation</title>
     </h:head>
     <h:body>
-        <h:outputText escape="false" value="#{sessionBean.activeNotice.noticeTextBeforeViolations}"/>
+        <f:view id="view-nov">
+            <div class="nov-container">
+                <div class="header" style="margin-top:#{noticeOfViolationBB.currentNotice.topMargin}" >
+                    <f:subview id="subview-header-image" rendered="#{noticeOfViolationBB.currentNotice.useCustomMuniHeaderImage}">
+
+                    </f:subview>
+                </div>
+
+                <div class="addressee" style="  margin-left: #{noticeOfViolationBB.currentNotice.addresseeLeftMargin}; 
+                     margin-top: #{noticeOfViolationBB.currentNotice.addresseeTopMargin}">
+                    <f:subview id="subview-addressee-normaladdress"
+                               rendered="#{!(noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress)}">
+                        <h:outputText value="#{p.firstName} #{p.lastName}"/>
+                        <h:outputText escape="false" value="#{p.addressStreet}"/>
+                        <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
+                    </f:subview>
+
+                    <f:subview id="subview-addressee-normaladdress"
+                               rendered="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress}">
+                        <h:outputText value="#{p.firstName} #{p.lastName}"/>
+                        <h:outputText escape="false" value="#{p.mailingAddressStreet}"/>
+                        <h:outputText value="#{p.mailingAddressCity}, #{p.mailingAddressState} #{p.mailingAddressZip}"/>
+                        </h:panelGroup>
+                </div>
+
+                <div class="text-insert">
+                    <h:outputText id="text-before-violations-ot" value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}" />
+                </div>
+
+                <p:dataScroller id="violations-ds"
+                                value="#{noticeOfViolationBB.currentNotice.violationList}"
+                                var="v">
+                    <div class="violation">
+
+                        <h:panelGrid columns="2" rendered="true"
+                                     columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                     headerClass="no-border"
+                                     footerClass="no-border">
+
+                            <f:facet name="header">
+                                <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                <p:spacer height="5px" />
+                                <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                               (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
+                                <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                <p:spacer height="2px" />
+                                <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
+                                <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
+                                <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputText styleClass="bold" value="Stipulated Compliance Date: " />
+                                <h:outputText   id="stipcompdate-ot" styleClass="compliance-date"
+                                                value="#{v.stipulatedComplianceDatePretty}"/>
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Description of violation recorded on #{v.dateOfRecordPretty} 
+                                               by code officer #{v.createdBy.person.firstName} #{v.createdBy.person.lastName}:"/>
+                                <p:spacer height="2px"/>
+                                <h:outputText styleClass="weight-normal" value="#{v.description}"/>
+
+                                <p:spacer height="2px" />
+
+                                <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTD" 
+                                                rendered="#{v.includeOrdinanceText}">
+                                    <h:panelGroup>
+                                        <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                        <div class="ord-text">
+                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                        </div>
+                                    </h:panelGroup>
+
+                                </h:panelGrid>
+
+                                <h:panelGrid    id="violation-ord-humanfriendly-pg" columns="1" columnClasses="gridTD" 
+                                                rendered="#{v.includeHumanFriendlyText}">
+                                    <h:panelGroup>
+                                        <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                        <div class="ord-text">
+                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordHumanFriendlyText}"/>
+                                        </div>
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                            </f:facet>
+                            <h:panelGroup rendered="#{v.includeViolationPhotos}">
+                                <h:outputText value="Number of photographs enclosed: " />
+                                <h:outputText value="#{empty v.photoList ? '0' : v.photoList.size()}"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </div>
+                </p:dataScroller>
+                
+                 <div class="text-insert">
+                     <h:outputText id="text-after-violations-ot" value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}" />
+                </div>
+                
+                <f:subview id="subview-violation-photos"
+                           rendered="#{noticeOfViolationBB.currentNotice.i}"
+                
+                
+            </div>
+        </f:view>
     </h:body>
 </html>
 
