@@ -48,8 +48,7 @@ Council of Governments, PA
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     private PropertyWithLists currProp;
-    private ArrayList<Person> filteredPersonList;
-    private ArrayList<Person> pList;
+    private List<Person> filteredPersonList;
     
     private String parid;
     private String address;
@@ -295,34 +294,18 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the filteredPersonList
      */
-    public ArrayList<Person> getFilteredPersonList() {
+    public List<Person> getFilteredPersonList() {
         return filteredPersonList;
     }
 
     /**
      * @param filteredPersonList the filteredPersonList to set
      */
-    public void setFilteredPersonList(ArrayList<Person> filteredPersonList) {
+    public void setFilteredPersonList(List<Person> filteredPersonList) {
         this.filteredPersonList = filteredPersonList;
     }
 
-    /**
-     * @return the pList
-     */
-    public ArrayList<Person> getpList() throws IntegrationException {
-            PropertyIntegrator pi = getPropertyIntegrator();
-        if(pList == null || currProp == null){
-            pList= pi.getPersonIntegrator().getPersonList(selectedMuni.getMuniCode());
-        }
-        return pList;
-    }
-
-    /**
-     * @param pList the pList to set
-     */
-    public void setpList(ArrayList<Person> pList) {
-        this.pList = pList;
-    }
+    
 
     /**
      * @return the selectedMuni

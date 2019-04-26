@@ -128,6 +128,10 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         
     }
     
+    public void connectCurrentPersonToProperty(ActionEvent ev){
+        
+    }
+    
     public void initiatePersonCreation(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getActiveMuni());
@@ -155,10 +159,12 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         PersonCoordinator pc = getPersonCoordinator();
         PersonIntegrator pi = getPersonIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        
         System.out.println("PersonsBB.createNewPerson | before insert selected person: " + selectedPerson.getPersonID());
         
         int newPersonID;
         try {
+            selectedPerson.setCreatorUserID(getSessionBean().getFacesUser().getUserID());
             newPersonID = pc.addNewPerson(selectedPerson);
             selectedPerson = pi.getPerson(newPersonID);
             System.out.println("PersonsBB.createNewPerson | newly inserted personID: " + selectedPerson.getPersonID());
@@ -170,7 +176,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Person created! This person is now your active one and has been added to your history.'", ""));
+                    "Person created with ID " + newPersonID + "! This person is now your active one and has been added to your history.'", ""));
         
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,

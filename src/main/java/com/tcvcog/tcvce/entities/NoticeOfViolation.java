@@ -143,6 +143,9 @@ public class NoticeOfViolation extends EntityUtils {
      * @return the creationTSPretty
      */
     public String getCreationTSPretty() {
+        if(creationTS != null){
+            creationTSPretty = getPrettyDate(creationTS);
+        }
         return creationTSPretty;
     }
 
@@ -150,6 +153,9 @@ public class NoticeOfViolation extends EntityUtils {
      * @return the dateOfRecordPretty
      */
     public String getDateOfRecordPretty() {
+        if(dateOfRecord != null){
+            dateOfRecordPretty = getPrettyDate(dateOfRecord);
+        }
         return dateOfRecordPretty;
     }
 
@@ -157,6 +163,9 @@ public class NoticeOfViolation extends EntityUtils {
      * @return the sentTSPretty
      */
     public String getSentTSPretty() {
+        if(sentTS != null){
+            sentTSPretty = getPrettyDate(sentTS);
+        }
         return sentTSPretty;
     }
 
@@ -266,6 +275,9 @@ public class NoticeOfViolation extends EntityUtils {
      * @return the lockedAndQueuedTSPretty
      */
     public String getLockedAndQueuedTSPretty() {
+        if(lockedAndqueuedTS != null){
+            lockedAndQueuedTSPretty = getPrettyDate(lockedAndqueuedTS);
+        }
         return lockedAndQueuedTSPretty;
     }
 

@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
@@ -772,7 +773,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * Utility method for determining which CasePhase follows any given case's CasePhase. 
+     * Utility method for determining which CasePhase follows any given case's CasePhase.
+     * 
+     * @deprecated 
      * @param c the case whose set CasePhase will be read to determine the next CasePhase
      * @return the ONLY CasePhase to which any case can be changed to without a manual protocol
      * override request
@@ -878,9 +881,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         EventCoordinator evCoord = getEventCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
+        PersonIntegrator pi = getPersonIntegrator();
         
         if(nov.getLockedAndqueuedTS() == null){
+            int ghostID = pc.createChostPerson(nov.getRecipient(), user);
+            nov.setRecipient(pi.getPerson(ghostID));
+            nov.setLockedAndqueuedTS(LocalDateTime.now());
+            nov.setLockedAndQueuedBy(user);
             cvi.novLockAndQueueForMailing(nov);
+            System.out.println("CaseCoordinator.novLockAndQueue | NOV locked in integrator");
         } else {
             throw new CaseLifecyleException("Notice is already locked and queued for sending");
         }
@@ -907,6 +917,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     public void novInsertNotice(NoticeOfViolation nov, CECase cse, User usr) throws IntegrationException{
         ViolationIntegrator vi = getCodeViolationIntegrator();
+        System.out.println("CaseCoordinator.novInsertNotice");
         vi.novInsert(cse, nov);
     }
     
@@ -915,17 +926,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         vi.novUpdate(nov);
     }
     
-    public void novMarkAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
+    public void novMarkAsSent(CECase ceCase, NoticeOfViolation nov, User user) throws CaseLifecyleException, EventException, IntegrationException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setSentTS(LocalDateTime.now());
-        nov.setSentTSPretty(getPrettyDate(LocalDateTime.now()));
+        nov.setSentBy(user);
         cvi.novUpdate(nov);   
-        //advanceToNextCasePhase(ceCase);
     }
     
     public void novMarkAsReturned(CECase c, NoticeOfViolation nov, User user) throws IntegrationException, CaseLifecyleException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         nov.setReturnedTS(LocalDateTime.now());
+        nov.setReturnedBy(user);
         cvi.novUpdate(nov);
         refreshCase(c);
     } 

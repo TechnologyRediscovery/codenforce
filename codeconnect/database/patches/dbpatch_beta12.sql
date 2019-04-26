@@ -84,8 +84,13 @@ $BODY$
   LANGUAGE plpgsql VOLATILE;
 
   -- Forgot FK in citationviolation table
-ALTER TABLE citationviolation ADD CONSTRAINT citationviolation_violationid_fk FOREIGN KEY (codeviolation_violationid)
-      REFERENCES public.codeviolation (violationid);
+
+
+--ALTER TABLE citationviolation ADD CONSTRAINT citationviolation_violationid_fk FOREIGN KEY (codeviolation_violationid)
+--      REFERENCES public.codeviolation (violationid);
+
+ALTER TABLE citationviolation ADD CONSTRAINT citationviolation_citation_fk FOREIGN KEY (citation_citationid)
+      REFERENCES public.citation (citationid);
 
  -- Facelift of NOVs
  CREATE TABLE public.noticeofviolationcodeviolation

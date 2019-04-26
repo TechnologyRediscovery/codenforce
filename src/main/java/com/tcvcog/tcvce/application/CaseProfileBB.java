@@ -34,6 +34,7 @@ import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCasePropBundle;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -768,6 +769,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     public String printNotice(NoticeOfViolation nov) {
+        Municipality m = getSessionBean().getActiveMuni();
+        nov.setTopMargin(m.getNovTopMargin());
+        nov.setAddresseeLeftMargin(m.getNovAddresseeLeftMargin());
+        nov.setAddresseeTopMargin(m.getNovAddresseeTopMargin());
         getSessionBean().setActiveNotice(nov);
         positionCurrentCaseAtHeadOfQueue();
         return "noticeOfViolationPrint";
@@ -781,6 +786,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public void lockNoticeAndQueueForMailing(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
+        
         try {
             caseCoord.novLockAndQueue(currentCase, nov, getSessionBean().getFacesUser());
         } catch (CaseLifecyleException | IntegrationException ex) {
@@ -829,7 +835,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
-            caseCoord.novMarkAsSent(currentCase, nov);
+            caseCoord.novMarkAsSent(currentCase, nov, getSessionBean().getFacesUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Marked notice as sent and added event to case",
@@ -1611,7 +1617,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @return the styleClassStatusIcon
      */
     public String getStyleClassStatusIcon() {
-        styleClassStatusIcon = currentCase.getCasePhaseIcon().getStyleClass();
+        if(currentCase.getCasePhaseIcon() != null){
+            styleClassStatusIcon = currentCase.getCasePhaseIcon().getStyleClass();
+        }
         return styleClassStatusIcon;
     }
 

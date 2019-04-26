@@ -522,6 +522,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * An unused (but very schnazzy) method for generating the appropriate event that will advance a case
      * to the next phase of its life cycle. Currently called by the method 
      * getEventForTriggeringCasePhaseAdvancement in CaseManageBB
+     * @deprecated 
      * @param c
      * @return
      * @throws IntegrationException

@@ -90,7 +90,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
         
         // Removes the default, automatically generated PropertyUnit        
-        ArrayList<PropertyUnit> unitList = propWithLists.getUnitList();
+        List<PropertyUnit> unitList = propWithLists.getUnitList();
         PropertyUnit defaultUnit = null;
         for(PropertyUnit unit:unitList){
             if(unit.getUnitNumber().equals("-1")){

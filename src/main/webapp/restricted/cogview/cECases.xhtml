@@ -440,6 +440,9 @@
                                                           value="#{caseProfileBB.currentCase.caseManager.person.firstName} 
                                                           #{caseProfileBB.currentCase.caseManager.person.lastName} 
                                                           (#{caseProfileBB.currentCase.caseManager.username})"/>  
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Case Phase: "/>
+                                            <h:outputText id="casephase-ot" value="#{caseProfileBB.currentCase.casePhase.label}"/>
                                         </h:panelGroup>      
 
                                         <f:facet name="footer" class="leftalign">
@@ -1085,7 +1088,7 @@
                                                          
                                         <h:panelGroup>
                                             <h:outputText styleClass="bold" value="Notice ID:" />
-                                            <h:outputText style="font-size:1.5em;"   value="#{notice.noticeID}"/>
+                                            <h:outputText value="#{notice.noticeID}"/>
 
                                             <p:spacer height="5px"/>
 
@@ -1103,6 +1106,7 @@
                                         
                                         <h:panelGroup rendered="#{!notice.recipient.useSeparateMailingAddress}">
                                             <h:outputLabel styleClass="bold" value="Recipient:"/>
+                                            <p:spacer height="5px"/>
                                             <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
                                             <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
                                             <p:spacer height="5px"/>
@@ -1130,23 +1134,26 @@
                                                     columnClasses="gridTd-solid-back, gridTd-solid-back, gridTd-solid-back, gridTd-solid-back" >
 
                                         <h:panelGroup>
-                                            <p:commandButton ajax="false" action="#{caseProfileBB.printNotice(notice)}"
-                                                             value="Print/View" styleClass="noFill button-size-small"
-                                                             icon="fa fa-print" disabled="#{(empty notice) or !(empty notice.lockedAndqueuedTS)}" />
+                                            <p:commandButton    id="nov-print-cb"
+                                                                ajax="false" action="#{caseProfileBB.printNotice(notice)}"
+                                                                value="Print/View" styleClass="noFill button-size-small"
+                                                                icon="fa fa-print" disabled="#{(empty notice.lockedAndqueuedTS)}" />
                                         </h:panelGroup>
 
                                         <h:panelGroup>
                                             <p:commandButton id="nov-edit-cb"
                                                              ajax="false" action="#{caseProfileBB.editNoticeOfViolation(notice)}"
                                                              value="Edit notice" styleClass="noFill"
-                                                             icon="fa fa-edit " disabled="#{notice.lockedAndqueuedTS}" />
+                                                             icon="fa fa-edit " 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}" />
                                         </h:panelGroup>
 
                                         <h:panelGroup>
                                             <p:commandButton id="nov-delete-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.deleteNoticeOfViolation(notice)}"
                                                              value="Nuke notice" styleClass="noFill"
-                                                             icon="fa fa-bomb" disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             icon="fa fa-bomb" 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
                                                              rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                              update="notices-messages-form:notices-messages-global
                                                              notices-ds"/>
@@ -1157,20 +1164,23 @@
                                             <p:commandButton id="nov-queuenotice-cb"
                                                              ajax="true" action="#{caseProfileBB.lockNoticeAndQueueForMailing(notice)}"
                                                              value="Lock notice: ready to print and mail" styleClass="noFill"
-                                                             icon="fa fa-edit" disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             icon="fa fa-edit" 
+                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-queuenotice-cb
                                                              nov-queued-ot
                                                              nov-edit-cb
                                                              nov-delete-cb
-                                                             nov-sent-cb"/>
+                                                             nov-sent-cb
+                                                             nov-print-cb"/>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
                                             <p:commandButton id="nov-sent-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsSent(notice)}"
                                                              value="Mark notice as mailed!" styleClass="noFill"
-                                                             icon="fa fa-paper-plane" disabled="#{!(notice.lockedAndqueuedTS) || (!(empty notice.sentTS) and notice.lockedAndqueuedTS)}"
+                                                             icon="fa fa-paper-plane" 
+                                                             disabled="#{(empty notice.lockedAndqueuedTS) || (!(empty notice.sentTS) and !(empty notice.lockedAndqueuedTS))}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-sent-date
                                                              nov-returned-cb
@@ -1182,7 +1192,8 @@
                                             <p:commandButton id="nov-returned-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.markNoticeOfViolationAsReturned(notice)}"
                                                              value="Mark notice as returned" styleClass="noFill"
-                                                             icon="fa fa-mail-reply" disabled="#{(empty notice.sentTS) || !(empty notice.returnedTS)}"
+                                                             icon="fa fa-mail-reply" 
+                                                             disabled="#{(empty notice.sentTS) || !(empty notice.returnedTS)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-returned-date
                                                              nov-returned-cb"/>
@@ -1192,7 +1203,8 @@
                                             <p:commandButton id="nov-reset-cb"
                                                              ajax="true" actionListener="#{caseProfileBB.resetNotice(notice)}"
                                                              value="Reset mailing status" styleClass="noFill"
-                                                             icon="fa fa-window-close-o" disabled="false"
+                                                             icon="fa fa-window-close-o" 
+                                                             disabled="false"
                                                              rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-returned-date
