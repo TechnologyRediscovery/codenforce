@@ -53,6 +53,15 @@ public class NoticeOfViolation extends EntityUtils {
     private User returnedBy;
     
     private String notes;
+    
+    private int topMargin;
+    private int addresseeLeftMargin;
+    private int addresseeTopMargin;
+    
+    private boolean useCustomMuniHeaderImage;
+    private boolean useSignatureImage;
+    
+    
 
     /**
      * @return the noticeTextBeforeViolations
@@ -337,6 +346,76 @@ public class NoticeOfViolation extends EntityUtils {
      */
     public void setCreationBy(User creationBy) {
         this.creationBy = creationBy;
+    }
+
+    /**
+     * @return the topMargin
+     */
+    public int getTopMargin() {
+        return topMargin;
+    }
+
+    /**
+     * @return the addresseeLeftMargin
+     */
+    public int getAddresseeLeftMargin() {
+        return addresseeLeftMargin;
+    }
+
+    /**
+     * @return the addresseeTopMargin
+     */
+    public int getAddresseeTopMargin() {
+        return addresseeTopMargin;
+    }
+
+    /**
+     * @return the useCustomMuniHeaderImage
+     */
+    public boolean isUseCustomMuniHeaderImage() {
+        return useCustomMuniHeaderImage;
+    }
+
+    /**
+     * @return the useSignatureImage
+     */
+    public boolean isUseSignatureImage() {
+        return useSignatureImage;
+    }
+
+    /**
+     * @param topMargin the topMargin to set
+     */
+    public void setTopMargin(int topMargin) {
+        this.topMargin = topMargin;
+    }
+
+    /**
+     * @param addresseeLeftMargin the addresseeLeftMargin to set
+     */
+    public void setAddresseeLeftMargin(int addresseeLeftMargin) {
+        this.addresseeLeftMargin = addresseeLeftMargin;
+    }
+
+    /**
+     * @param addresseeTopMargin the addresseeTopMargin to set
+     */
+    public void setAddresseeTopMargin(int addresseeTopMargin) {
+        this.addresseeTopMargin = addresseeTopMargin;
+    }
+
+    /**
+     * @param useCustomMuniHeaderImage the useCustomMuniHeaderImage to set
+     */
+    public void setUseCustomMuniHeaderImage(boolean useCustomMuniHeaderImage) {
+        this.useCustomMuniHeaderImage = useCustomMuniHeaderImage;
+    }
+
+    /**
+     * @param useSignatureImage the useSignatureImage to set
+     */
+    public void setUseSignatureImage(boolean useSignatureImage) {
+        this.useSignatureImage = useSignatureImage;
     }
     
 }
