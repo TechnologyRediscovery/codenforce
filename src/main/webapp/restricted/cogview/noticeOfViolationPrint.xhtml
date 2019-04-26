@@ -117,7 +117,7 @@
                                     <h:panelGroup>
                                         <h:outputLabel styleClass="bold" value="Ordinance text: "/>
                                         <div class="ord-text">
-                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                            <h:outputText escape="false" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
                                         </div>
                                     </h:panelGroup>
 
@@ -128,7 +128,8 @@
                                     <h:panelGroup>
                                         <h:outputLabel styleClass="bold" value="Ordinance text: "/>
                                         <div class="ord-text">
-                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordHumanFriendlyText}"/>
+                                            <h:outputText   escape="false"
+                                                            value="#{v.violatedEnfElement.codeElement.ordHumanFriendlyText}"/>
                                         </div>
                                     </h:panelGroup>
                                 </h:panelGrid>

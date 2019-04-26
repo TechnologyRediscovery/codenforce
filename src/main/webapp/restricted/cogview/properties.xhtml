@@ -388,6 +388,13 @@
 
 
                                     <h2 class="property-blue">Property Persons</h2>
+                                    
+                                    <p:dataScroller
+                                        var="per"
+                                        value="#{propertyProfileBB.currProp.personList}">
+                                        <h:outputText value="#{per.personID}" />
+                                    
+                                    </p:dataScroller>
 
                                     <p:dataTable
                                         id="prop-persons-datatable"

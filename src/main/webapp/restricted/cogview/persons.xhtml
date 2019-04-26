@@ -76,7 +76,7 @@
                                 <p:commandButton
                                     value="Search by name only" tabindex="3" 
                                     ajax="true" icon="fa fa-search"
-                                    process=    "   @form
+                                    process=    "@form
                                     change-person-form:formFirstName-person
                                     change-person-form:formLastName-person"
                                     actionListener="#{personsBB.searchForPersons}" 
@@ -119,7 +119,6 @@
                                     expandedRow="false"
                                     filteredValue="#{personsBB.filteredPersonList}"
                                     widgetVar="personSelectListTable">
-                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
                                     <p:column width="4%">
                                         <f:facet name="header">
@@ -170,7 +169,8 @@
                                         <p:commandButton actionListener="#{personsBB.selectPerson(per)}"
                                                          ajax="true" icon="fa fa-hand-o-right"
                                                          value="view"
-                                                         update="selected-person-info-form:selected-person-info-ds"/>
+                                                         update="selected-person-info-form
+                                                         connect-person-to-property-form"/>
 
                                     </p:column>
                                 </p:dataTable>
@@ -183,101 +183,103 @@
 
                             <h:form id="selected-person-info-form">
 
-                                <p:dataScroller
-                                    id="selected-person-info-ds"
-                                    value="#{personsBB.selectedPerson}"
-                                    var="p">
-
-
                                     <div class="outlinedBox">
 
-                                        <h2><h:outputText value="#{p.firstName} #{p.lastName}"/>, Person ID:<h:outputText value="#{p.personID}"/> </h2>
+                                        <h2><h:outputText value="#{personsBB.selectedPerson.firstName} #{personsBB.selectedPerson.lastName}"/>, Person ID:<h:outputText value="#{personsBB.selectedPerson.personID}"/> </h2>
+                                        
+                                    <p:commandButton value="update person" ajax="true"
+                                         icon="fa fa-edit"
+                                         oncomplete="PF('person-addupdate-dialog-var').show()"
+                                         update="person-addupdate-form"
+                                         actionListener="#{personsBB.initiatePersonUpdate}"
+                                         />
+                                    
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd, gridTd, gridTd">
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Person Type: "/>
-                                                <h:outputText value="#{p.personType.label}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.personType.label}"/>
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Job Title: "/>
-                                                <h:outputText value="#{p.jobTitle}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.jobTitle}"/>
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Email: "/>
-                                                <h:outputText value="#{p.email}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.email}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Last Updated: "/>
-                                                <h:outputText value="#{p.lastUpdatedPretty}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.lastUpdatedPretty}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Address: "/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText escape="false" value="#{p.addressStreet}"/>
+                                                <h:outputText escape="false" value="#{personsBB.selectedPerson.addressStreet}"/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.addressCity}, #{personsBB.selectedPerson.addressState} #{personsBB.selectedPerson.addressZip}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
-                                                <h:outputText value="#{p.useSeparateMailingAddress ? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.useSeparateMailingAddress ? 'Yes':'No'}"/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText escape="false" value="#{p.mailingAddressStreet}"/>
+                                                <h:outputText escape="false" value="#{personsBB.selectedPerson.mailingAddressStreet}"/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText value="#{p.mailingAddressCity}, #{p.mailingAddressState} #{p.mailingAddressZip}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.mailingAddressCity}, #{personsBB.selectedPerson.mailingAddressState} #{personsBB.selectedPerson.mailingAddressZip}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Under 18? "/>
-                                                <h:outputText value="#{p.under18 ? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.under18 ? 'Yes':'No'}"/>
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Active? "/>
-                                                <h:outputText value="#{p.active ? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.active ? 'Yes':'No'}"/>
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Composite last name? "/>
-                                                <h:outputText value="#{p.compositeLastName? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.compositeLastName? 'Yes':'No'}"/>
                                             </h:panelGroup>
 
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
-                                                <h:outputText value="#{p.canExpire ? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.canExpire ? 'Yes':'No'}"/>
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Expires: "/>
-                                                <h:outputText value="#{p.expireString}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.expireString}"/>
 
                                                 <p:spacer height="5px"/>
                                                 <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
                                                 <div class="rowExpansion">
-                                                    <h:outputText value="#{p.expiryNotes}"/>
+                                                    <h:outputText value="#{personsBB.selectedPerson.expiryNotes}"/>
                                                 </div>
 
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Phone(h): "/>
-                                                <h:outputText value="#{p.phoneHome}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.phoneHome}"/>
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Phone(w): "/>
-                                                <h:outputText value="#{p.phoneWork}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.phoneWork}"/>
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Phone(m): "/>
-                                                <h:outputText value="#{p.phoneCell}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.phoneCell}"/>
                                             </h:panelGroup>
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Linked to user? "/>
-                                                <h:outputText value="#{p.linkedUserID == 0 ? 'No':'Yes'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.linkedUserID == 0 ? 'No':'Yes'}"/>
                                                 <p:spacer height="5px"/>
 
                                             </h:panelGroup>
@@ -294,73 +296,87 @@
                                                                  rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
                                                 <p:spacer height="15px"/>
                                                 <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{p.notes}"/>
+                                                    <h:outputText escape="false" value="#{personsBB.selectedPerson.notes}"/>
                                                 </div>
                                             </f:facet>
                                         </h:panelGrid>
                                     </div>
-                                    <p:commandButton value="update person" ajax="true"
-                                                     icon="fa fa-edit"
-                                                     oncomplete="PF('person-addupdate-dialog-var').show()"
-                                                     update="person-addupdate-form"
-                                                     actionListener="#{personsBB.initiatePersonUpdate}"
-                                                     />
-
-                                </p:dataScroller>
+                                    
 
 
                             </h:form>
 
 
-                            <h3>Associated properties</h3>
+                            <h2>Person-connected properties</h2>
+                            
+                            
+                            <h:form id="connect-person-to-property-form">
+                                
 
+                                <p:selectOneMenu id="property-som" tabindex="3" value="#{personsBB.selectedProperty}">
+                                    <f:converter converterId="propertyConverter"/>
+                                    <f:selectItem itemLabel="select a property..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems id="propertylist-selitems" value="#{personsBB.propertyCandidateList}" var="p" itemValue="#{p}" itemLabel="#{p.address}" />
+                                </p:selectOneMenu>
+                                <p:spacer height="5px" />
+                                
+                                <p:commandButton value="connect #{personsBB.selectedPerson.firstName} #{personsBB.selectedPerson.lastName} to this property" 
+                                        ajax="true"
+                                         icon="fa fa-link"
+                                         update="table-person-associated-properties"
+                                         actionListener="#{personsBB.connectCurrentPersonToProperty}"
+                                         />
+                                <p:spacer height="5px" />
+                                
+                                <h3>Properties connected to this person</h3>
+                                <p:dataTable
+                                    id="table-person-associated-properties"
+                                    var="prop"
+                                    value="#{personsBB.propertyPersonList}"
+                                    rowKey="#{prop.propertyID}"
+                                    filteredValue="#{propertyProfileBB.filteredPropList}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6"
+                                    >
+                                    <p:column width="4%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyID}" />
+                                    </p:column>
+                                    <p:column width="12%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Address"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.address}" />
+                                    </p:column>
 
-                            <p:dataTable
-                                id="table-person-associated-properties"
-                                var="prop"
-                                value="#{propertyProfileBB.propList}"
-                                rowKey="#{prop.propertyID}"
-                                filteredValue="#{propertyProfileBB.filteredPropList}"
-                                tableStyleClass="primeDataTable"
-                                draggableRows="false" tabindex="6"
-                                >
-                                <p:column width="8%">
-                                    <f:facet name="header">
-                                        <h:outputText value="ID"/>
-                                    </f:facet>
-                                    <h:outputText value="#{prop.propertyID}" />
-                                </p:column>
-                                <p:column width="15%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Address"/>
-                                    </f:facet>
-                                    <h:outputText value="#{prop.address}" />
-                                </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Muni" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.muni.muniName}"/>
+                                    </p:column>
 
-                                <p:column width="10%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Muni" />
-                                    </f:facet>
-                                    <h:outputText value="#{prop.muni.muniName}"/>
-                                </p:column>
+                                    <p:column width="7%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Use Type"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyUseType}" />
+                                    </p:column>
 
-                                <p:column width="12%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Use Type"/>
-                                    </f:facet>
-                                    <h:outputText value="#{prop.propertyUseType}" />
-                                </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value=""/>
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-home"
+                                                         value="view property"
+                                                         action="#{personsBB.viewPersonAssociatedProperty(prop)}" 
+                                                         ajax="true"/>
+                                    </p:column>
+                                </p:dataTable>
 
-                                <p:column width="5%">
-                                    <f:facet name="header">
-                                        <h:outputText value=""/>
-                                    </f:facet>
-                                    <p:commandButton icon="fa fa-hand-o-right"
-                                                     action="#{propertyProfileBB.manageProperty(prop)}" 
-                                                     ajax="true"/>
-                                </p:column>
-                            </p:dataTable>
-
+                            </h:form>
 
                         </div>
                     </div>
@@ -469,7 +485,7 @@
                             <p:inputTextarea id="note-ita" style="width: 300px; height: 200px;" value="#{personsBB.notesToAppend}" tabindex="1"/>
                             <p:spacer height="15px"/>
                             <h:outputText escape="false" value="The above text, your name, and a timestamp will be attached to "/> 
-                            <h:outputText value="#{p.firstName} #{p.lastName} (#{p.muni.muniName})"/>, Person ID:<h:outputText value="#{p.personID}"/>
+                            <h:outputText value="#{personsBB.selectedPerson.firstName} #{personsBB.selectedPerson.lastName} (#{personsBB.selectedPerson.muniName})"/>, Person ID:<h:outputText value="#{personsBB.selectedPerson.personID}"/>
 
                             <p:spacer height="15px"/>
 
@@ -480,7 +496,7 @@
                             <p:commandButton    ajax="true" actionListener="#{personsBB.attachNoteToPerson}" tabindex="3"
                                                 value="Submit" icon="fa fa-link" oncomplete="PF('person-note-dialog').hide()"
                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
-                                                update="    selected-person-info-form:selected-person-info-ds
+                                                update="    selected-person-info-form
                                                 messages-left-form:persons-messages-global"/>
                         </h:form>
                     </p:confirmDialog>
