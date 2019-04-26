@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -429,10 +430,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * any phase from any other phase
      * @param currentCase
      * @param pastPhase
+     * @param rule
      * @throws IntegrationException
      * @throws CaseLifecyleException 
+     * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase) throws IntegrationException, CaseLifecyleException, ViolationException{
+    public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase, CasePhaseChangeRule rule) 
+            throws IntegrationException, CaseLifecyleException, ViolationException{
         
         EventIntegrator ei = getEventIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -446,7 +450,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(pastPhase.toString());
         sb.append("\' to \'");
         sb.append(currentCase.getCasePhase().toString());
-        sb.append("\' by an action event or manual override.");
+        sb.append("\'");
+        if(rule != null){
+            sb.append("following the passing of CasePhaseChangeRule:  ");
+            sb.append(rule.getTitle());
+            sb.append(", no. ");
+            sb.append(rule.getRuleID());
+        }
         event.setDescription(sb.toString());
         
         event.setCaseID(currentCase.getCaseID());

@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
@@ -36,6 +35,10 @@
                         <h:outputText value="#{p.mailingAddressCity}, #{p.mailingAddressState} #{p.mailingAddressZip}"/>
                         </h:panelGroup>
                 </div>
+                
+                <div class="date-of-record">
+                    <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                </div> 
 
                 <div class="text-insert">
                     <h:outputText id="text-before-violations-ot" value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}" />
@@ -100,21 +103,59 @@
                                 </h:panelGrid>
                             </f:facet>
                             <h:panelGroup rendered="#{v.includeViolationPhotos}">
-                                <h:outputText value="Number of photographs enclosed: " />
+                                <h:outputText value="Number of photographs enclosed in attachments: " />
                                 <h:outputText value="#{empty v.photoList ? '0' : v.photoList.size()}"/>
                             </h:panelGroup>
                         </h:panelGrid>
                     </div>
                 </p:dataScroller>
-                
-                 <div class="text-insert">
-                     <h:outputText id="text-after-violations-ot" value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}" />
+
+                <div class="text-insert">
+                    <h:outputText id="text-after-violations-ot" value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}" />
                 </div>
-                
+
+                <div class="signature">
+                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
+                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
+                    <br />
+                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
+                    <br />
+                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
+                    <h:outputText value=" | " />
+                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
+                </div>
+
+
                 <f:subview id="subview-violation-photos"
-                           rendered="#{noticeOfViolationBB.currentNotice.i}"
-                
-                
+                           rendered="#{noticeOfViolationBB.currentNotice.includeViolationPhotoAttachment}">
+                    <div class="violation-photo-attachments">
+                        <h2>Attachments: photographs of code violations</h2>
+                        <p:dataScroller id="violations-photos-ds"
+                                        value="#{noticeOfViolationBB.currentNotice.violationList}"
+                                        var="v">
+                            <p:dataTable
+                                id="violation-photo-table"
+                                var="photoid"
+                                value="#{v.photoList}"
+                                rowKey="#{photoid}"
+                                rendered="#{v.includeViolationPhotos and v.photoList.size()>0}"
+                                tableStyleClass="primeDataTable"
+                                draggableRows="false" tabindex="6">
+                                <p:column width="100%">
+                                    <h:outputText value="Description: "/>
+                                    <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Photo: "/>
+                                    <p:spacer height="5px" />
+                                    <p:graphicImage width="100%" value="#{imageServices.image}">
+                                        <f:param name="photoID" value="#{photoid}"/>
+                                    </p:graphicImage>
+                                </p:column>
+                            </p:dataTable>
+                        </p:dataScroller>
+                    </div>
+                </f:subview>
             </div>
         </f:view>
     </h:body>

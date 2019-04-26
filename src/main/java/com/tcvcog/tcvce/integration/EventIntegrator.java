@@ -21,7 +21,6 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
-import com.tcvcog.tcvce.domain.EventExceptionDeprecated;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;

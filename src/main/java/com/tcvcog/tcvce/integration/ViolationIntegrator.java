@@ -410,7 +410,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "       returnedby, notes\n" +
+                        "       returnedby, notes, creationby\n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -504,8 +504,8 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         } 
         
         if (rs.getTimestamp("returneddate") != null) {
-            notice.setReturnedTS(rs.getTimestamp("letterreturneddate").toLocalDateTime());
-            notice.setReturnedBy(ui.getUser(rs.getInt("returedby")));
+            notice.setReturnedTS(rs.getTimestamp("returneddate").toLocalDateTime());
+            notice.setReturnedBy(ui.getUser(rs.getInt("returnedby")));
         } 
         
         notice.setNotes(rs.getString("notes"));
@@ -655,7 +655,11 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
-        v.setCreatedBy(ui.getUser(rs.getString("createdby")));
+        
+        if(rs.getString("createdby") != null){
+            v.setCreatedBy(ui.getUser(rs.getString("createdby")));
+        }
+        
         v.setCeCaseID(rs.getInt("cecase_caseid"));
         v.setDateOfRecord(rs.getTimestamp("dateofrecord").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
@@ -694,7 +698,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n"
                 + "       entrytimestamp, stipulatedcompliancedate, actualcompliancdate, \n"
                 + "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
-"       complianceuser, compliancetfevent, severity_classid \n"
+"       complianceuser, compliancetfevent, severity_classid, createdby \n"
                 + "  FROM public.codeviolation WHERE violationid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;

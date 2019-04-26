@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -64,7 +65,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * or the error page
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public String initiateInternalSession() throws IntegrationException{
+    public String initiateInternalSession() throws IntegrationException, CaseLifecyleException{
         CodeIntegrator ci = getCodeIntegrator();
         System.out.println("SessionInitializer.initiateInternalSession");
         FacesContext facesContext = getFacesContext();
@@ -133,7 +134,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 
     
         
-    private void populateSessionObjectQueues(User u) throws IntegrationException{
+    private void populateSessionObjectQueues(User u) throws IntegrationException, CaseLifecyleException{
         PersonCoordinator persCoord = getPersonCoordinator();
         CaseCoordinator caseCoord = getCaseCoordinator();
         PropertyIntegrator propI = getPropertyIntegrator();

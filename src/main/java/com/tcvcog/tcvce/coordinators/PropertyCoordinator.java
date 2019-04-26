@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -77,7 +78,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param prop
      * @return PropertyWithLists object
      */
-    public PropertyWithLists checkPropertyForUnits(Property prop){
+    public PropertyWithLists checkPropertyForUnits(Property prop) throws CaseLifecyleException{
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyWithLists propWithLists = pi.getNewPropertyWithLists();
         

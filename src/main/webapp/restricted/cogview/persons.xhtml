@@ -211,7 +211,7 @@
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Last Updated: "/>
-                                                <h:outputText value="#{p.lastUpdatedString}"/>
+                                                <h:outputText value="#{p.lastUpdatedPretty}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
@@ -316,7 +316,7 @@
 
 
                             <p:dataTable
-                                id="propSearchTable"
+                                id="table-person-associated-properties"
                                 var="prop"
                                 value="#{propertyProfileBB.propList}"
                                 rowKey="#{prop.propertyID}"

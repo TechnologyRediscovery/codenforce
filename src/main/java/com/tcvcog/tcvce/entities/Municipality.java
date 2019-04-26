@@ -44,6 +44,12 @@ public class Municipality implements Serializable{
     private int defaultCodeOfficerUserID;
     private int defaultCourtEntityID;
     
+    private int novTopMargin;
+    private int novAddresseeLeftMargin;
+    private int novAddresseeTopMargin;
+    
+    
+    
     /**
      * @return the muniCode
      */
@@ -321,6 +327,48 @@ public class Municipality implements Serializable{
      */
     public void setDefaultCourtEntityID(int defaultCourtEntityID) {
         this.defaultCourtEntityID = defaultCourtEntityID;
+    }
+
+    /**
+     * @return the novTopMargin
+     */
+    public int getNovTopMargin() {
+        return novTopMargin;
+    }
+
+    /**
+     * @return the novAddresseeLeftMargin
+     */
+    public int getNovAddresseeLeftMargin() {
+        return novAddresseeLeftMargin;
+    }
+
+    /**
+     * @return the novAddresseeTopMargin
+     */
+    public int getNovAddresseeTopMargin() {
+        return novAddresseeTopMargin;
+    }
+
+    /**
+     * @param novTopMargin the novTopMargin to set
+     */
+    public void setNovTopMargin(int novTopMargin) {
+        this.novTopMargin = novTopMargin;
+    }
+
+    /**
+     * @param novAddresseeLeftMargin the novAddresseeLeftMargin to set
+     */
+    public void setNovAddresseeLeftMargin(int novAddresseeLeftMargin) {
+        this.novAddresseeLeftMargin = novAddresseeLeftMargin;
+    }
+
+    /**
+     * @param novAddresseeTopMargin the novAddresseeTopMargin to set
+     */
+    public void setNovAddresseeTopMargin(int novAddresseeTopMargin) {
+        this.novAddresseeTopMargin = novAddresseeTopMargin;
     }
 
     

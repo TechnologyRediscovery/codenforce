@@ -73,6 +73,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the CECase with a populated set of Events
      * @return the CECase with the action request list ready to roll
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
     public CECase configureCECase(CECase c) throws CaseLifecyleException{
         
@@ -383,11 +384,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
         int insertedEventID = 0;
         
+        if(e.getCategory().getCasePhaseChangeRule() != null){
+            evalulateCasePhaseChangeRule(c, e);
+        }
+        
         switch(eventType){
             case Action:
                 System.out.println("CaseCoordinator.attachNewEventToCECase: action case");
                 insertedEventID = ei.insertEvent(e);
-                checkForAndCarryOutCasePhaseChange(c, e);
                 break;
             case Compliance:
                 if(viol != null){
@@ -410,6 +414,131 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         } // close switch
         return insertedEventID;
     } // close method
+    
+    private boolean evalulateCasePhaseChangeRule(CECase cse, EventCECase event) 
+            throws IntegrationException, CaseLifecyleException, ViolationException{
+        
+        CasePhaseChangeRule rule = event.getCategory().getCasePhaseChangeRule();
+        boolean rulePasses = false;
+        
+        if(rule.getRequiredCurrentCasePhase() != null){
+            if(rule.isTreatRequiredPhaseAsThreshold()){
+                if (cse.getCasePhase().getOrder() >= rule.getRequiredCurrentCasePhase().getOrder()){
+                    if(ruleSubcheck_forbiddenCasePhase(cse, rule)
+                            &&
+                        ruleSubcheck_requiredEventType(cse, rule)
+                            &&
+                        ruleSubcheck_forbiddenEventType(cse, rule)
+                            &&
+                        ruleSubcheck_requiredEventCategory(cse, rule)
+                            &&
+                        ruleSubcheck_forbiddenEventCategory(cse, rule)){
+                            rulePasses = true;
+                            implementPassedCasePhaseChangeRule(cse, rule);
+                    }
+                }
+            } else if (cse.getCasePhase() == rule.getRequiredCurrentCasePhase()){
+                if(ruleSubcheck_forbiddenCasePhase(cse, rule)
+                            &&
+                        ruleSubcheck_requiredEventType(cse, rule)
+                            &&
+                        ruleSubcheck_forbiddenEventType(cse, rule)
+                            &&
+                        ruleSubcheck_requiredEventCategory(cse, rule)
+                            &&
+                        ruleSubcheck_forbiddenEventCategory(cse, rule)){
+                            rulePasses = true;
+                            implementPassedCasePhaseChangeRule(cse, rule);
+                }
+            }
+        }
+        return rulePasses;
+    }
+    
+    
+    private boolean ruleSubcheck_forbiddenCasePhase(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = true;
+        
+        if(rule.isTreatForbiddenPhaseAsThreshold()){
+                if (cse.getCasePhase().getOrder() >= rule.getRequiredCurrentCasePhase().getOrder()){
+                    subcheckPasses = false;
+                }
+            } else if (cse.getCasePhase() == rule.getRequiredCurrentCasePhase()){
+                subcheckPasses = false;
+            }
+        return subcheckPasses;
+    }
+    
+    
+    private boolean ruleSubcheck_requiredEventType(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = false;
+        Iterator<EventCECase> iter = cse.getEventList().iterator();
+        while(iter.hasNext()){
+            EventCECase ev = iter.next();
+            if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
+                subcheckPasses = true;
+            }
+        }
+        return subcheckPasses;
+    }
+   
+    
+    private boolean ruleSubcheck_forbiddenEventType(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = true;
+        Iterator<EventCECase> iter = cse.getEventList().iterator();
+        while(iter.hasNext()){
+            EventCECase ev = iter.next();
+            if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
+                subcheckPasses = false;
+            }
+        }
+        return subcheckPasses;
+    }
+    
+    private boolean ruleSubcheck_requiredEventCategory(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = false;
+        Iterator<EventCECase> iter = cse.getEventList().iterator();
+        while(iter.hasNext()){
+            EventCECase ev = iter.next();
+            if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
+                subcheckPasses = true;
+            }
+        }
+        return subcheckPasses;
+    }
+    
+    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = true;
+        Iterator<EventCECase> iter = cse.getEventList().iterator();
+        while(iter.hasNext()){
+            EventCECase ev = iter.next();
+            if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
+                subcheckPasses = false;
+            }
+        }
+        return subcheckPasses;
+    }
+    
+    private void implementPassedCasePhaseChangeRule(CECase cse, CasePhaseChangeRule rule) 
+            throws IntegrationException, CaseLifecyleException, ViolationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        EventCECase newEvent = null;
+        
+        CasePhase oldCP = cse.getCasePhase();
+        cse.setCasePhase(rule.getTargetCasePhase());
+        ci.changeCECasePhase(cse);
+        ec.generateAndInsertPhaseChangeEvent(cse, oldCP, rule);
+        if(rule.getTriggeredEventCategoryID() != 0){
+            newEvent = ec.getInitializedEvent(cse, ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryID()));
+            if(rule.getTriggeredEventCategoryRequestedEventCatID() != 0){
+                newEvent.setRequestedEventCat(ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryRequestedEventCatID()));
+            }
+            attachNewEventToCECase(cse, newEvent, null);
+            System.out.println("CaseCoordinator.implementPassedCasePhaseChangeRule "  + newEvent.getCategory().getEventCategoryTitle());
+        }
+        
+    }
    
    
     
@@ -567,7 +696,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
+    /**
+     * @deprecated 
+     * @param c
+     * @param e
+     * @throws CaseLifecyleException
+     * @throws IntegrationException
+     * @throws ViolationException 
+     */
     private void checkForAndCarryOutCasePhaseChange(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException, ViolationException{
         
         CaseIntegrator ci = getCaseIntegrator();
@@ -626,7 +762,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             ci.changeCECasePhase(c);
             
             // generate event for phase change and write
-            ec.generateAndInsertPhaseChangeEvent(c, initialCasePhase); 
+            ec.generateAndInsertPhaseChangeEvent(c, initialCasePhase, null); 
 
         } 
         
@@ -710,9 +846,28 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
         
-    public NoticeOfViolation novGetNewNOVSkeleton(){
+    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m){
         NoticeOfViolation nov = new NoticeOfViolation();
+        nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
+        nov.setUseCustomMuniHeaderImage(false);
+        nov.setUseSignatureImage(false);
+        
+        nov.setTopMargin(m.getNovTopMargin());
+        nov.setAddresseeLeftMargin(m.getNovAddresseeLeftMargin());
+        nov.setAddresseeTopMargin(m.getNovAddresseeTopMargin());
+        
+        // loop over unresolved violations on case and generate CodeViolationDisplayable obects
+        Iterator<CodeViolation> iter = cse.getViolationListUnresolved().iterator();
+        while(iter.hasNext()){
+            CodeViolation cv = iter.next();
+            CodeViolationDisplayable cvd = new CodeViolationDisplayable(cv);
+            cvd.setIncludeHumanFriendlyText(false);
+            cvd.setIncludeOrdinanceText(true);
+            cvd.setIncludeViolationPhotos(false);
+            nov.getViolationList().add(cvd);
+        }
+        
         return nov;
         
     }
@@ -750,11 +905,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         getSessionBean().setcECase(ci.getCECase(c.getCaseID()));
     }
     
-    public int novInsertNotice(NoticeOfViolation nov, CECase cse, User usr){
-        
-        
-        
-        return 0;
+    public void novInsertNotice(NoticeOfViolation nov, CECase cse, User usr) throws IntegrationException{
+        ViolationIntegrator vi = getCodeViolationIntegrator();
+        vi.novInsert(cse, nov);
+    }
+    
+    public void novUpdate(NoticeOfViolation nov) throws IntegrationException{
+        ViolationIntegrator vi = getCodeViolationIntegrator();
+        vi.novUpdate(nov);
     }
     
     public void novMarkAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
