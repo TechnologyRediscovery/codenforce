@@ -606,7 +606,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 selectSB.append("AND property_propertyid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(),
                         ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                stmt.setInt(1, p.getPropertyID());
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPropertyID());
                 rs = stmt.executeQuery();
                 
                 if(rs.first()){ // history entry with this user and person already exists

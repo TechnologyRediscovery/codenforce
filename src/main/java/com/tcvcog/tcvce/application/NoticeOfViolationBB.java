@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -50,9 +51,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private List<TextBlock> blockListByMuni;
     
     private List<Person> personCandidateList;
+    private List<Person> manualRetrievedPersonList;
     
     private List<TextBlock> blockListBeforeViolations;
     private List<TextBlock> blockListAfterViolations;
+    
+    private Person retrievedManualLookupPerson;
+    private int recipientPersonID;
+    
     
     
     /**
@@ -74,6 +80,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        manualRetrievedPersonList = new ArrayList<>();
         
     }
     
@@ -115,6 +122,28 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         currentNotice.setRecipient(pers);
     }
     
+    public void checkNOVRecipient(ActionEvent ev){
+        PersonIntegrator pi = getPersonIntegrator();
+        try {
+            setRetrievedManualLookupPerson(pi.getPerson(getRecipientPersonID()));
+            System.out.println("NoticeOfViolationBB.checkNOVRecipient | looked up person: " + getRetrievedManualLookupPerson());
+            if(getRetrievedManualLookupPerson() != null){
+                getManualRetrievedPersonList().add(getRetrievedManualLookupPerson());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucess! Found person " + getRetrievedManualLookupPerson().getPersonID()  + "( " + getRetrievedManualLookupPerson().getLastName()+ ")",""));
+                
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Person not found; try again!",""));
+                
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                getRecipientPersonID() + "not mapped to a known person", "Please try again or visit our person search page."));
+        }
+    }
     
     public String assembleNotice(){
         CaseCoordinator cc = getCaseCoordinator();
@@ -280,6 +309,48 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setCurrentCase(CECase currentCase) {
         this.currentCase = currentCase;
+    }
+
+    /**
+     * @return the retrievedManualLookupPerson
+     */
+    public Person getRetrievedManualLookupPerson() {
+        return retrievedManualLookupPerson;
+    }
+
+    /**
+     * @return the recipientPersonID
+     */
+    public int getRecipientPersonID() {
+        return recipientPersonID;
+    }
+
+    /**
+     * @param retrievedManualLookupPerson the retrievedManualLookupPerson to set
+     */
+    public void setRetrievedManualLookupPerson(Person retrievedManualLookupPerson) {
+        this.retrievedManualLookupPerson = retrievedManualLookupPerson;
+    }
+
+    /**
+     * @param recipientPersonID the recipientPersonID to set
+     */
+    public void setRecipientPersonID(int recipientPersonID) {
+        this.recipientPersonID = recipientPersonID;
+    }
+
+    /**
+     * @return the manualRetrievedPersonList
+     */
+    public List<Person> getManualRetrievedPersonList() {
+        return manualRetrievedPersonList;
+    }
+
+    /**
+     * @param manualRetrievedPersonList the manualRetrievedPersonList to set
+     */
+    public void setManualRetrievedPersonList(List<Person> manualRetrievedPersonList) {
+        this.manualRetrievedPersonList = manualRetrievedPersonList;
     }
     
 }

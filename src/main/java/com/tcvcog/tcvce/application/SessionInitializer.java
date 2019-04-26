@@ -159,7 +159,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        getSessionBean().setcECaseQueue(new ArrayList<CECase>());
 //        getSessionBean().getcECaseQueue().add(c);
         
-        getSessionBean().setPropertyQueue(new ArrayList<Property>());
+        getSessionBean().setPropertyQueue(propI.getPropertyHistoryList(u));
         getSessionBean().getPropertyQueue().add(p);
     }
 }

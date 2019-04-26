@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private String addrPartAllMunis;
     private boolean allMunis;
     
-    private ArrayList<Property> propList;
+    private List<Property> propList;
     private List<Property> filteredPropList;
     private UIInput addressInput;
     
@@ -73,7 +74,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        this.currProp = getSessionBean().getActivePropWithLists();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            this.currProp = pi.getPropertyWithLists(getSessionBean().getPropertyQueue().get(0).getPropertyID());
+        } catch (IntegrationException | CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        propList = getSessionBean().getPropertyQueue();
     }
 
     public void searchForProperties(ActionEvent event){
@@ -119,9 +126,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     public void manageProperty(Property prop){
         PropertyIntegrator pi = getPropertyIntegrator();
+        UserIntegrator ui = getUserIntegrator();
         try {
             currProp = pi.getPropertyWithLists(prop.getPropertyID());
-            System.out.println("PropertyProfileBB.manageProperty | curr Prop: " + currProp.getAddress());
+            ui.logObjectView(getSessionBean().getFacesUser(), prop);
+            getSessionBean().getPropertyQueue().add(prop);
+            
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
@@ -159,7 +169,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         /**
      * @return the propList
      */
-    public ArrayList<Property> getPropList() {
+    public List<Property> getPropList() {
         return propList;
     }
 
