@@ -20,7 +20,7 @@ public class EventCECase extends Event implements Serializable{
     
     
     private int caseID;
-    private ArrayList<Person> eventPersons;
+    
     
    
     /**
@@ -38,20 +38,7 @@ public class EventCECase extends Event implements Serializable{
     }
 
    
-    /**
-     * @return the eventPersons
-     */
-    public ArrayList<Person> getEventPersons() {
-        return eventPersons;
-    }
-
-    /**
-     * @param eventPersons the eventPersons to set
-     */
-    public void setEventPersons(ArrayList<Person> eventPersons) {
-        this.eventPersons = eventPersons;
-    }
-
+   
    
 
     

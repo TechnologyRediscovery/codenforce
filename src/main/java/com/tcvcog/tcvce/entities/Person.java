@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -34,11 +35,12 @@ public class Person extends EntityUtils implements Serializable{
     private int personID;
     
     private PersonType personType;
-    private Municipality muni;
+    private int muniCode;
+    private String muniName;
     
     private int sourceID;
     private String sourceTitle;
-    private User creator;
+    private int creatorUserID;
     private LocalDateTime creationTimeStamp;
     
     // for backwards compatability
@@ -65,17 +67,16 @@ public class Person extends EntityUtils implements Serializable{
     
     private boolean useSeparateMailingAddress;
     private String mailingAddressStreet;
+    private String mailingAddressThirdLine;
     private String mailingAddressCity;
     private String mailingAddressZip;
     
     private String mailingAddressState;
-    // postgres defaults this to true
     
     private String notes;
     
     private LocalDateTime lastUpdated;
-    private String lastUpdatedString;
-    
+    private String lastUpdatedPretty;
     
     private boolean canExpire;
     private LocalDateTime expiryDate;
@@ -83,13 +84,31 @@ public class Person extends EntityUtils implements Serializable{
     private java.util.Date expiryDateUtilDate;
     private String expiryNotes;
     private boolean active;
-    private User userLink;
+    private int linkedUserID;
     
     /**
      * Tenancy tracking
      */
     private boolean under18;
-    private User verifiedBy;
+    private int verifiedByUserID;
+    
+    private boolean referencePerson;
+    
+    private LocalDateTime ghostCreatedDate;
+    private String ghostCreatedDatePretty;
+    private int ghostOf;
+    private int ghostCreatedByUserID;
+    
+    private LocalDateTime cloneCreatedDate;
+    private String cloneCreatedDatePretty;
+    private int cloneOf;
+    private int cloneCreatedByUserID;
+    
+    private ArrayList<Integer> ghostsList;
+    private ArrayList<Integer> cloneList;
+    private ArrayList<Integer> mergedList;
+    
+    
     
 
     /**
@@ -317,19 +336,7 @@ public class Person extends EntityUtils implements Serializable{
         this.under18 = under18;
     }
 
-    /**
-     * @return the muni
-     */
-    public Municipality getMuni() {
-        return muni;
-    }
-
-    /**
-     * @param muni the muni to set
-     */
-    public void setMuni(Municipality muni) {
-        this.muni = muni;
-    }
+  
 
     /**
      * @return the firstName
@@ -380,13 +387,7 @@ public class Person extends EntityUtils implements Serializable{
         return sourceTitle;
     }
 
-    /**
-     * @return the creator
-     */
-    public User getCreator() {
-        return creator;
-    }
-
+   
     /**
      * @return the businessEntity
      */
@@ -454,12 +455,7 @@ public class Person extends EntityUtils implements Serializable{
         this.sourceTitle = sourceTitle;
     }
 
-    /**
-     * @param creator the creator to set
-     */
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
+   
 
     /**
      * @param businessEntity the businessEntity to set
@@ -526,29 +522,15 @@ public class Person extends EntityUtils implements Serializable{
         this.compositeLastName = compositeLastName;
     }
 
-    /**
-     * @return the verifiedBy
-     */
-    public User getVerifiedBy() {
-        return verifiedBy;
-    }
-
-    /**
-     * @param verifiedBy the verifiedBy to set
-     */
-    public void setVerifiedBy(User verifiedBy) {
-        this.verifiedBy = verifiedBy;
-    }
+   
 
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 79 * hash + this.personID;
         hash = 79 * hash + Objects.hashCode(this.personType);
-        hash = 79 * hash + Objects.hashCode(this.muni);
         hash = 79 * hash + this.sourceID;
         hash = 79 * hash + Objects.hashCode(this.sourceTitle);
-        hash = 79 * hash + Objects.hashCode(this.creator);
         hash = 79 * hash + Objects.hashCode(this.firstName);
         hash = 79 * hash + Objects.hashCode(this.lastName);
         hash = 79 * hash + (this.compositeLastName ? 1 : 0);
@@ -573,7 +555,6 @@ public class Person extends EntityUtils implements Serializable{
         hash = 79 * hash + Objects.hashCode(this.expiryNotes);
         hash = 79 * hash + (this.active ? 1 : 0);
         hash = 79 * hash + (this.under18 ? 1 : 0);
-        hash = 79 * hash + Objects.hashCode(this.verifiedBy);
         return hash;
     }
 
@@ -592,97 +573,7 @@ public class Person extends EntityUtils implements Serializable{
         if (this.personID != other.personID) {
             return false;
         }
-        if (this.sourceID != other.sourceID) {
-            return false;
-        }
-        if (this.compositeLastName != other.compositeLastName) {
-            return false;
-        }
-        if (this.businessEntity != other.businessEntity) {
-            return false;
-        }
-        if (this.useSeparateMailingAddress != other.useSeparateMailingAddress) {
-            return false;
-        }
-        
-        if (this.active != other.active) {
-            return false;
-        }
-        if (this.under18 != other.under18) {
-            return false;
-        }
-        if (!Objects.equals(this.sourceTitle, other.sourceTitle)) {
-            return false;
-        }
-        if (!Objects.equals(this.firstName, other.firstName)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastName, other.lastName)) {
-            return false;
-        }
-        if (!Objects.equals(this.jobTitle, other.jobTitle)) {
-            return false;
-        }
-        if (!Objects.equals(this.phoneCell, other.phoneCell)) {
-            return false;
-        }
-        if (!Objects.equals(this.phoneHome, other.phoneHome)) {
-            return false;
-        }
-        if (!Objects.equals(this.phoneWork, other.phoneWork)) {
-            return false;
-        }
-        if (!Objects.equals(this.email, other.email)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressStreet, other.addressStreet)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressCity, other.addressCity)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressZip, other.addressZip)) {
-            return false;
-        }
-        if (!Objects.equals(this.addressState, other.addressState)) {
-            return false;
-        }
-        if (!Objects.equals(this.mailingAddressStreet, other.mailingAddressStreet)) {
-            return false;
-        }
-        if (!Objects.equals(this.mailingAddressCity, other.mailingAddressCity)) {
-            return false;
-        }
-        if (!Objects.equals(this.mailingAddressZip, other.mailingAddressZip)) {
-            return false;
-        }
-        if (!Objects.equals(this.mailingAddressState, other.mailingAddressState)) {
-            return false;
-        }
-        if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.expiryNotes, other.expiryNotes)) {
-            return false;
-        }
-        if (this.personType != other.personType) {
-            return false;
-        }
-        if (!Objects.equals(this.muni, other.muni)) {
-            return false;
-        }
-        if (!Objects.equals(this.creator, other.creator)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastUpdated, other.lastUpdated)) {
-            return false;
-        }
-        if (!Objects.equals(this.expiryDate, other.expiryDate)) {
-            return false;
-        }
-        if (!Objects.equals(this.verifiedBy, other.verifiedBy)) {
-            return false;
-        }
+       
         return true;
     }
 
@@ -701,19 +592,7 @@ public class Person extends EntityUtils implements Serializable{
         this.canExpire = canExpire;
     }
 
-    /**
-     * @return the userLink
-     */
-    public User getUserLink() {
-        return userLink;
-    }
-
-    /**
-     * @param userLink the userLink to set
-     */
-    public void setUserLink(User userLink) {
-        this.userLink = userLink;
-    }
+    
 
     /**
      * @return the creationTimeStamp
@@ -768,18 +647,273 @@ public class Person extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the lastUpdatedString
+     * @return the lastUpdatedPretty
      */
-    public String getLastUpdatedString() {
-        lastUpdatedString = getPrettyDate(lastUpdated);
-        return lastUpdatedString;
+    public String getLastUpdatedPretty() {
+        lastUpdatedPretty = getPrettyDate(lastUpdated);
+        return lastUpdatedPretty;
     }
 
     /**
-     * @param lastUpdatedString the lastUpdatedString to set
+     * @param lastUpdatedPretty the lastUpdatedPretty to set
      */
-    public void setLastUpdatedString(String lastUpdatedString) {
-        this.lastUpdatedString = lastUpdatedString;
+    public void setLastUpdatedPretty(String lastUpdatedPretty) {
+        this.lastUpdatedPretty = lastUpdatedPretty;
+    }
+
+  
+   
+
+    /**
+     * @return the verifiedByUserID
+     */
+    public int getVerifiedByUserID() {
+        return verifiedByUserID;
+    }
+
+    /**
+     * @param verifiedByUserID the verifiedByUserID to set
+     */
+    public void setVerifiedByUserID(int verifiedByUserID) {
+        this.verifiedByUserID = verifiedByUserID;
+    }
+
+    /**
+     * @return the linkedUserID
+     */
+    public int getLinkedUserID() {
+        return linkedUserID;
+    }
+
+    /**
+     * @param linkedUserID the linkedUserID to set
+     */
+    public void setLinkedUserID(int linkedUserID) {
+        this.linkedUserID = linkedUserID;
+    }
+
+    /**
+     * @return the creatorUserID
+     */
+    public int getCreatorUserID() {
+        return creatorUserID;
+    }
+
+    /**
+     * @param creatorUserID the creatorUserID to set
+     */
+    public void setCreatorUserID(int creatorUserID) {
+        this.creatorUserID = creatorUserID;
+    }
+
+    /**
+     * @return the muniName
+     */
+    public String getMuniName() {
+        return muniName;
+    }
+
+    /**
+     * @param muniName the muniName to set
+     */
+    public void setMuniName(String muniName) {
+        this.muniName = muniName;
+    }
+
+    /**
+     * @return the muniCode
+     */
+    public int getMuniCode() {
+        return muniCode;
+    }
+
+    /**
+     * @param muniCode the muniCode to set
+     */
+    public void setMuniCode(int muniCode) {
+        this.muniCode = muniCode;
+    }
+
+    /**
+     * @return the ghostCreatedDate
+     */
+    public LocalDateTime getGhostCreatedDate() {
+        return ghostCreatedDate;
+    }
+
+    /**
+     * @return the ghostCreatedDatePretty
+     */
+    public String getGhostCreatedDatePretty() {
+        return ghostCreatedDatePretty;
+    }
+
+    /**
+     * @return the ghostOf
+     */
+    public int getGhostOf() {
+        return ghostOf;
+    }
+
+    /**
+     * @return the ghostCreatedByUserID
+     */
+    public int getGhostCreatedByUserID() {
+        return ghostCreatedByUserID;
+    }
+
+    /**
+     * @return the cloneCreatedDate
+     */
+    public LocalDateTime getCloneCreatedDate() {
+        return cloneCreatedDate;
+    }
+
+    /**
+     * @return the cloneCreatedDatePretty
+     */
+    public String getCloneCreatedDatePretty() {
+        return cloneCreatedDatePretty;
+    }
+
+    /**
+     * @return the cloneOf
+     */
+    public int getCloneOf() {
+        return cloneOf;
+    }
+
+    /**
+     * @return the cloneCreatedByUserID
+     */
+    public int getCloneCreatedByUserID() {
+        return cloneCreatedByUserID;
+    }
+
+    /**
+     * @param ghostCreatedDate the ghostCreatedDate to set
+     */
+    public void setGhostCreatedDate(LocalDateTime ghostCreatedDate) {
+        this.ghostCreatedDate = ghostCreatedDate;
+    }
+
+    /**
+     * @param ghostCreatedDatePretty the ghostCreatedDatePretty to set
+     */
+    public void setGhostCreatedDatePretty(String ghostCreatedDatePretty) {
+        this.ghostCreatedDatePretty = ghostCreatedDatePretty;
+    }
+
+    /**
+     * @param ghostOf the ghostOf to set
+     */
+    public void setGhostOf(int ghostOf) {
+        this.ghostOf = ghostOf;
+    }
+
+    /**
+     * @param ghostCreatedByUserID the ghostCreatedByUserID to set
+     */
+    public void setGhostCreatedByUserID(int ghostCreatedByUserID) {
+        this.ghostCreatedByUserID = ghostCreatedByUserID;
+    }
+
+    /**
+     * @param cloneCreatedDate the cloneCreatedDate to set
+     */
+    public void setCloneCreatedDate(LocalDateTime cloneCreatedDate) {
+        this.cloneCreatedDate = cloneCreatedDate;
+    }
+
+    /**
+     * @param cloneCreatedDatePretty the cloneCreatedDatePretty to set
+     */
+    public void setCloneCreatedDatePretty(String cloneCreatedDatePretty) {
+        this.cloneCreatedDatePretty = cloneCreatedDatePretty;
+    }
+
+    /**
+     * @param cloneOf the cloneOf to set
+     */
+    public void setCloneOf(int cloneOf) {
+        this.cloneOf = cloneOf;
+    }
+
+    /**
+     * @param cloneCreatedByUserID the cloneCreatedByUserID to set
+     */
+    public void setCloneCreatedByUserID(int cloneCreatedByUserID) {
+        this.cloneCreatedByUserID = cloneCreatedByUserID;
+    }
+
+    /**
+     * @return the mailingAddressThirdLine
+     */
+    public String getMailingAddressThirdLine() {
+        return mailingAddressThirdLine;
+    }
+
+    /**
+     * @param mailingAddressThirdLine the mailingAddressThirdLine to set
+     */
+    public void setMailingAddressThirdLine(String mailingAddressThirdLine) {
+        this.mailingAddressThirdLine = mailingAddressThirdLine;
+    }
+
+    /**
+     * @return the referencePerson
+     */
+    public boolean isReferencePerson() {
+        return referencePerson;
+    }
+
+    /**
+     * @param referencePerson the referencePerson to set
+     */
+    public void setReferencePerson(boolean referencePerson) {
+        this.referencePerson = referencePerson;
+    }
+
+    /**
+     * @return the ghostsList
+     */
+    public ArrayList<Integer> getGhostsList() {
+        return ghostsList;
+    }
+
+    /**
+     * @return the cloneList
+     */
+    public ArrayList<Integer> getCloneList() {
+        return cloneList;
+    }
+
+    /**
+     * @return the mergedList
+     */
+    public ArrayList<Integer> getMergedList() {
+        return mergedList;
+    }
+
+    /**
+     * @param ghostsList the ghostsList to set
+     */
+    public void setGhostsList(ArrayList<Integer> ghostsList) {
+        this.ghostsList = ghostsList;
+    }
+
+    /**
+     * @param cloneList the cloneList to set
+     */
+    public void setCloneList(ArrayList<Integer> cloneList) {
+        this.cloneList = cloneList;
+    }
+
+    /**
+     * @param mergedList the mergedList to set
+     */
+    public void setMergedList(ArrayList<Integer> mergedList) {
+        this.mergedList = mergedList;
     }
     
 

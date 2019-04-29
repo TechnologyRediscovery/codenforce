@@ -9,10 +9,24 @@ and open the template in the editor.
 */
 
 /* colors
+
+// original dark blue/green, and orange
+
 COG green: #7fb337
 COG red: #a0270f
 COG blue: #2d66cd
 COG yellow: #e3b73d
+
+// new TCVCOG logo colors
+
+// yellow-ish
+#cde162
+
+// skyish blue
+#00b5ec
+
+//earthy:
+#5a5754
 
 
 */
@@ -33,27 +47,30 @@ body{
 h1{
     font-family: 'roboto', sans-serif;
     font-size: 1.5em;
-    color: #46C92A;
+    color: #5a5754;
     font-weight: normal;
-    display: box;
+    display: block;
     border-top: none;
     border-right: none;
     border-left: none;
-    border-bottom: 3px solid #46C92A;
+    border-bottom: 3px solid #5a5754;
     
 }
 
 h2{
-    font-size: 1.2em;
-    color: #46C92A;
-    font-weight: normal;
+    font-size: 1.4em;
+    /* color: #00b5ec;  sky blue*/
+    
+    /*darker sky*/
+    color: #00637F; 
+    font-weight: bold;
 }
 
 h3{
     font-size: 1em;
     font-style: italic;
     font-weight: bold;
-    color: #F18732;
+    color: #4F361E;
     font-weight: normal;
     
     
@@ -63,6 +80,46 @@ h4{
     color: darkgray;
     font-style: italic;
 }
+
+
+.logoBox{
+    float:left;
+    clear:none;
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 10px;
+       
+}
+
+.logoBox h2{
+    color: white;
+}
+
+.sys-title{
+    font-size: 1.3em;
+    color: #cde162;
+}
+
+.sys-title-sub{
+    font-size: 1.1em;
+    font-style: italic;
+    color: #00b5ec;
+}
+
+.report-title{
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cde162;
+    
+}
+
+.report-title-sub{
+    font-size: 1.1em;
+    color: #00b5ec;
+    font-style: italic;
+    
+}
+
 
 .darkFont{
     color:#163F8A;
@@ -84,6 +141,35 @@ h4{
 .occupancy-green{
     
 }
+
+.action-request-header{
+    display: block;
+    font-weight: bold;
+    font-size: 1.6em;
+    
+    
+    
+}
+
+.action-request-subheader{
+    display: block;
+    clear: both;
+    font-size: 1.3em;
+    
+}
+
+.logoBox{
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding:5px;
+}
+
+.logo-image-wrapper{
+    margin-right: 15px;
+}
+
 
 
 
@@ -205,11 +291,11 @@ i.material-icons{
 
 a:link{
     text-decoration: none;
-    color: #2C5F90;
+    color: #181F36;
 }
 
 a:visited{
-    color: #2C5F90;
+    color: #181F36;
 }
 
 a:hover{
@@ -274,6 +360,12 @@ div.headerLink a:before, a:visited{
 }
 
 /************** END LINKS ******************/
+
+
+/************** START PAGE LAYOUT  ******************/
+
+
+
 .two-column-page-flex-container{
     display: flex;
     flex-direction: row;
@@ -312,8 +404,22 @@ div.headerLink a:before, a:visited{
 
 
 
-/* ----------- Primary two-column setup: PAGE LAYOUT BOXES -------- */
+/* ----------- Printing and reports-------- */
 
+.printing-page-break-before{
+    page-break-before: always;
+    
+}
+
+.printing-page-break-after{
+    page-break-after: always;
+}
+
+
+div.printer-friendly-report .ui-widget-content{
+    border: none;
+    
+}
 
 
 
@@ -365,8 +471,8 @@ div.headerLink a:before, a:visited{
     flex-basis: 100%;
     flex-shrink: 1;
     
-    height: 65px;
-    background-color: #2C5F90;
+    height: 75px;
+    background-color: #5a5754;
     
 }
 
@@ -390,7 +496,7 @@ div.headerLink a:before, a:visited{
     flex-shrink: 1;
     height: 50px;
     
-    background-color: #163F8A;
+    background-color: #181F36;
     margin-left: 0px;
     margin-right: 0px;
     margin-top: 0px;
@@ -487,19 +593,6 @@ div.headerLink a:before, a:visited{
     height: 100px;
 }
 
-.logoBox{
-    float:left;
-    clear:none;
-    display: inline-block;
-    margin-left: 10px;
-    margin-top: 10px;
-       
-}
-
-.logoBox h2{
-    color: white;
-}
-
 
 p.note{
     font-size: .9em;
@@ -536,6 +629,93 @@ div.headerLinkCont{
 
 /* *********END MAIN PAGE LAYOUT BOXES ***************/
 
+/* --------- BUSINESS OBJECTS AND STATUS ------------------- */
+.mced-status-investigation{
+    font-weight: bold;
+    color:blue;
+}
+.mced-status-enforcement{
+    font-weight: bold;
+    color: blueviolet;
+    
+}
+.mced-status-citation{
+    font-weight: bold;
+    color: red;
+    
+}
+.mced-status-closed{
+    font-weight: bold;
+    color: black;
+}
+.mced-status-holding{
+    
+}
+
+.status-list{
+    list-style-type: none;
+    padding-top: 0px;
+    padding-left: 0px;
+    margin-left: 10px;
+    margin-top: 0px;
+    
+}
+
+i.status-display-icon-i{
+    color: inherit;
+}
+
+.status-display-container{
+	display: flex;
+	flex-direction: row;
+	flex-basis: auto;
+
+}
+
+.status-display-icon-container{
+	width: auto;
+	margin-right: 5px;
+
+
+}
+
+.action-request-icon i.material-icons{
+    font-size: 3em;
+    display: block;
+    margin-right: 15px;
+}
+
+
+.status-display-icon-container i.material-icons{
+        font-size: 5em;
+}
+
+
+.status-display-status-list-container{
+	flex-grow: 1;
+	flex-basis: auto;
+
+
+}
+
+.status-item{
+	font-size: 1em;
+        color: gray;
+        font-weight: normal;
+    
+}
+
+.stage-inactive{
+    font-weight: normal;
+    color:grey;
+}
+
+
+
+
+
+/* ********* end BUSINESS OBJECTS AND STATUS *******************
+
 /*----------------  TEXT AND SPANS ----------------------------*/
 
 
@@ -563,6 +743,10 @@ div.headerLinkCont{
     font-weight: normal;
 }
 
+.weight-normal{
+    font-weight:normal;
+}
+
 
 /***************** CLOSE TEXT AND SPANS ***********************/
 
@@ -572,12 +756,17 @@ div.headerLinkCont{
 .rowExpansion{
     white-space: normal;
     overflow-wrap: normal;
+    text-align: left;
 }
 
 .wrapText{
     white-space: normal;
     overflow-wrap: normal;
     word-break: break-all;
+}
+
+.roomy-top-margin{
+    margin-top: 15px;
 }
 
 .outlinedBox{
@@ -601,6 +790,10 @@ div.headerLinkCont{
     font-size:small;
     display: inline-block;
     
+    
+}
+.compact-violation-list-container{
+    margin-top: 5px;
     
 }
 
@@ -627,6 +820,20 @@ div.headerLinks{
     /*height: 100px;*/
     margin: 10px 10px 10px 10px;
 }
+
+.ord-text{
+    font-weight: normal;
+    font-style: italic;
+    font-family: mono;
+    white-space: normal;
+    overflow-wrap: normal;
+    padding: 20px;
+    line-height: 105%;
+       
+}
+
+
+
 
 
 /*will be deprecated when Adams public pages come online*/
@@ -697,6 +904,23 @@ img.headerImg{
 
 
 /* ------------------TABLE STYLES ----------------------*/
+
+.cases-report-citations-2cols{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+
+.object-info-box thead{
+    text-align: left;
+    font-weight: normal;
+}
+
+.no-border{
+    border: none;
+    
+}
 
 .ui-expanded-row-content{
     background-color: #04284A;
@@ -815,8 +1039,12 @@ gridTd-bignum{
 }
 
 .gridTd-mccontainer{
-    background-color: #163F8A;
+    background-color: #181F36;
     
+}
+
+.action-requests-search{
+    background-color: bisque;
 }
 
 /***********************CLOSE TABLE STYLES**********************/
@@ -828,6 +1056,11 @@ gridTd-bignum{
 /* this styling is for use w/ command button on codeSourceManage.xhtml */
 .manButton{
     margin-bottom: 15px;
+}
+
+.inline-button{
+    margin-left:10px;
+    
 }
 
 /* formatting command buttons completeCodeSourceList & codeSourceTable on codeSourceManage.xhtml  */
@@ -939,17 +1172,17 @@ div.checkBoxLabel{
     margin-bottom: 10px;
 }
 
-.viewconf-status{
+.requested-action-status {
     font-size: 1.3em;
     font-weight: bold;
 }
 
-.conf-needed{
+.action-needed{
     color:red;
     
 }
 
-.conf-received{
+.action-complete{
     color:blue;
 }
 

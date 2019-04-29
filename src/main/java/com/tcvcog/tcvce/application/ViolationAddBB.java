@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.event.FileUploadEvent;
 
@@ -62,6 +63,11 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
      */
     public ViolationAddBB() {
         
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        currentViolation = getSessionBean().getActiveCodeViolation();
     }
     
     public void updateDescription(Photograph photo){
@@ -106,6 +112,8 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     public String addViolation(){
         
+        
+        
         ViolationCoordinator vc = getViolationCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         
@@ -120,7 +128,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         
         try {
              vc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, 
-                     getSessionBean().getcECase());
+                     getSessionBean().getcECaseQueue().get(0));
              getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 

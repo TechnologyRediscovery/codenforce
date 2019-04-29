@@ -689,7 +689,7 @@
                                              value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
                                 <f:converter converterId="muniConverter"/>
                                 <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
-                                <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                             </p:selectOneMenu>
 
                                 <p:panelGrid columns="3" layout="grid">
@@ -808,7 +808,7 @@
                                                              value="#{personBB.searchParams.muni}">
                                                 <f:converter converterId="muniConverter"/>
                                                 <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
-                                                <f:selectItems id="muniNameList" value="#{sessionBean.facesUser.authMunis}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                                             </p:selectOneMenu>
                                     </h:panelGroup>
                                     

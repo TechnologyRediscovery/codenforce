@@ -58,7 +58,7 @@
                                 <f:facet name="header">
                                     <h:outputText value="Municipality" />
                                 </f:facet>
-                                <h:outputText value="#{p.muni.muniName}"/>
+                                <h:outputText value="#{p.muniName}"/>
                             </p:column>
                             <p:column>
                                 <f:facet name="header">
@@ -78,11 +78,18 @@
                                 </f:facet>
                                 <h:outputText value="#{p.addressStreet}"/>
                             </p:column>
+                            <p:column>
+                                <p:commandButton id="use-person-from-table-cb"
+                                                 ajax="false"
+                                                 value="Select this person"
+                                                 action="#{noticeOfViolationBB.storeRecipient(p)}" />
+                            </p:column>
+                            
                         </p:dataTable>
 
 
                         <hr />
-                        <h2>Option 2: Manaully enter a person ID</h2>
+                        <h2>Option 2: Manually enter a person ID</h2>
                         
                         <p:selectBooleanButton id="addPersonByIdIS" 
                                                value="#{noticeOfViolationBB.addPersonByID}" 
@@ -91,9 +98,9 @@
                         
 
                         <p>If you wish to send the letter to a person not on the list above, 
-                            enter the Person's ID number in the box below and toggle option switch to "Add from ID". 
+                            enter the Person's ID number in the box below and click "Look Up Person". 
                             You can open the Persons's search page by "right-clicking" the link to "Persons" 
-                            on the left sidebar and opening that page in its own browser tab.</p>
+                            on the left side bar and opening that page in its own browser tab.</p>
 
                         <h:commandLink  class="bold" target="_blank" action="persons" value="Open person search in new tab ---> "/>
                         <p:spacer height="5px"/>
@@ -106,24 +113,38 @@
 
                         
                         <p:commandButton id="chartBtn" 
-                                         value="Verify Person ID" 
+                                         value="Look up person" 
                                          actionListener="#{noticeOfViolationBB.checkNOVRecipient}" 
                                          ajax="true" 
-                                         update=    "notice-recipient-form:lookup-person-it
-                                                    msg-form:person-add-messages"/>
+                                         update=    "msg-form:person-add-messages
+                                                    person-scroller"/>
                         <p:spacer height="5px"/>
                         
-                        <h:outputText id="lookup-person-it" 
-                                      value="Lookup verification: #{!empty noticeOfViolationBB.retrievedManualLookupPerson?noticeOfViolationBB.retrievedManualLookupPerson.lastName:null}"/>
-
+                        
+                            <p:dataScroller
+                                id="person-scroller"
+                                value="#{noticeOfViolationBB.manualRetrievedPersonList}"
+                                var="per" 
+                                widgetVar="noticebuilder-pers-ds-var">
+                                
+                                <h:outputText value="#{per.firstName} #{per.lastName}"/>
+                                <p:spacer height="5px"/>
+                                <p:commandButton id="use-person-from-table-cb"
+                                                 ajax="false"
+                                                 value="Select this person"
+                                                 disabled=""
+                                                 action="#{noticeOfViolationBB.storeRecipient(per)}" />
+                                
+                                
+                            </p:dataScroller>
+                        
+                        
                         <hr/>
                         
                         <p:commandButton action="ceCases" icon="fa fa-arrow-left"
                                          value="cancel"/>
                         
-                        <p:commandButton ajax="false" value="Continue to assemble letter" 
-                                             action="#{noticeOfViolationBB.storeRecipient}"
-                                             icon="fa fa-tasks"/>
+                     
                     </h:form>
                 </div>
             </ui:define>

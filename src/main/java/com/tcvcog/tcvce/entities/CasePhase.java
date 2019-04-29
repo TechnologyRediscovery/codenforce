@@ -23,29 +23,33 @@ package com.tcvcog.tcvce.entities;
  */
 public enum CasePhase {
 
-    PrelimInvestigationPending("Preliminary Investigation Pending"),
-    NoticeDelivery("Notice of Violation Delivery"),
-    InitialComplianceTimeframe("Initial Compliance Timeframe"),
-    SecondaryComplianceTimeframe("Secondary Compliance Timeframe"),
-    AwaitingHearingDate("Awaiting Hearing"),
-    HearingPreparation("Hearing Preparation"),
-    InitialPostHearingComplianceTimeframe("Initial Post-Hearing Compliance Timeframe"),
-    SecondaryPostHearingComplianceTimeframe("Secondary Post-Hearing Compliance Timeframe"),
-    InactiveHolding("Inactive Holding"),
-    Closed("Closed"),
-    LegacyImported("Legacy data container case");
+    PrelimInvestigationPending("Preliminary Investigation Pending", 1),
+    NoticeDelivery("Notice of Violation Delivery", 2 ),
+    InitialComplianceTimeframe("Initial Compliance Timeframe", 3),
+    SecondaryComplianceTimeframe("Secondary Compliance Timeframe",4 ),
+    AwaitingHearingDate("Awaiting Hearing", 5),
+    HearingPreparation("Hearing Preparation", 6),
+    InitialPostHearingComplianceTimeframe("Initial Post-Hearing Compliance Timeframe", 7),
+    SecondaryPostHearingComplianceTimeframe("Secondary Post-Hearing Compliance Timeframe", 8),
+    InactiveHolding("Inactive Holding", 9),
+    Closed("Closed", 10),
+    LegacyImported("Legacy data container case", 11);
     
     private final String label;
+    private final int phaseOrder;
     
-    private CasePhase(String label){
+    private CasePhase(String label, int ord){
         this.label = label;
+        this.phaseOrder = ord;
     }
     
     public String getLabel(){
         return label;
     }
-
     
+    public int getOrder(){
+        return phaseOrder;
+    }
 }
 
 

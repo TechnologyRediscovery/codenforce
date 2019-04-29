@@ -31,6 +31,11 @@
             <base-name>dbconnection</base-name>
             <var>dbConnectionParams</var>
         </resource-bundle>
+        
+        <resource-bundle>
+            <base-name>violations</base-name>
+            <var>violations</var>
+        </resource-bundle>
 
         
     </application>
@@ -911,6 +916,18 @@
         </navigation-case>
 
         <navigation-case>
+            <from-outcome>reportCECase</from-outcome>
+            <to-view-id>/restricted/reports/reportCECase.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>reportCECaseList</from-outcome>
+            <to-view-id>/restricted/reports/reportCECaseList.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+
+        <navigation-case>
             <from-outcome>ceEvents</from-outcome>
             <to-view-id>/restricted/cogview/ceEvents.xhtml</to-view-id>
             <redirect />
@@ -1007,8 +1024,16 @@
             <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        <navigation-case>
+            <from-outcome>printCase</from-outcome>
+            <to-view-id>/restricted/cogView/ceCasePrint.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>citationEdit</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
+        </navigation-case>
     </navigation-rule>
-    
+        
     <navigation-rule>
         <from-view-id>/restricted/cogstaff/ce/requestManagement.xhtml</from-view-id>
         <navigation-case>
@@ -1079,7 +1104,7 @@
     
    
     <navigation-rule>
-        <from-view-id>/restricted/cogview/caseProfile.xhtml</from-view-id>
+        <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
         <navigation-case>
             <from-action>#{caseProfileBB.editViolation}</from-action>
             <from-outcome>violationEdit</from-outcome>
@@ -1087,47 +1112,10 @@
             <redirect />
         </navigation-case>
         <navigation-case>
-            <from-action>#{caseProfileBB.createCitationFromSelected}</from-action>
-            <from-outcome>citationEdit</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{caseProfileBB.createCitationForAllViolations}</from-action>
-            <from-outcome>citationEdit</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{caseProfileBB.updateCitation}</from-action>
-            <from-outcome>citationEdit</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/citationEdit.xhtml</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{eventAddBB.startNewEvent}</from-action>
-            <from-outcome>eventAdd</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/eventAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{eventAddBB.takeNextAction}</from-action>
-            <from-outcome>eventAdd</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/eventAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{caseProfileBB.recordCompliance}</from-action>
-            <from-outcome>eventAdd</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/eventAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        <navigation-case>
             <from-action>#{caseProfileBB.addViolation}</from-action>
             <from-outcome>violationSelectElement</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
             <redirect />
-        </navigation-case>
-        <navigation-case>
-            <from-outcome>eventEdit</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/eventEdit.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
     
@@ -1345,6 +1333,15 @@
     <navigation-rule>
         <from-view-id>*</from-view-id>
         <navigation-case>
+            <from-outcome>iconManage</from-outcome>
+            <to-view-id>/restricted/cogadmin/iconManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
             <from-outcome>userMuniMapping</from-outcome>
             <to-view-id>/restricted/cogadmin/userAuthMuniManage.xhtml</to-view-id>
             <redirect />
@@ -1475,6 +1472,16 @@
     <managed-bean>
         <managed-bean-name>propertyAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyAddBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>iconBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.IconBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>reportingBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ReportingBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

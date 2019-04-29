@@ -252,7 +252,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         actionRequest.setRequestID(rs.getInt("requestid"));
         actionRequest.setRequestPublicCC(rs.getInt("requestPubliccc"));
-        actionRequest.setMuni(mi.getMuniFromMuniCode(rs.getInt("muni_municode")));
+        actionRequest.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
         actionRequest.setRequestProperty(propI.getProperty(rs.getInt("property_propertyID")));
         actionRequest.setActionRequestorPerson(pi.getPerson(rs.getInt("actrequestor_requestorid")));

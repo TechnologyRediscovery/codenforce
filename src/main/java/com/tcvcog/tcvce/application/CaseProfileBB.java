@@ -17,13 +17,13 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
@@ -31,17 +31,24 @@ import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCECase;
+import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.ReportConfigCECase;
+import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
-import java.time.ZoneId;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -74,24 +81,51 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private ArrayList<Person> muniPeopleList;
 
     private EventCECase eventForTriggeringCasePhaseAdvancement;
+    private EventCECase triggeringEventForRequestedCaseAction;
 
-    private List<EventCECase> eventList;
     private List<EventCECase> filteredEventList;
+    private List<EventCECase> removedEventList;
     private EventCECase selectedEvent;
+    private boolean allowedToClearActionResponse;
+    private int rejectedEventListIndex;
+    private boolean showHiddenEvents;
+    private boolean showInactiveEvents;
 
-    private List<CodeViolation> fullCaseViolationList;
     private List<CodeViolation> selectedViolations;
     private CodeViolation selectedViolation;
     private int newViolationCodeBookEleID;
-
-    private List<NoticeOfViolation> noticeList;
-    
 
     private List<Citation> citationList;
     private Citation selectedCitation;
 
     private HashMap<CasePhase, String> imageFilenameMap;
     private String phaseDiagramImageFilename;
+    
+     // add currentEvent form fields
+    private ArrayList<EventCategory> eventCategoryList;
+    
+    private EventCategory selectedEventCategory ;
+    private EventType selectedEventType;
+    private List<EventType> availableEventList;
+    
+    private Person selectedPerson;
+    
+    private boolean includeActionRequest;
+    private List<EventCategory> availableActionsToRequest;
+    
+    private String styleClassStatusIcon;
+    
+    private String styleClassInvestigation;
+    private String styleClassEnforcement;
+    private String sytleClassCitation;
+    private String sytleClassClosed;
+    private String styleClassActionRequestIcon;
+    
+//    reports
+    
+    private ReportConfigCECase reportCECase;
+    private ReportConfigCECaseList reportCECaseList;
+    
 
     /**
      * Creates a new instance of CaseManageBB
@@ -116,10 +150,77 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         searchParams = cc.getDefaultSearchParamsCECase(getSessionBean().getActiveMuni());
         List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
+        removedEventList = new ArrayList<>();
+        showHiddenEvents = false;
+        showInactiveEvents = false;
         if(retrievedCaseList != null){
             currentCase = retrievedCaseList.get(0);
             caseList = retrievedCaseList;
+            refreshCurrentCase();
+            trimEventList();
         }
+        
+        ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
+        if(rpt != null){
+            reportCECase = rpt;
+        }
+        
+        ReportConfigCECaseList listRpt = getSessionBean().getReportConfigCECaseList();
+        if(listRpt != null){
+            reportCECaseList = listRpt;
+        } else {
+            reportCECaseList = cc.getDefaultReportConfigCECaseList();
+        }
+    }
+    
+    /**
+     * Pass through method for calling trimEventList when any of the two
+     * boolean check boxes above the event list on ceCases.xhtml are pressed
+     */
+    public void reloadEventList(){
+        System.out.println("CaseProfileBB.reloadEventList");
+        trimEventList();
+    }
+    
+    /**
+     * Used by the UI to adjust the events shown in the event history list
+     * and responds to changes in the two boolean check boxes for showing
+     * hidden and inactive events
+     */
+    public void trimEventList(){
+        
+        if(currentCase.getEventList() != null){
+            for(EventCECase ev: currentCase.getEventList()){
+                System.out.println("CaseProfileBB.trimEventList | inspecting ev " + ev.getEventID());
+                if(!ev.isActive() && !showInactiveEvents){
+                    System.out.println("CaseProfileBB.trimEventList | found inactive; adding to removed list ev " + ev.getEventID());
+                    removedEventList.add(ev);
+                }
+                if(ev.isHidden() && !showHiddenEvents){
+                    System.out.println("CaseProfileBB.trimEventList | found hidden; adding to removed list ev " + ev.getEventID());
+                    removedEventList.add(ev);
+                }
+            } // close for   
+            for(EventCECase ev: removedEventList){
+                System.out.println("CaseProfileBB.trimEventList | removing ev " + ev.getEventID());
+                currentCase.getEventList().remove(ev);
+            }
+            
+            if(showHiddenEvents){
+                for(EventCECase ev: removedEventList){
+                    if(ev.isHidden()){
+                        currentCase.getEventList().add(ev);
+                    }
+                }
+            }
+            if(showInactiveEvents){
+                for(EventCECase ev: removedEventList){
+                    if(!ev.isActive()){
+                        currentCase.getEventList().add(ev);
+                    }
+                }
+            }
+        } // close if
     }
     
     public void deletePhoto(int photoID){
@@ -138,6 +239,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    /**
+     * Responder to the query button on the UI
+     * @param ev 
+     */
     public void executeQuery(ActionEvent ev){
         System.out.println("CaseProfileBB.executeQuery");
         CaseCoordinator cc = getCaseCoordinator();
@@ -156,10 +261,274 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
         }
+    }
+    
+    public String generateReportCECase(){
+        CaseCoordinator cc = getCaseCoordinator();
+        getSessionBean().getcECaseQueue().remove(currentCase);
+        getSessionBean().getcECaseQueue().add(0, currentCase);
+        
+        reportCECase.setCse(currentCase);
+        
+        reportCECase.setCreator(getSessionBean().getFacesUser());
+        reportCECase.setMuni(getSessionBean().getActiveMuni());
+        reportCECase.setGenerationTimestamp(LocalDateTime.now());
+        
+        try {
+            reportCECase = cc.transformCECaseForReport(reportCECase);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        getSessionBean().setReportConfigCECase(reportCECase);
+        // this is for use by the report header to have a super class with only
+        // the basic info. reportingBB exposes it to the faces page
+        getSessionBean().setActiveReport(reportCECase);
+        // force our reportingBB to choose the right bundle
+        getSessionBean().setReportConfigCECaseList(null);
+        
+        
+        return "reportCECase";
+    }
+    
+    public void prepareReportCECaseList(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(reportCECaseList == null){
+            reportCECaseList = cc.getDefaultReportConfigCECaseList();
+        }
+        System.out.println("CaseProfileBB.prepareCaseListReport");
+        
         
     }
     
+    public String generateReportCECaseList(){
+        reportCECaseList.setCreator(getSessionBean().getFacesUser());
+        reportCECaseList.setMuni(getSessionBean().getActiveMuni());
+        reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
+        getSessionBean().setReportConfigCECaseList(reportCECaseList);
+        getSessionBean().setReportConfigCECase(null);
+        getSessionBean().setcECaseQueue(caseList);
+        getSessionBean().setActiveReport(reportCECaseList);
+        return "reportCECaseList";
+        
+    }
     
+    public void prepareReportCECase(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        reportCECase = cc.getDefaultReportConfigCECase(currentCase);
+        System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + reportCECase);
+        
+    }
+    
+    public void rejectRequestedEvent(EventCECase ev){
+        selectedEvent = ev;
+        rejectedEventListIndex = currentCase.getEventListActionRequests().indexOf(ev);
+    }
+    
+    /**
+     * Called when the user clicks the take requested action button 
+     * @param ev 
+     */
+    public void initiateNewRequestedEvent(EventCECase ev){
+        selectedEventCategory = ev.getRequestedEventCat();
+        triggeringEventForRequestedCaseAction = ev;
+        initiateNewEvent();
+    }
+    
+    /**
+     * Called when the user selects their own EventCategory to add to the case
+     * and is a pass-through method to the initiateNewEvent method
+     * @param ev 
+     */
+    public void initiateUserChosenEventCreation(ActionEvent ev){
+        initiateNewEvent();
+    }
+    
+    
+    public void initiateNewEvent(){
+        
+        if (selectedEventCategory != null){
+
+            System.out.println("EventAddBB.startNewEvent | category: " + selectedEventCategory.getEventCategoryTitle());
+            EventCoordinator ec = getEventCoordinator();
+            try {
+                selectedEvent = ec.getInitializedEvent(currentCase, selectedEventCategory);
+                selectedEvent.setDateOfRecord(LocalDateTime.now());
+            } catch (CaseLifecyleException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            }
+        } else {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Please select an event category to create a new event." ,""));
+        }
+    }
+
+    
+    /**
+     * All Code Enforcement case events are funneled through this method
+     * which has to carry out a number of checks based on the
+     * type of event being created. The event is then passed to
+     * the attachNewEventToCECase on the CaseCoordinator who will do some more
+     * checking about the event before writing it to the DB
+     * 
+     * @param ev unused
+     * @throws ViolationException 
+     */
+    public void attachEventToCase(ActionEvent ev) throws ViolationException{
+        EventCoordinator ec = getEventCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        // category is already set from initialization sequence
+        selectedEvent.setCaseID(currentCase.getCaseID());
+        selectedEvent.setOwner(getSessionBean().getFacesUser());
+        try {
+            if(selectedEvent.isRequestsAction()){
+                selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
+            }
+            
+            // writing null in here is fine if the event wasn't triggered
+            selectedEvent.setTriggeringEvent(triggeringEventForRequestedCaseAction);
+            
+            // main entry point for handing the new event off to the CaseCoordinator
+            // only the compliance events need to pass in another object--the violation
+            // otherwise just the case and the event go to the coordinator
+            if(selectedEvent.getCategory().getEventType() == EventType.Compliance){
+                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, selectedViolation));
+            } else {
+                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, null));
+            }
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Successfully logged event with an ID " + selectedEvent.getEventID(), ""));
+            
+            // now update the triggering event with the newly inserted event's ID
+            // (We saved the triggering event when the take action button was clicked, before the event
+            // add dialog was displayed and event-specific data is entered by the user
+            if(triggeringEventForRequestedCaseAction != null){
+                triggeringEventForRequestedCaseAction.setResponseEvent(selectedEvent);
+                triggeringEventForRequestedCaseAction.setResponderActual(getSessionBean().getFacesUser());
+                ec.logResponseToActionRequest(triggeringEventForRequestedCaseAction);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                                "Updated triggering event ID + "
+                                        + triggeringEventForRequestedCaseAction.getEventID() +
+                                 " with response info!", ""));
+                // reset our holding var since we're done processing the event
+                triggeringEventForRequestedCaseAction = null;
+            }
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            ex.getMessage(), 
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        } catch (CaseLifecyleException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            ex.getMessage(), 
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        }
+
+        // nullify the session's case so that the reload of currentCase
+        // no the cecaseProfile.xhtml will trigger a new DB read
+        refreshCurrentCase();
+        trimEventList();
+    }
+    
+    /**
+     * Called by pages that aren't ceCases.xhtml to bring up the 
+     * proper case for viewing
+     * @param ev
+     * @return 
+     */
+    public String jumpToCasesToEditCEEvent(EventCasePropBundle ev){
+        CaseIntegrator ci = getCaseIntegrator();
+        caseList = getSessionBean().getcECaseQueue();
+        List<Property> propList = getSessionBean().getPropertyQueue();
+        if(caseList != null){
+            caseList.add(1, caseList.remove(0));
+            try {
+                caseList.add(0, ci.generateCECase(ev.getEventCaseBare()));
+            } catch (SQLException | IntegrationException ex ) {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Unable to migrate from events to cases", 
+                "This is a non-user system-level error that must be fixed by your Sys Admin, sorry"));
+            }
+        }
+        if(propList != null){
+            propList.add(1, propList.remove(0));
+            propList.add(0, ev.getEventCaseBare().getProperty());
+        }
+        return "ceCases";
+    }
+    
+    public void commitEventEdits(ActionEvent ev){
+        EventIntegrator ei = getEventIntegrator();
+        System.out.println("CaseProfileBB.commitEventEdits");
+        EventCoordinator ec = getEventCoordinator();
+//        currentCase.getEventList().remove(selectedEvent);
+        try {
+            if(selectedEvent.getRequestedEventCat()!= null){
+                selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
+            }
+            ec.editEvent(selectedEvent, getSessionBean().getFacesUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Event udpated!", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Please select one or more people to attach to this event", 
+                "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        }
+        refreshCurrentCase();
+        
+    }
+    
+    public void commitActionRequestRejection(ActionEvent ev){
+        EventCoordinator ec = getEventCoordinator();
+        selectedEvent.setResponderActual(getSessionBean().getFacesUser());
+        selectedEvent.setRequestRejected(true);
+        selectedEvent.setResponseEvent(null);
+        try {
+            ec.logResponseToActionRequest(selectedEvent);
+            currentCase.getEventListActionRequests().remove(rejectedEventListIndex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Action request successfully rejected for event ID " + selectedEvent.getEventID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Could not insert the action request rejection event.", 
+                "This is a non-user system-level error that must be fixed by your Sys Admin, sorry!"));
+        }
+    }
+   
+    public void queueSelectedPerson(ActionEvent ev){
+        if(selectedPerson != null){
+            selectedEvent.getPersonList().add(selectedPerson);
+        } else {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Please select one or more people to attach to this event", 
+                    "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        }
+    }
+    
+    public void deQueuePersonFromEvent(Person p){
+        if(selectedEvent.getPersonList() != null){
+            selectedEvent.getPersonList().remove(p);
+        }
+    }
+    
+    public void editEvent(EventCECase ev){
+        includeActionRequest = ev.isRequestsAction();
+        selectedEvent = ev;
+    }
+
 /**
  * Primary injection point for setting the case which will be displayed in the right
  * column (the manage object column) on cECases.xhtml
@@ -167,13 +536,15 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
  */
     public void manageCECase(CECase c) {
         UserIntegrator ui = getUserIntegrator();
-        getSessionBean().setcECase(c);
+//        getSessionBean().getcECaseQueue().add(0, c);
         try {
             ui.logObjectView(getSessionBean().getFacesUser(), c);
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         currentCase = c;
+        getSessionBean().setActiveProp(c.getProperty());
+        removedEventList.clear();
     }
 
     public void changePACCAccess() {
@@ -194,25 +565,23 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-  
-
-    /**
-     *
-     * @return
-     */
-    public String overrideCasePhase() {
+    public void overrideCasePhase(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         try {
             cc.manuallyChangeCasePhase(currentCase, getSelectedCasePhase());
             currentCase = ci.getCECase(currentCase.getCaseID());
+            updateCaseInCaseList(currentCase);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Updated case phase; please refresh case",""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to write case phase changes to DB",
                             "This error must be corrected by a system administrator, sorry"));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecyleException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -220,35 +589,87 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                             "Please check with your system administrator"));
 
         }
-        
-        return "";
-    }
-
-    public String reloadPage() {
-        return "";
     }
     
-    public void refreshCurrentCase(ActionEvent ev){
+    /**
+     * Designed to update the case phase or name in the master case list
+     * in ceCases.xhtml when a case is updated. Prevents rebuilding all the 
+     * cases in the entire list, which could be massive
+     * @param c 
+     */
+    private void updateCaseInCaseList(CECase c){
         CaseIntegrator ci = getCaseIntegrator();
+        Iterator<CECase> it = caseList.iterator();
+        CECase localCase;
+        int idx = 0;
+        while(it.hasNext()){
+            localCase = it.next();
+            if(localCase.getCaseID() == c.getCaseID()){
+                try {
+                    caseList.set(idx, ci.getCECase(c.getCaseID()));
+                } catch (IntegrationException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Error updating case in case docket",
+                                    "Please check with your system administrator"));
+                } // end catch
+            } // end if
+            idx++;
+        } // end while
+    }
+    
+    /**
+     * Pass through method for clicks of the refresh case data button
+     * on cECases.xhtml
+     * @param ev 
+     */
+    public void refreshCurrentCase(ActionEvent ev){
+        refreshCurrentCase();
+    }
+    
+    public void refreshCurrentCase(){
+        CaseIntegrator ci = getCaseIntegrator();
+        System.out.println("CaseProfileBB.refreshCurrentCase | eventlist size before refresh: " + currentCase.getEventList().size());
         try {
             currentCase = ci.getCECase(currentCase.getCaseID());
-            System.out.println("CaseProfileBB.refreshCurrentCase");
+        System.out.println("CaseProfileBB.refreshCurrentCase | eventlist size after refresh: " + currentCase.getEventList().size());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         
     }
-
-    public void recordCompliance(CodeViolation cv) throws IntegrationException {
-        EventCoordinator ec = getEventCoordinator();
-        // build event details 
-        EventCECase e = ec.generateViolationComplianceEvent(cv);
-        // put our violation on its session shelf for the eventAddBB
-        getSessionBean().setActiveCodeViolation(cv);
-        // put our event on its session shelf for the eventAddBB
-        getSessionBean().setActiveEvent(e);
-        getSessionBean().setcECase(currentCase);
+    
+    public void initiatePhaseOverride(ActionEvent ev){
+        System.out.println("CaseProfileBB.initiatePhaseOverride");
+        // do nothing
     }
+
+    
+    public void recordCompliance(CodeViolation cv) {
+        EventCoordinator ec = getEventCoordinator();
+        ViolationCoordinator vc = getViolationCoordinator();
+        selectedViolation = cv;
+        // build event details package
+        EventCECase e = null;
+        try {
+            selectedViolation.setComplianceUser(getSessionBean().getFacesUser());
+            e = ec.generateViolationComplianceEvent(selectedViolation);
+            e.setOwner(getSessionBean().getFacesUser());
+            e.setDateOfRecord(LocalDateTime.now());
+            cv.setActualComplianceDate(LocalDateTime.now());
+            vc.recordCompliance(cv, getSessionBean().getFacesUser());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        // the user is then shown the add event dialog, and when the
+        // event is added to the case, the CaseCoordinator will
+        // set the date of record on the violation to match that chosen
+        // for the event
+        selectedEvent = e;
+        
+    }
+    
+//    Procedural vs. OO code
 
     public String editViolation() {
         ArrayList<CodeViolation> ll = new ArrayList();
@@ -264,16 +685,21 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             return "";
         }
     }
+    
 
     public String createNewNotice() {
+        getSessionBean().getcECaseQueue().remove(currentCase);
+        getSessionBean().getcECaseQueue().add(0, currentCase);
 
         List<CodeViolation> retrievedList = currentCase.getViolationList();
         
         if (retrievedList != null) {
             if (retrievedList.size() > 0) {
                 getSessionBean().setViolationQueue(retrievedList);
+                getSessionBean().getPropertyQueue().add(0,currentCase.getProperty());
                 getSessionBean().setActiveProp(currentCase.getProperty());
                 getSessionBean().setcECase(currentCase);
+                getSessionBean().getcECaseQueue().set(0, currentCase);
             }
             return "noticeOfViolationBuilder";
 
@@ -306,7 +732,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         try {
-            cc.resetNOVMailing(getSessionBean().getcECase(), nov);
+            cc.noticeOfViolationResetMailing(getSessionBean().getcECase(), nov);
             //reset case
             getSessionBean().setcECase(ci.getCECase(currentCase.getCaseID()));
             getFacesContext().addMessage(null,
@@ -321,58 +747,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
    
 
-    public String createCitationForAllViolations() {
-        System.out.println("CaseManageBB.createCitationForAllViolations | current case tostring: "
+    public String createNewCitation() {
+        System.out.println("CaseProfileBB.createNewCitation  | current case tostring: "
                 + currentCase);
-//        if(!currentCase.getViolationList().isEmpty()){
-        if (currentCase != null) {
-            if (checkViolationListForNoComplianceDates(selectedViolations)) {
-                CaseCoordinator cc = getCaseCoordinator();
-                getSessionBean().setActiveCitation(cc.generateNewCitation(fullCaseViolationList));
-                return "citationEdit";
-            } else {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Yikes! You may not cite a violation with a compliance date!", ""));
-                return "";
-            }
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Please select a violation and try again", ""));
-        return "";
+        getSessionBean().setActiveCitation(null);
+        getSessionBean().getcECaseQueue().remove(currentCase);
+        getSessionBean().getcECaseQueue().add(0, currentCase);
+        return "citationEdit";
     }
 
-    public String createCitationFromSelected() {
-        System.out.println("CaseManageBB.createCitationFromSelected");
-        if (!selectedViolations.isEmpty()) {
-            if (checkViolationListForNoComplianceDates(selectedViolations)) {
-                CaseCoordinator cc = getCaseCoordinator();
-                getSessionBean().setActiveCitation(cc.generateNewCitation(selectedViolations));
-                return "citationEdit";
-            } else {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Yikes! You may not cite a violation with a compliance date!", ""));
-                return "";
-            }
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Please select a violation and try again", ""));
-        return "";
-    }
-
-    public String updateCitation() {
-        if (selectedCitation != null) {
-
-            getSessionBean().setActiveCitation(selectedCitation);
-            return "citationEdit";
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Please select a citation and try again", ""));
-        return "";
+    public String updateCitation(Citation cit) {
+        getSessionBean().setActiveCitation(cit);
+        getSessionBean().getcECaseQueue().remove(currentCase);
+        getSessionBean().getcECaseQueue().add(0, currentCase);
+        return "citationEdit";
     }
 
     public String deleteCitation() {
@@ -409,7 +797,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Don't get wreckless, now! You may only delete one violation at a time!", ""));
-
             }
         } else {
             getFacesContext().addMessage(null,
@@ -419,8 +806,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     public String addViolation() {
-        getSessionBean().setcECase(currentCase);
-
+        getSessionBean().getcECaseQueue().remove(currentCase);
+        getSessionBean().getcECaseQueue().add(0, currentCase);
         return "violationSelectElement";
     }
 
@@ -440,15 +827,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public void queueNotice(NoticeOfViolation nov){
         System.out.println("CaseProfileBB.QueueNotice");
         CaseCoordinator caseCoord = getCaseCoordinator();
-        
-//        CECase ceCase = getSessionBean().getcECase();
-
-        
-//        NoticeOfViolation notice = caseCoord.generateNoticeSkeleton(ceCase);
-        
         try {
             
-            caseCoord.queueNoticeOfViolation(currentCase, nov);
+            caseCoord.noticeOfViolationLockAndQueue(currentCase, nov);
             
         } catch (CaseLifecyleException ex) {
             System.out.println(ex);
@@ -469,7 +850,19 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                         "The automatic event generation associated with this action has thrown an error. "
                                 + "Please create an event manually which logs this letter being queued for mailing", ""));
             
+        } catch (ViolationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                        "Unable to queue notice of violatio. "
+                                + "Please create an event manually which logs this letter being queued for mailing", ""));
+            
         }
+        
+        
+    }
+    
+    public void deleteSelectedEvent(){
         
         
     }
@@ -481,7 +874,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setActiveNotice(nov);
         try {
 
-            caseCoord.deleteNoticeOfViolation(nov);
+            caseCoord.noticeOfViolationDelete(nov);
             caseCoord.refreshCase(currentCase);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -507,7 +900,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         try {
                 if (nov.getLetterSentDate() == null
                         && nov.isRequestToSend() == true) {
-                    caseCoord.markNoticeOfViolationAsSent(currentCase, nov);
+                    caseCoord.noticeOfViolationMarkAsSent(currentCase, nov);
                     caseCoord.refreshCase(currentCase);
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -556,7 +949,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             if (nov.getLetterSentDate() != null
                     && nov.getLetterReturnedDate() == null) {
 
-                caseCoord.processReturnedNotice(currentCase, nov);
+                caseCoord.noticeOfViolationMarkAsReturned(currentCase, nov);
                 caseCoord.refreshCase(currentCase);
 
                 getFacesContext().addMessage(null,
@@ -583,29 +976,29 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @return the currentCase
      */
     public CECase getCurrentCase() {
-        CaseIntegrator caseint = getCaseIntegrator();
-        CECase sessionCase = getSessionBean().getcECase();
-        if (sessionCase != null) {
-            currentCase = sessionCase;
-        } else {
-            if (currentCase != null) {
-                try {
-                    // most desirably, we've got a current case, so reload it
-                    currentCase = caseint.getCECase(currentCase.getCaseID());
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                }
-            } else {
-                try {
-                    // otherwise, get an arbitrary case
-                    currentCase = caseint.getCECase(
-                            Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderCaseID")));
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                }
-            }
-
-        }
+//        CaseIntegrator caseint = getCaseIntegrator();
+//        CECase sessionCase = getSessionBean().getcECase();
+//        if (sessionCase != null) {
+//            currentCase = sessionCase;
+//        } else {
+//            if (currentCase != null) {
+//                try {
+//                    // most desirably, we've got a current case, so reload it
+//                    currentCase = caseint.getCECase(currentCase.getCaseID());
+//                } catch (IntegrationException ex) {
+//                    System.out.println(ex);
+//                }
+//            } else {
+//                try {
+//                    // otherwise, get an arbitrary case
+//                    currentCase = caseint.getCECase(
+//                            Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("arbitraryPlaceholderCaseID")));
+//                } catch (IntegrationException ex) {
+//                    System.out.println(ex);
+//                }
+//            }
+//
+//        }
         return currentCase;
     }
 
@@ -646,6 +1039,39 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
 
     }
+    
+    
+     public void logActionResponse(EventCECase ev){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ev.setResponderActual(getSessionBean().getFacesUser());
+            ec.logResponseToActionRequest(ev);
+//            refreshCurrentEventList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Registered view confirmation!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not confirm view, sorry.", ""));
+        }
+    }
+    
+    public void clearActionResponse(ActionEvent ev){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.clearActionResponse(selectedEvent);
+//            refreshCurrentEventList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Action response: cleared for event ID " + selectedEvent.getEventID() , ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not clear action response, sorry.", ""));
+        }
+        refreshCurrentCase();
+    }
 
     /**
      * @param currentCase the currentCase to set
@@ -654,14 +1080,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.currentCase = currentCase;
     }
 
-    /**
-     * @return the eventList
-     */
-    public List<EventCECase> getEventList() {
-        setEventList(currentCase.getEventList());
-        return eventList;
-    }
-
+   
     /**
      * @return the selectedEvent
      */
@@ -669,23 +1088,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         return selectedEvent;
     }
 
-    /**
-     * @return the fullCaseViolationList
-     */
-    public List<CodeViolation> getFullCaseViolationList() {
-        ViolationCoordinator vc = getViolationCoordinator();
-        try {
-            setFullCaseViolationList((List<CodeViolation>) vc.getCodeViolations(currentCase));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to load code violation list",
-                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
-
-        }
-        return fullCaseViolationList;
-    }
+ 
 
     /**
      * @return the selectedViolation
@@ -694,12 +1097,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         return selectedViolations;
     }
 
-    /**
-     * @param el
-     */
-    public void setEventList(ArrayList<EventCECase> el) {
-        eventList = el;
-    }
+    
 
     /**
      * @param selectedEvent the selectedEvent to set
@@ -708,13 +1106,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.selectedEvent = selectedEvent;
     }
 
-    /**
-     * @param fcvll
-     */
-    public void setFullCaseViolationList(ArrayList<CodeViolation> fcvll) {
-        fullCaseViolationList = fcvll;
-    }
-
+   
     /**
      * @param svs
      */
@@ -724,20 +1116,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
    
 
-    /**
-     * @return the noticeList
-     */
-    public List<NoticeOfViolation> getNoticeList() {
-        setNoticeList(getSessionBean().getcECase().getNoticeList());
-        return noticeList;
-    }
-
-    /**
-     * @param nl
-     */
-    public void setNoticeList(ArrayList<NoticeOfViolation> nl) {
-        noticeList = nl;
-    }
+  
 
     /**
      * @return the citationList
@@ -771,9 +1150,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public String takeNextAction() {
         EventCECase e = getEventForTriggeringCasePhaseAdvancement();
-
-        getSessionBean().setActiveEvent(e);
-
         return "eventAdd";
     }
 
@@ -922,7 +1298,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             searchParams.setMuni(getSessionBean().getActiveMuni());
             try {
                 System.out.println("CaseProfileBB.getCaseList | getting list for : " + getSessionBean().getActiveMuni().getMuniName());
-                caseList = ci.getCECases(searchParams);
+                caseList = ci.queryCECases(searchParams);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -1003,12 +1379,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.muniPeopleList = muniPeopleList;
     }
 
-    /**
-     * @param eventList the eventList to set
-     */
-    public void setEventList(List<EventCECase> eventList) {
-        this.eventList = eventList;
-    }
+    
 
     /**
      * @param filteredEventList the filteredEventList to set
@@ -1017,13 +1388,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.filteredEventList = filteredEventList;
     }
 
-    /**
-     * @param fullCaseViolationList the fullCaseViolationList to set
-     */
-    public void setFullCaseViolationList(List<CodeViolation> fullCaseViolationList) {
-        this.fullCaseViolationList = fullCaseViolationList;
-    }
-
+   
     /**
      * @param selectedViolations the selectedViolations to set
      */
@@ -1031,13 +1396,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.selectedViolations = selectedViolations;
     }
 
-    /**
-     * @param noticeList the noticeList to set
-     */
-    public void setNoticeList(List<NoticeOfViolation> noticeList) {
-        this.noticeList = noticeList;
-    }
-
+   
     /**
      * @param citationList the citationList to set
      */
@@ -1088,4 +1447,370 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public void setCaseStageArray(CaseStage[] caseStageArray) {
         this.caseStageArray = caseStageArray;
     }
+
+    /**
+     * @return the eventCategoryList
+     */
+    public ArrayList<EventCategory> getEventCategoryList() {
+         EventIntegrator ei = getEventIntegrator();
+        
+        if(selectedEventType != null){
+            
+            try {
+                eventCategoryList = ei.getEventCategoryList(selectedEventType);
+            } catch (IntegrationException ex) {
+                // do nothing
+            }
+        }
+        return eventCategoryList;
+    }
+
+    /**
+     * @return the selectedEventCategory
+     */
+    public EventCategory getSelectedEventCategory() {
+        return selectedEventCategory;
+    }
+
+    /**
+     * @return the selectedEventType
+     */
+    public EventType getSelectedEventType() {
+        return selectedEventType;
+    }
+
+    /**
+     * @return the availableEventList
+     */
+    public List<EventType> getAvailableEventTypeList() {
+        CaseCoordinator cc = getCaseCoordinator();
+        availableEventList = cc.getPermittedEventTypesForCECase(currentCase, 
+                getSessionBean().getFacesUser());
+        return availableEventList;
+    }
+
+   
+
+   
+    /**
+     * @return the selectedPerson
+     */
+    public Person getSelectedPerson() {
+        return selectedPerson;
+    }
+
+    /**
+     * @param eventCategoryList the eventCategoryList to set
+     */
+    public void setEventCategoryList(ArrayList<EventCategory> eventCategoryList) {
+        this.eventCategoryList = eventCategoryList;
+    }
+
+    /**
+     * @param selectedEventCategory the selectedEventCategory to set
+     */
+    public void setSelectedEventCategory(EventCategory selectedEventCategory) {
+        this.selectedEventCategory = selectedEventCategory;
+    }
+
+    /**
+     * @param selectedEventType the selectedEventType to set
+     */
+    public void setSelectedEventType(EventType selectedEventType) {
+        this.selectedEventType = selectedEventType;
+    }
+
+    /**
+     * @param availableEventList the availableEventList to set
+     */
+    public void setAvailableEventList(List<EventType> availableEventList) {
+        this.availableEventList = availableEventList;
+    }
+
+    
+
+    /**
+     * @param selectedPerson the selectedPerson to set
+     */
+    public void setSelectedPerson(Person selectedPerson) {
+        this.selectedPerson = selectedPerson;
+    }
+
+    /**
+     * @return the includeActionRequest
+     */
+    public boolean isIncludeActionRequest() {
+       
+        return includeActionRequest;
+    }
+
+    /**
+     * @param includeActionRequest the includeActionRequest to set
+     */
+    public void setIncludeActionRequest(boolean includeActionRequest) {
+        this.includeActionRequest = includeActionRequest;
+    }
+
+    /**
+     * @return the availableActionsToRequest
+     */
+    public List<EventCategory> getAvailableActionsToRequest() {
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            availableActionsToRequest = ei.getRequestableEventCategories();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return availableActionsToRequest;
+    }
+
+    /**
+     * @param availableActionToRequest the availableActionsToRequest to set
+     */
+    public void setAvailableActionToRequest(ArrayList<EventCategory> availableActionToRequest) {
+        this.availableActionsToRequest = availableActionToRequest;
+    }
+
+    /**
+     * @return the allowedToClearActionResponse
+     */
+    public boolean isAllowedToClearActionResponse() {
+        allowedToClearActionResponse = false;
+        if(selectedEvent != null){
+            if(selectedEvent.isResponseComplete()
+                    &&
+                ((getSessionBean().getFacesUser().getUserID() == selectedEvent.getResponderActual().getUserID())
+                    ||
+                getSessionBean().getFacesUser().getKeyCard().isHasSysAdminPermissions())){
+                allowedToClearActionResponse = true;
+            }
+        }
+        return allowedToClearActionResponse;
+    }
+
+    /**
+     * @param allowedToClearActionResponse the allowedToClearActionResponse to set
+     */
+    public void setAllowedToClearActionResponse(boolean allowedToClearActionResponse) {
+        this.allowedToClearActionResponse = allowedToClearActionResponse;
+    }
+
+    /**
+     * @return the triggeringEventForRequestedCaseAction
+     */
+    public EventCECase getTriggeringEventForRequestedCaseAction() {
+        return triggeringEventForRequestedCaseAction;
+    }
+
+    /**
+     * @param triggeringEventForRequestedCaseAction the triggeringEventForRequestedCaseAction to set
+     */
+    public void setTriggeringEventForRequestedCaseAction(EventCECase triggeringEventForRequestedCaseAction) {
+        this.triggeringEventForRequestedCaseAction = triggeringEventForRequestedCaseAction;
+    }
+
+    /**
+     * @return the showHiddenEvents
+     */
+    public boolean isShowHiddenEvents() {
+        return showHiddenEvents;
+    }
+
+    /**
+     * @param showHiddenEvents the showHiddenEvents to set
+     */
+    public void setShowHiddenEvents(boolean showHiddenEvents) {
+        this.showHiddenEvents = showHiddenEvents;
+    }
+
+    /**
+     * @return the showInactiveEvents
+     */
+    public boolean isShowInactiveEvents() {
+        return showInactiveEvents;
+    }
+
+    /**
+     * @param showInactiveEvents the showInactiveEvents to set
+     */
+    public void setShowInactiveEvents(boolean showInactiveEvents) {
+        this.showInactiveEvents = showInactiveEvents;
+    }
+
+    /**
+     * @return the removedEventList
+     */
+    public List<EventCECase> getRemovedEventList() {
+        return removedEventList;
+    }
+
+    /**
+     * @param removedEventList the removedEventList to set
+     */
+    public void setRemovedEventList(List<EventCECase> removedEventList) {
+        this.removedEventList = removedEventList;
+    }
+
+    /**
+     * @return the styleClassInvestigation
+     */
+    public String getStyleClassInvestigation() {
+        String style = null;
+        try {
+            if(currentCase.getCaseStage() == CaseStage.Investigation){
+                style = currentCase.getCasePhaseIcon().getStyleClass();
+                
+            } else {
+                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
+            }
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        styleClassInvestigation = style;
+        return styleClassInvestigation;
+    }
+
+    /**
+     * @return the styleClassEnforcement
+     */
+    public String getStyleClassEnforcement() {
+        String style = null;
+        try {
+            if(currentCase.getCaseStage() == CaseStage.Enforcement){
+                style = currentCase.getCasePhaseIcon().getStyleClass();
+                
+            } else {
+                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
+            }
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        styleClassEnforcement = style;
+        return styleClassEnforcement;
+    }
+
+    /**
+     * @return the sytleClassCitation
+     */
+    public String getSytleClassCitation() {
+        String style = null;
+        try {
+            if(currentCase.getCaseStage() == CaseStage.Citation){
+                style = currentCase.getCasePhaseIcon().getStyleClass();
+                
+            } else {
+                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
+            }
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        sytleClassCitation = style;
+        return sytleClassCitation;
+    }
+
+    /**
+     * @return the sytleClassClosed
+     */
+    public String getSytleClassClosed() {
+        String style = null;
+        try {
+            if(currentCase.getCaseStage() == CaseStage.Closed){
+                style = currentCase.getCasePhaseIcon().getStyleClass();
+                
+            } else {
+                style = Constants.STYLE_CLASS_INACTIVE_CASE_PHASE;
+            }
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        sytleClassClosed = style;
+        return sytleClassClosed;
+    }
+
+    /**
+     * @param styleClassInvestigation the styleClassInvestigation to set
+     */
+    public void setStyleClassInvestigation(String styleClassInvestigation) {
+        this.styleClassInvestigation = styleClassInvestigation;
+    }
+
+    /**
+     * @param styleClassEnforcement the styleClassEnforcement to set
+     */
+    public void setStyleClassEnforcement(String styleClassEnforcement) {
+        this.styleClassEnforcement = styleClassEnforcement;
+    }
+
+    /**
+     * @param sytleClassCitation the sytleClassCitation to set
+     */
+    public void setSytleClassCitation(String sytleClassCitation) {
+        this.sytleClassCitation = sytleClassCitation;
+    }
+
+    /**
+     * @param sytleClassClosed the sytleClassClosed to set
+     */
+    public void setSytleClassClosed(String sytleClassClosed) {
+        this.sytleClassClosed = sytleClassClosed;
+    }
+
+    /**
+     * @return the styleClassStatusIcon
+     */
+    public String getStyleClassStatusIcon() {
+        styleClassStatusIcon = currentCase.getCasePhaseIcon().getStyleClass();
+        return styleClassStatusIcon;
+    }
+
+    /**
+     * @param styleClassStatusIcon the styleClassStatusIcon to set
+     */
+    public void setStyleClassStatusIcon(String styleClassStatusIcon) {
+        this.styleClassStatusIcon = styleClassStatusIcon;
+    }
+
+    /**
+     * @return the styleClassActionRequestIcon
+     */
+    public String getStyleClassActionRequestIcon() {
+        return styleClassActionRequestIcon;
+    }
+
+    /**
+     * @param styleClassActionRequestIcon the styleClassActionRequestIcon to set
+     */
+    public void setStyleClassActionRequestIcon(String styleClassActionRequestIcon) {
+        this.styleClassActionRequestIcon = styleClassActionRequestIcon;
+    }
+
+    /**
+     * @return the reportCECase
+     */
+    public ReportConfigCECase getReportCECase() {
+        return reportCECase;
+    }
+
+    /**
+     * @param reportCECase the reportCECase to set
+     */
+    public void setReportCECase(ReportConfigCECase reportCECase) {
+        this.reportCECase = reportCECase;
+    }
+
+    /**
+     * @return the reportCECaseList
+     */
+    public ReportConfigCECaseList getReportCECaseList() {
+        return reportCECaseList;
+    }
+
+    /**
+     * @param reportCECaseList the reportCECaseList to set
+     */
+    public void setReportCECaseList(ReportConfigCECaseList reportCECaseList) {
+        this.reportCECaseList = reportCECaseList;
+    }
+
+    
 }

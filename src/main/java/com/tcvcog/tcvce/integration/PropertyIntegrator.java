@@ -67,7 +67,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         try{
             p.setPropertyID(rs.getInt("propertyid"));
-            p.setMuni(mi.getMuniFromMuniCode(rs.getInt("municipality_muniCode")));
+            p.setMuni(mi.getMuni(rs.getInt("municipality_muniCode")));
             p.setMuniCode(rs.getInt("municipality_muniCode"));
             p.setParID(rs.getString("parid"));
             
@@ -103,7 +103,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         try{
             p.setPropertyID(rs.getInt("propertyid"));
-            p.setMuni(mi.getMuniFromMuniCode(rs.getInt("municipality_muniCode")));
+            p.setMuni(mi.getMuni(rs.getInt("municipality_muniCode")));
             p.setMuniCode(rs.getInt("municipality_muniCode"));
             p.setParID(rs.getString("parid"));
             

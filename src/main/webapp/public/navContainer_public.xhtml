@@ -10,7 +10,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
           <h:outputStylesheet name="css/style.css"/>
           
-        <title>COGBase</title>
+        <title>COGConnect</title>
         <script>
             function setSideBarHeight(){
                 var height = $('.contentContainer').height();
@@ -31,17 +31,20 @@
         
             <ui:insert name="top">
                 <f:view id="navview">
-                    <div class="flexing-box-topbar">
-                        <div class="userToolBar">
-                            <h:form id="navForm">
-                                <h:panelGrid columns="3" border="0" 
-                                           cellpadding="2" columnClasses="userBarTd,  userBarTd, userBarTd"
-                                           footerClass="gridFooter" >
-                                </h:panelGrid>
-                            </h:form>
-                        </div>
+                     <div class="flexing-box-topbar">
                         <div class="logoBox">
-                            <h2 id="logoHeader" style="font-weight: bold;">COGBase Municipal Data Hub<br />Turtle Creek Valley Council of Governments</h2>
+                            <div class="logo-image-wrapper">
+                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
+                            </div>
+                            <div class="logo-title-wrapper">
+                                <div class="report-title">
+                                    <div class="sys-title" style="font-weight: bold;">COG Connect: Municipal code enforcement data platform</div>
+                                </div>
+                                <div class="report-title-sub">
+                                    
+                                <div class="sys-title-sub">Turtle Creek Valley Council of Governments</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </f:view>

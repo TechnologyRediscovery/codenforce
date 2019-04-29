@@ -8,15 +8,19 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseNoLists;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventWithCasePropInfo;
+import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,12 +38,13 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
 
     
     private SearchParamsCEEvents searchParams;
+    private int actionRequestsUserType;
     private List<EventType> eventTypesList;
     private List<EventCategory> eventCatList;
     private List<User> userList;
     
-    private List<EventWithCasePropInfo> eventList;
-    private List<EventWithCasePropInfo> filteredEventList;
+    private List<EventCasePropBundle> eventList;
+    private List<EventCasePropBundle> filteredEventList;
     
     /**
      * Creates a new instance of CEEventsBB
@@ -50,7 +55,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
-        searchParams = ec.getDefaultSearchParamsCEEventsRequiringView(
+        searchParams = ec.getSearchParamsCEEventsRequiringAction(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
     }
     
@@ -58,7 +63,9 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         System.out.println("CEEventsBB.executeQuery");
         EventCoordinator ec = getEventCoordinator();
         try {
-            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            eventList = ec.queryEvents(searchParams, 
+                        getSessionBean().getFacesUser(), 
+                        getSessionBean().getUserAuthMuniList());
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -79,6 +86,22 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         
         
     }
+    
+    public String editEventInCaseManager(EventCasePropBundle ev){
+        CaseIntegrator ci = getCaseIntegrator();
+        CECase c = getSessionBean().getcECaseQueue().remove(0);
+        CECaseNoLists caseNoLists = ev.getEventCaseBare();
+        try {
+            getSessionBean().getcECaseQueue().set(0, ci.generateCECase(caseNoLists));
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        getSessionBean().getcECaseQueue().add(c);
+        
+        return "ceCases";
+    }
 
     /**
      * @return the searchParams
@@ -87,13 +110,34 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         return searchParams;
     }
     
+    public void loadEventsRequiringAction(ActionEvent ev){
+        System.out.println("CEEventsBB.loadOfficerActivity");
+        EventCoordinator ec = getEventCoordinator();
+        searchParams = ec.getSearchParamsCEEventsRequiringAction(
+                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+        try {
+            eventList = ec.queryEvents(searchParams, 
+                        getSessionBean().getFacesUser(), 
+                        getSessionBean().getUserAuthMuniList());
+            generateQueryResultMessage();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not query the database, sorry.", ""));
+        }
+    }
+    
+    
     public void loadOfficerActivityPastWeek(ActionEvent ev){
         System.out.println("CEEventsBB.loadOfficerActivity");
         EventCoordinator ec = getEventCoordinator();
         searchParams = ec.getSearchParamsOfficerActibityPastWeek(getSessionBean().getFacesUser(),
                 getSessionBean().getActiveMuni());
         try {
-            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            eventList = ec.queryEvents(searchParams, 
+                        getSessionBean().getFacesUser(), 
+                        getSessionBean().getUserAuthMuniList());
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -108,7 +152,9 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
         searchParams = ec.getSearchParamsComplianceEvPastMonth(getSessionBean().getActiveMuni());
         try {
-            eventList = ec.queryEvents(searchParams, getSessionBean().getFacesUser());
+            eventList = ec.queryEvents(searchParams, 
+                        getSessionBean().getFacesUser(), 
+                        getSessionBean().getUserAuthMuniList());
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -120,6 +166,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
+     * Not used
      * @param searchParams the searchParams to set
      */
     public void setSearchParams(SearchParamsCEEvents searchParams) {
@@ -129,15 +176,13 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public void refreshCurrentEventList() {
         EventIntegrator ei = getEventIntegrator();
         EventCoordinator ec = getEventCoordinator();
-        EventWithCasePropInfo e;
-        List<EventWithCasePropInfo> refreshedList = new ArrayList<>();
-        Iterator<EventWithCasePropInfo> iter = eventList.iterator();
+        EventCasePropBundle e;
+        List<EventCasePropBundle> refreshedList = new ArrayList<>();
+        Iterator<EventCasePropBundle> iter = eventList.iterator();
         try {
             while (iter.hasNext()) {
                 e = iter.next();
-                e = ei.getSuperEvent(e.getEventID());
-                e.setCurrentUserCanConfirm(
-                        ec.computeEventViewConfirmationAbility(e, getSessionBean().getFacesUser()));
+                e = ei.getEventCasePropBundle(e.getEvent().getEventID());
                 refreshedList.add(e);
             }
         } catch (IntegrationException ex) {
@@ -148,37 +193,6 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         }
         eventList = refreshedList;
     }
-
-    public void confirmViewWithoutNotes(EventWithCasePropInfo ev){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ec.confirmEventView(ev, getSessionBean().getFacesUser());
-            refreshCurrentEventList();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Registered view confirmation!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not confirm view, sorry.", ""));
-        }
-    }
-    
-    public void clearViewconfirmation(EventWithCasePropInfo ev){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ec.clearEventView(ev);
-            refreshCurrentEventList();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "View confirmation: cleared!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not clear view confirmation, sorry.", ""));
-        }
-    }
-    
 
    
     /**
@@ -217,7 +231,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public List<User> getUserList() {
         UserIntegrator ui = getUserIntegrator();
         try {
-            userList = ui.getCompleteUserList();
+            userList = ui.getCompleteActiveUserList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -227,7 +241,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the eventList
      */
-    public List<EventWithCasePropInfo> getEventList() {
+    public List<EventCasePropBundle> getEventList() {
         
         return eventList;
     }
@@ -235,7 +249,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventList
      */
-    public List<EventWithCasePropInfo> getFilteredEventList() {
+    public List<EventCasePropBundle> getFilteredEventList() {
         return filteredEventList;
     }
 
@@ -263,15 +277,29 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventWithCasePropInfo> eventList) {
+    public void setEventList(List<EventCasePropBundle> eventList) {
         this.eventList = eventList;
     }
 
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventWithCasePropInfo> filteredEventList) {
+    public void setFilteredEventList(List<EventCasePropBundle> filteredEventList) {
         this.filteredEventList = filteredEventList;
+    }
+
+    /**
+     * @return the actionRequestsUserType
+     */
+    public int getActionRequestsUserType() {
+        return actionRequestsUserType;
+    }
+
+    /**
+     * @param actionRequestsUserType the actionRequestsUserType to set
+     */
+    public void setActionRequestsUserType(int actionRequestsUserType) {
+        this.actionRequestsUserType = actionRequestsUserType;
     }
     
     

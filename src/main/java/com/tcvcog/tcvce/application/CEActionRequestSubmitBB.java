@@ -68,7 +68,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private String violationTypeName;
     
     private Municipality selectedMuni;
-    private List<Municipality> muniList;
     
     private Property selectedProperty;
     
@@ -121,7 +120,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String storeSelectedMuni(){
         CEActionRequest cear;
         CaseCoordinator cc = getCaseCoordinator();
-        cear = cc.getNewActionRequest();
+        cear = cc.getInititalizedCEActionRequest();
         cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
         getSessionBean().setCeactionRequestForSubmission(cear);
@@ -180,7 +179,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private void setupPersonEntry(){
         PersonCoordinator pc = getPersonCoordinator();
         Person p = pc.getNewPersonSkeleton(getSessionBean().getCeactionRequestForSubmission().getMuni());
-        p.setMuni(getSessionBean().getCeactionRequestForSubmission().getMuni());
+        p.setMuniCode(getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
         getSessionBean().setPersonForCEActionRequestSubmission(p);
     }
     
@@ -606,26 +605,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         this.selectedMuni = selectedMuni;
     }
 
-    /**
-     * @return the muniList
-     */
-    public List<Municipality> getMuniList() {
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            muniList = mi.getCompleteMuniList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return muniList;
-    }
+    
 
-    /**
-     * @param muniList the muniList to set
-     */
-    public void setMuniList(List<Municipality> muniList) {
-        this.muniList = muniList;
-    }
-
+   
     /**
      * @return the violationTypeMap
      */

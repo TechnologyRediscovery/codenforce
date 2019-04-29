@@ -17,7 +17,9 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -37,6 +39,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -150,16 +153,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     private Person generatePersonFromResultSet(ResultSet rs) throws IntegrationException {
         // Instantiates the new person object
         Person newPerson = new Person();
-        MunicipalityIntegrator muniIntegrator = getMunicipalityIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        SessionSystemCoordinator ssc = getSsCoordinator();
         
         try {
             newPerson.setPersonID(rs.getInt("personid"));
             newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
-            Municipality m = muniIntegrator.getMuniFromMuniCode(rs.getInt("muni_muniCode"));
-            newPerson.setMuni(m);
-            
-            
+            newPerson.setMuniCode(rs.getInt("muni_municode"));
+            newPerson.setMuniName(ssc.getMuniCodeNameMap().get(rs.getInt("muni_municode")));
+
             newPerson.setFirstName(rs.getString("fName"));
             newPerson.setLastName(rs.getString("lName"));
             newPerson.setJobTitle(rs.getString("jobtitle"));
@@ -186,13 +187,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             newPerson.setActive(rs.getBoolean("isactive"));
 
             newPerson.setUnder18(rs.getBoolean("isunder18"));
-            newPerson.setVerifiedBy(ui.getUser(rs.getInt("humanverifiedby")));
+            newPerson.setVerifiedByUserID(rs.getInt("humanverifiedby"));
             newPerson.setCompositeLastName(rs.getBoolean("compositelname"));
 
             newPerson.setSourceID(rs.getInt("sourceid"));
             newPerson.setSourceTitle(rs.getString("title"));
             
-            newPerson.setCreator(ui.getUser(rs.getInt("creator")));
+            newPerson.setCreatorUserID(rs.getInt("creator"));
             newPerson.setBusinessEntity(rs.getBoolean("businessentity"));
 
             newPerson.setMailingAddressStreet(rs.getString("mailing_address_street"));
@@ -208,12 +209,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 newPerson.setCreationTimeStamp(null);
             }
             newPerson.setCanExpire(rs.getBoolean("canexpire"));
+            newPerson.setLinkedUserID(rs.getInt("userlink"));
             
-            if(!(rs.getInt("userlink")==0)){
-                newPerson.setUserLink(ui.getUser(rs.getInt("userlink")));
-            } else {
-                newPerson.setUserLink(null);
-            }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -348,8 +345,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    
-
     public void connectPersonToProperty(Person person, Property prop) throws IntegrationException {
 
         String query = "INSERT INTO public.propertyperson(\n"
@@ -428,7 +423,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(1, java.sql.Types.NULL);
                 
             }
-            stmt.setInt(2, personToStore.getMuni().getMuniCode());
+            stmt.setInt(2, personToStore.getMuniCode());
 
             stmt.setString(3, personToStore.getFirstName());
             stmt.setString(4, personToStore.getLastName());
@@ -458,11 +453,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             
             stmt.setBoolean(18, personToStore.isUnder18());
-            if(personToStore.getVerifiedBy() != null){
-                stmt.setInt(19, personToStore.getVerifiedBy().getUserID());
-            } else {
-                stmt.setNull(19, java.sql.Types.NULL);
-            }
+            stmt.setInt(19, personToStore.getVerifiedByUserID());
             stmt.setBoolean(20, personToStore.isCompositeLastName());
             
             
@@ -471,12 +462,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setInt(21, unknownPersonSourceID);
             }
-            if(personToStore.getCreator() != null){
-                stmt.setInt(22, personToStore.getCreator().getUserID());
-            } else {
-                stmt.setNull(22, java.sql.Types.NULL);
-                
-            }
+            stmt.setInt(22, personToStore.getCreatorUserID());
             stmt.setBoolean(23, personToStore.isBusinessEntity());
             
             stmt.setString(24, personToStore.getMailingAddressStreet());
@@ -489,12 +475,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(29, personToStore.getExpiryNotes());
             stmt.setTimestamp(30, java.sql.Timestamp.valueOf(LocalDateTime.now()));
             stmt.setBoolean(31, personToStore.isCanExpire());
-            if(personToStore.getUserLink() != null){
-                stmt.setInt(32, personToStore.getUserLink().getUserID());
-            } else {
-                stmt.setNull(32, java.sql.Types.NULL);
-                
-            }
+            stmt.setInt(32, personToStore.getLinkedUserID());
 
             stmt.execute();
 
@@ -553,6 +534,79 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
     }
+    
+    public void connectPersonToMunicipalities(List<Municipality> munuiList, Person p) throws IntegrationException {
+
+        Iterator<Municipality> iter = munuiList.iterator();
+        while (iter.hasNext()) {
+            connectPersonToMunicipality( (Municipality) iter.next(), p);
+        }
+    }
+    
+    
+    public void connectPersonToMunicipality(Municipality munui, Person p) throws IntegrationException {
+
+        String query =  "INSERT INTO public.personmunilink(\n" +
+                        "            muni_municode, person_personid)\n" +
+                        "    VALUES (?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, munui.getMuniCode());
+            stmt.setInt(2, p.getPersonID());
+
+            System.out.println("PersonIntegrator.connectPersonToMunicipality | sql: " + stmt.toString());
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to connect person to muni ", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
+    
+    public void connectPersonsToCitation(Citation c, List<Person> persList) throws IntegrationException {
+        Iterator<Person> iter = persList.iterator();
+        while (iter.hasNext()) {
+            connectPersonToCitation( c, (Person) iter.next());
+        }
+    }
+    
+    
+    public void connectPersonToCitation(Citation c, Person p) throws IntegrationException {
+
+        String query =  "INSERT INTO public.citationperson(\n" +
+                        "    citation_citationid, person_personid)\n" +
+                        "    VALUES (?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, c.getCitationID());
+            stmt.setInt(2, p.getPersonID());
+
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to connect person to citation ", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
+    
 
     /**
      * Generates a linked list of Person objects given an array of person ID
@@ -606,7 +660,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             // default ID generated by sequence in PostGres
             stmt.setString(1, personToUpdate.getPersonType().toString());
-            stmt.setInt(2, personToUpdate.getMuni().getMuniCode());
+            stmt.setInt(2, personToUpdate.getMuniCode());
 
             stmt.setString(3, personToUpdate.getFirstName());
             stmt.setString(4, personToUpdate.getLastName());
@@ -732,6 +786,70 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         System.out.println("PersonIntegrator Retrieved history of size: " + al.size());
         return al;
+
+    }
+
+    public int createGhost(Person p, User u) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int newGhostID = 0;
+
+        try {
+            String s = "select createghostperson(p.*, ? ) from person AS p where personid = ?;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, p.getPersonID());
+            stmt.setInt(1, u.getUserID());
+
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                newGhostID = rs.getInt("createghostperson");
+                System.out.println("PersonIntegrator.createGhostPerson | new ghost ID: " + newGhostID );
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getGhost | Unable create ghost person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return newGhostID;
+
+    }
+
+    public int createClone(Person p, User u) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int newGhostID = 0;
+
+        try {
+            String s = "select creatClonedperson(p.*, ? ) from person AS p where personid = ?;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, p.getPersonID());
+            stmt.setInt(1, u.getUserID());
+
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                newGhostID = rs.getInt("createClonedperson");
+                System.out.println("PersonIntegrator.createClone| new clone ID: " + newGhostID );
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.createClone | Unable to make Clone person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return newGhostID;
 
     }
     

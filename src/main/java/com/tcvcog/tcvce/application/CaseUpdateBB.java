@@ -53,7 +53,7 @@ public class CaseUpdateBB extends BackingBeanUtils implements Serializable{
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         currentCase.setNotes(formCaseNotes);
         try {
-            cc.updateCase(currentCase);
+            cc.updateCoreCECaseData(currentCase);
             cc.refreshCase(currentCase);
         } catch (CaseLifecyleException ex) {
             System.out.println(ex);

@@ -711,7 +711,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         disabledDueToRoutingNotAllowed = 
                 !(cc.determineCEActionRequestRoutingActionEnabledStatus(
                         selectedRequest,
-                        getSessionBean().getFacesUser().getKeyCard()));
+                        getSessionBean().getFacesUser()));
         System.out.println("CEACtionRequestsBB.isRoutingAllowedOnSelectedRequest | Status: " 
                 + disabledDueToRoutingNotAllowed);
         return disabledDueToRoutingNotAllowed;

@@ -22,23 +22,21 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
-import java.util.Enumeration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import com.tcvcog.tcvce.util.Constants;
+import java.util.ArrayList;
 
 /**
  *
@@ -83,13 +81,14 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 ec.getSessionMap().put("facesUser", extractedUser);
                 System.out.println("SessionInitializer.initiateInternalSession ");
 
-                Municipality muni = extractedUser.getMuni();
+                Municipality muni = uc.getDefaultyMuni(extractedUser);
                 
 //                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                        .getString("arbitraryPlaceholderPersonID"))));
                 getSessionBean().setFacesUser(extractedUser);
 //                getSessionBean().setActivePersonList(persInt.getPersonHistory(extractedUser));
                 getSessionBean().setActiveMuni(muni);
+                getSessionBean().setUserAuthMuniList(uc.getUserAuthMuniList(extractedUser.getUserID()));
                 
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
@@ -142,21 +141,24 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         CaseIntegrator caseInt = getCaseIntegrator();
         
         getSessionBean().setPersonQueue(persCoord.loadPersonHistoryList(u));
-        getSessionBean().setcECaseQueue(caseCoord.getOpenCECaseList(u.getMuni()));
         
-        getSessionBean().setActiveProp(propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("arbitraryPlaceholderPropertyID"))));
+        getSessionBean().setcECaseQueue(caseCoord.getOpenCECaseList(getSessionBean().getActiveMuni()));
+        
+        Property p = propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("arbitraryPlaceholderPropertyID")));
+        getSessionBean().setActiveProp(p);
 
         getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("arbitraryPlaceholderPersonID"))));
 
-        getSessionBean().setcECase(caseInt.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("arbitraryPlaceholderCaseID"))));
-
-
+        CECase c = caseInt.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("arbitraryPlaceholderCaseID")));
+        getSessionBean().setcECase(c);
         
+//        getSessionBean().setcECaseQueue(new ArrayList<CECase>());
+//        getSessionBean().getcECaseQueue().add(c);
+        
+        getSessionBean().setPropertyQueue(new ArrayList<Property>());
+        getSessionBean().getPropertyQueue().add(p);
     }
-
-    
-
 }

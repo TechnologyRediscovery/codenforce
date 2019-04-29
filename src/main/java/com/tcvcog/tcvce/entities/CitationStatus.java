@@ -25,6 +25,39 @@ import java.util.Objects;
  * @author Eric C. Darsow
  */
 public class CitationStatus extends Status {
+    private boolean editsAllowed;
+    private CasePhaseChangeRule phaseChangeRule;
+    
+
+    /**
+     * @return the editsAllowed
+     */
+    public boolean isEditsAllowed() {
+        return editsAllowed;
+    }
+
+    /**
+     * @param editsAllowed the editsAllowed to set
+     */
+    public void setEditsAllowed(boolean editsAllowed) {
+        this.editsAllowed = editsAllowed;
+    }
+
+    /**
+     * @return the phaseChangeRule
+     */
+    public CasePhaseChangeRule getPhaseChangeRule() {
+        return phaseChangeRule;
+    }
+
+    /**
+     * @param phaseChangeRule the phaseChangeRule to set
+     */
+    public void setPhaseChangeRule(CasePhaseChangeRule phaseChangeRule) {
+        this.phaseChangeRule = phaseChangeRule;
+    }
+
+    
     
     
 }
