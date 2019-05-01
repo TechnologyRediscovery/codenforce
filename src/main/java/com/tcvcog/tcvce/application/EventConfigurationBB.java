@@ -55,9 +55,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     private boolean formPublicdeployable;
     private boolean formRequestable;
     private boolean formNotifycasemonitors;
-    private boolean formCasephasechangetrigger;
     private boolean formHidable;
-    
     
     private EventType newFormSelectedEventType;
     private String newFormEventCategoryTitle;
@@ -69,7 +67,6 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
     private boolean newFormPublicdeployable;
     private boolean newFormRequestable;
     private boolean newFormNotifycasemonitors;
-    private boolean newFormCasephasechangetrigger;
     private boolean newFormHidable;
     
     
@@ -154,7 +151,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
         
         ec.setUserdeployable(newFormUserdeployable);
         ec.setMunideployable(newFormMunideployable);
-        ec.setPublicdeployable(newFormCasephasechangetrigger);
+        ec.setPublicdeployable(newFormPublicdeployable);
         ec.setRequestable(newFormRequestable);
         ec.setNotifycasemonitors(newFormNotifycasemonitors);
         ec.setHidable(newFormHidable);
@@ -380,12 +377,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
         return formNotifycasemonitors;
     }
 
-    /**
-     * @return the formCasephasechangetrigger
-     */
-    public boolean isFormCasephasechangetrigger() {
-        return formCasephasechangetrigger;
-    }
+    
 
     /**
      * @return the formHidable
@@ -429,12 +421,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
         return newFormNotifycasemonitors;
     }
 
-    /**
-     * @return the newFormCasephasechangetrigger
-     */
-    public boolean isNewFormCasephasechangetrigger() {
-        return newFormCasephasechangetrigger;
-    }
+   
 
     /**
      * @return the newFormHidable
@@ -479,12 +466,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
         this.formNotifycasemonitors = formNotifycasemonitors;
     }
 
-    /**
-     * @param formCasephasechangetrigger the formCasephasechangetrigger to set
-     */
-    public void setFormCasephasechangetrigger(boolean formCasephasechangetrigger) {
-        this.formCasephasechangetrigger = formCasephasechangetrigger;
-    }
+   
 
     /**
      * @param formHidable the formHidable to set
@@ -528,12 +510,7 @@ public class EventConfigurationBB extends BackingBeanUtils implements Serializab
         this.newFormNotifycasemonitors = newFormNotifycasemonitors;
     }
 
-    /**
-     * @param newFormCasephasechangetrigger the newFormCasephasechangetrigger to set
-     */
-    public void setNewFormCasephasechangetrigger(boolean newFormCasephasechangetrigger) {
-        this.newFormCasephasechangetrigger = newFormCasephasechangetrigger;
-    }
+    
 
     /**
      * @param newFormHidable the newFormHidable to set

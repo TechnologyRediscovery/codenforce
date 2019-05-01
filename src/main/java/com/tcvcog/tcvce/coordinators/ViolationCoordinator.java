@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -102,7 +103,7 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         eventCat = ec.getInitiatlizedEventCategory(
                 Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
                 .getString("propertyInspection")));
-        tfEvent.setActionEventCat(eventCat);
+        tfEvent.setRequestedEventCat(eventCat);
         tfEvent.setActionRequestedBy(uc.getCogBotUser());
         
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
@@ -130,6 +131,51 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         return violationStoredDBKey;
         
     }
+    
+    /**
+     * Uses date fields on the populated CodeViolation to determine
+     * a status string and icon for UI
+     * Called by the integrator when creating a code violation
+     * @param cv
+     * @return the CodeViolation with correct icon and statusString
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public CodeViolation configureCodeViolation(CodeViolation cv) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        if(cv.getActualComplianceDate() == null){
+            // violation still within compliance timeframe
+            if(cv.getDaysUntilStipulatedComplianceDate() >= 0){
+                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_withincomptimeframe_statusstring"));
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_withincomptimeframe_iconid"))));
+                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_withincomptimeframe_ageleadtext"));
+                
+            } else if(cv.getCitationIDList().isEmpty()) {
+                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_overdue_statusstring"));
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_overdue_iconid"))));
+                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_overdue_ageleadtext"));
+            } else {
+                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_citation_statusstring"));
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_citation_iconid"))));
+                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_citation_ageleadtext"));
+            }
+        } else {
+            cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                    .getString("codeviolation_resolved_statusstring"));
+            cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                    .getString("codeviolation_resolved_iconid"))));
+        }
+        return cv;
+    }
+    
     
     private boolean verifyCodeViolationAttributes(CodeViolation cv) throws ViolationException{
         
@@ -167,9 +213,10 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
         // inactivate timeframe expiry event
         if(cv.getCompTimeFrameComplianceEvent() != null || cv.getComplianceTimeframeEventID() != 0){
             int vev;
+            // cope with the condition that incoming code violations may only have the id
+            // of the assocaited event and not the entire object
             if(cv.getCompTimeFrameComplianceEvent() != null){
                  vev = cv.getCompTimeFrameComplianceEvent().getEventID();
-                
             } else {
                 vev = cv.getComplianceTimeframeEventID();
             }

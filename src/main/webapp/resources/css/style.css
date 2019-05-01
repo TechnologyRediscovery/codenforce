@@ -58,9 +58,12 @@ h1{
 }
 
 h2{
-    font-size: 1.2em;
-    color: #00b5ec;
-    font-weight: normal;
+    font-size: 1.4em;
+    /* color: #00b5ec;  sky blue*/
+    
+    /*darker sky*/
+    color: #00637F; 
+    font-weight: bold;
 }
 
 h3{
@@ -103,6 +106,20 @@ h4{
     color: #00b5ec;
 }
 
+.report-title{
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cde162;
+    
+}
+
+.report-title-sub{
+    font-size: 1.1em;
+    color: #00b5ec;
+    font-style: italic;
+    
+}
+
 
 .darkFont{
     color:#163F8A;
@@ -140,6 +157,19 @@ h4{
     font-size: 1.3em;
     
 }
+
+.logoBox{
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding:5px;
+}
+
+.logo-image-wrapper{
+    margin-right: 15px;
+}
+
 
 
 
@@ -330,6 +360,12 @@ div.headerLink a:before, a:visited{
 }
 
 /************** END LINKS ******************/
+
+
+/************** START PAGE LAYOUT  ******************/
+
+
+
 .two-column-page-flex-container{
     display: flex;
     flex-direction: row;
@@ -368,8 +404,22 @@ div.headerLink a:before, a:visited{
 
 
 
-/* ----------- Primary two-column setup: PAGE LAYOUT BOXES -------- */
+/* ----------- Printing and reports-------- */
 
+.printing-page-break-before{
+    page-break-before: always;
+    
+}
+
+.printing-page-break-after{
+    page-break-after: always;
+}
+
+
+div.printer-friendly-report .ui-widget-content{
+    border: none;
+    
+}
 
 
 
@@ -421,7 +471,7 @@ div.headerLink a:before, a:visited{
     flex-basis: 100%;
     flex-shrink: 1;
     
-    height: 65px;
+    height: 75px;
     background-color: #5a5754;
     
 }
@@ -706,6 +756,7 @@ i.status-display-icon-i{
 .rowExpansion{
     white-space: normal;
     overflow-wrap: normal;
+    text-align: left;
 }
 
 .wrapText{
@@ -770,7 +821,16 @@ div.headerLinks{
     margin: 10px 10px 10px 10px;
 }
 
-
+.ord-text{
+    font-weight: normal;
+    font-style: italic;
+    font-family: mono;
+    white-space: normal;
+    overflow-wrap: normal;
+    padding: 20px;
+    line-height: 105%;
+       
+}
 
 
 
@@ -844,6 +904,13 @@ img.headerImg{
 
 
 /* ------------------TABLE STYLES ----------------------*/
+
+.cases-report-citations-2cols{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
 
 .object-info-box thead{
     text-align: left;

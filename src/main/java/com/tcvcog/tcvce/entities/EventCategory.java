@@ -20,28 +20,8 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
-/**
- *
- * 
-CREATE TABLE public.ceeventcategory
-(
-  categoryid integer NOT NULL DEFAULT nextval('ceeventcategory_categoryid_seq'::regclass),
-  categorytype ceeventtype NOT NULL,
-  title text,
-  description text,
-  userdeployable boolean DEFAULT true,
-  munideployable boolean DEFAULT false,
-  publicdeployable boolean DEFAULT false,
-  requestsAction boolean DEFAULT false,
-  notifycasemonitors boolean DEFAULT false,
-  casephasechangetrigger boolean DEFAULT false,
-  hidable boolean DEFAULT false,
-  CONSTRAINT ceeventcategory_categoryid_pk PRIMARY KEY (categoryid)
-)
-WITH (
-  OIDS=FALSE
-);
- * 
+
+ /**s 
  * @author Eric Darsow
  */
 public class EventCategory implements Serializable {
@@ -56,14 +36,13 @@ public class EventCategory implements Serializable {
     private boolean publicdeployable;
     
     private boolean notifycasemonitors;
-    private boolean casephasechangetrigger;
+    
+    private CasePhaseChangeRule casePhaseChangeRule;
+    
     private boolean hidable;
     private boolean requestable;
     
     private Icon icon;
-    
-    
-    
 
     /**
      * @return the eventType
@@ -187,12 +166,7 @@ public class EventCategory implements Serializable {
         return notifycasemonitors;
     }
 
-    /**
-     * @return the casephasechangetrigger
-     */
-    public boolean isCasephasechangetrigger() {
-        return casephasechangetrigger;
-    }
+   
 
     /**
      * @return the hidable
@@ -230,12 +204,7 @@ public class EventCategory implements Serializable {
         this.notifycasemonitors = notifycasemonitors;
     }
 
-    /**
-     * @param casephasechangetrigger the casephasechangetrigger to set
-     */
-    public void setCasephasechangetrigger(boolean casephasechangetrigger) {
-        this.casephasechangetrigger = casephasechangetrigger;
-    }
+    
 
     /**
      * @param hidable the hidable to set
@@ -270,6 +239,20 @@ public class EventCategory implements Serializable {
      */
     public void setRequestable(boolean requestable) {
         this.requestable = requestable;
+    }
+
+    /**
+     * @return the casePhaseChangeRule
+     */
+    public CasePhaseChangeRule getCasePhaseChangeRule() {
+        return casePhaseChangeRule;
+    }
+
+    /**
+     * @param casePhaseChangeRule the casePhaseChangeRule to set
+     */
+    public void setCasePhaseChangeRule(CasePhaseChangeRule casePhaseChangeRule) {
+        this.casePhaseChangeRule = casePhaseChangeRule;
     }
 
     

@@ -38,6 +38,7 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
+import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -123,6 +124,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 //    reports
     
     private ReportConfigCECase reportCECase;
+    private ReportConfigCECaseList reportCECaseList;
     
 
     /**
@@ -156,6 +158,18 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             caseList = retrievedCaseList;
             refreshCurrentCase();
             trimEventList();
+        }
+        
+        ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
+        if(rpt != null){
+            reportCECase = rpt;
+        }
+        
+        ReportConfigCECaseList listRpt = getSessionBean().getReportConfigCECaseList();
+        if(listRpt != null){
+            reportCECaseList = listRpt;
+        } else {
+            reportCECaseList = cc.getDefaultReportConfigCECaseList();
         }
     }
     
@@ -267,9 +281,37 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
         
         getSessionBean().setReportConfigCECase(reportCECase);
+        // this is for use by the report header to have a super class with only
+        // the basic info. reportingBB exposes it to the faces page
+        getSessionBean().setActiveReport(reportCECase);
+        // force our reportingBB to choose the right bundle
+        getSessionBean().setReportConfigCECaseList(null);
         
         
         return "reportCECase";
+    }
+    
+    public void prepareReportCECaseList(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(reportCECaseList == null){
+            reportCECaseList = cc.getDefaultReportConfigCECaseList();
+        }
+        System.out.println("CaseProfileBB.prepareCaseListReport");
+        
+        
+    }
+    
+    public String generateReportCECaseList(){
+        reportCECaseList.setCreator(getSessionBean().getFacesUser());
+        reportCECaseList.setMuni(getSessionBean().getActiveMuni());
+        reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
+        getSessionBean().setReportConfigCECaseList(reportCECaseList);
+        getSessionBean().setReportConfigCECase(null);
+        getSessionBean().setcECaseQueue(caseList);
+        getSessionBean().setActiveReport(reportCECaseList);
+        return "reportCECaseList";
+        
     }
     
     public void prepareReportCECase(ActionEvent ev){
@@ -289,7 +331,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @param ev 
      */
     public void initiateNewRequestedEvent(EventCECase ev){
-        selectedEventCategory = ev.getActionEventCat();
+        selectedEventCategory = ev.getRequestedEventCat();
         triggeringEventForRequestedCaseAction = ev;
         initiateNewEvent();
     }
@@ -431,7 +473,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
 //        currentCase.getEventList().remove(selectedEvent);
         try {
-            if(selectedEvent.getActionEventCat()!= null){
+            if(selectedEvent.getRequestedEventCat()!= null){
                 selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
             }
             ec.editEvent(selectedEvent, getSessionBean().getFacesUser());
@@ -501,6 +543,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
         }
         currentCase = c;
+        getSessionBean().setActiveProp(c.getProperty());
         removedEventList.clear();
     }
 
@@ -689,7 +732,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         try {
-            cc.resetNOVMailing(getSessionBean().getcECase(), nov);
+            cc.noticeOfViolationResetMailing(getSessionBean().getcECase(), nov);
             //reset case
             getSessionBean().setcECase(ci.getCECase(currentCase.getCaseID()));
             getFacesContext().addMessage(null,
@@ -786,7 +829,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             
-            caseCoord.queueNoticeOfViolation(currentCase, nov);
+            caseCoord.noticeOfViolationLockAndQueue(currentCase, nov);
             
         } catch (CaseLifecyleException ex) {
             System.out.println(ex);
@@ -831,7 +874,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setActiveNotice(nov);
         try {
 
-            caseCoord.deleteNoticeOfViolation(nov);
+            caseCoord.noticeOfViolationDelete(nov);
             caseCoord.refreshCase(currentCase);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -857,7 +900,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         try {
                 if (nov.getLetterSentDate() == null
                         && nov.isRequestToSend() == true) {
-                    caseCoord.markNoticeOfViolationAsSent(currentCase, nov);
+                    caseCoord.noticeOfViolationMarkAsSent(currentCase, nov);
                     caseCoord.refreshCase(currentCase);
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -906,7 +949,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             if (nov.getLetterSentDate() != null
                     && nov.getLetterReturnedDate() == null) {
 
-                caseCoord.processReturnedNotice(currentCase, nov);
+                caseCoord.noticeOfViolationMarkAsReturned(currentCase, nov);
                 caseCoord.refreshCase(currentCase);
 
                 getFacesContext().addMessage(null,
@@ -1753,6 +1796,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setReportCECase(ReportConfigCECase reportCECase) {
         this.reportCECase = reportCECase;
+    }
+
+    /**
+     * @return the reportCECaseList
+     */
+    public ReportConfigCECaseList getReportCECaseList() {
+        return reportCECaseList;
+    }
+
+    /**
+     * @param reportCECaseList the reportCECaseList to set
+     */
+    public void setReportCECaseList(ReportConfigCECaseList reportCECaseList) {
+        this.reportCECaseList = reportCECaseList;
     }
 
     

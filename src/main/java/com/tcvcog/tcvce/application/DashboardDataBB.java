@@ -5,8 +5,10 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
@@ -113,8 +115,10 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
     private Map<String, Integer> getCaseCountMap(){
         Map<String, Integer> caseCountMap = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        SessionSystemCoordinator ssc = getSsCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
         try {
-             caseCountMap = mi.getCaseCountsByPhase(getSessionBean().getActiveMuni().getMuniCode());
+             caseCountMap = si.getCaseCountsByPhase(getSessionBean().getActiveMuni().getMuniCode());
         } catch (IntegrationException ex) {
             Logger.getLogger(DashboardDataBB.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("DashboardDataBB.getCaseCountMap");

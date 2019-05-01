@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -66,17 +67,16 @@ public class Person extends EntityUtils implements Serializable{
     
     private boolean useSeparateMailingAddress;
     private String mailingAddressStreet;
+    private String mailingAddressThirdLine;
     private String mailingAddressCity;
     private String mailingAddressZip;
     
     private String mailingAddressState;
-    // postgres defaults this to true
     
     private String notes;
     
     private LocalDateTime lastUpdated;
-    private String lastUpdatedString;
-    
+    private String lastUpdatedPretty;
     
     private boolean canExpire;
     private LocalDateTime expiryDate;
@@ -91,6 +91,24 @@ public class Person extends EntityUtils implements Serializable{
      */
     private boolean under18;
     private int verifiedByUserID;
+    
+    private boolean referencePerson;
+    
+    private LocalDateTime ghostCreatedDate;
+    private String ghostCreatedDatePretty;
+    private int ghostOf;
+    private int ghostCreatedByUserID;
+    
+    private LocalDateTime cloneCreatedDate;
+    private String cloneCreatedDatePretty;
+    private int cloneOf;
+    private int cloneCreatedByUserID;
+    
+    private ArrayList<Integer> ghostsList;
+    private ArrayList<Integer> cloneList;
+    private ArrayList<Integer> mergedList;
+    
+    
     
 
     /**
@@ -629,18 +647,18 @@ public class Person extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the lastUpdatedString
+     * @return the lastUpdatedPretty
      */
-    public String getLastUpdatedString() {
-        lastUpdatedString = getPrettyDate(lastUpdated);
-        return lastUpdatedString;
+    public String getLastUpdatedPretty() {
+        lastUpdatedPretty = getPrettyDate(lastUpdated);
+        return lastUpdatedPretty;
     }
 
     /**
-     * @param lastUpdatedString the lastUpdatedString to set
+     * @param lastUpdatedPretty the lastUpdatedPretty to set
      */
-    public void setLastUpdatedString(String lastUpdatedString) {
-        this.lastUpdatedString = lastUpdatedString;
+    public void setLastUpdatedPretty(String lastUpdatedPretty) {
+        this.lastUpdatedPretty = lastUpdatedPretty;
     }
 
   
@@ -714,6 +732,188 @@ public class Person extends EntityUtils implements Serializable{
      */
     public void setMuniCode(int muniCode) {
         this.muniCode = muniCode;
+    }
+
+    /**
+     * @return the ghostCreatedDate
+     */
+    public LocalDateTime getGhostCreatedDate() {
+        return ghostCreatedDate;
+    }
+
+    /**
+     * @return the ghostCreatedDatePretty
+     */
+    public String getGhostCreatedDatePretty() {
+        return ghostCreatedDatePretty;
+    }
+
+    /**
+     * @return the ghostOf
+     */
+    public int getGhostOf() {
+        return ghostOf;
+    }
+
+    /**
+     * @return the ghostCreatedByUserID
+     */
+    public int getGhostCreatedByUserID() {
+        return ghostCreatedByUserID;
+    }
+
+    /**
+     * @return the cloneCreatedDate
+     */
+    public LocalDateTime getCloneCreatedDate() {
+        return cloneCreatedDate;
+    }
+
+    /**
+     * @return the cloneCreatedDatePretty
+     */
+    public String getCloneCreatedDatePretty() {
+        return cloneCreatedDatePretty;
+    }
+
+    /**
+     * @return the cloneOf
+     */
+    public int getCloneOf() {
+        return cloneOf;
+    }
+
+    /**
+     * @return the cloneCreatedByUserID
+     */
+    public int getCloneCreatedByUserID() {
+        return cloneCreatedByUserID;
+    }
+
+    /**
+     * @param ghostCreatedDate the ghostCreatedDate to set
+     */
+    public void setGhostCreatedDate(LocalDateTime ghostCreatedDate) {
+        this.ghostCreatedDate = ghostCreatedDate;
+    }
+
+    /**
+     * @param ghostCreatedDatePretty the ghostCreatedDatePretty to set
+     */
+    public void setGhostCreatedDatePretty(String ghostCreatedDatePretty) {
+        this.ghostCreatedDatePretty = ghostCreatedDatePretty;
+    }
+
+    /**
+     * @param ghostOf the ghostOf to set
+     */
+    public void setGhostOf(int ghostOf) {
+        this.ghostOf = ghostOf;
+    }
+
+    /**
+     * @param ghostCreatedByUserID the ghostCreatedByUserID to set
+     */
+    public void setGhostCreatedByUserID(int ghostCreatedByUserID) {
+        this.ghostCreatedByUserID = ghostCreatedByUserID;
+    }
+
+    /**
+     * @param cloneCreatedDate the cloneCreatedDate to set
+     */
+    public void setCloneCreatedDate(LocalDateTime cloneCreatedDate) {
+        this.cloneCreatedDate = cloneCreatedDate;
+    }
+
+    /**
+     * @param cloneCreatedDatePretty the cloneCreatedDatePretty to set
+     */
+    public void setCloneCreatedDatePretty(String cloneCreatedDatePretty) {
+        this.cloneCreatedDatePretty = cloneCreatedDatePretty;
+    }
+
+    /**
+     * @param cloneOf the cloneOf to set
+     */
+    public void setCloneOf(int cloneOf) {
+        this.cloneOf = cloneOf;
+    }
+
+    /**
+     * @param cloneCreatedByUserID the cloneCreatedByUserID to set
+     */
+    public void setCloneCreatedByUserID(int cloneCreatedByUserID) {
+        this.cloneCreatedByUserID = cloneCreatedByUserID;
+    }
+
+    /**
+     * @return the mailingAddressThirdLine
+     */
+    public String getMailingAddressThirdLine() {
+        return mailingAddressThirdLine;
+    }
+
+    /**
+     * @param mailingAddressThirdLine the mailingAddressThirdLine to set
+     */
+    public void setMailingAddressThirdLine(String mailingAddressThirdLine) {
+        this.mailingAddressThirdLine = mailingAddressThirdLine;
+    }
+
+    /**
+     * @return the referencePerson
+     */
+    public boolean isReferencePerson() {
+        return referencePerson;
+    }
+
+    /**
+     * @param referencePerson the referencePerson to set
+     */
+    public void setReferencePerson(boolean referencePerson) {
+        this.referencePerson = referencePerson;
+    }
+
+    /**
+     * @return the ghostsList
+     */
+    public ArrayList<Integer> getGhostsList() {
+        return ghostsList;
+    }
+
+    /**
+     * @return the cloneList
+     */
+    public ArrayList<Integer> getCloneList() {
+        return cloneList;
+    }
+
+    /**
+     * @return the mergedList
+     */
+    public ArrayList<Integer> getMergedList() {
+        return mergedList;
+    }
+
+    /**
+     * @param ghostsList the ghostsList to set
+     */
+    public void setGhostsList(ArrayList<Integer> ghostsList) {
+        this.ghostsList = ghostsList;
+    }
+
+    /**
+     * @param cloneList the cloneList to set
+     */
+    public void setCloneList(ArrayList<Integer> cloneList) {
+        this.cloneList = cloneList;
+    }
+
+    /**
+     * @param mergedList the mergedList to set
+     */
+    public void setMergedList(ArrayList<Integer> mergedList) {
+        this.mergedList = mergedList;
     }
     
 

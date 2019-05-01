@@ -51,6 +51,7 @@ public class Constants implements Serializable {
     public final static String EVENT_CATEGORY_BUNDLE = "eventCategories";
     public final static String DB_FIXED_VALUE_BUNDLE = "dbFixedValueLookup";
     public final static String DB_CONNECTION_PARAMS = "dbConnectionParams";
+    public final static String VIOLATIONS_BUNDLE = "violations";
     
     public final static String STYLE_CLASS_INACTIVE_CASE_PHASE = "stage-inactive";
     

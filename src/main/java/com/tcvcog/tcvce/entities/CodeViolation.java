@@ -33,11 +33,11 @@ public class CodeViolation extends EntityUtils implements Serializable{
     private int violationID;
     private EnforcableCodeElement violatedEnfElement;
     private int ceCaseID;
-    private int citationID;
+    
     
     private String statusString;
-
-   
+    private Icon icon;
+    private String ageLeadText;
     
     private double penalty;
     private String description;
@@ -153,13 +153,6 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the citationID
-     */
-    public int getCitationID() {
-        return citationID;
-    }
-
-    /**
      * @return the penalty
      */
     public double getPenalty() {
@@ -187,12 +180,6 @@ public class CodeViolation extends EntityUtils implements Serializable{
         this.ceCaseID = ceCaseID;
     }
 
-    /**
-     * @param citationID the citationID to set
-     */
-    public void setCitationID(int citationID) {
-        this.citationID = citationID;
-    }
 
     /**
      * @param penalty the penalty to set
@@ -492,18 +479,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
      * @return the statusString
      */
     public String getStatusString() {
-        StringBuilder sb = new StringBuilder();
-        if(actualComplianceDate == null){
-            sb.append("Unresolved");
-            sb.append("; Compliance due on: ");
-            sb.append(getStipulatedComplianceDatePretty());
-            
-            
-        } else {
-            sb.append("Compliance achieved on ");
-            sb.append(getActualComplianceDatePretty());
-        }
-        statusString = sb.toString();
+        
         return statusString;
     }
 
@@ -521,7 +497,6 @@ public class CodeViolation extends EntityUtils implements Serializable{
         hash = 53 * hash + this.violationID;
         hash = 53 * hash + Objects.hashCode(this.violatedEnfElement);
         hash = 53 * hash + this.ceCaseID;
-        hash = 53 * hash + this.citationID;
         hash = 53 * hash + (int) (Double.doubleToLongBits(this.penalty) ^ (Double.doubleToLongBits(this.penalty) >>> 32));
         hash = 53 * hash + Objects.hashCode(this.description);
         hash = 53 * hash + Objects.hashCode(this.notes);
@@ -566,6 +541,34 @@ public class CodeViolation extends EntityUtils implements Serializable{
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the icon
+     */
+    public Icon getIcon() {
+        return icon;
+    }
+
+    /**
+     * @param icon the icon to set
+     */
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+    }
+
+    /**
+     * @return the ageLeadText
+     */
+    public String getAgeLeadText() {
+        return ageLeadText;
+    }
+
+    /**
+     * @param ageLeadText the ageLeadText to set
+     */
+    public void setAgeLeadText(String ageLeadText) {
+        this.ageLeadText = ageLeadText;
     }
 
 }

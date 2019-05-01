@@ -36,6 +36,7 @@ public class User implements Serializable{
     
     private Person person;
     private int personID;
+   
     
     private String notes;
     private LocalDateTime activityStartDate;

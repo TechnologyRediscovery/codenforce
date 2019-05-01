@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class ReportConfig extends EntityUtils implements Serializable {
     private String title;
     private LocalDateTime generationTimestamp;
+    private String generationTimestampPretty;
     private User creator;
     private Municipality muni;
     private String notes;
@@ -90,6 +91,23 @@ public class ReportConfig extends EntityUtils implements Serializable {
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the generationTimestampPretty
+     */
+    public String getGenerationTimestampPretty() {
+        if(generationTimestamp != null){
+            generationTimestampPretty = getPrettyDate(generationTimestamp);
+        }
+        return generationTimestampPretty;
+    }
+
+    /**
+     * @param generationTimestampPretty the generationTimestampPretty to set
+     */
+    public void setGenerationTimestampPretty(String generationTimestampPretty) {
+        this.generationTimestampPretty = generationTimestampPretty;
     }
 
    
