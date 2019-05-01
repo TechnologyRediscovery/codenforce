@@ -28,7 +28,7 @@ import javax.faces.event.ActionEvent;
 
 /**
  *
- * @author dom
+ * @author Dominic Pimpinella
  */
 
 public class OccPermitApplicationBB extends BackingBeanUtils implements Serializable{
@@ -420,6 +420,20 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void setSelectedApplicationReason(OccPermitApplicationReason selectedApplicationReason) {
         this.selectedApplicationReason = selectedApplicationReason;
+    }
+
+    /**
+     * @return the multiUnit
+     */
+    public boolean isMultiUnit() {
+        return multiUnit;
+    }
+
+    /**
+     * @param multiUnit the multiUnit to set
+     */
+    public void setMultiUnit(boolean multiUnit) {
+        this.multiUnit = multiUnit;
     }
     
 }

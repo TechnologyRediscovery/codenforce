@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.occupancy.entities.OccPermit;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitType;
+import com.tcvcog.tcvce.occupancy.entities.PersonsRequirement;
 import java.io.Serializable;
 import java.sql.Array;
 import java.sql.Connection;
@@ -277,9 +278,9 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             stmt.setBoolean(1, application.isMultiUnit());
             stmt.setInt(2, application.getReason().getId());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
-            stmt.setInt(4, application.getCurrentOwner().getPersonID());
-            stmt.setInt(5, application.getContactPerson().getPersonID());
-            stmt.setInt(6, application.getNewOwner().getPersonID());
+//            stmt.setInt(4, application.getCurrentOwner().getPersonID());
+//            stmt.setInt(5, application.getContactPerson().getPersonID());
+//            stmt.setInt(6, application.getNewOwner().getPersonID());
             stmt.setString(7, application.getSubmissionNotes());
             stmt.setString(8, application.getInternalNotes());
             stmt.setString(9, String.valueOf(application.getApplicationProperty().getPropertyID()));
@@ -297,7 +298,8 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         OccPermitApplicationReason reason = null;
         ArrayList<OccPermitApplicationReason> reasons = new ArrayList<>();
         String query = "SELECT reasonid, reasontitle, reasondescription, activereason "
-                + "FROM public.occpermitapplicationreason;";
+                + "FROM public.occpermitapplicationreason "
+                + "WHERE activereason = 'true';";
         
         Connection con = null;
         PreparedStatement stmt = null;
@@ -365,10 +367,10 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("reasonid")));
             occpermitapp.setMultiUnit(rs.getBoolean("multiunit"));
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
-            occpermitapp.setCurrentOwner(pi.getPerson(rs.getInt("currentowner_personid")));
-            occpermitapp.setContactPerson(pi.getPerson(rs.getInt("contactperson_personid")));
-            occpermitapp.setNewOccupants(pi.getOccPermitAppPersons(rs.getInt("applicationid")));
-            occpermitapp.setNewOwner(pi.getPerson(rs.getInt("newowner_personid")));
+//            occpermitapp.setCurrentOwner(pi.getPerson(rs.getInt("currentowner_personid")));
+//            occpermitapp.setContactPerson(pi.getPerson(rs.getInt("contactperson_personid")));
+//            occpermitapp.setNewOccupants(pi.getOccPermitAppPersons(rs.getInt("applicationid")));
+//            occpermitapp.setNewOwner(pi.getPerson(rs.getInt("newowner_personid")));
             occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
 //            TODO 2/12/2019: Remove this if Property will be used in OccPermitApplication instead of propertyUnitId as member variable.
@@ -397,9 +399,9 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             stmt.setBoolean(1,application.isMultiUnit());
             stmt.setInt(2,application.getReason().getId());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
-            stmt.setInt(4,application.getCurrentOwner().getPersonID());
-            stmt.setInt(5,application.getContactPerson().getPersonID());
-            stmt.setInt(6,application.getNewOwner().getPersonID());
+//            stmt.setInt(4,application.getCurrentOwner().getPersonID());
+//            stmt.setInt(5,application.getContactPerson().getPersonID());
+//            stmt.setInt(6,application.getNewOwner().getPersonID());
             stmt.setString(7,application.getSubmissionNotes());
             stmt.setString(8,application.getInternalNotes());
             stmt.setString(9,String.valueOf(application.getApplicationProperty().getPropertyID()));
@@ -461,7 +463,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             occpermitappreason.setTitle(rs.getString("reasontitle"));
             occpermitappreason.setDescription(rs.getString("reasondescription"));
             occpermitappreason.setActive(rs.getBoolean("activereason"));
-            occpermitappreason.setHumanFriendlyDescription(rs.getString("humanfriendlydescription"));
+            occpermitappreason.setPersonsRequirement(getPersonsRequirement(rs.getInt("reasonid")));
         } catch(SQLException ex) {
             throw new IntegrationException("OccupancyPermitIntegrator.generateOccPermitApplicationReason | "
                     + "Integration Error: Unable to generate occupancy permit application reason ", ex);
@@ -470,9 +472,51 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         return occpermitappreason;
     }
     
-    public ArrayList<PersonType> getRequiredPersonTypes (OccPermitApplicationReason occPermitApplicationReason) throws IntegrationException{
+    public PersonsRequirement getPersonsRequirement(int reasonId) throws IntegrationException {
+        PersonsRequirement personsRequirement = null;
+        String query = "SELECT reasonid, humanfriendlydescription FROM public.occpermitapplicationreason "
+                + "WHERE reasonid = ?";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, reasonId);
+            rs = stmt.executeQuery();
+            while (rs.next()){
+                personsRequirement = generatePersonsRequirement(rs);
+            }
+        } catch(SQLException ex) {
+            throw new IntegrationException("OccupancyPermitIntegrator.getPersonsRequirement | "
+                    + "IntegrationError: Unable to get PersonsRequirement ", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        
+        return personsRequirement;
+    }
+    
+    public PersonsRequirement generatePersonsRequirement(ResultSet rs) throws IntegrationException{
+        PersonsRequirement personsRequirement = new PersonsRequirement();
+        
+        try {
+            personsRequirement.setRequirementSatisfied(false);
+            personsRequirement.setRequirementExplanation(rs.getString("humanfriendlydescription"));
+            personsRequirement.setRequiredPersons(getRequiredPersonTypes(rs.getInt("reasonid")));
+            personsRequirement.setOptionalPersons(getOptionalPersonTypes(rs.getInt("reasonid")));
+        } catch(SQLException ex) {
+            throw new IntegrationException("OccupancyPermitIntegrator.generatePersonsRequirement | "
+                    + "IntegrationError: Unable to generate PersonsRequirement. ", ex);
+        }
+        
+        return personsRequirement;
+    }
+    
+    public ArrayList<PersonType> getRequiredPersonTypes (int reasonId) throws IntegrationException{
         ArrayList<PersonType> requiredPersonTypes = null;
-        int reasonId = occPermitApplicationReason.getId();
         String query = "SELECT requiredpersontypes FROM public.occpermitapplicationreason "
                 + "WHERE reasonid = ?";
         Connection con = getPostgresCon();
@@ -480,7 +524,6 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         PreparedStatement stmt = null;
         
         try {
-            con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, reasonId);
             rs = stmt.executeQuery();            
@@ -490,7 +533,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         } catch(SQLException ex) {
             throw new IntegrationException("OccupancyPermitIntegrator.getRequiredPersonTypes | "
                     + "IntegrationError: Unable to get required person types ", ex);
-        } finally{
+        } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
@@ -510,10 +553,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         } catch(SQLException ex) {
             throw new IntegrationException("OccupancyPermitIntegrator.generateRequiredPersonTypes | "
                     + "IntegrationError: Unable to generate required person types ", ex);
-        } finally {
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        }
-        
+        }         
         for (String personType:convertedPersonTypes){
             PersonType requiredPersonType = PersonType.valueOf(personType);
             requiredPersonTypes.add(requiredPersonType);
@@ -521,9 +561,8 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         return requiredPersonTypes;        
     }
     
-    public ArrayList<PersonType> getOptionalPersonTypes (OccPermitApplicationReason occPermitApplicationReason) throws IntegrationException{
+    public ArrayList<PersonType> getOptionalPersonTypes (int reasonId) throws IntegrationException{
         ArrayList<PersonType> optionalPersonTypes = null;
-        int reasonId = occPermitApplicationReason.getId();
         String query = "SELECT optionalpersontypes FROM public.occpermitapplicationreason "
                 + "WHERE reasonid = ?";
         Connection con = getPostgresCon();
@@ -531,7 +570,6 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         PreparedStatement stmt = null;
         
         try {
-            con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, reasonId);
             rs = stmt.executeQuery();            
@@ -556,18 +594,19 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         
         try {
             Array personTypes = rs.getArray("optionalpersontypes");
+            if (personTypes != null){ 
             convertedPersonTypes = (String[]) personTypes.getArray();
+            }
             
         } catch(SQLException ex) {
             throw new IntegrationException("OccupancyPermitIntegrator.generateOptionalPersonTypes | "
                     + "IntegrationError: Unable to generate optional person types. ", ex);
-        } finally {
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         }
-        
-        for (String personType:convertedPersonTypes){
-            PersonType optionalPersonType = PersonType.valueOf(personType);
-            optionalPersonTypes.add(optionalPersonType);
+        if (convertedPersonTypes != null){
+            for (String personType:convertedPersonTypes){
+                PersonType optionalPersonType = PersonType.valueOf(personType);
+                optionalPersonTypes.add(optionalPersonType);
+            }
         }         
         return optionalPersonTypes;        
     }
@@ -584,8 +623,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
         
         String query = "INSERT INTO public.occpermitapplicationperson(permitapp_applicationid, "
                 + "person_personid, applicant)\n"
-                + "VALUES (?, ?, ?)";
-                
+                + "VALUES (?, ?, ?)";                
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
