@@ -22,6 +22,7 @@ package com.tcvcog.tcvce.entities;
  */
 public enum PersonType{
     User("System user"),
+    Owner("Owner"),
     CogStaff("TCVCOG Staff"),
     NonCogOfficial("Non-TCVCOG Official"),
     MuniStaff("Municipality Staff"),
