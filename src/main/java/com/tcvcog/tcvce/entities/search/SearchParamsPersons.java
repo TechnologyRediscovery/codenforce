@@ -37,7 +37,7 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
         private boolean filterByAddressStreet;
         private String city;
         private boolean filterByCity;
-        private int zipCode;
+        private String zipCode;
         private boolean filterByZipCode;
                 
         private List<PersonType> personTypes; 
@@ -321,14 +321,14 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
     /**
      * @return the zipCode
      */
-    public int getZipCode() {
+    public String getZipCode() {
         return zipCode;
     }
 
     /**
      * @param zipCode the zipCode to set
      */
-    public void setZipCode(int zipCode) {
+    public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
     }
 
