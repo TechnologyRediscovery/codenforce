@@ -961,5 +961,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
+    
+    public List<Person> queryPersons(SearchParamsPersons params) throws IntegrationException {
+        ArrayList<Person> personList = new ArrayList();
+        
+        // mimic code from CaseIntegrator.queryCECases
+        return personList;
+    }
 
 } // close class

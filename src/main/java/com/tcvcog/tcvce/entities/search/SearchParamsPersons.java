@@ -21,28 +21,32 @@ import java.util.List;
  * @author Sylvia Garland
  */
 public class SearchParamsPersons extends SearchParams implements Serializable{
-     
     
         private String firstNameSS;
         private boolean filterByFirstName;
         private String lastNameSS;
         private boolean filterByLastName;
         private boolean onlySearchCompositeLastNames;
-    
-        private List<PersonType> personTypes; 
-        private boolean filterByPersonTypes;
+        
+        private String phoneNumber;
+        private boolean filterByPhoneNumber;
         private String emailSS;
         private boolean filterByEmail;
+
         private String addrStreetSS;
         private boolean filterByAddressStreet;
+        private String city;
+        private boolean filterByCity;
+        private String zipCode;
+        private boolean filterByZipCode;
+                
+        private List<PersonType> personTypes; 
+        private boolean filterByPersonTypes;
         
         private boolean activeSwitch;
         private boolean filterByActiveSwitch;
         private boolean verifiedSwitch;
-        private boolean filterByVerifiedSwitch;
-       
-        
-        
+        private boolean filterByVerifiedSwitch;       
         
    public SearchParamsPersons(){
        personTypes = new ArrayList<>();
@@ -258,7 +262,90 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
         this.filterByVerifiedSwitch = filterByVerifiedSwitch;
     }
 
-  
+    /**
+     * @return the phoneNumber
+     */
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * @param phoneNumber the phoneNumber to set
+     */
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * @return the filterByPhoneNumber
+     */
+    public boolean isFilterByPhoneNumber() {
+        return filterByPhoneNumber;
+    }
+
+    /**
+     * @param filterByPhoneNumber the filterByPhoneNumber to set
+     */
+    public void setFilterByPhoneNumber(boolean filterByPhoneNumber) {
+        this.filterByPhoneNumber = filterByPhoneNumber;
+    }
+
+    /**
+     * @return the city
+     */
+    public String getCity() {
+        return city;
+    }
+
+    /**
+     * @param city the city to set
+     */
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    /**
+     * @return the filterByCity
+     */
+    public boolean isFilterByCity() {
+        return filterByCity;
+    }
+
+    /**
+     * @param filterByCity the filterByCity to set
+     */
+    public void setFilterByCity(boolean filterByCity) {
+        this.filterByCity = filterByCity;
+    }
+
+    /**
+     * @return the zipCode
+     */
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    /**
+     * @param zipCode the zipCode to set
+     */
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    /**
+     * @return the filterByZipCode
+     */
+    public boolean isFilterByZipCode() {
+        return filterByZipCode;
+    }
+
+    /**
+     * @param filterByZipCode the filterByZipCode to set
+     */
+    public void setFilterByZipCode(boolean filterByZipCode) {
+        this.filterByZipCode = filterByZipCode;
+    }
+     
    
    
    
