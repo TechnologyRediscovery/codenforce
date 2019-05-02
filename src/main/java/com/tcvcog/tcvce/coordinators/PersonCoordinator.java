@@ -174,5 +174,28 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public void setPersonTypes(PersonType[] personTypes) {
         this.personTypes = personTypes;
     }
+    /**
+     * To be used in public search, no muni required
+     * @return 
+     */
+    public SearchParamsPersons  getDefaultSearchParamsPersons(){
+        SearchParamsPersons params = new SearchParamsPersons();
+        
+        // TODO: set all properties to a default value (last name = true, the rest are false)
+        
+        return params;
+    }
     
+    public List<Person> queryPersons(SearchParamsPersons params) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        List<Person> results = pi.queryPersons(params);
+        results = anonymizePersonList(results);
+        
+        return results;
+    }
+    
+    public List<Person> anonymizePersonList(List<Person> personList) {
+        
+        return personList; 
+    }
 }
