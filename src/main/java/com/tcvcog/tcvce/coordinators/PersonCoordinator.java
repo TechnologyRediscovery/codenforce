@@ -181,7 +181,21 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsPersons  getDefaultSearchParamsPersons(){
         SearchParamsPersons params = new SearchParamsPersons();
         
-        // TODO: set all properties to a default value (last name = true, the rest are false)
+        // superclass parameters
+        params.setFilterByMuni(false);
+        params.setFilterByObjectID(false);
+        params.setFilterByStartEndDate(false);
+        params.setLimitResultCountTo100(true);
+        
+        // subclass specific parameters
+        params.setFilterByLastName(true);
+        params.setFilterByAddressStreet(true);
+        
+        params.setFilterByFirstName(false);
+        params.setFilterByPhoneNumber(false);
+        params.setFilterByEmail(false);        
+        params.setFilterByCity(false);
+        params.setFilterByZipCode(false);
         
         return params;
     }
