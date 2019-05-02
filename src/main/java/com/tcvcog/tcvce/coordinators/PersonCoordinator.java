@@ -203,13 +203,77 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public List<Person> queryPersons(SearchParamsPersons params) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
         List<Person> results = pi.queryPersons(params);
-        results = anonymizePersonList(results);
         
         return results;
     }
     
-    public List<Person> anonymizePersonList(List<Person> personList) {
+    public List<Person> queryPersonsAnonymized(SearchParamsPersons params) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        List<Person> results = pi.queryPersons(params);
+        results = anonymizePersonList(results);
         
+        return results;
+    }    
+    
+    public List<Person> anonymizePersonList(List<Person> personList) {
+        for (Person person:personList){
+            anonymizePersonData(person);
+        }
         return personList; 
+    }
+    
+    public Person anonymizePersonData(Person person){
+        
+        // anonymize first name
+        StringBuilder first = new StringBuilder(person.getFirstName());
+        for (int i = 2; i < first.length(); i++){
+            first.setCharAt(i, '*');
+        }
+        person.setFirstName(first.toString());
+        
+        // anonymize last name
+        StringBuilder last = new StringBuilder(person.getLastName());
+        for (int i = 2; i < last.length(); i++){
+            last.setCharAt(i, '*');
+        }
+        person.setLastName(last.toString());
+        
+        // anonymize email
+        StringBuilder email = new StringBuilder(person.getEmail());
+        for (int i = 3; i < email.length() &&  email.charAt(i) != '@'; i++){
+            email.setCharAt(i, '*');
+        }
+        person.setEmail(email.toString());
+        
+        // anonymize cell phone number
+        StringBuilder cellNumber = new StringBuilder(person.getPhoneCell());
+        for (int i = cellNumber.length() - 1; i > cellNumber.length() - 5 ; i--){
+            cellNumber.setCharAt(i, '*');
+        }
+        person.setPhoneCell(cellNumber.toString());
+        
+        // anonymize work phone number
+        StringBuilder workNumber = new StringBuilder(person.getPhoneWork());
+        for (int i = workNumber.length() - 1; i > workNumber.length() - 5 ; i--){
+            workNumber.setCharAt(i, '*');
+        }
+        person.setPhoneWork(workNumber.toString());
+        
+        // anonymize home phone number
+        StringBuilder homeNumber = new StringBuilder(person.getPhoneHome());
+        for (int i = homeNumber.length() - 1; i > homeNumber.length() - 5 ; i--){
+            homeNumber.setCharAt(i, '*');
+        }
+        person.setPhoneHome(homeNumber.toString());
+        
+        
+        // anonymize address
+        StringBuilder address = new StringBuilder(person.getAddressStreet());
+        for (int i = 0; i < address.length(); i++){
+            address.setCharAt(i, '*');
+        }
+        person.setAddressStreet(address.toString());
+        
+        return person;
     }
 }
