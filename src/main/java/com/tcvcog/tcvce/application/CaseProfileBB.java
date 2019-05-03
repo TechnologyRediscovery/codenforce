@@ -171,6 +171,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             reportCECaseList = cc.getDefaultReportConfigCECaseList();
         }
     }
+    
+    public String viewCasePropertyProfile(){
+        getSessionBean().getPropertyQueue().add(0, currentCase.getProperty());
+        positionCurrentCaseAtHeadOfQueue();
+        return "properties";
+    }
 
     /**
      * Pass through method for calling trimEventList when any of the two boolean
@@ -675,16 +681,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
 //    Procedural vs. OO code
-    public String editViolation() {
-        if (!selectedViolations.isEmpty()) {
-            getSessionBean().setActiveCodeViolation(selectedViolations.get(0));
+    public String editViolation(CodeViolation cv) {
+            getSessionBean().setActiveCodeViolation(cv);
+            positionCurrentCaseAtHeadOfQueue();
             return "violationEdit";
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a violation and try again", ""));
-            return "";
-        }
     }
 
     public String createNewNotice() {

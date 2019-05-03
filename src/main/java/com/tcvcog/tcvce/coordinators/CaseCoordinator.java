@@ -1331,16 +1331,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 
         // inactivate timeframe expiry event
         if(cv.getCompTimeFrameComplianceEvent() != null || cv.getComplianceTimeframeEventID() != 0){
-            int vev;
+            int violTimeframeEventID;
             // cope with the condition that incoming code violations may only have the id
             // of the assocaited event and not the entire object
             if(cv.getCompTimeFrameComplianceEvent() != null){
-                 vev = cv.getCompTimeFrameComplianceEvent().getEventID();
+                 violTimeframeEventID = cv.getCompTimeFrameComplianceEvent().getEventID();
             } else {
-                vev = cv.getComplianceTimeframeEventID();
+                violTimeframeEventID = cv.getComplianceTimeframeEventID();
             }
-            System.out.println("ViolationCoordinator.recordCompliance | invalidating event id: " + vev);
-            ei.inactivateEvent(vev);
+            System.out.println("ViolationCoordinator.recordCompliance | invalidating event id: " + violTimeframeEventID);
+            ei.inactivateEvent(violTimeframeEventID);
         }
     }
 

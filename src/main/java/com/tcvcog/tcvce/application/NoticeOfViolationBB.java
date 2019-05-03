@@ -82,12 +82,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             if(personCandidateList != null){
                 System.out.println("NoticeOfViolationBuilderBB.initbean "
                         + "| person candidate list size: " + personCandidateList.size());
-                Person p = null;
-                Iterator<Person> it = personCandidateList.iterator();
-                while(it.hasNext()){
-                    p = it.next();
-                    System.out.println("NoticeOfViolationBuilderBB.initbean | looping over persons, ID: " + p.getPersonID());
-                }
             }
             
         } catch (IntegrationException ex) {

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -43,11 +44,21 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
      */
     public CodeSetBB() {
     }
+    
+    @PostConstruct
+    public void initBean(){
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        try {
+            muniNameIDMap = mi.getMunicipalityStringIDMap();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+    }
 
-    private HashMap muniMap;
     private Municipality selectedMuni;
     private ArrayList<CodeSet> codeSetList;
-
+    private Map<String, Integer> muniNameIDMap;
     // used by codeSetElementManage
     private CodeSet selectedCodeSet;
     private EnforcableCodeElement selectedEnforcableCodeElement;
@@ -175,12 +186,7 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
 
    
 
-    /**
-     * @param muniMap the muniMap to set
-     */
-    public void setMuniMap(HashMap muniMap) {
-        this.muniMap = muniMap;
-    }
+   
 
     /**
      * @return the selectedMuni
@@ -475,6 +481,20 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
      */
     public void setFormNewCodeSetDescription(String formNewCodeSetDescription) {
         this.formNewCodeSetDescription = formNewCodeSetDescription;
+    }
+
+    /**
+     * @return the muniNameIDMap
+     */
+    public Map<String, Integer> getMuniNameIDMap() {
+        return muniNameIDMap;
+    }
+
+    /**
+     * @param muniNameIDMap the muniNameIDMap to set
+     */
+    public void setMuniNameIDMap(Map<String, Integer> muniNameIDMap) {
+        this.muniNameIDMap = muniNameIDMap;
     }
 
 }
