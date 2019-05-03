@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,27 +45,33 @@ public class CodeViolation extends EntityUtils implements Serializable{
     
     protected LocalDateTime dateOfCitation;
     protected String dateOfCitationPretty;
+    
     protected List<Integer> citationIDList;
-    protected String citationsListAsString;
+    protected String citationListAsString;
     
     protected List<Integer> noticeIDList;
     protected String noticeIDListAsString;
  
     protected LocalDateTime dateOfRecord;
+    protected java.util.Date dateOfRecordUtilDate;
     protected String dateOfRecordPretty;
     
     protected LocalDateTime creationTS;
     protected String creationTSPretty;
+    
     protected User createdBy;
     
     protected long daysUntilStipulatedComplianceDate;
     protected LocalDateTime stipulatedComplianceDate;
+    protected java.util.Date stipulatedComplianceDateUtilDate;
     protected String stipulatedComplianceDatePretty;
     
     protected LocalDateTime actualComplianceDate;
+    protected java.util.Date actualComplianceDateUtilDate;
     protected String actualComplianceDatePretty;
     
     protected boolean leagacyImport;
+    
     protected LocalDateTime complianceTimeStamp;
     protected User complianceUser;
     protected EventCECase compTimeFrameComplianceEvent;
@@ -256,18 +263,18 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the citationsListAsString
+     * @return the citationListAsString
      */
-    public String getCitationsListAsString() {
+    public String getCitationListAsString() {
        
-        return citationsListAsString;
+        return citationListAsString;
     }
 
     /**
-     * @param citationsListAsString the citationsListAsString to set
+     * @param citationListAsString the citationListAsString to set
      */
-    public void setCitationsListAsString(String citationsListAsString) {
-        this.citationsListAsString = citationsListAsString;
+    public void setCitationListAsString(String citationListAsString) {
+        this.citationListAsString = citationListAsString;
     }
 
     /**
@@ -493,7 +500,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
         hash = 53 * hash + Objects.hashCode(this.dateOfCitation);
         hash = 53 * hash + Objects.hashCode(this.dateOfCitationPretty);
         hash = 53 * hash + Objects.hashCode(this.citationIDList);
-        hash = 53 * hash + Objects.hashCode(this.citationsListAsString);
+        hash = 53 * hash + Objects.hashCode(this.citationListAsString);
         hash = 53 * hash + Objects.hashCode(this.dateOfRecord);
         hash = 53 * hash + Objects.hashCode(this.dateOfRecordPretty);
         hash = 53 * hash + Objects.hashCode(this.creationTS);
@@ -573,6 +580,102 @@ public class CodeViolation extends EntityUtils implements Serializable{
      */
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
+    }
+
+    /**
+     * @return the noticeIDList
+     */
+    public List<Integer> getNoticeIDList() {
+        return noticeIDList;
+    }
+
+    /**
+     * @return the noticeIDListAsString
+     */
+    public String getNoticeIDListAsString() {
+        return noticeIDListAsString;
+    }
+
+    /**
+     * @return the dateOfRecordUtilDate
+     */
+    public java.util.Date getDateOfRecordUtilDate() {
+        if(dateOfRecord != null){
+            dateOfRecordUtilDate 
+                    = java.util.Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return dateOfRecordUtilDate;
+    }
+
+    /**
+     * @return the stipulatedComplianceDateUtilDate
+     */
+    public java.util.Date getStipulatedComplianceDateUtilDate() {
+        if(stipulatedComplianceDate != null){
+            stipulatedComplianceDateUtilDate 
+                    = java.util.Date.from(stipulatedComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return stipulatedComplianceDateUtilDate;
+    }
+
+    /**
+     * @return the actualComplianceDateUtilDate
+     */
+    public java.util.Date getActualComplianceDateUtilDate() {
+        if(actualComplianceDate != null){
+            actualComplianceDateUtilDate 
+                    = java.util.Date.from(actualComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return actualComplianceDateUtilDate;
+    }
+
+    /**
+     * @param noticeIDList the noticeIDList to set
+     */
+    public void setNoticeIDList(List<Integer> noticeIDList) {
+        this.noticeIDList = noticeIDList;
+    }
+
+    /**
+     * @param noticeIDListAsString the noticeIDListAsString to set
+     */
+    public void setNoticeIDListAsString(String noticeIDListAsString) {
+        this.noticeIDListAsString = noticeIDListAsString;
+    }
+
+    /**
+     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
+     */
+    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
+        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
+        if(dateOfRecordUtilDate != null){
+            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    /**
+     * @param stipulatedComplianceDateUtilDate the stipulatedComplianceDateUtilDate to set
+     */
+    public void setStipulatedComplianceDateUtilDate(java.util.Date stipulatedComplianceDateUtilDate) {
+            
+        this.stipulatedComplianceDateUtilDate = stipulatedComplianceDateUtilDate;
+        if(stipulatedComplianceDateUtilDate != null){
+            stipulatedComplianceDate = stipulatedComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            
+        }
+    }
+
+    /**
+     * @param actualComplianceDateUtilDate the actualComplianceDateUtilDate to set
+     */
+    public void setActualComplianceDateUtilDate(java.util.Date actualComplianceDateUtilDate) {
+        
+        this.actualComplianceDateUtilDate = actualComplianceDateUtilDate;
+        
+        if(actualComplianceDateUtilDate != null){
+            actualComplianceDate = actualComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        
     }
 
 }

@@ -339,16 +339,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param event An initialized event
      * @throws IntegrationException bubbled up from the integrator
      * @throws EventException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
+     * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCECase event) throws IntegrationException, EventException{
+    public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCECase event) 
+            throws IntegrationException, EventException, CaseLifecyleException, ViolationException{
         EventIntegrator ei = getEventIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
         String updateViolationDescr = getResourceBundle(Constants.MESSAGE_TEXT).getString("violationChangeEventDescription");
-        // fetch the event category id from the event category bundle under the key updateViolationEventCategoryID
-        // now we're ready to log the event
-        EventCategory ec = new EventCategory();
-        ec.setCategoryID(Integer.parseInt(getResourceBundle(
-                Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
-        event.setCategory(ec); 
+       
        
         // hard coded for now
 //        event.setCategory(ei.getEventCategory(117));
@@ -361,7 +360,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // disclose to public from violation coord
         event.setActive(true);
         
-        ei.insertEvent(event);
+        cc.attachNewEventToCECase(ceCase, event, null);
     }
     
     

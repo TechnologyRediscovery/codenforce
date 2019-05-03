@@ -109,11 +109,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     "  personsource.sourceid, \n" +
                     "  personsource.title\n" +
                     "FROM \n" +
-                    "  public.person, \n" +
-                    "  public.personsource\n" +
+                    "  public.person LEFT OUTER JOIN public.personsource ON person.sourceid = personsource.sourceid \n" +
                     "WHERE \n" +
-                    "  person.sourceid = personsource.sourceid \n"+
-                    "  AND personid = ?;";
+                    "  personid = ?;";
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, personId);

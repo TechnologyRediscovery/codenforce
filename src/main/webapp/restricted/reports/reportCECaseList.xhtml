@@ -197,7 +197,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="Citations" />
                                     </f:facet>
-                                    <h:outputText value="#{v.citationsStringList}" />
+                                    <h:outputText value="#{v.citationListAsString}" />
                                 </p:column>
                             </p:dataTable>
 
@@ -229,19 +229,19 @@
                                     <f:facet name="header">
                                         <h:outputText styleClass="bold"   value="Queued for Mailing: " />
                                     </f:facet>
-                                    <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
+                                    <h:outputText id="nov-queued-ot" value="#{notice.lockedAndQueuedTSPretty}"/>
                                 </p:column>
                                 <p:column width="5%">
                                     <f:facet name="header">
                                         <h:outputText styleClass="bold"  value="Sent Date: " />
                                     </f:facet>
-                                    <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
+                                    <h:outputText id="nov-sent-date" value="#{notice.sentTSPretty}"/>
                                 </p:column>
                                 <p:column width="5%">
                                     <f:facet name="header">
                                         <h:outputText styleClass="bold"  value="Returned? " />
                                     </f:facet>
-                                    <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
+                                    <h:outputText id="nov-returned-date" value="#{notice.returnedTSPretty}"/>
                                 </p:column>
 
                             </p:dataTable>

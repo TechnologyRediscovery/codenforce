@@ -217,11 +217,13 @@ public class BackingBeanUtils implements Serializable{
     public String appendNoteBlock(MessageBuilderParams mcc){
         StringBuilder sb = new StringBuilder();
         sb.append(mcc.existingContent);
-        sb.append("<br/>*********************NOTE*********************<br/>");
+        sb.append("<br/>******************** NOTE ********************<br/>");
         sb.append(mcc.header);
         sb.append("<br/>");
-        sb.append(mcc.explanation);
-        sb.append("<br/>");
+        if(mcc.explanation != null){
+            sb.append(mcc.explanation);
+            sb.append("<br/>");
+        }
         sb.append("creatd by: ");
         sb.append(mcc.user.getPerson().getFirstName());
         sb.append(" ");
@@ -236,7 +238,7 @@ public class BackingBeanUtils implements Serializable{
         sb.append(getPrettyDate(LocalDateTime.now()));
         sb.append("<br/>----------------note-text-----------------<br/>");
         sb.append(mcc.newMessageContent);
-        sb.append("<br/>****************END_NOTE******************<br/>");
+        sb.append("<br/>**************** END NOTE *****************<br/>");
         return sb.toString();
     }
     

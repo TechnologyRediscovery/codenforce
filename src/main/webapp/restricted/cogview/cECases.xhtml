@@ -385,13 +385,12 @@
                                         <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
                                         <h:outputText id="header-muni-ot" value="(#{caseProfileBB.currentCase.property.muni.muniName})"/>  
                                         <h:outputText id="header-propid-ot" value=" Prop ID: #{caseProfileBB.currentCase.property.propertyID}"/>  
-                                        <h:outputText id="header-lob-ot" value="| Lot-block: #{caseProfileBB.currentCase.property.lotAndBlock}"/>  
+                                        <h:outputText id="header-lob-ot" value=" | Lot-block: #{caseProfileBB.currentCase.property.lotAndBlock}"/>  
                                     </h2>
 
 
                                     <p:commandButton    id="view-property-cb" 
-                                                        ajax="false"
-                                                        disabled="trye"
+                                                        ajax="false" action="properties"
                                                         icon="fa fa-home" styleClass="noFill button-size-small"
                                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
                                                         value="view property profile" />
@@ -557,14 +556,14 @@
                                     </p:column>
 
 
-                                    <p:column width="8%" sortBy="#{v.statusString}">
+                                    <p:column width="6%" sortBy="#{v.statusString}">
                                         <f:facet name="header">
                                             <h:outputText value="Status" />
                                         </f:facet>
                                         <h:outputText id="violation-status-ot" value="#{v.statusString}"/>
                                     </p:column>
 
-                                    <p:column width="13%">
+                                    <p:column width="12%">
                                         <f:facet name="header">
                                             <h:outputText value="Ordinance" />
                                         </f:facet>
@@ -573,7 +572,7 @@
                                             <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
                                         </div>
                                     </p:column>
-                                    <p:column width="8%">
+                                    <p:column width="6%">
                                         <f:facet name="header">
                                             <h:outputText value="Photos" />
                                         </f:facet>
@@ -609,6 +608,15 @@
                                                             value="Mark compliance"  
                                                             update="addNewEventForm"/>
                                     </p:column>
+                                    <p:column width="4%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Edit" />
+                                        </f:facet>
+                                        <p:commandButton    id="violation-edit-cb" 
+                                                            ajax="false" action="#{caseProfileBB.editViolation(v)}"
+                                                            icon="fa fa-edit"
+                                                            disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
+                                    </p:column>
                                     <p:rowExpansion>
                                         <div class="outlinedBox">
                                             <h:outputLabel styleClass="bold" value="Ordindance: "  />
@@ -638,7 +646,10 @@
                                             </h:panelGrid>
                                             <p:spacer height="5px"/>
                                             <h:outputLabel styleClass="bold" value="Description of violation: "/>
-                                            <h:outputText styleClass="weight-normal" value="#{v.description}"/>
+                                            <h:outputText styleClass="weight-normal" value="#{v.description}" escape="false" />
+                                            <p:spacer height="5px"/>
+                                            <h:outputLabel styleClass="bold" value="Internal notes: "/>
+                                            <h:outputText styleClass="weight-normal" value="#{v.notes}" escape="false"/>
                                         </div>
                                     </p:rowExpansion>
                                 </p:dataTable>
