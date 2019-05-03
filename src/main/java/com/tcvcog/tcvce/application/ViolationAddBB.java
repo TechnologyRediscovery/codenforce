@@ -56,8 +56,6 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     private List<Photograph> photoList;
     private Photograph selectedPhoto;
     
-   
-    
     /**
      * Creates a new instance of ViolationAdd
      */

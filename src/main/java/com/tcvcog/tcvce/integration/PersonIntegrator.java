@@ -747,6 +747,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             while (rs.next()) {
                 Person pers = getPerson(rs.getInt("person_personid"));
                 list.add(pers);
+                
             }
 
         } catch (SQLException ex) {

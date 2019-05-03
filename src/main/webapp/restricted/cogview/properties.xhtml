@@ -193,6 +193,9 @@
                                 <h1 class="property-blue">
                                     <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address} 
                                                   (#{propertyProfileBB.currProp.muni.muniName})"/>
+                                    
+                                     <h:outputText id="header-propid-ot" value=" Prop ID: #{caseProfileBB.currentCase.property.propertyID}"/>  
+                                        <h:outputText id="header-lob-ot" value="| Lot-block: #{caseProfileBB.currentCase.property.lotAndBlock}"/>  
                                 </h1>
 
                                 <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"

@@ -13,7 +13,7 @@ BEGIN
        
 
 	INSERT INTO public.person(
-		    personid, persontype, municipality_municipalitycode, fname, lname, jobtitle, 
+		    personid, persontype, muni_municode, fname, lname, jobtitle, 
 		    phonecell, phonehome, phonework, email, address_street, address_city, 
 		    address_state, address_zip, notes, lastupdated, expirydate, isactive, 
 		    isunder18, humanverifiedby, compositelname, sourceid, creator, 
@@ -22,7 +22,7 @@ BEGIN
 		    expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline, 
             ghostof, ghostby, ghosttimestamp, cloneof, clonedby, clonetimestamp, 
             referenceperson)
-	    VALUES (DEFAULT, person_row.persontype, person_row.municipality_municipalitycode, person_row.fname, person_row.lname, person_row.jobtitle, 
+	    VALUES (DEFAULT, person_row.persontype, person_row.muni_municode, person_row.fname, person_row.lname, person_row.jobtitle, 
 		    person_row.phonecell, person_row.phonehome, person_row.phonework, person_row.email, person_row.address_street, person_row.address_city, 
 		    person_row.address_state, person_row.address_zip, person_row.notes, now(), NULL, TRUE, 
 		    person_row.isunder18, NULL, person_row.compositelname, person_row.sourceid , person_row.creator, 
@@ -56,7 +56,7 @@ BEGIN
        
 
 	INSERT INTO public.person(
-		    personid, persontype, municipality_municipalitycode, fname, lname, jobtitle, 
+		    personid, persontype, muni_municode, fname, lname, jobtitle, 
 		    phonecell, phonehome, phonework, email, address_street, address_city, 
 		    address_state, address_zip, notes, lastupdated, expirydate, isactive, 
 		    isunder18, humanverifiedby, compositelname, sourceid, creator, 
@@ -65,7 +65,7 @@ BEGIN
 		    expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline, 
             ghostof, ghostby, ghosttimestamp, cloneof, clonedby, clonetimestamp, 
             referenceperson)
-	    VALUES (DEFAULT, person_row.persontype, person_row.municipality_municipalitycode, person_row.fname, person_row.lname, person_row.jobtitle, 
+	    VALUES (DEFAULT, person_row.persontype, person_row.muni_municode, person_row.fname, person_row.lname, person_row.jobtitle, 
 		    person_row.phonecell, person_row.phonehome, person_row.phonework, person_row.email, person_row.address_street, person_row.address_city, 
 		    person_row.address_state, person_row.address_zip, person_row.notes, now(), NULL, TRUE, 
 		    person_row.isunder18, NULL, person_row.compositelname, person_row.sourceid , person_row.creator, 
@@ -169,39 +169,64 @@ CREATE INDEX "fki_noticeOfViolation_recipient_fk"
   USING btree
   (personid_recipient);
 
-
-
-
 ALTER TABLE codeviolation ADD COLUMN createdby INTEGER;
 ALTER TABLE codeviolation ADD CONSTRAINT violation_creationby_userid_fk FOREIGN KEY ( createdby ) REFERENCES login ( userid ) ;
 
 
-
-
-ALTER TABLE municipality ADD COLUMN novtopmargin INTEGER;
-ALTER TABLE municipality ADD COLUMN novaddresseleftmargin INTEGER;
-ALTER TABLE municipality ADD COLUMN novaddressetopmargin INTEGER;
-ALTER TABLE municipality ADD COLUMN headerimage INTEGER;
-ALTER TABLE municipality ADD CONSTRAINT muni_headerimage_fk FOREIGN KEY (headerimage) REFERENCES photodoc (photoDocID);
-
-UPDATE municipality SET novtopmargin=10;
-UPDATE municipality SET novaddresseleftmargin=10;
-UPDATE municipality SET novaddressetopmargin=10;
-
-
-
-CREATE TABLE municipalitycipalityphotodoc
+CREATE TABLE muniphotodoc
   (
     photodoc_photodocid INTEGER NOT NULL ,
-    municipalitycipality_municipalitycode INTEGER NOT NULL,
+    muni_municode INTEGER NOT NULL
   ) ;
 
-ALTER TABLE municipalityphotodoc ADD CONSTRAINT municipalityphotodoc_pk PRIMARY KEY ( photoDoc_photoDocID, municipalitycipality_municipalitycode ) ;
+ALTER TABLE muniphotodoc ADD CONSTRAINT muniphotodoc_pk PRIMARY KEY ( photoDoc_photoDocID, muni_municode ) ;
+ALTER TABLE muniphotodoc ADD CONSTRAINT muniphotodoc_pdid_fk FOREIGN KEY (photodoc_photoDocID) REFERENCES photodoc (photoDocID);
+ALTER TABLE muniphotodoc ADD CONSTRAINT muniphotodoc_muni_fk FOREIGN KEY (muni_municode) REFERENCES municipality (municode);
 
-ALTER TABLE municipalityphotodoc ADD CONSTRAINT municipalityphotodoc_pdid_fk FOREIGN KEY (photodoc_photoDocID) REFERENCES photodoc (photoDocID);
+-- NOVs need a header image
+ALTER TABLE noticeofviolation ADD COLUMN headerimage_pdid INTEGER;
+ALTER TABLE noticeofviolation ADD CONSTRAINT nov_headerimage_fk FOREIGN KEY (headerimage_pdid) references photodoc (photodocid); 
 
-ALTER TABLE municipalityphotodoc ADD CONSTRAINT municipalityphotodoc_muni_fk FOREIGN KEY (municipalitycipality_municipalitycode) REFERENCES municipality (municode);
 
+
+CREATE SEQUENCE IF NOT EXISTS printstyle_seq
+	    START WITH 1000
+	    INCREMENT BY 1
+	    MINVALUE 1000
+	    NO MAXVALUE
+	    CACHE 1;
+
+DROP TABLE printstyle;
+
+CREATE TABLE printstyle
+(
+	styleid							INTEGER DEFAULT nextval('printstyle_seq') 
+									CONSTRAINT paramsid_pk PRIMARY KEY,
+	description						TEXT,
+	headerimage_photodocid			INTEGER CONSTRAINT printstyle_headerimage_pdid_fk REFERENCES photodoc (photoDocID),
+	headerheight					INTEGER,
+	novtopmargin 					INTEGER,
+	novaddresseleftmargin			INTEGER,
+	novaddressetopmargin			INTEGER,
+	browserheadfootenabled			BOOLEAN DEFAULT FALSE,
+	novtexttopmargin				INTEGER
+	
+);
+
+
+ALTER TABLE municipality ADD COLUMN novprintstyle_styleid INTEGER;
+ALTER TABLE municipality ADD CONSTRAINT muni_printstyleid_fk FOREIGN KEY (novprintstyle_styleid) REFERENCES printstyle (styleid);
+
+ALTER TABLE noticeofviolation ADD COLUMN printstyle_styleid INTEGER;
+ALTER TABLE noticeofviolation ADD CONSTRAINT nov_printstyleid_fk FOREIGN KEY (printstyle_styleid) REFERENCES printstyle (styleid);
+
+ALTER TABLE noticeofviolation DROP COLUMN headerimage_pdid;
+
+ALTER SEQUENCE IF EXISTS person_personidseq RESTART WITH 110000;
+
+-- from Matt Scott work
+-- need on both servers 
+ALTER TABLE person ADD COLUMN rawtext TEXT;
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)

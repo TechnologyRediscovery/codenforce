@@ -345,7 +345,33 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("Error linking photo to actionrequest", ex);
+            throw new IntegrationException("Error linking photo to code violation", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    public void linkPhotoToMuni(int photoID, int muniCode) throws IntegrationException{
+        //Store Photograph first please 
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.muniphotodoc(\n" +
+                        "            photodoc_photodocid, muni_municode)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photoID);
+            stmt.setInt(2, muniCode);
+            System.out.println("ImageServices.linkPhotoToMuni| Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error linking photo to muni", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

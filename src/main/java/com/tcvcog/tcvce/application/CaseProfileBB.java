@@ -770,9 +770,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public String printNotice(NoticeOfViolation nov) {
         Municipality m = getSessionBean().getActiveMuni();
-        nov.setTopMargin(m.getNovTopMargin());
-        nov.setAddresseeLeftMargin(m.getNovAddresseeLeftMargin());
-        nov.setAddresseeTopMargin(m.getNovAddresseeTopMargin());
         getSessionBean().setActiveNotice(nov);
         positionCurrentCaseAtHeadOfQueue();
         return "noticeOfViolationPrint";
