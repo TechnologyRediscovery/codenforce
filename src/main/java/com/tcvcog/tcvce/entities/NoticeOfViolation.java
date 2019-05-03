@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Iterator;
@@ -26,7 +27,7 @@ import java.util.List;
  *
  * @author Eric C. Darsow
  */
-public class NoticeOfViolation extends EntityUtils {
+public class NoticeOfViolation extends EntityUtils implements Serializable, Comparable<NoticeOfViolation> {
     
     private int noticeID;
     private Person recipient;
@@ -42,7 +43,9 @@ public class NoticeOfViolation extends EntityUtils {
     private LocalDateTime creationTS;
     private String creationTSPretty;
     private User creationBy;
-
+    
+    private int headerImageID;
+   
     private LocalDateTime lockedAndqueuedTS;
     private String lockedAndQueuedTSPretty;
     private User lockedAndQueuedBy;
@@ -56,15 +59,17 @@ public class NoticeOfViolation extends EntityUtils {
     private User returnedBy;
     
     private String notes;
-    
-    private int topMargin;
-    private int addresseeLeftMargin;
-    private int addresseeTopMargin;
-    
-    private boolean useCustomMuniHeaderImage;
+   
+    private PrintStyle style;
+   
     private boolean useSignatureImage;
     
     private boolean includeViolationPhotoAttachment;
+
+    @Override
+    public int compareTo(NoticeOfViolation nv) {
+        return dateOfRecord.compareTo(nv.getDateOfRecord());
+    }
     
     
 
@@ -365,34 +370,7 @@ public class NoticeOfViolation extends EntityUtils {
         this.creationBy = creationBy;
     }
 
-    /**
-     * @return the topMargin
-     */
-    public int getTopMargin() {
-        return topMargin;
-    }
-
-    /**
-     * @return the addresseeLeftMargin
-     */
-    public int getAddresseeLeftMargin() {
-        return addresseeLeftMargin;
-    }
-
-    /**
-     * @return the addresseeTopMargin
-     */
-    public int getAddresseeTopMargin() {
-        return addresseeTopMargin;
-    }
-
-    /**
-     * @return the useCustomMuniHeaderImage
-     */
-    public boolean isUseCustomMuniHeaderImage() {
-        return useCustomMuniHeaderImage;
-    }
-
+    
     /**
      * @return the useSignatureImage
      */
@@ -400,34 +378,7 @@ public class NoticeOfViolation extends EntityUtils {
         return useSignatureImage;
     }
 
-    /**
-     * @param topMargin the topMargin to set
-     */
-    public void setTopMargin(int topMargin) {
-        this.topMargin = topMargin;
-    }
-
-    /**
-     * @param addresseeLeftMargin the addresseeLeftMargin to set
-     */
-    public void setAddresseeLeftMargin(int addresseeLeftMargin) {
-        this.addresseeLeftMargin = addresseeLeftMargin;
-    }
-
-    /**
-     * @param addresseeTopMargin the addresseeTopMargin to set
-     */
-    public void setAddresseeTopMargin(int addresseeTopMargin) {
-        this.addresseeTopMargin = addresseeTopMargin;
-    }
-
-    /**
-     * @param useCustomMuniHeaderImage the useCustomMuniHeaderImage to set
-     */
-    public void setUseCustomMuniHeaderImage(boolean useCustomMuniHeaderImage) {
-        this.useCustomMuniHeaderImage = useCustomMuniHeaderImage;
-    }
-
+   
     /**
      * @param useSignatureImage the useSignatureImage to set
      */
@@ -475,6 +426,35 @@ public class NoticeOfViolation extends EntityUtils {
             dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
+    }
+
+  
+    /**
+     * @return the headerImageID
+     */
+    public int getHeaderImageID() {
+        return headerImageID;
+    }
+
+    /**
+     * @param headerImageID the headerImageID to set
+     */
+    public void setHeaderImageID(int headerImageID) {
+        this.headerImageID = headerImageID;
+    }
+
+    /**
+     * @return the style
+     */
+    public PrintStyle getStyle() {
+        return style;
+    }
+
+    /**
+     * @param style the style to set
+     */
+    public void setStyle(PrintStyle style) {
+        this.style = style;
     }
     
 }

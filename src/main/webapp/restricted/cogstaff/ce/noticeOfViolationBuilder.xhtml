@@ -33,7 +33,10 @@
                             <h:outputText value="#{noticeOfViolationBB.currentCase.property.address}" />
                             If your intended addressee is not in this table, navigate to the Persons manager and create a new 
                             Person on this property or connect an existing person to the property.</p>
-
+                        
+                        
+                            
+                        
                         <p:dataTable
                             id="newRecipientPersonTD"
                             var="person"
@@ -417,6 +420,10 @@
                     <h:form id="noticeBuilderForm">
 
                         <h2>Step 3: Choose text blocks</h2>
+                        
+                        <p:selectBooleanCheckbox id="nov-builder-blocks-showallmunis-cb" value="#{noticeOfViolationBB.showTextBlocksAllMuni}">
+                            <p:ajax listener="#{noticeOfViolationBB.loadBlocksAllMunis}" update="paragraph-scroller" />
+                        </p:selectBooleanCheckbox>
 
 
                         <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
@@ -424,7 +431,7 @@
                             <h:panelGroup>
                                 <p:dataScroller
                                     id="paragraph-scroller"
-                                    value="#{noticeOfViolationBB.blockListByMuni}"
+                                    value="#{noticeOfViolationBB.blockList}"
                                     var="block" 
                                     widgetVar="noticebuilder-ds-var">
                                     <div class="outlinedBox event-ds-box">

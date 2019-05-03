@@ -44,9 +44,8 @@ public class Municipality implements Serializable{
     private int defaultCodeOfficerUserID;
     private int defaultCourtEntityID;
     
-    private int novTopMargin;
-    private int novAddresseeLeftMargin;
-    private int novAddresseeTopMargin;
+    private PrintStyle novPrintStyle;
+    
     
     
     
@@ -299,8 +298,6 @@ public class Municipality implements Serializable{
         this.issuingPermitCodeSourceID = issuingPermitCodeSourceID;
     }
 
-    
-
     /**
      * @return the defaultCodeOfficerUserID
      */
@@ -330,46 +327,20 @@ public class Municipality implements Serializable{
     }
 
     /**
-     * @return the novTopMargin
+     * @return the novPrintStyle
      */
-    public int getNovTopMargin() {
-        return novTopMargin;
+    public PrintStyle getNovPrintStyle() {
+        return novPrintStyle;
     }
 
     /**
-     * @return the novAddresseeLeftMargin
+     * @param novPrintStyle the novPrintStyle to set
      */
-    public int getNovAddresseeLeftMargin() {
-        return novAddresseeLeftMargin;
+    public void setNovPrintStyle(PrintStyle novPrintStyle) {
+        this.novPrintStyle = novPrintStyle;
     }
 
-    /**
-     * @return the novAddresseeTopMargin
-     */
-    public int getNovAddresseeTopMargin() {
-        return novAddresseeTopMargin;
-    }
-
-    /**
-     * @param novTopMargin the novTopMargin to set
-     */
-    public void setNovTopMargin(int novTopMargin) {
-        this.novTopMargin = novTopMargin;
-    }
-
-    /**
-     * @param novAddresseeLeftMargin the novAddresseeLeftMargin to set
-     */
-    public void setNovAddresseeLeftMargin(int novAddresseeLeftMargin) {
-        this.novAddresseeLeftMargin = novAddresseeLeftMargin;
-    }
-
-    /**
-     * @param novAddresseeTopMargin the novAddresseeTopMargin to set
-     */
-    public void setNovAddresseeTopMargin(int novAddresseeTopMargin) {
-        this.novAddresseeTopMargin = novAddresseeTopMargin;
-    }
+   
 
     
 }

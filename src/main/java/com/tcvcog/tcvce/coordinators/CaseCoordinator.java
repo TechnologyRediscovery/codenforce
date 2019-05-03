@@ -92,8 +92,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         }
         c.setEventListActionRequests(evList);
         
+        Collections.sort(c.getNoticeList());
+        Collections.reverse(c.getNoticeList());
         Collections.sort(c.getEventListActionRequests());
-        
         Collections.sort(c.getEventList());
         Collections.reverse(c.getEventList()); 
         
@@ -853,12 +854,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
-        nov.setUseCustomMuniHeaderImage(false);
-        nov.setUseSignatureImage(false);
+        nov.setStyle(m.getNovPrintStyle());
         
-        nov.setTopMargin(m.getNovTopMargin());
-        nov.setAddresseeLeftMargin(m.getNovAddresseeLeftMargin());
-        nov.setAddresseeTopMargin(m.getNovAddresseeTopMargin());
         
         // loop over unresolved violations on case and generate CodeViolationDisplayable obects
         Iterator<CodeViolation> iter = cse.getViolationListUnresolved().iterator();
@@ -915,10 +912,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         getSessionBean().setcECase(ci.getCECase(c.getCaseID()));
     }
     
-    public void novInsertNotice(NoticeOfViolation nov, CECase cse, User usr) throws IntegrationException{
+    public int novInsertNotice(NoticeOfViolation nov, CECase cse, User usr) throws IntegrationException{
         ViolationIntegrator vi = getCodeViolationIntegrator();
         System.out.println("CaseCoordinator.novInsertNotice");
-        vi.novInsert(cse, nov);
+        return vi.novInsert(cse, nov);
     }
     
     public void novUpdate(NoticeOfViolation nov) throws IntegrationException{

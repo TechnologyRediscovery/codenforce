@@ -11,10 +11,11 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class Photograph {
+public class Photograph extends EntityUtils{
     private int photoID;
     private String description;
     private LocalDateTime timeStamp;
+    private String timestampPretty;
     private int typeID;
     private byte[] photoBytes;
 
@@ -87,6 +88,23 @@ public class Photograph {
      */
     public void setTypeID(int typeID) {
         this.typeID = typeID;
+    }
+
+    /**
+     * @return the getTimestampPretty
+     */
+    public String getTimestampPretty() {
+        if(timeStamp != null){
+            timestampPretty = getPrettyDate(timeStamp);
+        }
+        return timestampPretty;
+    }
+
+    /**
+     * @param timestampPretty
+     */
+    public void setTimestampPretty(String timestampPretty) {
+        this.timestampPretty = timestampPretty;
     }
     
     

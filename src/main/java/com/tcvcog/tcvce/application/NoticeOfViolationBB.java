@@ -48,7 +48,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private NoticeOfViolation currentNotice;
     private List<CodeViolation> activeVList;
     
-    private List<TextBlock> blockListByMuni;
+    private List<TextBlock> blockList;
     
     private List<Person> personCandidateList;
     private List<Person> manualRetrievedPersonList;
@@ -58,6 +58,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     private Person retrievedManualLookupPerson;
     private int recipientPersonID;
+    
+    private boolean showTextBlocksAllMuni;
     
     
     
@@ -77,33 +79,51 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         blockListAfterViolations = new ArrayList<>();
         try {
             personCandidateList = pi.getPersonList(currentCase.getProperty());
+            if(personCandidateList != null){
+                System.out.println("NoticeOfViolationBuilderBB.initbean "
+                        + "| person candidate list size: " + personCandidateList.size());
+                Person p = null;
+                Iterator<Person> it = personCandidateList.iterator();
+                while(it.hasNext()){
+                    p = it.next();
+                    System.out.println("NoticeOfViolationBuilderBB.initbean | looping over persons, ID: " + p.getPersonID());
+                }
+            }
+            
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         manualRetrievedPersonList = new ArrayList<>();
+        showTextBlocksAllMuni = false;
+        
+    }
+    
+    public void loadBlocksAllMunis(){
+        blockList = null;
+        System.out.println("NOVBB.loadblocksAllMunis");
         
     }
     
     public void addBlockBeforeViolations(TextBlock tb){
-        blockListByMuni.remove(tb);
+        blockList.remove(tb);
         blockListBeforeViolations.add(tb);
     }
     
     public void removeBlockBeforeViolations(TextBlock tb){
         blockListBeforeViolations.remove(tb);
-        blockListByMuni.add(tb);
+        blockList.add(tb);
         
     }
     
     public void removeBlockAfterViolations(TextBlock tb){
         blockListAfterViolations.remove(tb);
-        blockListByMuni.add(tb);
+        blockList.add(tb);
         
     }
     
     
     public void addBlockAfterViolations(TextBlock tb){
-        blockListByMuni.remove(tb);
+        blockList.remove(tb);
         blockListAfterViolations.add(tb);
     }
     
@@ -147,6 +167,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public String assembleNotice(){
         CaseCoordinator cc = getCaseCoordinator();
+        int newNoticeId = 0;
         
         StringBuilder sb = new StringBuilder();
         Iterator<TextBlock> it = blockListBeforeViolations.iterator();
@@ -155,6 +176,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
         currentNotice.setNoticeTextBeforeViolations(sb.toString());
         
+        sb = new StringBuilder();
         it = blockListAfterViolations.iterator();
         while(it.hasNext()){
             appendTextBlockAsPara(it.next(), sb);
@@ -162,13 +184,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
         currentNotice.setNoticeTextAfterViolations(sb.toString());
         
-        getSessionBean().setActiveNotice(currentNotice);
         try {
-            cc.novInsertNotice(currentNotice, currentCase, getSessionBean().getFacesUser());
+            newNoticeId = cc.novInsertNotice(currentNotice, currentCase, getSessionBean().getFacesUser());
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
             System.out.println(ex);
         }
+        currentNotice.setNoticeID(newNoticeId);
+        getSessionBean().setActiveNotice(currentNotice);
         return "noticeOfViolationEditor";
     }
 
@@ -214,24 +237,28 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the textBlockListByMuni
      */
-    public List<TextBlock> getBlockListByMuni() {
+    public List<TextBlock> getBlockList() {
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         Municipality m = getSessionBean().getActiveMuni();
-        if(blockListByMuni == null){
+        if(blockList == null){
             try {
-                blockListByMuni = cvi.getTextBlocks(m);
+                if(showTextBlocksAllMuni){
+                    blockList = cvi.getAllTextBlocks();
+                } else {
+                    blockList = cvi.getTextBlocks(m);
+                }
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
         }
-        return blockListByMuni;
+        return blockList;
     }
 
     /**
      * @param textBlockListByMuni the textBlockListByMuni to set
      */
     public void setTextBlockListByMuni(ArrayList<TextBlock> textBlockListByMuni) {
-        this.blockListByMuni = textBlockListByMuni;
+        this.blockList = textBlockListByMuni;
     }
 
     /**
@@ -351,6 +378,20 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setManualRetrievedPersonList(List<Person> manualRetrievedPersonList) {
         this.manualRetrievedPersonList = manualRetrievedPersonList;
+    }
+
+    /**
+     * @return the showTextBlocksAllMuni
+     */
+    public boolean isShowTextBlocksAllMuni() {
+        return showTextBlocksAllMuni;
+    }
+
+    /**
+     * @param showTextBlocksAllMuni the showTextBlocksAllMuni to set
+     */
+    public void setShowTextBlocksAllMuni(boolean showTextBlocksAllMuni) {
+        this.showTextBlocksAllMuni = showTextBlocksAllMuni;
     }
     
 }
