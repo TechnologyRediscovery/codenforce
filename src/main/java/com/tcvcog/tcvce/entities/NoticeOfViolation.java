@@ -61,9 +61,7 @@ public class NoticeOfViolation extends EntityUtils implements Serializable, Comp
     private String notes;
    
     private PrintStyle style;
-   
     private boolean useSignatureImage;
-    
     private boolean includeViolationPhotoAttachment;
 
     @Override

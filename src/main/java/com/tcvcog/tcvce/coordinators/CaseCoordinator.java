@@ -462,10 +462,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         boolean subcheckPasses = true;
         
         if(rule.isTreatForbiddenPhaseAsThreshold()){
-                if (cse.getCasePhase().getOrder() >= rule.getRequiredCurrentCasePhase().getOrder()){
+                if (cse.getCasePhase().getOrder() >= rule.getForbiddenCurrentCasePhase().getOrder()){
                     subcheckPasses = false;
                 }
-            } else if (cse.getCasePhase() == rule.getRequiredCurrentCasePhase()){
+            } else if (cse.getCasePhase() == rule.getForbiddenCurrentCasePhase()){
                 subcheckPasses = false;
             }
         return subcheckPasses;
@@ -473,12 +473,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     
     private boolean ruleSubcheck_requiredEventType(CECase cse, CasePhaseChangeRule rule){
-        boolean subcheckPasses = false;
-        Iterator<EventCECase> iter = cse.getEventList().iterator();
-        while(iter.hasNext()){
-            EventCECase ev = iter.next();
-            if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
-                subcheckPasses = true;
+        boolean subcheckPasses = true;
+        if(rule.getRequiredExtantEventType() != null){
+            subcheckPasses = false;
+            Iterator<EventCECase> iter = cse.getEventList().iterator();
+            while(iter.hasNext()){
+                EventCECase ev = iter.next();
+                if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
+                    subcheckPasses = true;
+                }
             }
         }
         return subcheckPasses;
@@ -498,12 +501,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     private boolean ruleSubcheck_requiredEventCategory(CECase cse, CasePhaseChangeRule rule){
-        boolean subcheckPasses = false;
-        Iterator<EventCECase> iter = cse.getEventList().iterator();
-        while(iter.hasNext()){
-            EventCECase ev = iter.next();
-            if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
-                subcheckPasses = true;
+        boolean subcheckPasses = true;
+        if(rule.getRequiredExtantEventCatID() != 0){
+            subcheckPasses = false;
+            Iterator<EventCECase> iter = cse.getEventList().iterator();
+            while(iter.hasNext()){
+                EventCECase ev = iter.next();
+                if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
+                    subcheckPasses = true;
+                }
             }
         }
         return subcheckPasses;
@@ -674,7 +680,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         } // close if
         
     }
-    
      
     private int processClosingEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
@@ -695,7 +700,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
         return ei.insertEvent(e);
-        
     }
     
     /**
