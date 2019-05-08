@@ -14,7 +14,6 @@ public enum BlobType {
     PDF(2);
 
     private final int typeID;
-    private Icon typeIcon;
 
     private BlobType(int typeID){
         this.typeID = typeID;
@@ -30,26 +29,7 @@ public enum BlobType {
         return null;
     }
     
-    
-    
-    public int getTypeID(){
+    public int getTypID(){
         return this.typeID;
     }
-
-    /**
-     * @return the typeIcon
-     */
-    public Icon getTypeIcon() {
-        return typeIcon;
-    }
-
-    /**
-     * @param typeIcon the typeIcon to set
-     */
-    public void setTypeIcon(Icon typeIcon) {
-        this.typeIcon = typeIcon;
-    }
-    
-    
-    
 }

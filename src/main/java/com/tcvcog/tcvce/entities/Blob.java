@@ -5,15 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.BlobTypeException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
-import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
 
 /**
  *
@@ -23,11 +15,10 @@ public class Blob {
 
     private int blobID;
     private BlobType type;
-    private String description, filename;
+    private String description;
     private LocalDateTime timestamp;
     private int uploadPersonID;
     private byte[] bytes;
-    //private StreamedContent image;
     
     /**
      * @return the blobID
@@ -85,6 +76,8 @@ public class Blob {
         this.timestamp = timestamp;
     }
 
+
+
     /**
      * @return the bytes
      */
@@ -111,20 +104,6 @@ public class Blob {
      */
     public void setUploadPersonID(int uploadPersonID) {
         this.uploadPersonID = uploadPersonID;
-    }
-
-    /**
-     * @return the filename
-     */
-    public String getFilename() {
-        return filename;
-    }
-
-    /**
-     * @param filename the filename to set
-     */
-    public void setFilename(String filename) {
-        this.filename = filename;
     }
     
 }
