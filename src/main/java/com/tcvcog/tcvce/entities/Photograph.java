@@ -11,13 +11,8 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class Photograph extends EntityUtils{
-    private int photoID;
-    private String description;
-    private LocalDateTime timeStamp;
-    private String timestampPretty;
-    private int typeID;
-    private byte[] photoBytes;
+public class Photograph {
+
 
     /**
      * @return the photoBytes
