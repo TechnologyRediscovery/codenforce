@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Citation;
@@ -113,6 +114,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private PropertyWithLists activePropWithLists;
     private OccPermitApplicationReason occPermitApplicationReason;
 
+    /* *** Blob Upload Session Shelves *** */
+    private List<Blob> blobList;
 
 
     /**
@@ -623,6 +626,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setReportConfigCECaseList(ReportConfigCECaseList reportConfigCECaseList) {
         this.reportConfigCECaseList = reportConfigCECaseList;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
     }
     
 }

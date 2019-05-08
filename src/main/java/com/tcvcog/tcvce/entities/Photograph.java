@@ -12,11 +12,7 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public class Photograph {
-    private int photoID;
-    private String description;
-    private LocalDateTime timeStamp;
-    private int typeID;
-    private byte[] photoBytes;
+
 
     /**
      * @return the photoBytes

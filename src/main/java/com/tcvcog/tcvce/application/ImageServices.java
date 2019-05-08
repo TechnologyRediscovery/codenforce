@@ -229,6 +229,7 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
             stmt.setTimestamp(2, java.sql.Timestamp.from(ph.getTimeStamp()
                     .atZone(ZoneId.systemDefault()).toInstant()));
             stmt.setInt(3, ph.getTypeID());
+            
             stmt.setBytes(4, ph.getPhotoBytes());
             stmt.setBoolean(5, false);
             
