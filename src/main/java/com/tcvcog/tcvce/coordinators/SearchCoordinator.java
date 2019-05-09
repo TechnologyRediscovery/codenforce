@@ -19,6 +19,8 @@ import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperties;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -34,6 +36,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
 //    CODE ENFORCEMENT CASE QUERIES
     
+    public List<SearchParams> getAvaialbleSearchParamsCECases(User u, Municipality m){
+        List<SearchParams> pList = new ArrayList<>();
+        return pList;
+        
+    }
+    
     
     /**
      * Returns a SearchParams subclass for retrieving all open
@@ -43,7 +51,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECases getDefaultSearchParamsCECase(Municipality m){
+    public SearchParamsCECases getDefaultSearchParams_CECase_allOpen(Municipality m){
         SearchParamsCECases params = new SearchParamsCECases();
         
         // superclass 
@@ -76,9 +84,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECases getSearchParams_openCECases (Municipality m){
+    public SearchParamsCECases getSearchParams_CECase_closedPast30Days (Municipality m){
         SearchParamsCECases params = new SearchParamsCECases();
-        params.setSearchName("All open cases in current municipality");
+        params.setSearchName("CECases");
         
         // superclass 
         params.setFilterByMuni(true);

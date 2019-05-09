@@ -54,6 +54,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     // for request lookup
     
     private Person currentPerson;
+    private CEActionRequest currentRequest;
     
     private TabView tabView;
     private int currentTabIndex;
@@ -93,15 +94,20 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * Creates a new instance of ActionRequestBean
      */
     public CEActionRequestSubmitBB(){
+    }
+    
+    @PostConstruct
+    public void initBean(){
         // set date of record to current date
         form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
                 .atZone(ZoneId.systemDefault()).toInstant());
         currentTabIndex = 0;
-        System.out.println("ActionRequestBean.ActionRequestBean");
-        
         // init new, empty photo list
-        this.photoList = new ArrayList<>();    
+        this.photoList = new ArrayList<>();
+        
+        
     }
+    
     
     public String getReturnValue(){
         return "paccSearch";
@@ -138,18 +144,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
     
     public String saveConcernDescriptions(){
-//        User u = getSessionBean().getFacesUser();
-//        if(u == null){
         if(getSessionBean().getCeactionRequestForSubmission().getPhotoList() == null){
             getSessionBean().getCeactionRequestForSubmission().setPhotoList(new ArrayList<Integer>());
         }
-            return "photoUpload";
-//            
-//        } else {
-//            
-//            return "reviewAndSubmit";
-//        }
-        
+        return "photoUpload";
     }
     
     public String savePhotos(){
@@ -666,5 +664,19 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public void setSelectedPhoto(Photograph selectedPhoto) {
         this.selectedPhoto = selectedPhoto;
+    }
+
+    /**
+     * @return the currentRequest
+     */
+    public CEActionRequest getCurrentRequest() {
+        return currentRequest;
+    }
+
+    /**
+     * @param currentRequest the currentRequest to set
+     */
+    public void setCurrentRequest(CEActionRequest currentRequest) {
+        this.currentRequest = currentRequest;
     }
 }

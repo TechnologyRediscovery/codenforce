@@ -48,6 +48,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private NoticeOfViolation currentNotice;
     private List<CodeViolation> activeVList;
     
+    private Person noticePerson;
+    
     private List<TextBlock> blockList;
     
     private List<Person> personCandidateList;
@@ -386,6 +388,20 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setShowTextBlocksAllMuni(boolean showTextBlocksAllMuni) {
         this.showTextBlocksAllMuni = showTextBlocksAllMuni;
+    }
+
+    /**
+     * @return the noticePerson
+     */
+    public Person getNoticePerson() {
+        return noticePerson;
+    }
+
+    /**
+     * @param noticePerson the noticePerson to set
+     */
+    public void setNoticePerson(Person noticePerson) {
+        this.noticePerson = noticePerson;
     }
     
 }

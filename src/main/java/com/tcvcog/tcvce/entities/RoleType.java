@@ -25,8 +25,8 @@ public enum RoleType {
     
     Developer("Developer"),
     SysAdmin("System Administrator"),
-    CogStaff("TCVCOG Staff Member"),
     EnforcementOfficial("Enforcement Authorized Staff"),
+    CogStaff("TCVCOG Staff Member"),
     MuniStaff("Municipal Government Staff"),
     MuniReader("Municipal Government Viewer"),
     Public("Public at Large"); 

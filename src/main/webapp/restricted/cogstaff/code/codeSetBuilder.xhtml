@@ -61,9 +61,12 @@
                                 styleClass="buttonOwnLine" />
 
                         </h:form>
+                        
                         <h:form id="codeElemetnAddForm">
 
-                            <p class="note">Select multiple elements by clicking them sequentially. Unselect a row by holding down control while clicking (using a mouse for this is handy).</p>
+                            <p class="note">Select multiple elements by clicking them sequentially. 
+                                Un-select a row by holding down control while clicking (using a mouse for this is handy).</p>
+                            
                             <p:dataTable
                                 id="codeElementTable"
                                 var="element"
@@ -82,12 +85,14 @@
                                     </f:facet>
                                     <h:outputText value="#{element.ordchapterNo}"/>
                                 </p:column>
+                                
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Sec. No" />
                                     </f:facet>
                                     <h:outputText value="#{element.ordSecNum}"/>
                                 </p:column>
+                                
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Sec. Title" />
@@ -100,12 +105,14 @@
                                     </f:facet>
                                     <h:outputText value="#{element.ordSubSecNum}"/>
                                 </p:column>
+                                
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="SubSec. Title" />
                                     </f:facet>
                                     <h:outputText value="#{element.ordSubSecTitle}"/>
                                 </p:column>
+                                
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Active?" />
@@ -114,15 +121,13 @@
                                 </p:column>
                             </p:dataTable>
 
-
                             <p:spacer height="15px"/>
-
 
                             <p:fieldset toggleable="true" collapsed="true" id="eceUpdateFS"
                                         legend="Default enforcability data vaules">
 
                                 <p>The values in these input boxes will be copied into each of the code elements you choose to add to the code set. 
-                                    This allows for bulk adding of code elements all with the same enforcability data. Values for each individual element
+                                    This allows for bulk adding of code elements all with the same enforceability data. Values for each individual element
                                     can always be edited by loading the assembled code set through the "Code Sets" page link in the left side bar.</p> 
 
                                 <h:panelGrid columns="4" cellpadding="10"  
