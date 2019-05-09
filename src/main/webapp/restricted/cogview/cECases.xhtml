@@ -286,10 +286,17 @@
 
                             <h2>CE Case docket</h2>
                             <h:form id="caseListForm">
+                                
+                                <p:selectOneMenu id="casequery-som" tabindex="1" value="#{caseProfileBB.selectedBOBQuery}">
+                                    <f:converter converterId="bOBQueryConverter"/>
+                                    <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems id="querylist-si" value="#{caseProfileBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                </p:selectOneMenu>
+                                
                                 <p:commandButton   id="query-allopencases-cb" 
                                    ajax="true" actionListener="#{caseProfileBB.query_allOpenCases}"
                                    icon="fa fa-print" styleClass="button"
-                                   value="all open cases: any unresolved violations" 
+                                   value="view all open cases in #{sessionBean.activeMuni.muniName}" 
                                    update="caseListForm:caseTable"/>
                                 
                                 <ui:remove>

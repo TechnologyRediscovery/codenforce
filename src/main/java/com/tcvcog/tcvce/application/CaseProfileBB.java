@@ -41,6 +41,8 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
+import com.tcvcog.tcvce.entities.search.BOBQuery;
+import com.tcvcog.tcvce.entities.search.CECaseQuery;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -77,6 +79,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private List<CECase> caseList;
     private ArrayList<CECase> filteredCaseList;
     private SearchParamsCECases searchParams;
+    
+    private List<BOBQuery> queryList;
+    private CECaseQuery selectedCECaseQuery;
+    private BOBQuery selectedBOBQuery;
+    
 
     private ArrayList<CECase> filteredCaseHistoryList;
     private ArrayList<EventCECase> recentEventList;
@@ -147,11 +154,15 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         */
     }
 
+    
+    /**
+     * Configures the cECases.xhtml page by loading our case Queues
+     */
     @PostConstruct
     public void initBean() {
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-        searchParams = sc.getSearchParams_openCECases(getSessionBean().getActiveMuni());
+        searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
         List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
         removedEventList = new ArrayList<>();
         showHiddenEvents = false;
@@ -256,19 +267,19 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     
     public void query_allOpenCases(ActionEvent ev){
         SearchCoordinator sc = getSearchCoordinator();
-        searchParams = sc.getSearchParams_openCECases(getSessionBean().getActiveMuni());
+        searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
         executeQuery();
     }
     
     public void query_anyActiveCasePast1Week(ActionEvent ev){
         SearchCoordinator sc = getSearchCoordinator();
-        searchParams = sc.getSearchParams_openCECases(getSessionBean().getActiveMuni());
+        searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
         executeQuery();
     }
     
     public void query_anyActiveCasePastMonth(ActionEvent ev){
         SearchCoordinator sc = getSearchCoordinator();
-        searchParams = sc.getSearchParams_openCECases(getSessionBean().getActiveMuni());
+        searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
         executeQuery();
     }
     
@@ -1213,7 +1224,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the caseList
      */
-    public List<CECase> getCaseList() {
+     public List<CECase> getCaseList() {
 //        List<CECase> sessionList = getSessionBean().getcECaseList();
         CaseIntegrator ci = getCaseIntegrator();
         if (caseList == null) {
@@ -1708,6 +1719,54 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setReportCECaseList(ReportConfigCECaseList reportCECaseList) {
         this.reportCECaseList = reportCECaseList;
+    }
+
+    
+    /**
+     * @return the selectedCECaseQuery
+     */
+    public CECaseQuery getSelectedCECaseQuery() {
+        if(selectedBOBQuery instanceof BOBQuery){
+            selectedCECaseQuery = (CECaseQuery) selectedBOBQuery;
+        }
+        return selectedCECaseQuery;
+    }
+
+    /**
+     * @param selectedCECaseQuery the selectedCECaseQuery to set
+     */
+    public void setSelectedCECaseQuery(CECaseQuery selectedCECaseQuery) {
+        
+        
+        this.selectedCECaseQuery = selectedCECaseQuery;
+    }
+
+    /**
+     * @return the queryList
+     */
+    public List<BOBQuery> getQueryList() {
+        return queryList;
+    }
+
+    /**
+     * @param queryList the queryList to set
+     */
+    public void setQueryList(List<BOBQuery> queryList) {
+        this.queryList = queryList;
+    }
+
+    /**
+     * @return the selectedBOBQuery
+     */
+    public BOBQuery getSelectedBOBQuery() {
+        return selectedBOBQuery;
+    }
+
+    /**
+     * @param selectedBOBQuery the selectedBOBQuery to set
+     */
+    public void setSelectedBOBQuery(BOBQuery selectedBOBQuery) {
+        this.selectedBOBQuery = selectedBOBQuery;
     }
 
 }
