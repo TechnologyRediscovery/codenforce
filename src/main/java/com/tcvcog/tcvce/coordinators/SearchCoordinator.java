@@ -32,6 +32,75 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchCoordinator() {
     }
     
+//    CODE ENFORCEMENT CASE QUERIES
+    
+    
+    /**
+     * Returns a SearchParams subclass for retrieving all open
+     * cases in a given municipality. Open cases are defined as a 
+     * case whose closing date is null.
+     * @param m
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCECases getDefaultSearchParamsCECase(Municipality m){
+        SearchParamsCECases params = new SearchParamsCECases();
+        
+        // superclass 
+        params.setFilterByMuni(true);
+        params.setMuni(m);
+        params.setFilterByObjectID(false);
+        params.setLimitResultCountTo100(true);
+        
+        // subclass specific
+        params.setUseIsOpen(true);
+        params.setIsOpen(true);
+        
+        params.setDateToSearchCECases("Opening date of record");
+        params.setUseCaseManager(false);
+        
+        params.setUseCasePhase(false);
+        params.setUseCaseStage(false);
+        params.setUseProperty(false);
+        params.setUsePropertyInfoCase(false);
+        params.setUseCaseManager(false);
+        
+        return params;
+    }
+    
+     /**
+     * Returns a SearchParams subclass for retrieving all open
+     * cases in a given municipality. Open cases are defined as a 
+     * case whose closing date is null.
+     * @param m
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCECases getSearchParams_openCECases (Municipality m){
+        SearchParamsCECases params = new SearchParamsCECases();
+        params.setSearchName("All open cases in current municipality");
+        
+        // superclass 
+        params.setFilterByMuni(true);
+        params.setMuni(m);
+        params.setFilterByObjectID(false);
+        params.setLimitResultCountTo100(true);
+        
+        // subclass specific
+        params.setUseIsOpen(true);
+        params.setIsOpen(true);
+        
+        params.setDateToSearchCECases("Opening date of record");
+        params.setUseCaseManager(false);
+        
+        params.setUseCasePhase(false);
+        params.setUseCaseStage(false);
+        params.setUseProperty(false);
+        params.setUsePropertyInfoCase(false);
+        params.setUseCaseManager(false);
+        
+        return params;
+    }
     
     
     
