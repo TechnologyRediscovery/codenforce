@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -50,11 +51,16 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
 
     private List<Person> personList;
     private Person selectedPerson;
+    private List<Property> propertyPersonList;
+    
     private List<Person> filteredPersonList;
     private PersonType[] personTypes;
     private String notesToAppend;
     private String updateDescription;
     private Map<String, Integer> muniNameIDMap;
+    
+    private List<Property> propertyCandidateList;
+    private Property selectedProperty;
     
     private SearchParamsPersons searchParams;
     
@@ -78,10 +84,11 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        propertyCandidateList = getSessionBean().getPropertyQueue();
     }
     
     public String viewPersonAssociatedProperty(Property p){
-        getSessionBean().setActiveProp(p);
+        getSessionBean().getPropertyQueue().add(0, p);
         return "properties";
     }
     
@@ -128,6 +135,21 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         
     }
     
+    public void connectCurrentPersonToProperty(ActionEvent ev){
+        PersonIntegrator pi = getPersonIntegrator();
+        try {
+            pi.connectPersonToProperty(selectedPerson, selectedProperty);
+             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Successfully connected person ID " + selectedPerson.getPersonID() + " to property ID " + selectedProperty.getPropertyID() , ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        ex.getMessage(), ""));
+        }
+        // clear list so the list itself looks properties up again
+        propertyPersonList = null;
+    }
+    
     public void initiatePersonCreation(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getActiveMuni());
@@ -155,13 +177,14 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         PersonCoordinator pc = getPersonCoordinator();
         PersonIntegrator pi = getPersonIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        
         System.out.println("PersonsBB.createNewPerson | before insert selected person: " + selectedPerson.getPersonID());
         
         int newPersonID;
         try {
+            selectedPerson.setCreatorUserID(getSessionBean().getFacesUser().getUserID());
             newPersonID = pc.addNewPerson(selectedPerson);
             selectedPerson = pi.getPerson(newPersonID);
-            System.out.println("PersonsBB.createNewPerson | newly inserted personID: " + selectedPerson.getPersonID());
             getSessionBean().setActivePerson(selectedPerson);
             getSessionBean().getPersonQueue().add(selectedPerson);
             
@@ -170,7 +193,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Person created! This person is now your active one and has been added to your history.'", ""));
+                    "Person created with ID " + newPersonID + "! This person is now your active one and has been added to your history.'", ""));
         
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
@@ -205,16 +228,16 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     public void selectPerson(Person p){
         UserIntegrator ui = getUserIntegrator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         try {
             ui.logObjectView(getSessionBean().getFacesUser(), p);
+            propertyPersonList = pi.getProperties(p);
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Person history logging is broken!",""));
         }
-        getSessionBean().setActivePerson(selectedPerson);
-        System.out.println("PersonsBB.selectPreson | person: " + selectedPerson.getPersonID());
         selectedPerson = p;
     }
 
@@ -396,6 +419,57 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      */
     public void setMuniNameIDMap(Map<String, Integer> muniNameIDMap) {
         this.muniNameIDMap = muniNameIDMap;
+    }
+
+    /**
+     * @return the propertyCandidateList
+     */
+    public List<Property> getPropertyCandidateList() {
+        return propertyCandidateList;
+    }
+
+    /**
+     * @param propertyCandidateList the propertyCandidateList to set
+     */
+    public void setPropertyCandidateList(List<Property> propertyCandidateList) {
+        this.propertyCandidateList = propertyCandidateList;
+    }
+
+    /**
+     * @return the selectedProperty
+     */
+    public Property getSelectedProperty() {
+        return selectedProperty;
+    }
+
+    /**
+     * @param selectedProperty the selectedProperty to set
+     */
+    public void setSelectedProperty(Property selectedProperty) {
+        this.selectedProperty = selectedProperty;
+    }
+
+    /**
+     * @return the propertyPersonList
+     */
+    public List<Property> getPropertyPersonList() {
+        PropertyIntegrator pi = getPropertyIntegrator();
+        if(propertyPersonList == null){
+            try {
+                propertyPersonList = pi.getProperties(selectedPerson);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+        }
+        return propertyPersonList;
+    }
+    
+
+    /**
+     * @param propertyPersonList the propertyPersonList to set
+     */
+    public void setPropertyPersonList(List<Property> propertyPersonList) {
+        this.propertyPersonList = propertyPersonList;
     }
     
 }

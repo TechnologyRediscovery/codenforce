@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -27,51 +28,51 @@ import java.util.ArrayList;
 public class PropertyWithLists extends Property implements Serializable{
     
     // cases store code enforcement data
-    private ArrayList<CECase> ceCaseList;
+    private List<CECase> ceCaseList;
     // property units store occupancy data
-    private ArrayList<PropertyUnit> unitList;
+    private List<PropertyUnit> unitList;
     // both are connected to Person objects all over the place
-    private ArrayList<Person> personList;
+    private List<Person> personList;
 
     /**
      * @return the ceCaseList
      */
-    public ArrayList<CECase> getCeCaseList() {
+    public List<CECase> getCeCaseList() {
         return ceCaseList;
     }
 
     /**
      * @return the unitList
      */
-    public ArrayList<PropertyUnit> getUnitList() {
+    public List<PropertyUnit> getUnitList() {
         return unitList;
     }
 
     /**
      * @return the personList
      */
-    public ArrayList<Person> getPersonList() {
+    public List<Person> getPersonList() {
         return personList;
     }
 
     /**
      * @param ceCaseList the ceCaseList to set
      */
-    public void setCeCaseList(ArrayList<CECase> ceCaseList) {
+    public void setCeCaseList(List<CECase> ceCaseList) {
         this.ceCaseList = ceCaseList;
     }
 
     /**
      * @param unitList the unitList to set
      */
-    public void setUnitList(ArrayList<PropertyUnit> unitList) {
+    public void setUnitList(List<PropertyUnit> unitList) {
         this.unitList = unitList;
     }
 
     /**
      * @param personList the personList to set
      */
-    public void setPersonList(ArrayList<Person> personList) {
+    public void setPersonList(List<Person> personList) {
         this.personList = personList;
     }
     

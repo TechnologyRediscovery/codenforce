@@ -22,13 +22,15 @@ public class AccessKeyCard implements Serializable{
     private final boolean hasEnfOfficialPermissions;
     private final boolean hasMuniStaffPermissions;
     private final boolean hasMuniReaderPermissions;
+    private final int rank;
 
     public AccessKeyCard(   boolean dev,
                             boolean admin,
                             boolean cogstaff,
                             boolean ceo,
                             boolean munistaff,
-                            boolean munireader){
+                            boolean munireader,
+                            int r){
         
         hasDeveloperPermissions = dev;
         hasSysAdminPermissions = admin;
@@ -36,6 +38,7 @@ public class AccessKeyCard implements Serializable{
         hasEnfOfficialPermissions = ceo;
         hasMuniStaffPermissions = munistaff;
         hasMuniReaderPermissions = munireader;
+        rank = r;
         
     }
 
@@ -80,6 +83,10 @@ public class AccessKeyCard implements Serializable{
      */
     public boolean isHasMuniReaderPermissions() {
         return hasMuniReaderPermissions;
+    }
+    
+    public int getRank(){
+        return rank;
     }
     
     

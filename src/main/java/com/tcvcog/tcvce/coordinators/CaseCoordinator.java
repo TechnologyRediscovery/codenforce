@@ -21,32 +21,17 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.PermissionsException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCECase;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Icon;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.ReportConfigCECase;
-import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
-import com.tcvcog.tcvce.entities.RoleType;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
-import com.tcvcog.tcvce.integration.CodeViolationIntegrator;
+import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
@@ -89,8 +74,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param c the CECase with a populated set of Events
      * @return the CECase with the action request list ready to roll
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
-    public CECase configureCECase(CECase c){
+    public CECase configureCECase(CECase c) throws CaseLifecyleException{
+        
+        setCaseStage(c);
+        
         List<EventCECase> evList = new ArrayList();
         // transfer any events with requests to a separate list for display at
         // the head of the case profile
@@ -103,8 +92,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         }
         c.setEventListActionRequests(evList);
         
+        Collections.sort(c.getNoticeList());
+        Collections.reverse(c.getNoticeList());
         Collections.sort(c.getEventListActionRequests());
-        
         Collections.sort(c.getEventList());
         Collections.reverse(c.getEventList()); 
         
@@ -173,51 +163,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return sps;
     }
     
-     /**
-     * Returns a SearchParams subclass for retrieving all open
-     * cases in a given municipality. Open cases are defined as a 
-     * case whose closing date is null.
-     * @param m
-     * @return a SearchParams subclass with mem vars ready to send
-     * into the Integrator for case list retrieval
-     */
-    public SearchParamsCECases getDefaultSearchParamsCECase(Municipality m){
-        SearchParamsCECases params = new SearchParamsCECases();
-        
-        // superclass 
-        params.setFilterByMuni(true);
-        params.setMuni(m);
-        params.setFilterByObjectID(false);
-        params.setLimitResultCountTo100(true);
-        
-        // subclass specific
-        params.setUseIsOpen(true);
-        params.setIsOpen(true);
-        
-        params.setDateToSearchCECases("Opening date of record");
-        params.setUseCaseManager(false);
-        
-        params.setUseCasePhase(false);
-        params.setUseCaseStage(false);
-        params.setUseProperty(false);
-        params.setUsePropertyInfoCase(false);
-        params.setUseCaseManager(false);
-        
-        return params;
-    }
     
-    /**
-     * Existed before queryCases() became the goto way to retrieve lists of cases
-     * @deprecated 
-     * @param m
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<CECase> getOpenCECaseList(Municipality m) throws IntegrationException{
-        CaseIntegrator ci = getCaseIntegrator();
-        List<CECase> cList = ci.queryCECases(getDefaultSearchParamsCECase(m));
-        return cList;
-    }
+    
+   
     
     /**
      * Front door for querying cases in the DB
@@ -225,12 +173,23 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param params pre-configured search parameters
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
      */
-    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException{
+    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
         return ci.queryCECases(params);
         
     }
+    
+    public List<CECase> getUserCaseHistoryList(User u) throws IntegrationException, CaseLifecyleException{
+        CaseIntegrator caseInt = getCaseIntegrator();
+        return caseInt.getCECaseHistoryList(u);
+        
+    }
+    
+    
+    
+    
     
     
     public CECase getInitializedCECase(Property p, User u){
@@ -396,11 +355,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
         int insertedEventID = 0;
         
+        if(e.getCategory().getCasePhaseChangeRule() != null){
+            evalulateCasePhaseChangeRule(c, e);
+        }
+        
         switch(eventType){
             case Action:
                 System.out.println("CaseCoordinator.attachNewEventToCECase: action case");
                 insertedEventID = ei.insertEvent(e);
-                checkForAndCarryOutCasePhaseChange(c, e);
                 break;
             case Compliance:
                 if(viol != null){
@@ -423,6 +385,137 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         } // close switch
         return insertedEventID;
     } // close method
+    
+    private boolean evalulateCasePhaseChangeRule(CECase cse, EventCECase event) 
+            throws IntegrationException, CaseLifecyleException, ViolationException{
+        
+        CasePhaseChangeRule rule = event.getCategory().getCasePhaseChangeRule();
+        boolean rulePasses = false;
+        
+        if(rule.getRequiredCurrentCasePhase() != null){
+            if(rule.isTreatRequiredPhaseAsThreshold()){
+                if (cse.getCasePhase().getOrder() >= rule.getRequiredCurrentCasePhase().getOrder()){
+                    if(ruleSubcheck_forbiddenCasePhase(cse, rule)
+                            &&
+                        ruleSubcheck_requiredEventType(cse, rule)
+                            &&
+                        ruleSubcheck_forbiddenEventType(cse, rule)
+                            &&
+                        ruleSubcheck_requiredEventCategory(cse, rule)
+                            &&
+                        ruleSubcheck_forbiddenEventCategory(cse, rule)){
+                            rulePasses = true;
+                            implementPassedCasePhaseChangeRule(cse, rule);
+                    }
+                }
+            } else if (cse.getCasePhase() == rule.getRequiredCurrentCasePhase()){
+                if(ruleSubcheck_forbiddenCasePhase(cse, rule)
+                            &&
+                        ruleSubcheck_requiredEventType(cse, rule)
+                            &&
+                        ruleSubcheck_forbiddenEventType(cse, rule)
+                            &&
+                        ruleSubcheck_requiredEventCategory(cse, rule)
+                            &&
+                        ruleSubcheck_forbiddenEventCategory(cse, rule)){
+                            rulePasses = true;
+                            implementPassedCasePhaseChangeRule(cse, rule);
+                }
+            }
+        }
+        return rulePasses;
+    }
+    
+    
+    private boolean ruleSubcheck_forbiddenCasePhase(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = true;
+        
+        if(rule.isTreatForbiddenPhaseAsThreshold()){
+                if (cse.getCasePhase().getOrder() >= rule.getForbiddenCurrentCasePhase().getOrder()){
+                    subcheckPasses = false;
+                }
+            } else if (cse.getCasePhase() == rule.getForbiddenCurrentCasePhase()){
+                subcheckPasses = false;
+            }
+        return subcheckPasses;
+    }
+    
+    
+    private boolean ruleSubcheck_requiredEventType(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = true;
+        if(rule.getRequiredExtantEventType() != null){
+            subcheckPasses = false;
+            Iterator<EventCECase> iter = cse.getEventList().iterator();
+            while(iter.hasNext()){
+                EventCECase ev = iter.next();
+                if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
+                    subcheckPasses = true;
+                }
+            }
+        }
+        return subcheckPasses;
+    }
+   
+    
+    private boolean ruleSubcheck_forbiddenEventType(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = true;
+        Iterator<EventCECase> iter = cse.getEventList().iterator();
+        while(iter.hasNext()){
+            EventCECase ev = iter.next();
+            if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
+                subcheckPasses = false;
+            }
+        }
+        return subcheckPasses;
+    }
+    
+    private boolean ruleSubcheck_requiredEventCategory(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = true;
+        if(rule.getRequiredExtantEventCatID() != 0){
+            subcheckPasses = false;
+            Iterator<EventCECase> iter = cse.getEventList().iterator();
+            while(iter.hasNext()){
+                EventCECase ev = iter.next();
+                if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
+                    subcheckPasses = true;
+                }
+            }
+        }
+        return subcheckPasses;
+    }
+    
+    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, CasePhaseChangeRule rule){
+        boolean subcheckPasses = true;
+        Iterator<EventCECase> iter = cse.getEventList().iterator();
+        while(iter.hasNext()){
+            EventCECase ev = iter.next();
+            if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
+                subcheckPasses = false;
+            }
+        }
+        return subcheckPasses;
+    }
+    
+    private void implementPassedCasePhaseChangeRule(CECase cse, CasePhaseChangeRule rule) 
+            throws IntegrationException, CaseLifecyleException, ViolationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        EventCECase newEvent = null;
+        
+        CasePhase oldCP = cse.getCasePhase();
+        cse.setCasePhase(rule.getTargetCasePhase());
+        ci.changeCECasePhase(cse);
+        ec.generateAndInsertPhaseChangeEvent(cse, oldCP, rule);
+        if(rule.getTriggeredEventCategoryID() != 0){
+            newEvent = ec.getInitializedEvent(cse, ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryID()));
+            if(rule.getTriggeredEventCategoryRequestedEventCatID() != 0){
+                newEvent.setRequestedEventCat(ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryRequestedEventCatID()));
+            }
+            attachNewEventToCECase(cse, newEvent, null);
+            System.out.println("CaseCoordinator.implementPassedCasePhaseChangeRule "  + newEvent.getCategory().getEventCategoryTitle());
+        }
+        
+    }
    
    
     
@@ -456,6 +549,60 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return typeList;
     }
     
+    /**
+     * A CECase's Stage is derived from its Phase based on the set of business
+     * rules encoded in this method.
+     * @param cs which needs its StageConfigured
+     * @return the same CECas passed in with the CaseStage configured
+     * @throws CaseLifecyleException 
+     */
+     private CECase setCaseStage(CECase cs) throws CaseLifecyleException {
+        CaseStage stage;
+        switch (cs.getCasePhase()) {
+            case PrelimInvestigationPending:
+                stage = CaseStage.Investigation;
+                break;
+            case NoticeDelivery:
+                stage = CaseStage.Investigation;
+                break;
+        // Letter marked with a send date
+            case InitialComplianceTimeframe:
+                stage = CaseStage.Enforcement;
+                break;
+        // compliance inspection
+            case SecondaryComplianceTimeframe:
+                stage = CaseStage.Enforcement;
+                break;
+        // Filing of citation
+            case AwaitingHearingDate:
+                stage = CaseStage.Citation;
+                break;
+        // hearing date scheduled
+            case HearingPreparation:
+                stage = CaseStage.Citation;
+                break;
+        // hearing not resulting in a case closing
+            case InitialPostHearingComplianceTimeframe:
+                stage = CaseStage.Citation;
+                break;
+            case SecondaryPostHearingComplianceTimeframe:
+                stage = CaseStage.Citation;
+                break;
+            case Closed:
+                stage = CaseStage.Closed;
+                // TODO deal with this later
+                //                throw new CaseLifecyleException("Cannot advance a closed case to any other phase");
+                break;
+            case InactiveHolding:
+                stage = CaseStage.Closed;
+                break;
+            default:
+                stage = CaseStage.Closed;
+        }
+        cs.setCaseStage(stage);
+        return cs;
+    }
+    
     
     
     /**
@@ -473,7 +620,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         EventCoordinator ec = getEventCoordinator();
         EventIntegrator ei = getEventIntegrator();
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         
         List caseViolationList = cvi.getCodeViolations(c);
         boolean complianceWithAllViolations = false;
@@ -502,7 +649,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         } // close if
         
     }
-    
      
     private int processClosingEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
@@ -523,10 +669,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
         return ei.insertEvent(e);
-        
     }
     
-    
+    /**
+     * @deprecated 
+     * @param c
+     * @param e
+     * @throws CaseLifecyleException
+     * @throws IntegrationException
+     * @throws ViolationException 
+     */
     private void checkForAndCarryOutCasePhaseChange(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException, ViolationException{
         
         CaseIntegrator ci = getCaseIntegrator();
@@ -585,7 +737,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             ci.changeCECasePhase(c);
             
             // generate event for phase change and write
-            ec.generateAndInsertPhaseChangeEvent(c, initialCasePhase); 
+            ec.generateAndInsertPhaseChangeEvent(c, initialCasePhase, null); 
 
         } 
         
@@ -595,7 +747,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * Utility method for determining which CasePhase follows any given case's CasePhase. 
+     * Utility method for determining which CasePhase follows any given case's CasePhase.
+     * 
+     * @deprecated 
      * @param c the case whose set CasePhase will be read to determine the next CasePhase
      * @return the ONLY CasePhase to which any case can be changed to without a manual protocol
      * override request
@@ -657,98 +811,115 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public List retrieveViolationList(CECase ceCase) throws IntegrationException{
-        List<CodeViolation> al;
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        al = cvi.getCodeViolations(ceCase);
-        return al;
-    }
+   
     
-    public void noticeOfViolationResetMailing(CECase cs, NoticeOfViolation nov) throws IntegrationException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        nov.setRequestToSend(false);
-        nov.setLetterSentDate(null);
-        nov.setLetterReturnedDate(null);
-        cvi.updateViolationLetter(nov);
-        
-    }
-    
-    
-    public void noticeOfViolationLockAndQueue(CECase c, NoticeOfViolation nov) 
-            throws CaseLifecyleException, IntegrationException, EventException, ViolationException{
-        
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        
-        EventCoordinator evCoord = getEventCoordinator();
-        
-        // togglign this switch puts the notice in the queue for sending
-        // flag violation letter as ready to send
-        // this will also need to trigger a letter mailing process that hasn't been implemented as
-        // of 2 March 2018
-        if(nov.isRequestToSend() == false){
-            nov.setRequestToSend(true);
+    public void novResetMailing(NoticeOfViolation nov, User user) throws IntegrationException, PermissionsException{
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        if(user.getKeyCard().isHasSysAdminPermissions()){
+            cvi.novResetMailingFieldsToNull(nov);
         } else {
-            throw new CaseLifecyleException("Notice is already queued for sending");
+            throw new PermissionsException("User does not have sufficient acces righst to clear notice mailing fields");
+        }
+    }
+    
+        
+    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m){
+        NoticeOfViolation nov = new NoticeOfViolation();
+        nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
+        nov.setDateOfRecord(LocalDateTime.now());
+        nov.setStyle(m.getNovPrintStyle());
+        
+        
+        // loop over unresolved violations on case and generate CodeViolationDisplayable obects
+        Iterator<CodeViolation> iter = cse.getViolationListUnresolved().iterator();
+        while(iter.hasNext()){
+            CodeViolation cv = iter.next();
+            CodeViolationDisplayable cvd = new CodeViolationDisplayable(cv);
+            cvd.setIncludeHumanFriendlyText(false);
+            cvd.setIncludeOrdinanceText(true);
+            cvd.setIncludeViolationPhotos(false);
+            nov.getViolationList().add(cvd);
         }
         
-        // new letters won't have a LocalDateTime object
-        // so insert instead of update in this case
-        if(nov.getInsertionTimeStamp() == null){
-            cvi.insertNoticeOfViolation(c, nov);
-            
+        return nov;
+        
+    }
+    
+    
+    public void novLockAndQueue(CECase c, NoticeOfViolation nov, User user) 
+            throws CaseLifecyleException, IntegrationException, EventException, ViolationException{
+        
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        EventCoordinator evCoord = getEventCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        if(nov.getLockedAndqueuedTS() == null){
+            int ghostID = pc.createChostPerson(nov.getRecipient(), user);
+            nov.setRecipient(pi.getPerson(ghostID));
+            nov.setLockedAndqueuedTS(LocalDateTime.now());
+            nov.setLockedAndQueuedBy(user);
+            cvi.novLockAndQueueForMailing(nov);
+            System.out.println("CaseCoordinator.novLockAndQueue | NOV locked in integrator");
         } else {
-            cvi.updateViolationLetter(nov);
-            
+            throw new CaseLifecyleException("Notice is already locked and queued for sending");
         }
         
         EventCECase noticeEvent = evCoord.getInitializedEvent(c, evCoord.getInitiatlizedEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
-        
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setDescription(queuedNoticeEventNotes);
-        
-        noticeEvent.setOwner(getFacesUser());
+        noticeEvent.setOwner(user);
         noticeEvent.setDiscloseToMunicipality(true);
         noticeEvent.setDiscloseToPublic(true);
-        
         ArrayList<Person> al = new ArrayList();
         al.add(nov.getRecipient());
         noticeEvent.setPersonList(al);
-        
         attachNewEventToCECase(c, noticeEvent, null);
     }
     
-    public void refreshCase(CECase c) throws IntegrationException{
+    public void refreshCase(CECase c) throws IntegrationException, CaseLifecyleException{
         System.out.println("CaseCoordinator.refreshCase");
         CaseIntegrator ci = getCaseIntegrator();
         
         getSessionBean().setcECase(ci.getCECase(c.getCaseID()));
     }
     
-    public void noticeOfViolationMarkAsSent(CECase ceCase, NoticeOfViolation nov) throws CaseLifecyleException, EventException, IntegrationException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        nov.setLetterSentDate(LocalDateTime.now());
-        nov.setLetterSentDatePretty(getPrettyDate(LocalDateTime.now()));
-        cvi.updateViolationLetter(nov);   
-        //advanceToNextCasePhase(ceCase);
+    public int novInsertNotice(NoticeOfViolation nov, CECase cse, User usr) throws IntegrationException{
+        ViolationIntegrator vi = getCodeViolationIntegrator();
+        System.out.println("CaseCoordinator.novInsertNotice");
+        return vi.novInsert(cse, nov);
     }
     
-    public void noticeOfViolationMarkAsReturned(CECase c, NoticeOfViolation nov) throws IntegrationException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        nov.setLetterReturnedDate(LocalDateTime.now());
-        cvi.updateViolationLetter(nov);
+    public void novUpdate(NoticeOfViolation nov) throws IntegrationException{
+        ViolationIntegrator vi = getCodeViolationIntegrator();
+        vi.novUpdate(nov);
+    }
+    
+    public void novMarkAsSent(CECase ceCase, NoticeOfViolation nov, User user) throws CaseLifecyleException, EventException, IntegrationException{
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        nov.setSentTS(LocalDateTime.now());
+        nov.setSentBy(user);
+        cvi.novUpdate(nov);   
+    }
+    
+    public void novMarkAsReturned(CECase c, NoticeOfViolation nov, User user) throws IntegrationException, CaseLifecyleException{
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        nov.setReturnedTS(LocalDateTime.now());
+        nov.setReturnedBy(user);
+        cvi.novUpdate(nov);
         refreshCase(c);
     } 
     
-    public void noticeOfViolationDelete(NoticeOfViolation nov) throws CaseLifecyleException{
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+    public void novDelete(NoticeOfViolation nov) throws CaseLifecyleException{
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
 
         //cannot delete a letter that was already sent
-        if(nov != null && nov.getLetterSentDate() != null){
+        if(nov != null && nov.getSentTS() != null){
             throw new CaseLifecyleException("Cannot delete a letter that has been sent");
         } else {
             try {
-                cvi.deleteViolationLetter(nov);
+                cvi.novDelete(nov);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
                  getFacesContext().addMessage(null,
@@ -919,7 +1090,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     * @return
     * @throws IntegrationException 
     */
-   public ReportConfigCECase transformCECaseForReport(ReportConfigCECase rptCse) throws IntegrationException{
+   public ReportConfigCECase transformCECaseForReport(ReportConfigCECase rptCse) throws IntegrationException, CaseLifecyleException{
        CaseIntegrator ci = getCaseIntegrator();
        // we actually get an entirely new object instead of editing the 
        // one we used throughout the ceCases.xhtml
@@ -947,9 +1118,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        while(iterNotice.hasNext()){
            NoticeOfViolation nov = iterNotice.next();
            // skip unsent notices
-           if(nov.getLetterSentDate() == null) continue;
+           if(nov.getSentTS() == null) continue;
            // if the user dones't want all notices, skip returned notices
-           if(!rptCse.isIncludeAllNotices() && nov.getLetterReturnedDate() != null  ) continue;
+           if(!rptCse.isIncludeAllNotices() && nov.getReturnedTS() != null  ) continue;
            noticeList.add(nov);
        }
        c.setNoticeList(noticeList);
@@ -967,5 +1138,197 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        return ci.getPhaseChangeRule(ec.getCasePhaseChangeRule().getRuleID());
        
    }
+   
+   
+    
+    public CodeViolation generateNewCodeViolation(CECase c, EnforcableCodeElement ece){
+        CodeViolation v = new CodeViolation();
+        
+        System.out.println("ViolationCoordinator.generateNewCodeViolation | enfCodeElID:" + ece.getCodeSetElementID());
+        
+        v.setViolatedEnfElement(ece);
+        v.setStipulatedComplianceDate(LocalDateTime.now()
+                .plusDays(ece.getNormDaysToComply()));
+        v.setPenalty(ece.getNormPenalty());
+        v.setDateOfRecord(LocalDateTime.now());
+        v.setCeCaseID(c.getCaseID());
+        // control is passed back to the violationAddBB which stores this 
+        // generated violation under teh activeCodeViolation in the session
+        // which the ViolationAddBB then picks up and edits
+        
+        return v;
+    }
+    
+    /**
+     * Standard coordinator method which calls the integration method after 
+     * checking businses rules. 
+     * ALSO creates a corresponding timeline event to match the stipulated compliance
+     * date on the violation that's added.
+     * @param v
+     * @param c
+     * @return the database key assigned to the inserted violation
+     * @throws IntegrationException
+     * @throws ViolationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
+     */
+    public int attachViolationToCaseAndInsertTimeFrameEvent(CodeViolation v, CECase c) throws IntegrationException, ViolationException, CaseLifecyleException{
+        
+        ViolationIntegrator vi = getCodeViolationIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        EventCECase tfEvent;
+        int violationStoredDBKey;
+        int eventID;
+        StringBuilder sb = new StringBuilder();
+        
+        EventCategory eventCat = ec.getInitiatlizedEventCategory(
+                                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+                                .getString("complianceTimeframeExpiry")));
+//        EventCategory eventCat = ec.getInitiatlizedEventCategory(113);
+        tfEvent = ec.getInitializedEvent(c, eventCat);
+        tfEvent.setDateOfRecord(v.getStipulatedComplianceDate());
+        tfEvent.setOwner(c.getCaseManager());
+        tfEvent.setRequestActionByDefaultMuniCEO(true);
+        eventCat = ec.getInitiatlizedEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+                .getString("propertyInspection")));
+        tfEvent.setRequestedEventCat(eventCat);
+        tfEvent.setActionRequestedBy(uc.getCogBotUser());
+        
+        sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
+                        .getString("complianceTimeframeEndEventDesc"));
+        sb.append("Case: ");
+        sb.append(c.getCaseName());
+        sb.append(" at ");
+        sb.append(c.getProperty().getAddress());
+        sb.append("(");
+        sb.append(c.getProperty().getMuni().getMuniName());
+        sb.append(")");
+        sb.append("; Violation: ");
+        sb.append(v.getViolatedEnfElement().getCodeElement().getHeaderString());
+        tfEvent.setDescription(sb.toString());
+        
+        if(verifyCodeViolationAttributes(v)){
+            eventID = cc.attachNewEventToCECase(c, tfEvent, v);
+            v.setComplianceTimeframeEventID(eventID);
+            violationStoredDBKey = vi.insertCodeViolation(v);
+        } else {
+            throw new ViolationException("Failed violation verification");
+        }
+        
+        
+        return violationStoredDBKey;
+        
+    }
+    
+    /**
+     * Uses date fields on the populated CodeViolation to determine
+     * a status string and icon for UI
+     * Called by the integrator when creating a code violation
+     * @param cv
+     * @return the CodeViolation with correct icon and statusString
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public CodeViolation configureCodeViolation(CodeViolation cv) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        if(cv.getActualComplianceDate() == null){
+            // violation still within compliance timeframe
+            if(cv.getDaysUntilStipulatedComplianceDate() >= 0){
+                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_withincomptimeframe_statusstring"));
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_withincomptimeframe_iconid"))));
+                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_withincomptimeframe_ageleadtext"));
+                
+            // violation has not been cited, but is past compliance timeframe end date
+            } else if(cv.getCitationIDList().isEmpty()) {
+                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_overdue_statusstring"));
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_overdue_iconid"))));
+                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_overdue_ageleadtext"));
+            // violation has been cited on at least one citation
+            } else {
+                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_citation_statusstring"));
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_citation_iconid"))));
+                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString("codeviolation_unresolved_citation_ageleadtext"));
+            }
+        } else {
+            cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                    .getString("codeviolation_resolved_statusstring"));
+            cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                    .getString("codeviolation_resolved_iconid"))));
+        }
+        return cv;
+    }
+    
+    
+    private boolean verifyCodeViolationAttributes(CodeViolation cv) throws ViolationException{
+        
+        // this is no good--when we get past stip comp date, we'll have a coordinator issue
+//        if(cv.getStipulatedComplianceDate().isBefore(LocalDateTime.now())){
+//            throw new ViolationException("Stipulated Complicance must be in the future!");
+//        }
+        
+        return true;
+    }
+    
+    public void updateCodeViolation(CodeViolation cv) throws ViolationException, IntegrationException{
+        
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        if(verifyCodeViolationAttributes(cv)){
+            cvi.updateCodeViolation(cv);
+        }
+    }
+    
+    /**
+     * CodeViolation should have the actual compliance date set from the user's 
+     * event date of record
+     * @param cv
+     * @param u
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void recordCompliance(CodeViolation cv, User u) throws IntegrationException{
+        
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        EventIntegrator ei = getEventIntegrator();
+        // update violation record for compliance
+        cv.setComplianceUser(u);
+        cvi.recordCompliance(cv);
+                
+        // inactivate timeframe expiry event
+        if(cv.getCompTimeFrameComplianceEvent() != null || cv.getComplianceTimeframeEventID() != 0){
+            int violTimeframeEventID;
+            // cope with the condition that incoming code violations may only have the id
+            // of the assocaited event and not the entire object
+            if(cv.getCompTimeFrameComplianceEvent() != null){
+                 violTimeframeEventID = cv.getCompTimeFrameComplianceEvent().getEventID();
+            } else {
+                violTimeframeEventID = cv.getComplianceTimeframeEventID();
+            }
+            System.out.println("ViolationCoordinator.recordCompliance | invalidating event id: " + violTimeframeEventID);
+            ei.inactivateEvent(violTimeframeEventID);
+        }
+    }
+
+    
+    public void deleteViolation(CodeViolation cv) throws IntegrationException{
+        //TODO: delete photos and photo links
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        cvi.deleteCodeViolation(cv);
+    }
+    
+    public List getCodeViolations(CECase ceCase) throws IntegrationException{
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
+        List al = cvi.getCodeViolations(ceCase);
+        return al;
+    }
+    
    
 } // close class

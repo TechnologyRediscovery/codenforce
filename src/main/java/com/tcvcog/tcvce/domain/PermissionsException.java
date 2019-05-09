@@ -21,24 +21,24 @@ package com.tcvcog.tcvce.domain;
  *
  * @author cedba
  */
-public class DataStoreException extends BaseException{
+public class PermissionsException extends BaseException{
  
-  public DataStoreException()
+  public PermissionsException()
   {
     super();
   }
 
-  public DataStoreException(String message)
+  public PermissionsException(String message)
   {
     super(message);
   }
 
-  public DataStoreException(Exception e)
+  public PermissionsException(Exception e)
   {
     super(e);
   }
 
-  public DataStoreException(String message, Exception e)
+  public PermissionsException(String message, Exception e)
   {
     super(message, e);
   }

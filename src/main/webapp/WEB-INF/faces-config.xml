@@ -103,9 +103,9 @@
 
     <managed-bean>
         <managed-bean-name>violationIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.CodeViolationIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.integration.ViolationIntegrator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
 
     <managed-bean>
         <managed-bean-name>userIntegrator</managed-bean-name>
@@ -161,12 +161,7 @@
         <managed-bean-class>com.tcvcog.tcvce.coordinators.SessionSystemCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
-    <managed-bean>
-        <description>Interfaces between code violation related objects and integration layer objects</description>
-        <managed-bean-name>violationCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.ViolationCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+   
     
     <managed-bean>
         <managed-bean-name>codeCoordinator</managed-bean-name>
@@ -706,15 +701,11 @@
     <navigation-rule>
         <from-view-id>*</from-view-id>
         
-        
-        
         <navigation-case>
             <from-outcome>ceCases</from-outcome>
             <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
             <redirect />
         </navigation-case>
-        
-      
         
         
         <navigation-case>
@@ -989,16 +980,6 @@
         </navigation-case>
 
         <navigation-case>
-            <from-outcome>noticeOfViolationBuilderPersons</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilderPersons.xhtml</to-view-id>
-        </navigation-case>
-
-        <navigation-case>
-            <from-outcome>noticeOfViolationBuilderText</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationBuilderText.xhtml</to-view-id>
-        </navigation-case>
- 
-        <navigation-case>
             <from-outcome>noticeOfViolationEditor</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/noticeOfViolationEditor.xhtml</to-view-id>
         </navigation-case>
@@ -1064,15 +1045,7 @@
     </navigation-rule>
 
     
-    <navigation-rule>
-        <from-view-id>/restricted/cogstaff/ce/violationEdit.xhtml</from-view-id>
-        <navigation-case>
-            <from-action>#{violationEditBB.backTocaseProfiler}</from-action>
-            <from-outcome>caseProfile</from-outcome>
-            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
+   
 
 
     <navigation-rule>
@@ -1106,16 +1079,13 @@
     <navigation-rule>
         <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
         <navigation-case>
-            <from-action>#{caseProfileBB.editViolation}</from-action>
             <from-outcome>violationEdit</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/violationEdit.xhtml</to-view-id>
-            <redirect />
         </navigation-case>
         <navigation-case>
             <from-action>#{caseProfileBB.addViolation}</from-action>
             <from-outcome>violationSelectElement</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
-            <redirect />
         </navigation-case>
     </navigation-rule>
     

@@ -76,7 +76,7 @@
                                 <p:commandButton
                                     value="Search by name only" tabindex="3" 
                                     ajax="true" icon="fa fa-search"
-                                    process=    "   @form
+                                    process=    "@form
                                     change-person-form:formFirstName-person
                                     change-person-form:formLastName-person"
                                     actionListener="#{personsBB.searchForPersons}" 
@@ -119,7 +119,6 @@
                                     expandedRow="false"
                                     filteredValue="#{personsBB.filteredPersonList}"
                                     widgetVar="personSelectListTable">
-                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
                                     <p:column width="4%">
                                         <f:facet name="header">
@@ -170,7 +169,8 @@
                                         <p:commandButton actionListener="#{personsBB.selectPerson(per)}"
                                                          ajax="true" icon="fa fa-hand-o-right"
                                                          value="view"
-                                                         update="selected-person-info-form:selected-person-info-ds"/>
+                                                         update="selected-person-info-form
+                                                         connect-person-to-property-form"/>
 
                                     </p:column>
                                 </p:dataTable>
@@ -183,101 +183,103 @@
 
                             <h:form id="selected-person-info-form">
 
-                                <p:dataScroller
-                                    id="selected-person-info-ds"
-                                    value="#{personsBB.selectedPerson}"
-                                    var="p">
-
-
                                     <div class="outlinedBox">
 
-                                        <h2><h:outputText value="#{p.firstName} #{p.lastName}"/>, Person ID:<h:outputText value="#{p.personID}"/> </h2>
+                                        <h2><h:outputText value="#{personsBB.selectedPerson.firstName} #{personsBB.selectedPerson.lastName}"/>, Person ID:<h:outputText value="#{personsBB.selectedPerson.personID}"/> </h2>
+                                        
+                                    <p:commandButton value="update person" ajax="true"
+                                         icon="fa fa-edit"
+                                         oncomplete="PF('person-addupdate-dialog-var').show()"
+                                         update="person-addupdate-form"
+                                         actionListener="#{personsBB.initiatePersonUpdate}"
+                                         />
+                                    
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd, gridTd, gridTd">
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Person Type: "/>
-                                                <h:outputText value="#{p.personType.label}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.personType.label}"/>
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Job Title: "/>
-                                                <h:outputText value="#{p.jobTitle}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.jobTitle}"/>
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Email: "/>
-                                                <h:outputText value="#{p.email}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.email}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Last Updated: "/>
-                                                <h:outputText value="#{p.lastUpdatedString}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.lastUpdatedPretty}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Address: "/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText escape="false" value="#{p.addressStreet}"/>
+                                                <h:outputText escape="false" value="#{personsBB.selectedPerson.addressStreet}"/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.addressCity}, #{personsBB.selectedPerson.addressState} #{personsBB.selectedPerson.addressZip}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
-                                                <h:outputText value="#{p.useSeparateMailingAddress ? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.useSeparateMailingAddress ? 'Yes':'No'}"/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText escape="false" value="#{p.mailingAddressStreet}"/>
+                                                <h:outputText escape="false" value="#{personsBB.selectedPerson.mailingAddressStreet}"/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText value="#{p.mailingAddressCity}, #{p.mailingAddressState} #{p.mailingAddressZip}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.mailingAddressCity}, #{personsBB.selectedPerson.mailingAddressState} #{personsBB.selectedPerson.mailingAddressZip}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Under 18? "/>
-                                                <h:outputText value="#{p.under18 ? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.under18 ? 'Yes':'No'}"/>
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Active? "/>
-                                                <h:outputText value="#{p.active ? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.active ? 'Yes':'No'}"/>
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Composite last name? "/>
-                                                <h:outputText value="#{p.compositeLastName? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.compositeLastName? 'Yes':'No'}"/>
                                             </h:panelGroup>
 
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
-                                                <h:outputText value="#{p.canExpire ? 'Yes':'No'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.canExpire ? 'Yes':'No'}"/>
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Expires: "/>
-                                                <h:outputText value="#{p.expireString}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.expireString}"/>
 
                                                 <p:spacer height="5px"/>
                                                 <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
                                                 <div class="rowExpansion">
-                                                    <h:outputText value="#{p.expiryNotes}"/>
+                                                    <h:outputText value="#{personsBB.selectedPerson.expiryNotes}"/>
                                                 </div>
 
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Phone(h): "/>
-                                                <h:outputText value="#{p.phoneHome}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.phoneHome}"/>
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Phone(w): "/>
-                                                <h:outputText value="#{p.phoneWork}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.phoneWork}"/>
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel styleClass="bold" value="Phone(m): "/>
-                                                <h:outputText value="#{p.phoneCell}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.phoneCell}"/>
                                             </h:panelGroup>
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Linked to user? "/>
-                                                <h:outputText value="#{p.linkedUserID == 0 ? 'No':'Yes'}"/>
+                                                <h:outputText value="#{personsBB.selectedPerson.linkedUserID == 0 ? 'No':'Yes'}"/>
                                                 <p:spacer height="5px"/>
 
                                             </h:panelGroup>
@@ -294,73 +296,87 @@
                                                                  rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
                                                 <p:spacer height="15px"/>
                                                 <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{p.notes}"/>
+                                                    <h:outputText escape="false" value="#{personsBB.selectedPerson.notes}"/>
                                                 </div>
                                             </f:facet>
                                         </h:panelGrid>
                                     </div>
-                                    <p:commandButton value="update person" ajax="true"
-                                                     icon="fa fa-edit"
-                                                     oncomplete="PF('person-addupdate-dialog-var').show()"
-                                                     update="person-addupdate-form"
-                                                     actionListener="#{personsBB.initiatePersonUpdate}"
-                                                     />
-
-                                </p:dataScroller>
+                                    
 
 
                             </h:form>
 
 
-                            <h3>Associated properties</h3>
+                            <h2>Person-connected properties</h2>
+                            
+                            
+                            <h:form id="connect-person-to-property-form">
+                                
 
+                                <p:selectOneMenu id="property-som" tabindex="3" value="#{personsBB.selectedProperty}">
+                                    <f:converter converterId="propertyConverter"/>
+                                    <f:selectItem itemLabel="select a property..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems id="propertylist-selitems" value="#{personsBB.propertyCandidateList}" var="p" itemValue="#{p}" itemLabel="#{p.address}" />
+                                </p:selectOneMenu>
+                                <p:spacer height="5px" />
+                                
+                                <p:commandButton value="connect #{personsBB.selectedPerson.firstName} #{personsBB.selectedPerson.lastName} to this property" 
+                                        ajax="true"
+                                         icon="fa fa-link"
+                                         update="table-person-associated-properties"
+                                         actionListener="#{personsBB.connectCurrentPersonToProperty}"
+                                         />
+                                <p:spacer height="5px" />
+                                
+                                <h3>Properties connected to this person</h3>
+                                <p:dataTable
+                                    id="table-person-associated-properties"
+                                    var="prop"
+                                    value="#{personsBB.propertyPersonList}"
+                                    rowKey="#{prop.propertyID}"
+                                    filteredValue="#{propertyProfileBB.filteredPropList}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6"
+                                    >
+                                    <p:column width="4%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyID}" />
+                                    </p:column>
+                                    <p:column width="12%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Address"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.address}" />
+                                    </p:column>
 
-                            <p:dataTable
-                                id="propSearchTable"
-                                var="prop"
-                                value="#{propertyProfileBB.propList}"
-                                rowKey="#{prop.propertyID}"
-                                filteredValue="#{propertyProfileBB.filteredPropList}"
-                                tableStyleClass="primeDataTable"
-                                draggableRows="false" tabindex="6"
-                                >
-                                <p:column width="8%">
-                                    <f:facet name="header">
-                                        <h:outputText value="ID"/>
-                                    </f:facet>
-                                    <h:outputText value="#{prop.propertyID}" />
-                                </p:column>
-                                <p:column width="15%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Address"/>
-                                    </f:facet>
-                                    <h:outputText value="#{prop.address}" />
-                                </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Muni" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.muni.muniName}"/>
+                                    </p:column>
 
-                                <p:column width="10%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Muni" />
-                                    </f:facet>
-                                    <h:outputText value="#{prop.muni.muniName}"/>
-                                </p:column>
+                                    <p:column width="7%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Use Type"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyUseType}" />
+                                    </p:column>
 
-                                <p:column width="12%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Use Type"/>
-                                    </f:facet>
-                                    <h:outputText value="#{prop.propertyUseType}" />
-                                </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value=""/>
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-home"
+                                                         value="view property"
+                                                         action="#{personsBB.viewPersonAssociatedProperty(prop)}" 
+                                                         ajax="true"/>
+                                    </p:column>
+                                </p:dataTable>
 
-                                <p:column width="5%">
-                                    <f:facet name="header">
-                                        <h:outputText value=""/>
-                                    </f:facet>
-                                    <p:commandButton icon="fa fa-hand-o-right"
-                                                     action="#{propertyProfileBB.manageProperty(prop)}" 
-                                                     ajax="true"/>
-                                </p:column>
-                            </p:dataTable>
-
+                            </h:form>
 
                         </div>
                     </div>
@@ -469,7 +485,7 @@
                             <p:inputTextarea id="note-ita" style="width: 300px; height: 200px;" value="#{personsBB.notesToAppend}" tabindex="1"/>
                             <p:spacer height="15px"/>
                             <h:outputText escape="false" value="The above text, your name, and a timestamp will be attached to "/> 
-                            <h:outputText value="#{p.firstName} #{p.lastName} (#{p.muni.muniName})"/>, Person ID:<h:outputText value="#{p.personID}"/>
+                            <h:outputText value="#{personsBB.selectedPerson.firstName} #{personsBB.selectedPerson.lastName} (#{personsBB.selectedPerson.muniName})"/>, Person ID:<h:outputText value="#{personsBB.selectedPerson.personID}"/>
 
                             <p:spacer height="15px"/>
 
@@ -480,7 +496,7 @@
                             <p:commandButton    ajax="true" actionListener="#{personsBB.attachNoteToPerson}" tabindex="3"
                                                 value="Submit" icon="fa fa-link" oncomplete="PF('person-note-dialog').hide()"
                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
-                                                update="    selected-person-info-form:selected-person-info-ds
+                                                update="    selected-person-info-form
                                                 messages-left-form:persons-messages-global"/>
                         </h:form>
                     </p:confirmDialog>
@@ -495,7 +511,8 @@
                         <h:form id="person-addupdate-form">
 
                             
-                            <h:panelGrid columns="1">
+                            <h:panelGrid columns="1"
+                                         columnClasses="gridTd">
                                 <h:panelGroup id="person-update-h1-pg" rendered="#{personsBB.selectedPerson.personID != 0}">
                                     <h2>
                                         <h:outputText value="Update record: " /> 
@@ -504,6 +521,7 @@
                                         <h:outputText value=", " /> 
                                         <h:outputText id="pers-form-header-id" value="ID: #{personsBB.selectedPerson.personID}"/> 
                                     </h2>
+                                    <p>This record was last updated on: <h:outputText id="pers-form-lastupdated" value="#{personsBB.selectedPerson.lastUpdatedPretty}"/></p>
                                 </h:panelGroup>
                                 <h:panelGroup id="person-add-h1-pg" rendered="#{personsBB.selectedPerson.personID == 0}">
                                     <h2>
@@ -512,18 +530,14 @@
                                 </h:panelGroup>
                             </h:panelGrid>
                             
-                            <p>This record was last updated on: <h:outputText id="pers-form-lastupdated" value="#{personsBB.selectedPerson.lastUpdatedPretty}"/></p>
 
-                            <f:subview id="cond-header-pers-update-form" rendered="#{personsBB.selectedPerson.personID == 0}">
-                                <h2>Create a new Person</h2>
-                            </f:subview>
 
                             <h:messages globalOnly="true" showDetail="true" showSummary="true" id="messages-global"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
 
                             <h:panelGrid columns="3" border="0" 
-                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
                                          footerClass="gridFooter">
 
                                 <ui:remove>FIRST ROW</ui:remove>
@@ -531,7 +545,9 @@
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Person Type:" for="personTypeSelectMenu"/>
                                     <p:spacer height="3px"/>
-                                    <p:selectOneMenu id="personTypeSelectMenu" required="true" value="#{personsBB.selectedPerson.personType}">
+                                    <p:selectOneMenu id="personTypeSelectMenu" required="true" 
+                                                     value="#{personsBB.selectedPerson.personType}"
+                                                     tabindex="1">
                                         <f:selectItems value="#{personCoordinator.personTypes}"
                                                        var="pt" itemValue="#{pt}" itemLabel="#{pt.label}"/>
                                     </p:selectOneMenu>
@@ -543,13 +559,12 @@
                                     <h:outputLabel styleClass="bold" value="Municipality" for="personMuniSelectMenu"/>
                                     <p:spacer height="3px"/>
                                     <p:selectOneMenu
-                                        id="muniSM" tabindex="1" var=""
+                                        id="muniSM" tabindex="2"
                                         value="#{personsBB.selectedPerson.muniCode}">
                                         <f:selectItems id="muniNameList" value="#{personsBB.muniNameIDMap}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
 
-                                <h:panelGroup></h:panelGroup>
                                 <h:panelGroup></h:panelGroup>
 
                                 <ui:remove>SECOND ROW</ui:remove>
@@ -558,7 +573,7 @@
                                     <h:outputLabel styleClass="bold" value="First Name:" for="formFirstNameIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formFirstNameIT" value="#{personsBB.selectedPerson.firstName}" 
-                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                                 style="width: 200px;" tabindex="3" required="true" styleClass="inputText"/>
                                     <h:message for="formFirstNameIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -568,7 +583,7 @@
                                     <h:outputLabel styleClass="bold" value="Last Name:" for="formLastNameIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formLastNameIT" value="#{personsBB.selectedPerson.lastName}" 
-                                                 style="width: 200px;" tabindex="2" required="true" styleClass="inputText"/>
+                                                 style="width: 200px;" tabindex="4" required="true" styleClass="inputText"/>
                                     <h:message for="formLastNameIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -578,20 +593,18 @@
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Job Title:" for="formJobTitleIT"/>
                                     <p:inputText id="formJobTitleIT" value="#{personsBB.selectedPerson.jobTitle}"
-                                                 style="width: 150px;" tabindex="3" required="false" styleClass="inputText"/>
+                                                 style="width: 150px;" tabindex="5" required="false" styleClass="inputText"/>
                                     <p:spacer height="3px"/>
                                     <h:message for="formJobTitleIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
-                                <h:panelGroup></h:panelGroup>
-
                                 <ui:remove>THIRD ROW</ui:remove>
 
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Phone(cell):" for="formCellIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formCellIT" value="#{personsBB.selectedPerson.phoneCell}" 
-                                                 style="width: 150px;" tabindex="4" required="false" styleClass="inputText" maxlength="12"/>
+                                                 style="width: 150px;" tabindex="6" required="false" styleClass="inputText" maxlength="12"/>
                                     <h:message for="formCellIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -600,7 +613,7 @@
                                     <h:outputLabel styleClass="bold" value="Phone(home):" for="formHomeIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formHomeIT" value="#{personsBB.selectedPerson.phoneHome}" 
-                                                 style="width: 150px;" tabindex="5" required="false" styleClass="inputText" maxlength="12"/>
+                                                 style="width: 150px;" tabindex="7" required="false" styleClass="inputText" maxlength="12"/>
                                     <h:message for="formHomeIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -609,7 +622,7 @@
                                     <h:outputLabel styleClass="bold" value="Phone(work)" for="formWorkIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formWorkIT" value="#{personsBB.selectedPerson.phoneWork}" 
-                                                 style="width: 150px;" tabindex="6" required="false" styleClass="inputText" maxlength="12"/>
+                                                 style="width: 150px;" tabindex="8" required="false" styleClass="inputText" maxlength="12"/>
                                     <h:message for="formWorkIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -619,7 +632,7 @@
                                     <h:outputLabel styleClass="bold" value="Email:" for="formEmailIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formEmailIT" value="#{personsBB.selectedPerson.email}" 
-                                                 style="width: 250px;" tabindex="7" required="false" styleClass="inputText">
+                                                 style="width: 250px;" tabindex="9" required="false" styleClass="inputText">
                                         <ui:remove>
                                             Thanks SO https://stackoverflow.com/questions/7875108/email-validation-using-regular-expression-in-jsf-2-primefaces 
                                             <f:validateRegex pattern="(^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[\p{L}\p{M}\p{N}.-]*(\.[\p{L}\p{M}]{2,})$)?"/>
@@ -635,7 +648,7 @@
                                     <h:outputLabel styleClass="bold" value="Street:" for="formStreetIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formStreetIT" value="#{personsBB.selectedPerson.addressStreet}" 
-                                                 style="width: 250px;" tabindex="9" required="false" styleClass="inputText"/>
+                                                 style="width: 250px;" tabindex="10" required="false" styleClass="inputText"/>
                                     <h:message for="formStreetIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -644,7 +657,7 @@
                                     <h:outputLabel styleClass="bold" value="City:" for="formCityIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formCityIT" value="#{personsBB.selectedPerson.addressCity}" 
-                                                 style="width: 250px;" tabindex="10" required="false" styleClass="inputText"/>
+                                                 style="width: 250px;" tabindex="11" required="false" styleClass="inputText"/>
                                     <h:message for="formCityIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -654,7 +667,7 @@
                                     <h:outputLabel styleClass="bold" value="State:" for="formStateIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formStateIT" value="#{personsBB.selectedPerson.addressState}" 
-                                                 style="width: 50px;" tabindex="11" required="false" styleClass="inputText"/>
+                                                 style="width: 50px;" tabindex="12" required="false" styleClass="inputText"/>
                                     <h:message for="formStateIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -663,7 +676,7 @@
                                     <h:outputLabel styleClass="bold" value="ZipCode:" for="formZipIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formZipIT" value="#{personsBB.selectedPerson.addressZip}" 
-                                                 style="width: 100px;" tabindex="12" required="false" styleClass="inputText"/>
+                                                 style="width: 100px;" tabindex="13" required="false" styleClass="inputText"/>
                                     <h:message for="formZipIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -679,7 +692,8 @@
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Allowed to expire?" for="canexpire-sbcb"/>
                                     <p:spacer height="3px"/>
-                                    <p:selectBooleanCheckbox id="canexpire-sbcb" value="#{personsBB.selectedPerson.canExpire}" />
+                                    <p:selectBooleanCheckbox id="canexpire-sbcb" value="#{personsBB.selectedPerson.canExpire}" 
+                                                             tabindex="15"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup>
@@ -701,7 +715,7 @@
                                     <h:outputLabel styleClass="bold" value="Expiry notes" for="expiry-notes-it"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="expiry-notes-it" value="#{personsBB.selectedPerson.expiryNotes}" 
-                                                 style="width: 100px;" tabindex="12" required="false" styleClass="inputText"/>
+                                                 style="width: 100px;" tabindex="17" required="false" styleClass="inputText"/>
                                     <h:message for="expiry-notes-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -711,40 +725,46 @@
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Person under 18?" for="isUnder18-pupdate-sbcb"/>
                                     <p:spacer height="3px"/>
-                                    <p:selectBooleanCheckbox id="isUnder18-pupdate-sbcb" value="#{personsBB.selectedPerson.under18}" />
+                                    <p:selectBooleanCheckbox id="isUnder18-pupdate-sbcb" 
+                                                             value="#{personsBB.selectedPerson.under18}" 
+                                                             tabindex="18"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Composite last name?" for="composite-sbcb"/>
                                     <p:spacer height="3px"/>
-                                    <p:selectBooleanCheckbox id="composite-sbcb" value="#{personsBB.selectedPerson.compositeLastName}" />
+                                    <p:selectBooleanCheckbox id="composite-sbcb" 
+                                                             value="#{personsBB.selectedPerson.compositeLastName}" 
+                                                             tabindex="19"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Person data source ID" for="datasource-it"/>
                                     <p:spacer height="3px"/>
-                                    <p:inputText id="datasource-it" value="#{personsBB.selectedPerson.sourceID}" />
+                                    <p:inputText id="datasource-it" value="#{personsBB.selectedPerson.sourceID}" 
+                                                 tabindex="19"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Business entity?" for="business-sbcb"/>
                                     <p:spacer height="3px"/>
-                                    <p:selectBooleanCheckbox id="business-sbcb" value="#{personsBB.selectedPerson.businessEntity}" />
+                                    <p:selectBooleanCheckbox id="business-sbcb" value="#{personsBB.selectedPerson.businessEntity}" 
+                                                             tabindex="20"/>
                                 </h:panelGroup>
 
                                 <ui:remove>SEVENTH ROW</ui:remove>
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Use separate mailing address?" for="sep-mailing-sbcb"/>
                                     <p:spacer height="3px"/>
-                                    <p:selectBooleanCheckbox id="sep-mailing-sbcb" value="#{personsBB.selectedPerson.useSeparateMailingAddress}" />
+                                    <p:selectBooleanCheckbox id="sep-mailing-sbcb" 
+                                                             value="#{personsBB.selectedPerson.useSeparateMailingAddress}" 
+                                                             tabindex="21"/>
                                 </h:panelGroup>
-                                <h:panelGroup></h:panelGroup>
-                                <h:panelGroup></h:panelGroup>
-                                <h:panelGroup></h:panelGroup>
-                                <ui:remove>EIGTH ROW</ui:remove>
+
+                    <ui:remove>EIGTH ROW</ui:remove>
 
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Mailing street" for="form-mail-street-it"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="form-mail-street-it" value="#{personsBB.selectedPerson.mailingAddressStreet}" 
-                                                 style="width: 250px;" tabindex="9" required="false" styleClass="inputText"/>
+                                                 style="width: 250px;" tabindex="22" required="false" styleClass="inputText"/>
                                     <h:message for="form-mail-street-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -753,7 +773,7 @@
                                     <h:outputLabel styleClass="bold" value="Mailing city" for="form-mail-city-it"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="form-mail-city-it" value="#{personsBB.selectedPerson.mailingAddressCity}" 
-                                                 style="width: 200px;" tabindex="10" required="false" styleClass="inputText"/>
+                                                 style="width: 200px;" tabindex="23" required="false" styleClass="inputText"/>
                                     <h:message for="form-mail-city-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -763,7 +783,7 @@
                                     <h:outputLabel styleClass="bold" value="Mailing state" for="form-mail-state-it"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="form-mail-state-it" value="#{personsBB.selectedPerson.mailingAddressState}" 
-                                                 style="width: 50px;" tabindex="11" required="false" styleClass="inputText"/>
+                                                 style="width: 50px;" tabindex="24" required="false" styleClass="inputText"/>
                                     <h:message for="form-mail-state-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -772,7 +792,7 @@
                                     <h:outputLabel styleClass="bold" value="Mailing zip" for="form-mail-zip-it"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="form-mail-zip-it" value="#{personsBB.selectedPerson.mailingAddressZip}" 
-                                                 style="width: 100px;" tabindex="12" required="false" styleClass="inputText"/>
+                                                 style="width: 100px;" tabindex="25" required="false" styleClass="inputText"/>
                                     <h:message for="form-mail-zip-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -782,20 +802,23 @@
 
                             <hr />
 
-                            <h:outputLabel styleClass="bold" for="update-desc-ita" value="What data did you update and why?"/>
-                            <p:spacer height="5px"/>
-                            <p:inputTextarea id="update-desc-ita" style="width: 300px; height: 200px;" value="#{personsBB.updateDescription}" tabindex="1"/>
-                            <h:message for="update-desc-ita" showDetail="false" showSummary="true" 
-                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            <p:spacer height="5px"/>
-
+                            <f:subview  id="person-update-reason-subview"
+                                            rendered="#{personsBB.selectedPerson.personID != 0}">
+                                <h:outputLabel styleClass="bold" for="update-desc-ita" value="What data did you update and why?"/>
+                                <p:spacer height="5px"/>
+                                <p:inputTextarea id="update-desc-ita" style="width: 300px; height: 200px;" 
+                                                 value="#{personsBB.updateDescription}" 
+                                                 tabindex="26"/>
+                                <h:message for="update-desc-ita" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </f:subview>
 
                             <p:spacer height="5px"/>
 
 
 
                             <p:commandButton    id="cancel-cb"
-                                                ajax="true" 
+                                                ajax="true"  tabindex="27"
                                                 value="Cancel" 
                                                 icon="fa fa-stop" 
                                                 immediate="true"
@@ -805,17 +828,20 @@
 
                             <p:commandButton id="update-person-cb" ajax="true"
                                              value="Update Person" action="#{personsBB.updatePerson}"
-                                             icon="fa fa-check"
+                                             icon="fa fa-check" tabindex="28"
                                              disabled="#{personsBB.selectedPerson.personID == 0}"
                                              oncomplete="PF('person-addupdate-dialog-var').hide()"
+                                             update="messages-left-form"
                                              />
 
                             <p:commandButton id="new-person-cb" ajax="false"
                                              value="Store new Person" 
                                              action="#{personsBB.createNewPerson}"
-                                             icon="fa fa-plus"
+                                             icon="fa fa-plus" tabindex="29"
                                              oncomplete="PF('person-addupdate-dialog-var').hide()"
-                                             disabled="#{personsBB.selectedPerson.personID != 0}"/>
+                                             disabled="#{personsBB.selectedPerson.personID != 0}"
+                                             update="messages-left-form"
+                                             />
 
                         </h:form>
 

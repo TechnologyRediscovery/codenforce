@@ -18,17 +18,22 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
+import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.Date;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -39,11 +44,8 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
 
     
     private CodeViolation currentViolation;
-    private Date dateOfRecord;
-    private Date stipulatedComplianceDate;
-    private double penalty;
-    private String description;
-    private String notes;
+    private CECase currentCase;
+    
     
     // violation update event fields
     private boolean formDiscloseToMuni;
@@ -56,33 +58,40 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
     public ViolationEditBB() {
     }
     
-    public String editViolation(){
-       ViolationCoordinator violationCoordinator = getViolationCoordinator();
-       
-       EventCoordinator eventCoordinator = getEventCoordinator();
-       currentViolation = getSessionBean().getActiveCodeViolation();
-       CECase ceCase = getSessionBean().getcECase();
-       EventCECase event = new EventCECase();
+    @PostConstruct
+    public void initBean(){
         
-        currentViolation.setStipulatedComplianceDate(getStipulatedComplianceDate()
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        currentViolation.setDateOfRecord(getDateOfRecord()
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        currentViolation.setPenalty(penalty);
-        currentViolation.setDescription(description);
-        currentViolation.setNotes(notes);
+         currentViolation = getSessionBean().getActiveCodeViolation();
+         currentCase = getSessionBean().getcECaseQueue().get(0);
+    }
+    
+    public String editViolation() throws IntegrationException, CaseLifecyleException{
+       CaseCoordinator cc = getCaseCoordinator();
+       EventCoordinator eventCoordinator = getEventCoordinator();       
+       
+       EventCategory ec = eventCoordinator.getInitiatlizedEventCategory(
+               Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
+       
+       EventCECase event = eventCoordinator.getInitializedEvent(getCurrentCase(), ec);
         
         // load up edit event data
-        event.setNotes(getFormEventNotes());
+        event.setNotes(formEventNotes);
         event.setDiscloseToMunicipality(formDiscloseToMuni);
         event.setDiscloseToPublic(formDiscloseToPublic);
         
+        MessageBuilderParams mcc = new MessageBuilderParams();
+        mcc.existingContent = currentViolation.getNotes();
+        mcc.newMessageContent = formEventNotes;
+        mcc.user = getSessionBean().getFacesUser();
+        currentViolation.setNotes(appendNoteBlock(mcc));
+        
         try {
-             violationCoordinator.updateCodeViolation(currentViolation);
+            
+             cc.updateCodeViolation(currentViolation);
              
              // if update succeeds without throwing an error, then generate an
              // update violation event
-             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(ceCase, currentViolation, event);
+             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
 
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -105,7 +114,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
                             ex.getMessage(), "Unable to generate automated event to log violation update"));
         }
         
-            return "caseProfile";
+            return "ceCases";
     }
 
     /**
@@ -113,7 +122,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
      */
     public CodeViolation getCurrentViolation() {
        
-       currentViolation = getSessionBean().getActiveCodeViolation();
+      
         return currentViolation;
     }
     
@@ -121,48 +130,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
         return "caseProfile";
     }
 
-    /**
-     * @return the dateOfRecord
-     */
-    public Date getDateOfRecord() {
-        dateOfRecord = Date.from(currentViolation
-                .getDateOfRecord().atZone(ZoneId.systemDefault()).toInstant());
-        return dateOfRecord;
-    }
-
-    /**
-     * @return the stipulatedComplianceDate
-     */
-    public Date getStipulatedComplianceDate() {
-        stipulatedComplianceDate = Date.from(currentViolation
-                .getStipulatedComplianceDate().atZone(ZoneId.systemDefault()).toInstant());
-        return stipulatedComplianceDate;
-    }
-
-    /**
-     * @return the penalty
-     */
-    public double getPenalty() {
-        penalty = currentViolation.getPenalty();
-        return penalty;
-    }
-
-    /**
-     * @return the description
-     */
-    public String getDescription() {
-        description = currentViolation.getDescription();
-        return description;
-    }
-
-    /**
-     * @return the notes
-     */
-    public String getNotes() {
-        notes = currentViolation.getNotes();
-        return notes;
-    }
-
+   
    
 
     /**
@@ -172,42 +140,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
         this.currentViolation = currentViolation;
     }
 
-    /**
-     * @param dateOfRecord the dateOfRecord to set
-     */
-    public void setDateOfRecord(Date dateOfRecord) {
-        this.dateOfRecord = dateOfRecord;
-    }
-
-    /**
-     * @param stipulatedComplianceDate the stipulatedComplianceDate to set
-     */
-    public void setStipulatedComplianceDate(Date stipulatedComplianceDate) {
-        this.stipulatedComplianceDate = stipulatedComplianceDate;
-    }
-
-    /**
-     * @param penalty the penalty to set
-     */
-    public void setPenalty(double penalty) {
-        this.penalty = penalty;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @param notes the notes to set
-     */
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    
+   
 
     /**
      * @return the formDiscloseToMuni
@@ -250,6 +183,20 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
      */
     public void setFormEventNotes(String formEventNotes) {
         this.formEventNotes = formEventNotes;
+    }
+
+    /**
+     * @return the currentCase
+     */
+    public CECase getCurrentCase() {
+        return currentCase;
+    }
+
+    /**
+     * @param currentCase the currentCase to set
+     */
+    public void setCurrentCase(CECase currentCase) {
+        this.currentCase = currentCase;
     }
     
 }

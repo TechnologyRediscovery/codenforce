@@ -8,6 +8,8 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Superlcass of entity objects: a Hodgepodge set of methods for use by 
@@ -49,4 +51,31 @@ public class EntityUtils {
         return daysBetween ;
     }
     
+    /**
+     * Pretty prints a List of Integers
+     * Used by CodeViolations to list their citations and notices
+     * @param intList
+     * @return 
+     */
+    public String fomatIDListAsString(List<Integer> intList){
+        
+        String listString;
+        StringBuilder sb = new StringBuilder();
+        Iterator<Integer> it;
+        
+        if(!intList.isEmpty()){
+            sb.append("ID #s: ");
+            it = intList.iterator();
+            while(it.hasNext()){
+                Integer i = it.next();
+                sb.append(String.valueOf(i));
+                if(it.hasNext()){
+                    sb.append(", ");
+                }
+            }
+             listString = sb.toString();
+        } else listString = "";
+        
+        return listString;
+    }
 }

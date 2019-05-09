@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
@@ -39,7 +40,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @throws IntegrationException created by any of the interrogated integrator
      * classes that look for public info.
      */
-    public List<PublicInfoBundle> getPublicInfoBundles(int pacc) throws IntegrationException{
+    public List<PublicInfoBundle> getPublicInfoBundles(int pacc) throws IntegrationException, CaseLifecyleException{
         
         CaseIntegrator caseInt = getCaseIntegrator();
         List<CEActionRequest> requestList;

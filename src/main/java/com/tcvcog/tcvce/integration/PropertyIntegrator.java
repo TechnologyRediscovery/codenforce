@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -270,6 +271,34 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         
     }
+    
+    public List<Property> getProperties(Person p) throws IntegrationException{
+         String query = "SELECT property_propertyid FROM propertyperson WHERE person_personid = ?;";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        List<Property> pList = new ArrayList<>();
+ 
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, p.getPersonID());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                pList.add(getProperty(rs.getInt("property_propertyid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return pList;
+        
+    }
   
     public String updateProperty(Property propToUpdate) throws IntegrationException{
         String query = "UPDATE public.property\n" +
@@ -355,7 +384,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     } // close getProperty()
     
-    public PropertyWithLists getPropertyWithLists(int propertyID) throws IntegrationException{
+    public PropertyWithLists getPropertyWithLists(int propertyID) throws IntegrationException, CaseLifecyleException{
         PropertyWithLists p = new PropertyWithLists();
         String query = "SELECT * from property WHERE propertyid = ?;";
         

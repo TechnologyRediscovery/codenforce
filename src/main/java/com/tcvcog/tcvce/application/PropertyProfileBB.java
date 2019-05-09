@@ -1,6 +1,7 @@
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
@@ -11,6 +12,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -47,8 +49,7 @@ Council of Governments, PA
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     private PropertyWithLists currProp;
-    private ArrayList<Person> filteredPersonList;
-    private ArrayList<Person> pList;
+    private List<Person> filteredPersonList;
     
     private String parid;
     private String address;
@@ -57,7 +58,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private String addrPartAllMunis;
     private boolean allMunis;
     
-    private ArrayList<Property> propList;
+    private List<Property> propList;
     private List<Property> filteredPropList;
     private UIInput addressInput;
     
@@ -73,7 +74,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        this.currProp = getSessionBean().getActivePropWithLists();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            this.currProp = pi.getPropertyWithLists(getSessionBean().getPropertyQueue().get(0).getPropertyID());
+        } catch (IntegrationException | CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+        propList = getSessionBean().getPropertyQueue();
     }
 
     public void searchForProperties(ActionEvent event){
@@ -119,10 +126,13 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     public void manageProperty(Property prop){
         PropertyIntegrator pi = getPropertyIntegrator();
+        UserIntegrator ui = getUserIntegrator();
         try {
             currProp = pi.getPropertyWithLists(prop.getPropertyID());
-            System.out.println("PropertyProfileBB.manageProperty | curr Prop: " + currProp.getAddress());
-        } catch (IntegrationException ex) {
+            ui.logObjectView(getSessionBean().getFacesUser(), prop);
+            getSessionBean().getPropertyQueue().add(prop);
+            
+        } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
     }
@@ -136,7 +146,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             if(currProp == null){
                 currProp = pi.getPropertyWithLists(getSessionBean().getActiveProp().getPropertyID());
             }
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
         return currProp;
@@ -159,7 +169,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         /**
      * @return the propList
      */
-    public ArrayList<Property> getPropList() {
+    public List<Property> getPropList() {
         return propList;
     }
 
@@ -294,34 +304,18 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the filteredPersonList
      */
-    public ArrayList<Person> getFilteredPersonList() {
+    public List<Person> getFilteredPersonList() {
         return filteredPersonList;
     }
 
     /**
      * @param filteredPersonList the filteredPersonList to set
      */
-    public void setFilteredPersonList(ArrayList<Person> filteredPersonList) {
+    public void setFilteredPersonList(List<Person> filteredPersonList) {
         this.filteredPersonList = filteredPersonList;
     }
 
-    /**
-     * @return the pList
-     */
-    public ArrayList<Person> getpList() throws IntegrationException {
-            PropertyIntegrator pi = getPropertyIntegrator();
-        if(pList == null || currProp == null){
-            pList= pi.getPersonIntegrator().getPersonList(selectedMuni.getMuniCode());
-        }
-        return pList;
-    }
-
-    /**
-     * @param pList the pList to set
-     */
-    public void setpList(ArrayList<Person> pList) {
-        this.pList = pList;
-    }
+    
 
     /**
      * @return the selectedMuni

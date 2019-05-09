@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,43 +31,53 @@ import java.util.Objects;
  * @author Eric C. Darsow
  */
 public class CodeViolation extends EntityUtils implements Serializable{
-    private int violationID;
-    private EnforcableCodeElement violatedEnfElement;
-    private int ceCaseID;
+    protected int violationID;
+    protected EnforcableCodeElement violatedEnfElement;
+    protected int ceCaseID;
+       
+    protected String statusString;
+    protected Icon icon;
+    protected String ageLeadText;
     
+    protected double penalty;
+    protected String description;
+    protected String notes;
     
-    private String statusString;
-    private Icon icon;
-    private String ageLeadText;
+    protected LocalDateTime dateOfCitation;
+    protected String dateOfCitationPretty;
     
-    private double penalty;
-    private String description;
-    private String notes;
+    protected List<Integer> citationIDList;
+    protected String citationListAsString;
     
-    private LocalDateTime dateOfCitation;
-    private String dateOfCitationPretty;
-    private List<Integer> citationIDList;
-    private String citationsStringList;
+    protected List<Integer> noticeIDList;
+    protected String noticeIDListAsString;
+ 
+    protected LocalDateTime dateOfRecord;
+    protected java.util.Date dateOfRecordUtilDate;
+    protected String dateOfRecordPretty;
     
-    private LocalDateTime dateOfRecord;
-    private String dateOfRecordPretty;
-    private LocalDateTime entryTimeStamp;
-    private String entryTimeStampPretty;
+    protected LocalDateTime creationTS;
+    protected String creationTSPretty;
     
-    private long daysUntilStipulatedComplianceDate;
-    private LocalDateTime stipulatedComplianceDate;
-    private String stipulatedComplianceDatePretty;
+    protected User createdBy;
     
-    private LocalDateTime actualComplianceDate;
-    private String actualComplianceDatePretty;
+    protected long daysUntilStipulatedComplianceDate;
+    protected LocalDateTime stipulatedComplianceDate;
+    protected java.util.Date stipulatedComplianceDateUtilDate;
+    protected String stipulatedComplianceDatePretty;
     
-    private boolean leagacyImport;
-    private LocalDateTime complianceTimeStamp;
-    private User complianceUser;
-    private EventCECase compTimeFrameComplianceEvent;
-    private int complianceTimeframeEventID;
+    protected LocalDateTime actualComplianceDate;
+    protected java.util.Date actualComplianceDateUtilDate;
+    protected String actualComplianceDatePretty;
     
-    private List<Integer> photoList;
+    protected boolean leagacyImport;
+    
+    protected LocalDateTime complianceTimeStamp;
+    protected User complianceUser;
+    protected EventCECase compTimeFrameComplianceEvent;
+    protected int complianceTimeframeEventID;
+    
+    protected List<Integer> photoList;
 
     /**
      * @return the violationID
@@ -210,10 +221,10 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the entryTimeStamp
+     * @return the creationTS
      */
-    public LocalDateTime getEntryTimeStamp() {
-        return entryTimeStamp;
+    public LocalDateTime getCreationTS() {
+        return creationTS;
     }
 
     /**
@@ -231,10 +242,10 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @param entryTimeStamp the entryTimeStamp to set
+     * @param creationTS the creationTS to set
      */
-    public void setEntryTimeStamp(LocalDateTime entryTimeStamp) {
-        this.entryTimeStamp = entryTimeStamp;
+    public void setCreationTS(LocalDateTime creationTS) {
+        this.creationTS = creationTS;
     }
 
     /**
@@ -252,32 +263,18 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the citationsStringList
+     * @return the citationListAsString
      */
-    public String getCitationsStringList() {
-        StringBuilder sb = new StringBuilder();
-        Iterator<Integer> it;
-        
-        if(!citationIDList.isEmpty()){
-            sb.append("Citation IDs: ");
-            it = citationIDList.iterator();
-            while(it.hasNext()){
-                Integer i = it.next();
-                sb.append(String.valueOf(i));
-                if(it.hasNext()){
-                    sb.append(", ");
-                }
-            }
-            citationsStringList = sb.toString();
-        } else citationsStringList = "";
-        return citationsStringList;
+    public String getCitationListAsString() {
+       
+        return citationListAsString;
     }
 
     /**
-     * @param citationsStringList the citationsStringList to set
+     * @param citationListAsString the citationListAsString to set
      */
-    public void setCitationsStringList(String citationsStringList) {
-        this.citationsStringList = citationsStringList;
+    public void setCitationListAsString(String citationListAsString) {
+        this.citationListAsString = citationListAsString;
     }
 
     /**
@@ -313,12 +310,12 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the entryTimeStampPretty
+     * @return the creationTSPretty
      */
-    public String getEntryTimeStampPretty() {
-        entryTimeStampPretty = getPrettyDate(entryTimeStamp);
+    public String getCreationTSPretty() {
+        creationTSPretty = getPrettyDate(creationTS);
         
-        return entryTimeStampPretty;
+        return creationTSPretty;
     }
 
     /**
@@ -353,10 +350,10 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @param entryTimeStampPretty the entryTimeStampPretty to set
+     * @param creationTSPretty the creationTSPretty to set
      */
-    public void setEntryTimeStampPretty(String entryTimeStampPretty) {
-        this.entryTimeStampPretty = entryTimeStampPretty;
+    public void setCreationTSPretty(String creationTSPretty) {
+        this.creationTSPretty = creationTSPretty;
     }
 
     /**
@@ -466,7 +463,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
         return getStrElement();
     }
     
-    private String getStrElement(){
+    protected String getStrElement(){
         StringBuilder sb = new StringBuilder();
         sb.append(violatedEnfElement.getCodeElement().getOrdSubSecNum());
         sb.append(": ");
@@ -503,11 +500,11 @@ public class CodeViolation extends EntityUtils implements Serializable{
         hash = 53 * hash + Objects.hashCode(this.dateOfCitation);
         hash = 53 * hash + Objects.hashCode(this.dateOfCitationPretty);
         hash = 53 * hash + Objects.hashCode(this.citationIDList);
-        hash = 53 * hash + Objects.hashCode(this.citationsStringList);
+        hash = 53 * hash + Objects.hashCode(this.citationListAsString);
         hash = 53 * hash + Objects.hashCode(this.dateOfRecord);
         hash = 53 * hash + Objects.hashCode(this.dateOfRecordPretty);
-        hash = 53 * hash + Objects.hashCode(this.entryTimeStamp);
-        hash = 53 * hash + Objects.hashCode(this.entryTimeStampPretty);
+        hash = 53 * hash + Objects.hashCode(this.creationTS);
+        hash = 53 * hash + Objects.hashCode(this.creationTSPretty);
         hash = 53 * hash + (int) (this.daysUntilStipulatedComplianceDate ^ (this.daysUntilStipulatedComplianceDate >>> 32));
         hash = 53 * hash + Objects.hashCode(this.stipulatedComplianceDate);
         hash = 53 * hash + Objects.hashCode(this.stipulatedComplianceDatePretty);
@@ -569,6 +566,116 @@ public class CodeViolation extends EntityUtils implements Serializable{
      */
     public void setAgeLeadText(String ageLeadText) {
         this.ageLeadText = ageLeadText;
+    }
+
+    /**
+     * @return the createdBy
+     */
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    /**
+     * @param createdBy the createdBy to set
+     */
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    /**
+     * @return the noticeIDList
+     */
+    public List<Integer> getNoticeIDList() {
+        return noticeIDList;
+    }
+
+    /**
+     * @return the noticeIDListAsString
+     */
+    public String getNoticeIDListAsString() {
+        return noticeIDListAsString;
+    }
+
+    /**
+     * @return the dateOfRecordUtilDate
+     */
+    public java.util.Date getDateOfRecordUtilDate() {
+        if(dateOfRecord != null){
+            dateOfRecordUtilDate 
+                    = java.util.Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return dateOfRecordUtilDate;
+    }
+
+    /**
+     * @return the stipulatedComplianceDateUtilDate
+     */
+    public java.util.Date getStipulatedComplianceDateUtilDate() {
+        if(stipulatedComplianceDate != null){
+            stipulatedComplianceDateUtilDate 
+                    = java.util.Date.from(stipulatedComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return stipulatedComplianceDateUtilDate;
+    }
+
+    /**
+     * @return the actualComplianceDateUtilDate
+     */
+    public java.util.Date getActualComplianceDateUtilDate() {
+        if(actualComplianceDate != null){
+            actualComplianceDateUtilDate 
+                    = java.util.Date.from(actualComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return actualComplianceDateUtilDate;
+    }
+
+    /**
+     * @param noticeIDList the noticeIDList to set
+     */
+    public void setNoticeIDList(List<Integer> noticeIDList) {
+        this.noticeIDList = noticeIDList;
+    }
+
+    /**
+     * @param noticeIDListAsString the noticeIDListAsString to set
+     */
+    public void setNoticeIDListAsString(String noticeIDListAsString) {
+        this.noticeIDListAsString = noticeIDListAsString;
+    }
+
+    /**
+     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
+     */
+    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
+        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
+        if(dateOfRecordUtilDate != null){
+            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+    }
+
+    /**
+     * @param stipulatedComplianceDateUtilDate the stipulatedComplianceDateUtilDate to set
+     */
+    public void setStipulatedComplianceDateUtilDate(java.util.Date stipulatedComplianceDateUtilDate) {
+            
+        this.stipulatedComplianceDateUtilDate = stipulatedComplianceDateUtilDate;
+        if(stipulatedComplianceDateUtilDate != null){
+            stipulatedComplianceDate = stipulatedComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            
+        }
+    }
+
+    /**
+     * @param actualComplianceDateUtilDate the actualComplianceDateUtilDate to set
+     */
+    public void setActualComplianceDateUtilDate(java.util.Date actualComplianceDateUtilDate) {
+        
+        this.actualComplianceDateUtilDate = actualComplianceDateUtilDate;
+        
+        if(actualComplianceDateUtilDate != null){
+            actualComplianceDate = actualComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        
     }
 
 }

@@ -57,7 +57,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query = "SELECT municode, muniname, address_street, address_city, address_state, \n" +
                         "       address_zip, phone, fax, email, managername, managerphone, population, \n" +
                         "       activeinprogram, defaultcodeset, occpermitissuingsource_sourceid, \n" +
-                        "       defaultcodeofficeruser, defaultcourtentity FROM public.municipality WHERE municode = ?;";
+                        "       defaultcodeofficeruser, defaultcourtentity, novprintstyle_styleid \n" +
+                        " FROM public.municipality WHERE municode = ?;";
         ResultSet rs = null;
  
         try {
@@ -85,6 +86,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     public Municipality generateMuni(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        
         Municipality muni = new Municipality();
         
         muni.setMuniCode(rs.getInt("municode"));
@@ -108,6 +111,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setIssuingPermitCodeSourceID(rs.getInt("occpermitissuingsource_sourceid"));
         muni.setDefaultCodeOfficerUserID(rs.getInt("defaultcodeofficeruser"));
         muni.setDefaultCourtEntityID(rs.getInt("defaultcourtentity"));
+        
+        muni.setNovPrintStyle(si.getPrintStyle(rs.getInt("novprintstyle_styleid")));
         
         return muni;
     }

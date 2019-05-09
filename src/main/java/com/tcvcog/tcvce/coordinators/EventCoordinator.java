@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -338,16 +339,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param event An initialized event
      * @throws IntegrationException bubbled up from the integrator
      * @throws EventException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
+     * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCECase event) throws IntegrationException, EventException{
+    public void generateAndInsertCodeViolationUpdateEvent(CECase ceCase, CodeViolation cv, EventCECase event) 
+            throws IntegrationException, EventException, CaseLifecyleException, ViolationException{
         EventIntegrator ei = getEventIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
         String updateViolationDescr = getResourceBundle(Constants.MESSAGE_TEXT).getString("violationChangeEventDescription");
-        // fetch the event category id from the event category bundle under the key updateViolationEventCategoryID
-        // now we're ready to log the event
-        EventCategory ec = new EventCategory();
-        ec.setCategoryID(Integer.parseInt(getResourceBundle(
-                Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
-        event.setCategory(ec); 
+       
        
         // hard coded for now
 //        event.setCategory(ei.getEventCategory(117));
@@ -360,7 +360,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // disclose to public from violation coord
         event.setActive(true);
         
-        ei.insertEvent(event);
+        cc.attachNewEventToCECase(ceCase, event, null);
     }
     
     
@@ -429,10 +429,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * any phase from any other phase
      * @param currentCase
      * @param pastPhase
+     * @param rule
      * @throws IntegrationException
      * @throws CaseLifecyleException 
+     * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase) throws IntegrationException, CaseLifecyleException, ViolationException{
+    public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase, CasePhaseChangeRule rule) 
+            throws IntegrationException, CaseLifecyleException, ViolationException{
         
         EventIntegrator ei = getEventIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -446,7 +449,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(pastPhase.toString());
         sb.append("\' to \'");
         sb.append(currentCase.getCasePhase().toString());
-        sb.append("\' by an action event or manual override.");
+        sb.append("\'");
+        if(rule != null){
+            sb.append("following the passing of CasePhaseChangeRule:  ");
+            sb.append(rule.getTitle());
+            sb.append(", no. ");
+            sb.append(rule.getRuleID());
+        }
         event.setDescription(sb.toString());
         
         event.setCaseID(currentCase.getCaseID());
@@ -512,6 +521,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * An unused (but very schnazzy) method for generating the appropriate event that will advance a case
      * to the next phase of its life cycle. Currently called by the method 
      * getEventForTriggeringCasePhaseAdvancement in CaseManageBB
+     * @deprecated 
      * @param c
      * @return
      * @throws IntegrationException

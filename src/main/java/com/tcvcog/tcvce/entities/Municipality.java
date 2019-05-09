@@ -44,6 +44,11 @@ public class Municipality implements Serializable{
     private int defaultCodeOfficerUserID;
     private int defaultCourtEntityID;
     
+    private PrintStyle novPrintStyle;
+    
+    
+    
+    
     /**
      * @return the muniCode
      */
@@ -293,8 +298,6 @@ public class Municipality implements Serializable{
         this.issuingPermitCodeSourceID = issuingPermitCodeSourceID;
     }
 
-    
-
     /**
      * @return the defaultCodeOfficerUserID
      */
@@ -322,6 +325,22 @@ public class Municipality implements Serializable{
     public void setDefaultCourtEntityID(int defaultCourtEntityID) {
         this.defaultCourtEntityID = defaultCourtEntityID;
     }
+
+    /**
+     * @return the novPrintStyle
+     */
+    public PrintStyle getNovPrintStyle() {
+        return novPrintStyle;
+    }
+
+    /**
+     * @param novPrintStyle the novPrintStyle to set
+     */
+    public void setNovPrintStyle(PrintStyle novPrintStyle) {
+        this.novPrintStyle = novPrintStyle;
+    }
+
+   
 
     
 }
