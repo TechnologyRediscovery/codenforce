@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -132,6 +133,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public CaseProfileBB() {
         //TODO: move somewhere else! This is too hackey. Needs a resource bundle for
         // changing image IDs without recompiling!
+        /**
         imageFilenameMap = new HashMap<>();
         imageFilenameMap.put(CasePhase.PrelimInvestigationPending, "stage1_prelim.svg");
         imageFilenameMap.put(CasePhase.NoticeDelivery, "stage1_notice.svg");
@@ -142,17 +144,19 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         imageFilenameMap.put(CasePhase.InitialPostHearingComplianceTimeframe, "stage3_postHearing.svg");
         imageFilenameMap.put(CasePhase.SecondaryPostHearingComplianceTimeframe, "stage3_postHearing.svg");
         imageFilenameMap.put(CasePhase.Closed, "stage3_closed.svg");
+        */
     }
 
     @PostConstruct
     public void initBean() {
+        SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-        searchParams = cc.getDefaultSearchParamsCECase(getSessionBean().getActiveMuni());
+        searchParams = sc.getSearchParams_openCECases(getSessionBean().getActiveMuni());
         List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
         removedEventList = new ArrayList<>();
         showHiddenEvents = false;
         showInactiveEvents = false;
-        if (retrievedCaseList != null) {
+        if (retrievedCaseList != null && !retrievedCaseList.isEmpty()) {
             currentCase = retrievedCaseList.get(0);
             caseList = retrievedCaseList;
             refreshCurrentCase();
@@ -249,13 +253,27 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println("CaseProfileBB.deletePhotograph | " + ex);
         }
     }
-
-    /**
-     * Responder to the query button on the UI
-     *
-     * @param ev
-     */
-    public void executeQuery(ActionEvent ev) {
+    
+    public void query_allOpenCases(ActionEvent ev){
+        SearchCoordinator sc = getSearchCoordinator();
+        searchParams = sc.getSearchParams_openCECases(getSessionBean().getActiveMuni());
+        executeQuery();
+    }
+    
+    public void query_anyActiveCasePast1Week(ActionEvent ev){
+        SearchCoordinator sc = getSearchCoordinator();
+        searchParams = sc.getSearchParams_openCECases(getSessionBean().getActiveMuni());
+        executeQuery();
+    }
+    
+    public void query_anyActiveCasePastMonth(ActionEvent ev){
+        SearchCoordinator sc = getSearchCoordinator();
+        searchParams = sc.getSearchParams_openCECases(getSessionBean().getActiveMuni());
+        executeQuery();
+    }
+    
+    public void executeQuery(){
+        
         System.out.println("CaseProfileBB.executeQuery");
         CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
@@ -276,6 +294,22 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             Logger.getLogger(CaseProfileBB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
+
+    /**
+     * Responder to the query button on the UI
+     *
+     * @param ev
+     */
+    public void executeQuery(ActionEvent ev) {
+        executeQuery();
+    }
+    
+    public void refreshCaseList(ActionEvent ev){
+        caseList = null;
+    }
+    
 
     public String generateReportCECase() {
         CaseCoordinator cc = getCaseCoordinator();
@@ -314,6 +348,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         System.out.println("CaseProfileBB.prepareCaseListReport");
 
     }
+    
+    
+    
 
     public String generateReportCECaseList() {
         reportCECaseList.setCreator(getSessionBean().getFacesUser());
@@ -333,6 +370,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + reportCECase);
 
     }
+    
+    
+    
+    
 
     public void rejectRequestedEvent(EventCECase ev) {
         selectedEvent = ev;

@@ -163,51 +163,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return sps;
     }
     
-     /**
-     * Returns a SearchParams subclass for retrieving all open
-     * cases in a given municipality. Open cases are defined as a 
-     * case whose closing date is null.
-     * @param m
-     * @return a SearchParams subclass with mem vars ready to send
-     * into the Integrator for case list retrieval
-     */
-    public SearchParamsCECases getDefaultSearchParamsCECase(Municipality m){
-        SearchParamsCECases params = new SearchParamsCECases();
-        
-        // superclass 
-        params.setFilterByMuni(true);
-        params.setMuni(m);
-        params.setFilterByObjectID(false);
-        params.setLimitResultCountTo100(true);
-        
-        // subclass specific
-        params.setUseIsOpen(true);
-        params.setIsOpen(true);
-        
-        params.setDateToSearchCECases("Opening date of record");
-        params.setUseCaseManager(false);
-        
-        params.setUseCasePhase(false);
-        params.setUseCaseStage(false);
-        params.setUseProperty(false);
-        params.setUsePropertyInfoCase(false);
-        params.setUseCaseManager(false);
-        
-        return params;
-    }
     
-    /**
-     * Existed before queryCases() became the goto way to retrieve lists of cases
-     * @deprecated 
-     * @param m
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<CECase> getOpenCECaseList(Municipality m) throws IntegrationException, CaseLifecyleException{
-        CaseIntegrator ci = getCaseIntegrator();
-        List<CECase> cList = ci.queryCECases(getDefaultSearchParamsCECase(m));
-        return cList;
-    }
+    
+   
     
     /**
      * Front door for querying cases in the DB
@@ -215,12 +173,23 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param params pre-configured search parameters
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
      */
     public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
         return ci.queryCECases(params);
         
     }
+    
+    public List<CECase> getUserCaseHistoryList(User u) throws IntegrationException, CaseLifecyleException{
+        CaseIntegrator caseInt = getCaseIntegrator();
+        return caseInt.getCECaseHistoryList(u);
+        
+    }
+    
+    
+    
+    
     
     
     public CECase getInitializedCECase(Property p, User u){

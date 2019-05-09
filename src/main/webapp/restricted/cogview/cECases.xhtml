@@ -286,16 +286,56 @@
 
                             <h2>CE Case docket</h2>
                             <h:form id="caseListForm">
+                                <p:commandButton   id="query-allopencases-cb" 
+                                   ajax="true" actionListener="#{caseProfileBB.query_allOpenCases}"
+                                   icon="fa fa-print" styleClass="button"
+                                   value="all open cases: any unresolved violations" 
+                                   update="caseListForm:caseTable"/>
+                                
+                                <ui:remove>
+                                    
 
-                                <p:commandButton   id="print-case-list-cb" 
-                                                   ajax="true" actionListener="#{caseProfileBB.prepareReportCECaseList}"
-                                                   icon="fa fa-print" styleClass="noFill"
-                                                   oncomplete="PF('report-caselist-profile-diaglog-var').show()"
-                                                   value="generate case list report" 
-                                                   update="report-caselist-profile-form"/>
+                                    <p:commandButton   id="query-activecases1week-cb" 
+                                       ajax="true" actionListener="#{caseProfileBB.query_openCasesActive1Week}"
+                                       icon="fa fa-print" styleClass="button"
+                                       value="open cases: active only (any event +/- 1 week)" 
+                                       update="caseListForm:caseTable"/>
+
+                                    <p:commandButton   id="query-button-opencases" 
+                                       ajax="true" actionListener="#{caseProfileBB.queryOpenCases}"
+                                       icon="fa fa-print" styleClass="button"
+                                       value="open cases: all" 
+                                       update="caseListForm:caseTable"/>
+
+                                    <p:commandButton   id="query-recentlyclosed-cb" 
+                                       ajax="true" actionListener="#{caseProfileBB.queryOpenCases}"
+                                       icon="fa fa-print" styleClass="button"
+                                       value="recently closed: past 30 days" 
+                                       update="caseListForm:caseTable"/>
+
+                                    <p:commandButton   id="query-recentlyclosed-plusopen-cb" 
+                                       ajax="true" actionListener="#{caseProfileBB.queryOpenCases}"
+                                       icon="fa fa-print" styleClass="button"
+                                       value="recently closed (past 30 days) + open cases" 
+                                       update="caseListForm:caseTable"/>
+
+                                </ui:remove>
+                               
                                 <p:spacer height="5px" />
+                                
+                                <h:outputLabel value="Current query name: " for="cecases-queryname-ot" class="bold" />
+                                <h:outputText id="cecases-queryname-ot" 
+                                              value="#{caseProfileBB.searchParams.searchName}" />
+                                <p:spacer height="5px" />
+                                
+                                <p:commandButton   id="query-refreshlist-cb" 
+                                                   ajax="true" actionListener="#{caseProfileBB.refreshCaseList}"
+                                   icon="fa fa-refresh" styleClass="button"
+                                   value="refresh case list" 
+                                   update="caseListForm:caseTable"/>
+                               
 
-                                <p:spacer height="15px"/>
+                                <p:spacer height="5px" />
                                 <p:dataTable
                                     id="caseTable"
                                     var="c"
@@ -362,6 +402,13 @@
 
 
                                 <p:spacer height="10px"/>
+                                
+                                 <p:commandButton   id="print-case-list-cb" 
+                                                   ajax="true" actionListener="#{caseProfileBB.prepareReportCECaseList}"
+                                                   icon="fa fa-print" styleClass="button"
+                                                   oncomplete="PF('report-caselist-profile-diaglog-var').show()"
+                                                   value="generate case list report" 
+                                                   update="report-caselist-profile-form"/>
                             </h:form>
                         </div>
                         <div class="object-column">
