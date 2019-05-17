@@ -188,21 +188,14 @@ public class BackingBeanUtils implements Serializable{
      * @return the postgresCon
      */
     public Connection getPostgresCon() {
-        String username = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("dbusername_readwrite");
-//        String username = getResourceBundle("dbconnection").getString("dbusername_readwrite");
-        String password = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("dbpassowrd_readwrite");
         String jndi_name = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("jndi_name");
-//        String password = getResourceBundle("dbconnection").getString("dbpassowrd_readwrite");
         
         Context initContext = null;
         try {
             initContext = new InitialContext();
             Context envCtx = (Context) initContext.lookup("java:comp/env");
             dataSource = (DataSource) envCtx.lookup(jndi_name);
-//            System.out.println(dataSource.toString());
-//            connx = dataSource.getConnection("sylvia", "c0d3");
             connx = dataSource.getConnection();
-//            System.out.println("BackingBeanUtils.getConnx | connectionob" + connx.toString());
         } catch (NamingException | SQLException ex) {
             System.out.println(ex);
         }

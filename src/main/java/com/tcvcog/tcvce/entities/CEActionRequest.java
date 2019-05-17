@@ -47,7 +47,7 @@ public class CEActionRequest implements Serializable{
     private CEActionRequestStatus requestStatus;
 
     private Municipality muni;
-    private Person actionRequestorPerson;
+    private Person requestor;
 
     private Property requestProperty;
    
@@ -286,17 +286,17 @@ public class CEActionRequest implements Serializable{
     }
 
     /**
-     * @return the actionRequestorPerson
+     * @return the requestor
      */
-    public Person getActionRequestorPerson() {
-        return actionRequestorPerson;
+    public Person getRequestor() {
+        return requestor;
     }
 
     /**
-     * @param actionRequestorPerson the actionRequestorPerson to set
+     * @param requestor the requestor to set
      */
-    public void setActionRequestorPerson(Person actionRequestorPerson) {
-        this.actionRequestorPerson = actionRequestorPerson;
+    public void setRequestor(Person requestor) {
+        this.requestor = requestor;
     }
 
     /**
@@ -442,7 +442,7 @@ public class CEActionRequest implements Serializable{
         hash = 73 * hash + this.requestPublicCC;
         hash = 73 * hash + Objects.hashCode(this.requestStatus);
         hash = 73 * hash + Objects.hashCode(this.muni);
-        hash = 73 * hash + Objects.hashCode(this.actionRequestorPerson);
+        hash = 73 * hash + Objects.hashCode(this.requestor);
         hash = 73 * hash + Objects.hashCode(this.requestProperty);
         hash = 73 * hash + this.issueType_issueTypeID;
         hash = 73 * hash + Objects.hashCode(this.issueTypeString);
@@ -530,7 +530,7 @@ public class CEActionRequest implements Serializable{
         if (!Objects.equals(this.muni, other.muni)) {
             return false;
         }
-        if (!Objects.equals(this.actionRequestorPerson, other.actionRequestorPerson)) {
+        if (!Objects.equals(this.requestor, other.requestor)) {
             return false;
         }
         if (!Objects.equals(this.requestProperty, other.requestProperty)) {

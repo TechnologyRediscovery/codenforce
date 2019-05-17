@@ -162,8 +162,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             // TODO: populate from text file
             pib.setTypeName("Code enforcement action request");
 
-            pib.setActionRequestorFLname(req.getActionRequestorPerson().getFirstName() 
-                                        + " " + req.getActionRequestorPerson().getLastName());
+            pib.setActionRequestorFLname(req.getRequestor().getFirstName() 
+                                        + " " + req.getRequestor().getLastName());
 
             pib.setIssueTypeString(req.getIssueTypeString());
 

@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
         <title>Enter action requestor details</title>
     </h:head>
     <h:body>
@@ -18,19 +18,84 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        
-                        <h1>Requestor details</h1>
+
+                        <h1>Code enforcement requestor details</h1>
+
+                        <f:subview  id="ceactionreq-facesuser-subview" 
+                                    rendered="#{!(empty sessionBean.facesUser)}">
+                            <h:form id="ceactionreq-requestor-config-form">
+                                <h2>You are logged in as user: <h:outputText value="#{sessionBean.facesUser.username}"/> </h2>
+
+                                <p>You have three options for attaching this request to a Person in COGConnect</p>
+
+                                
+                                <p:commandButton ajax="false" 
+                                                 id="ceactionrequest-requestasyourself-cb"
+                                                 value="Request as yourself: #{sessionBean.facesUser.person.firstName} #{sessionBean.facesUser.person.firstName}" 
+                                                 action="#{cEActionRequestSubmitBB.requestAsFacesUser}"
+                                                 />    
+                                
+                                <p:selectOneListbox id="selectactionrequestoruser"  style="width: 100%"
+                                                    value="#{cEActionRequestSubmitBB.actionRequestorAssignmentMethod}">
+                                    <f:selectItem itemValue="1" itemLabel="Request action as yourself"/>
+                                    <f:selectItem itemValue="2" itemLabel="Request action on behalf of a person connected to the property of concern: 
+                                                  #{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/>
+                                    <f:selectItem itemValue="3" itemLabel="Add new person (enter details in form below)"/>
+                                    <p:ajax         listener="#{cEActionRequestSubmitBB.changeActionRequestorAssignmentMethod}"
+                                                    update="person-list-menu
+                                                    requestCEActionFlowFormRequestorDetails
+                                                    ceactionrequest-confirmexistingperson-cb"/>
+                                </p:selectOneListbox>
+
+                                <p:spacer height="10px" />
+
+                                <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Persons connected to #{cEActionRequestSubmitBB.currentRequest.requestProperty.address}:"/>
+                                
+                                <p:spacer height="5px" />
+                                
+                                <p:selectOneMenu id="person-list-menu" 
+                                                 required="false" 
+                                                 value="#{cEActionRequestSubmitBB.currentPerson}"
+                                                 disabled="#{cEActionRequestSubmitBB.actionRequestorAssignmentMethod != 2}">
+                                    <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                    <f:selectItems value="#{cEActionRequestSubmitBB.personCandidateList}"  var="p" itemValue="#{p}" 
+                                                   itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                    <f:converter converterId="personConverter"/>
+                                    <p:ajax     listener="#{cEActionRequestSubmitBB.changePropertyPersonsDropDown}"
+                                                update="requestCEActionFlowFormRequestorDetails
+                                                ceactionrequest-confirmexistingperson-cb" />
+                                </p:selectOneMenu>
+                                
+                                <h:message for="person-list-menu" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                
+                                <p:spacer height="10px" />
+                                
+                                <p:commandButton ajax="false" 
+                                                 id="ceactionrequest-confirmexistingperson-cb"
+                                                 value="Set requestor to #{cEActionRequestSubmitBB.currentPerson.firstName} #{cEActionRequestSubmitBB.currentPerson.lastName} and continue" 
+                                                 action="#{cEActionRequestSubmitBB.assignSelectedRequestorPersonAndContinue}"
+                                                 disabled="#{cEActionRequestSubmitBB.actionRequestorAssignmentMethod == 3 
+                                                             or empty cEActionRequestSubmitBB.currentRequest.requestor
+                                                             or cEActionRequestSubmitBB.currentPerson.personID == 0}"/>
+                            </h:form>
+                        </f:subview>
+
+                        <p:spacer height="5px" />
+
+                        <hr />
 
                         <h:form id="requestCEActionFlowFormRequestorDetails">
 
                             <h:outputLabel for="requestorType" >
-                                <h:outputText styleClass="uiLabel" value="Please choose the most appropriate role that describes you:" />
+                                <h:outputText styleClass="uiLabel" value="Please choose the most appropriate role that describes this person" />
                             </h:outputLabel>
 
                             <p:selectOneMenu 
                                 id="requestorType" 
                                 required="true" tabindex="13"
-                                value="#{sessionBean.personForCEActionRequestSubmission.personType}">
+                                value="#{cEActionRequestSubmitBB.currentRequest.requestor.personType}"
+                                disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}">
 
                                 <f:selectItems 
                                     value="#{cEActionRequestSubmitBB.submittingPersonTypes}"
@@ -55,8 +120,10 @@
                                     </h:outputLabel>
                                     <h:inputText 
                                         id="requestorFirstName" size="30"  tabindex="14"
-                                        value="#{sessionBean.personForCEActionRequestSubmission.firstName}" styleClass="inputText" 
-                                        required="true"/>
+                                        value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName}" styleClass="inputText" 
+                                        required="true"
+                                        disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                        />
                                     <h:message for="requestorFirstName" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -65,8 +132,9 @@
                                     <h:outputLabel for="requestorLastName" >
                                         <h:outputText styleClass="uiLabel" value="Last Name*" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorLastName" size="30" value="#{sessionBean.personForCEActionRequestSubmission.lastName}" 
-                                                 styleClass="inputText" required="false" tabindex="15"/>
+                                    <h:inputText id="requestorLastName" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.lastName}" 
+                                                 styleClass="inputText" required="false" tabindex="15"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorLastName" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -75,7 +143,8 @@
                                     <h:outputLabel for="requestorJobTitle" >
                                         <h:outputText styleClass="uiLabel" value="Job Title (if applicable)" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorJobTitle" size="30" value="#{sessionBean.personForCEActionRequestSubmission.jobTitle}" 
+                                    <h:inputText id="requestorJobTitle" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.jobTitle}" 
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                  styleClass="inputText" required="false" tabindex="16"/>
                                     <h:message for="requestorJobTitle" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -85,8 +154,9 @@
                                     <h:outputLabel for="requestorPhoneCell" >
                                         <h:outputText styleClass="uiLabel" value="Phone (cell)" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorPhoneCell" size="15" value="#{sessionBean.personForCEActionRequestSubmission.phoneCell}" 
-                                                 styleClass="inputText" required="false" tabindex="17"/>
+                                    <h:inputText id="requestorPhoneCell" size="15" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}" 
+                                                 styleClass="inputText" required="false" tabindex="17"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorPhoneCell" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -95,8 +165,9 @@
                                     <h:outputLabel for="requestorPhoneHome" >
                                         <h:outputText styleClass="uiLabel" value="Phone (home)" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorPhoneHome" size="15" value="#{sessionBean.personForCEActionRequestSubmission.phoneHome}" 
-                                                 styleClass="inputText" required="false" tabindex="18"/>
+                                    <h:inputText id="requestorPhoneHome" size="15" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneHome}" 
+                                                 styleClass="inputText" required="false" tabindex="18"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorPhoneHome" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -105,8 +176,9 @@
                                     <h:outputLabel for="requestorPhoneWork" >
                                         <h:outputText styleClass="uiLabel" value="Phone (work)" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorPhoneWork" size="15" value="#{sessionBean.personForCEActionRequestSubmission.phoneWork}" 
-                                                 styleClass="inputText" required="false" tabindex="19"/>
+                                    <h:inputText id="requestorPhoneWork" size="15" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneWork}" 
+                                                 styleClass="inputText" required="false" tabindex="19"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorPhoneWork" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -115,8 +187,9 @@
                                     <h:outputLabel for="requestorEmail" >
                                         <h:outputText styleClass="uiLabel" value="Email" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorEmail" size="30" value="#{sessionBean.personForCEActionRequestSubmission.email}" 
-                                                 styleClass="inputText" required="false" tabindex="20"/>
+                                    <h:inputText id="requestorEmail" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}" 
+                                                 styleClass="inputText" required="false" tabindex="20"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorEmail" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -125,8 +198,9 @@
                                     <h:outputLabel for="requestorAddressStreet" >
                                         <h:outputText styleClass="uiLabel" value="Street Address*" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorAddressStreet" size="30" value="#{sessionBean.personForCEActionRequestSubmission.addressStreet}" 
-                                                 styleClass="inputText" required="false" tabindex="21"/>
+                                    <h:inputText id="requestorAddressStreet" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}" 
+                                                 styleClass="inputText" required="false" tabindex="21"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorAddressStreet" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -135,8 +209,9 @@
                                     <h:outputLabel for="requestorAddressCity" >
                                         <h:outputText styleClass="uiLabel" value="City*" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorAddressCity" size="30" value="#{sessionBean.personForCEActionRequestSubmission.addressCity}" 
-                                                 styleClass="inputText" required="false" tabindex="22"/>
+                                    <h:inputText id="requestorAddressCity" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}" 
+                                                 styleClass="inputText" required="false" tabindex="22"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorAddressCity" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -145,8 +220,9 @@
                                     <h:outputLabel for="requestorAddressZip" >
                                         <h:outputText styleClass="uiLabel" value="ZIP Code*" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorAddressZip" size="10" value="#{sessionBean.personForCEActionRequestSubmission.addressZip}" 
-                                                 styleClass="inputText" required="false" tabindex="23"/>
+                                    <h:inputText id="requestorAddressZip" size="10" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}" 
+                                                 styleClass="inputText" required="false" tabindex="23"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorAddressZip" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -155,26 +231,21 @@
                                     <h:outputLabel for="requestorAddressState" >
                                         <h:outputText styleClass="uiLabel" value="State Abbreviation*" />
                                     </h:outputLabel>
-                                    <h:inputText id="requestorAddressState" size="2" value="#{sessionBean.personForCEActionRequestSubmission.addressState}" 
-                                                 styleClass="inputText" required="true" tabindex="24"/>
+                                    <h:inputText id="requestorAddressState" size="2" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressState}" 
+                                                 styleClass="inputText" required="true" tabindex="24"
+                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorAddressState" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
 
-                                <f:facet name="footer">
-                                    <h:panelGroup>
-                                        <h:outputLabel for="remainAnonymousIS" >
-                                            <h:outputText styleClass="uiLabel" value="Do you wish to remain anonymous during the code enforcement investigation?" />
-                                        </h:outputLabel>
-                                        <p:inputSwitch id="remainAnonymousIS" value="#{sessionBean.ceactionRequestForSubmission.anonymitiyRequested}" onLabel="Yes" offLabel="No" tabindex="25"/>
-                                    </h:panelGroup>
-                                </f:facet>
+
 
                             </h:panelGrid>
                             <p:spacer width="10px"/>
 
                             <p:commandButton ajax="false" value="Review request and submit" 
-                                             action="#{cEActionRequestSubmitBB.populateActionRequestorPerson}"/>
+                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields or cEActionRequestSubmitBB.actionRequestorAssignmentMethod != 3}"
+                                             action="#{cEActionRequestSubmitBB.validateActionRequestorNewPersonAndContinue}"/>
 
                         </h:form>
                     </div>

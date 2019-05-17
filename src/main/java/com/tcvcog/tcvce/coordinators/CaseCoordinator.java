@@ -251,9 +251,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             sb.append("ID#:");
             sb.append(cear.getRequestID());
             sb.append(" submitted by ");
-            sb.append(cear.getActionRequestorPerson().getFirstName());
+            sb.append(cear.getRequestor().getFirstName());
             sb.append(" ");
-            sb.append(cear.getActionRequestorPerson().getLastName());
+            sb.append(cear.getRequestor().getLastName());
             sb.append(" on ");
             sb.append(getPrettyDate(cear.getDateOfRecord()));
             sb.append(" with a database timestamp of ");
