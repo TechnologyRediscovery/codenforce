@@ -163,10 +163,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
-        List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
+        // go fetch 
+        executeQuery();
         removedEventList = new ArrayList<>();
         showHiddenEvents = false;
         showInactiveEvents = false;
+        List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
         if (retrievedCaseList != null && !retrievedCaseList.isEmpty()) {
             currentCase = retrievedCaseList.get(0);
             caseList = retrievedCaseList;
@@ -246,7 +248,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     }
                 }
             }
-        } // close if
+        } // close outer if
     }
 
     public void deletePhoto(int photoID) {
@@ -421,6 +423,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             try {
                 selectedEvent = ec.getInitializedEvent(currentCase, selectedEventCategory);
                 selectedEvent.setDateOfRecord(LocalDateTime.now());
+                selectedEvent.setDiscloseToMunicipality(true);
+                selectedEvent.setDiscloseToPublic(false);
             } catch (CaseLifecyleException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -690,6 +694,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void refreshCurrentCase(ActionEvent ev) {
         refreshCurrentCase();
+        
     }
 
     public void refreshCurrentCase() {
@@ -700,6 +705,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
+        trimEventList();
 
     }
 

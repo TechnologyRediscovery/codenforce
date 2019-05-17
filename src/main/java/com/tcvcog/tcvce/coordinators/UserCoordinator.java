@@ -68,7 +68,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public User getCogBotUser() throws IntegrationException{
+    public User getRobotUser() throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         User u;
         u = ui.getUser(Integer.parseInt(

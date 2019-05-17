@@ -626,8 +626,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         String query = "UPDATE public.codeviolation\n"
                 + "   SET codesetelement_elementid=?, cecase_caseid=?, \n"
                 + "       dateofrecord=?, stipulatedcompliancedate=?, \n"
-                + "       penalty=?, description=?, notes=?,"
-                + "       compliancetfevent=? "
+                + "       penalty=?, description=?, notes=? "
                 + " WHERE violationid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -643,12 +642,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setDouble(5, v.getPenalty());
             stmt.setString((6), v.getDescription());
             stmt.setString(7, v.getNotes());
-            if(v.getCompTimeFrameComplianceEvent() != null){
-                stmt.setInt(8, v.getCompTimeFrameComplianceEvent().getEventID());
-            } else {
-                stmt.setNull(8, java.sql.Types.NULL);
-            }
-            stmt.setInt(9, v.getViolationID());
+            stmt.setInt(8, v.getViolationID());
 
             System.out.println("CodeViolationIntegrator.updateViolation | stmt: " + stmt.toString());
 

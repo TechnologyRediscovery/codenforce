@@ -63,6 +63,8 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
         
          currentViolation = getSessionBean().getActiveCodeViolation();
          currentCase = getSessionBean().getcECaseQueue().get(0);
+         formDiscloseToMuni = true;
+         formDiscloseToPublic = true;
     }
     
     public String editViolation() throws IntegrationException, CaseLifecyleException{
@@ -87,12 +89,12 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
         
         try {
             
-             cc.updateCodeViolation(currentViolation);
+             cc.updateCodeViolation(currentCase, currentViolation, getSessionBean().getFacesUser());
              
              // if update succeeds without throwing an error, then generate an
              // update violation event
              eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
-
+             
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation updated and notice event generated", ""));

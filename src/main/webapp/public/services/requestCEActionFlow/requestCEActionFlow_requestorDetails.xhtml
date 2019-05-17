@@ -24,17 +24,19 @@
                         <f:subview  id="ceactionreq-facesuser-subview" 
                                     rendered="#{!(empty sessionBean.facesUser)}">
                             <h:form id="ceactionreq-requestor-config-form">
-                                <h2>You are logged in as user: <h:outputText value="#{sessionBean.facesUser.username}"/> </h2>
 
-                                <p>You have three options for attaching this request to a Person in COGConnect</p>
-
+                                <h2>Option 1: Request action as yourself</h2>
                                 
-                                <p:commandButton ajax="false" 
+                                <p>Use this option when you identified the code enforcement concern yourself.</p>
+                                
+                                <p:commandButton ajax="false" tabindex="1"
                                                  id="ceactionrequest-requestasyourself-cb"
-                                                 value="Request as yourself: #{sessionBean.facesUser.person.firstName} #{sessionBean.facesUser.person.firstName}" 
-                                                 action="#{cEActionRequestSubmitBB.requestAsFacesUser}"
+                                                 value="Request as yourself: #{sessionBean.facesUser.person.firstName} #{sessionBean.facesUser.person.lastName} (user ID #{sessionBean.facesUser.userID})" 
+                                                 action="#{cEActionRequestSubmitBB.requestActionAsFacesUser}"
                                                  />    
                                 
+                <ui:remove>
+                                    
                                 <p:selectOneListbox id="selectactionrequestoruser"  style="width: 100%"
                                                     value="#{cEActionRequestSubmitBB.actionRequestorAssignmentMethod}">
                                     <f:selectItem itemValue="1" itemLabel="Request action as yourself"/>
@@ -46,54 +48,87 @@
                                                     requestCEActionFlowFormRequestorDetails
                                                     ceactionrequest-confirmexistingperson-cb"/>
                                 </p:selectOneListbox>
+                </ui:remove>
 
-                                <p:spacer height="10px" />
+                                <hr />
+                                
+                                <h2>Option 2: Request action on behalf of existing person</h2>
 
                                 <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Persons connected to #{cEActionRequestSubmitBB.currentRequest.requestProperty.address}:"/>
                                 
                                 <p:spacer height="5px" />
                                 
                                 <p:selectOneMenu id="person-list-menu" 
-                                                 required="false" 
+                                                 required="false" tabindex="2"
                                                  value="#{cEActionRequestSubmitBB.currentPerson}"
-                                                 disabled="#{cEActionRequestSubmitBB.actionRequestorAssignmentMethod != 2}">
+                                                 disabled="#{cEActionRequestSubmitBB.personCandidateList.size() == 0}">
                                     <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
                                     <f:selectItems value="#{cEActionRequestSubmitBB.personCandidateList}"  var="p" itemValue="#{p}" 
                                                    itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
                                     <f:converter converterId="personConverter"/>
+                                    
                                     <p:ajax     listener="#{cEActionRequestSubmitBB.changePropertyPersonsDropDown}"
-                                                update="requestCEActionFlowFormRequestorDetails
-                                                ceactionrequest-confirmexistingperson-cb" />
+                                                update="ceactionrequestflow-requestasprpertyperson-cb" />
                                 </p:selectOneMenu>
                                 
                                 <h:message for="person-list-menu" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 
+                                <p:spacer height="5px" />
+                                
+                                <p:outputLabel id="recent-person-list-menu-ol" for="person-list-menu" value="Recently viewed Persons:"/>
+                                
+                                <p:spacer height="5px" />
+                                
+                                <p:selectOneMenu id="recent-person-list-menu" 
+                                                 required="false" tabindex="2"
+                                                 value="#{cEActionRequestSubmitBB.currentPerson}"
+                                                 disabled="#{sessionBean.propertyQueue.size() == 0}">
+                                    <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                    <f:selectItems value="#{sessionBean.personQueue}"  var="p" itemValue="#{p}" 
+                                                   itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                    <f:converter converterId="personConverter"/>
+                                    
+                                    <p:ajax     listener="#{cEActionRequestSubmitBB.changePropertyPersonsDropDown}"
+                                                update="ceactionrequestflow-requestasprpertyperson-cb" />
+                                </p:selectOneMenu>
+                                
+                                <h:message for="recent-person-list-menu" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                <p class="italic">If you do not see a Person you expect and believe they are already in the system, please </p>
+                                
                                 <p:spacer height="10px" />
                                 
-                                <p:commandButton ajax="false" 
-                                                 id="ceactionrequest-confirmexistingperson-cb"
-                                                 value="Set requestor to #{cEActionRequestSubmitBB.currentPerson.firstName} #{cEActionRequestSubmitBB.currentPerson.lastName} and continue" 
+                                <p:commandButton ajax="false"  tabindex="3"
+                                                 id="ceactionrequestflow-requestasprpertyperson-cb"
+                                                 value="Request on behalf of: #{cEActionRequestSubmitBB.currentPerson.firstName} #{cEActionRequestSubmitBB.currentPerson.lastName}" 
                                                  action="#{cEActionRequestSubmitBB.assignSelectedRequestorPersonAndContinue}"
-                                                 disabled="#{cEActionRequestSubmitBB.actionRequestorAssignmentMethod == 3 
-                                                             or empty cEActionRequestSubmitBB.currentRequest.requestor
-                                                             or cEActionRequestSubmitBB.currentPerson.personID == 0}"/>
+                                                 disabled="#{empty cEActionRequestSubmitBB.currentPerson}"/>
                             </h:form>
+                            
+                            <hr />
+                            
+                            <h2>Option 3: Input a new person</h2>
+                            
                         </f:subview>
 
                         <p:spacer height="5px" />
 
-                        <hr />
 
                         <h:form id="requestCEActionFlowFormRequestorDetails">
+                            
+                              <f:subview  id="ceactionreq-facesuser-subview" 
+                                          rendered="#{(empty sessionBean.facesUser)}">
+                                    <h2>Enter your contact details</h2>
+                              </f:subview>
 
                             <h:outputLabel for="requestorType" >
-                                <h:outputText styleClass="uiLabel" value="Please choose the most appropriate role that describes this person" />
+                                <h:outputText styleClass="uiLabel" value="Please choose the most appropriate role from the list" />
                             </h:outputLabel>
 
                             <p:selectOneMenu 
                                 id="requestorType" 
-                                required="true" tabindex="13"
+                                required="true" tabindex="4"
                                 value="#{cEActionRequestSubmitBB.currentRequest.requestor.personType}"
                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}">
 
@@ -119,7 +154,7 @@
                                         <h:outputText styleClass="uiLabel" value="First Name*" />
                                     </h:outputLabel>
                                     <h:inputText 
-                                        id="requestorFirstName" size="30"  tabindex="14"
+                                        id="requestorFirstName" size="30"  tabindex="5"
                                         value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName}" styleClass="inputText" 
                                         required="true"
                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
@@ -133,7 +168,7 @@
                                         <h:outputText styleClass="uiLabel" value="Last Name*" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorLastName" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.lastName}" 
-                                                 styleClass="inputText" required="false" tabindex="15"
+                                                 styleClass="inputText" required="false" tabindex="6"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorLastName" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -145,7 +180,7 @@
                                     </h:outputLabel>
                                     <h:inputText id="requestorJobTitle" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.jobTitle}" 
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
-                                                 styleClass="inputText" required="false" tabindex="16"/>
+                                                 styleClass="inputText" required="false" tabindex="7"/>
                                     <h:message for="requestorJobTitle" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -155,7 +190,7 @@
                                         <h:outputText styleClass="uiLabel" value="Phone (cell)" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorPhoneCell" size="15" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}" 
-                                                 styleClass="inputText" required="false" tabindex="17"
+                                                 styleClass="inputText" required="false" tabindex="8"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorPhoneCell" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -166,7 +201,7 @@
                                         <h:outputText styleClass="uiLabel" value="Phone (home)" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorPhoneHome" size="15" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneHome}" 
-                                                 styleClass="inputText" required="false" tabindex="18"
+                                                 styleClass="inputText" required="false" tabindex="9"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorPhoneHome" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -177,7 +212,7 @@
                                         <h:outputText styleClass="uiLabel" value="Phone (work)" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorPhoneWork" size="15" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneWork}" 
-                                                 styleClass="inputText" required="false" tabindex="19"
+                                                 styleClass="inputText" required="false" tabindex="10"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorPhoneWork" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -188,7 +223,7 @@
                                         <h:outputText styleClass="uiLabel" value="Email" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorEmail" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}" 
-                                                 styleClass="inputText" required="false" tabindex="20"
+                                                 styleClass="inputText" required="false" tabindex="11"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorEmail" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -199,7 +234,7 @@
                                         <h:outputText styleClass="uiLabel" value="Street Address*" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorAddressStreet" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}" 
-                                                 styleClass="inputText" required="false" tabindex="21"
+                                                 styleClass="inputText" required="false" tabindex="12"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorAddressStreet" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -210,7 +245,7 @@
                                         <h:outputText styleClass="uiLabel" value="City*" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorAddressCity" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}" 
-                                                 styleClass="inputText" required="false" tabindex="22"
+                                                 styleClass="inputText" required="false" tabindex="13"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorAddressCity" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -221,7 +256,7 @@
                                         <h:outputText styleClass="uiLabel" value="ZIP Code*" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorAddressZip" size="10" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}" 
-                                                 styleClass="inputText" required="false" tabindex="23"
+                                                 styleClass="inputText" required="false" tabindex="14"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorAddressZip" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -232,7 +267,7 @@
                                         <h:outputText styleClass="uiLabel" value="State Abbreviation*" />
                                     </h:outputLabel>
                                     <h:inputText id="requestorAddressState" size="2" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressState}" 
-                                                 styleClass="inputText" required="true" tabindex="24"
+                                                 styleClass="inputText" required="true" tabindex="15"
                                                  disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
                                     <h:message for="requestorAddressState" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -243,8 +278,8 @@
                             </h:panelGrid>
                             <p:spacer width="10px"/>
 
-                            <p:commandButton ajax="false" value="Review request and submit" 
-                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields or cEActionRequestSubmitBB.actionRequestorAssignmentMethod != 3}"
+                            <p:commandButton ajax="false" value="Store new person and continue" 
+                                             id="ceactionrequestflow-storenewperson-cb" tabindex="16"
                                              action="#{cEActionRequestSubmitBB.validateActionRequestorNewPersonAndContinue}"/>
 
                         </h:form>

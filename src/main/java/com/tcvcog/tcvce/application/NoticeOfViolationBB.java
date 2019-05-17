@@ -162,33 +162,41 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
     
     public String assembleNotice(){
-        CaseCoordinator cc = getCaseCoordinator();
-        int newNoticeId = 0;
-        
-        StringBuilder sb = new StringBuilder();
-        Iterator<TextBlock> it = blockListBeforeViolations.iterator();
-        while(it.hasNext()){
-            appendTextBlockAsPara(it.next(), sb);
+        if(currentNotice.getRecipient() != null){
+            CaseCoordinator cc = getCaseCoordinator();
+            int newNoticeId = 0;
+
+            StringBuilder sb = new StringBuilder();
+            Iterator<TextBlock> it = blockListBeforeViolations.iterator();
+            while(it.hasNext()){
+                appendTextBlockAsPara(it.next(), sb);
+            }
+            currentNotice.setNoticeTextBeforeViolations(sb.toString());
+
+            sb = new StringBuilder();
+            it = blockListAfterViolations.iterator();
+            while(it.hasNext()){
+                appendTextBlockAsPara(it.next(), sb);
+            }
+
+            currentNotice.setNoticeTextAfterViolations(sb.toString());
+
+            try {
+                newNoticeId = cc.novInsertNotice(currentNotice, currentCase, getSessionBean().getFacesUser());
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+                System.out.println(ex);
+            }
+            currentNotice.setNoticeID(newNoticeId);
+            getSessionBean().setActiveNotice(currentNotice);
+            return "noticeOfViolationEditor";
+        } else {
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                getRecipientPersonID() + "Please choose a notice recipient before moving on", ""));
+            
+            return "";
         }
-        currentNotice.setNoticeTextBeforeViolations(sb.toString());
-        
-        sb = new StringBuilder();
-        it = blockListAfterViolations.iterator();
-        while(it.hasNext()){
-            appendTextBlockAsPara(it.next(), sb);
-        }
-        
-        currentNotice.setNoticeTextAfterViolations(sb.toString());
-        
-        try {
-            newNoticeId = cc.novInsertNotice(currentNotice, currentCase, getSessionBean().getFacesUser());
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            System.out.println(ex);
-        }
-        currentNotice.setNoticeID(newNoticeId);
-        getSessionBean().setActiveNotice(currentNotice);
-        return "noticeOfViolationEditor";
     }
 
     

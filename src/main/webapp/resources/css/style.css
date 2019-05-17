@@ -1192,6 +1192,16 @@ div.checkBoxLabel{
     color:blue;
 }
 
+.nov-builder-halfwidth{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+.preview-violations-box{
+    display: block;
+    width:1000px;
+}
 
 
 /* ******************** CLOSE MISC ********************************/

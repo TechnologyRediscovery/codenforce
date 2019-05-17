@@ -224,7 +224,9 @@ public class CECaseBaseClass extends EntityUtils implements Serializable, Clonea
      * @return the originiationDatePretty
      */
     public String getOriginiationDatePretty() {
-        originiationDatePretty = getPrettyDate(originationDate);
+        if(originationDate != null){
+            originiationDatePretty = getPrettyDate(originationDate);
+        }
         return originiationDatePretty;
     }
 
@@ -232,6 +234,9 @@ public class CECaseBaseClass extends EntityUtils implements Serializable, Clonea
      * @return the closingDatePretty
      */
     public String getClosingDatePretty() {
+        if(closingDate != null){
+            closingDatePretty = getPrettyDate(closingDate);
+        }
         return closingDatePretty;
     }
 

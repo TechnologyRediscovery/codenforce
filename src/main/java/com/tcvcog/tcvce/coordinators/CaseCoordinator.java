@@ -72,56 +72,65 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * DESIGN NOTE: A competing possible location for this method would be on the
      * CECase object itself--in its getEventListActionRequest method
      * 
-     * @param c the CECase with a populated set of Events
+     * @param cse the CECase with a populated set of Events
      * @return the CECase with the action request list ready to roll
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
-    public CECase configureCECase(CECase c) throws CaseLifecyleException{
+    public CECase configureCECase(CECase cse) throws CaseLifecyleException{
         
-        setCaseStage(c);
+        setCaseStage(cse);
         
         List<EventCECase> evList = new ArrayList();
+        
         // transfer any events with requests to a separate list for display at
         // the head of the case profile
-        if(c.getEventList() !=  null && c.getEventList().size() >= 1){
-            for(EventCECase ev: c.getEventList()){
-                if(ev.getRequestedEventCat()!= null && !ev.isResponseComplete()){
+        // only add events which make an event category request, are not done, 
+        // are active, and not hidden
+        if(cse.getEventList() !=  null && cse.getEventList().size() >= 1){
+            for(EventCECase ev: cse.getEventList()){
+                if(ev.getRequestedEventCat()!= null 
+                        && 
+                    !ev.isResponseComplete()
+                        &&
+                    ev.isActive()
+                        &&
+                    !ev.isHidden()){
                     evList.add(ev);
                 }
             }
         }
-        c.setEventListActionRequests(evList);
+        cse.setEventListActionRequests(evList);
         
-        Collections.sort(c.getNoticeList());
-        Collections.reverse(c.getNoticeList());
-        Collections.sort(c.getEventListActionRequests());
-        Collections.sort(c.getEventList());
-        Collections.reverse(c.getEventList()); 
+        Collections.sort(cse.getNoticeList());
+        Collections.reverse(cse.getNoticeList());
+        Collections.sort(cse.getEventListActionRequests());
+        Collections.sort(cse.getEventList());
+        Collections.reverse(cse.getEventList()); 
         
         // check to make sure we have empty lists on all of our list objects
-        if(c.getViolationList() == null){
-            c.setViolationList(new ArrayList<CodeViolation>());
+        if(cse.getViolationList() == null){
+            cse.setViolationList(new ArrayList<CodeViolation>());
         }
         
-        if(c.getEventListActionRequests() == null){
-            c.setEventListActionRequests(new ArrayList<EventCECase>());
+        if(cse.getEventListActionRequests() == null){
+            cse.setEventListActionRequests(new ArrayList<EventCECase>());
         }
         
-        if(c.getCitationList() == null){
-            c.setCitationList(new ArrayList<Citation>());
+        if(cse.getCitationList() == null){
+            cse.setCitationList(new ArrayList<Citation>());
         }
         
-        if(c.getNoticeList() == null){
-            c.setNoticeList(new ArrayList<NoticeOfViolation>());
+        if(cse.getNoticeList() == null){
+            cse.setNoticeList(new ArrayList<NoticeOfViolation>());
         }
         
-        if(c.getRequestList() == null){
-            c.setRequestList(new ArrayList<CEActionRequest>());
+        if(cse.getRequestList() == null){
+            cse.setRequestList(new ArrayList<CEActionRequest>());
         }
         
         
         
-        return c;
+        return cse;
     }
     
     public Icon getIconByCasePhase(CasePhase phase) throws IntegrationException{
@@ -1164,21 +1173,21 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * checking businses rules. 
      * ALSO creates a corresponding timeline event to match the stipulated compliance
      * date on the violation that's added.
-     * @param v
-     * @param c
+     * @param cv
+     * @param cse
      * @return the database key assigned to the inserted violation
      * @throws IntegrationException
      * @throws ViolationException 
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
      */
-    public int attachViolationToCaseAndInsertTimeFrameEvent(CodeViolation v, CECase c) throws IntegrationException, ViolationException, CaseLifecyleException{
+    public int attachViolationToCaseAndInsertTimeFrameEvent(CodeViolation cv, CECase cse) throws IntegrationException, ViolationException, CaseLifecyleException{
         
         ViolationIntegrator vi = getCodeViolationIntegrator();
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         EventCECase tfEvent;
-        int violationStoredDBKey;
+        int insertedViolationID;
         int eventID;
         StringBuilder sb = new StringBuilder();
         
@@ -1186,40 +1195,37 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                                 Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
                                 .getString("complianceTimeframeExpiry")));
 //        EventCategory eventCat = ec.getInitiatlizedEventCategory(113);
-        tfEvent = ec.getInitializedEvent(c, eventCat);
-        tfEvent.setDateOfRecord(v.getStipulatedComplianceDate());
-        tfEvent.setOwner(c.getCaseManager());
+        tfEvent = ec.getInitializedEvent(cse, eventCat);
+        tfEvent.setDateOfRecord(cv.getStipulatedComplianceDate());
+        tfEvent.setOwner(cse.getCaseManager());
         tfEvent.setRequestActionByDefaultMuniCEO(true);
         eventCat = ec.getInitiatlizedEventCategory(
                 Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
                 .getString("propertyInspection")));
         tfEvent.setRequestedEventCat(eventCat);
-        tfEvent.setActionRequestedBy(uc.getCogBotUser());
+        tfEvent.setActionRequestedBy(uc.getRobotUser());
         
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
                         .getString("complianceTimeframeEndEventDesc"));
         sb.append("Case: ");
-        sb.append(c.getCaseName());
+        sb.append(cse.getCaseName());
         sb.append(" at ");
-        sb.append(c.getProperty().getAddress());
+        sb.append(cse.getProperty().getAddress());
         sb.append("(");
-        sb.append(c.getProperty().getMuni().getMuniName());
+        sb.append(cse.getProperty().getMuni().getMuniName());
         sb.append(")");
         sb.append("; Violation: ");
-        sb.append(v.getViolatedEnfElement().getCodeElement().getHeaderString());
+        sb.append(cv.getViolatedEnfElement().getCodeElement().getHeaderString());
         tfEvent.setDescription(sb.toString());
         
-        if(verifyCodeViolationAttributes(v)){
-            eventID = cc.attachNewEventToCECase(c, tfEvent, v);
-            v.setComplianceTimeframeEventID(eventID);
-            violationStoredDBKey = vi.insertCodeViolation(v);
+        if(verifyCodeViolationAttributes(cse, cv)){
+            eventID = cc.attachNewEventToCECase(cse, tfEvent, cv);
+            cv.setComplianceTimeframeEventID(eventID);
+            insertedViolationID = vi.insertCodeViolation(cv);
         } else {
             throw new ViolationException("Failed violation verification");
         }
-        
-        
-        return violationStoredDBKey;
-        
+        return insertedViolationID;
     }
     
     /**
@@ -1269,21 +1275,42 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    private boolean verifyCodeViolationAttributes(CodeViolation cv) throws ViolationException{
-        
-        // this is no good--when we get past stip comp date, we'll have a coordinator issue
-//        if(cv.getStipulatedComplianceDate().isBefore(LocalDateTime.now())){
-//            throw new ViolationException("Stipulated Complicance must be in the future!");
-//        }
+    private boolean verifyCodeViolationAttributes(CECase cse, CodeViolation cv) throws ViolationException{
+        if(cse.getCasePhase() == CasePhase.Closed){
+            throw new ViolationException("Cannot update code violations on closed cases!");
+            
+        }
+        if(cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())){
+            throw new ViolationException("Stipulated compliance date cannot be before the violation's date of record");
+        }
         
         return true;
     }
     
-    public void updateCodeViolation(CodeViolation cv) throws ViolationException, IntegrationException{
-        
+    public void updateCodeViolation(CECase cse, CodeViolation cv, User u) throws ViolationException, IntegrationException{
+        EventCoordinator ec = getEventCoordinator();
         ViolationIntegrator cvi = getCodeViolationIntegrator();
-        if(verifyCodeViolationAttributes(cv)){
+        EventIntegrator ei = getEventIntegrator();
+        if(verifyCodeViolationAttributes(cse, cv)){
             cvi.updateCodeViolation(cv);
+            
+            // if we update the code violation, make sure to update any associated compliance timeframe events!
+            if(cv.getCompTimeFrameComplianceEvent() != null || cv.getComplianceTimeframeEventID() != 0){
+                int violTimeframeEventID;
+                // cope with the condition that incoming code violations may only have the id
+                // of the assocaited event and not the entire object
+                if(cv.getCompTimeFrameComplianceEvent() != null){
+                     violTimeframeEventID = cv.getCompTimeFrameComplianceEvent().getEventID();
+                } else {
+                    violTimeframeEventID = cv.getComplianceTimeframeEventID();
+                }
+                EventCECase tfEvent = ei.getEventCECase(violTimeframeEventID);
+                tfEvent.setDateOfRecord(cv.getStipulatedComplianceDate());
+                ec.editEvent(tfEvent, u);
+                System.out.println("CaseCoordinator.updateCodeViolation | updated timeframe event ID: " + tfEvent.getEventID());
+            }
+            
+            
         }
     }
     

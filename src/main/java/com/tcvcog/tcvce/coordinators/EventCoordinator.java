@@ -310,7 +310,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setOwner(uc.getCogBotUser());
+        event.setOwner(uc.getRobotUser());
         event.setDiscloseToMunicipality(true);
         event.setDiscloseToPublic(true);
         event.setActive(true);
@@ -393,6 +393,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSubSecNum());
             sb.append(":");
             sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSubSecTitle());
+            sb.append(" (ID ");
+            sb.append(violation.getViolationID());
+            sb.append(")");
             sb.append("<br/><br/>");
         e.setNotes(sb.toString());
         return e;
