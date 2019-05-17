@@ -436,7 +436,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public void inactivateEvent(int eventIdToInactivate) throws IntegrationException {
         String query = "UPDATE public.ceevent\n"
-                + "   SET activeevent=false WHERE eventid = ?;";
+                + "   SET activeevent=false, hidden=true WHERE eventid = ?;";
 
         // TO DO: finish clearing view confirmation
         Connection con = getPostgresCon();

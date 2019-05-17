@@ -34,7 +34,6 @@ import javax.faces.application.FacesMessage;
  */
 public class ViolationSelectElementBB extends BackingBeanUtils implements Serializable {
 
-    private EnforcableCodeElement selectedViolatedEnfElement;
     private ArrayList<EnforcableCodeElement> enfElementList;
     private ArrayList<EnforcableCodeElement> filteredElementList;
     private CodeSet currentCodeSet;
@@ -45,32 +44,15 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
     public ViolationSelectElementBB() {
     }
 
-    public String useSelectedElement() {
+    public String useSelectedElement(EnforcableCodeElement ece) {
         CaseCoordinator cc = getCaseCoordinator();
-        CodeViolation cv;
-        if (selectedViolatedEnfElement != null && getSessionBean() != null) {
-             cv = cc.generateNewCodeViolation(getSessionBean().getcECaseQueue().get(0),
-                    selectedViolatedEnfElement);
-            getSessionBean().setActiveCodeViolation(cv);
-//            System.out.println("ViolationSelectElementBB.useSelectedElement | Selected Enf Element: "
-//                    + selectedViolatedEnfElement.getCodeElement().getOrdchapterTitle());
-            return "violationAdd";
+        CodeViolation cv = cc.generateNewCodeViolation(getSessionBean().getcECaseQueue().get(0), ece);
+        getSessionBean().setActiveCodeViolation(cv);
+        return "violationAdd";
 
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Oops: Can't continue -- Please select an element from the list.", ""));
-            return "";
-        }
 
     }
 
-    /**
-     * @return the selectedViolatedEnfElement
-     */
-    public EnforcableCodeElement getSelectedViolatedEnfElement() {
-        return selectedViolatedEnfElement;
-    }
 
     /**
      * @return the enfElementList
@@ -100,12 +82,6 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
         return enfElementList;
     }
 
-    /**
-     * @param selectedViolatedEnfElement the selectedViolatedEnfElement to set
-     */
-    public void setSelectedViolatedEnfElement(EnforcableCodeElement selectedViolatedEnfElement) {
-        this.selectedViolatedEnfElement = selectedViolatedEnfElement;
-    }
 
     /**
      * @param enfElementList the enfElementList to set

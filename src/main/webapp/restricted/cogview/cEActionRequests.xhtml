@@ -401,14 +401,17 @@
 
                                             <div class="wrapText">
                                                 <h:outputLabel id="selr-persontype" styleClass="bold" value="Requestor ID:#{cEActionRequestsBB.selectedRequest.requestor.personID} 
-                                                                (#{cEActionRequestsBB.selectedRequest.actionRequesrequestorlabel}): "/>
+                                                               (#{cEActionRequestsBB.selectedRequest.requestor.personType.label}): "/>
                                                 <p:spacer height="5px"/>
 
-                                                <h:outputText id="selr-pers-fn" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.firequestor                                         <h:outputText id="selr-pers-ln" value="#{cEActionRequestsBB.selectedRequest.requestor.lastName}"/><br/> 
+                                                <h:outputText id="selr-pers-fn" value="#{cEActionRequestsBB.selectedRequest.requestor.firstName}" />
+                                                              <h:outputText id="selr-pers-ln" value="#{cEActionRequestsBB.selectedRequest.requestor.lastName}"/><br/> 
                                                 <h:outputText id="selr-pers-str" value="#{cEActionRequestsBB.selectedRequest.requestor.addressStreet}"/> <br/>
                                                 <h:outputText id="selr-pers-city" value="#{cEActionRequestsBB.selectedRequest.requestor.addressCity}, "/> 
-                                                <h:outputText id="selr-pers-state" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.adrequestor                                            <h:outputText id="selr-pers-zip" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.addressZip}"/> 
-                                  requestor                                        
+                                                <h:outputText id="selr-pers-state" value="#{cEActionRequestsBB.selectedRequest.requestor.addressState}"/>                                            
+                                                <h:outputText id="selr-pers-zip" value="#{cEActionRequestsBB.selectedRequest.requestor.addressZip}"/> 
+
+                                            </div>
                                             <p:spacer height="5px"/>
                                             <p:commandButton    id="change-person-cb"
                                                                 onclick="PF('change-person-dialog').show()" 
@@ -424,10 +427,11 @@
                                             <p:spacer height="5px"/>
                                             <div class="wrapText"> 
                                                 <h:outputText value="Phone (cell): "/>
-                                                <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.phoneCell}"/> <br/>
-                                          requestorvalue="Phone (work): "/>
-                                                <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestsBB.selectedRequest.actionRequestorPerson.phoneWork}"/> requestor                                 <h:outputText value="Phone (home): "/>
-                                                <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestsBB.selectedRequest.actionRequesrequestor/> <br/>
+                                                <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneCell}"/> <br/>
+                                                <h:outputText value="Phone (work): "/>
+                                                <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneWork}"/> 
+                                                <h:outputText value="Phone (home): "/>
+                                                <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneHome}"/> <br/>
                                                 <h:outputText value="Email: "/>
                                                 <h:outputText id="selr-pers-email" value="#{cEActionRequestsBB.selectedRequest.requestor.email}"/>
                                             </div>

@@ -278,7 +278,8 @@
                                     <p:commandButton    id="queryButton"
                                                         ajax="true" value="Run query" actionListener="#{caseProfileBB.executeQuery}"
                                                         process="@form"
-                                                        update="caseListForm:caseTable"
+                                                        update="caseListForm:caseTable
+                                                         cecases-messages-form"
 
                                                         />
                                 </p:fieldset>
@@ -525,6 +526,7 @@
                                                         action-requests-form:actionRequestTable
                                                         event-dt-form:caseEventTable
                                                         events-datascroller-form
+                                                        cecases-messages-form
                                                         case-profile-messages-form:case-profile-messages-global
                                                         "
                                                         />
@@ -673,18 +675,21 @@
                                     </p:column>
                                     <p:rowExpansion>
                                         <div class="outlinedBox">
+                                            <h:outputLabel styleClass="bold" value="Violation ID: "  />
+                                            <h:outputText  value="#{v.violationID}" />
+                                            <p:spacer height="5px" />
                                             <h:outputLabel styleClass="bold" value="Ordindance: "  />
                                             <p:spacer height="5px" />
-                                            <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.source.sourceName} 
                                                            (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
-                                            <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
-                                            <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                            <h:outputText  value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
                                             <p:spacer height="2px" />
 
-                                            <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
-                                            <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
-                                            <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                            <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                            <h:outputText  value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
+                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
+                                            <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
 
                                             <p:spacer height="2px" />
 
@@ -1795,7 +1800,7 @@
 
                         </h:panelGrid>
 
-                        <h2>Connect persons to event</h2>
+                        <h2>Connect persons to event (coming soon!)</h2>
 
                         <h:form id="add-person-to-event-form">
 
@@ -1812,7 +1817,7 @@
                             </h:panelGroup>
 
                             <p:commandButton    ajax="true" actionListener="#{caseProfileBB.queueSelectedPerson}"
-                                                value="Add selected person to event"
+                                                value="Add selected person to event" disabled="true"
                                                 update="persons-to-add-ds"/>
                             <p:spacer height="5px"/>
 

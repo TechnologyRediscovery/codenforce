@@ -35,8 +35,6 @@
                                 id="enforcableCodeSetElementTable"
                                 var="cse"
                                 value="#{violationSelectElementBB.enfElementList}"
-                                selectionMode="single"
-                                selection="#{violationSelectElementBB.selectedViolatedEnfElement}"
                                 rowKey="#{cse.codeSetElementID}"
                                 tableStyleClass="primeDataTable"
                                 scrollable="true"
@@ -52,6 +50,17 @@
                                         <h:outputText value="Exp"/>
                                     </f:facet>
                                     <p:rowToggler/>
+                                </p:column>
+                                
+                                <p:column width="6%" >
+                                    <f:facet name="header">
+                                        <h:outputText value="Select" />
+                                    </f:facet>
+                                    <p:commandButton id="selectviolation-cb" 
+                                                     ajax="false" value="select"
+                                                     icon="fa fa-hand-o-right"
+                                                     action="#{violationSelectElementBB.useSelectedElement(cse)}" />
+                                    
                                 </p:column>
                                 
                                 <p:column width="4%" >

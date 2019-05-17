@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.util.Date;
@@ -109,7 +110,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         PersonCoordinator pc = getPersonCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         PersonIntegrator persInt = getPersonIntegrator();
-        User fu = getSessionBean().getFacesUser();
+        User facesUser = getSessionBean().getFacesUser();
         if(req != null){
             currentRequest = req;
         } 
@@ -117,66 +118,40 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // set date of record to current date
         form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
                 .atZone(ZoneId.systemDefault()).toInstant());
-        currentTabIndex = 0;
         // init new, empty photo list
         this.photoList = new ArrayList<>();
         
-        if(fu != null && req != null && currentRequest.getRequestProperty() != null){
+        if(facesUser != null && req != null && currentRequest.getRequestProperty() != null){
             try {
                 personCandidateList = pi.getPropertyWithLists(currentRequest.getRequestProperty().getPropertyID()).getPersonList();
             } catch (IntegrationException | CaseLifecyleException ex) {
                 System.out.println(ex);
             }
-        } else if (fu != null && req != null ) {
+        } else if (facesUser != null && req != null ) {
             personCandidateList = getSessionBean().getPersonQueue();
         }
-        disabledPersonFormFields = true;
+        disabledPersonFormFields = false;
         actionRequestorAssignmentMethod = 1;
-        if(fu != null){
-            currentPerson = fu.getPerson();
+        if(facesUser != null){
+            selectedMuni = getSessionBean().getActiveMuni();
         }
     }
     
+  
     
-    public void changeActionRequestorAssignmentMethod(){
-        Person p = currentRequest.getRequestor(); 
-        PersonCoordinator pc = getPersonCoordinator();
-        skeleton = pc.getNewPersonSkeleton(currentRequest.getMuni());
-        switch(actionRequestorAssignmentMethod){
-            case 1:
-                currentRequest.setRequestor(getSessionBean().getFacesUser().getPerson());
-                disabledPersonFormFields = true;
-                break;
-            case 2:
-                currentRequest.setRequestor(skeleton);
-                disabledPersonFormFields = true;
-                break;
-            case 3:
-                System.out.println("CEActionRequestSubmitBB.changeActionRequestorChoice | in case 3");
-                currentRequest.setRequestor(skeleton);
-                disabledPersonFormFields = false;
-                break;
-            default:
-                disabledPersonFormFields = true;
-        }
+    public String requestActionAsFacesUser(){
+        currentRequest.setRequestor(getSessionBean().getFacesUser().getPerson());
+        getSessionBean().setCeactionRequestForSubmission(currentRequest);
+        return "reviewAndSubmit";
     }
+    
     
     public void changePropertyPersonsDropDown(){
-        System.out.println("CEActionRequestSubmitBB.changeActionRequestorFromDropDown");
-        PersonCoordinator pc = getPersonCoordinator();
-        if(currentPerson != null){
-            currentRequest.setRequestor(currentPerson);
-        } else {
-            currentRequest.setRequestor(pc.getNewPersonSkeleton(currentRequest.getMuni()));
-        }
+        
     }
     
     public String assignSelectedRequestorPersonAndContinue(){
-        if(actionRequestorAssignmentMethod == 1){
-            currentRequest.setRequestor(getSessionBean().getFacesUser().getPerson());
-        }else if(actionRequestorAssignmentMethod == 2){
-            currentRequest.setRequestor(currentPerson);
-        }
+        currentRequest.setRequestor(currentPerson);
         getSessionBean().setCeactionRequestForSubmission(currentRequest);
         return "reviewAndSubmit";
     }
@@ -268,9 +243,16 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
     
     private void setupPersonEntry(){
+        UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
         Person skel = pc.getNewPersonSkeleton(m);
+        try {
+            skel.setCreatorUserID(uc.getRobotUser().getUserID());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        skel.setSourceID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestPublicUserPersonSourceID")));
         currentRequest.setRequestor(skel);
         getSessionBean().setCeactionRequestForSubmission(currentRequest);
     }
@@ -295,17 +277,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             return;
         }
         this.photoList.add(ph);
-    //    System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | upload succesful!");
-
-        // views that this function knows how to handle
-        // there's probably a better way to do this, some sort of view constants .java
-    //    String requestCEActionFlow1ViewID = "/public/services/requestCEActionFlow/requestCEActionFlow_photoUpload.xhtml";
-        
-        // get the current view to determine where we should link this photo
-    //    String curViewID = FacesContext.getCurrentInstance().getViewRoot().getViewId();
-    //    System.out.println("handlePhotoUpload | currViewID: " + curViewID);
-        
-        
     }
     
     
@@ -321,8 +292,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         ImageServices is = getImageServices();
         PersonIntegrator pi = getPersonIntegrator();
         
-        int submittedActionRequestID = 0;
-        int personID = 0;
+        int submittedActionRequestID;
+        int personID;
         // start by pulling the person fields and sending them to be entered
         // into db as a person. The ID of this person is returned, and used in our
         // insertion of the action request as a whole. 
@@ -332,6 +303,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         if(currentRequest.getRequestor().getPersonID() == 0){
              personID = insertActionRequestorNewPerson(req.getRequestor());
+            try {
+                currentRequest.setRequestor(pi.getPerson(personID));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
         }
         
         int controlCode = getControlCodeFromTime();

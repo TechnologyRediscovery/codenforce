@@ -21,10 +21,15 @@
                         <h2>Notice of Violation editor</h2>
                         
                         <p>Current Notice ID (0 for new notice): <h:outputText value="#{noticeOfViolationBB.currentNotice.noticeID}"/> </p>
-                                               
+                                 
+                        <h:outputText class="bold" value="date of record:" />
                         <div class="date-of-record">
                             <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
                         </div> 
+                        
+                        <p:spacer height="5px" />
+                        
+                        <h3>letter text (upper half):</h3>
 
                         <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
                                   controls="bold italic underline strikethrough font size style color 
@@ -33,8 +38,97 @@
                                   width="1000"
                                   height="400"/>
                         
-                        <h3>Violations</h3>
+                        <div class="preview-violations-box">
+                            
+                        
+                            <h2>Code violations</h2>
+                                
+                                     <p:dataScroller id="violations-ds"
+                                    value="#{noticeOfViolationBB.currentNotice.violationList}"
+                                    var="v">
+                                    <div class="violation">
 
+                                        <h:panelGrid columns="2" rendered="true"
+                                                     columnClasses="gridTd, gridTd"
+                                                     headerClass="no-border"
+                                                     footerClass="no-border">
+
+                                            <h:panelGroup>
+
+                                                <h:outputLabel styleClass="bold" value="Ordinance: "  />
+
+                                                <br />
+
+                                                <h:outputText    value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                                <h:outputText    value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+
+                                                <p:spacer height="2px" />
+
+                                                <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                                <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                                <p:spacer height="2px" />
+
+                                                <h:outputLabel  value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                                (#{v.violatedEnfElement.codeElement.source.sourceYear}) " />
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputText styleClass="bold" value="Compliance due by: " />
+                                                <br />
+                                                <h:outputText   id="stipcompdate-ot" styleClass="compliance-date"
+                                                                value="#{v.stipulatedComplianceDatePretty}"/>
+
+                                                <p:spacer height="5px"/>
+
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Description of violation recorded on #{v.dateOfRecordPretty} 
+                                                               by code officer #{v.createdBy.person.firstName} #{v.createdBy.person.lastName}:"/>
+
+                                                <p:spacer height="2px"/>
+
+                                                <h:outputText value="#{v.description}"/>
+
+                                                <p:spacer height="2px" />
+
+                                                <h:outputText style="bold" value="Number of photographs enclosed in attachments: " 
+                                                              rendered="#{v.includeViolationPhotos}"/>
+                                                <h:outputText value="#{empty v.photoList ? '0' : v.photoList.size()}"
+                                                              rendered="#{v.includeViolationPhotos}"/>
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer">
+                                                <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTD" 
+                                                                rendered="#{v.includeOrdinanceText}">
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                                        <div class="ord-text">
+                                                            <h:outputText escape="false" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                </h:panelGrid>
+
+                                                <h:panelGrid    id="violation-ord-humanfriendly-pg" columns="1" columnClasses="gridTD" 
+                                                                rendered="#{v.includeHumanFriendlyText}">
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                                        <div class="ord-text">
+                                                            <h:outputText   escape="false"
+                                                                            value="#{v.violatedEnfElement.codeElement.ordHumanFriendlyText}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </h:panelGrid>
+                                            </f:facet>
+                                        </h:panelGrid>
+                                         <hr />
+                                    </div>
+                                </p:dataScroller>
+                            </div>
+                        
+                        <h3>letter text (bottom half)</h3>
+                        
                         <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
                                   controls="bold italic underline strikethrough font size style color 
                                   bullets numbering center undo redo rule link removeformat outdent 
