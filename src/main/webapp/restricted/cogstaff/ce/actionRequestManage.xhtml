@@ -102,11 +102,11 @@
                                 <h:panelGroup>
 
                                     <div class="wrapText">
-                                        <h:outputLabel styleClass="bold" value="Requestor (#{actionRequestManageBB.selectedRequest.actionRequestorPerson.personType.label}): "/>
+                                        <h:outputLabel styleClass="bold" value="Requestor (#{actionRequestManageBB.selectedRequest.requestor.personType.label}): "/>
                                         <p:spacer height="5px"/>
 
-                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.firstName} "/> 
-                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.lastName}"/><br/> 
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequesrequestor"/> 
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequesrequestor><br/> 
                                         <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.addressStreet}"/> <br/>
                                         <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.addressCity}, "/> 
                                         <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.addressState} "/> 
@@ -117,14 +117,13 @@
                                     <p:spacer height="5px"/>
                                     <div class="wrapText"> 
                                         <h:outputText value="Phone (cell): "/>
-                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.phoneCell}"/> <br/>
-                                        <h:outputText value="Phone (work): "/>
-                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.phoneWork}"/> <br/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.phrequestor                                     <h:outputText value="Phone (work): "/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.requestor.phoneWork}"/> <br/>
                                         <h:outputText value="Phone (home): "/>
-                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.phoneHome}"/> <br/>
+                                        <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequesrequestor/> <br/>
                                         <h:outputText value="Email: "/>
                                         <h:outputText value="#{actionRequestManageBB.selectedRequest.actionRequestorPerson.email}"/>
-                                    </div>
+    requestor           </div>
                                     <p:commandButton ajax="false" value="Verify person and maintain property link" action="#{actionRequestManageBB.updateActionRequest}"/>
                                     <p:commandButton ajax="false" value="Verify person but link to different property" action="#{actionRequestManageBB.updateActionRequest}"/>
                                 </h:panelGroup>
