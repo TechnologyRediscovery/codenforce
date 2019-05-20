@@ -15,7 +15,7 @@ ADD COLUMN applicationpersontype persontype DEFAULT 'LegacyOwner' NOT NULL;
 
 ALTER TABLE occpermitapplicationreason
 ADD COLUMN optionalpersontypes persontype[],
-ADD COLUMN personfriendlydescription text;
+ADD COLUMN humanfriendlydescription text;
 
 -- Populate optionalpersontypes 
 
