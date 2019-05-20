@@ -30,7 +30,7 @@ public enum PersonType{
     OwnerOccupant("Owner-Occupant"),
     OwnerNonOccupant("Owner-Non Occupant"),
     FutureOwner("Future owner"),
-    Manager("Property Manager"),
+    Manager("Manager"),
     ElectedOfficial("Elected Official"),
     Public("Public"),
     LawEnforcement("Law Enforcement"),

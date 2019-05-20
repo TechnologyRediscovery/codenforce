@@ -74,11 +74,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     /**
-     * 
+     * Returns PropertyWithLists without default unit. Useful for displaying a list of units for
+     * a multiunit property.
      * @param prop
      * @return PropertyWithLists object
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
-    public PropertyWithLists checkPropertyForUnits(Property prop) throws CaseLifecyleException{
+    public PropertyWithLists getPropertyUnitsWithoutDefault(Property prop) throws CaseLifecyleException{
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyWithLists propWithLists = pi.getNewPropertyWithLists();
         
@@ -101,12 +103,24 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
         return propWithLists;
     }
-    
-    public ArrayList<PersonType> generatePersonTypeRequirements(OccPermitApplication occpermitapp){
+    /**
+     * Returns PropertyWithLists with all units, including default unit.
+     * @param prop
+     * @return PropertyWithLists object
+     * @throws CaseLifecyleException 
+     */
+    public PropertyWithLists getPropertyUnits(Property prop) throws CaseLifecyleException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyWithLists propWithLists = pi.getNewPropertyWithLists();
         
-        
-        return new ArrayList<>();
-    }
-    
+        try{
+            propWithLists = pi.getPropertyWithLists(prop.getPropertyID());
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }     
+
+        return propWithLists;
+    }   
     
 }

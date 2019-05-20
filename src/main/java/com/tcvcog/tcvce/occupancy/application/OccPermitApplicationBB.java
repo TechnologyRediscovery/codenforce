@@ -11,10 +11,11 @@ import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
@@ -24,10 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
-import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -56,10 +54,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     private OccPermitApplicationReason selectedApplicationReason;
     private List<OccPermitApplicationReason> reasonList;
     
+    private Person applicationPerson;
     private Person currentOwner;
     private Person newOwner;
     private Person contactPerson;
     private ArrayList<Person> newOccupants;
+    
+    private SearchParamsPersons params;
     
     /**
      * Creates a new instance of OccPermitApplicationBB
@@ -124,15 +125,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     /**
      * @return the reasonList
      */
-    public List<OccPermitApplicationReason> getReasonList() {
-        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
-        try {
-            reasonList = opi.getOccPermitApplicationReasons();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return reasonList;
-    }
+
 
     /**
      * @param reasonList the reasonList to set
@@ -197,112 +190,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         this.newOccupants = newOccupants;
     }
     
-    public void onPropertySelection(){
-        PropertyCoordinator pc = getPropertyCoordinator();
-        try {
-            propWithLists = pc.checkPropertyForUnits(getSessionBean().getOccPermitApplication().getApplicationProperty());
-        } catch (CaseLifecyleException ex) {
-            System.out.println(ex);
-        }
-        getSessionBean().setActivePropWithLists(propWithLists);
-    }
-        
-    public String storeSelectedMuni(){        
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();                        
-        getSessionBean().setOccPermitApplication(occpermitapp);
-        getSessionBean().setActiveMuni(selectedMuni);
-        return "chooseProperty";
-    }    
-
-    public void searchForPropertiesSingleMuni(ActionEvent ev){
-        PropertyIntegrator pi = getPropertyIntegrator();
-        Municipality activeMuni = getSessionBean().getActiveMuni();
-
-        try {
-            propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Your search completed with " + getPropList().size() + " results", ""));
-            
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to complete a property search! Sorry!", ""));
-            
-        }
-    }
-
-    public String storePropertyInfo(){
-        if(getSessionBean().getOccPermitApplication().getApplicationProperty() == null){        
-            getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                       "Please select a property from the list of search results to continue.", ""));
-            return "addReason";
-        }
-        PropertyCoordinator pc = getPropertyCoordinator();
-        PropertyUnit pu = pc.getNewPropertyUnit();
-        getSessionBean().setActivePropUnit(pu);
-        
-        return "addPropertyUnit";
-    }
-    
-        public String storePropertyUnitInfo(){
-            if(getSessionBean().getOccPermitApplication().getApplicationProperty() == null 
-                && getSessionBean().getActivePropUnit() == null){        
-            getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                       "Please select a property and property unit to continue.", ""));
-            return "";
-        }
-        return "addReason";
-        }
-        
-        public String storeNewPropertyUnit(){
-            return "addReason";
-        }
-    
-    
-    
-    public void removeSelectedUnit(PropertyUnit selectedUnit){
-        propUnitsToAdd.remove(selectedUnit);
-        clearAddUnitFormValues();
-    }
-    
-    public void addUnitToPropWithLists(){
-        PropertyCoordinator pc = getPropertyCoordinator();
-        unitToAdd = pc.getNewPropertyUnit();
-        unitToAdd.setUnitNumber(unitNum);
-        unitToAdd.setRental(rental);
-        unitToAdd.setNotes(unitNotes);
-        
-        if(propUnitsToAdd == null){
-            propUnitsToAdd = new ArrayList<>();
-        }
-        
-        propUnitsToAdd.add(unitToAdd);
-        clearAddUnitFormValues();        
-    }
-    
-    public void clearAddUnitFormValues(){
-        unitNum = null;
-        rental = false;
-        unitNotes = null;
-    }
-    
-    public String selectPropertyUnit(PropertyUnit unit){
-        getSessionBean().setActivePropUnit(unit);
-        return "addReason";
-    }
-    
-    public String storeReason(){
-        System.out.println("Occpermitapplication.storeReason");
-        getSessionBean().setOccPermitApplicationReason(selectedApplicationReason);
-        return "addPeople";
-    }
-
     /**
      * @return the propWithLists
      */
@@ -442,5 +329,272 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public void setMultiUnit(boolean multiUnit) {
         this.multiUnit = multiUnit;
     }
+
+    /**
+     * @return the params
+     */
+    public SearchParamsPersons getParams() {
+        return params;
+    }
+
+    /**
+     * @param params the params to set
+     */
+    public void setParams(SearchParamsPersons params) {
+        this.params = params;
+    }
+
+    /**
+     * @return the applicationPerson
+     */
+    public Person getApplicationPerson() {
+        return applicationPerson;
+    }
+
+    /**
+     * @param applicationPerson the applicationPerson to set
+     */
+    public void setApplicationPerson(Person applicationPerson) {
+        this.applicationPerson = applicationPerson;
+    }
     
+    /**
+     * Set the user-selected municipality. The property search will be done within this municipality.
+     * @return "chooseProperty" - Navigates to property selection page
+     */    
+    public String setActiveMuni(){
+        if (selectedMuni == null){
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                       "Please select a municipality.", ""));
+            return "";
+        }
+        getSessionBean().setActiveMuni(selectedMuni);
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();                        
+        getSessionBean().setOccPermitApplication(occpermitapp);
+        return "chooseProperty";
+    }
+    
+    /**
+     * Searches for a property within the activeMuni set on the SessionBean.
+     */
+    public void searchForPropertiesSingleMuni(){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        Municipality activeMuni = getSessionBean().getActiveMuni();
+
+        try {
+            propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Your search completed with " + getPropList().size() + " result(s)", ""));    
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to complete a property search! Sorry!", ""));            
+        }
+    }
+    
+    /**
+     * For multiunit properties: Gets the list of property units.
+     * For non-multiunit properties: Sets the activePropertyUnit to default unit. 
+     * 
+     */
+    public void onPropertySelection(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        if(getSessionBean().getOccPermitApplication().isMultiUnit() == true){
+            try {
+            propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
+            } catch (CaseLifecyleException ex) {
+                System.out.println(ex);
+            }
+        } 
+        else {
+            try {
+            propWithLists = pc.getPropertyUnits(selectedProperty);
+            } catch (CaseLifecyleException ex) {
+                System.out.println(ex);
+            } 
+        }
+       
+        getSessionBean().setActivePropWithLists(propWithLists);
+        
+        if (propWithLists.getUnitList().size() == 1){
+            List<PropertyUnit> propertyUnitList = propWithLists.getUnitList();
+            getSessionBean().setActivePropUnit(propertyUnitList.get(0));
+            getSessionBean().getOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
+        }
+    }
+    
+    /**
+     * Adds a user-created unit to propUnitsToAdd list. This newly-created unit can then be selected
+     * an added to the application.
+     */
+    public void addUnitToPropWithLists(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        unitToAdd = pc.getNewPropertyUnit();
+        unitToAdd.setUnitNumber(unitNum);
+        unitToAdd.setRental(rental);
+        unitToAdd.setNotes(unitNotes);
+        
+        if(propUnitsToAdd == null){
+            propUnitsToAdd = new ArrayList<>();
+        }
+        
+        propUnitsToAdd.add(unitToAdd);
+        clearAddUnitFormValues();        
+    }
+    
+    /**
+     * Removes a newly-created unit from propUnitsToAdd list.
+     * @param selectedUnit 
+     */
+    public void removeSelectedUnit(PropertyUnit selectedUnit){
+        propUnitsToAdd.remove(selectedUnit);
+        clearAddUnitFormValues();
+    }
+
+    /**
+     * Clears add unit form values, so that they are null if the user wishes to add another unit.
+     */
+    public void clearAddUnitFormValues(){
+        unitNum = null;
+        rental = false;
+        unitNotes = null;
+    }        
+    
+    /**
+     * Sets an empty PropertyUnit to activePropUnit on the SessionBean, sends user to occPermitAddPropertyUnit.xhtml
+     * @return 
+     */
+    public String addPropertyUnit(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        PropertyUnit pu = pc.getNewPropertyUnit();
+        getSessionBean().setActivePropUnit(pu);
+       
+        return "addPropertyUnit";
+    }
+    
+    /**
+     * Sets a property unit on the SessionBean and the OccPermitApplication, sends user to occPermitAddReason.xhtml
+     * @param unit
+     * @return 
+     */
+    public String selectPropertyUnit(PropertyUnit unit){
+        unit.setThisProperty(getSessionBean().getActivePropWithLists());
+        getSessionBean().setActivePropUnit(unit);
+        getSessionBean().getOccPermitApplication().setApplicationPropertyUnit(unit);
+        return "addReason";
+    }
+    
+    /**
+     * Checks that the user has not selected a multiunit property without also selecting a property unit. 
+     * Sends user to occPermitAddReason.xhtml
+     * @return 
+     */
+    public String storePropertyUnitInfo(){
+        if(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit() == null 
+            && getSessionBean().getActivePropUnit() == null){         
+            getFacesContext().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                   "This is a multiunit property, please select or add a unit", ""));
+            return "";
+        }
+        return "addReason";
+    }
+    
+    /**
+     * Gets a list of reasons for an occupancy permit application to be displayed.
+     * @return 
+     */
+    public List<OccPermitApplicationReason> getReasonList() {
+        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
+        try {
+            reasonList = opi.getOccPermitApplicationReasons();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return reasonList;
+    }    
+    /**
+     * Sends user to personsRequirementManage.xhtml
+     * @return 
+     */
+    public String storeReason(){
+        return "managePeople";
+    }
+        
+    /*
+    DP 5/20/2019: The methods below relating to people must be reworked. The goal is to make sure 
+    all of the correct people are added per the PersonsRequirement for the selected 
+    OccPermitApplicationReason. The user must be able to find people in the database via a search, 
+    edit the person if necessary, or alternatively, create and attach a brand new Person to the application.
+    
+    Features that must be added/reworked:
+    - public person search
+    - person edit
+        - Create a clone Person and edit that
+        - Using clones avoids public users overwriting existing fields in person table in the database
+    - person add
+    - set applicant and preferredContact booleans on OccPermitApplication object
+    - Verify that the PersonsRequirement is met (use OccupancyCoordinator.verifyOccPermitPersonsRequirement())    
+    */
+    public String attachPerson(PersonType personType){
+        getSessionBean().setActivePersonType(personType);
+        return "searchPeople";
+    }
+    
+    public String addPersonToApplication(Person person){
+        person.setPersonType(getSessionBean().getActivePersonType());
+        List<Person> attachedPersons = getSessionBean().getOccPermitApplication().getAttachedPersons();
+        
+        if (attachedPersons == null){
+            attachedPersons = new ArrayList();
+        }
+        attachedPersons.add(person);
+        getSessionBean().getOccPermitApplication().setAttachedPersons(attachedPersons);
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        oc.verifyOccPermitPersonsRequirement(getSessionBean().getOccPermitApplication());
+        return "managePeople";              
+    }    
+    
+    public String editPersonInfo(Person person){
+        person.setPersonType(getSessionBean().getActivePersonType());
+        List<Person> attachedPersons = getSessionBean().getOccPermitApplication().getAttachedPersons();
+        
+        if (attachedPersons == null){
+            attachedPersons = new ArrayList();
+        }
+        getSessionBean().getOccPermitApplication().setAttachedPersons(attachedPersons);
+        getSessionBean().setActiveAnonPerson(person);
+        return "editPerson";
+    }
+    
+    public String addANewPerson(){        
+        return "addPerson";
+    }
+    
+    public String reviewApplication(){
+        if (getSessionBean().getOccPermitApplication().getApplicantPerson() == null) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                       "Please identify yourself by selecting your name from the list below.", ""));
+            return "";
+        }
+        return "reviewApplication";
+    }
+    
+    public String submitApplication(){
+        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
+        try{
+            int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getOccPermitApplication());
+            getSessionBean().getOccPermitApplication().setId(applicationId);
+            opi.insertOccPermitPersons(getSessionBean().getOccPermitApplication());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }          
+        
+        return "";
+    }
 }

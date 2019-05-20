@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import javax.faces.application.FacesMessage;
 
@@ -77,7 +78,13 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         PersonIntegrator personInt = getPersonIntegrator();
         
         p.setPersonType(formPersonType);
-        p.setMuniCode(formMuni.getMuniCode());
+        
+        if (formMuni != null){
+            p.setMuniCode(formMuni.getMuniCode());
+        } else {
+            p.setMuniCode(getSessionBean().getActiveMuni().getMuniCode());
+        }
+        
         
         p.setFirstName(formFirstName);
         p.setLastName(formLastName);
@@ -96,9 +103,14 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         p.setNotes(formNotes);
         
         // placeholder for lastupdated
-        p.setExpiryDate(formExpiryDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
+        if (formExpiryDate != null) {
+            p.setExpiryDate(formExpiryDate.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
+        } else{
+            p.setExpiryDate(LocalDateTime.MAX);
+        }
+        
         p.setActive(formIsActive);
         
         p.setUnder18(formIsUnder18);

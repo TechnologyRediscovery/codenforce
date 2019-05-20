@@ -18,7 +18,7 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Occupancy Permit Application for <h:outputText value="#{sessionBean.occPermitApplication.applicationProperty.address}"/> in <h:outputText value="#{sessionBean.occPermitApplication.applicationProperty.muni.muniName}"/></h1>                        
+                        <h1>Occupancy Permit Application for <h:outputText value="#{sessionBean.occPermitApplication.applicationPropertyUnit.thisProperty.address}"/> in <h:outputText value="#{sessionBean.occPermitApplication.applicationPropertyUnit.thisProperty.muni.muniName}"/></h1>                        
                         <h:form id="occPermitApplicationAddReasonForm">
                             
 
@@ -27,9 +27,9 @@
 
                             <p:selectOneMenu
                                 id="reasonSM" tabindex="1"
-                                value="#{occPermitApplicationBB.selectedApplicationReason}">
+                                value="#{sessionBean.occPermitApplication.reason}">
                                 <f:converter converterId="occPermitApplicationReasonConverter"/>
-                                <f:selectItem itemLabel="Select a reason" />
+                                <f:selectItem itemLabel="Select a reason" itemDisabled="true"/>
                                 <f:selectItems id="reasonList" value="#{occPermitApplicationBB.reasonList}" var ="r" itemValue="#{r}" itemLabel="#{r.title}" />
                                 
                             </p:selectOneMenu>
@@ -51,7 +51,7 @@
                             
                             <p:commandButton ajax="false"                                             
                                              value="Add people to application"
-                                             action="#{occPermitApplicationBB.storeReason}"/>
+                                             action="#{occPermitApplicationBB.storeReason()}"/>
                             
                         </h:form>
                     </div>

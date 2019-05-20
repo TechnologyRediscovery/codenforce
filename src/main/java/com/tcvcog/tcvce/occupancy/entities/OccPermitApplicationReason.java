@@ -30,6 +30,7 @@ public class OccPermitApplicationReason {
     private String description;
     private boolean active;
     private PersonsRequirement personsRequirement;
+    private String humanFriendlyDescription;
 
     public int getId() {
         return id;
@@ -104,5 +105,19 @@ public class OccPermitApplicationReason {
     public void setPersonsRequirement(PersonsRequirement personsRequirement) {
         this.personsRequirement = personsRequirement;
     }    
+
+    /**
+     * @return the humanFriendlyDescription
+     */
+    public String getHumanFriendlyDescription() {
+        return humanFriendlyDescription;
+    }
+
+    /**
+     * @param humanFriendlyDescription the humanFriendlyDescription to set
+     */
+    public void setHumanFriendlyDescription(String humanFriendlyDescription) {
+        this.humanFriendlyDescription = humanFriendlyDescription;
+    }
     
 }

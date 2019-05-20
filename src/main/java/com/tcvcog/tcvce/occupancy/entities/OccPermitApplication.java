@@ -18,11 +18,11 @@ Council of Governments, PA
 package com.tcvcog.tcvce.occupancy.entities;
 
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -36,14 +36,17 @@ public class OccPermitApplication {
     private Date submissionDateUtilDate;;
     private String submissionNotes;
     private String internalNotes;
-    private Property applicationProperty;
+    private PropertyUnit applicationPropertyUnit;
     private Person applicantPerson;
+    private Person preferredContact;
+    
     /**
-    * This will contain either existing Person objects, new Person objects created by user, or clones of existing Person 
-    * objects whose reference persons data was changed as part of the application. The occupancy coordinator will digest this
-    * list to determine if the requirements have been satisfied.
+    * This will contain either existing Person objects, new Person objects created by user, or 
+    * clones of existing Person objects whose reference persons data was changed as part of the 
+    * application. The occupancy coordinator will digest this list to determine if the requirements 
+    * have been satisfied.
     */
-    private ArrayList<Person> attachedPersons;
+    private List<Person> attachedPersons;
 
     /**
      * @return the id
@@ -139,12 +142,12 @@ public class OccPermitApplication {
         submissionDate = submissionDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
-    public Property getApplicationProperty() {
-        return applicationProperty;
+    public PropertyUnit getApplicationPropertyUnit() {
+        return applicationPropertyUnit;
     }
 
-    public void setApplicationProperty(Property applicationProperty) {
-        this.applicationProperty = applicationProperty;
+    public void setApplicationPropertyUnit(PropertyUnit applicationPropertyUnit) {
+        this.applicationPropertyUnit = applicationPropertyUnit;
     }    
 
     /**
@@ -164,15 +167,29 @@ public class OccPermitApplication {
     /**
      * @return the attachedPersons
      */
-    public ArrayList<Person> getAttachedPersons() {
+    public List<Person> getAttachedPersons() {
         return attachedPersons;
     }
 
     /**
      * @param attachedPersons the attachedPersons to set
      */
-    public void setAttachedPersons(ArrayList<Person> attachedPersons) {
+    public void setAttachedPersons(List<Person> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
-    
+
+    /**
+     * @return the preferredContact
+     */
+    public Person getPreferredContact() {
+        return preferredContact;
+    }
+
+    /**
+     * @param preferredContact the preferredContact to set
+     */
+    public void setPreferredContact(Person preferredContact) {
+        this.preferredContact = preferredContact;
+    }
+
 }
