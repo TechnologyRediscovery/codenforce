@@ -17,49 +17,63 @@
 
                     <div class="mainContainer">
 
-                        <h:messages id="personSearchPublicMessages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-
-
-                        <h1>Public Data Access Portal</h1>
-
-                        <h:form id="personSearchPublicForm">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
+                        
+                        
+                        <h:form id="personsRequirementManageForm">
                             
-                            <h:outputText>
-                            Display all persons required based on application reason. Radioselectone for user to select which person they are. Cannot go to next page before
-                            selecting a person as themselves. Disable button until this is done. 
+                            <h1>Add People to Application</h1>
                             
-                            Underneath required persons, allow user to add optional person. Display personTypes corresponding to optionalPersons field in occPermitApplicationReason.
-                            Underneath that, option to add themselves if they do not correspond to any of the above required or optional persons. 
-                            </h:outputText>
+                            <p:outputLabel value="The selected reason for the application is: #{sessionBean.occPermitApplication.reason.title}"/>
+                            <p:spacer height="5px"/>
+                            <p:outputLabel value="#{sessionBean.occPermitApplication.reason.humanFriendlyDescription}"/>
+                            
+                            <p:dataTable var="requiredPersonType" value="#{sessionBean.occPermitApplication.reason.personsRequirement.requiredPersonTypes}">
+
+                                <p:column headerText="Required Persons">
+                                    <h:outputText value="#{requiredPersonType.label}"/>
+                                </p:column>
+                                
+                                <p:column>
+                                    <p:commandButton value="Add" action="#{occPermitApplicationBB.attachPerson(requiredPersonType)}"/>
+                                </p:column>
+                            </p:dataTable>
+                            
+                            <p:dataTable var="optionalPersonType" value="#{sessionBean.occPermitApplication.reason.personsRequirement.optionalPersonTypes}">
+                                
+                                <p:column headerText="Optional Persons">
+                                    <h:outputText value="#{optionalPersonType.label}"/>
+                                </p:column>
+                                
+                                <p:column>
+                                    <p:commandButton value="Add" action="#{occPermitApplicationBB.attachPerson(optionalPersonType)}"/>
+                                </p:column>
+                            </p:dataTable>
+                            
+                            <p:spacer height="10px"/>
+                            
+                            <p:outputLabel> Please identify yourself by selecting your name from the table below: </p:outputLabel>
+                            
+                            <p:dataTable var="applicationPerson" value="#{sessionBean.occPermitApplication.attachedPersons}" 
+                                         selectionMode="single"
+                                         selection="#{sessionBean.occPermitApplication.applicantPerson}"
+                                         rowKey="#{applicationPerson.personID}">                                
+                                <p:column headerText="Name">
+                                    <h:outputText value="#{applicationPerson.firstName} #{applicationPerson.lastName}"/>
+                                </p:column>
+                                
+                                <p:column headerText="Person Type">
+                                    <h:outputText value="#{applicationPerson.personType}"/>
+                                </p:column>                            
+                                
+                            </p:dataTable>
+                            
+                            <p:commandButton ajax="false" value="Review application" disabled="#{!sessionBean.occPermitApplication.reason.personsRequirement.requirementSatisfied}"
+                                             action="#{occPermitApplicationBB.reviewApplication}"/>
 
                         </h:form>
-                        
-                        
-                        
-                                <p:confirmDialog message="Type your message to the code enforcement staff in the box below." 
-                                                      severity="alert" widgetVar="messageDialog">
-
-                                    <h:form id="messageForm">
-                                        
-                                        
-                                        <h:outputText value="You are attaching a note to bundle with a type: #{publicInfoBB.selectedBundle.typeName}"/>
-                                        
-                                        <p:spacer height="15px"/>
-                                        <p:inputTextarea id="message-ita" style="width: 300px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
-                                        <p:spacer height="15px"/>
-                                        <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage}"
-                                                         value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
-                                                         update="paccSearchMessages
-                                                                messageForm:message-ita"/>
-                                        <p>Please note that all messages submitted through this portal become part of the permanent case record
-                                        and may be included in documents prepare for town councils and magistrates. </p>
-                                    </h:form>
-                                </p:confirmDialog>
-                                
-                        
-                        
+                      
                     </div>
                 </f:view>
 

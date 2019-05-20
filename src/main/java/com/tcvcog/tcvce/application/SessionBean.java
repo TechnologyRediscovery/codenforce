@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
@@ -43,7 +44,6 @@ import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
-import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
 import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
 import java.io.Serializable;
 import java.util.List;
@@ -112,11 +112,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private OccPermitApplication occPermitApplication;
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
-    private OccPermitApplicationReason occPermitApplicationReason;
-
-    /* *** Blob Upload Session Shelves *** */
-    private List<Blob> blobList;
-
+    private PersonType activePersonType;
+    
+    /* *** Public Person Search/Edit Session Shelves *** */
+    private Person activeAnonPerson;
 
     /**
      * Creates a new instance of getSessionBean()
@@ -486,6 +485,50 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
+     * @return the activePropWithList
+     */
+    public PropertyWithLists getActivePropWithList() {
+        return activePropWithList;
+    }
+
+    /**
+     * @param activePropWithList the activePropWithList to set
+     */
+    public void setActivePropWithList(PropertyWithLists activePropWithList) {
+        this.activePropWithList = activePropWithList;
+    }
+    
+    public OccPermitApplication getOccPermitApplication() {
+        return occPermitApplication;
+    }
+
+    public void setOccPermitApplication(OccPermitApplication occPermitApplication) {
+        this.occPermitApplication = occPermitApplication;
+    }
+
+    public PropertyUnit getActivePropUnit() {
+        return activePropUnit;
+    }
+
+    public void setActivePropUnit(PropertyUnit activePropUnit) {
+        this.activePropUnit = activePropUnit;
+    }
+
+    /**
+     * @return the activePropWithLists
+     */
+    public PropertyWithLists getActivePropWithLists() {
+        return activePropWithLists;
+    }
+
+    /**
+     * @param activePropWithLists the activePropWithLists to set
+     */
+    public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
+        this.activePropWithLists = activePropWithLists;
+    }
+     
+    /*
      * @return the cEEventWCPIQueue
      */
     public List<EventCasePropBundle> getcEEventWCPIQueue() {
@@ -570,17 +613,31 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the blobList
+     * @return the activePersonType
      */
-    public List<Blob> getBlobList() {
-        return blobList;
+    public PersonType getActivePersonType() {
+        return activePersonType;
     }
 
     /**
-     * @param blobList the blobList to set
+     * @param activePersonType the activePersonType to set
      */
-    public void setBlobList(List<Blob> blobList) {
-        this.blobList = blobList;
+    public void setActivePersonType(PersonType activePersonType) {
+        this.activePersonType = activePersonType;
+    }
+
+    /**
+     * @return the activeAnonPerson
+     */
+    public Person getActiveAnonPerson() {
+        return activeAnonPerson;
+    }
+
+    /**
+     * @param activeAnonPerson the activeAnonPerson to set
+     */
+    public void setActiveAnonPerson(Person activeAnonPerson) {
+        this.activeAnonPerson = activeAnonPerson;
     }
     
 }

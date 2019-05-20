@@ -18,7 +18,7 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Add a unit at <h:outputText value="#{sessionBean.occPermitApplication.applicationProperty.address}"/> in <h:outputText value="#{sessionBean.occPermitApplication.applicationProperty.muni.muniName}"/></h1>
+                        <h1>Add a unit at <h:outputText value="#{occPermitApplicationBB.selectedProperty}"/> in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
                         
                         <h:form id="occPermitApplicationAddPropertyUnitForm">
                             <p:panel>

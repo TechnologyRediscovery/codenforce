@@ -11,7 +11,6 @@
     </h:head>
     <h:body>
         <ui:composition template="./../navContainer_public.xhtml">
-
             <ui:define name="content">
                 <f:view id="sysHomeView">
 
@@ -21,48 +20,182 @@
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
 
-
-                        <h1>Public Data Access Portal</h1>
+                        <h1>Edit Person Information</h1>
 
                         <h:form id="personSearchPublicForm">
                             
-                            <h:outputText>
-                            Each field on Person must be displayed after it is being anonymized, and there needs to be a boolean checkbox the user can select to edit the data
-                            for specific fields.
-                            See lines 61-66 and 80-85 on cECases.xhtml.
-                            
-                            Changes are inserted to database as a new person (that will be a clone).
-                            </h:outputText>
-
-                        </h:form>
-                        
-                        
-                        
-                                <p:confirmDialog message="Type your message to the code enforcement staff in the box below." 
-                                                      severity="alert" widgetVar="messageDialog">
-
-                                    <h:form id="messageForm">
-                                        
-                                        
-                                        <h:outputText value="You are attaching a note to bundle with a type: #{publicInfoBB.selectedBundle.typeName}"/>
-                                        
-                                        <p:spacer height="15px"/>
-                                        <p:inputTextarea id="message-ita" style="width: 300px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
-                                        <p:spacer height="15px"/>
-                                        <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage}"
-                                                         value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
-                                                         update="paccSearchMessages
-                                                                messageForm:message-ita"/>
-                                        <p>Please note that all messages submitted through this portal become part of the permanent case record
-                                        and may be included in documents prepare for town councils and magistrates. </p>
-                                    </h:form>
-                                </p:confirmDialog>
+                            <p:panelGrid styleClass="ui-panelgrid-blank" style="padding: 10px">
+                                <p:row>
+                                    <p:column>Edit?</p:column>
+                                </p:row>
                                 
-                        
-                        
+                                <p:row>
+                                    <p:column>
+                                        <p:selectBooleanCheckbox id="first-name-chkbx" value="#{personEditPublicBB.editableFirstName}">
+                                            <p:ajax update="first-name-it"/>
+                                        </p:selectBooleanCheckbox>
+                                    </p:column>
+                                    
+                                    <p:column colspan="2">
+                                        <h:outputLabel for="first-name-it" value="First Name:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="first-name-it" styleClass="dataText" value="#{personEditPublicBB.clonePerson.firstName}"
+                                                 disabled="#{!personEditPublicBB.editableFirstName}"/>
+                                    </p:column>
+                                </p:row>                                
+                                
+                                <p:row>
+                                    <p:column>
+                                    <p:selectBooleanCheckbox id="last-name-chkbx" value="#{personEditPublicBB.editableLastName}">
+                                        <p:ajax update="last-name-it"/>
+                                    </p:selectBooleanCheckbox> 
+                                    </p:column>
+                                    
+                                    <p:column colspan="2">
+                                        <h:outputLabel for="last-name-it" styleClass="uiLabel" value="Last Name:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="last-name-it" styleClass="dataText" value="#{personEditPublicBB.clonePerson.lastName}"
+                                                    disabled="#{!personEditPublicBB.editableLastName}"/>
+                                    </p:column>
+                                </p:row>
+                                
+                                <p:row>
+                                    <p:column rowspan="4" style="vertical-align: top">
+                                        <p:selectBooleanCheckbox id="address-street-chkbx" value="#{personEditPublicBB.editableAddress}">
+                                            <p:ajax update="address-street-it address-city-it address-state-it address-zip-it" />
+                                        </p:selectBooleanCheckbox>
+                                    </p:column>
+                                    
+                                    <p:column rowspan="4" style="vertical-align: top">Address</p:column>
+                                    
+                                    <p:column>
+                                        <h:outputLabel for="address-street-it" value="Street:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="address-street-it" styleClass="dataText" value="#{personEditPublicBB.clonePerson.addressStreet}"
+                                                 disabled="#{!personEditPublicBB.editableAddress}" />
+                                    </p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <h:outputLabel for="address-city-it" value="City:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="address-city-it" styleClass="dataText" 
+                                                     value="#{personEditPublicBB.clonePerson.addressCity}"
+                                                     disabled="#{!personEditPublicBB.editableAddress}"/>
+                                    </p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <h:outputLabel for="address-state-it" value="State:"/>
+                                    </p:column>
+                                        
+                                    <p:column>
+                                        <h:inputText id="address-state-it" styleClass="dataText" 
+                                                     value="#{personEditPublicBB.clonePerson.addressState}"
+                                                     disabled="#{!personEditPublicBB.editableAddress}"/>
+                                    </p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <h:outputLabel for="address-zip-it" value="Zip Code:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="address-zip-it" styleClass="dataText" 
+                                                     value="#{personEditPublicBB.clonePerson.addressZip}"
+                                                     disabled="#{!personEditPublicBB.editableAddress}"/>
+                                    </p:column>
+                                </p:row>
+                                
+                                <p:row>
+                                    <p:column>
+                                        <p:selectBooleanCheckbox id="home-phone-it-chkbx" value="#{personEditPublicBB.editableHomePhone}">
+                                            <p:ajax update="home-phone-it"/>
+                                        </p:selectBooleanCheckbox>
+                                    </p:column>
+                                    
+                                    <p:column colspan="2">
+                                        <h:outputLabel for="home-phone-it" value="Home Phone:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="home-phone-it" styleClass="dataText" value="#{personEditPublicBB.clonePerson.phoneHome}"
+                                                 disabled="#{!personEditPublicBB.editableHomePhone}"/>
+                                    </p:column>
+                                    
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <p:selectBooleanCheckbox id="cell-phone-it-chkbx" value="#{personEditPublicBB.editableCellPhone}">
+                                            <p:ajax update="cell-phone-it"/>
+                                        </p:selectBooleanCheckbox>
+                                    </p:column>
+                                    
+                                    <p:column colspan="2">
+                                        <h:outputLabel for="cell-phone-it" value="Cell Phone:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="cell-phone-it" styleClass="dataText" value="#{personEditPublicBB.clonePerson.phoneCell}"
+                                                     disabled="#{!personEditPublicBB.editableCellPhone}"/>
+                                    </p:column>
+                                </p:row>
+                                
+                                <p:row>
+                                    <p:column>
+                                        <p:selectBooleanCheckbox id="work-phone-it-chkbx" value="#{personEditPublicBB.editableWorkPhone}">
+                                           <p:ajax update="work-phone-it"/>
+                                        </p:selectBooleanCheckbox>
+                                    </p:column>
+                                    
+                                    <p:column colspan="2">
+                                        <h:outputLabel for="work-phone-it" value="Work Phone:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="work-phone-it" styleClass="dataText" value="#{personEditPublicBB.clonePerson.phoneWork}"
+                                                 disabled="#{!personEditPublicBB.editableWorkPhone}"/>
+                                    </p:column>
+                                </p:row>
+                                
+                                <p:row>
+                                    <p:column>
+                                        <p:selectBooleanCheckbox id="email-chkbx" value="#{personEditPublicBB.editableEmail}">
+                                            <p:ajax update="email-it"/>
+                                        </p:selectBooleanCheckbox>
+                                    </p:column>
+                                    
+                                    <p:column colspan="2">
+                                        <h:outputLabel for="email-it" value="Email:"/>
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <h:inputText id="email-it" styleClass="dataText" value="#{personEditPublicBB.clonePerson.email}"
+                                                     disabled="#{!personEditPublicBB.editableEmail}"/>  
+                                    </p:column>
+                                </p:row>  
+                                
+                                <p:row>
+                                    <p:column colspan="4" style="text-align: center">
+                                        <p:commandButton value="Submit changes" action="#{personEditPublicBB.addCloneToApplicantPersons(personEditPublicBB.clonePerson)}"/>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>      
+                        </h:form>                   
                     </div>
                 </f:view>
-
             </ui:define>
         </ui:composition>
     </h:body>

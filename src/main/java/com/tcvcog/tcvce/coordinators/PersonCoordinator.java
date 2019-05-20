@@ -26,10 +26,8 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -157,9 +155,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         return pi.getPersonHistory(u);
         
-    }
-    
-    
+    }   
 
     /**
      * @return the personTypes
@@ -176,8 +172,8 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         this.personTypes = personTypes;
     }
     /**
-     * To be used in public search, no muni required
-     * @return 
+     * Returns SearchParamsPersons object with its member variables set to default values.
+     * @return params
      */
     public SearchParamsPersons  getDefaultSearchParamsPersons(){
         SearchParamsPersons params = new SearchParamsPersons();
@@ -190,7 +186,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
         // subclass specific parameters
         params.setFilterByLastName(true);
-        params.setFilterByAddressStreet(true);
+        params.setFilterByAddressStreet(false);
         
         params.setFilterByFirstName(false);
         params.setFilterByPhoneNumber(false);
@@ -200,21 +196,24 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
         return params;
     }
-    
-    public List<Person> queryPersons(SearchParamsPersons params) throws IntegrationException {
+    /**
+     * Queries the person table and returns a list of Person objects. The results are anonymized if
+     * the anonymizeResults parameter is true.
+     * @param params
+     * @param anonymizeResults
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Person> queryPersons(SearchParamsPersons params, boolean anonymizeResults) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
         List<Person> results = pi.queryPersons(params);
+        
+        if (anonymizeResults){
+            results = anonymizePersonList(results);          
+        }
         
         return results;
     }
-    
-    public List<Person> queryPersonsAnonymized(SearchParamsPersons params) throws IntegrationException {
-        PersonIntegrator pi = getPersonIntegrator();
-        List<Person> results = pi.queryPersons(params);
-        results = anonymizePersonList(results);
-        
-        return results;
-    }    
     
     public List<Person> anonymizePersonList(List<Person> personList) {
         for (Person person:personList){
@@ -223,57 +222,78 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return personList; 
     }
     
+
+    /**
+     * Anonymizes Person object member variables, for use in the case of a public search. The 
+     * anonymized fields should still be recognizable if one knows what they are likely to be, but
+     * someone without that knowledge should not be able to guess the address, phone number, email etc.
+     * @param person
+     * @return 
+     */
     public Person anonymizePersonData(Person person){
         
-        // anonymize first name
-        StringBuilder first = new StringBuilder(person.getFirstName());
-        for (int i = 2; i < first.length(); i++){
-            first.setCharAt(i, '*');
+        // anonymize all but first two characters of first name
+        if(person.getFirstName() != null) {
+            StringBuilder first = new StringBuilder(person.getFirstName());
+            for (int i = 2; i < first.length() && i >=0; i++){
+                first.setCharAt(i, '*');
+            }
+            person.setFirstName(first.toString());
         }
-        person.setFirstName(first.toString());
         
-        // anonymize last name
-        StringBuilder last = new StringBuilder(person.getLastName());
-        for (int i = 2; i < last.length(); i++){
-            last.setCharAt(i, '*');
+        // anonymize all but first two characters of last name
+        if(person.getLastName() != null) {
+            StringBuilder last = new StringBuilder(person.getLastName());
+            for (int i = 2; i < last.length() && i >= 0; i++){
+                last.setCharAt(i, '*');
+            }
+            person.setLastName(last.toString());
         }
-        person.setLastName(last.toString());
         
-        // anonymize email
-        StringBuilder email = new StringBuilder(person.getEmail());
-        for (int i = 3; i < email.length() &&  email.charAt(i) != '@'; i++){
-            email.setCharAt(i, '*');
+        // anonymize all but first three characters and the domain of an email address
+        if (person.getEmail() != null) {
+            StringBuilder email = new StringBuilder(person.getEmail());
+            for (int i = 3; i < email.length() &&  email.charAt(i) != '@' && i >= 0; i++){
+                email.setCharAt(i, '*');
+            }
+            person.setEmail(email.toString());
         }
-        person.setEmail(email.toString());
         
-        // anonymize cell phone number
-        StringBuilder cellNumber = new StringBuilder(person.getPhoneCell());
-        for (int i = cellNumber.length() - 1; i > cellNumber.length() - 5 ; i--){
-            cellNumber.setCharAt(i, '*');
+        // anonymize all but last four digits of cell phone number
+        if(person.getPhoneCell() != null) {        
+            StringBuilder cellNumber = new StringBuilder(person.getPhoneCell());
+            for (int i = cellNumber.length() - 5; i >= 0; i--){
+                cellNumber.setCharAt(i, '*');
+            }
+            person.setPhoneCell(cellNumber.toString());
         }
-        person.setPhoneCell(cellNumber.toString());
+
+        // anonymize all but last four digits of work phone number
+        if(person.getPhoneWork() != null) {
+            StringBuilder workNumber = new StringBuilder(person.getPhoneWork());
+            for (int i = workNumber.length() - 5; i >= 0; i--){
+                workNumber.setCharAt(i, '*');
+            }
+            person.setPhoneWork(workNumber.toString());
+        }     
         
-        // anonymize work phone number
-        StringBuilder workNumber = new StringBuilder(person.getPhoneWork());
-        for (int i = workNumber.length() - 1; i > workNumber.length() - 5 ; i--){
-            workNumber.setCharAt(i, '*');
+        // anonymize all but last four digits of home phone number
+        if(person.getPhoneHome() != null) {
+            StringBuilder homeNumber = new StringBuilder(person.getPhoneHome());
+            for (int i = homeNumber.length() - 5; i >= 0; i--){
+                homeNumber.setCharAt(i, '*');
+            }
+            person.setPhoneHome(homeNumber.toString());      
         }
-        person.setPhoneWork(workNumber.toString());
-        
-        // anonymize home phone number
-        StringBuilder homeNumber = new StringBuilder(person.getPhoneHome());
-        for (int i = homeNumber.length() - 1; i > homeNumber.length() - 5 ; i--){
-            homeNumber.setCharAt(i, '*');
+           
+        // anonymize all but first five characters of address
+        if(person.getAddressStreet() != null) {
+            StringBuilder address = new StringBuilder(person.getAddressStreet());
+            for (int i = 5; i < address.length() && i >= 0; i++){
+                address.setCharAt(i, '*');
+            }
+            person.setAddressStreet(address.toString());
         }
-        person.setPhoneHome(homeNumber.toString());
-        
-        
-        // anonymize address
-        StringBuilder address = new StringBuilder(person.getAddressStreet());
-        for (int i = 0; i < address.length(); i++){
-            address.setCharAt(i, '*');
-        }
-        person.setAddressStreet(address.toString());
         
         return person;
     }

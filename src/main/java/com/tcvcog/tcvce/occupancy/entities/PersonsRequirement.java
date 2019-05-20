@@ -12,8 +12,8 @@ import java.util.ArrayList;
 public class PersonsRequirement extends EntityUtils implements Serializable {
    
     private boolean requirementSatisfied;
-    private ArrayList<PersonType> requiredPersons;
-    private ArrayList<PersonType> optionalPersons;
+    private ArrayList<PersonType> requiredPersonTypes;
+    private ArrayList<PersonType> optionalPersonTypes;
     private String requirementExplanation;
     
     /**
@@ -31,31 +31,31 @@ public class PersonsRequirement extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the requiredPersons
+     * @return the requiredPersonTypes
      */
-    public ArrayList<PersonType> getRequiredPersons() {
-        return requiredPersons;
+    public ArrayList<PersonType> getRequiredPersonTypes() {
+        return requiredPersonTypes;
     }
 
     /**
-     * @param requiredPersons the requiredPersons to set
+     * @param requiredPersonTypes the requiredPersonTypes to set
      */
-    public void setRequiredPersons(ArrayList<PersonType> requiredPersons) {
-        this.requiredPersons = requiredPersons;
+    public void setRequiredPersonTypes(ArrayList<PersonType> requiredPersonTypes) {
+        this.requiredPersonTypes = requiredPersonTypes;
     }
 
     /**
-     * @return the optionalPersons
+     * @return the optionalPersonTypes
      */
-    public ArrayList<PersonType> getOptionalPersons() {
-        return optionalPersons;
+    public ArrayList<PersonType> getOptionalPersonTypes() {
+        return optionalPersonTypes;
     }
 
     /**
-     * @param optionalPersons the optionalPersons to set
+     * @param optionalPersonTypes the optionalPersonTypes to set
      */
-    public void setOptionalPersons(ArrayList<PersonType> optionalPersons) {
-        this.optionalPersons = optionalPersons;
+    public void setOptionalPersonTypes(ArrayList<PersonType> optionalPersonTypes) {
+        this.optionalPersonTypes = optionalPersonTypes;
     }
 
     /**

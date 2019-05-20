@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
+import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -31,7 +31,7 @@ import javax.annotation.PostConstruct;
  */
 public class PersonSearchPublicBB extends BackingBeanUtils implements Serializable {
 
-    private SearchParamsPerson params;
+    private SearchParamsPersons params;
     private List<Person> personSearchResults;
     private Person selectedPerson;
     
@@ -41,25 +41,23 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
         setParams(pc.getDefaultSearchParamsPersons());
     }
     
-    public void queryPersons(SearchParamsPerson params) throws IntegrationException{
+    public void queryPersons(SearchParamsPersons params) throws IntegrationException{
        PersonCoordinator pc = getPersonCoordinator();
        boolean anonymizeResults = true;
-       // Yikes--we need to not call this method but need to go through and get a Query object
-       // first so things can be tracked and organized
        setPersonSearchResults(pc.queryPersons(params, anonymizeResults));
     }
 
     /**
      * @return the params
      */
-    public SearchParamsPerson getParams() {
+    public SearchParamsPersons getParams() {
         return params;
     }
 
     /**
      * @param params the params to set
      */
-    public void setParams(SearchParamsPerson params) {
+    public void setParams(SearchParamsPersons params) {
         this.params = params;
     }
 

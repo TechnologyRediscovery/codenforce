@@ -20,6 +20,10 @@ package com.tcvcog.tcvce.occupancy.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.occupancy.entities.InspectedElement;
 import com.tcvcog.tcvce.occupancy.entities.InspectedSpace;
 import com.tcvcog.tcvce.occupancy.entities.LocationDescriptor;
@@ -31,6 +35,8 @@ import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 /**
@@ -74,8 +80,26 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return occpermitapp;       
     }
     
-    public PersonsRequirement verifyOccPermitPersonsRequirement (PersonsRequirement pr){
-        // this will verify that this requirement has been satisfied based on the state of the application
-        return pr;
+    /**
+     * Sets boolean requirementSatisfied on an OccPermitApplication based on the application reason,
+     * the person requirement for that reason, and the PersonTypes of the Persons attached to the 
+     * application.
+     * @param opa 
+     */
+    public void verifyOccPermitPersonsRequirement (OccPermitApplication opa){
+        boolean isRequirementSatisfied = true;
+        PersonsRequirement pr = opa.getReason().getPersonsRequirement();        
+        List<PersonType> requiredPersonTypes = pr.getRequiredPersonTypes();
+        List<Person> applicationPersons = opa.getAttachedPersons();
+        List<PersonType> applicationPersonTypes = new ArrayList<>();
+        for (Person applicationPerson:applicationPersons){
+            applicationPersonTypes.add(applicationPerson.getPersonType());
+        }
+        for (PersonType personType:requiredPersonTypes) {
+            if (!applicationPersonTypes.contains(personType)){
+                isRequirementSatisfied = false;               
+            }
+        }
+        pr.setRequirementSatisfied(isRequirementSatisfied);
     }
 }

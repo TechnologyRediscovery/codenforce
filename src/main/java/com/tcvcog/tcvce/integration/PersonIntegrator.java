@@ -838,7 +838,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         int newGhostID = 0;
 
         try {
-            String s = "select creatClonedperson(p.*, ? ) from person AS p where personid = ?;";
+            String s = "select createcloneperson(p.*, ? ) from person AS p where personid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, u.getUserID());
             stmt.setInt(2, p.getPersonID());
@@ -846,7 +846,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             
             while (rs.next()) {
-                newGhostID = rs.getInt("createClonedperson");
+                newGhostID = rs.getInt("createcloneperson");
                 System.out.println("PersonIntegrator.createClone| new clone ID: " + newGhostID );
             }
 
