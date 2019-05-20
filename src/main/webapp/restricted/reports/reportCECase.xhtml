@@ -30,11 +30,11 @@
                         <p>
                             <a href="#action-requests">next actions <h:outputText value=" (#{caseProfileBB.currentCase.eventListActionRequests.size()})" /> </a> | 
                             <a href="#add-event">new event</a> | 
-                            <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.eventList.size()})" /></a> | 
+                            <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.visibleEventList.size()})" /></a> | 
                             <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
                             <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
                             <a href="#citations">citations <h:outputText value=" (#{caseProfileBB.currentCase.citationList.size()})" /></a> | 
-                            <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.requestList.size()})" /></a>  
+                            <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.ceActionRequestList.size()})" /></a>  
                         </p>
 
 
@@ -168,7 +168,7 @@
                     <p:dataScroller
                         id="events-datascroller"
                         var="e"
-                        value="#{caseProfileBB.currentCase.eventList}"
+                        value="#{caseProfileBB.currentCase.visibleEventList}"
                         widgetVar="ceevent-ds-var">
 
                         <div class="outlinedBox event-ds-box">
@@ -457,7 +457,7 @@
                         <p:spacer height="5px"/>
 
                         <h:outputText styleClass="bold"   value="Queued for Mailing: " />
-                        <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
+                        <h:outputText id="nov-queued-ot" value="#{notice.lockedAndQueuedTSPretty}"/>
                         <p:spacer height="5px"/>
 
                         <h:outputText styleClass="bold"  value="Sent Date: " />
@@ -560,7 +560,7 @@
                     <p:dataScroller
                         id="actionRequestTable"
                         var="r"
-                        value="#{caseProfileBB.currentCase.requestList}">
+                        value="#{caseProfileBB.currentCase.ceActionRequestList}">
                         <div class="outlinedBox">
 
                             <h3>Code Enforcement Action Request</h3>
@@ -617,25 +617,30 @@
                                         <p:spacer height="5px"/>
 
                                         <h:outputText value="#{r.requestor.firstName} "/> 
-                                        <h:outputText value="#{r.actionRequestorPerson.larequestor                                    <h:outputText value="#{r.actionRequestorPerson.addressStreet}requestor                             <h:outputText value="#{r.actionRequesrequestor}, "/> 
-                                        <h:outputText value="#{r.actionRequestorPerson.addressState} "/> 
-                   requestor<h:outputText value="#{r.actionRequestorPerson.addressZip}"/> 
-                      requestor                                </h:panelGroup>
+                                        <h:outputText value="#{r.requestor.lastName}" />
+                                        <br />
+                                        <h:outputText value="#{r.requestor.addressStreet}" />                                    
+                                        <h:outputText value="#{r.requestor.addressCity}" />                                    
+                                        <h:outputText value="#{r.requestor.addressState}" />                                    
+                                        <h:outputText value="#{r.requestor.addressZip}" />          
+                                    </div>
+                            </h:panelGroup>
 
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Contact: "/>
                                     <p:spacer height="5px"/>
                                     <div class="wrapText"> 
                                         <h:outputText value="Phone (cell): "/>
-                                        <h:outputText value="#{r.actionRequesrequestor/> <br/>
+                                        <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneCell}"/> <br/>
                                         <h:outputText value="Phone (work): "/>
-                                        <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> <br/>
-                              requestorxt value="Phone (home): "/>
-                                        <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br/>
-                              requestorxt value="Email: "/>
-                                        <h:outputText value="#{r.actionRequestorPerson.email}"/>
+                                        <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneWork}"/> 
+                                        <h:outputText value="Phone (home): "/>
+                                        <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneHome}"/> <br/>
+                                        <h:outputText value="Email: "/>
+                                        <h:outputText id="selr-pers-email" value="#{cEActionRequestsBB.selectedRequest.requestor.email}"/>
                                     </div>
-                                </h:panelGrourequestor                 <f:facet name="footer" class="leftalign">
+                                </h:panelGroup>
+                                <f:facet name="footer" class="leftalign">
                                     <h:outputLabel styleClass="bold" value="Request description"/>
                                     <p:spacer height="15px"/>
                                     <div class="rowExpansion" style="leftalign">

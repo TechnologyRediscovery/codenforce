@@ -992,7 +992,6 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             while(rs.next()){
                 cege = generateCodeElementGuideEntry(rs);
-                System.out.println("CodeIntegrator.getCodeElementGuideEntry | retrievd " + cege.getGuideEntryID());
             }
              
         } catch (SQLException ex) { 

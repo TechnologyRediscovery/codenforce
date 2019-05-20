@@ -1114,7 +1114,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public EventCECase getEventCECase(int eventID) throws IntegrationException {
         EventCECase ev = null;
-        EventCoordinator ec = getEventCoordinator();
 
         String query = "SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n" +
                 "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
@@ -1153,8 +1152,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;    
     }
 
-    public ArrayList<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException {
-        ArrayList<EventCECase> eventList = new ArrayList();
+    public List<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException {
+        List<EventCECase> eventList = new ArrayList();
 
         String query = "SELECT eventid FROM public.ceevent WHERE cecase_caseid = ?;";
         Connection con = getPostgresCon();

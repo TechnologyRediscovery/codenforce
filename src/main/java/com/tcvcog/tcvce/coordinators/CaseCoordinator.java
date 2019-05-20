@@ -79,42 +79,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     public CECase configureCECase(CECase cse) throws CaseLifecyleException{
         
         setCaseStage(cse);
+        cse.setShowHiddenEvents(false);
+        cse.setShowInactiveEvents(false);
         
-        List<EventCECase> evList = new ArrayList();
-        
-        // transfer any events with requests to a separate list for display at
-        // the head of the case profile
-        // only add events which make an event category request, are not done, 
-        // are active, and not hidden
-        if(cse.getEventList() !=  null && cse.getEventList().size() >= 1){
-            for(EventCECase ev: cse.getEventList()){
-                if(ev.getRequestedEventCat()!= null 
-                        && 
-                    !ev.isResponseComplete()
-                        &&
-                    ev.isActive()
-                        &&
-                    !ev.isHidden()){
-                    evList.add(ev);
-                }
-            }
-        }
-        cse.setEventListActionRequests(evList);
-        
-        Collections.sort(cse.getNoticeList());
-        Collections.reverse(cse.getNoticeList());
-        Collections.sort(cse.getEventListActionRequests());
-        Collections.sort(cse.getEventList());
-        Collections.reverse(cse.getEventList()); 
+   
         
         // check to make sure we have empty lists on all of our list objects
         if(cse.getViolationList() == null){
             cse.setViolationList(new ArrayList<CodeViolation>());
         }
         
-        if(cse.getEventListActionRequests() == null){
-            cse.setEventListActionRequests(new ArrayList<EventCECase>());
-        }
+        cse.setEventListActionRequests(new ArrayList<EventCECase>());
+        cse.setVisibleEventList(new ArrayList<EventCECase>());
+        
         
         if(cse.getCitationList() == null){
             cse.setCitationList(new ArrayList<Citation>());
@@ -124,11 +101,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             cse.setNoticeList(new ArrayList<NoticeOfViolation>());
         }
         
-        if(cse.getRequestList() == null){
-            cse.setRequestList(new ArrayList<CEActionRequest>());
+        if(cse.getCeActionRequestList() == null){
+            cse.setCeActionRequestList(new ArrayList<CEActionRequest>());
         }
         
         
+        Collections.sort(cse.getNoticeList());
+        Collections.reverse(cse.getNoticeList());
+        Collections.sort(cse.getEventListActionRequests());
+        Collections.sort(cse.getVisibleEventList());
+        Collections.reverse(cse.getVisibleEventList()); 
         
         return cse;
     }
@@ -454,7 +436,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         boolean subcheckPasses = true;
         if(rule.getRequiredExtantEventType() != null){
             subcheckPasses = false;
-            Iterator<EventCECase> iter = cse.getEventList().iterator();
+            Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
             while(iter.hasNext()){
                 EventCECase ev = iter.next();
                 if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
@@ -468,7 +450,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     private boolean ruleSubcheck_forbiddenEventType(CECase cse, CasePhaseChangeRule rule){
         boolean subcheckPasses = true;
-        Iterator<EventCECase> iter = cse.getEventList().iterator();
+        Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
             EventCECase ev = iter.next();
             if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
@@ -482,7 +464,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         boolean subcheckPasses = true;
         if(rule.getRequiredExtantEventCatID() != 0){
             subcheckPasses = false;
-            Iterator<EventCECase> iter = cse.getEventList().iterator();
+            Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
             while(iter.hasNext()){
                 EventCECase ev = iter.next();
                 if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
@@ -495,7 +477,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, CasePhaseChangeRule rule){
         boolean subcheckPasses = true;
-        Iterator<EventCECase> iter = cse.getEventList().iterator();
+        Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
             EventCECase ev = iter.next();
             if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
@@ -1106,7 +1088,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        CECase c = ci.getCECase(rptCse.getCse().getCaseID());
        
        List<EventCECase> evList =  new ArrayList<>();
-       Iterator<EventCECase> iter = c.getEventList().iterator();
+       Iterator<EventCECase> iter = c.getVisibleEventList().iterator();
        while(iter.hasNext()){
             EventCECase ev = iter.next();
             
@@ -1121,7 +1103,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                     && !rptCse.isIncludeOfficerOnlyEvents()) continue;
             evList.add(ev);
        }
-       c.setEventList(evList);
+       c.setVisibleEventList(evList);
        List<NoticeOfViolation> noticeList = new ArrayList<>();
        Iterator<NoticeOfViolation> iterNotice = c.getNoticeList().iterator();
        while(iterNotice.hasNext()){
@@ -1265,6 +1247,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString("codeviolation_unresolved_citation_ageleadtext"));
             }
+            // we have a resolved violation
         } else {
             cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                     .getString("codeviolation_resolved_statusstring"));
