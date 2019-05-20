@@ -54,10 +54,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query = "INSERT INTO public.login(\n" +
             "            userid, userrole, username, notes, activitystartdate, \n" +
             "            activitystopdate, accesspermitted, enforcementofficial, badgenumber, \n" +
-            "       orinumber, personlink, password)\n" +
+            "       orinumber, personlink)\n" +
             "    VALUES (DEFAULT, CAST (? AS role), ?, ?, ?, ?, \n" +
             "            ?, ?, ?, ?, \n" +
-            "            ?, ?, ?);";
+            "            ?, ?);";
         
         PreparedStatement stmt = null;
         
@@ -302,7 +302,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public User getUser(int userID) throws IntegrationException{
-        System.out.println("UserIntegrator.getUser | userid: " + userID);
         Connection con = getPostgresCon();
         ResultSet rs = null;
         User newUser = new User();

@@ -93,12 +93,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private EventCECase triggeringEventForRequestedCaseAction;
 
     private List<EventCECase> filteredEventList;
-    private List<EventCECase> removedEventList;
     private EventCECase selectedEvent;
+
     private boolean allowedToClearActionResponse;
     private int rejectedEventListIndex;
-    private boolean showHiddenEvents;
-    private boolean showInactiveEvents;
 
     private List<CodeViolation> selectedViolations;
     private CodeViolation selectedViolation;
@@ -165,19 +163,16 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
         // go fetch 
         executeQuery();
-        removedEventList = new ArrayList<>();
-        showHiddenEvents = false;
-        showInactiveEvents = false;
         List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
         if (retrievedCaseList != null && !retrievedCaseList.isEmpty()) {
             currentCase = retrievedCaseList.get(0);
             caseList = retrievedCaseList;
             refreshCurrentCase();
-            trimEventList();
         }
 
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
         if (rpt != null) {
+            rpt.setTitle("Code Enforcement Case Summary");
             reportCECase = rpt;
         }
 
@@ -195,60 +190,45 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         return "properties";
     }
 
-    /**
-     * Pass through method for calling trimEventList when any of the two boolean
-     * check boxes above the event list on ceCases.xhtml are pressed
-     */
-    public void reloadEventList() {
-        System.out.println("CaseProfileBB.reloadEventList");
-        trimEventList();
-    }
-    
+   
     
     private void positionCurrentCaseAtHeadOfQueue(){
         getSessionBean().getcECaseQueue().remove(currentCase);
         getSessionBean().getcECaseQueue().add(0, currentCase);
     }
 
-    /**
-     * Used by the UI to adjust the events shown in the event history list and
-     * responds to changes in the two boolean check boxes for showing hidden and
-     * inactive events
-     */
-    public void trimEventList() {
-
-        if (currentCase.getEventList() != null) {
-            for (EventCECase ev : currentCase.getEventList()) {
-                System.out.println("CaseProfileBB.trimEventList | inspecting ev " + ev.getEventID());
-                if (!ev.isActive() && !showInactiveEvents) {
-                    System.out.println("CaseProfileBB.trimEventList | found inactive; adding to removed list ev " + ev.getEventID());
-                    removedEventList.add(ev);
-                }
-                if (ev.isHidden() && !showHiddenEvents) {
-                    System.out.println("CaseProfileBB.trimEventList | found hidden; adding to removed list ev " + ev.getEventID());
-                    removedEventList.add(ev);
-                }
-            } // close for   
-            for (EventCECase ev : removedEventList) {
-                System.out.println("CaseProfileBB.trimEventList | removing ev " + ev.getEventID());
-                currentCase.getEventList().remove(ev);
-            }
-
-            if (showHiddenEvents) {
-                for (EventCECase ev : removedEventList) {
-                    if (ev.isHidden()) {
-                        currentCase.getEventList().add(ev);
-                    }
-                }
-            }
-            if (showInactiveEvents) {
-                for (EventCECase ev : removedEventList) {
-                    if (!ev.isActive()) {
-                        currentCase.getEventList().add(ev);
-                    }
-                }
-            }
-        } // close outer if
+   
+    
+    public void hideEvent(EventCECase event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(true);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! event ID: " + event.getEventID() + " is now hidden", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not hide event, sorry; this is a system erro", ""));
+        }
+    }
+    
+    public void unHideEvent(EventCECase event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(false);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! Unhid event ID: " + event.getEventID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           "Could not unhide event, sorry; this is a system erro", ""));
+        }
     }
 
     public void deletePhoto(int photoID) {
@@ -304,7 +284,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
         } catch (CaseLifecyleException ex) {
-            Logger.getLogger(CaseProfileBB.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
         }
     }
     
@@ -506,7 +486,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         // nullify the session's case so that the reload of currentCase
         // no the cecaseProfile.xhtml will trigger a new DB read
         refreshCurrentCase();
-        trimEventList();
     }
 
     /**
@@ -613,7 +592,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
         currentCase = c;
         getSessionBean().setActiveProp(c.getProperty());
-        removedEventList.clear();
     }
 
     public void changePACCAccess() {
@@ -705,7 +683,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
-        trimEventList();
 
     }
 
@@ -1538,47 +1515,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         this.triggeringEventForRequestedCaseAction = triggeringEventForRequestedCaseAction;
     }
 
-    /**
-     * @return the showHiddenEvents
-     */
-    public boolean isShowHiddenEvents() {
-        return showHiddenEvents;
-    }
-
-    /**
-     * @param showHiddenEvents the showHiddenEvents to set
-     */
-    public void setShowHiddenEvents(boolean showHiddenEvents) {
-        this.showHiddenEvents = showHiddenEvents;
-    }
-
-    /**
-     * @return the showInactiveEvents
-     */
-    public boolean isShowInactiveEvents() {
-        return showInactiveEvents;
-    }
-
-    /**
-     * @param showInactiveEvents the showInactiveEvents to set
-     */
-    public void setShowInactiveEvents(boolean showInactiveEvents) {
-        this.showInactiveEvents = showInactiveEvents;
-    }
-
-    /**
-     * @return the removedEventList
-     */
-    public List<EventCECase> getRemovedEventList() {
-        return removedEventList;
-    }
-
-    /**
-     * @param removedEventList the removedEventList to set
-     */
-    public void setRemovedEventList(List<EventCECase> removedEventList) {
-        this.removedEventList = removedEventList;
-    }
+    
 
     /**
      * @return the styleClassInvestigation

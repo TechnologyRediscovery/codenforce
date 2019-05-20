@@ -420,9 +420,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     
     
-    public ArrayList getEventList(CECase currentCase) throws IntegrationException{
+    public List getEventList(CECase currentCase) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ArrayList<EventCECase> ll = ei.getEventsByCaseID(currentCase.getCaseID());
+        List<EventCECase> ll = ei.getEventsByCaseID(currentCase.getCaseID());
         return ll;
     }
     

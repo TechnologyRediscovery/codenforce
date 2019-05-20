@@ -439,7 +439,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = null;
-        CECase c = null;
+        CECase cse = null;
         
         try {
             
@@ -450,8 +450,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                CECaseBaseClass b = generateCECaseNoLists(rs);
-                c = generateCECase(b);
+                CECaseBaseClass baseCase = generateCECaseNoLists(rs);
+                cse = generateCECase(baseCase);
             }
             
         } catch (SQLException ex) {
@@ -464,7 +464,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return cc.configureCECase(c);
+        // send the case to the coordinator for the setting of casephase and such before returning
+        return cc.configureCECase(cse);
     }
     
     public CECase generateCECase(CECaseBaseClass caseBare) throws SQLException, IntegrationException{
@@ -473,15 +474,15 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         
-        CECase c = new CECase(caseBare);
+        CECase cse = new CECase(caseBare);
 
         // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
-        c.setEventList(ei.getEventsByCaseID(c.getCaseID()));
-        c.setNoticeList(cvi.novGetList(c));
-        c.setCitationList(ci.getCitations(c));
-        c.setViolationList(cvi.getCodeViolations(c.getCaseID()));
-        c.setRequestList(ceari.getCEActionRequestListByCase(c.getCaseID()));
-        return c;
+        cse.setCompleteEventList(ei.getEventsByCaseID(cse.getCaseID()));
+        cse.setNoticeList(cvi.novGetList(cse));
+        cse.setCitationList(ci.getCitations(cse));
+        cse.setViolationList(cvi.getCodeViolations(cse.getCaseID()));
+        cse.setCeActionRequestList(ceari.getCEActionRequestListByCase(cse.getCaseID()));
+        return cse;
     }
     
      public CECaseBaseClass generateCECaseNoLists(ResultSet rs) throws SQLException, IntegrationException{

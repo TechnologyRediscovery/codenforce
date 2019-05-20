@@ -453,11 +453,11 @@
                                     <p>
                                         <a href="#action-requests">next actions <h:outputText value=" (#{caseProfileBB.currentCase.eventListActionRequests.size()})" /> </a> | 
                                         <a href="#add-event">new event</a> | 
-                                        <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.eventList.size()})" /></a> | 
+                                        <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.visibleEventList.size()})" /></a> | 
                                         <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
                                         <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
                                         <a href="#citations">citations <h:outputText value=" (#{caseProfileBB.currentCase.citationList.size()})" /></a> | 
-                                        <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.requestList.size()})" /></a>  
+                                        <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.ceActionRequestList.size()})" /></a>  
                                     </p>
 
 
@@ -488,7 +488,7 @@
                                                           value=" (#{caseProfileBB.currentCase.caseAge} days ago)" 
                                                           rendered="#{empty caseProfileBB.currentCase.closingDate}"/>
                                             <p:spacer height="5px"/>
-                                            <h:outputLabel styleClass="bold" value="Closing Date:"/>
+                                            <h:outputLabel styleClass="bold" value="Closing Date: "/>
                                             <h:outputText id="selcase-cdate-it" value="#{caseProfileBB.currentCase.closingDatePretty}"/>
                                             <p:spacer height="5px"/>
                                             <h:outputLabel styleClass="bold" value="Case Manager: "/>
@@ -566,26 +566,23 @@
                                 <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
                                                  value="Add new code violation"
                                                  icon="fa fa-plus"
-                                                 disabled="#{!sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"/>
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                 disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
                                 <p:spacer height="15px"/>
 
+                <ui:remove>
+                                    
                                 <h:outputLabel styleClass="bold" value="Unresolved code violations: 
                                                #{caseProfileBB.currentCase.violationListUnresolved.size()} 
                                                / #{caseProfileBB.currentCase.violationList.size()}"/> 
                                 <p:spacer height="5px"/>
 
-                                <ui:remove >
-
-
                                     <h:outputLabel styleClass="bold" value="Violations with compliance achieved: 
                                                    #{caseProfileBB.currentCase.violationListResolved.size()} 
                                                    / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                    
+                </ui:remove>
                                     <p:spacer height="5px"/>
-
-                                </ui:remove>
-
-
-
 
 
                                 <p:dataTable
@@ -895,6 +892,9 @@
                                 </h:panelGrid>
                             </h:form>
 
+
+                            <hr />
+
                             <h:form id="event-messages-form">
                                 <h:messages id="cecases-events-messages"
                                             globalOnly="true" showDetail="true" showSummary="true"
@@ -902,29 +902,17 @@
                                 </h:messages>
                             </h:form>
 
-                            <hr />
-
-
 
                             <h2 id="event-history">Event history</h2>
 
                             <h:form id="event-dt-form">
 
-                                <h:outputLabel value="Show hidden events: " for="events-showhidden-sbcb" />
-                                <p:selectBooleanCheckbox id="events-showhidden-sbcb" value="#{caseProfileBB.showHiddenEvents}">
-                                    <p:ajax listener="#{caseProfileBB.reloadEventList}" update="caseEventTable" />
-                                </p:selectBooleanCheckbox>
-
-                                <h:outputLabel value="Show inactive events: " for="events-inactive-sbcb" />
-                                <p:selectBooleanCheckbox id="events-inactive-sbcb" value="#{caseProfileBB.showInactiveEvents}">
-                                    <p:ajax listener="#{caseProfileBB.reloadEventList}" update="caseEventTable" />
-                                </p:selectBooleanCheckbox>
 
                                 <p:dataTable
                                     id="caseEventTable"
                                     var="e"
                                     rowKey="#{e.eventID}"
-                                    value="#{caseProfileBB.currentCase.eventList}"
+                                    value="#{caseProfileBB.currentCase.visibleEventList}"
                                     tableStyleClass="primeDataTable"
                                     resizableColumns="true"
                                     rowExpandMode="multiple"
@@ -993,15 +981,40 @@
                                             <h:outputText value="#{e.description}"/>
                                         </div>
                                     </p:column>
-                                    <p:column width="5%" exportable="false">
+                                    
+                                    <p:column width="6%" exportable="false">
                                         <f:facet name="header">
-                                            <h:outputText value="edit" />
+                                            <h:outputText value="Hide" />
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-moon-o"
+                                                         ajax="true"
+                                                         disabled="#{e.hidden}"
+                                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                         actionListener="#{caseProfileBB.hideEvent(e)}" 
+                                                         update="caseEventTable
+                                                         event-messages-form"
+                                                         />
+                                        <p:commandButton icon="fa fa-star"
+                                                         ajax="true"
+                                                         disabled="#{!e.hidden}"
+                                                         actionListener="#{caseProfileBB.unHideEvent(e)}" 
+                                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                         update="caseEventTable
+                                                         event-messages-form"
+                                                         />
+
+                                    </p:column>
+                                    
+                                    <p:column width="4%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="Edit" />
                                         </f:facet>
                                         <p:commandButton icon="fa fa-edit"
                                                          ajax="true"
                                                          actionListener="#{caseProfileBB.editEvent(e)}" 
                                                          oncomplete="PF('add-event-dialog-var').show()"
-                                                         update="addNewEventForm"
+                                                         update="addNewEventForm
+                                                         event-messages-form"
                                                          />
 
                                     </p:column>
@@ -1120,6 +1133,25 @@
                                     </p:rowExpansion>
 
                                 </p:dataTable>
+                                <p:spacer height="5px" />
+                                
+                                <p:inputSwitch id="events-showhidden-sbcb" 
+                                               style="margin-right: 5px;"
+                                               value="#{caseProfileBB.currentCase.showHiddenEvents}" 
+                                               offLabel="view hidden events"
+                                               onLabel="conceal hidden events">
+                                    <p:ajax update="caseEventTable" />
+                                    
+                                </p:inputSwitch>
+                                
+                                
+                                
+                                <p:inputSwitch id="events-inactive-sbcb" 
+                                               value="#{caseProfileBB.currentCase.showInactiveEvents}"
+                                               offLabel="view inactive events"
+                                               onLabel="conceal inactive events">
+                                    <p:ajax update="caseEventTable" />
+                                </p:inputSwitch>
 
                             </h:form>
 
@@ -1137,10 +1169,11 @@
 
 
                             <h:form id="notices-form">
-                                <p:commandButton ajax="false" 
+                                <p:commandButton ajax="false" icon="fa fa-paper-plane"
                                                  action="#{caseProfileBB.createNewNotice}"
                                                  value="Create new notice of violation letter"
-                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                 disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
                                 <p:spacer height="5px"/>
 
                                 <p:dataScroller
@@ -1305,9 +1338,9 @@
 
                                 <p:commandButton ajax="false" action="#{caseProfileBB.createNewCitation}"
                                                  value="Create new citation"
-
                                                  icon="fa fa-warning"
-                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                 disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
                                 <p:spacer height="5px" />
 
                                 <p:dataTable
@@ -1416,7 +1449,7 @@
                                     id="actionRequestTable"
                                     var="r"
                                     rowKey="#{r.requestID}"
-                                    value="#{caseProfileBB.currentCase.requestList}"
+                                    value="#{caseProfileBB.currentCase.ceActionRequestList}"
                                     tableStyleClass="primeDataTable"
                                     expandedRow="false"
                                     rowExpandMode="multiple"
