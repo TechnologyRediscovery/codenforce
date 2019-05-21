@@ -30,7 +30,7 @@ import javax.faces.convert.FacesConverter;
  * @author Eric C. Darsow
  */
 @FacesConverter(value="bOBQueryConverter")
-public class SearchParamsConverterBOQuery extends EntityConverter implements Converter{
+public class SearchParamsConverterBOBQuery extends EntityConverter implements Converter{
     
      @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
@@ -38,6 +38,7 @@ public class SearchParamsConverterBOQuery extends EntityConverter implements Con
             return null; 
         }
         BOBQuery o = (BOBQuery) this.getViewMap(fc).get(titleS);
+        System.out.println("SearchParamsConverterBOB.getAsObject | object " + o.getQueryTitle());
         return o;
     }
 

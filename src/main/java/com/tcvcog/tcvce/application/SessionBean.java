@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.ReportConfig;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
+import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
@@ -85,8 +86,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Code Enf Action Request Session Shelves ***  */
     
     private Person personForCEActionRequestSubmission;
-    
-    
+
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
     private CEActionRequest activeRequest;
@@ -106,7 +106,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
     private ReportConfig activeReport;
-    
+    private ReportConfigCEEventList reportConfigCEEventList;
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication occPermitApplication;
@@ -623,6 +623,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setReportConfigCECaseList(ReportConfigCECaseList reportConfigCECaseList) {
         this.reportConfigCECaseList = reportConfigCECaseList;
+    }
+
+    /**
+     * @return the reportConfigCEEventList
+     */
+    public ReportConfigCEEventList getReportConfigCEEventList() {
+        return reportConfigCEEventList;
+    }
+
+    /**
+     * @param reportConfigCEEventList the reportConfigCEEventList to set
+     */
+    public void setReportConfigCEEventList(ReportConfigCEEventList reportConfigCEEventList) {
+        this.reportConfigCEEventList = reportConfigCEEventList;
     }
     
 }

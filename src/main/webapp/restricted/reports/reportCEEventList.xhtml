@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="css/style.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <title>Code Enforcement event report</title>
+    </h:head>
+    <h:body>
+        <ui:insert name="report-header">
+            <f:view id="report-header">
+                <div class="flexing-box-topbar">
+                    <div class="logoBox">
+                        <div class="logo-image-wrapper">
+                            <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
+                        </div>
+                        <div class="logo-title-wrapper">
+                            <div class="report-title">
+                                <h:outputText id="report-title-ot"  value="#{cEEventsBB.reportConfig.title}"/> 
+                            </div>
+                            <div class="report-title-sub">
+
+                                <h:outputText id="report-subtitle-ot"  value="#{cEEventsBB.reportConfig.muni.muniName}, #{cEEventsBB.reportConfig.muni.address_state}"/> 
+                                <br />
+                                <h:outputText id="creator-ot" value="Created by: #{cEEventsBB.reportConfig.creator.person.firstName} #{cEEventsBB.reportConfig.creator.person.lastName}" />
+                                <h:outputText id="creator-ot" value=" | Date: #{cEEventsBB.reportConfig.generationTimestampPretty}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </f:view>
+        </ui:insert>
+        <div class="flexing-box-pagecontent">
+            <ui:insert name="print-content">
+                <p:dataScroller
+                    id="events-datascroller"
+                    var="e"
+                    value="#{cEEventsBB.eventList}"
+                    widgetVar="ceevent-ds-var">
+
+                    <div class="outlinedBox event-ds-box">
+
+                        <div class="status-display-container">
+                            <div class="action-request-icon">
+                                <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.event.category.icon.materialIcon}"/></i>
+                            </div>
+                            <div class="status-display-status-list-container">
+                                <div class="action-request-header">
+                                    <h:outputText value="#{e.event.category.eventType.label}: #{e.event.category.eventCategoryTitle} "/>
+                                </div>
+                                <div class="action-request-subheader">
+                                    <h:outputText value="#{e.eventCaseBare.property.address} " />
+                                    <h:outputText value=" (#{e.eventCaseBare.property.muni.muniName}) | " />
+                                    <h:outputText value="Code enforcement case id: #{e.eventCaseBare.caseID} " />
+                                    <h:outputText value="Current case stage: #{e.eventCaseBare.caseStage.label} " />
+                                    <br />
+                                    <h:outputText value="Date: " styleClass="bold" />
+                                    <h:outputText value="#{e.event.dateOfRecordPretty}"/>
+                                </div>
+                                <h:outputText value="Event Owner: " styleClass="bold" />
+                                <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
+                                <div class="rowExpansion">
+                                    <h:outputText styleClass="bold" value="Description: " />
+                                    <h:outputText styleClass="weight-normal" value="#{e.event.description}"/>
+                                </div>
+                                <div class="rowExpansion">
+                                    <h:outputText styleClass="bold" value="Notes: " 
+                                                  rendered="#{!(empty e.event.responderNotes)}"/>
+                                    <h:outputText styleClass="weight-normal" 
+                                                  value="#{e.event.responderNotes}"
+                                                  rendered="#{!(empty e.event.responderNotes)}"/>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </p:dataScroller>
+            </ui:insert>
+        </div>
+    </h:body>
+</html>
+

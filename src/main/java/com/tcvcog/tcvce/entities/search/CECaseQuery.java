@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -17,8 +18,8 @@ public class CECaseQuery extends BOBQuery{
     
     private List<SearchParamsCECases> caseSearchParamsList; 
     
-    public CECaseQuery(String queryTitle, Municipality muni, User u) {
-        super(queryTitle, muni, u);
+    public CECaseQuery(String queryTitle, Municipality muni) {
+        super(queryTitle, muni);
     }
 
     /**
@@ -33,6 +34,31 @@ public class CECaseQuery extends BOBQuery{
      */
     public void setCaseSearchParamsList(List<SearchParamsCECases> caseSearchParamsList) {
         this.caseSearchParamsList = caseSearchParamsList;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + Objects.hashCode(this.caseSearchParamsList);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CECaseQuery other = (CECaseQuery) obj;
+        if (!Objects.equals(this.caseSearchParamsList, other.caseSearchParamsList)) {
+            return false;
+        }
+        return true;
     }
     
     

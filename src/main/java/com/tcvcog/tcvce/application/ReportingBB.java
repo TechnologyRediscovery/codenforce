@@ -68,9 +68,6 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
         }
         
-        
-        
-        
         reportCECase = getSessionBean().getReportConfigCECase();
         reportCECaseList = getSessionBean().getReportConfigCECaseList();
         if(reportCECase != null){

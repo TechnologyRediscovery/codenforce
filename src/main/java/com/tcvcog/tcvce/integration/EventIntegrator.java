@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -621,7 +622,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     
     
-    public EventCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException{
+    public EventCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException, CaseLifecyleException{
         EventCasePropBundle evCPBundle = null;
         CaseIntegrator ci = getCaseIntegrator();
 
@@ -709,7 +710,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<EventCECase> queryCaseDependentEvents(SearchParamsCEEvents params) throws IntegrationException{
+    public List<EventCECase> queryCaseDependentEvents(SearchParamsCEEvents params) throws IntegrationException, CaseLifecyleException{
         List<EventCasePropBundle> wrappedEventList = queryEvents(params);
         List<EventCECase> depList = new ArrayList<>();
         for(EventCasePropBundle ec: wrappedEventList){
@@ -719,7 +720,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
 
   
-    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params) throws IntegrationException {
+    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params) throws IntegrationException, CaseLifecyleException {
         List<EventCasePropBundle> eventList = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;

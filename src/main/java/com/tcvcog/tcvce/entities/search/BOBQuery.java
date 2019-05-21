@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -21,11 +22,9 @@ public class BOBQuery extends EntityUtils implements Serializable{
     private Municipality muni;
     private RoleType userRankAccessCeiling;
 
-    public BOBQuery(String queryTitle, Municipality muni, User u) {
+    public BOBQuery(String queryTitle, Municipality muni) {
         this.queryTitle = queryTitle;
         this.muni = muni;
-        
-        
         
     }
 
@@ -71,6 +70,35 @@ public class BOBQuery extends EntityUtils implements Serializable{
      */
     public void setUserRankAccessCeiling(RoleType userRankAccessCeiling) {
         this.userRankAccessCeiling = userRankAccessCeiling;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.queryTitle);
+        hash = 67 * hash + Objects.hashCode(this.muni);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BOBQuery other = (BOBQuery) obj;
+        if (!Objects.equals(this.queryTitle, other.queryTitle)) {
+            return false;
+        }
+        if (!Objects.equals(this.muni, other.muni)) {
+            return false;
+        }
+        return true;
     }
 
     

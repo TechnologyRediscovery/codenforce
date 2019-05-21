@@ -547,7 +547,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @return the same CECas passed in with the CaseStage configured
      * @throws CaseLifecyleException 
      */
-     private CECase setCaseStage(CECase cs) throws CaseLifecyleException {
+     public CECaseBaseClass setCaseStage(CECaseBaseClass cs) throws CaseLifecyleException {
         CaseStage stage;
         switch (cs.getCasePhase()) {
             case PrelimInvestigationPending:

@@ -29,12 +29,12 @@ COG yellow: #e3b73d
 #5a5754
 
 
-*/
 
 @font-face {
     font-family: 'roboto';
     src: url('https://fonts.googleapis.com/css?family=Roboto');
 }
+*/
 
 body{
     margin: 0 auto;
@@ -145,7 +145,7 @@ h4{
 .action-request-header{
     display: block;
     font-weight: bold;
-    font-size: 1.6em;
+    font-size: 1.2em;
     
     
     
@@ -154,7 +154,7 @@ h4{
 .action-request-subheader{
     display: block;
     clear: both;
-    font-size: 1.3em;
+    font-size: 1.1em;
     
 }
 

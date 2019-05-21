@@ -11,6 +11,8 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.BOBQuery;
+import com.tcvcog.tcvce.entities.search.EventQuery;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
@@ -135,6 +137,26 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         propParams.setFilterByPerson(false);
         
         return propParams;
+    }
+    
+    public List<BOBQuery> getEventQueryList(User u, Municipality m){
+        List<BOBQuery> queryList = new ArrayList<>();
+        
+        EventQuery eq = new EventQuery("Compliance follow-up events: Today", m);
+        eq.setEventSearchParams(getSearchParamsEventsRequiringAction(u, m));
+        queryList.add(eq);
+        
+        eq = new EventQuery("Officer Activity Report", m);
+        eq.setEventSearchParams(getSearchParamsOfficerActivity(u, m));
+        queryList.add(eq);
+        
+        
+        eq = new EventQuery("Compliance events: Past Month", m);
+        eq.setEventSearchParams(getSearchParamsComplianceEvPastMonth(m));
+        queryList.add(eq);
+        
+        return queryList;
+        
     }
     
     public SearchParamsCEEvents getSearchParamsEventsRequiringAction(User u, Municipality muni){
