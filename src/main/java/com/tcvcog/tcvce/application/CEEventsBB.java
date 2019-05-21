@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,6 +35,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
+
 
 /**
  *
@@ -52,8 +54,10 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     
     private List<BOBQuery> queryList;
     private BOBQuery selectedBOBQuery;
+    private SearchParamsCEEvents extractedSearchParams;
     
     private List<EventCasePropBundle> eventList;
+    private List<EventCasePropBundle> eventListForEventsReport;
     private List<EventCasePropBundle> filteredEventList;
     
     private ReportConfigCEEventList reportConfig;
@@ -69,13 +73,15 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
-        eventList = getSessionBean().getcEEventWCPIQueue();
+        eventListForEventsReport = getSessionBean().getcEEventWCPIQueue();
         searchParams = ec.getSearchParamsCEEventsRequiringAction(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
         queryList = sc.getEventQueryList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
-        reportConfig = ec.getDefaultReportConfigCEEventList();
-        reportConfig.setMuni(getSessionBean().getActiveMuni());
-        reportConfig.setCreator(getSessionBean().getFacesUser());
+       
+        // grab previously loaded event config from the session bean
+        // which would have been placed there by the generateReport method in this bean
+        reportConfig = getSessionBean().getReportConfigCEEventList();
+        
         
         
     }
@@ -100,6 +106,10 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
             eventList = ec.queryEvents( searchParams, 
                                         getSessionBean().getFacesUser(), 
                                         getSessionBean().getUserAuthMuniList());
+            if(eventList != null){
+                Collections.sort(eventList);
+                Collections.reverse(eventList);
+            }
             
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
@@ -123,6 +133,11 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
             eventList = ec.queryEvents( eq.getEventSearchParams(), 
                                         getSessionBean().getFacesUser(), 
                                         getSessionBean().getUserAuthMuniList());
+            
+            if(eventList != null){
+                Collections.sort(eventList);
+                Collections.reverse(eventList);
+            }
             
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
@@ -180,14 +195,34 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     }
     
    public void prepareEventReport(){
-       if(selectedBOBQuery != null){
-            reportConfig.setTitle(selectedBOBQuery.getQueryTitle());
+       if(eventList != null && eventList.size() > 0){
+           
+            EventCoordinator ec = getEventCoordinator();
+            reportConfig = ec.getDefaultReportConfigCEEventList();
+            reportConfig.setMuni(getSessionBean().getActiveMuni());
+            reportConfig.setCreator(getSessionBean().getFacesUser());
+            if(selectedBOBQuery != null){
+                 reportConfig.setTitle(selectedBOBQuery.getQueryTitle());
+            }
+            reportConfig.setQueryParams(searchParams);
+       } else {
+           getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Yikes! No events; You may only generate a report for an event list of size 1 or greater. "
+                                    + "Please revise your query.", ""));
        }
    }
    
    public String generateEventReport(){
        // put the current event list on the session bean for extraction when
        // we generate the report (and must reload the backing bean)
+       if(eventList != null){
+            Collections.sort(eventList);
+            if(reportConfig.isSortInRevChrono()){
+                Collections.reverse(eventList);
+            } 
+           
+       }
        getSessionBean().setcEEventWCPIQueue(eventList);
        getSessionBean().setReportConfigCEEventList(reportConfig);
        return "reportCEEventList";
@@ -343,6 +378,39 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      */
     public void setReportConfig(ReportConfigCEEventList reportConfig) {
         this.reportConfig = reportConfig;
+    }
+
+    /**
+     * @return the eventListForEventsReport
+     */
+    public List<EventCasePropBundle> getEventListForEventsReport() {
+        return eventListForEventsReport;
+    }
+
+    /**
+     * @param eventListForEventsReport the eventListForEventsReport to set
+     */
+    public void setEventListForEventsReport(List<EventCasePropBundle> eventListForEventsReport) {
+        this.eventListForEventsReport = eventListForEventsReport;
+    }
+
+    /**
+     * @return the extractedSearchParams
+     */
+    public SearchParamsCEEvents getExtractedSearchParams() {
+        EventQuery eq;
+        if(selectedBOBQuery != null){
+              eq = (EventQuery) selectedBOBQuery;
+              extractedSearchParams = eq.getEventSearchParams();
+        }
+        return extractedSearchParams;
+    }
+
+    /**
+     * @param extractedSearchParams the extractedSearchParams to set
+     */
+    public void setExtractedSearchParams(SearchParamsCEEvents extractedSearchParams) {
+        this.extractedSearchParams = extractedSearchParams;
     }
     
     

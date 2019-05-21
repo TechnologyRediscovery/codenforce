@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ import java.time.ZoneId;
  * integration end to just grab the date Type they need and go!
  * @author Sylvia Garland
  */
-public class SearchParams implements Serializable{
+public class SearchParams extends EntityUtils implements Serializable{
     
      
     private String searchName;
@@ -35,6 +36,8 @@ public class SearchParams implements Serializable{
     private java.util.Date endDateUtilDate;
     private java.sql.Timestamp startDateSQLDate;
     private java.sql.Timestamp endDateSQLDate;
+    private String startDatePretty;
+    private String endDatePretty;
     
     private boolean useRelativeDates;
     private int startDateRelativeDays;
@@ -344,6 +347,49 @@ public class SearchParams implements Serializable{
      */
     public void setUseDateOfRecord(boolean useDateOfRecord) {
         this.useDateOfRecord = useDateOfRecord;
+    }
+
+    /**
+     * Used for printing search params on reports: since the correct SQL timestamp
+     * is the relevant field that we draw from for building the actual SQL query
+     * and those getters take into account relative date preferences, we need
+     * to first convert the SQL-compatible date back to LocalDateTime and then
+     * make it pretty for printing
+     * @return the startDatePretty
+     */
+    public String getStartDatePretty() {
+        if(startDateSQLDate != null){
+            LocalDateTime startDateLDT = startDateSQLDate.toLocalDateTime();
+            startDatePretty = getPrettyDate(startDateLDT);
+        }
+        return startDatePretty;
+    }
+
+    /**
+     * @return the endDatePretty
+     */
+    public String getEndDatePretty() {
+        if(endDateSQLDate != null){
+            LocalDateTime endDateLDT = endDateSQLDate.toLocalDateTime();
+            endDatePretty = getPrettyDate(endDateLDT);
+        }
+        return endDatePretty;
+    }
+
+    /**
+     * 
+     * @param startDatePretty the startDatePretty to set
+     */
+    public void setStartDatePretty(String startDatePretty) {
+        
+        this.startDatePretty = startDatePretty;
+    }
+
+    /**
+     * @param endDatePretty the endDatePretty to set
+     */
+    public void setEndDatePretty(String endDatePretty) {
+        this.endDatePretty = endDatePretty;
     }
 
     

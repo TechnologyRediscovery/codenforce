@@ -5,6 +5,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+
 /**
  *
  * @author sylvia
@@ -15,6 +17,9 @@ public class ReportConfigCEEventList extends ReportConfig{
     private boolean includeEventTypeSummaryChart;
     private boolean includeActiveCaseListing;
     private boolean includeCaseActionRequestInfo;
+    private boolean includeCompleteQueryParamsDump;
+    
+    private SearchParamsCEEvents queryParams;
 
     /**
      * @return the includeCaseActionRequestInfo
@@ -70,6 +75,34 @@ public class ReportConfigCEEventList extends ReportConfig{
      */
     public void setIncludeActiveCaseListing(boolean includeActiveCaseListing) {
         this.includeActiveCaseListing = includeActiveCaseListing;
+    }
+
+    /**
+     * @return the includeCompleteQueryParamsDump
+     */
+    public boolean isIncludeCompleteQueryParamsDump() {
+        return includeCompleteQueryParamsDump;
+    }
+
+    /**
+     * @param includeCompleteQueryParamsDump the includeCompleteQueryParamsDump to set
+     */
+    public void setIncludeCompleteQueryParamsDump(boolean includeCompleteQueryParamsDump) {
+        this.includeCompleteQueryParamsDump = includeCompleteQueryParamsDump;
+    }
+
+    /**
+     * @return the queryParams
+     */
+    public SearchParamsCEEvents getQueryParams() {
+        return queryParams;
+    }
+
+    /**
+     * @param queryParams the queryParams to set
+     */
+    public void setQueryParams(SearchParamsCEEvents queryParams) {
+        this.queryParams = queryParams;
     }
     
     
