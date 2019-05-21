@@ -387,12 +387,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public CECaseBaseClass getCECaseBare(int ceCaseID) throws IntegrationException{
+    public CECaseBaseClass getCECaseBare(int ceCaseID) throws IntegrationException, CaseLifecyleException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
             "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
             "  FROM public.cecase WHERE caseid = ?;";
         ResultSet rs = null;
+        CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
         Connection con = null;
         CECaseBaseClass c = null;
@@ -419,7 +420,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return c;
+        return cc.setCaseStage(c);
     }
     
     

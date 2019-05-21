@@ -7,6 +7,8 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseBaseClass;
@@ -14,7 +16,10 @@ import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCasePropBundle;
+import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.BOBQuery;
+import com.tcvcog.tcvce.entities.search.EventQuery;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -38,13 +43,21 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
 
     
     private SearchParamsCEEvents searchParams;
+    
     private int actionRequestsUserType;
+    
     private List<EventType> eventTypesList;
     private List<EventCategory> eventCatList;
     private List<User> userList;
     
+    private List<BOBQuery> queryList;
+    private BOBQuery selectedBOBQuery;
+    
     private List<EventCasePropBundle> eventList;
     private List<EventCasePropBundle> filteredEventList;
+    
+    private ReportConfigCEEventList reportConfig;
+    
     
     /**
      * Creates a new instance of CEEventsBB
@@ -55,23 +68,72 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+        eventList = getSessionBean().getcEEventWCPIQueue();
         searchParams = ec.getSearchParamsCEEventsRequiringAction(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+        queryList = sc.getEventQueryList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+        reportConfig = ec.getDefaultReportConfigCEEventList();
+        reportConfig.setMuni(getSessionBean().getActiveMuni());
+        reportConfig.setCreator(getSessionBean().getFacesUser());
+        
+        
     }
     
-    public void executeQuery(){
-        System.out.println("CEEventsBB.executeQuery");
+    public void hideEvent(EventCasePropBundle ev){
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            ei.updateEvent(ev.getEvent());
+            eventList.remove(ev);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not hide event ID " + ev.getEvent().getEventID(), ""));
+            
+        }
+    }
+    
+    public void executeManualQuery(){
         EventCoordinator ec = getEventCoordinator();
         try {
-            eventList = ec.queryEvents(searchParams, 
-                        getSessionBean().getFacesUser(), 
-                        getSessionBean().getUserAuthMuniList());
+            eventList = ec.queryEvents( searchParams, 
+                                        getSessionBean().getFacesUser(), 
+                                        getSessionBean().getUserAuthMuniList());
+            
             generateQueryResultMessage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
+        } catch (CaseLifecyleException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Case lifecycle exception.", ""));
+        }
+    }
+    
+    public void executeQuery(){
+        System.out.println("CEEventsBB.executeQuery");
+        EventCoordinator ec = getEventCoordinator();
+        EventQuery eq = (EventQuery) selectedBOBQuery;
+        searchParams = eq.getEventSearchParams();
+        try {
+            eventList = ec.queryEvents( eq.getEventSearchParams(), 
+                                        getSessionBean().getFacesUser(), 
+                                        getSessionBean().getUserAuthMuniList());
+            
+            generateQueryResultMessage();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not query the database, sorry.", ""));
+        } catch (CaseLifecyleException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Case lifecycle exception.", ""));
         }
     }
     
@@ -89,16 +151,14 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     
     public String editEventInCaseManager(EventCasePropBundle ev){
         CaseIntegrator ci = getCaseIntegrator();
-        CECase c = getSessionBean().getcECaseQueue().remove(0);
         CECaseBaseClass caseNoLists = ev.getEventCaseBare();
         try {
-            getSessionBean().getcECaseQueue().set(0, ci.generateCECase(caseNoLists));
+            getSessionBean().getcECaseQueue().add(0, ci.generateCECase(caseNoLists));
         } catch (SQLException ex) {
             System.out.println(ex);
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        getSessionBean().getcECaseQueue().add(c);
         
         return "ceCases";
     }
@@ -110,61 +170,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         return searchParams;
     }
     
-    public void loadEventsRequiringAction(ActionEvent ev){
-        System.out.println("CEEventsBB.loadOfficerActivity");
-        EventCoordinator ec = getEventCoordinator();
-        searchParams = ec.getSearchParamsCEEventsRequiringAction(
-                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
-        try {
-            eventList = ec.queryEvents(searchParams, 
-                        getSessionBean().getFacesUser(), 
-                        getSessionBean().getUserAuthMuniList());
-            generateQueryResultMessage();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not query the database, sorry.", ""));
-        }
-    }
-    
-    
-    public void loadOfficerActivityPastWeek(ActionEvent ev){
-        System.out.println("CEEventsBB.loadOfficerActivity");
-        EventCoordinator ec = getEventCoordinator();
-        searchParams = ec.getSearchParamsOfficerActibityPastWeek(getSessionBean().getFacesUser(),
-                getSessionBean().getActiveMuni());
-        try {
-            eventList = ec.queryEvents(searchParams, 
-                        getSessionBean().getFacesUser(), 
-                        getSessionBean().getUserAuthMuniList());
-            generateQueryResultMessage();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not query the database, sorry.", ""));
-        }
-    }
-    
-    public void loadComplianceEventsPastMonth(ActionEvent ev){
-        System.out.println("CEEventsBB.loadComplianceEvents");
-        EventCoordinator ec = getEventCoordinator();
-        searchParams = ec.getSearchParamsComplianceEvPastMonth(getSessionBean().getActiveMuni());
-        try {
-            eventList = ec.queryEvents(searchParams, 
-                        getSessionBean().getFacesUser(), 
-                        getSessionBean().getUserAuthMuniList());
-            generateQueryResultMessage();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not query the database, sorry.", ""));
-        }
-        
-    }
-
+   
     /**
      * Not used
      * @param searchParams the searchParams to set
@@ -173,26 +179,19 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         this.searchParams = searchParams;
     }
     
-    public void refreshCurrentEventList() {
-        EventIntegrator ei = getEventIntegrator();
-        EventCoordinator ec = getEventCoordinator();
-        EventCasePropBundle e;
-        List<EventCasePropBundle> refreshedList = new ArrayList<>();
-        Iterator<EventCasePropBundle> iter = eventList.iterator();
-        try {
-            while (iter.hasNext()) {
-                e = iter.next();
-                e = ei.getEventCasePropBundle(e.getEvent().getEventID());
-                refreshedList.add(e);
-            }
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not refresh event list, sorry!", ""));
-            
-        }
-        eventList = refreshedList;
-    }
+   public void prepareEventReport(){
+       if(selectedBOBQuery != null){
+            reportConfig.setTitle(selectedBOBQuery.getQueryTitle());
+       }
+   }
+   
+   public String generateEventReport(){
+       // put the current event list on the session bean for extraction when
+       // we generate the report (and must reload the backing bean)
+       getSessionBean().setcEEventWCPIQueue(eventList);
+       getSessionBean().setReportConfigCEEventList(reportConfig);
+       return "reportCEEventList";
+   }
 
    
     /**
@@ -300,6 +299,50 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      */
     public void setActionRequestsUserType(int actionRequestsUserType) {
         this.actionRequestsUserType = actionRequestsUserType;
+    }
+
+    /**
+     * @return the selectedBOBQuery
+     */
+    public BOBQuery getSelectedBOBQuery() {
+        return selectedBOBQuery;
+    }
+
+    /**
+     * @param selectedBOBQuery the selectedBOBQuery to set
+     */
+    public void setSelectedBOBQuery(BOBQuery selectedBOBQuery) {
+        EventQuery eq = (EventQuery) selectedBOBQuery;
+        searchParams = eq.getEventSearchParams();
+        this.selectedBOBQuery = selectedBOBQuery;
+    }
+
+    /**
+     * @return the queryList
+     */
+    public List<BOBQuery> getQueryList() {
+        return queryList;
+    }
+
+    /**
+     * @param queryList the queryList to set
+     */
+    public void setQueryList(List<BOBQuery> queryList) {
+        this.queryList = queryList;
+    }
+
+    /**
+     * @return the reportConfig
+     */
+    public ReportConfigCEEventList getReportConfig() {
+        return reportConfig;
+    }
+
+    /**
+     * @param reportConfig the reportConfig to set
+     */
+    public void setReportConfig(ReportConfigCEEventList reportConfig) {
+        this.reportConfig = reportConfig;
     }
     
     

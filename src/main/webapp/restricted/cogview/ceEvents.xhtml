@@ -22,9 +22,54 @@
                             </h:messages>
                         </h:form>
 
-                        <h1>Code enforcement event explorer</h1>
+                        <h1>Code enforcement event report builder</h1>
 
-                        <p>All future timeline events in <h:outputText value="#{sessionBean.activeMuni.muniName} and events requiring your personal view confirmation."/></p>
+                        <h2>Execute a pre-built query</h2>
+
+                        <h:form id="event-selectquery-form">
+
+                            <p:selectOneMenu id="eventquery-som" tabindex="1" value="#{cEEventsBB.selectedBOBQuery}">
+                                <f:converter converterId="bOBQueryConverter"/>
+                                <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
+                                <f:selectItems id="querylist-si" value="#{cEEventsBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                <p:ajax />
+                            </p:selectOneMenu>
+
+                            <p:commandButton    id="execute-selected-query" 
+                                                ajax="true"
+                                                value="perform selected query" 
+                                                actionListener="#{cEEventsBB.executeQuery}"
+                                                disabled="false"
+                                                icon="fa fa-wheelchair-alt"
+                                                update="
+                                                ceev-form-search
+                                                event-list-tabview:events-datascroller-form:events-datascroller
+                                                event-list-tabview:events-datatable-form:events-datatable
+                                                ceev-form-globalmessages:ceev-globalmessages
+                                                "/>
+                        </h:form>
+
+                        <hr />
+                        <h2>Prepare the event report</h2>
+                        <p>After performing the query, hide any unwanted events from the results.<br /> 
+                            Then prepare your printer-friendly event report with the button below.</p>
+
+                        <p:commandButton   id="print-event-list-report-cb" 
+                                           ajax="true" actionListener="#{cEEventsBB.prepareEventReport}"
+                                           icon="fa fa-print" styleClass="button"
+                                           oncomplete="PF('report-event-diaglog-var').show()"
+                                           value="prepare event report" 
+                                           update="report-eventlist-form"/>
+
+                        <hr />
+
+                        <h2>Perform a custom query</h2>
+
+                        <p>Expand the search options to customize your query.
+                            <br />The query controls are automatically updated to match 
+                            <br /> the pre-built queries in the drop-down list above, 
+                            <br />allowing you to tune your results.</p>
+
 
                         <h:form id="ceev-form-search">
 
@@ -231,7 +276,7 @@
                                                                  disabled="#{!cEEventsBB.searchParams.filterByEventOwner}">
                                                     <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                                     <f:selectItems value="#{cEEventsBB.userList}"  var="u" itemValue="#{u}" 
-                                                                    itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
+                                                                   itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
                                                     <f:converter converterId="userConverter"/>
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
@@ -317,9 +362,9 @@
                                                 <p:outputLabel id="ceev-query-limit-ol" for="ceev-query-limit" value="limit results to 100? "/>
                                                 <p:selectBooleanCheckbox id="ceev-query-limit" value="#{cEEventsBB.searchParams.limitResultCountTo100}" />
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup></h:panelGroup>
-                                            
+
                                             <h:panelGroup>
                                                 <h3>Case action request events:</h3>
                                             </h:panelGroup>
@@ -333,15 +378,15 @@
                                                                />
                                                 <p:selectBooleanCheckbox id="ceev-filter-requestsaction-cb" value="#{cEEventsBB.searchParams.filterByrequestsAction}" >
                                                     <p:ajax update="ceev-criteria-requests-action-cb
-                                                                    ceev-filter-requested-action-status-cb
-                                                                    ceev-criteria-requested-action-status-cb
-                                                                    ceev-filter-requests-typecat-reqaction-cb
-                                                                    ceev-filter-requests-rejected-cb
-                                                                    ceev-criteria-requests-rejected-cb
-                                                                    ceev-filter-requests-user-requestor-cb
-                                                                    ceev-filter-requests-user-responder-intended-cb
-                                                                    ceev-filter-requests-user-responder-actual-cb
-                                                                    " />
+                                                            ceev-filter-requested-action-status-cb
+                                                            ceev-criteria-requested-action-status-cb
+                                                            ceev-filter-requests-typecat-reqaction-cb
+                                                            ceev-filter-requests-rejected-cb
+                                                            ceev-criteria-requests-rejected-cb
+                                                            ceev-filter-requests-user-requestor-cb
+                                                            ceev-filter-requests-user-responder-intended-cb
+                                                            ceev-filter-requests-user-responder-actual-cb
+                                                            " />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
 
@@ -373,7 +418,7 @@
                                                                for="ceev-criteria-requested-action-status-cb" 
                                                                value="(checked = has a response)" styleClass="italic"/>
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup styleClass="action-requests-search">
                                                 <p:outputLabel id="ceev-filter-requests-typecat-reqaction-ol" 
                                                                for="ceev-filter-requests-typecat-reqaction-cb" 
@@ -384,15 +429,15 @@
                                                     <p:ajax update="ceev-criteria-requests-action-cb" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup styleClass="action-requests-search">
                                                 <p class="italic">when enabled, this switch assigns <br />
                                                     the chosen event category (not type alone) <br />
                                                     selection box at left to requested case events</p>
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup styleClass="action-requests-search">
-                                                 <p:outputLabel id="ceev-filter-requests-user-requestor-ol" 
+                                                <p:outputLabel id="ceev-filter-requests-user-requestor-ol" 
                                                                for="ceev-filter-requests-user-requestor-cb" 
                                                                value="filter by requestor"/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-requests-user-requestor-cb" 
@@ -415,16 +460,16 @@
                                                                          value="#{cEEventsBB.searchParams.filterByResponderActual}" 
                                                                          disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
                                                 </p:selectBooleanCheckbox>
-                                                
+
                                             </h:panelGroup>
                                             <h:panelGroup>
-                                                 <p class="italic">these filters, when enabled, assign <br />
+                                                <p class="italic">these filters, when enabled, assign <br />
                                                     the chosen user selected in the filter above called <br />
                                                     "filter by event owner" to requested case events <br />
                                                     instead of the primary event</p>
-                                                
+
                                             </h:panelGroup>
-                                            
+
 
                                             <h:panelGroup styleClass="action-requests-search">
                                                 <p:outputLabel id="ceev-filter-requests-rejected-ol" 
@@ -448,77 +493,28 @@
                                     </h:panelGroup>
                                 </h:panelGrid>                               
                                 <p:commandButton    id="queryButton"
-                                                    ajax="true" value="Run query" actionListener="#{cEEventsBB.executeQuery}"
+                                                    ajax="true" value="Run query" actionListener="#{cEEventsBB.executeManualQuery}"
                                                     process="@form"
-                                                    update="events-datascroller-form:events-datascroller
-                                                    events-datatable-form:events-datatable
+                                                    update="event-list-tabview:events-datascroller-form:events-datascroller
+                                                    event-list-tabview:events-datatable-form:events-datatable
                                                     ceev-form-globalmessages:ceev-globalmessages
                                                     "
                                                     />
                             </p:fieldset>
                         </h:form>
-
-
-                        <h2>Load preset event lists</h2>
-                     
-                        <h:form id="presets-form">
-                            
-
-                            <p:commandButton    id="event-preset-eventsreqviewconf" 
-                                                ajax="true"
-                                                 value="Required actions" 
-                                                 styleClass="noFill"
-                                                 actionListener="#{cEEventsBB.loadEventsRequiringAction(ev)}"
-                                                 disabled="false"
-                                                 icon="fa fa-tasks"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
-                                                 update="
-                                                    ceev-form-search
-                                                    events-datascroller-form:events-datascroller
-                                                    events-datatable-form:events-datatable
-                                                    ceev-form-globalmessages:ceev-globalmessages
-                                                    "/>
-
-                            <p:commandButton    id="event-preset-allactivitybyoffandmuni" 
-                                                ajax="true"
-                                                 value="all officer activity by muni (past week)" 
-                                                 styleClass="noFill"
-                                                 actionListener="#{cEEventsBB.loadOfficerActivityPastWeek}"
-                                                 disabled="false"
-                                                 icon="fa fa-wheelchair-alt"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
-                                                 update="
-                                                    ceev-form-search
-                                                    events-datascroller-form:events-datascroller
-                                                    events-datatable-form:events-datatable
-                                                    ceev-form-globalmessages:ceev-globalmessages
-                                                    "/>
-
-                            <p:commandButton    id="event-preset-complianceevents" 
-                                                ajax="true"
-                                                 value="violation compliance events (past month)" 
-                                                 actionListener="#{cEEventsBB.loadComplianceEventsPastMonth}"
-                                                 styleClass="noFill"
-                                                 disabled="false"
-                                                 icon="fa fa-check-square"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
-                                                 update="
-                                                    ceev-form-search
-                                                    events-datascroller-form:events-datascroller
-                                                    events-datatable-form:events-datatable
-                                                    ceev-form-globalmessages:ceev-globalmessages
-                                                    "/>
-
-                        </h:form>
-
                         
-               
+                        <hr />
+
+                        <p:spacer height="10px" />
                         
+                        <h2>Query results</h2>
                         
+                        <p>The list view is more compact and reflects what is printed in event reports. The data table view contains exactly the same
+                            <br /> events but with more complete info for in-depth analysis.</p>
+
+                        <p:tabView id="event-list-tabview">
+                            <p:tab title="list view">
                                 <h:form id="events-datascroller-form">
-                                  
-                                    
-
                                     <p:dataScroller
                                         id="events-datascroller"
                                         var="e"
@@ -527,117 +523,67 @@
 
                                         <div class="outlinedBox event-ds-box">
 
-                                        <div class="status-display-container">
-                                            <div class="action-request-icon">
-                                                <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.event.category.icon.materialIcon}"/></i>
-                                            </div>
-                                            <div class="status-display-status-list-container">
-                                                <div class="action-request-header">
-                                                    <h:outputText value="#{e.event.category.eventType.label}: #{e.event.category.eventCategoryTitle} "/>
+                                            <div class="status-display-container">
+                                                <div class="action-request-icon">
+                                                    <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.event.category.icon.materialIcon}"/></i>
                                                 </div>
-                                                <div class="action-request-subheader">
-                                                    <h:outputText value="#{e.eventCaseBare.property.address} " />
-                                                    <h:outputText value=" (#{e.eventCaseBare.property.muni.muniName}) | " />
-                                                    <h:outputText value="CE Case: #{e.eventCaseBare.caseName}  
-                                                                        (id:#{e.eventCaseBare.caseID}) " /><br />
-                                                    <h:outputText value="#{e.event.dateOfRecordPretty}"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                            
-                                             <h:panelGrid columns="3" cellpadding="10" footerClass="gridFooter" headerClass="gridHeader"
-                                                         columnClasses="gridTd, gridTd, gridTd">
-
-                                                <f:facet name="header">
+                                                <div class="status-display-status-list-container">
+                                                    <div class="action-request-header">
+                                                        <h:outputText value="#{e.event.category.eventType.label}: #{e.event.category.eventCategoryTitle} "/>
+                                                    </div>
+                                                    <div class="action-request-subheader">
+                                                        <h:outputText value="#{e.eventCaseBare.property.address} " />
+                                                        <h:outputText value=" (#{e.eventCaseBare.property.muni.muniName}) | " />
+                                                        <h:outputText value="Code enforcement case id: #{e.eventCaseBare.caseID} " />
+                                                        <h:outputText value="Current case stage: #{e.eventCaseBare.caseStage.label} " />
+                                                        <br />
+                                                        <h:outputText value="Date: " styleClass="bold" />
+                                                        <h:outputText value="#{e.event.dateOfRecordPretty}"/>
+                                                    </div>
+                                                    <h:outputText value="Event Owner: " styleClass="bold" />
+                                                    <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
                                                     <div class="rowExpansion">
                                                         <h:outputText styleClass="bold" value="Description: " />
                                                         <h:outputText styleClass="weight-normal" value="#{e.event.description}"/>
                                                     </div>
                                                     <div class="rowExpansion">
-                                                        <h:outputText styleClass="bold" value="Notes: " />
-                                                        <h:outputText styleClass="weight-normal" value="#{e.event.responderNotes}"/>
+                                                        <h:outputText styleClass="bold" value="Notes: " 
+                                                                      rendered="#{!(empty e.event.responderNotes)}"/>
+                                                        <h:outputText styleClass="weight-normal" 
+                                                                      value="#{e.event.responderNotes}"
+                                                                      rendered="#{!(empty e.event.responderNotes)}"/>
                                                     </div>
-                                                    
-                                                </f:facet>
+                                                    <p:commandButton       
+                                                        id="event-view-in-cases-cb" 
+                                                        ajax="false"
+                                                        value="view parent case" 
+                                                        styleClass="noFill button-size-small"
+                                                        action="#{cEEventsBB.editEventInCaseManager(e)}"
+                                                        disabled="false"
+                                                        icon="fa fa-arrow-circle-right"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                        />
+                                                    <p:commandButton       
+                                                        id="eventlist-hide-event-cb" 
+                                                        ajax="true"
+                                                        value="hide event" 
+                                                        styleClass="noFill button-size-small"
+                                                        actionListener="#{cEEventsBB.hideEvent(e)}"
+                                                        icon="fa fa-moon-o"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                        update="event-list-tabview:events-datascroller-form:events-datascroller"
+                                                        />
 
-                                                <h:panelGroup>
-                                                    
-                                                    <h:outputText value="Owner: " styleClass="bold" />
-                                                    <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
-                                                    <p:spacer height="5px"/>
-                                                    <h:outputText styleClass="bold" value="Date of record: "/>
-                                                    <h:outputText value="#{e.event.dateOfRecordPretty}"/>
-                                                    <p:spacer height="5px"/>
-                                                    <h:outputText styleClass="bold" value="Creation time stamp: "/>
-                                                    <h:outputText value="#{e.event.timestampPretty}"/>
-                                                </h:panelGroup>
-                                                
-                                                 <h:panelGroup>
-                                                    <h:outputText styleClass="bold" value="Disclose to Municipality Staff: " />
-                                                    <h:outputText value="#{e.event.discloseToMunicipality}"/>
-                                                    
-                                                    <p:spacer height="5px"/>
-                                                    
-                                                    <h:outputText styleClass="bold" value="Disclose to Public: " />
-                                                    <h:outputText value="#{e.event.discloseToPublic}"/>
-                                                    <p:spacer height="5px"/>
-                                                    
-                                                    <h:outputText styleClass="bold" value="Active: "/>
-                                                    <h:outputText value="#{e.event.active}"/>
-                                                    
-                                                    <p:spacer height="5px"/>
-                                                    
-                                                    <h:outputText styleClass="bold" value="Hidden: "/>
-                                                    <h:outputText value="#{e.event.hidden}"/>
-                                                    
-                                                </h:panelGroup>
-
-                                                 <h:panelGroup rendered="#{e.event.requestsAction}">
-                                                    <h:outputText styleClass="bold" value="Requests action: "/>
-                                                    <h:outputText value="#{e.event.requestsAction}"/>
-                                                    
-                                                    <p:spacer height="5px"/>
-                                                    
-                                                    <h:outputText styleClass="bold" value="Requested event: "/>
-                                                    <h:outputText value="#{e.event.requestedEventCat.eventType.label}: #{e.event.requestedEventCat.eventCategoryTitle}"/>
-
-                                                    <p:spacer height="5px"/>
-                                                    
-                                                    <h:outputText styleClass="bold" value="Action requested by: "/>
-                                                    <h:outputText value="#{e.event.actionRequestedBy.person.firstName} #{e.event.actionRequestedBy.person.lastName}"/>
-
-                                                    <p:spacer height="5px"/>
-                                                    
-                                                    <h:outputText styleClass="bold" value="Intended user/action taker: "/>
-                                                    <h:outputText value="#{(empty e.event.responderIntended) ? 'default code officer' : e.event.responderIntended.person.lastName}"/>                                   
-
-                                                    <p:spacer height="5px"/>
-                                                    <h:outputText styleClass="bold" value="Action taken by: "/>
-                                                    <h:outputText value="#{e.event.responderActual.person.firstName} #{e.event.responderActual.person.lastName}"/>
-                                                    
-                                                    <h:outputText styleClass="bold" value="Action timestamp: "/>
-                                                    <h:outputText value="#{e.event.responseTimePrettyDate}"/>
-
-                                                    <h:outputText styleClass="bold" value="Request rejected? "/>
-                                                    <h:outputText value="#{e.event.requestRejected}"/>
-
-                                                    <h:outputText styleClass="bold" value="Action response notes:"/>
-                                                    <h:outputText value="#{e.event.responderNotes}"/>
-                                                </h:panelGroup>
-
-                                                
-
-                                            </h:panelGrid>
-                                                   
-
-                                               
+                                                </div>
+                                            </div>
                                         </div>
 
                                     </p:dataScroller>
 
                                 </h:form>
+                            </p:tab>
+                            <p:tab title="data table view">
 
-                     
                                 <h:form id="events-datatable-form">
                                     <p:dataTable
                                         id="events-datatable"
@@ -761,7 +707,7 @@
                                                         </div>
                                                     </h:panelGroup>
 
-                                                    
+
                                                     <h:panelGroup>
                                                         <h:outputText styleClass="bold" value="View confirmed by"/>
                                                         <div class="rowExpansion">
@@ -791,7 +737,10 @@
                                         </p:rowExpansion>
                                     </p:dataTable>
                                 </h:form>
-                        
+                            </p:tab>
+
+                        </p:tabView>
+
                         <p:dialog header="Code Enforcement Profile" widgetVar="helpdlg" responsive="true">
                             <h2>Code enforcement case profile</h2>
                             <p>This page is the launchpad for all other case-related actions and displays the entire case event history.</p>
@@ -799,6 +748,82 @@
 
                         <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
                         <p:spacer height="10px"/>
+
+
+                        <p:confirmDialog message="Create system activity/event report" 
+                                         severity="alert" widgetVar="report-event-diaglog-var"
+                                         closable="true" responsive="true"
+                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+
+                            <h:form id="report-eventlist-form">
+
+                                <h:panelGrid columns="1" border="0" 
+                                             cellpadding="5" columnClasses="gridTd"
+                                             footerClass="gridFooter">
+
+                                    <f:facet name="header">
+
+
+                                        <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+
+                                        <p:spacer height="5px"/>
+
+                                        <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{cEEventsBB.reportConfig.title}"/>
+                                        <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                        <p:spacer height="5px"/>
+
+                                        <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                        <p:spacer height="5px"/>
+                                        <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{cEEventsBB.reportConfig.notes}"/>
+                                        <p:spacer height="5px"/>
+                                    </f:facet>
+
+                                    <h:panelGroup>
+                                        <h3>Event display options</h3>
+
+                                        <h:outputLabel class="bold" value="Include persons attached to events" for="include-attached-persons-is" />
+                                        <p:inputSwitch  id="include-attached-persons-is"
+                                                        value="#{cEEventsBB.reportConfig.includeAttachedPersons}" 
+                                                        onLabel="Yes" offLabel="No" />
+
+                                        <p:spacer height="5px"/>
+
+                                        <h:outputLabel class="bold" value="Include event summary chart on page 1" for="include-event-summary-chart-is" />
+                                        <p:inputSwitch  id="include-event-summary-chart-is"
+                                                        value="#{cEEventsBB.reportConfig.includeEventTypeSummaryChart}" 
+                                                        onLabel="Yes" offLabel="No" />
+
+                                        <p:spacer height="5px"/>
+
+                                        <h:outputLabel class="bold" value="Include list of all active cases" for="include-active-case-list-is" />
+                                        <p:inputSwitch  id="include-active-case-list-is"
+                                                        value="#{cEEventsBB.reportConfig.includeActiveCaseListing}" 
+                                                        onLabel="Yes" offLabel="No" />
+
+                                        <p:spacer height="5px"/>
+
+                                        <h:outputLabel class="bold" value="Include info about events requesting user action" for="include-action-requests-is" />
+                                        <p:inputSwitch  id="include-action-requests-is"
+                                                        value="#{cEEventsBB.reportConfig.includeCaseActionRequestInfo}" 
+                                                        onLabel="Yes" offLabel="No" />
+
+                                        <p:spacer height="5px"/>
+
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('report-event-diaglog-var').hide()"/>
+
+                                <p:commandButton ajax="false" action="#{cEEventsBB.generateEventReport}"
+                                                 value="Generate report" icon="fa fa-print" 
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 />
+
+                            </h:form>
+                        </p:confirmDialog>
 
                     </f:view>
                 </div>

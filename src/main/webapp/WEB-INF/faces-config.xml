@@ -1088,6 +1088,14 @@
             <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
+   
+    <navigation-rule>
+        <from-view-id>/restricted/cogview/ceEvents.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>reportCEEventList</from-outcome>
+            <to-view-id>/restricted/reports/reportCEEventList.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
     
     
     <!--  OCCUPANCY  -->

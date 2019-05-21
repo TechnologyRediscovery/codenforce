@@ -11,8 +11,10 @@ package com.tcvcog.tcvce.entities;
  */
 public class ReportConfigCEEventList extends ReportConfig{
     
-    private boolean includeCaseActionRequestInfo;
     private boolean includeAttachedPersons;
+    private boolean includeEventTypeSummaryChart;
+    private boolean includeActiveCaseListing;
+    private boolean includeCaseActionRequestInfo;
 
     /**
      * @return the includeCaseActionRequestInfo
@@ -40,6 +42,34 @@ public class ReportConfigCEEventList extends ReportConfig{
      */
     public void setIncludeAttachedPersons(boolean includeAttachedPersons) {
         this.includeAttachedPersons = includeAttachedPersons;
+    }
+
+    /**
+     * @return the includeEventTypeSummaryChart
+     */
+    public boolean isIncludeEventTypeSummaryChart() {
+        return includeEventTypeSummaryChart;
+    }
+
+    /**
+     * @param includeEventTypeSummaryChart the includeEventTypeSummaryChart to set
+     */
+    public void setIncludeEventTypeSummaryChart(boolean includeEventTypeSummaryChart) {
+        this.includeEventTypeSummaryChart = includeEventTypeSummaryChart;
+    }
+
+    /**
+     * @return the includeActiveCaseListing
+     */
+    public boolean isIncludeActiveCaseListing() {
+        return includeActiveCaseListing;
+    }
+
+    /**
+     * @param includeActiveCaseListing the includeActiveCaseListing to set
+     */
+    public void setIncludeActiveCaseListing(boolean includeActiveCaseListing) {
+        this.includeActiveCaseListing = includeActiveCaseListing;
     }
     
     
