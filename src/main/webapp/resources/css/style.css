@@ -29,15 +29,16 @@ COG yellow: #e3b73d
 #5a5754
 
 
+*/
 
 @font-face {
-    font-family: 'roboto';
-    src: url('https://fonts.googleapis.com/css?family=Roboto');
+    font-family: 'Montserrat';
+    src: url('https://fonts.googleapis.com/css?family=Montserrat');
 }
-*/
 
 body{
     margin: 0 auto;
+    font-family: sans-serif;
     
    
 }
@@ -146,6 +147,7 @@ h4{
     display: block;
     font-weight: bold;
     font-size: 1.2em;
+    padding-left:5px;
     
     
     
@@ -421,6 +423,24 @@ div.printer-friendly-report .ui-widget-content{
     
 }
 
+.event-ds-box-report{
+    font-size: .7em;
+    margin: 3px;
+    padding: 5px;
+    border: thin solid #4774A0;
+    background-color: white;
+}
+
+.event-list-halfwidth{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+.report-header-info{
+    font-size: small;
+    font-family: sans-serif;
+}
 
 
 
@@ -1105,6 +1125,10 @@ gridTd-bignum{
     background-color: white;
 }
 
+.button-float-right{
+    display: block;
+    float:right;
+}
 .sessionInfoButton{
     background: none;
     

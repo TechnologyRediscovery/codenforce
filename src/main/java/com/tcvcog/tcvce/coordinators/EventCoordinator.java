@@ -121,6 +121,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         config.setGenerationTimestamp(LocalDateTime.now());
         config.setIncludeEventTypeSummaryChart(true);
         config.setIncludeActiveCaseListing(false);
+        config.setIncludeCompleteQueryParamsDump(false);
+        config.setSortInRevChrono(true);
         return config;
     }
     
