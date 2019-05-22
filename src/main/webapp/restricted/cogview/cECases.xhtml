@@ -707,6 +707,14 @@
                                             <h:outputLabel styleClass="bold" value="Internal notes: "/>
                                             <h:outputText styleClass="weight-normal" value="#{v.notes}" escape="false"/>
                                         </div>
+                                    <p:commandButton    id="violation-remove-cb" 
+                                                            ajax="true" action="#{caseProfileBB.removeViolation(v)}"
+                                                            icon="fa fa-stop"
+                                                            rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                            disabled="#{!(empty v.actualComplianceDate)}"
+                                                            value="Delete violation"  
+                                                            update="violation-table
+                                                            case-profile-messages-form"/>
                                     </p:rowExpansion>
                                 </p:dataTable>
 

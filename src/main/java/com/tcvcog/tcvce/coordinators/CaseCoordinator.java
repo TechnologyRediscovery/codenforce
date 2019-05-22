@@ -42,6 +42,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -815,10 +817,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
         
     public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m){
+        SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
-        nov.setStyle(m.getNovPrintStyle());
+        try {
+            nov.setStyle(si.getPrintStyle(m.getDefaultNOVStyleID()));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
         
         
         // loop over unresolved violations on case and generate CodeViolationDisplayable obects
@@ -1329,7 +1337,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 
     
     public void deleteViolation(CodeViolation cv) throws IntegrationException{
-        //TODO: delete photos and photo links
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         cvi.deleteCodeViolation(cv);
     }

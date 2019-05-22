@@ -690,6 +690,24 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         System.out.println("CaseProfileBB.initiatePhaseOverride");
         // do nothing
     }
+    
+    
+    public void removeViolation(CodeViolation cv){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.deleteViolation(cv);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Violation id " + cv.getViolationID() + " removed from case!", ""));
+            
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+            
+        }
+        refreshCurrentCase();
+        
+        
+    }
 
     public void recordCompliance(CodeViolation cv) {
         EventCoordinator ec = getEventCoordinator();

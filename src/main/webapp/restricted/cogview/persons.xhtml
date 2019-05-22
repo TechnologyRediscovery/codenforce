@@ -317,7 +317,11 @@
                                 <p:selectOneMenu id="property-som" tabindex="3" value="#{personsBB.selectedProperty}">
                                     <f:converter converterId="propertyConverter"/>
                                     <f:selectItem itemLabel="select a property..." noSelectionOption="true" itemDisabled="true"/>
-                                    <f:selectItems id="propertylist-selitems" value="#{personsBB.propertyCandidateList}" var="p" itemValue="#{p}" itemLabel="#{p.address}" />
+                                    <f:selectItems id="propertylist-selitems" 
+                                                   value="#{personsBB.propertyCandidateList}" 
+                                                   var="p" 
+                                                   itemValue="#{p}" 
+                                                   itemLabel="#{p.address} (parid: #{p.parID}, propid: #{p.propertyID}" />
                                 </p:selectOneMenu>
                                 <p:spacer height="5px" />
                                 

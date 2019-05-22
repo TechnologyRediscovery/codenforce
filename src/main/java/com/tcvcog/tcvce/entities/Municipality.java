@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ import java.util.Objects;
  *
  * @author Eric C. Darsow
  */
-public class Municipality implements Serializable{
+public class Municipality extends EntityUtils implements Serializable{
     
     private int muniCode;
     private String muniName;
@@ -41,10 +42,12 @@ public class Municipality implements Serializable{
     private boolean activeInProgram;
     private int defaultCodeSetID;
     private int issuingPermitCodeSourceID;
-    private int defaultCodeOfficerUserID;
-    private int defaultCourtEntityID;
     
-    private PrintStyle novPrintStyle;
+    private User defaultCodeOfficerUser;
+    
+    private CourtEntity defaultCourtEntity;
+    
+    private int defaultNOVStyleID;
     
     
     
@@ -298,46 +301,51 @@ public class Municipality implements Serializable{
         this.issuingPermitCodeSourceID = issuingPermitCodeSourceID;
     }
 
+    
+
+   
+
     /**
-     * @return the defaultCodeOfficerUserID
+     * @return the defaultNOVStyleID
      */
-    public int getDefaultCodeOfficerUserID() {
-        return defaultCodeOfficerUserID;
+    public int getDefaultNOVStyleID() {
+        return defaultNOVStyleID;
     }
 
     /**
-     * @param defaultCodeOfficerUserID the defaultCodeOfficerUserID to set
+     * @param defaultNOVStyleID the defaultNOVStyleID to set
      */
-    public void setDefaultCodeOfficerUserID(int defaultCodeOfficerUserID) {
-        this.defaultCodeOfficerUserID = defaultCodeOfficerUserID;
+    public void setDefaultNOVStyleID(int defaultNOVStyleID) {
+        this.defaultNOVStyleID = defaultNOVStyleID;
     }
 
     /**
-     * @return the defaultCourtEntityID
+     * @return the defaultCourtEntity
      */
-    public int getDefaultCourtEntityID() {
-        return defaultCourtEntityID;
+    public CourtEntity getDefaultCourtEntity() {
+        
+        return defaultCourtEntity;
     }
 
     /**
-     * @param defaultCourtEntityID the defaultCourtEntityID to set
+     * @param defaultCourtEntity the defaultCourtEntity to set
      */
-    public void setDefaultCourtEntityID(int defaultCourtEntityID) {
-        this.defaultCourtEntityID = defaultCourtEntityID;
+    public void setDefaultCourtEntity(CourtEntity defaultCourtEntity) {
+        this.defaultCourtEntity = defaultCourtEntity;
     }
 
     /**
-     * @return the novPrintStyle
+     * @return the defaultCodeOfficerUser
      */
-    public PrintStyle getNovPrintStyle() {
-        return novPrintStyle;
+    public User getDefaultCodeOfficerUser() {
+        return defaultCodeOfficerUser;
     }
 
     /**
-     * @param novPrintStyle the novPrintStyle to set
+     * @param defaultCodeOfficerUser the defaultCodeOfficerUser to set
      */
-    public void setNovPrintStyle(PrintStyle novPrintStyle) {
-        this.novPrintStyle = novPrintStyle;
+    public void setDefaultCodeOfficerUser(User defaultCodeOfficerUser) {
+        this.defaultCodeOfficerUser = defaultCodeOfficerUser;
     }
 
    

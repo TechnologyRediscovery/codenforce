@@ -119,9 +119,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     
     public String viewPersonProfile(Person p){
-        System.out.println("PropertyProfileBB.viewPersonProfile");
-        getSessionBean().setActivePerson(p);
-        return "personProfile";
+        getSessionBean().getPersonQueue().add(0,p);
+        return "persons";
     }
     
     public void manageProperty(Property prop){
@@ -160,8 +159,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String updateProperty(){
-        getSessionBean().setActivePropWithLists(currProp);
-        System.out.println("PropertyProfileBB.updateProperty");
+        getSessionBean().getPropertyQueue().add(0, currProp);
         return "propertyUpdate";
         
     }
