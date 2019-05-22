@@ -25,18 +25,11 @@ import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 
 /**
  *
@@ -88,9 +81,7 @@ public class SessionSystemCoordinator extends BackingBeanUtils implements Serial
             CaseStage stg = getCaseStage(c.getCasePhase());
             stageCountMap.put(stg, stageCountMap.get(stg) + 1);
         }
-        
         return stageCountMap;
-    
     }
     
     

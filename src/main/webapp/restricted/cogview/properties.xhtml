@@ -277,16 +277,6 @@
                                     </h:panelGroup>
                                     
                                     <h:panelGroup>
-                                        <h:outputLabel for="prop-info-multiUnit-cb" >
-                                            <h:outputText styleClass="uiLabel" value="Multi Unit?" />
-                                        </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:spacer width="5px"/>
-                                        <p:selectBooleanCheckbox id="prop-info-multiUnit-cb" value="#{propertyProfileBB.currProp.multiUnit}" tabindex="14" disabled="true"/>
-                                    </h:panelGroup>
-                                    
-                                    <h:panelGroup>
                                         <h:outputLabel for="prop-info-vacant-cb" >
                                             <h:outputText styleClass="uiLabel" value="Vacant?" />
                                         </h:outputLabel>
@@ -392,13 +382,7 @@
 
                                     <h2 class="property-blue">Property Persons</h2>
                                     
-                                    <p:dataScroller
-                                        var="per"
-                                        value="#{propertyProfileBB.currProp.personList}">
-                                        <h:outputText value="#{per.personID}" />
-                                    
-                                    </p:dataScroller>
-
+                                 
                                     <p:dataTable
                                         id="prop-persons-datatable"
                                         var="person"
@@ -462,7 +446,7 @@
                                             </f:facet>
                                             <p:commandButton icon="fa fa-clipboard"
                                                              action="#{propertyProfileBB.viewPersonProfile(p)}" 
-                                                             ajax="false" disabled="true"/>
+                                                             ajax="false" disabled="false"/>
                                         </p:column>
                                         <p:rowExpansion>
                                             <div class="outlinedBox">
@@ -597,11 +581,6 @@
                                         </p:rowExpansion>
                                     </p:dataTable>
 
-                                    <p:commandButton ajax="false" value="View Person's profile and edit info" action="personProfile" disabled="true"/>
-
-                                    <p:spacer height="10px"/>
-                                    <hr/>
-                                    <p:spacer height="10px"/>
 
                                     <h2>Dwelling units</h2>
                                     <p>List of each dwelling unit registered on this property.</p> 
@@ -609,9 +588,7 @@
                                     <!--Insert dwelling unit table here-->
 
 
-                                    <p:spacer height="10px"/>
                                     <hr/>
-                                    <p:spacer height="10px"/>
 
 
                                     <h2>Existing Occupancy Inspection Cases</h2>

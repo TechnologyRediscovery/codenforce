@@ -50,6 +50,30 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
     public SystemIntegrator() {
     }
     
+    public Map<String, Integer> getPrintStyleMap() throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        Map<String, Integer> styleMap = new HashMap<>();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append(  "SELECT styleid, description FROM printstyle;");
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                styleMap.put(rs.getString("description"), rs.getInt("styleid"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate icon", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return styleMap;
+    }
     
     
     

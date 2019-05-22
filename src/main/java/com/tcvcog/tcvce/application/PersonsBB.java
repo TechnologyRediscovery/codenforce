@@ -85,6 +85,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
         }
         propertyCandidateList = getSessionBean().getPropertyQueue();
+        loadPersonHistory();
     }
     
     public String viewPersonAssociatedProperty(Property p){
@@ -157,7 +158,10 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     }
     
     public void loadPersonHistory(ActionEvent ev){
-        System.out.println("PersonsBB.LoadPersonHistory");
+        loadPersonHistory();
+    }
+    
+    public void loadPersonHistory(){
         PersonIntegrator pi = getPersonIntegrator();
         try {
             personList = pi.getPersonHistory(getSessionBean().getFacesUser());

@@ -305,7 +305,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 "   SET parid=?, lotandblock=?, \n" +
                 "       address=?, propertyusetype=?, \n" +
                 "       usegroup=?, constructiontype=?, countycode=?, notes=?, \n" +
-                "       containsrentalunits=?, multiunit=? , vacant=?, \n" +
+                "       containsrentalunits=?, vacant=?, \n" +
                 "       lastupdatedby=?, lastupdated=?" +
                 " WHERE propertyid = ?;";
         
@@ -326,17 +326,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(8, propToUpdate.getNotes());
             
             stmt.setBoolean(9, propToUpdate.isRental());  // containsrentalunits=?
-            stmt.setBoolean(10, propToUpdate.isMultiUnit());  // multiunit=?
-            stmt.setBoolean(11, propToUpdate.isVacant());  // vacant=?
+            stmt.setBoolean(10, propToUpdate.isVacant());  // vacant=?
             
-            stmt.setInt(12, getSessionBean().getFacesUser().getUserID());
-            stmt.setTimestamp(13, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(11, getSessionBean().getFacesUser().getUserID());
+            stmt.setTimestamp(12, Timestamp.valueOf(LocalDateTime.now()));
             
             // TODO: add event to dumby tracker case on this property to track who/when of changes
-            
             // figure out if we need to do changes in the list elements
             
-            stmt.setInt(14, propToUpdate.getPropertyID());
+            stmt.setInt(13, propToUpdate.getPropertyID());
             
             stmt.executeUpdate();
             

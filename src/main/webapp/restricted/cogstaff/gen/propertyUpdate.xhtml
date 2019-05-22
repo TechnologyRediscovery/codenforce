@@ -13,9 +13,11 @@
         <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <div class="mainContainer">
-                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                    </h:messages>
+                    <h:form id="property-update-messages-form">
+                        
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                    </h:form>
                     <f:view>
                         <h:form id="propertyUpdateForm">
                             <h2>Update property information for <h:outputText value="#{propertyUpdateBB.currProp.address}"/>
@@ -127,17 +129,6 @@
                                  </h:panelGroup>
                                              
                                  <h:panelGroup>
-                                    <h:outputLabel for="propMultiForm" >
-                                        <h:outputText styleClass="uiLabel" value="Multi-Unit?" />
-                                    </h:outputLabel>
-                                 </h:panelGroup>
-                                 <h:panelGroup>
-                                    <p:selectBooleanCheckbox id="propMultiForm" value="#{propertyUpdateBB.currProp.multiUnit}" tabindex="14" disabled="false">
-                                         <p:ajax />
-                                    </p:selectBooleanCheckbox> 
-                                 </h:panelGroup>
-                                 
-                                 <h:panelGroup>
                                     <h:outputLabel for="propVacantForm" >
                                         <h:outputText styleClass="uiLabel" value="Vacant?" />
                                     </h:outputLabel>
@@ -161,6 +152,12 @@
                                  </f:facet>
                              </h:panelGrid>
                             <p:spacer height="10px"/>
+                            
+
+                             <p:commandButton id="cancel-property-update-cb" value="Cancel" 
+                                              icon="fa fa-stop"
+                                              style="margin-right: 10px;"
+                                              action="ceCases"/>
                             
 
                              <p:commandButton id="updatePropertyFormCB" value="Commit Updated Property Information" 

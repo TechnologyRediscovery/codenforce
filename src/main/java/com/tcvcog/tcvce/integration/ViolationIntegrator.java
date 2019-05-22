@@ -698,7 +698,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot delete code violation--probably because"
-                    + "other enetities in the system refer to it. Sorry!", ex);
+                    + " it has been used in a notice of violation or was cited!", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
