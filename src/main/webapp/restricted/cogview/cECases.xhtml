@@ -569,6 +569,8 @@
                                                  rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                  disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
                                 <p:spacer height="15px"/>
+                                
+                                <p:chart type="donut" model="#{reportingBB.violationDonut}" style="width:1200px; height:1000px"/>
 
                 <ui:remove>
                                     

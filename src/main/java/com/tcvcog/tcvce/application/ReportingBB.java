@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -16,6 +17,7 @@ import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +28,7 @@ import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
+import org.primefaces.model.chart.DonutChartModel;
 import org.primefaces.model.chart.HorizontalBarChartModel;
 
 /**
@@ -45,6 +48,8 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private HorizontalBarChartModel caseCountByStage;
     
     private BarChartModel violationCountByOrdinance;
+    
+    private DonutChartModel violationDonut;
     
     private List<CECase> caseList;
     private Map<CasePhase, Integer> cPhaseMap;
@@ -78,6 +83,31 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         
         generateModelCaseCountByPhase();
         generateModelCaseCountsByStage();
+        generateModelViolationDonut();
+        
+    }
+    
+    private void generateModelViolationDonut(){
+        CaseCoordinator cseCoord = getCaseCoordinator();
+        CECase cse = getSessionBean().getcECaseQueue().get(0);
+        violationDonut = new DonutChartModel();
+        
+        Map<String, Number> violComp = new LinkedHashMap<>();
+        violComp.put("Resolved", cse.getViolationListResolved().size());
+        violComp.put("Inside compliance timeframe", cse.getViolationListUnresolved().size());
+        violComp.put("Expired compliance timeframe", cse.getViolationListUnresolved().size());
+        violComp.put("Citation", cse.getViolationListUnresolved().size());
+        violationDonut.addCircle(violComp);
+        
+        Map<String, Number> goalRing = new LinkedHashMap<>();
+        goalRing.put("Goal: Resolved", 10 );
+        goalRing.put("Goal: Unresolved", 90);
+        violationDonut.addCircle(goalRing);
+        
+        
+        violationDonut.setTitle("Violation status");
+        violationDonut.setLegendPosition("e");
+        
     }
     
      private void generateModelCaseCountByPhase() {
@@ -280,6 +310,20 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      */
     public void setCaseCountByStage(HorizontalBarChartModel caseCountByStage) {
         this.caseCountByStage = caseCountByStage;
+    }
+
+    /**
+     * @return the violationDonut
+     */
+    public DonutChartModel getViolationDonut() {
+        return violationDonut;
+    }
+
+    /**
+     * @param violationDonut the violationDonut to set
+     */
+    public void setViolationDonut(DonutChartModel violationDonut) {
+        this.violationDonut = violationDonut;
     }
     
 }
