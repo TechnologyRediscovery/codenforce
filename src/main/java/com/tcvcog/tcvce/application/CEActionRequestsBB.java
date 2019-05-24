@@ -15,6 +15,8 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -24,12 +26,15 @@ import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
+import org.primefaces.model.chart.DonutChartModel;
 
 /**
  * Primary backing bean for managing all code enforcement action requests.
@@ -43,12 +48,19 @@ import javax.faces.event.ActionEvent;
 public class CEActionRequestsBB extends BackingBeanUtils implements Serializable {
     
     private CEActionRequest selectedRequest;
-    private List<CEActionRequest> requestList;
+    private List<CEActionRequest> cEARList;
     private int requestListSize;
+    
+    private DonutChartModel cEARReasonDonut;
     
     private List<CEActionRequestStatus> statusList;
     private CEActionRequestStatus selectedStatus;
+    
+    private List<Query> queryList;
+    private QueryCEAR selectedQueryCEAR;
     private SearchParamsCEActionRequests searchParams;
+    
+      
     
     private CEActionRequestStatus selectedChangeToStatus;
     private String invalidMessage;
@@ -86,7 +98,36 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void initBean(){
         CaseCoordinator cc = getCaseCoordinator();
         searchParams = cc.getDefaultSearchParamsCEActionRequests(getSessionBean().getActiveMuni());
+        List<CEActionRequest> initialCEARList = getSessionBean().getQueueCEAR();
         
+        
+        
+        generateCEARReasonDonutModel();
+        
+    }
+    
+    
+    private void generateCEARReasonDonutModel(){
+        
+        CECase cse = getSessionBean().getcECaseQueue().get(0);
+        cEARReasonDonut = new DonutChartModel();
+        
+        Map<String, Number> violComp = new LinkedHashMap<>();
+        
+        violComp.put("Resolved", cse.getViolationListResolved().size());
+        violComp.put("Inside compliance timeframe", cse.getViolationListUnresolved().size());
+        violComp.put("Expired compliance timeframe", cse.getViolationListUnresolved().size());
+        violComp.put("Citation", cse.getViolationListUnresolved().size());
+        cEARReasonDonut.addCircle(violComp);
+        
+        Map<String, Number> goalRing = new LinkedHashMap<>();
+        goalRing.put("Goal: Resolved", 10 );
+        goalRing.put("Goal: Unresolved", 90);
+        cEARReasonDonut.addCircle(goalRing);
+        
+        
+        cEARReasonDonut.setTitle("Violation status");
+        cEARReasonDonut.setLegendPosition("e");
     }
     
     public String path1CreateNewCaseAtProperty(){
@@ -149,7 +190,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         selectedRequest.setCaseID(selectedCaseForAttachment.getCaseID());
         updateSelectedRequestStatusWithBundleKey("actionRequestExistingCaseStatusCode");
         // force a reload of request list
-        requestList = null;
+        cEARList = null;
     }
     
     public void path3AttachInvalidMessage(ActionEvent ev){
@@ -181,7 +222,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                             "You just tried to attach a message to a nonexistent request!", 
                             "Choose the request to manage on the left, then click manage"));
         }
-        requestList = null;
+        cEARList = null;
     }
     
     
@@ -204,7 +245,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             
             // force the bean to go to the integrator and fetch a fresh, updated
             // list of action requests
-            requestList = null;
+            cEARList = null;
             try {
                 ceari.updateActionRequestNotes(selectedRequest);
                 getFacesContext().addMessage(null,
@@ -246,9 +287,11 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     
     public void updateRequestList(ActionEvent ev){
-        requestList = null;
+        cEARList = null;
         System.out.println("ActionRequestManagebb.updateRequestList");
     }
+    
+    
     
     public void searchForProperties(ActionEvent ev){
         
@@ -318,7 +361,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                     , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
         // force table reload to show changes
-        requestList = null;
+        cEARList = null;
     }
     
     public void selectNewRequestPerson(Person p){
@@ -476,17 +519,17 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     /**
-     * @return the requestList
+     * @return the cEARList
      */
-    public List<CEActionRequest> getRequestList() {
+    public List<CEActionRequest> getcEARList() {
         System.out.println("ActionRequestManageBB.getRequestList");
         
         CEActionRequestIntegrator ari = getcEActionRequestIntegrator();
         SearchParamsCEActionRequests spcear = getSearchParams();
-        if(requestList == null || requestList.isEmpty()){
+        if(cEARList == null || cEARList.isEmpty()){
             System.out.println("CeActionRequestsBB.getUnlinkedRequestList | unlinkedrequests is null");
             try {
-                requestList = ari.getCEActionRequestList(spcear);
+                cEARList = ari.getCEActionRequestList(spcear);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -494,14 +537,14 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                                 "Unable to load action requests due to an error in the Integration Module", ""));
             }
         }
-        return requestList;
+        return cEARList;
     }
 
     /**
-     * @param requestList the requestList to set
+     * @param cEARList the cEARList to set
      */
-    public void setRequestList(List<CEActionRequest> requestList) {
-        this.requestList = requestList;
+    public void setcEARList(List<CEActionRequest> cEARList) {
+        this.cEARList = cEARList;
     }
 
 
@@ -531,7 +574,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             
         }
         // force a reload of request list
-        requestList = null;
+        cEARList = null;
     
     }
     
@@ -620,10 +663,10 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      * @return the requestListSize
      */
     public int getRequestListSize() {
-        requestList = null;
+        cEARList = null;
         int ls = 0;
-        if(!(getRequestList() == null)){
-         ls = getRequestList().size();
+        if(!(getcEARList() == null)){
+         ls = getcEARList().size();
         } 
         requestListSize = ls;
         return requestListSize;
@@ -868,6 +911,48 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      */
     public void setSelectedPersonForAttachment(Person selectedPersonForAttachment) {
         this.selectedPersonForAttachment = selectedPersonForAttachment;
+    }
+
+    /**
+     * @return the cEARReasonDonut
+     */
+    public DonutChartModel getcEARReasonDonut() {
+        return cEARReasonDonut;
+    }
+
+    /**
+     * @param cEARReasonDonut the cEARReasonDonut to set
+     */
+    public void setcEARReasonDonut(DonutChartModel cEARReasonDonut) {
+        this.cEARReasonDonut = cEARReasonDonut;
+    }
+
+    /**
+     * @return the selectedQueryCEAR
+     */
+    public QueryCEAR getSelectedQueryCEAR() {
+        return selectedQueryCEAR;
+    }
+
+    /**
+     * @param selectedQueryCEAR the selectedQueryCEAR to set
+     */
+    public void setSelectedQueryCEAR(QueryCEAR selectedQueryCEAR) {
+        this.selectedQueryCEAR = selectedQueryCEAR;
+    }
+
+    /**
+     * @return the queryList
+     */
+    public List<Query> getQueryList() {
+        return queryList;
+    }
+
+    /**
+     * @param queryList the queryList to set
+     */
+    public void setQueryList(List<Query> queryList) {
+        this.queryList = queryList;
     }
 
 

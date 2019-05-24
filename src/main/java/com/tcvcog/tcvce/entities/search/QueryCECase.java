@@ -14,11 +14,11 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class CECaseQuery extends BOBQuery{
+public class QueryCECase extends Query{
     
     private List<SearchParamsCECases> caseSearchParamsList; 
     
-    public CECaseQuery(String queryTitle, Municipality muni) {
+    public QueryCECase(String queryTitle, Municipality muni) {
         super(queryTitle, muni);
     }
 
@@ -54,7 +54,7 @@ public class CECaseQuery extends BOBQuery{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CECaseQuery other = (CECaseQuery) obj;
+        final QueryCECase other = (QueryCECase) obj;
         if (!Objects.equals(this.caseSearchParamsList, other.caseSearchParamsList)) {
             return false;
         }

@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.util.Constants;
@@ -611,41 +612,24 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
         return status;
     }
-
-    public ArrayList getCEActionRequestList(int muniCode) throws IntegrationException {
-        ArrayList<CEActionRequest> requestList = new ArrayList();
-        int requestID;
-        String query = "SELECT requestid, requestpubliccc FROM public.ceactionrequest "
-                + "WHERE muni_municode = ?;";
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection con = getPostgresCon();
-        CEActionRequest cear;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                requestID = rs.getInt("requestid");
-                cear = getActionRequestByRequestID(requestID);
-                requestList.add(cear);
-            } // close while
-
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Integration Error: Problem retrieving and generating action request list", ex);
-        } finally {
-            
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-
-        }// close try/catch
-
-        return requestList;
-    } // close method
-
+    
+    
+    /**
+     * Unpacks a Query object and asks getCEActionRequestList for a set of CEARs
+     * for each of SearchParams object in the given Query
+     * @param q a fully-baked Query, meaning it has its own Params
+     * @return The set of returned CEARs from each SearchParams inside this Query
+     * @throws IntegrationException 
+     */
+    public QueryCEAR queryCEARs(QueryCEAR q) throws IntegrationException{
+        List<SearchParamsCEActionRequests> pList = q.getSearchParams();
+        for(SearchParamsCEActionRequests sp: pList){
+            q.addToResults(getCEActionRequestList(sp));
+        }
+        return q;
+        
+    }
+    
     /**
      * Primary retrieval method for Code Enforcement Action Requests. Implements
      * a multi-stage SQL statement building process based on the settings on the

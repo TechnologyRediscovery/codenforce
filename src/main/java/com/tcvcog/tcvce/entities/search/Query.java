@@ -16,17 +16,30 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class BOBQuery extends EntityUtils implements Serializable{
+public class Query extends EntityUtils implements Serializable{
     
     private String queryTitle;
     private Municipality muni;
     private RoleType userRankAccessCeiling;
+    private String resultsMessage;
+    private User user;
 
-    public BOBQuery(String queryTitle, Municipality muni) {
+    public Query(String queryTitle, Municipality muni) {
         this.queryTitle = queryTitle;
         this.muni = muni;
         
     }
+    
+    public Query(Municipality muni) {
+        this.muni = muni;
+        
+    }
+    
+    public Query(){
+        //emtpy
+    }
+    
+    
 
     /**
      * @return the queryTitle
@@ -91,7 +104,7 @@ public class BOBQuery extends EntityUtils implements Serializable{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final BOBQuery other = (BOBQuery) obj;
+        final Query other = (Query) obj;
         if (!Objects.equals(this.queryTitle, other.queryTitle)) {
             return false;
         }
@@ -99,6 +112,34 @@ public class BOBQuery extends EntityUtils implements Serializable{
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the resultsMessage
+     */
+    public String getResultsMessage() {
+        return resultsMessage;
+    }
+
+    /**
+     * @param resultsMessage the resultsMessage to set
+     */
+    public void setResultsMessage(String resultsMessage) {
+        this.resultsMessage = resultsMessage;
     }
 
     

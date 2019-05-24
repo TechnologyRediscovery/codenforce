@@ -13,11 +13,11 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class EventQuery extends BOBQuery {
+public class QueryEventCECase extends Query {
     
     private SearchParamsCEEvents eventSearchParams;
     
-    public EventQuery(String queryTitle, Municipality muni) {
+    public QueryEventCECase(String queryTitle, Municipality muni) {
         super(queryTitle, muni);
     }
 

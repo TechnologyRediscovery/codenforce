@@ -18,8 +18,8 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.BOBQuery;
-import com.tcvcog.tcvce.entities.search.EventQuery;
+import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -52,8 +52,8 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     private List<EventCategory> eventCatList;
     private List<User> userList;
     
-    private List<BOBQuery> queryList;
-    private BOBQuery selectedBOBQuery;
+    private List<Query> queryList;
+    private Query selectedBOBQuery;
     private SearchParamsCEEvents extractedSearchParams;
     
     private List<EventCasePropBundle> eventList;
@@ -127,7 +127,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public void executeQuery(){
         System.out.println("CEEventsBB.executeQuery");
         EventCoordinator ec = getEventCoordinator();
-        EventQuery eq = (EventQuery) selectedBOBQuery;
+        QueryEventCECase eq = (QueryEventCECase) selectedBOBQuery;
         searchParams = eq.getEventSearchParams();
         try {
             eventList = ec.queryEvents( eq.getEventSearchParams(), 
@@ -339,15 +339,15 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the selectedBOBQuery
      */
-    public BOBQuery getSelectedBOBQuery() {
+    public Query getSelectedBOBQuery() {
         return selectedBOBQuery;
     }
 
     /**
      * @param selectedBOBQuery the selectedBOBQuery to set
      */
-    public void setSelectedBOBQuery(BOBQuery selectedBOBQuery) {
-        EventQuery eq = (EventQuery) selectedBOBQuery;
+    public void setSelectedBOBQuery(Query selectedBOBQuery) {
+        QueryEventCECase eq = (QueryEventCECase) selectedBOBQuery;
         searchParams = eq.getEventSearchParams();
         this.selectedBOBQuery = selectedBOBQuery;
     }
@@ -355,14 +355,14 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the queryList
      */
-    public List<BOBQuery> getQueryList() {
+    public List<Query> getQueryList() {
         return queryList;
     }
 
     /**
      * @param queryList the queryList to set
      */
-    public void setQueryList(List<BOBQuery> queryList) {
+    public void setQueryList(List<Query> queryList) {
         this.queryList = queryList;
     }
 
@@ -398,9 +398,9 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      * @return the extractedSearchParams
      */
     public SearchParamsCEEvents getExtractedSearchParams() {
-        EventQuery eq;
+        QueryEventCECase eq;
         if(selectedBOBQuery != null){
-              eq = (EventQuery) selectedBOBQuery;
+              eq = (QueryEventCECase) selectedBOBQuery;
               extractedSearchParams = eq.getEventSearchParams();
         }
         return extractedSearchParams;

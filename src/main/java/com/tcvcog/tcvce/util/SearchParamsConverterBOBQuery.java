@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.util;
 
 import com.tcvcog.tcvce.entities.CitationStatus;
-import com.tcvcog.tcvce.entities.search.BOBQuery;
+import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -37,7 +37,7 @@ public class SearchParamsConverterBOBQuery extends EntityConverter implements Co
         if(titleS.isEmpty()) {
             return null; 
         }
-        BOBQuery o = (BOBQuery) this.getViewMap(fc).get(titleS);
+        Query o = (Query) this.getViewMap(fc).get(titleS);
         System.out.println("SearchParamsConverterBOB.getAsObject | object " + o.getQueryTitle());
         return o;
     }
@@ -48,7 +48,7 @@ public class SearchParamsConverterBOBQuery extends EntityConverter implements Co
             return "";
         }
         
-        BOBQuery sp = (BOBQuery) o;
+        Query sp = (Query) o;
         String title = sp.getQueryTitle();  
         if (title != null){
             this.getViewMap(fc).put(title,o);

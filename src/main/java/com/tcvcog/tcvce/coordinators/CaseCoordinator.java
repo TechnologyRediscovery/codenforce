@@ -24,6 +24,8 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.PermissionsException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
+import com.tcvcog.tcvce.entities.search.QueryCEARTitle;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -125,8 +127,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * The temporarily hard-coded values for default search parameters for various
-     * types of search Param objects
+     * Asks the SearchCoordinator for the appropriate 
      * 
      * @param m
      * @return an search params object for CEAction requests with default values
@@ -135,27 +136,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      */
     public SearchParamsCEActionRequests getDefaultSearchParamsCEActionRequests(Municipality m){
         
-            System.out.println("CaseCoordinator.configureDefaultSearchParams "
-                    + "| found actionrequest param object");
-            
-            SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
-
-            sps.setMuni(m);
-            LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
-            sps.setStartDate(pastTenYears);
-            
-            // action requests cannot have a time stamp past the current datetime
-            sps.setEndDate(LocalDateTime.now());
-
-            sps.setUseAttachedToCase(true);
-            sps.setAttachedToCase(false);
-            sps.setUseMarkedUrgent(false);
-            sps.setUseNotAtAddress(false);
-            sps.setUseRequestStatus(false);
-        
-        return sps;
+        SearchCoordinator sc = getSearchCoordinator();
+        return sc.generateParams_CEAR_Unprocessed(m);
     }
     
+   
+    public QueryCEAR generateInitialCEARList(User u, Municipality m) throws IntegrationException{
+        SearchCoordinator sc = getSearchCoordinator();
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        
+        return ceari.queryCEARs(sc.buildCEARQuery(QueryCEARTitle.UNPROCESSED, u, m));
+        
+    }
     
     
    

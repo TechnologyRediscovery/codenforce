@@ -42,6 +42,9 @@ import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
@@ -62,12 +65,19 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
 
     private List<Property> propertyQueue;
     private List<Person> personQueue;
-    private List<CEActionRequest> cEActionRequestQueue;
+    
+    private List<CEActionRequest> queueCEAR;
+    private QueryCEAR queryCEAR;
+    
+    
     private List<CECase> cECaseQueue;
     private List<EventCasePropBundle> cEEventWCPIQueue;
     private List<CodeViolation> violationQueue;
     private List<OccupancyInspection> inspectionQueue;
     
+    private QueryCECase queryCECase;
+    private QueryEventCECase queryEventCECase;
+   
     /* *** System Core Objects Session Shelves ***  */
     private Municipality activeMuni;
     private List<Municipality> userAuthMuniList;
@@ -93,7 +103,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CECase cECase;
     
      /* *** Code Enforcement Case Session Shelves ***  */
-    
     private NoticeOfViolation activeNotice;
     private Citation activeCitation;
     private CodeViolation activeCodeViolation;
@@ -368,10 +377,13 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the cEActionRequestQueue
+     * @return the queueCEAR
      */
-    public List<CEActionRequest> getcEActionRequestQueue() {
-        return cEActionRequestQueue;
+    public List<CEActionRequest> getQueueCEAR() {
+        if(queryCEAR != null & queryCEAR.getResults().size() > 0){
+            queueCEAR = queryCEAR.getResults();
+        }
+        return queueCEAR;
     }
 
     /**
@@ -382,10 +394,13 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param cEActionRequestQueue the cEActionRequestQueue to set
+     * @param qc
      */
-    public void setcEActionRequestQueue(List<CEActionRequest> cEActionRequestQueue) {
-        this.cEActionRequestQueue = cEActionRequestQueue;
+    public void setQueueCEAR(List<CEActionRequest> qc) {
+        if(qc != null && qc.size() > 0 ){
+            queryCEAR = null;
+            this.queueCEAR = qc;
+        }
     }
     
 
