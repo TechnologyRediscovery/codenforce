@@ -40,6 +40,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private ReportConfigCECase reportCECase;
     private ReportConfigCECaseList reportCECaseList;
     
+    
     private ReportConfig currentReport;
    
     private ReportConfigCEEventList reportCEEvent;
@@ -50,6 +51,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private BarChartModel violationCountByOrdinance;
     
     private DonutChartModel violationDonut;
+    
     
     private List<CECase> caseList;
     private Map<CasePhase, Integer> cPhaseMap;
@@ -325,5 +327,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     public void setViolationDonut(DonutChartModel violationDonut) {
         this.violationDonut = violationDonut;
     }
+
+   
     
 }

@@ -41,8 +41,8 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
-import com.tcvcog.tcvce.entities.search.BOBQuery;
-import com.tcvcog.tcvce.entities.search.CECaseQuery;
+import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -80,11 +80,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private ArrayList<CECase> filteredCaseList;
     private SearchParamsCECases searchParams;
     
-    private List<BOBQuery> queryList;
-    private CECaseQuery selectedCECaseQuery;
-    private BOBQuery selectedBOBQuery;
+    private List<Query> queryList;
+    private QueryCECase selectedCECaseQuery;
+    private Query selectedBOBQuery;
     
-
     private ArrayList<CECase> filteredCaseHistoryList;
     private ArrayList<EventCECase> recentEventList;
     private ArrayList<Person> muniPeopleList;
@@ -1686,9 +1685,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the selectedCECaseQuery
      */
-    public CECaseQuery getSelectedCECaseQuery() {
-        if(selectedBOBQuery instanceof BOBQuery){
-            selectedCECaseQuery = (CECaseQuery) selectedBOBQuery;
+    public QueryCECase getSelectedCECaseQuery() {
+        if(selectedBOBQuery instanceof Query){
+            selectedCECaseQuery = (QueryCECase) selectedBOBQuery;
         }
         return selectedCECaseQuery;
     }
@@ -1696,7 +1695,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param selectedCECaseQuery the selectedCECaseQuery to set
      */
-    public void setSelectedCECaseQuery(CECaseQuery selectedCECaseQuery) {
+    public void setSelectedCECaseQuery(QueryCECase selectedCECaseQuery) {
         
         
         this.selectedCECaseQuery = selectedCECaseQuery;
@@ -1705,28 +1704,28 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the queryList
      */
-    public List<BOBQuery> getQueryList() {
+    public List<Query> getQueryList() {
         return queryList;
     }
 
     /**
      * @param queryList the queryList to set
      */
-    public void setQueryList(List<BOBQuery> queryList) {
+    public void setQueryList(List<Query> queryList) {
         this.queryList = queryList;
     }
 
     /**
      * @return the selectedBOBQuery
      */
-    public BOBQuery getSelectedBOBQuery() {
+    public Query getSelectedBOBQuery() {
         return selectedBOBQuery;
     }
 
     /**
      * @param selectedBOBQuery the selectedBOBQuery to set
      */
-    public void setSelectedBOBQuery(BOBQuery selectedBOBQuery) {
+    public void setSelectedBOBQuery(Query selectedBOBQuery) {
         this.selectedBOBQuery = selectedBOBQuery;
     }
 

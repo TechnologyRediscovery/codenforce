@@ -5,13 +5,8 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.BusinessObject;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,103 +14,32 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class QueryCECase 
-        extends Query{
+public class QueryCECase extends Query{
     
-    private QueryCECaseEnum queryName;
-    private List<SearchParamsCECase> searchParamsList; 
-    private List<CECase> results;
+    private List<SearchParamsCECases> caseSearchParamsList; 
     
-    public QueryCECase( QueryCECaseEnum qName, 
-                        Municipality muni, 
-                        List<SearchParamsCECase> params,
-                        UserAuthorized u) {
-        super(muni, u);
-        queryName = qName;
-        searchParamsList = new ArrayList<>();
-        searchParamsList.addAll(params);
-        results = new ArrayList<>();
-    }
-    
-    public void addToResults(List<CECase> list){
-        results.addAll(list);
-    }
-
-    @Override
-    public List getBOBResultList() {
-        return results;
-    }
-
-    @Override
-    public void setBOBResultList(List l) {
-        results = l;
-    }
-
-    @Override
-    public List getParmsList() {
-        return searchParamsList;
-    }
-    
-
-    /**
-     * @return the searchParamsList
-     */
-    public List<SearchParamsCECase> getSearchParamsList() {
-        return searchParamsList;
+    public QueryCECase(String queryTitle, Municipality muni) {
+        super(queryTitle, muni);
     }
 
     /**
-     * @param searchParamsList the searchParamsList to set
+     * @return the caseSearchParamsList
      */
-    public void setSearchParamsList(List<SearchParamsCECase> searchParamsList) {
-        this.searchParamsList = searchParamsList;
-    }
-
-    @Override
-    public void clearResultList() {
-        if(results != null){
-            results.clear();
-        }
+    public List<SearchParamsCECases> getCaseSearchParamsList() {
+        return caseSearchParamsList;
     }
 
     /**
-     *
-     * @return
+     * @param caseSearchParamsList the caseSearchParamsList to set
      */
-    public List<SearchParamsCECase> getParamsList() {
-        return searchParamsList;
+    public void setCaseSearchParamsList(List<SearchParamsCECases> caseSearchParamsList) {
+        this.caseSearchParamsList = caseSearchParamsList;
     }
-
-    /**
-     * @return the results
-     */
-    public List<CECase> getResults() {
-        return results;
-    }
-
-    /**
-     * @param results the results to set
-     */
-    public void setResults(List<CECase> results) {
-        this.results = results;
-    }
-
-    public void setParamsList(List l) {
-        searchParamsList = l;
-    }
-
-    @Override
-    public String getQueryTitle() {
-        return queryName.getTitle();
-        
-    }
-    
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 97 * hash + Objects.hashCode(this.searchParamsList);
-        hash = 97 * hash + Objects.hashCode(this.results);
+        hash = 23 * hash + Objects.hashCode(this.caseSearchParamsList);
         return hash;
     }
 
@@ -131,20 +55,11 @@ public class QueryCECase
             return false;
         }
         final QueryCECase other = (QueryCECase) obj;
-        if(this.queryName != other.queryName){
+        if (!Objects.equals(this.caseSearchParamsList, other.caseSearchParamsList)) {
             return false;
         }
-        
         return true;
     }
-
-    /**
-     * @return the queryName
-     */
-    public QueryCECaseEnum getQueryName() {
-        return queryName;
-    }
-    
     
     
     

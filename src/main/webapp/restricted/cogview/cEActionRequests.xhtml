@@ -30,7 +30,21 @@
                             <h:panelGroup styleClass="split-page-list-side">
                                 <h:form id="actionRequestListForm">
 
-                                    <h2>Current Request List</h2>
+                                    <h2>Code enforcement action requests</h2>
+                                    
+
+                                        <p:selectOneMenu id="eventquery-som" 
+                                                         tabindex="1" 
+                                                         value="#{cEActionRequestsBB.selectedQueryCEAR}"
+                                                         style="margin-right: 10px;">
+                                            <f:converter converterId="bOBQueryConverter"/>
+                                            <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems id="querylist-si" value="#{cEActionRequestsBB.queryList}" var="q" itemValue="#{q}" itemLabel="#{q.queryTitle}" />
+                                            <p:ajax />
+                                        </p:selectOneMenu>
+
+                                    
+                                    
                                     <h3>Results below show all unattached action requests. Use advanced search options to specify a different result set.</h3>
 
                                     <p:fieldset legend="Advanced search options"
@@ -155,7 +169,7 @@
                                         id="actionRequestTable"
                                         var="r"
                                         rowKey="#{r.requestID}"
-                                        value="#{cEActionRequestsBB.requestList}"
+                                        value="#{cEActionRequestsBB.getcEARList}"
                                         tableStyleClass="primeDataTable"
                                         resizableColumns="true"
                                         reflow="true"
@@ -248,6 +262,10 @@
                                     </p:dataTable>
 
                                     <p:spacer height="15px"/>
+                                    
+                                    
+                                    <p:chart type="donut" model="#{cEActionRequestsBB.getcEARReasonDonut}" style="width:600px; height: 600px;"/>
+
 
                                     <p:commandLink value="Export table as pdf report" ajax="false">
                                         <p:dataExporter type="pdf" target="actionRequestTable" fileName="actionRequestReport_#{sessionBean.activeMuni.muniName}"/>
@@ -283,6 +301,7 @@
                                     <p:commandButton    id="open-new-case-cb"
                                                         ajax="false" value="Open new code enf case at this property" 
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                         action="#{cEActionRequestsBB.path1CreateNewCaseAtProperty}"
                                                         update="ceActionRequestsMessages" icon="fa fa-folder" 
                                                         styleClass="cear-actions-button"/>
@@ -290,6 +309,7 @@
                                     
                                     <p:commandButton    id="attach-to-case-cb"
                                                         value="Attach to existing code enf case"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('attach-to-case-dialog').show()"
                                                         update="attach-to-existing-case-form:cases-on-selected-request-property-DS"
@@ -299,19 +319,41 @@
                                     
                                     <p:commandButton    id="no-violation-found-cb"
                                                         value="No violation found on site"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('no-violation-found-dialog').show()"
                                                         icon="fa fa-circle-o"/>
-                                    <p:spacer height="5px"/>
 
                                     <p:commandButton    id="invalid-request-cb"
                                                         value="Invalid request"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('invalid-dialog').show()"
                                                         icon="fa fa-exclamation-circle"/>
                                     
-                                    <p:spacer height="5px"/>
+                                    
+                                    <p:spacer height="5px" />
+                                    <hr />
+                                    <p:spacer height="5px" />
 
+                                    <p:commandButton    id="print-singleCAR-cb"
+                                                        value="Print request"
+                                                        
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                        disabled="false"
+                                                        onclick="PF('cear-print-dialog-var').show()"
+                                                        icon="fa fa-print"/>
+
+                                    <p:spacer height="5px"/>
+                                    
+                                    <p:commandButton      id="attach-internal-note-cb"
+                                                            onclick="PF('muni-message-dialog').show()" 
+                                                             value="Attach internal note"
+                                                             icon="fa fa-pencil-square-o"
+                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
+
+                                 
+                                    
                                     
 
                                 <div class="outlinedBox">
@@ -359,7 +401,7 @@
                                             
                                             <p:commandButton    id="change-property-cb" 
                                                                 onclick="PF('change-property-dialog').show()" 
-                                                                 value="change property" 
+                                                                 value="change request property" 
                                                                  styleClass="noFill button-size-small"
                                                                  disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                                  icon="fa fa-home"
@@ -415,7 +457,7 @@
                                             <p:spacer height="5px"/>
                                             <p:commandButton    id="change-person-cb"
                                                                 onclick="PF('change-person-dialog').show()" 
-                                                                value="change person" 
+                                                                value="change requestor Person" 
                                                                 styleClass="noFill button-size-small" 
                                                                 icon="fa fa-child"
                                                                 disabled="#{empty cEActionRequestsBB.selectedRequest}"
@@ -462,7 +504,7 @@
                                             <hr />
                                             <p:spacer height="5px"/>
                                             
-                                            <h:outputLabel styleClass="bold" value="Internal notes: "/>
+                                            <h:outputLabel styleClass="bold" value="Officer-only notes: "/>
                                             <p:commandButton onclick="PF('internal-message-dialog').show()" 
                                                              icon="fa fa-pencil-square-o"
                                                              value="new note" 
@@ -477,12 +519,12 @@
                                             <hr />
                                             <p:spacer height="5px"/>
                                             
-                                            <h:outputLabel styleClass="bold" value="Staff-only notes: "/>
+                                            <h:outputLabel styleClass="bold" value="System internal only"/>
                                             <p:commandButton onclick="PF('muni-message-dialog').show()" 
                                                              value="new note"
                                                              icon="fa fa-pencil-square-o"
                                                              styleClass="noFill button-size-small" 
-                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" />
+                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
                                             <p:spacer height="5px"/>
                                             <div class="rowExpansion" style="leftalign">
                                                 <h:outputText id="selr-notes-muni" escape="false" value="#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
@@ -1251,6 +1293,19 @@
                         
                         
                     </div>
+                    
+                      <p:dialog  id="cear-print-dialog"
+                                    widgetVar="cear-print-dialog-var"
+                                    closable="true" responsive="true"
+                                    dynamic="true"
+                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                      
+                      
+                      
+                      
+                      
+                      
+                      </p:dialog>
                 </f:view>
             </ui:define>
         </ui:composition>

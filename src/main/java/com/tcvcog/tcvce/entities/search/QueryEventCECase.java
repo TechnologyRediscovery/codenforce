@@ -5,13 +5,8 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.CECaseEvent;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -20,74 +15,24 @@ import java.util.Objects;
  */
 public class QueryEventCECase extends Query {
     
-    private QueryEventCECaseEnum queryName;
+    private SearchParamsCEEvents eventSearchParams;
     
-    
-    // should be a list of search params eventually so we can build
-    // queries from a set of search params
-    private List<SearchParamsEventCECase> eventSearchParamsList;
-    private List<EventCECaseCasePropBundle> results;
-    
-    public QueryEventCECase(QueryEventCECaseEnum qName, 
-                            Municipality muni, 
-                            UserAuthorized u, 
-                            List<SearchParamsEventCECase> params) {
-        super(muni, u);
-        eventSearchParamsList = new ArrayList<>();
-        eventSearchParamsList.addAll(params);
-        queryName = qName;
-        results = new ArrayList<>();
-        
-    }
-
-    
-    public List getParamsList() {
-        return eventSearchParamsList;
-    }
-
-    @Override
-    public List<EventCECaseCasePropBundle> getBOBResultList() {
-        return results;
-    }
-
-    @Override
-    public void setBOBResultList(List l) {
-        results = l;
-    }
-
-    @Override
-    public List getParmsList() {
-        return eventSearchParamsList;
-    }
-
-    @Override
-    public String getQueryTitle() {
-        return queryName.getTitle();
-    }
-
-    @Override
-    public void clearResultList() {
-        if(results != null){
-            results.clear();
-        }
+    public QueryEventCECase(String queryTitle, Municipality muni) {
+        super(queryTitle, muni);
     }
 
     /**
-     * @return the queryName
+     * @return the eventSearchParams
      */
-    public QueryEventCECaseEnum getQueryName() {
-        return queryName;
+    public SearchParamsCEEvents getEventSearchParams() {
+        return eventSearchParams;
     }
 
     /**
-     * @param queryName the queryName to set
+     * @param eventSearchParams the eventSearchParams to set
      */
-    public void setQueryName(QueryEventCECaseEnum queryName) {
-        this.queryName = queryName;
-    }
-
-    public void addToResults(List<EventCECaseCasePropBundle> eventsCECase) {
-        results.addAll(eventsCECase);
+    public void setEventSearchParams(SearchParamsCEEvents eventSearchParams) {
+        this.eventSearchParams = eventSearchParams;
     }
 
    

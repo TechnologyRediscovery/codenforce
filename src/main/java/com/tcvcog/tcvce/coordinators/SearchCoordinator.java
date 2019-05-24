@@ -11,8 +11,10 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.BOBQuery;
-import com.tcvcog.tcvce.entities.search.EventQuery;
+import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
+import com.tcvcog.tcvce.entities.search.QueryCEARTitle;
+import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
@@ -23,6 +25,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -30,20 +33,91 @@ import java.util.List;
  */
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 
+    private List<QueryCEAR> queryCEARList;
+    
     /**
      * Creates a new instance of SearchCoordinator
      */
     public SearchCoordinator() {
     }
     
-//    CODE ENFORCEMENT CASE QUERIES
-    
-    public List<SearchParams> getAvaialbleSearchParamsCECases(User u, Municipality m){
-        List<SearchParams> pList = new ArrayList<>();
-        return pList;
+    @PostConstruct
+    public void initBean(){
         
     }
     
+    public List<QueryCEAR> buildCEARQueryList(User u, Municipality m){
+        QueryCEARTitle[] titleArr = QueryCEARTitle.values();
+        List<QueryCEAR> qList = new ArrayList<>();
+        for(QueryCEARTitle qTit: titleArr){
+            qList.add(buildCEARQuery(qTit, u, m));
+        }
+        return qList;
+    }
+    
+    
+    
+    
+    public QueryCEAR buildCEARQuery(QueryCEARTitle qTitle, User u, Municipality m){
+        QueryCEAR q = new QueryCEAR(m);
+        q.setQueryTitle(qTitle.getLabel());
+        
+        switch(qTitle){
+            case UNPROCESSED:
+                q.addSearchParams(generateParams_CEAR_Unprocessed(m));
+                break;
+            case ATTACHED_TO_CECASE:
+                break;
+            
+            case ALL_TODAY:
+                break;
+                
+            case ALL_PAST7DAYS:
+                break;
+                
+            case ALL_PAST30:
+                break;
+                
+            case ALL_PASTYEAR:
+                break;
+                
+            default:
+                q.addSearchParams(generateParams_CEAR_Unprocessed(m));
+        }
+        
+        return q;
+    }
+    
+    
+    
+    
+     public SearchParamsCEActionRequests generateParams_CEAR_Unprocessed(Municipality m){
+            
+        SearchCoordinator sc = getSearchCoordinator();
+
+        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
+
+        sps.setMuni(m);
+        LocalDateTime pastTenYears = LocalDateTime.now().minusYears(10);
+        sps.setStartDate(pastTenYears);
+
+        // action requests cannot have a time stamp past the current datetime
+        sps.setEndDate(LocalDateTime.now());
+
+        sps.setUseAttachedToCase(true);
+        sps.setAttachedToCase(false);
+        sps.setUseMarkedUrgent(false);
+        sps.setUseNotAtAddress(false);
+        sps.setUseRequestStatus(false);
+        
+        return sps;
+    }
+    
+    
+    
+    
+//    CODE ENFORCEMENT CASE QUERIES
+   
     
     /**
      * Returns a SearchParams subclass for retrieving all open
@@ -112,8 +186,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
     
-    
-    
    
     
     protected SearchParamsProperties getSearchParamsSkeletonProperties(){
@@ -139,19 +211,19 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return propParams;
     }
     
-    public List<BOBQuery> getEventQueryList(User u, Municipality m){
-        List<BOBQuery> queryList = new ArrayList<>();
+    public List<Query> getEventQueryList(User u, Municipality m){
+        List<Query> queryList = new ArrayList<>();
         
-        EventQuery eq = new EventQuery("Compliance follow-up events: Today", m);
+        QueryEventCECase eq = new QueryEventCECase("Compliance follow-up events: Today", m);
         eq.setEventSearchParams(getSearchParamsEventsRequiringAction(u, m));
         queryList.add(eq);
         
-        eq = new EventQuery("Officer Activity Report", m);
+        eq = new QueryEventCECase("Officer Activity Report", m);
         eq.setEventSearchParams(getSearchParamsOfficerActivity(u, m));
         queryList.add(eq);
         
         
-        eq = new EventQuery("Compliance events: Past Month", m);
+        eq = new QueryEventCECase("Compliance events: Past Month", m);
         eq.setEventSearchParams(getSearchParamsComplianceEvPastMonth(m));
         queryList.add(eq);
         
@@ -293,6 +365,23 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByHidden(false);
         
         return eventParams;
+    }
+
+    /**
+     * @return the queryCEARList
+     */
+    public List<QueryCEAR> getQueryCEARList() {
+   
+        
+        
+        return queryCEARList;
+    }
+
+    /**
+     * @param queryCEARList the queryCEARList to set
+     */
+    public void setQueryCEARList(List<QueryCEAR> queryCEARList) {
+        this.queryCEARList = queryCEARList;
     }
     
     
