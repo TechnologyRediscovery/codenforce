@@ -22,7 +22,7 @@ import java.util.Objects;
  */
 public abstract class Query<E extends BOB> 
         extends EntityUtils 
-        implements Serializable, Searchable{
+        implements Serializable{
     
     private String queryTitle;
     private Municipality muni;
@@ -30,7 +30,13 @@ public abstract class Query<E extends BOB>
     private String resultsMessage;
     private User user;
     private LocalDateTime executionTimestamp;
-      
+    
+    public abstract List<E> getBOBResultList();
+    public abstract void setBOBResultList(List<E> l);
+    
+    public abstract List getParmsList();
+    public abstract void setParamsList(List l);
+
 
     public Query(String queryTitle, Municipality muni) {
         this.queryTitle = queryTitle;

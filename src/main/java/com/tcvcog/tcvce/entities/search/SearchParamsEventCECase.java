@@ -41,6 +41,31 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
     private boolean filterByHidden;
     private boolean isHidden;
     
+    // main control for follow-up event request parameter activation
+    private boolean filterByrequestsAction;
+    private boolean requestsAction;
+    
+    // these search parameters are only valid for events that request
+    // a follow-up action
+    
+    private boolean filterByHasResponseEvent;
+    private boolean hasResponseEvent;
+
+    // use the EventCategory and EventType fields above to query the 
+    // event category or type of the requested follow-up event
+    private boolean filterByRequestedResponseEventCat;
+    
+    // we have a User type memvar called user. These switches can
+    // determine which db field the user is queried against
+    private boolean filterByRequestor;
+    private boolean filterByResponderIntended;
+    private boolean filterByResponderActual;
+
+    private boolean filterByRejectedRequest;
+    private boolean rejectedRequest;
+    
+    
+    
    public SearchParamsEventCECase(){
        
    }
@@ -90,7 +115,7 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
     /**
      * @return the filterByActive
      */
-    public boolean isActive_filterBy() {
+    public boolean isFilterByActive() {
         return filterByActive;
     }
 
@@ -101,7 +126,20 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
         return isActive;
     }
 
-  
+    /**
+     * @return the filterByrequestsAction
+     */
+    public boolean isFilterByrequestsAction() {
+        return filterByrequestsAction;
+    }
+
+    /**
+     * @return the requestsAction
+     */
+    public boolean isRequestsAction() {
+        return requestsAction;
+    }
+
     /**
      * @return the filterByHidden
      */
@@ -176,7 +214,7 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
     /**
      * @param filterByActive the filterByActive to set
      */
-    public void setActive_filterBy(boolean filterByActive) {
+    public void setFilterByActive(boolean filterByActive) {
         this.filterByActive = filterByActive;
     }
 
@@ -188,7 +226,18 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
     }
 
     /**
-  
+     * @param filterByrequestsAction the filterByrequestsAction to set
+     */
+    public void setFilterByrequestsAction(boolean filterByrequestsAction) {
+        this.filterByrequestsAction = filterByrequestsAction;
+    }
+
+    /**
+     * @param requestsAction the requestsAction to set
+     */
+    public void setRequestsAction(boolean requestsAction) {
+        this.requestsAction = requestsAction;
+    }
 
     /**
      * @param filterByHidden the filterByHidden to set
@@ -233,7 +282,33 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
         this.filterByEventType = filterByEventType;
     }
 
-   
+    /**
+     * @return the filterByHasResponseEvent
+     */
+    public boolean isFilterByHasResponseEvent() {
+        return filterByHasResponseEvent;
+    }
+
+    /**
+     * @return the hasResponseEvent
+     */
+    public boolean isHasResponseEvent() {
+        return hasResponseEvent;
+    }
+
+    /**
+     * @param filterByHasResponseEvent the filterByHasResponseEvent to set
+     */
+    public void setFilterByHasResponseEvent(boolean filterByHasResponseEvent) {
+        this.filterByHasResponseEvent = filterByHasResponseEvent;
+    }
+
+    /**
+     * @param hasResponseEvent the hasResponseEvent to set
+     */
+    public void setHasResponseEvent(boolean hasResponseEvent) {
+        this.hasResponseEvent = hasResponseEvent;
+    }
 
     /**
      * @return the evtType
@@ -272,6 +347,95 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
 
    
 
+    /**
+     * @return the filterByRejectedRequest
+     */
+    public boolean isFilterByRejectedRequest() {
+        return filterByRejectedRequest;
+    }
+
+    /**
+     * @param filterByRejectedRequest the filterByRejectedRequest to set
+     */
+    public void setFilterByRejectedRequest(boolean filterByRejectedRequest) {
+        this.filterByRejectedRequest = filterByRejectedRequest;
+    }
+
+    /**
+     * @return the rejectedRequest
+     */
+    public boolean isRejectedRequest() {
+        return rejectedRequest;
+    }
+
+    /**
+     * @param rejectedRequest the rejectedRequest to set
+     */
+    public void setRejectedRequest(boolean rejectedRequest) {
+        this.rejectedRequest = rejectedRequest;
+    }
+
+    /**
+     * @return the filterByRequestedResponseEventCat
+     */
+    public boolean isFilterByRequestedResponseEventCat() {
+        return filterByRequestedResponseEventCat;
+    }
+
+    
+    
+
+    /**
+     * @return the filterByRequestor
+     */
+    public boolean isFilterByRequestor() {
+        return filterByRequestor;
+    }
+
+    /**
+     * @return the filterByResponderIntended
+     */
+    public boolean isFilterByResponderIntended() {
+        return filterByResponderIntended;
+    }
+
+    /**
+     * @return the filterByResponderActual
+     */
+    public boolean isFilterByResponderActual() {
+        return filterByResponderActual;
+    }
+
+    /**
+     * @param filterByRequestedResponseEventCat the filterByRequestedResponseEventCat to set
+     */
+    public void setFilterByRequestedResponseEventCat(boolean filterByRequestedResponseEventCat) {
+        this.filterByRequestedResponseEventCat = filterByRequestedResponseEventCat;
+    }
+
+
+    /**
+     * @param filterByRequestor the filterByRequestor to set
+     */
+    public void setFilterByRequestor(boolean filterByRequestor) {
+        this.filterByRequestor = filterByRequestor;
+    }
+
+    /**
+     * @param filterByResponderIntended the filterByResponderIntended to set
+     */
+    public void setFilterByResponderIntended(boolean filterByResponderIntended) {
+        this.filterByResponderIntended = filterByResponderIntended;
+    }
+
+    /**
+     * @param filterByResponderActual the filterByResponderActual to set
+     */
+    public void setFilterByResponderActual(boolean filterByResponderActual) {
+        this.filterByResponderActual = filterByResponderActual;
+    }
+   
+   
    
    
 

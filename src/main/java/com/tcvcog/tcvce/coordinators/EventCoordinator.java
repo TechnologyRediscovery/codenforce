@@ -35,7 +35,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
@@ -77,20 +77,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
    
     
     
-    public SearchParamsCEEvents getSearchParamsCEEventsRequiringAction(User user, Municipality m){
+    public SearchParamsEventCECase getSearchParamsCEEventsRequiringAction(User user, Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
         return sc.getSearchParamsEventsRequiringAction(user,m);
         
     }
     
-    public SearchParamsCEEvents getSearchParamsOfficerActibityPastWeek(User user, Municipality m){
+    public SearchParamsEventCECase getSearchParamsOfficerActibityPastWeek(User user, Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
         return sc.getSearchParamsOfficerActivity(user, m);
         
     }
     
     
-    public SearchParamsCEEvents getSearchParamsComplianceEvPastMonth(Municipality m){
+    public SearchParamsEventCECase getSearchParamsComplianceEvPastMonth(Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
         return sc.getSearchParamsComplianceEvPastMonth(m);
     }
@@ -169,7 +169,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params, User user, List<Municipality> userAuthMuniList) throws IntegrationException, CaseLifecyleException{
+    public List<EventCasePropBundle> queryEvents(SearchParamsEventCECase params, User user, List<Municipality> userAuthMuniList) throws IntegrationException, CaseLifecyleException{
         EventIntegrator ei = getEventIntegrator();
         List<EventCasePropBundle> evList = configureEventBundleList(ei.queryEvents(params),user,userAuthMuniList);
         return evList;

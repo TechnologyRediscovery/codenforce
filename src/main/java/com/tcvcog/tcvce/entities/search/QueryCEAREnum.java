@@ -11,25 +11,21 @@ package com.tcvcog.tcvce.entities.search;
  */
 public enum QueryCEAREnum {
     
-    UNPROCESSED("Needs review by officer", "Code enforcement action requests that have not been reviewed", 2, false),
-    ATTACHED_TO_CECASE("Assigned to a case", "Code enforcement action requests from the past 30 days that was either used to create a new case or was attached to an existing code enforcement case", 2, false),
-    ALL_TODAY("Requests today" , "All action requests with activity today", 2, false),
-    ALL_PAST7DAYS("Requests past 7 days" , "All valid action requests created in the past 7 days", 2, false),
-    ALL_PAST30("Requests past 30 days", "All valid action requests created in the past 30 days", 2, false),
-    ALL_PASTYEAR("Requests past 365 days", "All valid action requests created in the past year", 2, false),
-    BY_CURRENT_USER("***Under construction***", "Action requests attributed to the current user", 2, false),
-    CUSTOM("Custom configuration", "Results based on the injected search parameters", 2, true);
+    UNPROCESSED("Needs review by officer", "Code enforcement action requests that have not been reviewed"),
+    ATTACHED_TO_CECASE("Assigned to a case", "Code enforcemetn action request "
+            + "that was either used to create a new case or was attached to an existing code enforcement case"),
+    ALL_TODAY("Requests today" , "All action requests with activity today"),
+    ALL_PAST7DAYS("Requests thsi week" , "All valid action requests created in the past 7 days"),
+    ALL_PAST30("Requests this month", "All valid action requests created in the past 30 days"),
+    ALL_PASTYEAR("Requests past year", "All valid action requests created in the past year"),
+    BY_CURRENT_USER("Requestor is you", "Action requests attributed to the current user");
     
     private final String title;
     private final String desc;
-    private final int userRankMinimum;
-    private final boolean log;
     
-    private QueryCEAREnum(String t, String l, int rnkMin, boolean lg){
+    private QueryCEAREnum(String t, String l){
         this.desc = l;
         this.title = t;
-        this.userRankMinimum = rnkMin;
-        this.log = lg;
     }
     
     public String getDesc(){
@@ -38,18 +34,6 @@ public enum QueryCEAREnum {
     
     public String getTitle(){
         return title;
-    }
-
-    /**
-     * @return the userRankMinimum
-     */
-    public int getUserRankMinimum() {
-        return userRankMinimum;
-    }
-    
-    
-    public boolean logQueryRun(){
-        return log;
     }
     
     

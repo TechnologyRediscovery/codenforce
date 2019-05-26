@@ -17,11 +17,6 @@ import java.util.List;
 public class QueryCEAR 
         extends Query{
 
-    public Query retrieveQuery() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    
     private List<SearchParamsCEActionRequests> searchParams; 
     private List<CEActionRequest> results;
     
@@ -38,12 +33,6 @@ public class QueryCEAR
         results = new ArrayList<>();
     }
 
-    /**
-     * @return the searchParams
-     */
-    public List<SearchParamsCEActionRequests> getSearchParams() {
-        return searchParams;
-    }
 
    public void addSearchParams(SearchParamsCEActionRequests sp){
        searchParams.add(sp);
@@ -62,20 +51,27 @@ public class QueryCEAR
         return results;
     }
 
-    @Override
-    public List<CEActionRequest> getParamsList() {
-        return results;
-    }
+   
 
     @Override
     public void setParamsList(List l) {
         searchParams = l;
     }
 
-   
+    @Override
+    public List<CEActionRequest> getBOBResultList() {
+        return results;
+    }
 
-   
+    @Override
+    public void setBOBResultList(List l) {
+        results = l;
+    }
 
+    @Override
+    public List<SearchParamsCEActionRequests> getParmsList() {
+        return searchParams;
+    }
     
     
 }

@@ -5,16 +5,37 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
  * @author sylvia
  */
-public class ReportCEARs extends Report implements Serializable{
+public class ReportCEARList 
+        extends Report 
+        implements Serializable{
     
     private boolean printFullCEARQueue;
     private boolean includePhotos;
+    
+    // rember a Query has search params and a List of BOB results
+    private QueryCEAR cearQuery;
+
+    @Override
+    public Query getBOBQuery() {
+        return cearQuery;
+
+    }
+
+    @Override
+    public void setBOBQuery(Query q) {
+        cearQuery = (QueryCEAR) q;
+    }
+    
+    
 
     /**
      * @return the printFullCEARQueue
@@ -43,5 +64,7 @@ public class ReportCEARs extends Report implements Serializable{
     public void setIncludePhotos(boolean includePhotos) {
         this.includePhotos = includePhotos;
     }
+
+   
     
 }

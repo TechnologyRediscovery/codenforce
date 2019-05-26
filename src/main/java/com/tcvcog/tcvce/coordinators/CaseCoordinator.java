@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.PermissionsException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.QueryCEARTitle;
+import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -147,7 +147,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         SearchCoordinator sc = getSearchCoordinator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         
-        return ceari.queryCEARs(sc.buildCEARQuery(QueryCEARTitle.ALL_PAST30, u, m));
+        return ceari.queryCEARs(sc.buildCEARQuery(QueryCEAREnum.ALL_PAST30, u, m));
         
     }
     
@@ -163,8 +163,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public ReportCEARs getInitializedReportConficCEARs(User u, Municipality m){
-        ReportCEARs rpt = new ReportCEARs();
+    public ReportCEARList getInitializedReportConficCEARs(User u, Municipality m){
+        ReportCEARList rpt = new ReportCEARList();
         rpt.setIncludePhotos(true);
         rpt.setPrintFullCEARQueue(false);
         rpt.setCreator(u);

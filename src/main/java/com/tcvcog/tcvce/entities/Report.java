@@ -5,8 +5,10 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.search.Query;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 public abstract class Report 
         extends EntityUtils 
         implements Serializable {
+    
     private String title;
     private LocalDateTime generationTimestamp;
     private String generationTimestampPretty;
@@ -23,8 +26,8 @@ public abstract class Report
     private String notes;
     private boolean sortInRevChrono;
     
-    
-    
+    public abstract Query getBOBQuery();
+    public abstract void setBOBQuery(Query q);
 
     /**
      * @return the title

@@ -5,11 +5,9 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.ReportCEARs;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
+import com.tcvcog.tcvce.entities.Report;
+import com.tcvcog.tcvce.entities.ReportCEARList;
 import java.io.Serializable;
-import java.util.List;
 import javax.annotation.PostConstruct;
 
 /**
@@ -18,10 +16,8 @@ import javax.annotation.PostConstruct;
  */
 public class CEActionRequestsReportBB extends BackingBeanUtils implements Serializable{
 
-     private List<CEActionRequest> requestReportList;
-     private ReportCEARs reportConfig;
-     private QueryCEAR queryCEAR;
-     private boolean validReport;
+     private ReportCEARList reportConfig;
+    
     
     /**
      * Creates a new instance of CEActionRequestsReportBB
@@ -31,64 +27,33 @@ public class CEActionRequestsReportBB extends BackingBeanUtils implements Serial
     
     @PostConstruct
     public void initBean(){
+        Report r = getSessionBean().getActiveReport();
+        if(r instanceof ReportCEARList){
+            reportConfig = (ReportCEARList) r;
+        }
         
     }
 
-    /**
-     * @return the requestReportList
-     */
-    public List<CEActionRequest> getRequestReportList() {
-        return requestReportList;
-    }
 
     /**
      * @return the reportConfig
      */
-    public ReportCEARs getReportConfig() {
+    public ReportCEARList getReportConfig() {
         return reportConfig;
     }
 
-    /**
-     * @return the queryCEAR
-     */
-    public QueryCEAR getQueryCEAR() {
-        return queryCEAR;
-    }
 
-    /**
-     * @return the validReport
-     */
-    public boolean isValidReport() {
-        return validReport;
-    }
+    
 
-    /**
-     * @param requestReportList the requestReportList to set
-     */
-    public void setRequestReportList(List<CEActionRequest> requestReportList) {
-        this.requestReportList = requestReportList;
-    }
 
     /**
      * @param reportConfig the reportConfig to set
      */
-    public void setReportConfig(ReportCEARs reportConfig) {
+    public void setReportConfig(ReportCEARList reportConfig) {
         this.reportConfig = reportConfig;
     }
 
-    /**
-     * @param queryCEAR the queryCEAR to set
-     */
-    public void setQueryCEAR(QueryCEAR queryCEAR) {
-        this.queryCEAR = queryCEAR;
-    }
 
-    /**
-     * @param validReport the validReport to set
-     */
-    public void setValidReport(boolean validReport) {
-        this.validReport = validReport;
-    }
     
     
     

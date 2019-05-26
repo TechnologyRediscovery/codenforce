@@ -13,12 +13,12 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.QueryCEARTitle;
+import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperties;
 import java.io.Serializable;
@@ -47,10 +47,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public List<QueryCEAR> buildCEARQueryList(User u, Municipality m){
-        QueryCEARTitle[] titleArr = QueryCEARTitle.values();
+        QueryCEAREnum[] titleArr = QueryCEAREnum.values();
         List<QueryCEAR> qList = new ArrayList<>();
-        qList.add(buildCEARQuery(QueryCEARTitle.ALL_PAST30, u, m));
-//        for(QueryCEARTitle qTit: titleArr){
+        qList.add(buildCEARQuery(QueryCEAREnum.ALL_PAST30, u, m));
+//        for(QueryCEAREnum qTit: titleArr){
 //            qList.add(buildCEARQuery(qTit, u, m));
 //        }
         return qList;
@@ -59,7 +59,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     
     
-    public QueryCEAR buildCEARQuery(QueryCEARTitle qTitle, User u, Municipality m){
+    public QueryCEAR buildCEARQuery(QueryCEAREnum qTitle, User u, Municipality m){
         QueryCEAR q = new QueryCEAR(m);
         q.setQueryTitle(qTitle.getDesc());
         
@@ -255,7 +255,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public SearchParamsCEEvents getSearchParamsEventsRequiringAction(User u, Municipality muni){
+    public SearchParamsEventCECase getSearchParamsEventsRequiringAction(User u, Municipality muni){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory
@@ -264,7 +264,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         EventCategory timelineEventTypeCategory = ec.getInitializedEventCateogry();
         timelineEventTypeCategory.setEventType(EventType.Timeline);
         
-        SearchParamsCEEvents eventParams = new SearchParamsCEEvents();
+        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
         
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(muni);
@@ -297,12 +297,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return eventParams;
     }
     
-    public SearchParamsCEEvents getSearchParamsOfficerActivity(User u, Municipality m){
+    public SearchParamsEventCECase getSearchParamsOfficerActivity(User u, Municipality m){
         // event types are always bundled in an EventCategory
         // so in this case of this query, we don't care about the Category title,
         // only the type
         
-        SearchParamsCEEvents eventParams = new SearchParamsCEEvents();
+        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
         
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(m);
@@ -343,7 +343,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public SearchParamsCEEvents getSearchParamsComplianceEvPastMonth(Municipality m){
+    public SearchParamsEventCECase getSearchParamsComplianceEvPastMonth(Municipality m){
         EventCoordinator ec = getEventCoordinator();
         
         // event types are always bundled in an EventCategory
@@ -353,7 +353,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         complianceEventCategory.setEventType(EventType.Compliance);
         
         
-        SearchParamsCEEvents eventParams = new SearchParamsCEEvents();
+        SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
         
         eventParams.setFilterByMuni(true);
         eventParams.setMuni(m);
