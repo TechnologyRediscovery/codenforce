@@ -15,10 +15,10 @@
                 <f:view id="CEActionRequestsView">
                     <div class="mainContainer">
                         <h:form id="msgForm">
-                            
-                        <h:messages id="ceActionRequestsMessages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+
+                            <h:messages id="ceActionRequestsMessages" globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
                         </h:form>
 
                         <h1>Code Enforcement Action Requests in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
@@ -28,30 +28,42 @@
                                      columnClasses="gridTd-splitPage, gridTd-splitPage">
 
                             <h:panelGroup styleClass="split-page-list-side">
-                                <h:form id="actionRequestListForm">
+                                <h:form id="cear-query-selector-form">
 
-                                    <h2>Code enforcement action requests</h2>
-                                    
+                                    <h2>Choose a pre-built query</h2>
 
-                                        <p:selectOneMenu id="eventquery-som" 
-                                                         tabindex="1" 
-                                                         value="#{cEActionRequestsBB.selectedQueryCEAR}"
-                                                         style="margin-right: 10px;">
-                                            <f:converter converterId="bOBQueryConverter"/>
-                                            <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
-                                            <f:selectItems id="querylist-si" value="#{cEActionRequestsBB.queryList}" var="q" itemValue="#{q}" itemLabel="#{q.queryTitle}" />
-                                            <p:ajax />
-                                        </p:selectOneMenu>
 
-                                    
-                                    
-                                    <h3>Results below show all unattached action requests. Use advanced search options to specify a different result set.</h3>
+                                    <p:selectOneMenu id="eventquery-som" 
+                                                     tabindex="1" 
+                                                     value="#{cEActionRequestsBB.selectedQueryCEAR}"
+                                                     style="margin-right: 10px;">
+                                        <f:converter converterId="bOBQueryConverter"/>
+                                        <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="querylist-si" value="#{cEActionRequestsBB.queryList}" var="q" itemValue="#{q}" itemLabel="#{q.queryTitle}" />
+                                        <p:ajax />
+                                    </p:selectOneMenu>
+
+                                    <p:commandButton    id="execute-selected-query" 
+                                                        ajax="true"
+                                                        value="perform selected query" 
+                                                        actionListener="#{cEActionRequestsBB.executeQuery}"
+                                                        disabled="false"
+                                                        icon="fa fa-wheelchair-alt"
+                                                        update="
+                                                        search-params-form
+
+                                                        "/>
+
+                                </h:form>
+
+
+                                <h:form id="search-params-form">
 
                                     <p:fieldset legend="Advanced search options"
                                                 toggleable="true" collapsed="true" style="background-color: white; back">
-                                        
+
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                      columnClasses="gridTd-solid-back, gridTd-solid-back">
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back">
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="Query start date "/>
@@ -82,7 +94,7 @@
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="useAttachedToCase" value="#{cEActionRequestsBB.searchParams.useAttachedToCase}" />
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup>
                                                 <p:outputLabel id="attachedToCaseOL" for="attachedToCaseCB" value="Attached to case"/>
                                                 <p:spacer height="5px"/>
@@ -94,7 +106,7 @@
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="useMarkedUrgent" value="#{cEActionRequestsBB.searchParams.useMarkedUrgent}" />
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup>
                                                 <p:outputLabel id="markedUrgentOL" for="useMarkedUrgentcb" value="Safety hazard"/>
                                                 <p:spacer height="5px"/>
@@ -106,7 +118,7 @@
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="useRequestIDCB" value="#{cEActionRequestsBB.searchParams.useRequestID}" />
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup>
                                                 <p:outputLabel id="requestIDOL" for="requestIDIT" value="Request ID:"/>
                                                 <p:spacer height="5px"/>
@@ -120,7 +132,7 @@
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="useActionRequestStatusSB" value="#{cEActionRequestsBB.searchParams.useRequestStatus}" />
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup>
                                                 <p:selectOneMenu id="ceactionrequeststatusmenuSearch" required="false" value="#{cEActionRequestsBB.searchParams.requestStatus}">
                                                     <f:converter converterId="ceActionRequestStatusConverter"/>
@@ -128,13 +140,13 @@
                                                                    var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
- 
+
                                             <h:panelGroup>
                                                 <p:outputLabel id="useNotAtAddressOL" for="useNotAtAddressCB" value="Filter by not at address?"/>
                                                 <p:spacer height="5px"/>
                                                 <p:selectBooleanCheckbox id="useNotAtAddressCB" value="#{cEActionRequestsBB.searchParams.useNotAtAddress}" />
                                             </h:panelGroup>
-                                            
+
                                             <h:panelGroup>
                                                 <p:outputLabel id="notAtAddressOL" for="notAtAddressCB" value="Not at an address"/>
                                                 <p:spacer height="5px"/>
@@ -143,24 +155,21 @@
                                         </h:panelGrid>
                                         <p:spacer height="15px"/>
 
-                                        <p:commandButton ajax="true" value="Update results" actionListener="#{cEActionRequestsBB.updateRequestList}"
-                                                         update="
-                                                         actionRequestListForm:eventDateCalStart
-                                                         actionRequestListForm:eventDateCalEnd
-                                                         actionRequestListForm:useAttachedToCase
-                                                         actionRequestListForm:attachedToCaseCB
-                                                         actionRequestListForm:useMarkedUrgent
-                                                         actionRequestListForm:useMarkedUrgentcb
-                                                         actionRequestListForm:useRequestIDCB
-                                                         actionRequestListForm:requestIDIT
-                                                         actionRequestListForm:useActionRequestStatusSB
-                                                         actionRequestListForm:useNotAtAddressCB
-                                                         actionRequestListForm:notAtAddressCB
-                                                         actionRequestListForm:actionRequestTable"/>
+                                        <p:commandButton    id="custom-query-cb"
+                                                            ajax="true" 
+                                                            value="Execute custom query" 
+                                                            actionListener="#{cEActionRequestsBB.executeQuery}"
+                                                            update="actionRequestListForm
+                                                            msgForm
+                                                            "/>
 
                                     </p:fieldset>
 
-                                    <h2>Code Enforcement Action Requests</h2>
+                                </h:form>
+
+                                <h2>Code Enforcement Action Requests</h2>
+
+                                <h:form id="actionRequestListForm">
                                     <h:messages id="actionQueryMessages" globalOnly="true" showDetail="true" showSummary="true"
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                     </h:messages>
@@ -169,7 +178,7 @@
                                         id="actionRequestTable"
                                         var="r"
                                         rowKey="#{r.requestID}"
-                                        value="#{cEActionRequestsBB.getcEARList}"
+                                        value="#{cEActionRequestsBB.requestList}"
                                         tableStyleClass="primeDataTable"
                                         resizableColumns="true"
                                         reflow="true"
@@ -192,7 +201,7 @@
                                                 <h:outputText value="#{r.issueTypeString}"/>
                                             </div>
                                         </p:column>
-                                        
+
                                         <p:column width="8%">
                                             <f:facet name="header">
                                                 <h:outputText value="Address" />
@@ -201,7 +210,7 @@
                                                 <h:outputText value="#{r.requestProperty.address}"/>
                                             </div>
                                         </p:column>
-                                        
+
                                         <p:column width="10%">
                                             <f:facet name="header">
                                                 <h:outputText value="Status" />
@@ -220,57 +229,26 @@
 
                                         <p:column width="8%">
                                             <p:commandButton actionListener="#{cEActionRequestsBB.manageActionRequest(r)}"
-                                                             ajax="true" value="manage"
-                                                             update="req-details-form:selr-status-ot
-                                                             req-details-form:selr-id
-                                                             req-details-form:selr-issueType
-                                                             req-details-form:selr-prop-address
-                                                             req-details-form:selr-attachedCase
-                                                             req-details-form:selr-prop-muni
-                                                             req-details-form:selr-pacc
-                                                             req-details-form:selr-access-sbcb
-                                                             req-details-form:selr-submitted-ts
-                                                             req-details-form:selr-isurgent
-                                                             req-details-form:selr-persontype
-                                                             req-details-form:selr-pers-fn
-                                                             req-details-form:selr-pers-ln
-                                                             req-details-form:selr-pers-str
-                                                             req-details-form:selr-pers-city
-                                                             req-details-form:selr-pers-state
-                                                             req-details-form:selr-pers-zip
-                                                             req-details-form:selr-pers-phone-cell
-                                                             req-details-form:selr-pers-phone-work
-                                                             req-details-form:selr-pers-email
-                                                             req-details-form:selr-descr
-                                                             req-details-form:selr-notes-internal
-                                                             req-details-form:selr-notes-muni
-                                                             req-details-form:selr-notes-public
-                                                             req-details-form:selr-photos
-                                                             req-details-form:open-new-case-cb
-                                                             req-details-form:attach-to-case-cb
-                                                             req-details-form:no-violation-found-cb
-                                                             req-details-form:invalid-request-cb
-                                                             req-details-form:change-person-cb
-                                                             req-details-form:change-property-cb
-                                                             req-details-form:manually-override-status-cb
-                                                             req-details-form:header-id-ot
-                                                             req-details-form:header-type-ot
-                                                             req-details-form:header-addr-ot
-                                                             req-details-form:header-muni-ot
+                                                             ajax="true" 
+                                                             value="manage"
+                                                             icon="fa fa-hand-o-right"
+                                                             update="
+                                                             req-details-form
+                                                             msgForm
                                                              "/>
                                         </p:column>
                                     </p:dataTable>
 
                                     <p:spacer height="15px"/>
-                                    
-                                    
-                                    <p:chart type="donut" model="#{cEActionRequestsBB.getcEARReasonDonut}" style="width:600px; height: 600px;"/>
+
+
+                                    <p:chart type="donut" model="#{cEActionRequestsBB.cEARReasonDonut}" style="width:600px; height: 600px;"/>
 
 
                                     <p:commandLink value="Export table as pdf report" ajax="false">
                                         <p:dataExporter type="pdf" target="actionRequestTable" fileName="actionRequestReport_#{sessionBean.activeMuni.muniName}"/>
                                     </p:commandLink>
-                                    
+
                                 </h:form>
 
                             </h:panelGroup>
@@ -283,21 +261,21 @@
                                         <h:outputText id="header-type-ot" value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
                                         at <h:outputText id="header-addr-ot" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address} "/>  
                                         <h:outputText id="header-muni-ot" value="(#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName})"/>  
-                                    
+
                                     </h2>
 
                                     <h:outputLabel styleClass="bold" value="Status:"/>
                                     <p:spacer height="5px"/>
-                                    
+
                                     <h:outputText id="selr-status-ot" value="#{cEActionRequestsBB.selectedRequest.requestStatus.statusTitle}"/>
-                                    
-                                    
+
+
                                     <p:spacer height="15px"/>
-                                    
+
                                     <h:outputLabel styleClass="bold" value="Available actions:"/>
 
                                     <p:spacer height="5px"/>
-                                    
+
                                     <p:commandButton    id="open-new-case-cb"
                                                         ajax="false" value="Open new code enf case at this property" 
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
@@ -306,7 +284,7 @@
                                                         update="ceActionRequestsMessages" icon="fa fa-folder" 
                                                         styleClass="cear-actions-button"/>
                                     <p:spacer height="5px"/>
-                                    
+
                                     <p:commandButton    id="attach-to-case-cb"
                                                         value="Attach to existing code enf case"
                                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
@@ -315,8 +293,8 @@
                                                         update="attach-to-existing-case-form:cases-on-selected-request-property-DS"
                                                         icon="fa fa-book" />
                                     <p:spacer height="5px"/>
-                                    
-                                    
+
+
                                     <p:commandButton    id="no-violation-found-cb"
                                                         value="No violation found on site"
                                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
@@ -330,252 +308,256 @@
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('invalid-dialog').show()"
                                                         icon="fa fa-exclamation-circle"/>
-                                    
-                                    
+
+
                                     <p:spacer height="5px" />
                                     <hr />
                                     <p:spacer height="5px" />
 
                                     <p:commandButton    id="print-singleCAR-cb"
                                                         value="Print request"
-                                                        
+                                                        actionListener="#{cEActionRequestsBB.prepareReport}"
                                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
                                                         disabled="false"
-                                                        onclick="PF('cear-print-dialog-var').show()"
-                                                        icon="fa fa-print"/>
+                                                        oncomplete="PF('cear-print-dialog-var').show()"
+                                                        icon="fa fa-print"
+                                                        update="cear-print-form"
+                                                        />
 
                                     <p:spacer height="5px"/>
-                                    
-                                    <p:commandButton      id="attach-internal-note-cb"
-                                                            onclick="PF('muni-message-dialog').show()" 
-                                                             value="Attach internal note"
-                                                             icon="fa fa-pencil-square-o"
-                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
 
-                                 
-                                    
-                                    
+                                    <p:commandButton      
+                                                          id="attach-internal-note-cb"
+                                                          onclick="PF('muni-message-dialog').show()" 
+                                                          
+                                                          value="Attach internal note"
+                                                          icon="fa fa-pencil-square-o"
+                                                          rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
 
-                                <div class="outlinedBox">
-                                    <h3>Code Enforcement Action Request</h3>
-                                    <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                 columnClasses="gridTd, gridTd" id="selectedRequestDetails">
 
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="ID"/>
-                                            <p:spacer height="5px"/>
-                                            <div class="wrapText">
-                                                <h:outputText id="selr-id" value="#{cEActionRequestsBB.selectedRequest.requestID}"/>
-                                            </div>
-                                        </h:panelGroup>
 
-                                        <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Issue Type" />
-                                            <p:spacer height="5px"/>
-                                            <div class="wrapText">
-                                                <h:outputText id="selr-issueType" value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
-                                            </div>
-                                        </h:panelGroup>
 
-                                        <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Attached to CE case?" />
-                                            <p:spacer height="5px"/>
-                                            <div class="wrapText">
-                                                <h:outputText id="selr-attachedCase" 
-                                                              value="#{cEActionRequestsBB.selectedRequest.caseID == 0 ? null : cEActionRequestsBB.selectedRequest.caseID}"/>
-                                            </div>
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            
-                                        </h:panelGroup>
 
-                                        <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Address" />
-                                            <p:spacer height="5px"/>
-                                            <div class="rowExpansion">
-                                                <h:outputText id="selr-prop-address" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/><br/>
-                                                <h:outputText id="selr-prop-muni" value="#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
-                                            </div>
-                                            <p:spacer height="5px"/>
-                                            
-                                            <p:commandButton    id="change-property-cb" 
-                                                                onclick="PF('change-property-dialog').show()" 
-                                                                 value="change request property" 
+                                    <div class="outlinedBox">
+                                        <h3>Code Enforcement Action Request</h3>
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd" id="selectedRequestDetails">
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="ID"/>
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText">
+                                                    <h:outputText id="selr-id" value="#{cEActionRequestsBB.selectedRequest.requestID}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Issue Type" />
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText">
+                                                    <h:outputText id="selr-issueType" value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Attached to CE case?" />
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText">
+                                                    <h:outputText id="selr-attachedCase" 
+                                                                  value="#{cEActionRequestsBB.selectedRequest.caseID == 0 ? null : cEActionRequestsBB.selectedRequest.caseID}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Address" />
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selr-prop-address" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/><br/>
+                                                    <h:outputText id="selr-prop-muni" value="#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
+                                                </div>
+                                                <p:spacer height="5px"/>
+
+                                                <p:commandButton    id="change-property-cb" 
+                                                                    onclick="PF('change-property-dialog').show()" 
+                                                                    value="change request property" 
+                                                                    styleClass="noFill button-size-small"
+                                                                    disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                                    icon="fa fa-home"
+                                                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"/>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Public access reference num" />
+                                                <div class="rowExpansion">
+                                                    <h:outputText id="selr-pacc" value="#{cEActionRequestsBB.selectedRequest.requestPublicCC}"/>
+                                                </div>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="selr-access-sbcb" value="#{cEActionRequestsBB.selectedRequest.paccEnabled}"
+                                                                         disabled="#{cEActionRequestsBB.disablePACCControl}">
+                                                    <p:ajax listener="#{cEActionRequestsBB.changePACCAccess}" update="msgForm:ceActionRequestsMessages" />
+                                                </p:selectBooleanCheckbox>
+                                                <h:outputText value=" Allow access using ref num?"/>
+                                                <p:spacer height="5px"/>
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Date Submitted" />
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText">
+                                                    <h:outputText id="selr-submitted-ts"  value="#{cEActionRequestsBB.selectedRequest.formattedSubmittedTimeStamp}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <div class="wrapText">
+                                                    <h:outputLabel styleClass="bold" value="Human safety issue?"/>
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText id="selr-isurgent"  value="#{cEActionRequestsBB.selectedRequest.isUrgent}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+
+                                                <div class="wrapText">
+                                                    <h:outputLabel id="selr-persontype" styleClass="bold" value="Requestor ID:#{cEActionRequestsBB.selectedRequest.requestor.personID} 
+                                                                   (#{cEActionRequestsBB.selectedRequest.requestor.personType.label}): "/>
+                                                    <p:spacer height="5px"/>
+
+                                                    <h:outputText id="selr-pers-fn" value="#{cEActionRequestsBB.selectedRequest.requestor.firstName}" />
+                                                    <h:outputText id="selr-pers-ln" value="#{cEActionRequestsBB.selectedRequest.requestor.lastName}"/><br/> 
+                                                    <h:outputText id="selr-pers-str" value="#{cEActionRequestsBB.selectedRequest.requestor.addressStreet}"/> <br/>
+                                                    <h:outputText id="selr-pers-city" value="#{cEActionRequestsBB.selectedRequest.requestor.addressCity}, "/> 
+                                                    <h:outputText id="selr-pers-state" value="#{cEActionRequestsBB.selectedRequest.requestor.addressState}"/>                                            
+                                                    <h:outputText id="selr-pers-zip" value="#{cEActionRequestsBB.selectedRequest.requestor.addressZip}"/> 
+
+                                                </div>
+                                                <p:spacer height="5px"/>
+                                                <p:commandButton    id="change-person-cb"
+                                                                    onclick="PF('change-person-dialog').show()" 
+                                                                    value="change requestor Person" 
+                                                                    styleClass="noFill button-size-small" 
+                                                                    icon="fa fa-child"
+                                                                    disabled="#{empty cEActionRequestsBB.selectedRequest}"
+                                                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" />
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Contact: "/>
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText"> 
+                                                    <h:outputText value="Phone (cell): "/>
+                                                    <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneCell}"/> <br/>
+                                                    <h:outputText value="Phone (work): "/>
+                                                    <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneWork}"/> 
+                                                    <h:outputText value="Phone (home): "/>
+                                                    <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneHome}"/> <br/>
+                                                    <h:outputText value="Email: "/>
+                                                    <h:outputText id="selr-pers-email" value="#{cEActionRequestsBB.selectedRequest.requestor.email}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+
+
+                                            <f:facet name="footer" class="leftalign">
+                                                <h:outputLabel styleClass="bold" value="Request description:"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selr-descr" escape="false" value="#{cEActionRequestsBB.selectedRequest.requestDescription}"/>
+                                                </div>
+
+                                                <p:spacer height="5px"/>
+                                                <hr />
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel id="selr-photos" styleClass="bold" value="Photos on request: #{cEActionRequestsBB.selectedRequest.photoList.size()}"/>
+                                                <p:commandButton onclick="PF('photo-dialog').show()" 
+                                                                 icon="fa fa-pencil-square-o"
+                                                                 value="view photos" 
                                                                  styleClass="noFill button-size-small"
-                                                                 disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
-                                                                 icon="fa fa-home"
-                                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"/>
-                                        </h:panelGroup>
+                                                                 update="photo-form:photoTable"
+                                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
 
-                                        <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Public access reference num" />
-                                            <div class="rowExpansion">
-                                                <h:outputText id="selr-pacc" value="#{cEActionRequestsBB.selectedRequest.requestPublicCC}"/>
-                                            </div>
-                                            <p:spacer height="5px"/>
-                                            <p:selectBooleanCheckbox id="selr-access-sbcb" value="#{cEActionRequestsBB.selectedRequest.paccEnabled}"
-                                                                     disabled="#{cEActionRequestsBB.disablePACCControl}">
-                                                <p:ajax listener="#{cEActionRequestsBB.changePACCAccess}" update="msgForm:ceActionRequestsMessages" />
-                                            </p:selectBooleanCheckbox>
-                                            <h:outputText value=" Allow access using ref num?"/>
-                                            <p:spacer height="5px"/>
-                                            
-                                        </h:panelGroup>
-                                        
-                                        <h:panelGroup>
-                                            <h:outputLabel class="bold" value="Date Submitted" />
-                                            <p:spacer height="5px"/>
-                                            <div class="wrapText">
-                                                <h:outputText id="selr-submitted-ts"  value="#{cEActionRequestsBB.selectedRequest.formattedSubmittedTimeStamp}"/>
-                                            </div>
-                                        </h:panelGroup>
 
-                                        <h:panelGroup>
-                                            <div class="wrapText">
-                                                <h:outputLabel styleClass="bold" value="Human safety issue?"/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText id="selr-isurgent"  value="#{cEActionRequestsBB.selectedRequest.isUrgent}"/>
-                                            </div>
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-
-                                            <div class="wrapText">
-                                                <h:outputLabel id="selr-persontype" styleClass="bold" value="Requestor ID:#{cEActionRequestsBB.selectedRequest.requestor.personID} 
-                                                               (#{cEActionRequestsBB.selectedRequest.requestor.personType.label}): "/>
+                                                <hr />
                                                 <p:spacer height="5px"/>
 
-                                                <h:outputText id="selr-pers-fn" value="#{cEActionRequestsBB.selectedRequest.requestor.firstName}" />
-                                                              <h:outputText id="selr-pers-ln" value="#{cEActionRequestsBB.selectedRequest.requestor.lastName}"/><br/> 
-                                                <h:outputText id="selr-pers-str" value="#{cEActionRequestsBB.selectedRequest.requestor.addressStreet}"/> <br/>
-                                                <h:outputText id="selr-pers-city" value="#{cEActionRequestsBB.selectedRequest.requestor.addressCity}, "/> 
-                                                <h:outputText id="selr-pers-state" value="#{cEActionRequestsBB.selectedRequest.requestor.addressState}"/>                                            
-                                                <h:outputText id="selr-pers-zip" value="#{cEActionRequestsBB.selectedRequest.requestor.addressZip}"/> 
-
-                                            </div>
-                                            <p:spacer height="5px"/>
-                                            <p:commandButton    id="change-person-cb"
-                                                                onclick="PF('change-person-dialog').show()" 
-                                                                value="change requestor Person" 
-                                                                styleClass="noFill button-size-small" 
-                                                                icon="fa fa-child"
-                                                                disabled="#{empty cEActionRequestsBB.selectedRequest}"
-                                                                rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" />
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Contact: "/>
-                                            <p:spacer height="5px"/>
-                                            <div class="wrapText"> 
-                                                <h:outputText value="Phone (cell): "/>
-                                                <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneCell}"/> <br/>
-                                                <h:outputText value="Phone (work): "/>
-                                                <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneWork}"/> 
-                                                <h:outputText value="Phone (home): "/>
-                                                <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneHome}"/> <br/>
-                                                <h:outputText value="Email: "/>
-                                                <h:outputText id="selr-pers-email" value="#{cEActionRequestsBB.selectedRequest.requestor.email}"/>
-                                            </div>
-                                        </h:panelGroup>
-
-
-
-                                        <f:facet name="footer" class="leftalign">
-                                            <h:outputLabel styleClass="bold" value="Request description:"/>
-                                            <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selr-descr" escape="false" value="#{cEActionRequestsBB.selectedRequest.requestDescription}"/>
-                                            </div>
-                                            
-                                            <p:spacer height="5px"/>
-                                            <hr />
-                                            <p:spacer height="5px"/>
-                                            
-                                            <h:outputLabel id="selr-photos" styleClass="bold" value="Photos on request: #{cEActionRequestsBB.selectedRequest.photoList.size()}"/>
-                                            <p:commandButton onclick="PF('photo-dialog').show()" 
-                                                             icon="fa fa-pencil-square-o"
-                                                             value="view photos" 
-                                                             styleClass="noFill button-size-small"
-                                                             update="photo-form:photoTable"
-                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
-                                            
-
-                                            <p:spacer height="5px"/>
-                                            <hr />
-                                            <p:spacer height="5px"/>
-                                            
-                                            <h:outputLabel styleClass="bold" value="Officer-only notes: "/>
-                                            <p:commandButton onclick="PF('internal-message-dialog').show()" 
-                                                             icon="fa fa-pencil-square-o"
-                                                             value="new note" 
-                                                             styleClass="noFill button-size-small" 
-                                                             rendered="#{sessionBean.facesUser.keyCard.hasCOGStaffPermissions}" />
+                                                <h:outputLabel styleClass="bold" value="Officer-only notes: "/>
+                                                <p:commandButton onclick="PF('internal-message-dialog').show()" 
+                                                                 icon="fa fa-pencil-square-o"
+                                                                 value="new note" 
+                                                                 styleClass="noFill button-size-small" 
+                                                                 rendered="#{sessionBean.facesUser.keyCard.hasCOGStaffPermissions}" />
                                                 <p:spacer height="5px"/>
-                                            <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selr-notes-internal" escape="false" value="#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
-                                            </div>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selr-notes-internal" escape="false" value="#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
+                                                </div>
 
-                                            <p:spacer height="5px"/>
-                                            <hr />
-                                            <p:spacer height="5px"/>
-                                            
-                                            <h:outputLabel styleClass="bold" value="System internal only"/>
-                                            <p:commandButton onclick="PF('muni-message-dialog').show()" 
-                                                             value="new note"
-                                                             icon="fa fa-pencil-square-o"
-                                                             styleClass="noFill button-size-small" 
-                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
-                                            <p:spacer height="5px"/>
-                                            <div class="rowExpansion" style="leftalign">
-                                                <h:outputText id="selr-notes-muni" escape="false" value="#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
-                                            </div>
-                                            
-                                            <p:spacer height="5px"/>
-                                            <hr />
-                                            <p:spacer height="5px"/>
-                                            
-                                            <h:outputLabel styleClass="bold" value="Public notes: "/>
-                                            <p:commandButton onclick="PF('public-message-dialog').show()" 
-                                                             value="new note" 
-                                                             icon="fa fa-pencil-square-o"
-                                                             styleClass="noFill button-size-small" 
-                                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" />
+                                                <p:spacer height="5px"/>
+                                                <hr />
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="System internal only"/>
+                                                <p:commandButton onclick="PF('muni-message-dialog').show()" 
+                                                                 value="new note"
+                                                                 icon="fa fa-pencil-square-o"
+                                                                 styleClass="noFill button-size-small" 
+                                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
+                                                <p:spacer height="5px"/>
+                                                <div class="rowExpansion" style="leftalign">
+                                                    <h:outputText id="selr-notes-muni" escape="false" value="#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
+                                                </div>
+
+                                                <p:spacer height="5px"/>
+                                                <hr />
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Public notes: "/>
+                                                <p:commandButton onclick="PF('public-message-dialog').show()" 
+                                                                 value="new note" 
+                                                                 icon="fa fa-pencil-square-o"
+                                                                 styleClass="noFill button-size-small" 
+                                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" />
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
                                                     <h:outputText id="selr-notes-public" escape="false" value="#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
                                                 </div>
-                                        </f:facet>
-                                    </h:panelGrid>
-                                </div>
-                                    
+                                            </f:facet>
+                                        </h:panelGrid>
+                                    </div>
+
                                     <p:spacer height="5px"/>
 
-                                    
+
                                     <p:commandButton    id="manually-override-status-cb"
                                                         value="Manually override request status"
                                                         rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
                                                         disabled="#{empty cEActionRequestsBB.selectedRequest}"
                                                         onclick="PF('override-request-status-dialog').show()"
                                                         icon="fa fa-gears"/>
-                                    
+
                                     <p:spacer height="5px"/>
-                                    
-                                    
+
+
                                 </h:form>
                             </h:panelGroup>
                         </h:panelGrid>
-                        
-                        
 
-                        
-                        
+
+
+
+
                         <p:confirmDialog message="Attach request to existing case" 
                                          severity="alert" widgetVar="attach-to-case-dialog"
                                          closable="true"
                                          rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="attach-to-existing-case-form">
-                                
+
                                 <p>Choose an existing case on <h:outputLabel for="invalidMessageITA" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>:</p>
                                 <p:dataScroller
                                     id="cases-on-selected-request-property-DS"
@@ -601,11 +583,11 @@
                                                      value="Cancel" icon="fa fa-stop" 
                                                      onclick="PF('attach-to-case-dialog').hide()"/>
                                     <hr/>
-                                    
+
                                 </p:dataScroller>
                             </h:form>
                         </p:confirmDialog>
-                        
+
                         <p:confirmDialog message="Mark request as invalid" 
                                          severity="alert" widgetVar="invalid-dialog"
                                          closable="true"
@@ -632,9 +614,9 @@
                                                  onclick="PF('invalid-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
-                        
-                        
-                        
+
+
+
                         <p:confirmDialog message="Mark request: No Violation Found" 
                                          severity="alert" widgetVar="no-violation-found-dialog"
                                          closable="true"
@@ -661,78 +643,78 @@
                                                  onclick="PF('no-violation-found-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
-                        
+
                         <p:confirmDialog message="Override request status" 
                                          severity="alert" widgetVar="override-request-status-dialog"
                                          closable="true"
                                          rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="override-request-status-form">
-                                    
-                                    <h:outputLabel styleClass="bold" for="ceactionrequeststatusmenu" value="Change status to:"/>
-                                    
-                                    <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{cEActionRequestsBB.selectedChangeToStatus}">
-                                        <f:converter converterId="ceActionRequestStatusConverter"/>
-                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                        <f:selectItems value="#{cEActionRequestsBB.statusList}"
-                                                       var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
-                                    </p:selectOneMenu>
-                                    
-                                    <p:commandButton    id="change-request-status-cb"
-                                                        ajax="true" value="Change request status" 
-                                                        actionListener="#{cEActionRequestsBB.updateActionRequestStatus}"
-                                                        update="actionRequestListForm:actionRequestTable
-                                                        req-details-form:selr-status-ot
-                                                        req-details-form:selr-notes-public"
-                                                        oncomplete="PF('override-request-status-dialog').hide()"/>
+
+                                <h:outputLabel styleClass="bold" for="ceactionrequeststatusmenu" value="Change status to:"/>
+
+                                <p:selectOneMenu id="ceactionrequeststatusmenu" required="false" value="#{cEActionRequestsBB.selectedChangeToStatus}">
+                                    <f:converter converterId="ceActionRequestStatusConverter"/>
+                                    <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems value="#{cEActionRequestsBB.statusList}"
+                                                   var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
+                                </p:selectOneMenu>
+
+                                <p:commandButton    id="change-request-status-cb"
+                                                    ajax="true" value="Change request status" 
+                                                    actionListener="#{cEActionRequestsBB.updateActionRequestStatus}"
+                                                    update="actionRequestListForm:actionRequestTable
+                                                    req-details-form:selr-status-ot
+                                                    req-details-form:selr-notes-public"
+                                                    oncomplete="PF('override-request-status-dialog').hide()"/>
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
                                                  onclick="PF('manage-public-access-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
 
-                        
+
                         <ui:remove>
-                            
-                        
-                        <p:confirmDialog message="Manage public access" 
-                                         severity="alert" widgetVar="manage-public-access-dialog"
-                                         closable="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
 
-                            <h:form id="manage-public-access-form">
-                                
-                                
-                                <p:spacer height="15px"/>
-                                <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.changePACCAccess}"
-                                                 value="Save" icon="fa fa-link" oncomplete="PF('manage-public-access-dialog').hide()"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                 update="req-details-form:selr-notes-public
-                                                 msgForm:ceActionRequestsMessages"/>
-                                <p:commandButton ajax="true" 
-                                                 value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('manage-public-access-dialog').hide()"/>
-                            </h:form>
-                        </p:confirmDialog>
-                        
+
+                            <p:confirmDialog message="Manage public access" 
+                                             severity="alert" widgetVar="manage-public-access-dialog"
+                                             closable="true"
+                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+
+                                <h:form id="manage-public-access-form">
+
+
+                                    <p:spacer height="15px"/>
+                                    <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.changePACCAccess}"
+                                                     value="Save" icon="fa fa-link" oncomplete="PF('manage-public-access-dialog').hide()"
+                                                     rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                     update="req-details-form:selr-notes-public
+                                                     msgForm:ceActionRequestsMessages"/>
+                                    <p:commandButton ajax="true" 
+                                                     value="Cancel" icon="fa fa-stop" 
+                                                     onclick="PF('manage-public-access-dialog').hide()"/>
+                                </h:form>
+                            </p:confirmDialog>
+
                         </ui:remove>
-                        
+
                         <p:confirmDialog message="Change property" 
                                          severity="alert" widgetVar="change-property-dialog"
                                          closable="true"
                                          rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="change-property-form">
-                               
-                                    
-                                
-                            <p:selectOneMenu id="muniSelectMenu" 
-                                             tabindex="1" 
-                                             value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
-                                <f:converter converterId="muniConverter"/>
-                                <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
-                                <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                            </p:selectOneMenu>
+
+
+
+                                <p:selectOneMenu id="muniSelectMenu" 
+                                                 tabindex="1" 
+                                                 value="#{cEActionRequestsBB.muniForPropSwitchSearch}">
+                                    <f:converter converterId="muniConverter"/>
+                                    <f:selectItem itemLabel="select one..." noSelectionOption="true"  itemDisabled="true"/>
+                                    <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                </p:selectOneMenu>
 
                                 <p:panelGrid columns="3" layout="grid">
 
@@ -763,114 +745,114 @@
                                             value="Search in Selected Municipality" tabindex="4" ajax="true" icon="fa fa-search"
                                             actionListener="#{cEActionRequestsBB.searchForProperties}" 
                                             update=    "change-property-form:propSearchHouseNumIT
-                                                        change-property-form:propSearchStreetIT
-                                                        change-property-form:propertyResultTable"/>
+                                            change-property-form:propSearchStreetIT
+                                            change-property-form:propertyResultTable"/>
                                     </h:panelGroup>
 
                                 </p:panelGrid> 
 
-                                 <h3>Search Results:</h3>
-                                        <p>Click to select the desired property or try your search again</p>
+                                <h3>Search Results:</h3>
+                                <p>Click to select the desired property or try your search again</p>
 
-                                        <p:dataTable
-                                            id="propertyResultTable"
-                                            var="prop" 
-                                            value="#{cEActionRequestsBB.propertyList}"
-                                            selectionMode="single" tabindex="5"
-                                            scrollable="true" scrollHeight="150" 
-                                            selection="#{cEActionRequestsBB.propertyForPropSwitch}"
-                                            rowKey="#{prop.propertyID}">
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Address" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.address}"/>
-                                            </p:column>
-                                            <p:column>
+                                <p:dataTable
+                                    id="propertyResultTable"
+                                    var="prop" 
+                                    value="#{cEActionRequestsBB.propertyList}"
+                                    selectionMode="single" tabindex="5"
+                                    scrollable="true" scrollHeight="150" 
+                                    selection="#{cEActionRequestsBB.propertyForPropSwitch}"
+                                    rowKey="#{prop.propertyID}">
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.address}"/>
+                                    </p:column>
+                                    <p:column>
 
-                                                <f:facet name="header">
-                                                    <h:outputText value="Municipality" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.muni.muniName}"/>
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.muni.muniName}"/>
 
-                                            </p:column>
+                                    </p:column>
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Type" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.propertyUseType}"/>
-                                            </p:column>
-                                        </p:dataTable>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyUseType}"/>
+                                    </p:column>
+                                </p:dataTable>
 
-                                        <p:spacer height="10px"/>
+                                <p:spacer height="10px"/>
 
-                                    <p:commandButton value="Assign request to selected property"
-                                                     actionListener="#{cEActionRequestsBB.updateRequestProperty}"
-                                                     rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                     update="   msgForm:ceActionRequestsMessages
-                                                                req-details-form:selr-prop-address
-                                                                req-details-form:selr-prop-muni
-                                                                actionRequestListForm:actionRequestTable
-                                                                req-details-form:selr-status-ot"
-                                                     oncomplete="PF('change-property-dialog').hide()"/>
-                                    <p:commandButton ajax="true" 
-                                                     value="Cancel" icon="fa fa-stop" 
-                                                     onclick="PF('change-property-dialog').hide()"/>
-                                    <hr/>
-                                    
+                                <p:commandButton value="Assign request to selected property"
+                                                 actionListener="#{cEActionRequestsBB.updateRequestProperty}"
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                 update="   msgForm:ceActionRequestsMessages
+                                                 req-details-form:selr-prop-address
+                                                 req-details-form:selr-prop-muni
+                                                 actionRequestListForm:actionRequestTable
+                                                 req-details-form:selr-status-ot"
+                                                 oncomplete="PF('change-property-dialog').hide()"/>
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('change-property-dialog').hide()"/>
+                                <hr/>
+
                             </h:form>
                         </p:confirmDialog>
-                        
-                        
+
+
                         <p:dialog       height="650" width="700"
                                         widgetVar="change-person-dialog"
                                         closable="true" 
                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
-                            
+
                             <h3>Search for a different person</h3>
-                            
+
                             <h:form id="change-person-form">
-                                  
+
                                 <h:messages id="person-search-messages" globalOnly="true" showDetail="true" showSummary="true"
                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                 </h:messages>
-                                
-                                
+
+
                                 <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd-solid-back, gridTd-solid-back">
+                                             columnClasses="gridTd-solid-back, gridTd-solid-back">
 
                                     <h:panelGroup>
                                         <p:outputLabel for="muniSelectMenu-person">
                                             <h:outputText value="Municipality:"/>
                                         </p:outputLabel>
 
-                                            <p:selectOneMenu id="muniSelectMenu-person" 
-                                                             tabindex="1" 
-                                                             value="#{personBB.searchParams.muni}">
-                                                <f:converter converterId="muniConverter"/>
-                                                <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
-                                                <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                            </p:selectOneMenu>
+                                        <p:selectOneMenu id="muniSelectMenu-person" 
+                                                         tabindex="1" 
+                                                         value="#{personBB.searchParams.muni}">
+                                            <f:converter converterId="muniConverter"/>
+                                            <f:selectItem itemLabel="select muni..." noSelectionOption="true"  itemDisabled="true"/>
+                                            <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                        </p:selectOneMenu>
                                     </h:panelGroup>
-                                    
+
                                     <h:panelGroup class="spacer"></h:panelGroup>    
-                                    
+
 
                                     <h:panelGroup>
                                         <p:outputLabel id="filter-by-fname-ol" for="filter-by-fname-cb" value="Filter by first name?"/>
                                         <p:spacer height="5px"/>
                                         <p:selectBooleanCheckbox id="filter-by-fname-cb" value="#{personBB.searchParams.filterByFirstName}" />
                                     </h:panelGroup>
-                                    
+
                                     <h:panelGroup>
                                         <p:outputLabel for="formFirstName-person">
                                             <h:outputText value="First Name"/>
                                         </p:outputLabel>
                                         <p:inputText id="formFirstName-person" value="#{personBB.searchParams.firstNameSS}" 
-                                              style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
+                                                     style="width: 200px;" tabindex="1" required="false" styleClass="inputText"/>
                                         <h:message for="formFirstName-person" showDetail="false" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
 
                                     <h:panelGroup>
@@ -878,15 +860,15 @@
                                         <p:spacer height="5px"/>
                                         <p:selectBooleanCheckbox id="filter-by-lname-cb" value="#{personBB.searchParams.filterByLastName}" />
                                     </h:panelGroup>
-                                    
+
                                     <h:panelGroup id="lname-person-person">
                                         <p:outputLabel for="formLastName-person">
                                             <h:outputText value="Last Name"/>
                                         </p:outputLabel>
                                         <p:inputText id="formLastName-person" value="#{personBB.searchParams.lastNameSS}" 
-                                              style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
+                                                     style="width: 200px;" tabindex="4" required="false" styleClass="inputText"/>
                                         <h:message for="formLastName-person" showDetail="false" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
 
 
@@ -895,34 +877,34 @@
                                         <p:spacer height="5px"/>
                                         <p:selectBooleanCheckbox id="filter-by-personid-cb" value="#{personBB.searchParams.filterByObjectID}" />
                                     </h:panelGroup>
-                                    
-                                    
-                                    
+
+
+
                                     <h:panelGroup id="personID">
                                         <p:outputLabel for="formPersonID">
                                             <h:outputText value="Person ID number"/>
                                         </p:outputLabel>
                                         <p:inputText id="formPersonID" value="#{personBB.searchParams.objectID}" 
-                                              style="width: 25%;" tabindex="3" required="true" styleClass="inputText"/>
+                                                     style="width: 25%;" tabindex="3" required="true" styleClass="inputText"/>
                                         <h:message for="formPersonID" showDetail="false" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     </h:panelGroup>
                                 </h:panelGrid>
-                                
+
                                 <p:commandButton
-                                            value="Search for Persons" tabindex="4" ajax="true" icon="fa fa-search"
-                                            actionListener="#{personBB.searchForPersons}" 
-                                            update=    "change-person-form:filter-by-personid-cb
-                                                        change-person-form:formPersonID
-                                                        change-person-form:filter-by-fname-cb
-                                                        change-person-form:formFirstName-person
-                                                        change-person-form:filter-by-lname-cb
-                                                        change-person-form:formLastName-person
-                                                        change-person-form:muniSelectMenu-person
-                                                        change-person-form:personTable
-                                                        change-person-form:person-search-messages
-                                                        "/>
+                                    value="Search for Persons" tabindex="4" ajax="true" icon="fa fa-search"
+                                    actionListener="#{personBB.searchForPersons}" 
+                                    update=    "change-person-form:filter-by-personid-cb
+                                    change-person-form:formPersonID
+                                    change-person-form:filter-by-fname-cb
+                                    change-person-form:formFirstName-person
+                                    change-person-form:filter-by-lname-cb
+                                    change-person-form:formLastName-person
+                                    change-person-form:muniSelectMenu-person
+                                    change-person-form:personTable
+                                    change-person-form:person-search-messages
+                                    "/>
                                 <h3>Chosen Person:</h3>
                                 <h:outputText id="confirm-person-ot" value="ID #{cEActionRequestsBB.selectedPersonForAttachment.personID}: 
                                               #{cEActionRequestsBB.selectedPersonForAttachment.lastName} "/>
@@ -933,19 +915,19 @@
                                                  actionListener="#{cEActionRequestsBB.updateRequestor}"
                                                  disabled="#{!sessionBean.facesUser.keyCard.hasCOGStaffPermissions}"
                                                  update="   msgForm:ceActionRequestsMessages
-                                                            req-details-form:selr-persontype
-                                                            req-details-form:selr-pers-fn
-                                                            req-details-form:selr-pers-ln
-                                                            req-details-form:selr-pers-str
-                                                            req-details-form:selr-pers-city
-                                                            req-details-form:selr-pers-state
-                                                            req-details-form:selr-pers-zip
-                                                            req-details-form:selr-pers-phone-cell
-                                                            req-details-form:selr-pers-phone-work
-                                                            req-details-form:selr-pers-phone-home
-                                                            req-details-form:selr-pers-email"
+                                                 req-details-form:selr-persontype
+                                                 req-details-form:selr-pers-fn
+                                                 req-details-form:selr-pers-ln
+                                                 req-details-form:selr-pers-str
+                                                 req-details-form:selr-pers-city
+                                                 req-details-form:selr-pers-state
+                                                 req-details-form:selr-pers-zip
+                                                 req-details-form:selr-pers-phone-cell
+                                                 req-details-form:selr-pers-phone-work
+                                                 req-details-form:selr-pers-phone-home
+                                                 req-details-form:selr-pers-email"
                                                  oncomplete="PF('change-person-dialog').hide()"/>
-                                
+
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
                                                  onclick="PF('change-person-dialog').hide()"/>
@@ -955,17 +937,17 @@
                                 <h2>Search Results</h2>
 
                                 <p:dataTable
-                                id="personTable"
-                                var="p"
-                                value="#{personBB.personList}"
-                                rowKey="#{p.personID}"
-                                tableStyleClass="primeDataTable"
-                                scrollable="true"
-                                scrollHeight="300"
-                                rowExpandMode="single"
-                                expandedRow="false"
-                                filteredValue="#{personBB.filteredPersonList}"
-                                widgetVar="personSelectListTable">
+                                    id="personTable"
+                                    var="p"
+                                    value="#{personBB.personList}"
+                                    rowKey="#{p.personID}"
+                                    tableStyleClass="primeDataTable"
+                                    scrollable="true"
+                                    scrollHeight="300"
+                                    rowExpandMode="single"
+                                    expandedRow="false"
+                                    filteredValue="#{personBB.filteredPersonList}"
+                                    widgetVar="personSelectListTable">
                                     <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
                                     <p:column width="3%">
@@ -1030,141 +1012,141 @@
                                     <p:rowExpansion>
                                         <div class="outlinedBox">
 
-                                        <h2>Full person listing for <h:outputText value="#{p.firstName} #{p.lastName}"/> </h2>
-                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                            <h2>Full person listing for <h:outputText value="#{p.firstName} #{p.lastName}"/> </h2>
+                                            <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="gridTd, gridTd, gridTd, gridTd">
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="First Name"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.firstName}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="First Name"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.firstName}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Last Name"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.lastName}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Last Name"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.lastName}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Muni"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.muni.muniName}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Muni"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.muni.muniName}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Type"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.personType.label}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Type"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.personType.label}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Job Title"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.jobTitle}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Job Title"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.jobTitle}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Email"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.email}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Email"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.email}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Address"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{p.addressStreet}"/>
-                                                    <p:spacer height="5px"/>
-                                                    <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Address"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{p.addressStreet}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText value="#{p.addressCity}, #{p.addressState} #{p.addressZip}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Under 19"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.under18}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Under 19"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.under18}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Active?"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.active}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Active?"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.active}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Last Updated"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.lastUpdated}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Last Updated"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.lastUpdated}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Expires"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.expiryDate.toString}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Expires"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.expiryDate.toString}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Phone home"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.phoneHome}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Phone home"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.phoneHome}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Phone work"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.phoneWork}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Phone work"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.phoneWork}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Phone cell"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{p.phoneCell}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="bold" value="Phone cell"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{p.phoneCell}"/>
+                                                    </div>
+                                                </h:panelGroup>
 
-                                            <f:facet name="footer">
-                                                <h:outputLabel styleClass="bold" value="Person notes"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{p.notes}"/>
-                                                </div>
-                                            </f:facet>
-                                        </h:panelGrid>
+                                                <f:facet name="footer">
+                                                    <h:outputLabel styleClass="bold" value="Person notes"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{p.notes}"/>
+                                                    </div>
+                                                </f:facet>
+                                            </h:panelGrid>
                                         </div>
                                     </p:rowExpansion>
                                 </p:dataTable>
 
                             </h:form>
                         </p:dialog>
-                        
-                        
+
+
                         <p:confirmDialog message="Attach internal message" 
                                          severity="alert" widgetVar="internal-message-dialog"
                                          closable="true" responsive="true"
@@ -1189,8 +1171,8 @@
                                                  onclick="PF('internal-message-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
-                        
-                        
+
+
                         <p:confirmDialog message="Attach municipality message" 
                                          severity="alert" widgetVar="muni-message-dialog"
                                          closable="true" responsive="true"
@@ -1213,8 +1195,8 @@
                                                  onclick="PF('muni-message-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
-                        
-                        
+
+
                         <p:confirmDialog message="Attach public message" 
                                          severity="alert" widgetVar="public-message-dialog"
                                          closable="true"
@@ -1238,47 +1220,47 @@
                                                  onclick="PF('public-message-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
-                        
+
                         <p:confirmDialog message="Photos attached to action request" 
                                          severity="alert" widgetVar="photo-dialog"
                                          closable="true"
-                                        
+
                                          rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
 
                             <h:form id="photo-form">
                                 <p:scrollPanel style="width:1000px; height:400px" mode="native">
                                     <p:dataTable
-                                                    id="photoTable"
-                                                    var="photoid"
-                                                    value="#{cEActionRequestsBB.selectedRequest.photoList}"
-                                                    rowKey="#{photoid}"
-                                                    tableStyleClass="primeDataTable"
-                                                    draggableRows="false" tabindex="6">
+                                        id="photoTable"
+                                        var="photoid"
+                                        value="#{cEActionRequestsBB.selectedRequest.photoList}"
+                                        rowKey="#{photoid}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="false" tabindex="6">
                                         <p:column width="10%">
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Manage"/>
-                                                        </f:facet>
-                                                        <p:commandButton ajax="true" 
-                                                                         actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
-                                                                         value="Delete" 
-                                                                         icon="fa fa-bomb"
-                                                                         rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
-                                                                         update=":photo-form:photoTable"/>
-                                                    </p:column>
-                                                    <p:column>
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Photo"/>
-                                                        </f:facet>
-                                                        <p:graphicImage width="100%" value="#{imageServices.image}">
-                                                            <f:param name="photoID" value="#{photoid}"/>
-                                                        </p:graphicImage>
-                                                    </p:column>
-                                                    <p:column width="20%">
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Description"/>
-                                                        </f:facet>
-                                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
-                                                    </p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Manage"/>
+                                            </f:facet>
+                                            <p:commandButton ajax="true" 
+                                                             actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
+                                                             value="Delete" 
+                                                             icon="fa fa-bomb"
+                                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                                             update=":photo-form:photoTable"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Photo"/>
+                                            </f:facet>
+                                            <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                <f:param name="photoID" value="#{photoid}"/>
+                                            </p:graphicImage>
+                                        </p:column>
+                                        <p:column width="20%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Description"/>
+                                            </f:facet>
+                                            <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                        </p:column>
                                     </p:dataTable>
                                 </p:scrollPanel>
                                 <p:spacer height="15px"/>
@@ -1288,24 +1270,71 @@
                                                  onclick="PF('photo-dialog').hide()"/>
                             </h:form>
                         </p:confirmDialog>
-                        
-                        
-                        
-                        
+
+
+
+
                     </div>
-                    
-                      <p:dialog  id="cear-print-dialog"
-                                    widgetVar="cear-print-dialog-var"
-                                    closable="true" responsive="true"
-                                    dynamic="true"
-                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
-                      
-                      
-                      
-                      
-                      
-                      
-                      </p:dialog>
+
+                    <p:dialog  id="cear-print-dialog"
+                               widgetVar="cear-print-dialog-var"
+                               closable="true" responsive="true"
+                               dynamic="true"
+                               rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                        
+                        <h:form id="cear-print-form">
+                            
+                                        <h2>Title</h2>
+
+                                        <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+
+                                        <p:spacer height="5px"/>
+
+                                        <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{cEActionRequestsBB.reportConfig.title}"/>
+                                        <p:spacer height="2px"/>
+                                        <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                        <p:spacer height="10px"/>
+
+                                        <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                        <p:spacer height="5px"/>
+                                        <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{cEActionRequestsBB.reportConfig.notes}"/>
+                                        <p:spacer height="5px"/>
+
+                                        <h2>Display options</h2>
+
+                                        <h:outputLabel class="bold" value="Single request or full list?" for="cear-print-singleorlist-is" />
+                                        <p:spacer height="1px"/>
+                                        <p:inputSwitch  id="cear-print-singleorlist-is"
+                                                        value="#{cEActionRequestsBB.reportConfig.printFullCEARQueue}" 
+                                                        onLabel="Print all requests in list" offLabel="Only print active request" />
+                                        
+                                        <p:spacer height="5px"/>
+                        
+                                        <h:outputLabel class="bold" value="Include photographs with requests?" for="cear-print-includephotos-is" />
+                                        <p:spacer height="1px"/>
+                                        <p:inputSwitch  id="cear-print-includephotos-is"
+                                                        value="#{cEActionRequestsBB.reportConfig.includePhotos}" 
+                                                        onLabel="Print photos" offLabel="Hide photos" />
+                                        
+                                        <p:spacer height="5px"/>
+                                        
+                                        <p:commandButton ajax="true" id="cear-print-cancel"
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('cear-print-dialog-var').hide()"/>
+
+                                        <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReport}"
+                                                 value="Generate report" icon="fa fa-print" 
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 />
+                            </h:form>
+
+                        
+                    </p:dialog>
+
+
+
+
                 </f:view>
             </ui:define>
         </ui:composition>

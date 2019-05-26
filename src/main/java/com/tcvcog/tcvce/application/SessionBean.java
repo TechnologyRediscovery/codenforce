@@ -39,6 +39,7 @@ import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.ReportConfig;
+import com.tcvcog.tcvce.entities.ReportConfigCEARs;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
@@ -116,6 +117,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigCECaseList reportConfigCECaseList;
     private ReportConfig activeReport;
     private ReportConfigCEEventList reportConfigCEEventList;
+    private ReportConfigCEARs reportCOnfigCEARList;
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication occPermitApplication;
@@ -381,9 +383,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      * @return the queueCEAR
      */
     public List<CEActionRequest> getQueueCEAR() {
-        if(queryCEAR != null & queryCEAR.getResults().size() > 0){
-            queueCEAR = queryCEAR.getResults();
-        }
+        
         return queueCEAR;
     }
 
@@ -399,7 +399,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setQueueCEAR(List<CEActionRequest> qc) {
         if(qc != null && qc.size() > 0 ){
-            queryCEAR = null;
+            setQueryCEAR(null);
             this.queueCEAR = qc;
         }
     }
@@ -639,6 +639,34 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setReportConfigCEEventList(ReportConfigCEEventList reportConfigCEEventList) {
         this.reportConfigCEEventList = reportConfigCEEventList;
+    }
+
+    /**
+     * @return the queryCEAR
+     */
+    public QueryCEAR getQueryCEAR() {
+        return queryCEAR;
+    }
+
+    /**
+     * @param queryCEAR the queryCEAR to set
+     */
+    public void setQueryCEAR(QueryCEAR queryCEAR) {
+        this.queryCEAR = queryCEAR;
+    }
+
+    /**
+     * @return the reportCOnfigCEARList
+     */
+    public ReportConfigCEARs getReportCOnfigCEARList() {
+        return reportCOnfigCEARList;
+    }
+
+    /**
+     * @param reportCOnfigCEARList the reportCOnfigCEARList to set
+     */
+    public void setReportCOnfigCEARList(ReportConfigCEARs reportCOnfigCEARList) {
+        this.reportCOnfigCEARList = reportCOnfigCEARList;
     }
     
 }

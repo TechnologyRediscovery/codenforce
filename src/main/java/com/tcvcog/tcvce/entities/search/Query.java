@@ -16,7 +16,7 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class Query extends EntityUtils implements Serializable{
+public abstract class Query extends EntityUtils implements Serializable, Reportable{
     
     private String queryTitle;
     private Municipality muni;

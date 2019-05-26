@@ -46,7 +46,7 @@ public class QueryCEAR extends Query{
    }
     
     public void addToResults(List<CEActionRequest> l){
-        results.add((CEActionRequest) l);
+        results.addAll(l);
     }
     
 

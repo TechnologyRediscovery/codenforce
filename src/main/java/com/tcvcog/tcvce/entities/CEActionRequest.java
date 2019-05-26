@@ -35,7 +35,7 @@ import java.util.Objects;
  to an CEActionRequest to do with as they please (print, etc.)
  * @author Eric Darsow
  */
-public class CEActionRequest implements Serializable{
+public class CEActionRequest implements Serializable, Comparable<CEActionRequest>{
     
     // requests no longer have a status--remove when fully updated
     // for the full case model
@@ -602,6 +602,12 @@ public class CEActionRequest implements Serializable{
      */
     public void setPhotoList(List<Integer> photoList) {
         this.photoList = photoList;
+    }
+
+    @Override
+    public int compareTo(CEActionRequest o) {
+        int comp = this.dateOfRecord.compareTo(o.dateOfRecord);
+        return comp;
     }
 
     
