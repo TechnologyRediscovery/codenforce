@@ -622,7 +622,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
      * @throws IntegrationException 
      */
     public QueryCEAR queryCEARs(QueryCEAR q) throws IntegrationException{
-        List<SearchParamsCEActionRequests> pList = q.getSearchParams();
+        List<SearchParamsCEActionRequests> pList = q.getParmsList();
         for(SearchParamsCEActionRequests sp: pList){
             q.addToResults(getCEActionRequestList(sp));
         }

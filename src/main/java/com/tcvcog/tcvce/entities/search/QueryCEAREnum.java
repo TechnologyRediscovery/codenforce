@@ -9,7 +9,7 @@ package com.tcvcog.tcvce.entities.search;
  *
  * @author sylvia
  */
-public enum QueryCEARTitle {
+public enum QueryCEAREnum {
     
     UNPROCESSED("Needs review by officer", "Code enforcement action requests that have not been reviewed"),
     ATTACHED_TO_CECASE("Assigned to a case", "Code enforcemetn action request "
@@ -23,7 +23,7 @@ public enum QueryCEARTitle {
     private final String title;
     private final String desc;
     
-    private QueryCEARTitle(String t, String l){
+    private QueryCEAREnum(String t, String l){
         this.desc = l;
         this.title = t;
     }

@@ -22,12 +22,12 @@
                         </div>
                         <div class="logo-title-wrapper">
                             <div class="report-title">
-                                <h:outputText id="report-title-ot"  value="#{cEActionRequestsBB.reportConfig.title}"/> 
+                                <h:outputText id="report-title-ot"  value="#{cEActionRequestsReportBB.reportConfig.title}"/> 
                             </div>
                             <div class="report-title-sub">
-                                <h:outputText id="report-subtitle-ot"  value="#{cEActionRequestsBB.reportConfig.muni.muniName}, #{cEActionRequestsBB.reportConfig.muni.address_state}"/> 
+                                <h:outputText id="report-subtitle-ot"  value="#{cEActionRequestsReportBB.reportConfig.muni.muniName}, #{cEActionRequestsReportBB.reportConfig.muni.address_state}"/> 
                                 <h:outputText value=" | " />
-                                <h:outputText id="date-ot" value="printed on: #{cEActionRequestsBB.reportConfig.generationTimestampPretty}" />
+                                <h:outputText id="date-ot" value="printed on: #{cEActionRequestsReportBB.reportConfig.generationTimestampPretty}" />
                             </div>
                         </div>
                     </div>
@@ -44,16 +44,16 @@
 
                             <h:panelGroup>
                                 <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="Creator credentials: " />
-                                <h:outputText id="report-creator-cred-ot"  value="User: #{cEActionRequestsBB.reportConfig.creator.username}, 
-                                              #{cEActionRequestsBB.reportConfig.creator.roleType.label} 
-                                              (ID: #{cEActionRequestsBB.reportConfig.creator.userID})"/>
+                                <h:outputText id="report-creator-cred-ot"  value="User: #{cEActionRequestsReportBB.reportConfig.creator.username}, 
+                                              #{cEActionRequestsReportBB.reportConfig.creator.roleType.label} 
+                                              (ID: #{cEActionRequestsReportBB.reportConfig.creator.userID})"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                     <h:outputText styleClass="bold" value="Number of requests in report: " />
-                                    <h:outputText styleClass="bold" value="#{cEActionRequestsBB.requestReportList.size()}" />
+                                    <h:outputText styleClass="bold" value="#{cEActionRequestsReportBB.reportConfig.BOBQuery.BOBResultList.size()}" />
                                 <br />
                                     <h:outputLabel id="report-notes-ol" for="report-notes-ot" styleClass="bold" value="Report notes: "/>
-                                    <h:outputText id="report-notes-ot"  value="#{cEActionRequestsBB.reportConfig.notes}"/>
+                                    <h:outputText id="report-notes-ot"  value="#{cEActionRequestsReportBB.reportConfig.notes}"/>
                             </h:panelGroup>
 
                         </h:panelGrid>
@@ -64,7 +64,7 @@
                     <p:dataScroller
                         id="cears-datascroller"
                         var="cear"
-                        value="#{cEActionRequestsBB.requestReportList}"
+                        value="#{cEActionRequestsReportBB.reportConfig.BOBQuery.BOBResultList}"
                         widgetVar="ceevent-ds-var">
 
                         <div class="event-ds-box-report">
@@ -221,7 +221,7 @@
                                 </h:form>
                                 
                             <f:subview id="photo-subview"
-                                        rendered="#{cEActionRequestsBB.reportConfig.includePhotos and cear.photoList.size()>0}"
+                                        rendered="#{cEActionRequestsReportBB.reportConfig.includePhotos and cear.photoList.size()>0}"
                                        >
                                 
                             <h:form id="cear-photo-form" >

@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import java.util.List;
@@ -16,8 +17,12 @@ import java.util.Objects;
  */
 public class QueryEventCECase extends Query {
     
-    private SearchParamsCEEvents eventSearchParams;
-    private List<SearchParamsCEEvents> eventSearchParamsList;
+    private SearchParamsEventCECase eventSearchParams;
+    
+    // should be a list of search params eventually so we can build
+    // queries from a set of search params
+    private List<SearchParamsEventCECase> eventSearchParamsList;
+    private List<EventCECase> results;
     
     public QueryEventCECase(String queryTitle, Municipality muni) {
         super(queryTitle, muni);
@@ -26,14 +31,14 @@ public class QueryEventCECase extends Query {
     /**
      * @return the eventSearchParams
      */
-    public SearchParamsCEEvents getEventSearchParams() {
+    public SearchParamsEventCECase getEventSearchParams() {
         return eventSearchParams;
     }
 
     /**
      * @param eventSearchParams the eventSearchParams to set
      */
-    public void setEventSearchParams(SearchParamsCEEvents eventSearchParams) {
+    public void setEventSearchParams(SearchParamsEventCECase eventSearchParams) {
         this.eventSearchParams = eventSearchParams;
     }
 
@@ -45,6 +50,16 @@ public class QueryEventCECase extends Query {
     @Override
     public void setParamsList(List l) {
         eventSearchParamsList = l;
+    }
+
+    @Override
+    public List getBOBResultList() {
+        return results;
+    }
+
+    @Override
+    public void setBOBResultList(List l) {
+        results = l;
     }
 
    

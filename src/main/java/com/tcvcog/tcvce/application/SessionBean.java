@@ -38,7 +38,7 @@ import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.Report;
-import com.tcvcog.tcvce.entities.ReportCEARs;
+import com.tcvcog.tcvce.entities.ReportCEARList;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
@@ -67,8 +67,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<Property> propertyQueue;
     private List<Person> personQueue;
     
+    
     private List<CEActionRequest> queueCEAR;
     private QueryCEAR queryCEAR;
+    private ReportCEARList reportCOnfigCEARList;
     
     
     private List<CECase> cECaseQueue;
@@ -113,13 +115,13 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private PublicInfoBundleCECase pibCECase;
 
     /* *** Reporting *** */
+    private Report activeReport;
+    
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
-    private Report activeReport;
     private ReportConfigCEEventList reportConfigCEEventList;
-    private ReportCEARs reportCOnfigCEARList;
     
-    private Report report;
+
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication occPermitApplication;
@@ -673,14 +675,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the reportCOnfigCEARList
      */
-    public ReportCEARs getReportCOnfigCEARList() {
+    public ReportCEARList getReportCOnfigCEARList() {
         return reportCOnfigCEARList;
     }
 
     /**
      * @param reportCOnfigCEARList the reportCOnfigCEARList to set
      */
-    public void setReportCOnfigCEARList(ReportCEARs reportCOnfigCEARList) {
+    public void setReportCOnfigCEARList(ReportCEARList reportCOnfigCEARList) {
         this.reportCOnfigCEARList = reportCOnfigCEARList;
     }
     

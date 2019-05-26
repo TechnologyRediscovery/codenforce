@@ -34,7 +34,7 @@ import com.tcvcog.tcvce.entities.EventCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -710,7 +710,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<EventCECase> queryCaseDependentEvents(SearchParamsCEEvents params) throws IntegrationException, CaseLifecyleException{
+    public List<EventCECase> queryCaseDependentEvents(SearchParamsEventCECase params) throws IntegrationException, CaseLifecyleException{
         List<EventCasePropBundle> wrappedEventList = queryEvents(params);
         List<EventCECase> depList = new ArrayList<>();
         for(EventCasePropBundle ec: wrappedEventList){
@@ -720,7 +720,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
 
   
-    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params) throws IntegrationException, CaseLifecyleException {
+    public List<EventCasePropBundle> queryEvents(SearchParamsEventCECase params) throws IntegrationException, CaseLifecyleException {
         List<EventCasePropBundle> eventList = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;

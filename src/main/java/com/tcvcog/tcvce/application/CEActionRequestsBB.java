@@ -15,7 +15,7 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.ReportCEARs;
+import com.tcvcog.tcvce.entities.ReportCEARList;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
@@ -51,7 +51,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     private CEActionRequest selectedRequest;
     private List<CEActionRequest> requestList;
-   
+    private ReportCEARList reportConfig;
     
     private DonutChartModel cEARReasonDonut;
     
@@ -100,7 +100,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         SearchCoordinator sc = getSearchCoordinator();
         
         requestList = getSessionBean().getQueueCEAR();
-        QueryCEAR sessionCEARQuery = getSessionBean().getQueryCEAR();
+        selectedQueryCEAR = getSessionBean().getQueryCEAR();
 
         if(requestList == null && sessionCEARQuery != null){
             requestList = sessionCEARQuery.getResults();
@@ -121,7 +121,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         
         queryList = sc.buildCEARQueryList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
         
-        ReportCEARs rptCfg = getSessionBean().getReportCOnfigCEARList();
+        ReportCEARList rptCfg = getSessionBean().getReportCOnfigCEARList();
         
         if(rptCfg != null){
             requestReportList = new ArrayList<>();
@@ -181,7 +181,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     public void prepareReport(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
-        ReportCEARs rpt = cc.getInitializedReportConficCEARs(
+        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
         rpt.setTitle("Code enforcement action request");
         reportConfig = rpt;
@@ -997,14 +997,14 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     /**
      * @return the reportConfig
      */
-    public ReportCEARs getReportConfig() {
+    public ReportCEARList getReportConfig() {
         return reportConfig;
     }
 
     /**
      * @param reportConfig the reportConfig to set
      */
-    public void setReportConfig(ReportCEARs reportConfig) {
+    public void setReportConfig(ReportCEARList reportConfig) {
         this.reportConfig = reportConfig;
     }
 

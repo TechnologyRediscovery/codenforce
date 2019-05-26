@@ -20,7 +20,7 @@ import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
@@ -44,7 +44,7 @@ import javax.faces.event.ActionEvent;
 public class CEEventsBB extends BackingBeanUtils implements Serializable {
 
     
-    private SearchParamsCEEvents searchParams;
+    private SearchParamsEventCECase searchParams;
     
     private int actionRequestsUserType;
     
@@ -54,7 +54,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     
     private List<Query> queryList;
     private Query selectedBOBQuery;
-    private SearchParamsCEEvents extractedSearchParams;
+    private SearchParamsEventCECase extractedSearchParams;
     
     private List<EventCasePropBundle> eventList;
     private List<EventCasePropBundle> eventListForEventsReport;
@@ -181,7 +181,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the searchParams
      */
-    public SearchParamsCEEvents getSearchParams() {
+    public SearchParamsEventCECase getSearchParams() {
         return searchParams;
     }
     
@@ -190,7 +190,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      * Not used
      * @param searchParams the searchParams to set
      */
-    public void setSearchParams(SearchParamsCEEvents searchParams) {
+    public void setSearchParams(SearchParamsEventCECase searchParams) {
         this.searchParams = searchParams;
     }
     
@@ -397,7 +397,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the extractedSearchParams
      */
-    public SearchParamsCEEvents getExtractedSearchParams() {
+    public SearchParamsEventCECase getExtractedSearchParams() {
         QueryEventCECase eq;
         if(selectedBOBQuery != null){
               eq = (QueryEventCECase) selectedBOBQuery;
@@ -409,7 +409,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @param extractedSearchParams the extractedSearchParams to set
      */
-    public void setExtractedSearchParams(SearchParamsCEEvents extractedSearchParams) {
+    public void setExtractedSearchParams(SearchParamsEventCECase extractedSearchParams) {
         this.extractedSearchParams = extractedSearchParams;
     }
     

@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
+import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 
 /**
  *
@@ -19,7 +19,7 @@ public class ReportConfigCEEventList extends Report{
     private boolean includeCaseActionRequestInfo;
     private boolean includeCompleteQueryParamsDump;
     
-    private SearchParamsCEEvents queryParams;
+    private SearchParamsEventCECase queryParams;
 
     /**
      * @return the includeCaseActionRequestInfo
@@ -94,14 +94,14 @@ public class ReportConfigCEEventList extends Report{
     /**
      * @return the queryParams
      */
-    public SearchParamsCEEvents getQueryParams() {
+    public SearchParamsEventCECase getQueryParams() {
         return queryParams;
     }
 
     /**
      * @param queryParams the queryParams to set
      */
-    public void setQueryParams(SearchParamsCEEvents queryParams) {
+    public void setQueryParams(SearchParamsEventCECase queryParams) {
         this.queryParams = queryParams;
     }
     

@@ -18,8 +18,7 @@ import java.util.Objects;
  * @author sylvia
  */
 public class QueryCECase 
-        extends Query
-        implements Reportable{
+        extends Query{
     
     private List<SearchParamsCECases> searchParams; 
     private List<CECase> caseList;
@@ -67,10 +66,7 @@ public class QueryCECase
         return true;
     }
 
-    @Override
-    public List<CECase> retrieveBOBList() {
-        return caseList;
-    }
+   
     
 
     /**
