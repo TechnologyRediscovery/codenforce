@@ -15,6 +15,11 @@ import java.util.List;
  * @author sylvia
  */
 public class QueryCEAR extends Query{
+
+    @Override
+    public Query retrieveQuery() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     
     private List<SearchParamsCEActionRequests> searchParams; 

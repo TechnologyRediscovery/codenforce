@@ -15,7 +15,7 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.ReportConfigCEARs;
+import com.tcvcog.tcvce.entities.ReportCEARs;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
@@ -61,10 +61,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     private List<QueryCEAR> queryList;
     private QueryCEAR selectedQueryCEAR;
     private SearchParamsCEActionRequests searchParams;
-    
-    private
-    
-      
     
     private CEActionRequestStatus selectedChangeToStatus;
     private String invalidMessage;
@@ -125,7 +121,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         
         queryList = sc.buildCEARQueryList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
         
-        ReportConfigCEARs rptCfg = getSessionBean().getReportCOnfigCEARList();
+        ReportCEARs rptCfg = getSessionBean().getReportCOnfigCEARList();
         
         if(rptCfg != null){
             requestReportList = new ArrayList<>();
@@ -185,7 +181,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     public void prepareReport(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
-        ReportConfigCEARs rpt = cc.getInitializedReportConficCEARs(
+        ReportCEARs rpt = cc.getInitializedReportConficCEARs(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
         rpt.setTitle("Code enforcement action request");
         reportConfig = rpt;
@@ -1001,14 +997,14 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     /**
      * @return the reportConfig
      */
-    public ReportConfigCEARs getReportConfig() {
+    public ReportCEARs getReportConfig() {
         return reportConfig;
     }
 
     /**
      * @param reportConfig the reportConfig to set
      */
-    public void setReportConfig(ReportConfigCEARs reportConfig) {
+    public void setReportConfig(ReportCEARs reportConfig) {
         this.reportConfig = reportConfig;
     }
 

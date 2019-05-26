@@ -9,6 +9,6 @@ package com.tcvcog.tcvce.entities;
  *
  * @author sylvia
  */
-public class ReportConfigProperty extends ReportConfig {
+public class ReportConfigProperty extends Report {
     
 }

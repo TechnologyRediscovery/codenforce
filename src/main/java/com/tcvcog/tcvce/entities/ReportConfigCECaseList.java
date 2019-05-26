@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class ReportConfigCECaseList extends ReportConfig implements Serializable{
+public class ReportConfigCECaseList extends Report implements Serializable{
     
     private boolean includeListSummaryFigures;
     

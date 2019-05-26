@@ -11,7 +11,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsCEEvents;
  *
  * @author sylvia
  */
-public class ReportConfigCEEventList extends ReportConfig{
+public class ReportConfigCEEventList extends Report{
     
     private boolean includeAttachedPersons;
     private boolean includeEventTypeSummaryChart;

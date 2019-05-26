@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class ReportConfig extends EntityUtils implements Serializable {
+public abstract class Report extends EntityUtils implements Serializable {
     private String title;
     private LocalDateTime generationTimestamp;
     private String generationTimestampPretty;

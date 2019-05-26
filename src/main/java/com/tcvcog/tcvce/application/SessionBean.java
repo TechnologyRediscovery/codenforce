@@ -38,8 +38,8 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
-import com.tcvcog.tcvce.entities.ReportConfig;
-import com.tcvcog.tcvce.entities.ReportConfigCEARs;
+import com.tcvcog.tcvce.entities.Report;
+import com.tcvcog.tcvce.entities.ReportCEARs;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
@@ -115,9 +115,9 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Reporting *** */
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
-    private ReportConfig activeReport;
+    private Report activeReport;
     private ReportConfigCEEventList reportConfigCEEventList;
-    private ReportConfigCEARs reportCOnfigCEARList;
+    private ReportCEARs reportCOnfigCEARList;
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication occPermitApplication;
@@ -602,14 +602,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the activeReport
      */
-    public ReportConfig getActiveReport() {
+    public Report getActiveReport() {
         return activeReport;
     }
 
     /**
      * @param activeReport the activeReport to set
      */
-    public void setActiveReport(ReportConfig activeReport) {
+    public void setActiveReport(Report activeReport) {
         this.activeReport = activeReport;
     }
 
@@ -658,14 +658,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the reportCOnfigCEARList
      */
-    public ReportConfigCEARs getReportCOnfigCEARList() {
+    public ReportCEARs getReportCOnfigCEARList() {
         return reportCOnfigCEARList;
     }
 
     /**
      * @param reportCOnfigCEARList the reportCOnfigCEARList to set
      */
-    public void setReportCOnfigCEARList(ReportConfigCEARs reportCOnfigCEARList) {
+    public void setReportCOnfigCEARList(ReportCEARs reportCOnfigCEARList) {
         this.reportCOnfigCEARList = reportCOnfigCEARList;
     }
     
