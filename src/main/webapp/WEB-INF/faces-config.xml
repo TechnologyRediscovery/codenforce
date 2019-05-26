@@ -633,6 +633,14 @@
     <navigation-rule>
         <from-view-id>*</from-view-id>  
         <navigation-case>
+            <from-outcome>reportCEARList</from-outcome>
+            <to-view-id>/restricted/reports/reportCEARList.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>  
+        <navigation-case>
             <from-outcome>requestCEActionFlow</from-outcome>
             <to-view-id>/public/services/requestCEActionFlow/requestCEActionFlow.xhtml</to-view-id>
         </navigation-case>
@@ -1461,5 +1469,10 @@
         <managed-bean-name>reportingBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ReportingBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cEActionRequestsReportBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsReportBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 </faces-config>

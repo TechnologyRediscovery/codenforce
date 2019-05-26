@@ -42,8 +42,10 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -145,10 +147,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         SearchCoordinator sc = getSearchCoordinator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         
-        return ceari.queryCEARs(sc.buildCEARQuery(QueryCEARTitle.UNPROCESSED, u, m));
+        return ceari.queryCEARs(sc.buildCEARQuery(QueryCEARTitle.ALL_PAST30, u, m));
         
     }
     
+    public QueryCEAR performQueryCEAR(QueryCEAR q) throws IntegrationException{
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        return ceari.queryCEARs(q);
+    }
+   
+    public List<CEActionRequest> getCEARList(SearchParamsCEActionRequests params) throws IntegrationException{
+        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+        return ceari.getCEActionRequestList(params);
+        
+        
+    }
+    
+    public ReportConfigCEARs getInitializedReportConficCEARs(User u, Municipality m){
+        ReportConfigCEARs rpt = new ReportConfigCEARs();
+        rpt.setIncludePhotos(true);
+        rpt.setPrintFullCEARQueue(false);
+        rpt.setCreator(u);
+        rpt.setMuni(m);
+        rpt.setGenerationTimestamp(LocalDateTime.now());
+        return rpt;
+    }
     
    
     
@@ -1339,5 +1362,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return al;
     }
     
+    public Map<String, Number> computeCountsByCEARReason(List<CEActionRequest> reqList){
+        CEActionRequest cear;
+        Map<String, Number> map = new LinkedHashMap<>();
+        for(CEActionRequest req: reqList){
+            if(map.containsKey(req.getIssueTypeString())){
+                map.put(req.getIssueTypeString(), map.get(req.getIssueTypeString()).intValue() + 1);
+            } else {
+                map.put(req.getIssueTypeString(), 1);
+            }
+        }
+        return map;
+    }
    
 } // close class

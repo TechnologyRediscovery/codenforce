@@ -33,7 +33,7 @@ import javax.annotation.PostConstruct;
  */
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 
-    private List<QueryCEAR> queryCEARList;
+   
     
     /**
      * Creates a new instance of SearchCoordinator
@@ -49,9 +49,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public List<QueryCEAR> buildCEARQueryList(User u, Municipality m){
         QueryCEARTitle[] titleArr = QueryCEARTitle.values();
         List<QueryCEAR> qList = new ArrayList<>();
-        for(QueryCEARTitle qTit: titleArr){
-            qList.add(buildCEARQuery(qTit, u, m));
-        }
+        qList.add(buildCEARQuery(QueryCEARTitle.ALL_PAST30, u, m));
+//        for(QueryCEARTitle qTit: titleArr){
+//            qList.add(buildCEARQuery(qTit, u, m));
+//        }
         return qList;
     }
     
@@ -66,20 +67,20 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case UNPROCESSED:
                 q.addSearchParams(generateParams_CEAR_Unprocessed(m));
                 break;
-            case ATTACHED_TO_CECASE:
-                break;
-            
-            case ALL_TODAY:
-                break;
-                
-            case ALL_PAST7DAYS:
-                break;
-                
+//            case ATTACHED_TO_CECASE:
+//                break;
+//            
+//            case ALL_TODAY:
+//                break;
+//                
+//            case ALL_PAST7DAYS:
+//                break;
+//                
             case ALL_PAST30:
                 break;
-                
-            case ALL_PASTYEAR:
-                break;
+//                
+//            case ALL_PASTYEAR:
+//                break;
                 
             default:
                 q.addSearchParams(generateParams_CEAR_Unprocessed(m));
@@ -106,6 +107,29 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 
         sps.setUseAttachedToCase(true);
         sps.setAttachedToCase(false);
+        sps.setUseMarkedUrgent(false);
+        sps.setUseNotAtAddress(false);
+        sps.setUseRequestStatus(false);
+        
+        return sps;
+    }
+    
+    
+    
+     public SearchParamsCEActionRequests generateParams_CEAR_past30Days(Municipality m){
+            
+        SearchCoordinator sc = getSearchCoordinator();
+
+        SearchParamsCEActionRequests sps = new SearchParamsCEActionRequests();
+
+        sps.setMuni(m);
+        LocalDateTime past30Days = LocalDateTime.now().minusDays(30);
+        sps.setStartDate(past30Days);
+
+        // action requests cannot have a time stamp past the current datetime
+        sps.setEndDate(LocalDateTime.now());
+
+        sps.setUseAttachedToCase(false);
         sps.setUseMarkedUrgent(false);
         sps.setUseNotAtAddress(false);
         sps.setUseRequestStatus(false);
@@ -367,22 +391,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return eventParams;
     }
 
-    /**
-     * @return the queryCEARList
-     */
-    public List<QueryCEAR> getQueryCEARList() {
    
-        
-        
-        return queryCEARList;
-    }
-
-    /**
-     * @param queryCEARList the queryCEARList to set
-     */
-    public void setQueryCEARList(List<QueryCEAR> queryCEARList) {
-        this.queryCEARList = queryCEARList;
-    }
     
     
 }
