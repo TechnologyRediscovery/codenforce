@@ -12,7 +12,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
-import com.tcvcog.tcvce.entities.ReportConfig;
+import com.tcvcog.tcvce.entities.Report;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
@@ -41,7 +41,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private ReportConfigCECaseList reportCECaseList;
     
     
-    private ReportConfig currentReport;
+    private Report currentReport;
    
     private ReportConfigCEEventList reportCEEvent;
     
@@ -217,7 +217,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the currentReport
      */
-    public ReportConfig getCurrentReport() {
+    public Report getCurrentReport() {
         currentReport = getSessionBean().getActiveReport();
         return currentReport;
     }
@@ -225,7 +225,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     /**
      * @param currentReport the currentReport to set
      */
-    public void setCurrentReport(ReportConfig currentReport) {
+    public void setCurrentReport(Report currentReport) {
         
         this.currentReport = currentReport;
     }

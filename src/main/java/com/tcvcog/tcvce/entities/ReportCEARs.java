@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class ReportConfigCEARs extends ReportConfig implements Serializable{
+public class ReportCEARs extends Report implements Serializable{
     
     private boolean printFullCEARQueue;
     private boolean includePhotos;

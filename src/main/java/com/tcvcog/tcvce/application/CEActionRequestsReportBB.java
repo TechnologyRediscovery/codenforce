@@ -6,7 +6,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.ReportConfigCEARs;
+import com.tcvcog.tcvce.entities.ReportCEARs;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import java.io.Serializable;
 import java.util.List;
@@ -19,7 +19,7 @@ import javax.annotation.PostConstruct;
 public class CEActionRequestsReportBB extends BackingBeanUtils implements Serializable{
 
      private List<CEActionRequest> requestReportList;
-     private ReportConfigCEARs reportConfig;
+     private ReportCEARs reportConfig;
      private QueryCEAR queryCEAR;
      private boolean validReport;
     
@@ -44,7 +44,7 @@ public class CEActionRequestsReportBB extends BackingBeanUtils implements Serial
     /**
      * @return the reportConfig
      */
-    public ReportConfigCEARs getReportConfig() {
+    public ReportCEARs getReportConfig() {
         return reportConfig;
     }
 
@@ -72,7 +72,7 @@ public class CEActionRequestsReportBB extends BackingBeanUtils implements Serial
     /**
      * @param reportConfig the reportConfig to set
      */
-    public void setReportConfig(ReportConfigCEARs reportConfig) {
+    public void setReportConfig(ReportCEARs reportConfig) {
         this.reportConfig = reportConfig;
     }
 

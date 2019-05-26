@@ -163,8 +163,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public ReportConfigCEARs getInitializedReportConficCEARs(User u, Municipality m){
-        ReportConfigCEARs rpt = new ReportConfigCEARs();
+    public ReportCEARs getInitializedReportConficCEARs(User u, Municipality m){
+        ReportCEARs rpt = new ReportCEARs();
         rpt.setIncludePhotos(true);
         rpt.setPrintFullCEARQueue(false);
         rpt.setCreator(u);

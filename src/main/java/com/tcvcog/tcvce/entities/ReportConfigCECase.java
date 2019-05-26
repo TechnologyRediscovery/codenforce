@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class ReportConfigCECase extends ReportConfig{
+public class ReportConfigCECase extends Report{
     
     private CECase cse;
     
