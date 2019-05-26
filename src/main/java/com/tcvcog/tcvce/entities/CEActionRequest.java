@@ -35,7 +35,9 @@ import java.util.Objects;
  to an CEActionRequest to do with as they please (print, etc.)
  * @author Eric Darsow
  */
-public class CEActionRequest implements Serializable, Comparable<CEActionRequest>{
+public class CEActionRequest 
+        extends BOB 
+        implements Serializable, Comparable<CEActionRequest>{
     
     // requests no longer have a status--remove when fully updated
     // for the full case model

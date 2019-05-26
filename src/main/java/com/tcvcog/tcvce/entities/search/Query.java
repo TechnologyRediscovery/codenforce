@@ -5,24 +5,32 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.BOB;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
  *
  * @author sylvia
+ * @param <E>
  */
-public abstract class Query extends EntityUtils implements Serializable, Reportable{
+public abstract class Query<E extends BOB> 
+        extends EntityUtils 
+        implements Serializable, Searchable{
     
     private String queryTitle;
     private Municipality muni;
     private RoleType userRankAccessCeiling;
     private String resultsMessage;
     private User user;
+    private LocalDateTime executionTimestamp;
+      
 
     public Query(String queryTitle, Municipality muni) {
         this.queryTitle = queryTitle;
@@ -38,6 +46,8 @@ public abstract class Query extends EntityUtils implements Serializable, Reporta
     public Query(){
         //emtpy
     }
+    
+    
     
     
 
@@ -140,6 +150,22 @@ public abstract class Query extends EntityUtils implements Serializable, Reporta
      */
     public void setResultsMessage(String resultsMessage) {
         this.resultsMessage = resultsMessage;
+    }
+
+    
+
+    /**
+     * @return the executionTimestamp
+     */
+    public LocalDateTime getExecutionTimestamp() {
+        return executionTimestamp;
+    }
+
+    /**
+     * @param executionTimestamp the executionTimestamp to set
+     */
+    public void setExecutionTimestamp(LocalDateTime executionTimestamp) {
+        this.executionTimestamp = executionTimestamp;
     }
 
     

@@ -119,6 +119,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigCEEventList reportConfigCEEventList;
     private ReportCEARs reportCOnfigCEARList;
     
+    private Report report;
+    
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication occPermitApplication;
     private PropertyUnit activePropUnit;

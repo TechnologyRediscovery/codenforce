@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -16,6 +17,7 @@ import java.util.Objects;
 public class QueryEventCECase extends Query {
     
     private SearchParamsCEEvents eventSearchParams;
+    private List<SearchParamsCEEvents> eventSearchParamsList;
     
     public QueryEventCECase(String queryTitle, Municipality muni) {
         super(queryTitle, muni);
@@ -33,6 +35,16 @@ public class QueryEventCECase extends Query {
      */
     public void setEventSearchParams(SearchParamsCEEvents eventSearchParams) {
         this.eventSearchParams = eventSearchParams;
+    }
+
+    @Override
+    public List getParamsList() {
+        return eventSearchParamsList;
+    }
+
+    @Override
+    public void setParamsList(List l) {
+        eventSearchParamsList = l;
     }
 
    

@@ -18,7 +18,9 @@ import java.util.List;
  *
  * @author Sylvia Garland
  */
-public class SearchParamsCECases extends SearchParams implements Serializable{
+public class SearchParamsCECases 
+        extends SearchParams 
+        implements Serializable{
     
     
     
