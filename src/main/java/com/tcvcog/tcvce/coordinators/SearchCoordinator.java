@@ -61,7 +61,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     public QueryCEAR buildCEARQuery(QueryCEARTitle qTitle, User u, Municipality m){
         QueryCEAR q = new QueryCEAR(m);
-        q.setQueryTitle(qTitle.getLabel());
+        q.setQueryTitle(qTitle.getDesc());
         
         switch(qTitle){
             case UNPROCESSED:

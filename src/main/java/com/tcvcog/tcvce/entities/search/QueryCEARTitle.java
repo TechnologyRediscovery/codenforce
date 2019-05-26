@@ -11,21 +11,29 @@ package com.tcvcog.tcvce.entities.search;
  */
 public enum QueryCEARTitle {
     
-    UNPROCESSED("Unreviewed code enforcement action requests"),
-    ATTACHED_TO_CECASE("Assigned to a code enforcement case"),
-    ALL_TODAY("All action requests with activity today"),
-    ALL_PAST7DAYS("All valid action requests created in the past 7 days"),
-    ALL_PAST30("All valid action requests created in the past 30 days"),
-    ALL_PASTYEAR("All valid action requests created in the past year");
+    UNPROCESSED("Needs review by officer", "Code enforcement action requests that have not been reviewed"),
+    ATTACHED_TO_CECASE("Assigned to a case", "Code enforcemetn action request "
+            + "that was either used to create a new case or was attached to an existing code enforcement case"),
+    ALL_TODAY("Requests today" , "All action requests with activity today"),
+    ALL_PAST7DAYS("Requests thsi week" , "All valid action requests created in the past 7 days"),
+    ALL_PAST30("Requests this month", "All valid action requests created in the past 30 days"),
+    ALL_PASTYEAR("Requests past year", "All valid action requests created in the past year"),
+    BY_CURRENT_USER("Requestor is you", "Action requests attributed to the current user");
     
-    private final String label;
+    private final String title;
+    private final String desc;
     
-    private QueryCEARTitle(String l){
-        this.label = l;
+    private QueryCEARTitle(String t, String l){
+        this.desc = l;
+        this.title = t;
     }
     
-    public String getLabel(){
-        return label;
+    public String getDesc(){
+        return desc;
+    }
+    
+    public String getTitle(){
+        return title;
     }
     
     

@@ -5,6 +5,9 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
+import com.tcvcog.tcvce.entities.BOB;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import java.util.List;
@@ -14,32 +17,35 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class QueryCECase extends Query{
+public class QueryCECase 
+        extends Query
+        implements Reportable{
     
-    private List<SearchParamsCECases> caseSearchParamsList; 
+    private List<SearchParamsCECases> searchParams; 
+    private List<CECase> caseList;
     
     public QueryCECase(String queryTitle, Municipality muni) {
         super(queryTitle, muni);
     }
 
     /**
-     * @return the caseSearchParamsList
+     * @return the searchParams
      */
-    public List<SearchParamsCECases> getCaseSearchParamsList() {
-        return caseSearchParamsList;
+    public List<SearchParamsCECases> getSearchParams() {
+        return searchParams;
     }
 
     /**
-     * @param caseSearchParamsList the caseSearchParamsList to set
+     * @param searchParams the searchParams to set
      */
-    public void setCaseSearchParamsList(List<SearchParamsCECases> caseSearchParamsList) {
-        this.caseSearchParamsList = caseSearchParamsList;
+    public void setSearchParams(List<SearchParamsCECases> searchParams) {
+        this.searchParams = searchParams;
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 23 * hash + Objects.hashCode(this.caseSearchParamsList);
+        hash = 23 * hash + Objects.hashCode(this.searchParams);
         return hash;
     }
 
@@ -55,10 +61,44 @@ public class QueryCECase extends Query{
             return false;
         }
         final QueryCECase other = (QueryCECase) obj;
-        if (!Objects.equals(this.caseSearchParamsList, other.caseSearchParamsList)) {
+        if (!Objects.equals(this.searchParams, other.searchParams)) {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public List<CECase> retrieveBOBList() {
+        return caseList;
+    }
+    
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public List<SearchParamsCECases> getParamsList() {
+        return searchParams;
+    }
+
+    /**
+     * @return the caseList
+     */
+    public List<CECase> getCaseList() {
+        return caseList;
+    }
+
+    /**
+     * @param caseList the caseList to set
+     */
+    public void setCaseList(List<CECase> caseList) {
+        this.caseList = caseList;
+    }
+
+    @Override
+    public void setParamsList(List l) {
+        searchParams = l;
     }
     
     

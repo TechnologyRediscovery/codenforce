@@ -5,19 +5,16 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.BOB;
 import java.util.List;
 
 /**
  *
  * @author sylvia
+ * @param <E>
  */
-public interface Reportable<E> {
-
-    /**
-     * `
-     * @return
-     */
-    public abstract List<E> retrieveBOBList();
+public interface Searchable<E> {
+    
+    public abstract List<E> getParamsList();
+    public abstract void setParamsList(List<E> l);
     
 }
