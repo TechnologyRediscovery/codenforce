@@ -1495,7 +1495,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <managed-bean-name>cEEventsBB</managed-bean-name>
+        <managed-bean-name>eventsCECaseBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.EventsCECaseBB</managed-bean-class>
     
         <managed-bean-scope>view</managed-bean-scope></managed-bean>

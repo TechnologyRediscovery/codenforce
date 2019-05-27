@@ -25,6 +25,8 @@ public class ReportCEARList
      */
     private boolean printFullCEARQueue;
     private boolean includePhotos;
+    private boolean insertPageBreakBeforeEachPhotoSet;
+    private boolean insertPageBreakBeforeEachIndivPhoto;
     private QueryCEAR queryCEAR;
 
     @Override
@@ -65,6 +67,34 @@ public class ReportCEARList
      */
     public void setIncludePhotos(boolean includePhotos) {
         this.includePhotos = includePhotos;
+    }
+
+    /**
+     * @return the insertPageBreakBeforeEachPhotoSet
+     */
+    public boolean isInsertPageBreakBeforeEachPhotoSet() {
+        return insertPageBreakBeforeEachPhotoSet;
+    }
+
+    /**
+     * @return the insertPageBreakBeforeEachIndivPhoto
+     */
+    public boolean isInsertPageBreakBeforeEachIndivPhoto() {
+        return insertPageBreakBeforeEachIndivPhoto;
+    }
+
+    /**
+     * @param insertPageBreakBeforeEachPhotoSet the insertPageBreakBeforeEachPhotoSet to set
+     */
+    public void setInsertPageBreakBeforeEachPhotoSet(boolean insertPageBreakBeforeEachPhotoSet) {
+        this.insertPageBreakBeforeEachPhotoSet = insertPageBreakBeforeEachPhotoSet;
+    }
+
+    /**
+     * @param insertPageBreakBeforeEachIndivPhoto the insertPageBreakBeforeEachIndivPhoto to set
+     */
+    public void setInsertPageBreakBeforeEachIndivPhoto(boolean insertPageBreakBeforeEachIndivPhoto) {
+        this.insertPageBreakBeforeEachIndivPhoto = insertPageBreakBeforeEachIndivPhoto;
     }
 
    
