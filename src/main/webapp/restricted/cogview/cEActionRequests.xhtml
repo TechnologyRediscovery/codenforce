@@ -233,7 +233,7 @@
                                             </div>
                                         </p:column>
 
-                                        <p:column width="5%">
+                                        <p:column width="3%">
                                             <f:facet name="header">
                                                 <h:outputText value="Age" />
                                             </f:facet>
@@ -253,10 +253,20 @@
                                     </p:dataTable>
 
                                     <p:spacer height="15px"/>
+                                    
+                                      <p:commandButton    id="prep-multi-cear-cb"
+                                                        value="Prepare request list report"
+                                                        actionListener="#{cEActionRequestsBB.prepareReportMultiCEAR}"
+                                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                        disabled="false"
+                                                        oncomplete="PF('cear-print-dialog-var').show()"
+                                                        icon="fa fa-print"
+                                                        update="cear-print-form"
+                                                        />
 
+                                    <p:spacer height="15px"/>
 
                                     <p:chart type="donut" 
-                                             rendered="#{cEActionRequestsBB.requestList.size() > 0}"
                                              model="#{cEActionRequestsBB.requestReasonDonut}" 
                                              style="width:600px; height: 600px;"/>
 
@@ -268,12 +278,16 @@
 
                             <h:panelGroup styleClass="split-page-manage-side">
                                 <h:form id="req-details-form">
-
+                                    
+                                    <h1>Code enforcement request</h1>
+                                    
                                     <h2>
-                                        Request ID #<h:outputText   id="header-id-ot" value="#{cEActionRequestsBB.selectedRequest.requestID}"/>: 
                                         <h:outputText id="header-type-ot" value="#{cEActionRequestsBB.selectedRequest.issueTypeString}"/>
-                                        at <h:outputText id="header-addr-ot" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address} "/>  
-                                        <h:outputText id="header-muni-ot" value="(#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName})"/>  
+                                        <h:outputText   id="header-id-ot" value=" (id: #{cEActionRequestsBB.selectedRequest.requestID})"/> 
+                                        
+                                        <br />
+                                        <h:outputText id="header-addr-ot" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address} "/>  
+                                        <h:outputText id="header-muni-ot" value=", #{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>  
 
                                     </h2>
 
@@ -329,7 +343,7 @@
 
                                     <p:commandButton    id="print-singleCAR-cb"
                                                         value="Print request"
-                                                        actionListener="#{cEActionRequestsBB.prepareReport}"
+                                                        actionListener="#{cEActionRequestsBB.prepareReportSingleCEAR}"
                                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
                                                         disabled="false"
                                                         oncomplete="PF('cear-print-dialog-var').show()"
@@ -352,10 +366,16 @@
 
 
                                     <div class="outlinedBox">
-                                        <h3>Code Enforcement Action Request</h3>
                                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd" id="selectedRequestDetails">
 
+                                            <h:panelGroup>
+                                                <h:outputLabel class="bold" value="Date Submitted" />
+                                                <p:spacer height="5px"/>
+                                                <div class="wrapText">
+                                                    <h:outputText id="selr-submitted-ts"  value="#{cEActionRequestsBB.selectedRequest.formattedSubmittedTimeStamp}"/>
+                                                </div>
+                                            </h:panelGroup>
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="ID"/>
                                                 <p:spacer height="5px"/>
@@ -418,13 +438,6 @@
 
                                             </h:panelGroup>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel class="bold" value="Date Submitted" />
-                                                <p:spacer height="5px"/>
-                                                <div class="wrapText">
-                                                    <h:outputText id="selr-submitted-ts"  value="#{cEActionRequestsBB.selectedRequest.formattedSubmittedTimeStamp}"/>
-                                                </div>
-                                            </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <div class="wrapText">
@@ -1297,21 +1310,21 @@
                         
                         <h:form id="cear-print-form">
                             
-                                        <h2>Title</h2>
+                                        <h2>Print code enforcement requests</h2>
 
-                                        <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+                                        <h:outputLabel for="report-cear-title-it" value="Report title"/>
 
                                         <p:spacer height="5px"/>
 
-                                        <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{cEActionRequestsBB.reportConfig.title}"/>
+                                        <p:inputText id="report-cear-title-it" style="width: 300px;" value="#{cEActionRequestsBB.reportConfig.title}"/>
                                         <p:spacer height="2px"/>
                                         <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
                                         <p:spacer height="10px"/>
 
-                                        <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                        <h:outputLabel for="report-cear-notes-ita" value="Notes"/>
                                         <p:spacer height="5px"/>
-                                        <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{cEActionRequestsBB.reportConfig.notes}"/>
+                                        <p:inputText id="report-cear-notes-ita" style="width: 300px; height: 100px;" value="#{cEActionRequestsBB.reportConfig.notes}"/>
                                         <p:spacer height="5px"/>
 
                                         <h2>Display options</h2>
@@ -1336,9 +1349,13 @@
                                                  value="Cancel" icon="fa fa-stop" 
                                                  onclick="PF('cear-print-dialog-var').hide()"/>
 
-                                        <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReport}"
+                                        <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReportSingleCEAR}"
+                                                 value="Print code enforcement request" icon="fa fa-print" 
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions and !cEActionRequestsBB.reportConfig.printFullCEARQueue}"
+                                                 />
+                                        <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReportMultiCEAR}"
                                                  value="Generate report" icon="fa fa-print" 
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions and cEActionRequestsBB.reportConfig.printFullCEARQueue}"
                                                  />
                             </h:form>
 

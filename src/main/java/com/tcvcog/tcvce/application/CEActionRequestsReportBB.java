@@ -27,7 +27,7 @@ public class CEActionRequestsReportBB extends BackingBeanUtils implements Serial
     
     @PostConstruct
     public void initBean(){
-        Report r = getSessionBean().getActiveReport();
+        Report r = getSessionBean().getSessionReport();
         if(r instanceof ReportCEARList){
             reportConfig = (ReportCEARList) r;
         }

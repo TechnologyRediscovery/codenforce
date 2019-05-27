@@ -157,7 +157,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         sessionBean.setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("arbitraryPlaceholderPersonID"))));
         
-        sessionBean.setQueryCEAR(searchCoord.getQueryInitialCEAR(u, m));
+        sessionBean.setSessionQueryCEAR(searchCoord.getQueryInitialCEAR(u, m));
         
         CECase c = caseInt.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("arbitraryPlaceholderCaseID")));

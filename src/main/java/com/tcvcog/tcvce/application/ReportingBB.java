@@ -218,7 +218,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      * @return the currentReport
      */
     public Report getCurrentReport() {
-        currentReport = getSessionBean().getActiveReport();
+        currentReport = getSessionBean().getSessionReport();
         return currentReport;
     }
 

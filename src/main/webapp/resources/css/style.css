@@ -442,6 +442,30 @@ div.printer-friendly-report .ui-widget-content{
     font-family: sans-serif;
 }
 
+.report-cear-requestbox{
+    font-size: .7em;
+    padding: 5px;
+    background-color: white;
+    margin: 15px;
+    border: thin solid #4774A0;
+    padding: 10px;
+/*    These two attributes are taken from .rowExpansion to see if we can use
+    only .outlinedBox divs for the row expansion*/
+    white-space: normal;
+    overflow-wrap: normal;
+}
+
+.ui-widget-content{
+    border: none;
+}
+
+.cear-request-titlehead{
+    font-size: 2em;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+
 
 
 /* ----------- Horizontal bars: LAYOUT BOXES  (OLD)-------- */

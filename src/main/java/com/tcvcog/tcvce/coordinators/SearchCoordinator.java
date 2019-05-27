@@ -92,7 +92,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         if(query.getQueryName().logQueryRun()){
             logRun(query);
         }
-        return ceari.queryCEARs(query);
+        return ceari.runQueryCEAR(query);
     }
     
     public void logRun(Query q){
@@ -156,6 +156,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         query = new QueryCEAR(qName, m, paramList, u);
+        query.setExecutedByIntegrator(false);
         return query;
     }
     
