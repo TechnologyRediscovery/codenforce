@@ -695,21 +695,22 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
         CEActionRequest cear;
+        int paramCounter = 0;
 
         try {
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, params.getMuni().getMuniCode());
+            stmt.setInt(++paramCounter, params.getMuni().getMuniCode());
             // as long as we're not searching by ID only
             if (!params.isUseRequestID()) {
-                stmt.setTimestamp(2, params.getStartDateSQLDate());
-                stmt.setTimestamp(3, params.getEndDateSQLDate());
+                stmt.setTimestamp(++paramCounter, params.getStartDateSQLDate());
+                stmt.setTimestamp(++paramCounter, params.getEndDateSQLDate());
                 
                 if(params.isUseRequestStatus()){
-                    stmt.setInt(4, params.getRequestStatus().getStatusID());
+                    stmt.setInt(++paramCounter, params.getRequestStatus().getStatusID());
                 }
 
             } else {
-                stmt.setInt(2, params.getRequestID());
+                stmt.setInt(++paramCounter, params.getRequestID());
             }
 
             System.out.println("CEActionRequestIntegrator.getCEActionRequestList | stmt: " + stmt.toString());

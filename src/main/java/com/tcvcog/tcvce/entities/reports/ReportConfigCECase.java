@@ -6,12 +6,9 @@
 package com.tcvcog.tcvce.entities.reports;
 
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseEvent;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  *
@@ -20,9 +17,6 @@ import java.util.List;
 public class ReportConfigCECase extends Report{
     
     private CECase cse;
-    
-    private List<CECaseEvent> eventListForReport;
-    private List<NoticeOfViolation> noticeListForReport;
     
     private boolean includeCaseName; // add to ui
     
@@ -222,34 +216,6 @@ public class ReportConfigCECase extends Report{
      */
     public void setIncludeViolationPhotos(boolean includeViolationPhotos) {
         this.includeViolationPhotos = includeViolationPhotos;
-    }
-
-    /**
-     * @return the eventListForReport
-     */
-    public List<CECaseEvent> getEventListForReport() {
-        return eventListForReport;
-    }
-
-    /**
-     * @return the noticeListForReport
-     */
-    public List<NoticeOfViolation> getNoticeListForReport() {
-        return noticeListForReport;
-    }
-
-    /**
-     * @param eventListForReport the eventListForReport to set
-     */
-    public void setEventListForReport(List<CECaseEvent> eventListForReport) {
-        this.eventListForReport = eventListForReport;
-    }
-
-    /**
-     * @param noticeListForReport the noticeListForReport to set
-     */
-    public void setNoticeListForReport(List<NoticeOfViolation> noticeListForReport) {
-        this.noticeListForReport = noticeListForReport;
     }
     
     

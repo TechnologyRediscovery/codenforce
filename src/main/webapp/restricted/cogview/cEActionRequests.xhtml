@@ -166,9 +166,10 @@
                                         <p:commandButton    id="custom-query-cb"
                                                             ajax="true" 
                                                             value="Execute custom query" 
-                                                            actionListener="#{cEActionRequestsBB.executeQuery}"
-                                                            update="actionRequestListForm
-                                                            msgForm
+                                                            actionListener="#{cEActionRequestsBB.executeCustomQuery}"
+                                                            update="
+                                                                actionRequestListForm
+                                                                msgForm
                                                             "/>
 
                                     </p:fieldset>
@@ -183,7 +184,8 @@
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                     </h:messages>
 
-                                    <h:outputText id="query-results-ot" value="Execution timestamp: #{cEActionRequestsBB.selectedQueryCEAR.executionTimestampPretty}" />
+                                    <h:outputText id="query-results-ot" value="results from query named #{cEActionRequestsBB.selectedQueryCEAR.queryName.title} 
+                                                  | execution timestamp: #{cEActionRequestsBB.selectedQueryCEAR.executionTimestampPretty}" />
                                     
                                     <p:dataTable
                                         id="actionRequestTable"

@@ -16,9 +16,10 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.ReportCEARList;
+import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
+import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -96,7 +97,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     @PostConstruct
     public void initBean() {
-        CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
 
         QueryCEAR sessionQuery = getSessionBean().getQueryCEAR();
@@ -137,7 +137,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void executeQuery(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchC = getSearchCoordinator();
         try {
             requestList = searchC.runQuery(selectedQueryCEAR).getResults();
@@ -160,16 +159,29 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public void executeCustomQuery(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
+        SearchCoordinator searchCoord = getSearchCoordinator();
         try {
-            requestList = cc.getCEARList(searchParams);
+            
+            selectedQueryCEAR = searchCoord.assembleQueryCEAR(
+                                                    QueryCEAREnum.CUSTOM,
+                                                    getSessionBean().getFacesUser(), 
+                                                    getSessionBean().getActiveMuni(), 
+                                                    searchParams);
+            requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
+            
+            
             generateCEARReasonDonutModel();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                             "Success!", ""));
+                             "Your query completed with " + requestList.size() + " results!", ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                              "Unable to query action requests, sorry", ""));
+        } catch (AuthorizationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                             ex.getMessage(), ""));
         }
     }
 
@@ -179,7 +191,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
         if (selectedQueryCEAR != null) {
             rpt.setTitle("Report of: " + selectedQueryCEAR.getQueryName().getTitle());
-            rpt.setNotes(selectedQueryCEAR.getQueryName().getTitle());
+            rpt.setNotes(selectedQueryCEAR.getQueryName().getDesc());
 
         }
         reportConfig = rpt;
