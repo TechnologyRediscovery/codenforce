@@ -3,8 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tcvcog.tcvce.entities;
+package com.tcvcog.tcvce.entities.reports;
 
+import com.tcvcog.tcvce.entities.EntityUtils;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.Query;
 import java.io.Serializable;
 import java.time.LocalDateTime;

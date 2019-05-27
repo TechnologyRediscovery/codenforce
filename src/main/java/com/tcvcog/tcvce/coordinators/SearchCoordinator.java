@@ -49,7 +49,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
      public QueryCEAR getQueryInitialCEAR(User u, Municipality m) throws IntegrationException{
-        return assembleQueryCEAR(QueryCEAREnum.ALL_PAST30, u, m);
+        return assembleQueryCEAR(Constants.QUERY_INITIAL_CEAR, u, m, null);
         
     }
     
@@ -66,7 +66,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //        qList.add(assembleQueryCEAR(QueryCEAREnum.ALL_PAST30, u, m));
         for(QueryCEAREnum queryTitle: nameArray){
             // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
-            queryList.add(assembleQueryCEAR(queryTitle, u, m));
+            queryList.add(assembleQueryCEAR(queryTitle, u, m, null));
         }
         return queryList;
     }
@@ -107,11 +107,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param u the requesting User
      * @param m the requesting Municipality. NOTE: It's up to the CaseCoordinator
      * to enforce access rules here
+     * @param params optional params. If this object is not null, the query will
+     * automatically become a custom query
      * @return assembled instance ready for sending to runQuery
      */
-    public QueryCEAR assembleQueryCEAR(QueryCEAREnum qName, User u, Municipality m) throws IntegrationException{
+    public QueryCEAR assembleQueryCEAR(QueryCEAREnum qName, User u, Municipality m, SearchParamsCEActionRequests params) throws IntegrationException{
         QueryCEAR query;
         List<SearchParamsCEActionRequests> paramList = new ArrayList<>();
+        
+        if(params != null){
+            qName = QueryCEAREnum.CUSTOM;
+        }
         
         switch(qName){
             case UNPROCESSED:
@@ -139,6 +145,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 
             case BY_CURRENT_USER:
                 paramList.add(generateParams_CEAR_Unprocessed(m));
+                break;
+                
+            case CUSTOM:
+                paramList.add(params);
                 break;
                 
             default:

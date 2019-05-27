@@ -17,6 +17,9 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
+import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
+import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -125,12 +128,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public List<CEActionRequest> getCEARList(SearchParamsCEActionRequests params) throws IntegrationException{
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        return ceari.getCEActionRequestList(params);
-        
-    }
-    
+   
     public ReportCEARList getInitializedReportConficCEARs(User u, Municipality m){
         ReportCEARList rpt = new ReportCEARList();
         rpt.setIncludePhotos(true);
