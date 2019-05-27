@@ -88,8 +88,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         cse.setShowHiddenEvents(false);
         cse.setShowInactiveEvents(false);
         
-   
-        
         // check to make sure we have empty lists on all of our list objects
         if(cse.getViolationList() == null){
             cse.setViolationList(new ArrayList<CodeViolation>());
@@ -127,39 +125,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
-    /**
-     * Asks the SearchCoordinator for the appropriate 
-     * 
-     * @param m
-     * @return an search params object for CEAction requests with default values
-     * which amount to requests that aren't attached to a case and were submitted
-     * within the past 10 years
-     */
-    public SearchParamsCEActionRequests getDefaultSearchParamsCEActionRequests(Municipality m){
-        
-        SearchCoordinator sc = getSearchCoordinator();
-        return sc.generateParams_CEAR_Unprocessed(m);
-    }
-    
-   
-    public QueryCEAR generateInitialCEARList(User u, Municipality m) throws IntegrationException{
-        SearchCoordinator sc = getSearchCoordinator();
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        
-        return ceari.queryCEARs(sc.buildCEARQuery(QueryCEAREnum.ALL_PAST30, u, m));
-        
-    }
-    
-    public QueryCEAR performQueryCEAR(QueryCEAR q) throws IntegrationException{
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        return ceari.queryCEARs(q);
-    }
-   
     public List<CEActionRequest> getCEARList(SearchParamsCEActionRequests params) throws IntegrationException{
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         return ceari.getCEActionRequestList(params);
-        
         
     }
     

@@ -1067,7 +1067,19 @@ gridTd-bignum{
     background-color: bisque;
 }
 
+
 /***********************CLOSE TABLE STYLES**********************/
+
+
+/*---------------------CHARTS ---------------------------*/
+
+.jqplot-table-legend{
+    border: none;
+}
+
+
+/***********************CLOSE CHARTS **********************/
+
 
 
 /*---------------------BUTTONS & CONTROLS---------------------------*/

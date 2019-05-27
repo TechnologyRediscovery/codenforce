@@ -5,13 +5,20 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryBacked;
+import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 
 /**
  *
  * @author sylvia
  */
-public class ReportConfigCEEventList extends Report{
+public class ReportConfigCEEventList 
+        extends Report
+        implements QueryBacked{
+    
+    private QueryEventCECase queryEventCECase;
     
     private boolean includeAttachedPersons;
     private boolean includeEventTypeSummaryChart;
@@ -19,7 +26,8 @@ public class ReportConfigCEEventList extends Report{
     private boolean includeCaseActionRequestInfo;
     private boolean includeCompleteQueryParamsDump;
     
-    private SearchParamsEventCECase queryParams;
+    
+    
 
     /**
      * @return the includeCaseActionRequestInfo
@@ -91,18 +99,15 @@ public class ReportConfigCEEventList extends Report{
         this.includeCompleteQueryParamsDump = includeCompleteQueryParamsDump;
     }
 
-    /**
-     * @return the queryParams
-     */
-    public SearchParamsEventCECase getQueryParams() {
-        return queryParams;
+
+    @Override
+    public Query getBOBQuery() {
+        return queryEventCECase;
     }
 
-    /**
-     * @param queryParams the queryParams to set
-     */
-    public void setQueryParams(SearchParamsEventCECase queryParams) {
-        this.queryParams = queryParams;
+    @Override
+    public void setBOBQuery(Query q) {
+        queryEventCECase = (QueryEventCECase) q;
     }
     
     

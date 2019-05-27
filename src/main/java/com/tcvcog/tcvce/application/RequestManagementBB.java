@@ -47,7 +47,7 @@ public class RequestManagementBB extends BackingBeanUtils implements Serializabl
      */
     public CEActionRequest getCurrentRequest() {
         if(currentRequest == null){
-            currentRequest = getSessionBean().getActiveRequest();
+            currentRequest = getSessionBean().getSessionCEAR();
         }
         return currentRequest;
     }

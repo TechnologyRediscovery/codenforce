@@ -15,7 +15,7 @@ import com.tcvcog.tcvce.entities.CECaseBaseClass;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.Query;
@@ -41,7 +41,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class CEEventsBB extends BackingBeanUtils implements Serializable {
+public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
 
     
     private SearchParamsEventCECase searchParams;
@@ -54,11 +54,10 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     
     private List<Query> queryList;
     private Query selectedBOBQuery;
-    private SearchParamsEventCECase extractedSearchParams;
     
-    private List<EventCasePropBundle> eventList;
-    private List<EventCasePropBundle> eventListForEventsReport;
-    private List<EventCasePropBundle> filteredEventList;
+    private List<EventCECaseCasePropBundle> eventList;
+   
+    private List<EventCECaseCasePropBundle> filteredEventList;
     
     private ReportConfigCEEventList reportConfig;
     
@@ -66,16 +65,14 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * Creates a new instance of CEEventsBB
      */
-    public CEEventsBB() {
+    public EventsCECaseBB() {
     }
      
     @PostConstruct
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
-        eventListForEventsReport = getSessionBean().getcEEventWCPIQueue();
-        searchParams = ec.getSearchParamsCEEventsRequiringAction(
-                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+       
         queryList = sc.getEventQueryList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
        
         // grab previously loaded event config from the session bean
@@ -86,7 +83,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         
     }
     
-    public void hideEvent(EventCasePropBundle ev){
+    public void hideEvent(EventCECaseCasePropBundle ev){
         EventIntegrator ei = getEventIntegrator();
         try {
             ei.updateEvent(ev.getEvent());
@@ -127,10 +124,10 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     public void executeQuery(){
         System.out.println("CEEventsBB.executeQuery");
         EventCoordinator ec = getEventCoordinator();
-        QueryEventCECase eq = (QueryEventCECase) selectedBOBQuery;
-        searchParams = eq.getEventSearchParams();
+        QueryEventCECase eventQuery = (QueryEventCECase) selectedBOBQuery;
+        searchParams = (SearchParamsEventCECase) eventQuery.getParamsList().get(0);
         try {
-            eventList = ec.queryEvents( eq.getEventSearchParams(), 
+            eventList = ec.queryEvents((SearchParamsEventCECase) eventQuery.getParamsList().get(0), 
                                         getSessionBean().getFacesUser(), 
                                         getSessionBean().getUserAuthMuniList());
             
@@ -164,7 +161,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         
     }
     
-    public String editEventInCaseManager(EventCasePropBundle ev){
+    public String editEventInCaseManager(EventCECaseCasePropBundle ev){
         CaseIntegrator ci = getCaseIntegrator();
         CECaseBaseClass caseNoLists = ev.getEventCaseBare();
         try {
@@ -204,7 +201,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
             if(selectedBOBQuery != null){
                  reportConfig.setTitle(selectedBOBQuery.getQueryTitle());
             }
-            reportConfig.setQueryParams(searchParams);
+//            reportConfig.setQueryParams(searchParams);
        } else {
            getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -275,7 +272,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the eventList
      */
-    public List<EventCasePropBundle> getEventList() {
+    public List<EventCECaseCasePropBundle> getEventList() {
         
         return eventList;
     }
@@ -283,7 +280,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventList
      */
-    public List<EventCasePropBundle> getFilteredEventList() {
+    public List<EventCECaseCasePropBundle> getFilteredEventList() {
         return filteredEventList;
     }
 
@@ -311,14 +308,14 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventCasePropBundle> eventList) {
+    public void setEventList(List<EventCECaseCasePropBundle> eventList) {
         this.eventList = eventList;
     }
 
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventCasePropBundle> filteredEventList) {
+    public void setFilteredEventList(List<EventCECaseCasePropBundle> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 
@@ -348,7 +345,7 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedBOBQuery(Query selectedBOBQuery) {
         QueryEventCECase eq = (QueryEventCECase) selectedBOBQuery;
-        searchParams = eq.getEventSearchParams();
+        searchParams = (SearchParamsEventCECase) eq.getParamsList().get(0);
         this.selectedBOBQuery = selectedBOBQuery;
     }
 
@@ -380,38 +377,5 @@ public class CEEventsBB extends BackingBeanUtils implements Serializable {
         this.reportConfig = reportConfig;
     }
 
-    /**
-     * @return the eventListForEventsReport
-     */
-    public List<EventCasePropBundle> getEventListForEventsReport() {
-        return eventListForEventsReport;
-    }
-
-    /**
-     * @param eventListForEventsReport the eventListForEventsReport to set
-     */
-    public void setEventListForEventsReport(List<EventCasePropBundle> eventListForEventsReport) {
-        this.eventListForEventsReport = eventListForEventsReport;
-    }
-
-    /**
-     * @return the extractedSearchParams
-     */
-    public SearchParamsEventCECase getExtractedSearchParams() {
-        QueryEventCECase eq;
-        if(selectedBOBQuery != null){
-              eq = (QueryEventCECase) selectedBOBQuery;
-              extractedSearchParams = eq.getEventSearchParams();
-        }
-        return extractedSearchParams;
-    }
-
-    /**
-     * @param extractedSearchParams the extractedSearchParams to set
-     */
-    public void setExtractedSearchParams(SearchParamsEventCECase extractedSearchParams) {
-        this.extractedSearchParams = extractedSearchParams;
-    }
-    
     
 }

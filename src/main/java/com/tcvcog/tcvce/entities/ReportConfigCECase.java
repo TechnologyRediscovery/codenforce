@@ -5,6 +5,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
 import java.io.Serializable;
 
 /**

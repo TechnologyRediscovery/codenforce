@@ -336,7 +336,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         try { 
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(req);
-            getSessionBean().setActiveRequest(ceari.getActionRequestByRequestID(submittedActionRequestID));
+            getSessionBean().setSessionCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
             
             // commit photos to db and link to request
             if(req.getPhotoList() == null || req.getPhotoList().isEmpty())

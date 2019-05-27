@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
@@ -69,12 +69,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     
     private List<CEActionRequest> queueCEAR;
+    
+    private CEActionRequest sessionCEAR;
     private QueryCEAR queryCEAR;
     private ReportCEARList reportCOnfigCEARList;
     
     
     private List<CECase> cECaseQueue;
-    private List<EventCasePropBundle> cEEventWCPIQueue;
+    private List<EventCECaseCasePropBundle> cEEventWCPIQueue;
     private List<CodeViolation> violationQueue;
     private List<OccupancyInspection> inspectionQueue;
     
@@ -102,7 +104,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
 
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
-    private CEActionRequest activeRequest;
     private CECase cECase;
     
      /* *** Code Enforcement Case Session Shelves ***  */
@@ -444,17 +445,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activeRequest
+     * @return the sessionCEAR
      */
-    public CEActionRequest getActiveRequest() {
-        return activeRequest;
+    public CEActionRequest getSessionCEAR() {
+        return sessionCEAR;
     }
 
     /**
-     * @param activeRequest the activeRequest to set
+     * @param sessionCEAR the sessionCEAR to set
      */
-    public void setActiveRequest(CEActionRequest activeRequest) {
-        this.activeRequest = activeRequest;
+    public void setSessionCEAR(CEActionRequest sessionCEAR) {
+        this.sessionCEAR = sessionCEAR;
     }
 
     /**
@@ -563,14 +564,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /*
      * @return the cEEventWCPIQueue
      */
-    public List<EventCasePropBundle> getcEEventWCPIQueue() {
+    public List<EventCECaseCasePropBundle> getcEEventWCPIQueue() {
         return cEEventWCPIQueue;
     }
 
     /**
      * @param cEEventWCPIQueue the cEEventWCPIQueue to set
      */
-    public void setcEEventWCPIQueue(List<EventCasePropBundle> cEEventWCPIQueue) {
+    public void setcEEventWCPIQueue(List<EventCECaseCasePropBundle> cEEventWCPIQueue) {
         this.cEEventWCPIQueue = cEEventWCPIQueue;
     }
 

@@ -16,7 +16,8 @@ import java.io.Serializable;
  * 
  * @author sylvia
  */
-public class EventCasePropBundle implements Serializable, Comparable<EventCasePropBundle> {
+public class EventCECaseCasePropBundle 
+        implements Serializable, Comparable<EventCECaseCasePropBundle> {
     
     private CECaseBaseClass eventCase;
     private EventCECase event;
@@ -52,7 +53,7 @@ public class EventCasePropBundle implements Serializable, Comparable<EventCasePr
     }
 
     @Override
-    public int compareTo(EventCasePropBundle ev) {
+    public int compareTo(EventCECaseCasePropBundle ev) {
         int c = this.event.getDateOfRecord().compareTo(ev.event.getDateOfRecord());
         return c;
     }

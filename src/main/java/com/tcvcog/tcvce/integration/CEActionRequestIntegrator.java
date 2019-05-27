@@ -623,9 +623,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
      */
     public QueryCEAR queryCEARs(QueryCEAR q) throws IntegrationException{
         List<SearchParamsCEActionRequests> pList = q.getParmsList();
+        
         for(SearchParamsCEActionRequests sp: pList){
             q.addToResults(getCEActionRequestList(sp));
         }
+        q.setExecutionTimestamp(LocalDateTime.now());
+        System.out.println("CEActionRequestIntegrator.QueryCEARs | returning list of size: " + q.getBOBResultList().size());
         return q;
         
     }

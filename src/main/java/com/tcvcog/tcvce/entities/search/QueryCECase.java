@@ -20,12 +20,29 @@ import java.util.Objects;
 public class QueryCECase 
         extends Query{
     
+    private String title;
     private List<SearchParamsCECases> searchParams; 
     private List<CECase> caseList;
     
-    public QueryCECase(String queryTitle, Municipality muni) {
-        super(queryTitle, muni);
+    public QueryCECase(Municipality muni, User u) {
+        super(muni, u);
     }
+
+    @Override
+    public List getBOBResultList() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setBOBResultList(List l) {
+        caseList = l;
+    }
+
+    @Override
+    public List getParmsList() {
+        return searchParams;
+    }
+    
 
     /**
      * @return the searchParams
@@ -41,29 +58,13 @@ public class QueryCECase
         this.searchParams = searchParams;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 23 * hash + Objects.hashCode(this.searchParams);
-        return hash;
-    }
+  
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
+    public void clearResultList() {
+        if(caseList != null){
+            caseList.clear();
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final QueryCECase other = (QueryCECase) obj;
-        if (!Objects.equals(this.searchParams, other.searchParams)) {
-            return false;
-        }
-        return true;
     }
 
    
@@ -73,7 +74,6 @@ public class QueryCECase
      *
      * @return
      */
-    @Override
     public List<SearchParamsCECases> getParamsList() {
         return searchParams;
     }
@@ -92,10 +92,50 @@ public class QueryCECase
         this.caseList = caseList;
     }
 
-    @Override
     public void setParamsList(List l) {
         searchParams = l;
     }
+
+    @Override
+    public String getQueryTitle() {
+        return title;
+        
+    }
+    
+    public void setQueryTitle(String t){
+        title = t;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + Objects.hashCode(this.title);
+        hash = 97 * hash + Objects.hashCode(this.searchParams);
+        hash = 97 * hash + Objects.hashCode(this.caseList);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final QueryCECase other = (QueryCECase) obj;
+        if (!Objects.equals(this.searchParams, other.searchParams)) {
+            return false;
+        }
+        if (!Objects.equals(this.caseList, other.caseList)) {
+            return false;
+        }
+        return true;
+    }
+    
     
     
     

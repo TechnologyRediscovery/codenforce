@@ -27,7 +27,9 @@ import java.util.Objects;
  *
  * @author Eric C. Darsow
  */
-public class Event extends EntityUtils implements Serializable, Comparable<Event> {
+public class Event 
+        extends EntityUtils 
+        implements Serializable, Comparable<Event> {
     
     private int eventID;
     

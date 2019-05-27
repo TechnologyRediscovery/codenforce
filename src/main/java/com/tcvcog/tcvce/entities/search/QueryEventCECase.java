@@ -17,39 +17,20 @@ import java.util.Objects;
  */
 public class QueryEventCECase extends Query {
     
-    private SearchParamsEventCECase eventSearchParams;
+    private QueryEventCECase queryEventCECase;
     
     // should be a list of search params eventually so we can build
     // queries from a set of search params
     private List<SearchParamsEventCECase> eventSearchParamsList;
     private List<EventCECase> results;
     
-    public QueryEventCECase(String queryTitle, Municipality muni) {
-        super(queryTitle, muni);
+    public QueryEventCECase(Municipality muni, User u) {
+        super(muni, u);
     }
 
-    /**
-     * @return the eventSearchParams
-     */
-    public SearchParamsEventCECase getEventSearchParams() {
-        return eventSearchParams;
-    }
-
-    /**
-     * @param eventSearchParams the eventSearchParams to set
-     */
-    public void setEventSearchParams(SearchParamsEventCECase eventSearchParams) {
-        this.eventSearchParams = eventSearchParams;
-    }
-
-    @Override
+    
     public List getParamsList() {
         return eventSearchParamsList;
-    }
-
-    @Override
-    public void setParamsList(List l) {
-        eventSearchParamsList = l;
     }
 
     @Override
@@ -60,6 +41,23 @@ public class QueryEventCECase extends Query {
     @Override
     public void setBOBResultList(List l) {
         results = l;
+    }
+
+    @Override
+    public List getParmsList() {
+        return eventSearchParamsList;
+    }
+
+    @Override
+    public String getQueryTitle() {
+        return queryEventCECase.getQueryTitle();
+    }
+
+    @Override
+    public void clearResultList() {
+        if(results != null){
+            results.clear();
+        }
     }
 
    
