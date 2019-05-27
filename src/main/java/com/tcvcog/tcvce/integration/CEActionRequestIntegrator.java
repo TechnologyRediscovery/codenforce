@@ -615,26 +615,29 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     
     
     /**
-     * Unpacks a Query object and asks getCEActionRequestList for a set of CEARs
-     * for each of SearchParams object in the given Query
+     * Unpacks a Query object and asks selectWithSearchParams for a set of CEARs
+ for each of SearchParams object in the given Query
      * @param q a fully-baked Query, meaning it has its own Params
      * @return The set of returned CEARs from each SearchParams inside this Query
      * @throws IntegrationException 
      */
-    public QueryCEAR queryCEARs(QueryCEAR q) throws IntegrationException{
+    public QueryCEAR runQueryCEAR(QueryCEAR q) throws IntegrationException{
         List<SearchParamsCEActionRequests> pList = q.getParmsList();
         
         for(SearchParamsCEActionRequests sp: pList){
-            q.addToResults(getCEActionRequestList(sp));
+            q.addToResults(selectWithSearchParams(sp));
         }
         q.setExecutionTimestamp(LocalDateTime.now());
         System.out.println("CEActionRequestIntegrator.QueryCEARs | returning list of size: " + q.getBOBResultList().size());
+        q.setExecutedByIntegrator(true);
         return q;
         
     }
     
     /**
-     * Primary retrieval method for Code Enforcement Action Requests. Implements
+     * Called by runQueryCEAR() only!
+     * 
+     * Internal retrieval method for Code Enforcement Action Requests. Implements
      * a multi-stage SQL statement building process based on the settings on the
      * SearchParams object passed into this method.
      *
@@ -647,7 +650,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
      * 
      * @throws IntegrationException
      */
-    public List<CEActionRequest> getCEActionRequestList(SearchParamsCEActionRequests params) throws IntegrationException {
+    private List<CEActionRequest> selectWithSearchParams(SearchParamsCEActionRequests params) throws IntegrationException {
         List<CEActionRequest> list = new ArrayList();
         StringBuilder sb = new StringBuilder();
 

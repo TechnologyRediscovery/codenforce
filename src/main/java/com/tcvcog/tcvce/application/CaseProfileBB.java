@@ -324,7 +324,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setReportConfigCECase(reportCECase);
         // this is for use by the report header to have a super class with only
         // the basic info. reportingBB exposes it to the faces page
-        getSessionBean().setActiveReport(reportCECase);
+        getSessionBean().setSessionReport(reportCECase);
         // force our reportingBB to choose the right bundle
         getSessionBean().setReportConfigCECaseList(null);
 
@@ -351,7 +351,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setReportConfigCECaseList(reportCECaseList);
         getSessionBean().setReportConfigCECase(null);
         getSessionBean().setcECaseQueue(caseList);
-        getSessionBean().setActiveReport(reportCECaseList);
+        getSessionBean().setSessionReport(reportCECaseList);
         return "reportCECaseList";
 
     }

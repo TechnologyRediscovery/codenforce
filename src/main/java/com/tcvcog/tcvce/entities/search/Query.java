@@ -45,6 +45,8 @@ public abstract class Query<E extends BOB>
     private LocalDateTime executionTimestamp;
     private String executionTimestampPretty;
     
+    private boolean executedByIntegrator;
+    
     public abstract List<E> getBOBResultList();
     public abstract void setBOBResultList(List<E> l);
     
@@ -146,6 +148,20 @@ public abstract class Query<E extends BOB>
             executionTimestampPretty = getPrettyDate(executionTimestamp);
         }
         return executionTimestampPretty;
+    }
+
+    /**
+     * @return the executedByIntegrator
+     */
+    public boolean isExecutedByIntegrator() {
+        return executedByIntegrator;
+    }
+
+    /**
+     * @param executedByIntegrator the executedByIntegrator to set
+     */
+    public void setExecutedByIntegrator(boolean executedByIntegrator) {
+        this.executedByIntegrator = executedByIntegrator;
     }
 
     

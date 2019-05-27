@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -99,7 +100,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void initBean() {
         SearchCoordinator sc = getSearchCoordinator();
 
-        QueryCEAR sessionQuery = getSessionBean().getQueryCEAR();
+        QueryCEAR sessionQuery = getSessionBean().getSessionQueryCEAR();
 
         selectedRequest = getSessionBean().getSessionCEAR();
 
@@ -132,7 +133,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             donut.setShowDataLabels(true);
             
             requestReasonDonut = donut;
-        }
+        } 
+        
 
     }
 
@@ -185,27 +187,88 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
     }
 
-    public void prepareReport(ActionEvent ev) {
+    
+    
+    public void prepareReportMultiCEAR(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
+        SearchCoordinator searchCoord = getSearchCoordinator();
+        
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
                 getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+        
+        rpt.setPrintFullCEARQueue(true);
         if (selectedQueryCEAR != null) {
-            rpt.setTitle("Report of: " + selectedQueryCEAR.getQueryName().getTitle());
+            //go run the Query if it hasn't been yet
+            if(!selectedQueryCEAR.isExecutedByIntegrator()){
+                try {
+                    selectedQueryCEAR = searchCoord.runQuery(selectedQueryCEAR);
+                } catch (AuthorizationException | IntegrationException ex) {
+                    System.out.println(ex);
+                }
+            }
+            rpt.setTitle("Code enforcement requests: " + selectedQueryCEAR.getQueryName().getTitle());
             rpt.setNotes(selectedQueryCEAR.getQueryName().getDesc());
+            rpt.setBOBQuery(selectedQueryCEAR);
 
         }
+        reportConfig = rpt;
+    }
+    
+    /**
+     *
+     * @param ev
+     */
+    public void prepareReportSingleCEAR(ActionEvent ev) {
+        CaseCoordinator cc = getCaseCoordinator();
+        SearchCoordinator searchCoord = getSearchCoordinator();
+        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
+                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+        rpt.setPrintFullCEARQueue(false);
+        try {
+            QueryCEAR query = searchCoord.assembleQueryCEAR(
+                                                QueryCEAREnum.CUSTOM, 
+                                                getSessionBean().getFacesUser(), 
+                                                getSessionBean().getActiveMuni(), 
+                                                null);
+            List<CEActionRequest> singleReqList = new ArrayList<>();
+            selectedRequest.setInsertPageBreakBefore(false);
+            singleReqList.add(selectedRequest);
+            query.addToResults(singleReqList);
+            query.setExecutionTimestamp(LocalDateTime.now());
+            rpt.setBOBQuery(query);
+            rpt.setGenerationTimestamp(LocalDateTime.now());
+            rpt.setTitle("Code enforcement request");
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                             "Unable to build query, sorry!", ""));
+            
+        }
+        
         reportConfig = rpt;
 
     }
 
-    public String generateReport() {
-        getSessionBean().setReportCOnfigCEARList(reportConfig);
-        requestList.remove(selectedRequest);
-        requestList.add(0, selectedRequest);
-        Collections.sort(requestList);
-        getSessionBean().setQueueCEAR(requestList);
+    public String generateReportSingleCEAR() {
+        getSessionBean().setSessionCEAR(selectedRequest);
+        getSessionBean().setSessionReport(reportConfig);
+        getSessionBean().setSessionQueryCEAR(selectedQueryCEAR);
         return "reportCEARList";
 
+    }
+    
+    public String generateReportMultiCEAR(){
+        getSessionBean().setSessionCEAR(selectedRequest);
+        
+        Collections.sort(reportConfig.getBOBQuery().getBOBResultList());
+        
+        // tell the first request in the list to not print a page break before itself
+        reportConfig.getBOBQuery().getBOBResultList().get(0).setInsertPageBreakBefore(false);
+        
+        getSessionBean().setSessionReport(reportConfig);
+        getSessionBean().setSessionQueryCEAR(selectedQueryCEAR);
+        return "reportCEARList";
     }
 
     public String path1CreateNewCaseAtProperty() {
@@ -993,6 +1056,9 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
      * @return the requestReasonDonut
      */
     public DonutChartModel getRequestReasonDonut() {
+        if(requestReasonDonut == null){
+            requestReasonDonut = new DonutChartModel();
+        }
         return requestReasonDonut;
     }
 

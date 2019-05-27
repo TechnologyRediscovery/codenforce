@@ -29,11 +29,14 @@
                                     </h:outputLabel>
 
                                     <p:selectOneListbox 
-                                        id="violationSOLB" tabindex="8"
+                                        id="violationSOLB" tabindex="1"
+                                        required="true"
                                         style="width: 100%;" value="#{sessionBean.ceactionRequestForSubmission.issueType_issueTypeID}">
 
                                         <f:selectItems value="#{cEActionRequestSubmitBB.violationTypeMap}"/>
                                     </p:selectOneListbox>
+                                    <h:message for="violationSOLB" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     <p:spacer height="10px"/>
 
@@ -44,7 +47,7 @@
                                     <p:inputTextarea 
                                         id="requestDescription" 
                                         styleClass="textArea" 
-                                        rows="6" tabindex="9"
+                                        rows="6" tabindex="2"
                                         required="true" 
                                         style="width: 100%;"
                                         value="#{sessionBean.ceactionRequestForSubmission.requestDescription}" />
@@ -58,10 +61,10 @@
                                     </h:outputLabel>
 
                                                 <p:calendar value="#{sessionBean.ceactionRequestForSubmission.dateOfRecordUtilDate}" 
-                                                mode="popup" tabindex="10"
+                                                mode="popup" tabindex="3"
                                                 id="dateOfRecord"
                                                 showOn="button"
-                                                pattern="EEE, dd MMM, yyyy"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                 maxdate="#{cEActionRequestSubmitBB.currentDate}"
                                                 navigator="true"
                                                 showButtonPanel="true"
@@ -78,17 +81,20 @@
                                    
                                     <p:spacer height="10px"/>
 
-                                    <p:inputSwitch tabindex="11" id="isIUrgentSwitch" 
+                                    <p:inputSwitch tabindex="4" id="isIUrgentSwitch" 
                                                    onLabel="Yes" offLabel="No" />
                                     
                                         <h:outputLabel for="remainAnonymousIS" >
                                             <h:outputText styleClass="uiLabel" value="Do you wish to remain anonymous during the code enforcement investigation?" />
                                         </h:outputLabel>
-                                    <p:inputSwitch id="remainAnonymousIS" value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested}" onLabel="Yes" offLabel="No" tabindex="25"/>
+                                    <p:inputSwitch id="remainAnonymousIS" 
+                                                   value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested}" 
+                                                   onLabel="Yes" 
+                                                   offLabel="No" tabindex="5"/>
 
                                     <p:spacer height="10px"/>
 
-                                    <p:commandButton  ajax="false" tabindex="12"
+                                    <p:commandButton  ajax="false" tabindex="6"
                                                       value="Next: Upload photos of your concern" id="continueToPhotoUploadButton"
                                                       action="#{cEActionRequestSubmitBB.saveConcernDescriptions}"/>
 

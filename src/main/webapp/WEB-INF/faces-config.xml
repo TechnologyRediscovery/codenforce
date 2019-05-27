@@ -635,6 +635,7 @@
         <navigation-case>
             <from-outcome>reportCEARList</from-outcome>
             <to-view-id>/restricted/reports/reportCEARList.xhtml</to-view-id>
+            <redirect />
         </navigation-case>
     </navigation-rule>
 

@@ -19,24 +19,23 @@ public class ReportCEARList
         extends Report 
         implements Serializable, QueryBacked{
     
+    /**
+     * This report config needs to work for printing single requests
+     * and multiple ones. Turn this switch on when reporting only the active CEAR
+     */
     private boolean printFullCEARQueue;
     private boolean includePhotos;
-    
-    
-    /**
-     * a Query has search params and a List of BOB results
-     */
-    private QueryCEAR cearQuery;
+    private QueryCEAR queryCEAR;
 
     @Override
-    public Query getBOBQuery() {
-        return cearQuery;
+    public QueryCEAR getBOBQuery() {
+        return queryCEAR;
 
     }
 
     @Override
     public void setBOBQuery(Query q) {
-        cearQuery = (QueryCEAR) q;
+        queryCEAR = (QueryCEAR) q;
     }
     
 

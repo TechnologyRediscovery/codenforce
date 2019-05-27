@@ -71,8 +71,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<CEActionRequest> queueCEAR;
     
     private CEActionRequest sessionCEAR;
-    private QueryCEAR queryCEAR;
-    private ReportCEARList reportCOnfigCEARList;
+    private QueryCEAR sessionQueryCEAR;
     
     
     private List<CECase> cECaseQueue;
@@ -116,7 +115,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private PublicInfoBundleCECase pibCECase;
 
     /* *** Reporting *** */
-    private Report activeReport;
+    private Report sessionReport;
     
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
@@ -404,7 +403,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setQueueCEAR(List<CEActionRequest> qc) {
         if(qc != null && qc.size() > 0 ){
-            setQueryCEAR(null);
+            setSessionQueryCEAR(null);
             this.queueCEAR = qc;
         }
     }
@@ -605,17 +604,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activeReport
+     * @return the sessionReport
      */
-    public Report getActiveReport() {
-        return activeReport;
+    public Report getSessionReport() {
+        return sessionReport;
     }
 
     /**
-     * @param activeReport the activeReport to set
+     * @param sessionReport the sessionReport to set
      */
-    public void setActiveReport(Report activeReport) {
-        this.activeReport = activeReport;
+    public void setSessionReport(Report sessionReport) {
+        this.sessionReport = sessionReport;
     }
 
     /**
@@ -647,31 +646,19 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the queryCEAR
+     * @return the sessionQueryCEAR
      */
-    public QueryCEAR getQueryCEAR() {
-        return queryCEAR;
+    public QueryCEAR getSessionQueryCEAR() {
+        return sessionQueryCEAR;
     }
 
     /**
-     * @param queryCEAR the queryCEAR to set
+     * @param sessionQueryCEAR the sessionQueryCEAR to set
      */
-    public void setQueryCEAR(QueryCEAR queryCEAR) {
-        this.queryCEAR = queryCEAR;
+    public void setSessionQueryCEAR(QueryCEAR sessionQueryCEAR) {
+        this.sessionQueryCEAR = sessionQueryCEAR;
     }
 
-    /**
-     * @return the reportCOnfigCEARList
-     */
-    public ReportCEARList getReportCOnfigCEARList() {
-        return reportCOnfigCEARList;
-    }
-
-    /**
-     * @param reportCOnfigCEARList the reportCOnfigCEARList to set
-     */
-    public void setReportCOnfigCEARList(ReportCEARList reportCOnfigCEARList) {
-        this.reportCOnfigCEARList = reportCOnfigCEARList;
-    }
+    
     
 }

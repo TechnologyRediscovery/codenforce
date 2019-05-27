@@ -107,13 +107,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     @PostConstruct
     public void initBean(){
         CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
-        PersonCoordinator pc = getPersonCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
-        PersonIntegrator persInt = getPersonIntegrator();
         User facesUser = getSessionBean().getFacesUser();
-        if(req != null){
-            currentRequest = req;
-        } 
+        currentRequest = req;
         
         // set date of record to current date
         form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
@@ -231,7 +227,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 System.out.println(ex.toString());
                     getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
+                                "INTEGRATION ERROR: Unable save photos, our apologies!", 
                                 "Please call your municipal office and report your concern by phone."));
                 return "";
             }
@@ -262,6 +258,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             System.out.println("CEActionRequestBB.handlePhotoUpload | event: null");
             return;
         }
+        int newPhotoID = 0;
         
         ImageServices is = getImageServices();
         Photograph ph = new Photograph();
@@ -271,12 +268,15 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         ph.setTimeStamp(LocalDateTime.now());
         // store photo on the request (by id)
         try {
-           getSessionBean().getCeactionRequestForSubmission().getPhotoList().add(is.storePhotograph(ph));
+           newPhotoID = is.storePhotograph(ph);
+           getSessionBean().getCeactionRequestForSubmission().getPhotoList().add(newPhotoID);
+           System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | stored photo ID " + newPhotoID );
         } catch (IntegrationException ex) {
             System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | upload failed!\n" + ex);
             return;
         }
         this.photoList.add(ph);
+        
     }
     
     
@@ -289,7 +289,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         CEActionRequest req = currentRequest;
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        ImageServices is = getImageServices();
+        ImageServices imageServices = getImageServices();
         PersonIntegrator pi = getPersonIntegrator();
         
         int submittedActionRequestID;
@@ -339,12 +339,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             getSessionBean().setSessionCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
             
             // commit photos to db and link to request
-            if(req.getPhotoList() == null || req.getPhotoList().isEmpty())
+            if(req.getPhotoList() != null && !req.getPhotoList().isEmpty()){
                 for(Integer photoID : req.getPhotoList()){
-                    is.commitPhotograph(photoID);
-                    is.linkPhotoToActionRequest(photoID, submittedActionRequestID);
+                    imageServices.commitPhotograph(photoID);
+                    imageServices.linkPhotoToActionRequest(photoID, submittedActionRequestID);
                 }
-                    
+            }
             // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 
