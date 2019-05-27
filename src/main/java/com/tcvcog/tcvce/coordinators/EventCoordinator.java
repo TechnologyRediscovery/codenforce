@@ -5,7 +5,7 @@ Council of Governments, PA
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option) any later version.O
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
@@ -105,9 +105,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<EventCasePropBundle> configureEventBundleList(  List<EventCasePropBundle> evList, 
+    public List<EventCECaseCasePropBundle> configureEventBundleList(  List<EventCECaseCasePropBundle> evList, 
                                                                 User user, List<Municipality> userAuthMuniList) throws IntegrationException{
-        Iterator<EventCasePropBundle> iter = evList.iterator();
+        Iterator<EventCECaseCasePropBundle> iter = evList.iterator();
         while(iter.hasNext()){
             configureEvent(iter.next().getEvent(), user, userAuthMuniList);
         }
@@ -169,9 +169,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<EventCasePropBundle> queryEvents(SearchParamsEventCECase params, User user, List<Municipality> userAuthMuniList) throws IntegrationException, CaseLifecyleException{
+    public List<EventCECaseCasePropBundle> queryEvents(SearchParamsEventCECase params, User user, List<Municipality> userAuthMuniList) throws IntegrationException, CaseLifecyleException{
         EventIntegrator ei = getEventIntegrator();
-        List<EventCasePropBundle> evList = configureEventBundleList(ei.queryEvents(params),user,userAuthMuniList);
+        List<EventCECaseCasePropBundle> evList = configureEventBundleList(ei.queryEvents(params),user,userAuthMuniList);
         return evList;
     }
     

@@ -40,8 +40,12 @@
                                         <f:converter converterId="bOBQueryConverter"/>
                                         <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
                                         <f:selectItems id="querylist-si" value="#{cEActionRequestsBB.queryList}" var="q" itemValue="#{q}" itemLabel="#{q.queryTitle}" />
-                                        <p:ajax />
+                                        <p:ajax 
+                                            update="cears-query-desc-ot"
+                                            />
                                     </p:selectOneMenu>
+                                    
+                                    
 
                                     <p:commandButton    id="execute-selected-query" 
                                                         ajax="true"
@@ -50,9 +54,13 @@
                                                         disabled="false"
                                                         icon="fa fa-wheelchair-alt"
                                                         update="
-                                                        search-params-form
-
+                                                            search-params-form
+                                                            actionRequestListForm
                                                         "/>
+                                    <p:spacer height="5px" />
+                                    <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
+                                    <p:spacer height="5px" />
+                                    <h:outputText id="cears-query-desc-ot" value="#{cEActionRequestsBB.selectedQueryCEAR.queryName.desc}" />
 
                                 </h:form>
 
@@ -167,13 +175,16 @@
 
                                 </h:form>
 
-                                <h2>Code Enforcement Action Requests</h2>
+                                <h2>Results</h2>
+                                
 
                                 <h:form id="actionRequestListForm">
                                     <h:messages id="actionQueryMessages" globalOnly="true" showDetail="true" showSummary="true"
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                     </h:messages>
 
+                                    <h:outputText id="query-results-ot" value="Execution timestamp: #{cEActionRequestsBB.selectedQueryCEAR.executionTimestampPretty}" />
+                                    
                                     <p:dataTable
                                         id="actionRequestTable"
                                         var="r"
@@ -242,12 +253,12 @@
                                     <p:spacer height="15px"/>
 
 
-                                    <p:chart type="donut" model="#{cEActionRequestsBB.cEARReasonDonut}" style="width:600px; height: 600px;"/>
+                                    <p:chart type="donut" 
+                                             rendered="#{cEActionRequestsBB.requestList.size() > 0}"
+                                             model="#{cEActionRequestsBB.requestReasonDonut}" 
+                                             style="width:600px; height: 600px;"/>
 
 
-                                    <p:commandLink value="Export table as pdf report" ajax="false">
-                                        <p:dataExporter type="pdf" target="actionRequestTable" fileName="actionRequestReport_#{sessionBean.activeMuni.muniName}"/>
-                                    </p:commandLink>
 
                                 </h:form>
 

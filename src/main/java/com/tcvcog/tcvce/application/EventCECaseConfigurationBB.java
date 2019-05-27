@@ -40,7 +40,7 @@ import javax.faces.event.ActionEvent;
 public class EventCECaseConfigurationBB extends BackingBeanUtils implements Serializable{
 
     private EventCategory selectedEventCategory;
-    private List<EventCategory> eventCategoryList;
+    private ArrayList<EventCategory> eventCategoryList;
     private List<Icon> iconList;
      
     private EventType[] eventTypeList;
@@ -75,21 +75,6 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
     
     @PostConstruct
     public void initBean(){
-        
-        if(eventCategoryList == null){
-            try {
-                EventIntegrator ei = getEventIntegrator();
-                eventCategoryList = ei.getEventCategoryList();
-                //return eventCategoryList;
-            } catch (IntegrationException ex) {
-                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to load event category list", 
-                            "This must be corrected by the System Administrator"));
-            }
-            
-        } 
-        
         SystemIntegrator si = getSystemIntegrator();
         try {
             iconList = si.getIconList();
@@ -110,7 +95,7 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
             setFormUserdeployable(selectedEventCategory.isUserdeployable());
             setFormMunideployable(selectedEventCategory.isMunideployable());
             setFormPublicdeployable(selectedEventCategory.isPublicdeployable());
-//            setFormRequestable(selectedEventCategory.isRequestable());
+            setFormRequestable(selectedEventCategory.isRequestable());
             setFormNotifycasemonitors(selectedEventCategory.isNotifycasemonitors());
             setFormHidable(selectedEventCategory.isHidable());
             
@@ -135,7 +120,7 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
         ec.setUserdeployable(formUserdeployable);
         ec.setMunideployable(formMunideployable);
         ec.setPublicdeployable(formPublicdeployable);
-//        ec.setRequestable(formRequestable);
+        ec.setRequestable(formRequestable);
         ec.setNotifycasemonitors(formNotifycasemonitors);
         ec.setHidable(formHidable);
         
@@ -167,7 +152,7 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
         ec.setUserdeployable(newFormUserdeployable);
         ec.setMunideployable(newFormMunideployable);
         ec.setPublicdeployable(newFormPublicdeployable);
-//        ec.setRequestable(newFormRequestable);
+        ec.setRequestable(newFormRequestable);
         ec.setNotifycasemonitors(newFormNotifycasemonitors);
         ec.setHidable(newFormHidable);
         
@@ -221,8 +206,23 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
     /**
      * @return the eventCategoryList
      */
-    public List<EventCategory> getEventCategoryList() {
-        return eventCategoryList;
+    public ArrayList<EventCategory> getEventCategoryList() {
+        if(eventCategoryList == null){
+            try {
+                EventIntegrator ei = getEventIntegrator();
+                eventCategoryList = ei.getEventCategoryList();
+                //return eventCategoryList;
+            } catch (IntegrationException ex) {
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Unable to load event category list", 
+                            "This must be corrected by the System Administrator"));
+            }
+            return eventCategoryList;
+            
+        } else {
+            return eventCategoryList;
+        }
         
     }
 

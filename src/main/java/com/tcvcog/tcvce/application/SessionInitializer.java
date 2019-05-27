@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
@@ -136,33 +137,36 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     
         
     private void populateSessionObjectQueues(User u, Municipality m) throws IntegrationException, CaseLifecyleException{
+        SessionBean sessionBean = getSessionBean();
+        
         PersonCoordinator persCoord = getPersonCoordinator();
         CaseCoordinator caseCoord = getCaseCoordinator();
         PropertyIntegrator propI = getPropertyIntegrator();
         PersonIntegrator persInt = getPersonIntegrator();
         CaseIntegrator caseInt = getCaseIntegrator();
+        SearchCoordinator searchCoord = getSearchCoordinator();
         
         
-        getSessionBean().setPersonQueue(persCoord.loadPersonHistoryList(u));
-        getSessionBean().setcECaseQueue(caseCoord.getUserCaseHistoryList(u));
+        sessionBean.setPersonQueue(persCoord.loadPersonHistoryList(u));
+        sessionBean.setcECaseQueue(caseCoord.getUserCaseHistoryList(u));
         
         Property p = propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("arbitraryPlaceholderPropertyID")));
-        getSessionBean().setActiveProp(p);
+        sessionBean.setActiveProp(p);
 
-        getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+        sessionBean.setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("arbitraryPlaceholderPersonID"))));
-
-        getSessionBean().setQueueCEAR(caseCoord.generateInitialCEARList(u, m).getResults());
+        
+        sessionBean.setQueryCEAR(searchCoord.getQueryInitialCEAR(u, m));
         
         CECase c = caseInt.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("arbitraryPlaceholderCaseID")));
-        getSessionBean().setcECase(c);
+        sessionBean.setcECase(c);
         
-//        getSessionBean().setcECaseQueue(new ArrayList<CECase>());
-//        getSessionBean().getcECaseQueue().add(c);
+//        sessionBean.setcECaseQueue(new ArrayList<CECase>());
+//        sessionBean.getcECaseQueue().add(c);
         
-        getSessionBean().setPropertyQueue(propI.getPropertyHistoryList(u));
-        getSessionBean().getPropertyQueue().add(p);
+        sessionBean.setPropertyQueue(propI.getPropertyHistoryList(u));
+        sessionBean.getPropertyQueue().add(p);
     }
 }

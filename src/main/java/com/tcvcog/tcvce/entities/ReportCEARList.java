@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryBacked;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import java.io.Serializable;
 import java.util.List;
@@ -16,12 +17,15 @@ import java.util.List;
  */
 public class ReportCEARList 
         extends Report 
-        implements Serializable{
+        implements Serializable, QueryBacked{
     
     private boolean printFullCEARQueue;
     private boolean includePhotos;
     
-    // rember a Query has search params and a List of BOB results
+    
+    /**
+     * a Query has search params and a List of BOB results
+     */
     private QueryCEAR cearQuery;
 
     @Override
@@ -34,7 +38,6 @@ public class ReportCEARList
     public void setBOBQuery(Query q) {
         cearQuery = (QueryCEAR) q;
     }
-    
     
 
     /**

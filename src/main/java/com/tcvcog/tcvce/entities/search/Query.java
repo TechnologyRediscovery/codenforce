@@ -16,52 +16,51 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * An experimental Generic superclass of the Query family
+ * of objects. The writer of this class has never designed with
+ * Generics before and needs some high-stakes tinkering
+ * 
  * @author sylvia
- * @param <E>
+ * @param <E> the Business Object of which this Query is used to 
+ * retrieve sets
  */
 public abstract class Query<E extends BOB> 
         extends EntityUtils 
         implements Serializable{
     
-    private String queryTitle;
     private Municipality muni;
-    private RoleType userRankAccessCeiling;
-    private String resultsMessage;
     private User user;
+    
+    /**
+     * Security mechanism for controlling queried data: Coordinators
+     * must check incoming requests to runQuery to ensure that the requestor's
+     * rank meets the minimum for the Query. Since a number of locations use
+     * Query objects to get data, we need a uniform location from which 
+     * to control who can get what queried information.
+     * 
+     */
+    private RoleType userRankAccessMinimum;
+    
+    private String resultsMessage;
     private LocalDateTime executionTimestamp;
+    private String executionTimestampPretty;
     
     public abstract List<E> getBOBResultList();
     public abstract void setBOBResultList(List<E> l);
     
     public abstract List getParmsList();
-    public abstract void setParamsList(List l);
-
-
-    public Query(String queryTitle, Municipality muni) {
-        this.queryTitle = queryTitle;
-        this.muni = muni;
-        
-    }
+    public abstract String getQueryTitle();
     
-    public Query(Municipality muni) {
+    public abstract void clearResultList();
+    
+    public Query(Municipality muni, User u) {
         this.muni = muni;
+        this.user = u;
         
     }
     
     public Query(){
-        //emtpy
-    }
-    
-    
-    
-    
-
-    /**
-     * @return the queryTitle
-     */
-    public String getQueryTitle() {
-        return queryTitle;
+        //blank
     }
 
     /**
@@ -71,14 +70,6 @@ public abstract class Query<E extends BOB>
         return muni;
     }
 
-    
-
-    /**
-     * @param queryTitle the queryTitle to set
-     */
-    public void setQueryTitle(String queryTitle) {
-        this.queryTitle = queryTitle;
-    }
 
     /**
      * @param muni the muni to set
@@ -88,47 +79,20 @@ public abstract class Query<E extends BOB>
     }
 
     /**
-     * @return the userRankAccessCeiling
+     * @return the userRankAccessMinimum
      */
-    public RoleType getUserRankAccessCeiling() {
-        return userRankAccessCeiling;
+    public RoleType getUserRankAccessMinimum() {
+        return userRankAccessMinimum;
     }
 
     /**
-     * @param userRankAccessCeiling the userRankAccessCeiling to set
+     * @param userRankAccessMinimum the userRankAccessMinimum to set
      */
-    public void setUserRankAccessCeiling(RoleType userRankAccessCeiling) {
-        this.userRankAccessCeiling = userRankAccessCeiling;
+    public void setUserRankAccessMinimum(RoleType userRankAccessMinimum) {
+        this.userRankAccessMinimum = userRankAccessMinimum;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + Objects.hashCode(this.queryTitle);
-        hash = 67 * hash + Objects.hashCode(this.muni);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Query other = (Query) obj;
-        if (!Objects.equals(this.queryTitle, other.queryTitle)) {
-            return false;
-        }
-        if (!Objects.equals(this.muni, other.muni)) {
-            return false;
-        }
-        return true;
-    }
+  
 
     /**
      * @return the user
@@ -172,6 +136,16 @@ public abstract class Query<E extends BOB>
      */
     public void setExecutionTimestamp(LocalDateTime executionTimestamp) {
         this.executionTimestamp = executionTimestamp;
+    }
+
+    /**
+     * @return the executionTimestampPretty
+     */
+    public String getExecutionTimestampPretty() {
+        if(executionTimestamp != null){
+            executionTimestampPretty = getPrettyDate(executionTimestamp);
+        }
+        return executionTimestampPretty;
     }
 
     

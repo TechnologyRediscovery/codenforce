@@ -34,7 +34,7 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventCasePropBundle;
+import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Person;
@@ -494,7 +494,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @param ev
      * @return
      */
-    public String jumpToCasesToEditCEEvent(EventCasePropBundle ev) {
+    public String jumpToCasesToEditCEEvent(EventCECaseCasePropBundle ev) {
         CaseIntegrator ci = getCaseIntegrator();
         caseList = getSessionBean().getcECaseQueue();
         List<Property> propList = getSessionBean().getPropertyQueue();

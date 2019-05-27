@@ -376,9 +376,9 @@
     
     <managed-bean>
         <managed-bean-name>eventConfigurationBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventConfigurationBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseConfigurationBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>violationAddBB</managed-bean-name>
@@ -1495,9 +1495,9 @@
     </managed-bean>
     <managed-bean>
         <managed-bean-name>cEEventsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventsCECaseBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>propertyAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyAddBB</managed-bean-class>
@@ -1516,6 +1516,11 @@
     <managed-bean>
         <managed-bean-name>cEActionRequestsReportBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsReportBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>eventCECaseReportBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseReportBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 </faces-config>

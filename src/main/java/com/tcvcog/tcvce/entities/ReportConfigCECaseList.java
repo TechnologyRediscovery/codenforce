@@ -5,13 +5,17 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryBacked;
 import java.io.Serializable;
 
 /**
  *
  * @author sylvia
  */
-public class ReportConfigCECaseList extends Report implements Serializable{
+public class ReportConfigCECaseList 
+        extends Report 
+        implements Serializable, QueryBacked{
     
     private boolean includeListSummaryFigures;
     
@@ -104,6 +108,16 @@ public class ReportConfigCECaseList extends Report implements Serializable{
      */
     public void setIncludeExtendedPropertyDetails(boolean includeExtendedPropertyDetails) {
         this.includeExtendedPropertyDetails = includeExtendedPropertyDetails;
+    }
+
+    @Override
+    public Query getBOBQuery() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setBOBQuery(Query q) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     

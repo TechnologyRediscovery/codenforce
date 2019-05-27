@@ -16,7 +16,9 @@ import java.util.ArrayList;
  * attributes on Event. 
  * @author sylvia
  */
-public class EventCECase extends Event implements Serializable{
+public class EventCECase 
+        extends Event 
+        implements Serializable{
     
     
     private int caseID;

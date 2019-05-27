@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author sylvia
  */
-public abstract class Report 
+public abstract class Report
         extends EntityUtils 
         implements Serializable {
     
@@ -26,9 +26,11 @@ public abstract class Report
     private String notes;
     private boolean sortInRevChrono;
     
-    public abstract Query getBOBQuery();
-    public abstract void setBOBQuery(Query q);
-
+    /**
+     *
+     * @return
+     */
+   
     /**
      * @return the title
      */
