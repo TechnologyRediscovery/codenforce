@@ -625,7 +625,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         List<SearchParamsCEActionRequests> pList = q.getParmsList();
         
         for(SearchParamsCEActionRequests sp: pList){
-            q.addToResults(selectWithSearchParams(sp));
+            q.addToResults(getCEARs(sp));
         }
         q.setExecutionTimestamp(LocalDateTime.now());
         System.out.println("CEActionRequestIntegrator.QueryCEARs | returning list of size: " + q.getBOBResultList().size());
@@ -650,7 +650,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
      * 
      * @throws IntegrationException
      */
-    private List<CEActionRequest> selectWithSearchParams(SearchParamsCEActionRequests params) throws IntegrationException {
+    private List<CEActionRequest> getCEARs(SearchParamsCEActionRequests params) throws IntegrationException {
         List<CEActionRequest> list = new ArrayList();
         StringBuilder sb = new StringBuilder();
 

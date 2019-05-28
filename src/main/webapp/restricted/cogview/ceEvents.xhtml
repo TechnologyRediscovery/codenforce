@@ -33,18 +33,18 @@
 
                             <p:selectOneMenu id="eventquery-som" 
                                              tabindex="1" 
-                                             value="#{cEEventsBB.selectedBOBQuery}"
+                                             value="#{eventsCECaseBB.selectedBOBQuery}"
                                              style="margin-right: 10px;">
                                 <f:converter converterId="bOBQueryConverter"/>
                                 <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
-                                <f:selectItems id="querylist-si" value="#{cEEventsBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                <f:selectItems id="querylist-si" value="#{eventsCECaseBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
                                 <p:ajax />
                             </p:selectOneMenu>
 
                             <p:commandButton    id="execute-selected-query" 
                                                 ajax="true"
                                                 value="perform selected query" 
-                                                actionListener="#{cEEventsBB.executeQuery}"
+                                                actionListener="#{eventsCECaseBB.executeQuery}"
                                                 disabled="false"
                                                 icon="fa fa-wheelchair-alt"
                                                 update="
@@ -68,13 +68,13 @@
                                                      columnClasses="topbottom-lines-left, topbottom-lines-right">
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-muni-ol" for="seev-filter-type" value="filter by municipality? "/>
-                                                <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{cEEventsBB.searchParams.filterByMuni}" >
+                                                <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{eventsCECaseBB.searchParams.filterByMuni}" >
                                                     <p:ajax update="ceev-search-muni-som"/>
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
                                             <h:panelGroup>
-                                                <p:selectOneMenu id="ceev-search-muni-som" tabindex="1" value="#{cEEventsBB.searchParams.muni}"
-                                                                 disabled="#{!cEEventsBB.searchParams.filterByMuni}">
+                                                <p:selectOneMenu id="ceev-search-muni-som" tabindex="1" value="#{eventsCECaseBB.searchParams.muni}"
+                                                                 disabled="#{!eventsCECaseBB.searchParams.filterByMuni}">
                                                     <f:converter converterId="muniConverter"/>
                                                     <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
                                                     <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
@@ -89,7 +89,7 @@
                                                                for="ceev-search-startend-chkbx" 
                                                                styleClass="bold"
                                                                value="filter by date range? "/>
-                                                <p:selectBooleanCheckbox id="ceev-search-startend-chkbx" value="#{cEEventsBB.searchParams.filterByStartEndDate}" >
+                                                <p:selectBooleanCheckbox id="ceev-search-startend-chkbx" value="#{eventsCECaseBB.searchParams.filterByStartEndDate}" >
                                                     <p:ajax update="ceev-search-usedor-chkbx
                                                             ceev-search-vconf-chkbx 
                                                             ceev-search-timestamp-chkbx
@@ -102,22 +102,22 @@
 
                                                 <p:outputLabel id="ceev-search-usedor-ol" for="ceev-search-usedor-chkbx" value="use date of record field? "/>
                                                 <p:selectBooleanCheckbox id="ceev-search-usedor-chkbx" 
-                                                                         value="#{cEEventsBB.searchParams.useDateOfRecord}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByStartEndDate}"/>
+                                                                         value="#{eventsCECaseBB.searchParams.useDateOfRecord}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByStartEndDate}"/>
 
                                                 <p:spacer height="1px"/>
 
                                                 <p:outputLabel id="ceev-search-vconf-ol" for="ceev-search-vconf-chkbx" value="use view confirmed date field? "/>
                                                 <p:selectBooleanCheckbox id="ceev-search-vconf-chkbx" 
-                                                                         value="#{cEEventsBB.searchParams.useRespondedAtDateRange}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByStartEndDate}"/>
+                                                                         value="#{eventsCECaseBB.searchParams.useRespondedAtDateRange}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByStartEndDate}"/>
 
                                                 <p:spacer height="1px"/>
 
                                                 <p:outputLabel id="ceev-search-timestamp-ol" for="ceev-search-timestamp-chkbx" value="use entry timestamp field? "/>
                                                 <p:selectBooleanCheckbox id="ceev-search-timestamp-chkbx" 
-                                                                         value="#{cEEventsBB.searchParams.useEntryTimestamp}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByStartEndDate}"/>
+                                                                         value="#{eventsCECaseBB.searchParams.useEntryTimestamp}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByStartEndDate}"/>
 
                                             </h:panelGroup>
 
@@ -125,8 +125,8 @@
                                                 <p:spacer height="5px" />
                                                 <p:outputLabel id="eventDateCalStartOL" for="eventDateCalStart" value="query start date: "/>
                                                 <p:spacer height="1px"/>
-                                                <p:calendar id="eventDateCalStart" value="#{cEEventsBB.searchParams.startDateUtilDate}" 
-                                                            mode="popup" disabled="#{(!cEEventsBB.searchParams.filterByStartEndDate) or cEEventsBB.searchParams.useRelativeDates}"
+                                                <p:calendar id="eventDateCalStart" value="#{eventsCECaseBB.searchParams.startDateUtilDate}" 
+                                                            mode="popup" disabled="#{(!eventsCECaseBB.searchParams.filterByStartEndDate) or eventsCECaseBB.searchParams.useRelativeDates}"
                                                             showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                             navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="false" showSecond="false" showMillisec="false"
                                                             showButtonPanel="true" showTodayButton="true"
@@ -138,8 +138,8 @@
 
                                                 <p:outputLabel id="eventDateCalEndOL" for="eventDateCalEnd" value="query end date: "/>
                                                 <p:spacer height="1px"/>
-                                                <p:calendar id="eventDateCalEnd" value="#{cEEventsBB.searchParams.endDateUtilDate}" 
-                                                            mode="popup" disabled="#{(!cEEventsBB.searchParams.filterByStartEndDate) or cEEventsBB.searchParams.useRelativeDates}"
+                                                <p:calendar id="eventDateCalEnd" value="#{eventsCECaseBB.searchParams.endDateUtilDate}" 
+                                                            mode="popup" disabled="#{(!eventsCECaseBB.searchParams.filterByStartEndDate) or eventsCECaseBB.searchParams.useRelativeDates}"
                                                             showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                             navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                                             showButtonPanel="true" showTodayButton="true"
@@ -152,8 +152,8 @@
 
                                                 <p:outputLabel id="ceev-search-relative-dates-ol" for="ceev-search-relative-dates-cb" value="use relative dates? "/>
                                                 <p:selectBooleanCheckbox id="ceev-search-relative-dates-cb" 
-                                                                         value="#{cEEventsBB.searchParams.useRelativeDates}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByStartEndDate}">
+                                                                         value="#{eventsCECaseBB.searchParams.useRelativeDates}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByStartEndDate}">
                                                     <p:ajax update="eventDateCalStart
                                                             eventDateCalEnd
                                                             ceev-search-relative-dates-start-it
@@ -166,8 +166,8 @@
                                                 <p:outputLabel id="ceev-search-relative-dates-start-ol" for="ceev-search-relative-dates-start-it" value="start date in days (relative to today)"/>
                                                 <p:spacer height="1px"/>
                                                 <p:inputText id="ceev-search-relative-dates-start-it" 
-                                                             value="#{cEEventsBB.searchParams.startDateRelativeDays}" 
-                                                             disabled="#{!(cEEventsBB.searchParams.filterByStartEndDate and cEEventsBB.searchParams.useRelativeDates)}" />
+                                                             value="#{eventsCECaseBB.searchParams.startDateRelativeDays}" 
+                                                             disabled="#{!(eventsCECaseBB.searchParams.filterByStartEndDate and eventsCECaseBB.searchParams.useRelativeDates)}" />
                                                 <h:message for="ceev-search-relative-dates-start-it" showDetail="false" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
@@ -175,8 +175,8 @@
                                                 <p:outputLabel id="ceev-search-relative-dates-end-ol" for="ceev-search-relative-dates-end-it" value="end date in days (relative to today)"/>
                                                 <p:spacer height="1px"/>
                                                 <p:inputText id="ceev-search-relative-dates-end-it" 
-                                                             value="#{cEEventsBB.searchParams.endDateRelativeDays}" 
-                                                             disabled="#{!(cEEventsBB.searchParams.filterByStartEndDate and cEEventsBB.searchParams.useRelativeDates)}" />
+                                                             value="#{eventsCECaseBB.searchParams.endDateRelativeDays}" 
+                                                             disabled="#{!(eventsCECaseBB.searchParams.filterByStartEndDate and eventsCECaseBB.searchParams.useRelativeDates)}" />
                                                 <h:message for="ceev-search-relative-dates-end-it" showDetail="false" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
@@ -184,7 +184,7 @@
                                             <h:panelGroup>
                                                 <p:outputLabel id="seev-filter-type-ol" for="seev-filter-type" value="filter by event type? "/>
                                                 <p:selectBooleanCheckbox id="seev-filter-type" 
-                                                                         value="#{cEEventsBB.searchParams.filterByEventType}">
+                                                                         value="#{eventsCECaseBB.searchParams.filterByEventType}">
                                                     <p:ajax update="ceev-critera-type" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
@@ -196,10 +196,10 @@
                                                 </h:outputLabel>
                                                 <p:spacer height="1px" />
                                                 <p:selectOneMenu id="ceev-critera-type" required="false" 
-                                                                 value="#{cEEventsBB.searchParams.evtType}" tabindex="10"
-                                                                 disabled="#{!cEEventsBB.searchParams.filterByEventType}">
+                                                                 value="#{eventsCECaseBB.searchParams.evtType}" tabindex="10"
+                                                                 disabled="#{!eventsCECaseBB.searchParams.filterByEventType}">
                                                     <p:ajax update="ceev-criteria-cat" immediate="true"/> 
-                                                    <f:selectItems value="#{cEEventsBB.eventTypesList}"/>
+                                                    <f:selectItems value="#{eventsCECaseBB.eventTypesList}"/>
                                                 </p:selectOneMenu>
                                                 <h:message for="ceev-critera-type" showDetail="false" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -207,7 +207,7 @@
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-cat-ol" for="ceev-filter-cat" value="filter by event category? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-cat" value="#{cEEventsBB.searchParams.filterByEventCategory}">
+                                                <p:selectBooleanCheckbox id="ceev-filter-cat" value="#{eventsCECaseBB.searchParams.filterByEventCategory}">
                                                     <p:ajax update="ceev-criteria-cat" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
@@ -218,17 +218,17 @@
                                                 </h:outputLabel>
                                                 <p:spacer height="1px" />
                                                 <p:selectOneMenu id="ceev-criteria-cat" style="width: 300px;" 
-                                                                 value="#{cEEventsBB.searchParams.eventCategory}" tabindex="10"
-                                                                 disabled="#{!cEEventsBB.searchParams.filterByEventCategory}">
+                                                                 value="#{eventsCECaseBB.searchParams.eventCategory}" tabindex="10"
+                                                                 disabled="#{!eventsCECaseBB.searchParams.filterByEventCategory}">
                                                     <f:converter converterId="eventCategoryConverter"/>
-                                                    <f:selectItems  id="catItemsList" value="#{cEEventsBB.eventCatList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                                    <f:selectItems  id="catItemsList" value="#{eventsCECaseBB.eventCatList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
                                                 </p:selectOneMenu>
                                                 <h:message for="ceev-criteria-cat" showDetail="false" showSummary="true"  
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                             </h:panelGroup>
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-id-ol" for="ceev-filter-id" value="filter by ce case ID? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-id" value="#{cEEventsBB.searchParams.filterByCaseID}" 
+                                                <p:selectBooleanCheckbox id="ceev-filter-id" value="#{eventsCECaseBB.searchParams.filterByCaseID}" 
                                                                          disabled="false" >
                                                     <p:ajax update="ceev-criteria-caseid" />
                                                 </p:selectBooleanCheckbox>
@@ -238,15 +238,15 @@
                                                 <p:outputLabel id="ceev-criteria-caseid-ol" for="ceev-criteria-caseid" value="ce case ID:"/>
                                                 <p:spacer height="5px"/>
                                                 <p:inputText id="ceev-criteria-caseid" 
-                                                             value="#{cEEventsBB.searchParams.caseId}" 
-                                                             disabled="#{!cEEventsBB.searchParams.filterByCaseID}"/>
+                                                             value="#{eventsCECaseBB.searchParams.caseId}" 
+                                                             disabled="#{!eventsCECaseBB.searchParams.filterByCaseID}"/>
                                                 <h:message for="ceev-criteria-caseid" showDetail="false" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-creator-ol" for="ceev-filter-creator" value="filter by event owner? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-creator" value="#{cEEventsBB.searchParams.filterByEventOwner}" >
+                                                <p:selectBooleanCheckbox id="ceev-filter-creator" value="#{eventsCECaseBB.searchParams.filterByEventOwner}" >
                                                     <p:ajax update="ceev-criteria-user" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
@@ -258,10 +258,10 @@
                                                 <p:spacer height="5px"/>
 
                                                 <p:selectOneMenu id="ceev-criteria-user" required="false" 
-                                                                 value="#{cEEventsBB.searchParams.user}"
-                                                                 disabled="#{!cEEventsBB.searchParams.filterByEventOwner}">
+                                                                 value="#{eventsCECaseBB.searchParams.user}"
+                                                                 disabled="#{!eventsCECaseBB.searchParams.filterByEventOwner}">
                                                     <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
-                                                    <f:selectItems value="#{cEEventsBB.userList}"  var="u" itemValue="#{u}" 
+                                                    <f:selectItems value="#{eventsCECaseBB.userList}"  var="u" itemValue="#{u}" 
                                                                    itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
                                                     <f:converter converterId="userConverter"/>
                                                 </p:selectOneMenu>
@@ -269,7 +269,7 @@
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-person-ol" for="ceev-filter-person" value="filter by person? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-person" value="#{cEEventsBB.searchParams.filterByPerson}" >
+                                                <p:selectBooleanCheckbox id="ceev-filter-person" value="#{eventsCECaseBB.searchParams.filterByPerson}" >
                                                     <p:ajax update="ceev-criteria-person" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
@@ -278,8 +278,8 @@
                                                 <p:outputLabel id="ceev-criteria-person-ol" for="ceev-criteria-person" value="your current session's person list:"/>
                                                 <p:spacer height="5px"/>
                                                 <p:selectOneMenu id="ceev-criteria-person" required="false" 
-                                                                 value="#{cEEventsBB.searchParams.person}"
-                                                                 disabled="#{!cEEventsBB.searchParams.filterByPerson}">
+                                                                 value="#{eventsCECaseBB.searchParams.person}"
+                                                                 disabled="#{!eventsCECaseBB.searchParams.filterByPerson}">
                                                     <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
                                                     <f:selectItems value="#{sessionBean.personQueue}"  var="p" itemValue="#{p}" 
                                                                    itemLabel="#{p.firstName} #{p.lastName}"/>
@@ -299,30 +299,30 @@
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-active-ol" for="ceev-filter-active" value="filter by active? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-active" value="#{cEEventsBB.searchParams.filterByActive}" >
+                                                <p:selectBooleanCheckbox id="ceev-filter-active" value="#{eventsCECaseBB.searchParams.filterByActive}" >
                                                     <p:ajax update="ceev-criteria-active" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:selectBooleanCheckbox id="ceev-criteria-active" 
-                                                                         value="#{cEEventsBB.searchParams.isActive}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByActive}" />
+                                                                         value="#{eventsCECaseBB.searchParams.isActive}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByActive}" />
                                                 <p:outputLabel id="ceev-criteria-active-ol" for="ceev-criteria-active" 
                                                                value="(checked = only active events:)" styleClass="italic"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-hidden-ol" for="ceev-filter-hidden" value="filter by hidden? "/>
-                                                <p:selectBooleanCheckbox id="ceev-filter-hidden" value="#{cEEventsBB.searchParams.filterByHidden}" >
+                                                <p:selectBooleanCheckbox id="ceev-filter-hidden" value="#{eventsCECaseBB.searchParams.filterByHidden}" >
                                                     <p:ajax update="ceev-criteria-hidden" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
                                                 <p:selectBooleanCheckbox id="ceev-criteria-hidden" 
-                                                                         value="#{cEEventsBB.searchParams.isHidden}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByHidden}" />
+                                                                         value="#{eventsCECaseBB.searchParams.isHidden}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByHidden}" />
                                                 <p:outputLabel id="ceev-criteria-hidden-ol" for="ceev-criteria-hidden" 
                                                                value="(checked = only hidden events)" styleClass="italic"/>
                                             </h:panelGroup>
@@ -330,7 +330,7 @@
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-filter-eventid-ol" for="ceev-filter-eventid" value="filter by event ID? "/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-eventid" 
-                                                                         value="#{cEEventsBB.searchParams.filterByObjectID}" 
+                                                                         value="#{eventsCECaseBB.searchParams.filterByObjectID}" 
                                                                          styleClass="checkbox">
                                                     <p:ajax update="ceev-criteria-eventid" />
                                                 </p:selectBooleanCheckbox>
@@ -339,14 +339,14 @@
                                                 <p:outputLabel id="ceev-criteria-eventid-ol" for="ceev-criteria-eventid" value="event id:"/>
                                                 <p:spacer height="5px"/>
                                                 <p:inputText id="ceev-criteria-eventid" 
-                                                             value="#{cEEventsBB.searchParams.objectID}" 
-                                                             disabled="#{!cEEventsBB.searchParams.filterByObjectID}"/>
+                                                             value="#{eventsCECaseBB.searchParams.objectID}" 
+                                                             disabled="#{!eventsCECaseBB.searchParams.filterByObjectID}"/>
                                                 <h:message for="ceev-criteria-eventid" showDetail="false" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                             </h:panelGroup>
                                             <h:panelGroup>
                                                 <p:outputLabel id="ceev-query-limit-ol" for="ceev-query-limit" value="limit results to 100? "/>
-                                                <p:selectBooleanCheckbox id="ceev-query-limit" value="#{cEEventsBB.searchParams.limitResultCountTo100}" />
+                                                <p:selectBooleanCheckbox id="ceev-query-limit" value="#{eventsCECaseBB.searchParams.limitResultCountTo100}" />
                                             </h:panelGroup>
 
                                             <h:panelGroup></h:panelGroup>
@@ -362,7 +362,7 @@
                                                                value="filter by requests action? "
                                                                styleClass="bold"
                                                                />
-                                                <p:selectBooleanCheckbox id="ceev-filter-requestsaction-cb" value="#{cEEventsBB.searchParams.filterByrequestsAction}" >
+                                                <p:selectBooleanCheckbox id="ceev-filter-requestsaction-cb" value="#{eventsCECaseBB.searchParams.filterByrequestsAction}" >
                                                     <p:ajax update="ceev-criteria-requests-action-cb
                                                             ceev-filter-requested-action-status-cb
                                                             ceev-criteria-requested-action-status-cb
@@ -378,8 +378,8 @@
 
                                             <h:panelGroup styleClass="action-requests-search">
                                                 <p:selectBooleanCheckbox id="ceev-criteria-requests-action-cb" 
-                                                                         value="#{cEEventsBB.searchParams.requestsAction}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}" />
+                                                                         value="#{eventsCECaseBB.searchParams.requestsAction}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByrequestsAction}" />
                                                 <p:outputLabel id="ceev-criteria-requireview-info-ol" for="ceev-criteria-requests-action-cb" 
                                                                value="(checked = requests action)" styleClass="italic"/>
                                             </h:panelGroup>
@@ -389,16 +389,16 @@
                                                                for="ceev-filter-requested-action-status-cb" 
                                                                value="filter by requested action status? "/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-requested-action-status-cb" 
-                                                                         value="#{cEEventsBB.searchParams.filterByHasResponseEvent}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                                         value="#{eventsCECaseBB.searchParams.filterByHasResponseEvent}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByrequestsAction}">
                                                     <p:ajax update="ceev-criteria-requested-action-status-cb" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
 
                                             <h:panelGroup styleClass="action-requests-search">
                                                 <p:selectBooleanCheckbox id="ceev-criteria-requested-action-status-cb" 
-                                                                         value="#{cEEventsBB.searchParams.hasResponseEvent}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByHasResponseEvent or !cEEventsBB.searchParams.filterByrequestsAction}" 
+                                                                         value="#{eventsCECaseBB.searchParams.hasResponseEvent}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByHasResponseEvent or !eventsCECaseBB.searchParams.filterByrequestsAction}" 
                                                                          styleClass="checkbox"/>
                                                 <p:outputLabel id="ceev-filter-requested-action-status-info-ol" 
                                                                for="ceev-criteria-requested-action-status-cb" 
@@ -410,8 +410,8 @@
                                                                for="ceev-filter-requests-typecat-reqaction-cb" 
                                                                value="filter by requested action category"/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-requests-typecat-reqaction-cb" 
-                                                                         value="#{cEEventsBB.searchParams.filterByRequestedResponseEventCat}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                                         value="#{eventsCECaseBB.searchParams.filterByRequestedResponseEventCat}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByrequestsAction}">
                                                     <p:ajax update="ceev-criteria-requests-action-cb" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
@@ -427,24 +427,24 @@
                                                                for="ceev-filter-requests-user-requestor-cb" 
                                                                value="filter by requestor"/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-requests-user-requestor-cb" 
-                                                                         value="#{cEEventsBB.searchParams.filterByRequestor}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                                         value="#{eventsCECaseBB.searchParams.filterByRequestor}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByrequestsAction}">
                                                 </p:selectBooleanCheckbox>
                                                 <p:spacer height="5px" />
                                                 <p:outputLabel id="ceev-filter-requests-user-responder-intended-ol" 
                                                                for="ceev-filter-requests-user-responder-intended-cb" 
                                                                value="filter by intended responder"/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-requests-user-responder-intended-cb" 
-                                                                         value="#{cEEventsBB.searchParams.filterByResponderIntended}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                                         value="#{eventsCECaseBB.searchParams.filterByResponderIntended}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByrequestsAction}">
                                                 </p:selectBooleanCheckbox>
                                                 <p:spacer height="5px" />
                                                 <p:outputLabel id="ceev-filter-requests-user-responder-actual-ol" 
                                                                for="ceev-filter-requests-user-responder-actual-cb" 
                                                                value="filter by actual responder"/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-requests-user-responder-actual-cb" 
-                                                                         value="#{cEEventsBB.searchParams.filterByResponderActual}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                                         value="#{eventsCECaseBB.searchParams.filterByResponderActual}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByrequestsAction}">
                                                 </p:selectBooleanCheckbox>
 
                                             </h:panelGroup>
@@ -462,16 +462,16 @@
                                                                for="ceev-filter-requests-rejected-cb" 
                                                                value="filter by rejected request?"/>
                                                 <p:selectBooleanCheckbox id="ceev-filter-requests-rejected-cb" 
-                                                                         value="#{cEEventsBB.searchParams.filterByRejectedRequest}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByrequestsAction}">
+                                                                         value="#{eventsCECaseBB.searchParams.filterByRejectedRequest}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByrequestsAction}">
                                                     <p:ajax update="ceev-criteria-requests-rejected-cb" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
 
                                             <h:panelGroup styleClass="action-requests-search">
                                                 <p:selectBooleanCheckbox id="ceev-criteria-requests-rejected-cb" 
-                                                                         value="#{cEEventsBB.searchParams.rejectedRequest}" 
-                                                                         disabled="#{!cEEventsBB.searchParams.filterByRejectedRequest or !cEEventsBB.searchParams.filterByrequestsAction }" />
+                                                                         value="#{eventsCECaseBB.searchParams.rejectedRequest}" 
+                                                                         disabled="#{!eventsCECaseBB.searchParams.filterByRejectedRequest or !eventsCECaseBB.searchParams.filterByrequestsAction }" />
                                                 <p:outputLabel id="ceev-criteria-requests-rejected-ol" for="ceev-criteria-requests-rejected-cb" 
                                                                value="(checked = rejected)" styleClass="italic"/>
                                             </h:panelGroup>
@@ -479,11 +479,12 @@
                                     </h:panelGroup>
                                 </h:panelGrid>                               
                                 <p:commandButton    id="queryButton"
-                                                    ajax="true" value="Run query" actionListener="#{cEEventsBB.executeManualQuery}"
+                                                    ajax="true" value="Run query" actionListener="#{eventsCECaseBB.executeManualQuery}"
                                                     process="@form"
                                                     update="event-list-tabview:events-datascroller-form:events-datascroller
                                                     event-list-tabview:events-datatable-form:events-datatable
                                                     ceev-form-globalmessages:ceev-globalmessages
+                                                    
                                                     "
                                                     />
                             </p:fieldset>
@@ -496,7 +497,7 @@
                         <h:form id="eventlist-prepare-event-report-form">
                         
                          <p:commandButton   id="print-event-list-report-cb" 
-                                           ajax="true" actionListener="#{cEEventsBB.prepareEventReport}"
+                                           ajax="true" actionListener="#{eventsCECaseBB.prepareEventReport}"
                                            icon="fa fa-print" styleClass="button"
                                            oncomplete="PF('report-event-diaglog-var').show()"
                                            value="prepare event report" 
@@ -508,12 +509,7 @@
                        
                         <p:spacer height="5px" />
                         
-                        <p>
-                            <h:outputText styleClass="bold" value="Showing results in date range: " />
-                            <h:outputText value="#{cEEventsBB.extractedSearchParams.startDatePretty}" />
-                            <h:outputText styleClass="bold" value=" to " />
-                            <h:outputText value="#{cEEventsBB.extractedSearchParams.endDatePretty}" />
-                        </p>
+                      
 
                         <p:tabView id="event-list-tabview">
                             <p:tab title="list view (report preview)">
@@ -521,7 +517,7 @@
                                     <p:dataScroller
                                         id="events-datascroller"
                                         var="e"
-                                        value="#{cEEventsBB.eventList}"
+                                        value="#{eventsCECaseBB.eventList}"
                                         widgetVar="ceevent-ds-var">
 
                                         <div class="outlinedBox event-ds-box">
@@ -539,7 +535,7 @@
                                                                     value="view containing case" 
                                                                     style="background-color: white; font-size: small;"
                                                                     styleClass="button-float-right"
-                                                                    action="#{cEEventsBB.editEventInCaseManager(e)}"
+                                                                    action="#{eventsCECaseBB.editEventInCaseManager(e)}"
                                                                     disabled="false"
                                                                     icon="fa fa-arrow-circle-right"
                                                                     rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
@@ -550,7 +546,7 @@
                                                                     value="hide event" 
                                                                     style="background-color: white; font-size: small;"
                                                                     styleClass="button-float-right"
-                                                                    actionListener="#{cEEventsBB.hideEvent(e)}"
+                                                                    actionListener="#{eventsCECaseBB.hideEvent(e)}"
                                                                     icon="fa fa-moon-o"
                                                                     rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                                     update="event-list-tabview:events-datascroller-form:events-datascroller"
@@ -625,12 +621,12 @@
                                         id="events-datatable"
                                         var="e"
                                         rowKey="#{e.event.eventID}"
-                                        value="#{cEEventsBB.eventList}"
+                                        value="#{eventsCECaseBB.eventList}"
                                         tableStyleClass="primeDataTable"
                                         resizableColumns="true"
                                         rowExpandMode="multiple"
                                         expandedRow="false"
-                                        filteredValue="#{cEEventsBB.filteredEventList}"
+                                        filteredValue="#{eventsCECaseBB.filteredEventList}"
                                         widgetVar="ceevent-dt-var"
                                         >
                                         <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
@@ -853,7 +849,7 @@
 
                                         <p:spacer height="5px"/>
 
-                                        <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{cEEventsBB.reportConfig.title}"/>
+                                        <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{eventsCECaseBB.reportConfig.title}"/>
                                         <p:spacer height="2px"/>
                                         <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
@@ -861,7 +857,7 @@
 
                                         <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
                                         <p:spacer height="5px"/>
-                                        <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{cEEventsBB.reportConfig.notes}"/>
+                                        <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{eventsCECaseBB.reportConfig.notes}"/>
                                         <p:spacer height="5px"/>
                                     </f:facet>
 
@@ -871,7 +867,7 @@
                                         <h:outputLabel class="bold" value="Sort events: " for="sort-reverse-chrono-is" />
                                         <p:spacer height="1px"/>
                                         <p:inputSwitch  id="sort-reverse-chrono-is"
-                                                        value="#{cEEventsBB.reportConfig.sortInRevChrono}" 
+                                                        value="#{eventsCECaseBB.reportConfig.sortInRevChrono}" 
                                                         onLabel="Reverse chrono (newest first)" offLabel="Timeline order (oldest first)" />
                                         
                                         <p:spacer height="5px"/>
@@ -879,7 +875,7 @@
                                         <h:outputLabel class="bold" value="Include persons attached to events" for="include-attached-persons-is" />
                                         <p:spacer height="1px"/>
                                         <p:inputSwitch  id="include-attached-persons-is"
-                                                        value="#{cEEventsBB.reportConfig.includeAttachedPersons}" 
+                                                        value="#{eventsCECaseBB.reportConfig.includeAttachedPersons}" 
                                                         onLabel="Yes" offLabel="No" />
 
                                         <p:spacer height="5px"/>
@@ -887,7 +883,7 @@
                                         <h:outputLabel class="bold" value="Include event summary chart on page 1" for="include-event-summary-chart-is" />
                                         <p:spacer height="1px"/>
                                         <p:inputSwitch  id="include-event-summary-chart-is"
-                                                        value="#{cEEventsBB.reportConfig.includeEventTypeSummaryChart}" 
+                                                        value="#{eventsCECaseBB.reportConfig.includeEventTypeSummaryChart}" 
                                                         onLabel="Yes" offLabel="No" />
 
                                         <p:spacer height="5px"/>
@@ -895,7 +891,7 @@
                                         <h:outputLabel class="bold" value="Include list of all active cases" for="include-active-case-list-is" />
                                         <p:spacer height="1px"/>
                                         <p:inputSwitch  id="include-active-case-list-is"
-                                                        value="#{cEEventsBB.reportConfig.includeActiveCaseListing}" 
+                                                        value="#{eventsCECaseBB.reportConfig.includeActiveCaseListing}" 
                                                         onLabel="Yes" offLabel="No" />
 
                                         <p:spacer height="5px"/>
@@ -903,7 +899,7 @@
                                         <h:outputLabel class="bold" value="Include info about events requesting user action" for="include-action-requests-is" />
                                         <p:spacer height="1px"/>
                                         <p:inputSwitch  id="include-action-requests-is"
-                                                        value="#{cEEventsBB.reportConfig.includeCaseActionRequestInfo}" 
+                                                        value="#{eventsCECaseBB.reportConfig.includeCaseActionRequestInfo}" 
                                                         onLabel="Yes" offLabel="No" />
 
                                         <p:spacer height="5px"/>
@@ -911,7 +907,7 @@
                                         <h:outputLabel class="bold" value="Include complete query parameters" for="include-queryparams-is" />
                                         <p:spacer height="1px"/>
                                         <p:inputSwitch  id="include-queryparams-is"
-                                                        value="#{cEEventsBB.reportConfig.includeCompleteQueryParamsDump}" 
+                                                        value="#{eventsCECaseBB.reportConfig.includeCompleteQueryParamsDump}" 
                                                         onLabel="Yes" offLabel="No" />
 
                                         <p:spacer height="5px"/>
@@ -923,7 +919,7 @@
                                                  value="Cancel" icon="fa fa-stop" 
                                                  onclick="PF('report-event-diaglog-var').hide()"/>
 
-                                <p:commandButton ajax="false" action="#{cEEventsBB.generateEventReport}"
+                                <p:commandButton ajax="false" action="#{eventsCECaseBB.generateEventReport}"
                                                  value="Generate report" icon="fa fa-print" 
                                                  rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
                                                  />

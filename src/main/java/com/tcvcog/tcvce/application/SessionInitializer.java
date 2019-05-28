@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -149,6 +150,9 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         
         sessionBean.setPersonQueue(persCoord.loadPersonHistoryList(u));
         sessionBean.setcECaseQueue(caseCoord.getUserCaseHistoryList(u));
+        
+        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
+        sessionBean.setSessionQueryCECase(queryCECase);
         
         Property p = propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("arbitraryPlaceholderPropertyID")));

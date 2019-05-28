@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,98 +21,100 @@ import java.util.Objects;
 public class QueryCECase 
         extends Query{
     
-    private String title;
-    private List<SearchParamsCECases> searchParams; 
-    private List<CECase> caseList;
+    private QueryCECaseEnum queryName;
+    private List<SearchParamsCECases> searchParamsList; 
+    private List<CECase> results;
     
-    public QueryCECase(Municipality muni, User u) {
+    public QueryCECase( QueryCECaseEnum qName, 
+                        Municipality muni, 
+                        List<SearchParamsCECases> params,
+                        User u) {
         super(muni, u);
+        queryName = qName;
+        searchParamsList = new ArrayList<>();
+        searchParamsList.addAll(params);
+        results = new ArrayList<>();
+    }
+    
+    public void addToResults(List<CECase> list){
+        results.addAll(list);
     }
 
     @Override
     public List getBOBResultList() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return results;
     }
 
     @Override
     public void setBOBResultList(List l) {
-        caseList = l;
+        results = l;
     }
 
     @Override
     public List getParmsList() {
-        return searchParams;
+        return searchParamsList;
     }
     
 
     /**
-     * @return the searchParams
+     * @return the searchParamsList
      */
-    public List<SearchParamsCECases> getSearchParams() {
-        return searchParams;
+    public List<SearchParamsCECases> getSearchParamsList() {
+        return searchParamsList;
     }
 
     /**
-     * @param searchParams the searchParams to set
+     * @param searchParamsList the searchParamsList to set
      */
-    public void setSearchParams(List<SearchParamsCECases> searchParams) {
-        this.searchParams = searchParams;
+    public void setSearchParamsList(List<SearchParamsCECases> searchParamsList) {
+        this.searchParamsList = searchParamsList;
     }
-
-  
 
     @Override
     public void clearResultList() {
-        if(caseList != null){
-            caseList.clear();
+        if(results != null){
+            results.clear();
         }
     }
-
-   
-    
 
     /**
      *
      * @return
      */
     public List<SearchParamsCECases> getParamsList() {
-        return searchParams;
+        return searchParamsList;
     }
 
     /**
-     * @return the caseList
+     * @return the results
      */
-    public List<CECase> getCaseList() {
-        return caseList;
+    public List<CECase> getResults() {
+        return results;
     }
 
     /**
-     * @param caseList the caseList to set
+     * @param results the results to set
      */
-    public void setCaseList(List<CECase> caseList) {
-        this.caseList = caseList;
+    public void setResults(List<CECase> results) {
+        this.results = results;
     }
 
     public void setParamsList(List l) {
-        searchParams = l;
+        searchParamsList = l;
     }
 
     @Override
     public String getQueryTitle() {
-        return title;
+        return queryName.getTitle();
         
     }
     
-    public void setQueryTitle(String t){
-        title = t;
-    }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 97 * hash + Objects.hashCode(this.title);
-        hash = 97 * hash + Objects.hashCode(this.searchParams);
-        hash = 97 * hash + Objects.hashCode(this.caseList);
+        hash = 97 * hash + Objects.hashCode(this.searchParamsList);
+        hash = 97 * hash + Objects.hashCode(this.results);
         return hash;
     }
 
@@ -127,13 +130,18 @@ public class QueryCECase
             return false;
         }
         final QueryCECase other = (QueryCECase) obj;
-        if (!Objects.equals(this.searchParams, other.searchParams)) {
+        if(this.queryName != other.queryName){
             return false;
         }
-        if (!Objects.equals(this.caseList, other.caseList)) {
-            return false;
-        }
+        
         return true;
+    }
+
+    /**
+     * @return the queryName
+     */
+    public QueryCECaseEnum getQueryName() {
+        return queryName;
     }
     
     

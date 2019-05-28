@@ -18,7 +18,7 @@ public class ReportConfigCEEventList
         extends Report
         implements QueryBacked{
     
-    private QueryEventCECase queryEventCECase;
+    private QueryEventCECase queryParams;
     
     private boolean includeAttachedPersons;
     private boolean includeEventTypeSummaryChart;
@@ -102,14 +102,17 @@ public class ReportConfigCEEventList
 
     @Override
     public Query getBOBQuery() {
-        return queryEventCECase;
+        return queryParams;
     }
 
     @Override
     public void setBOBQuery(Query q) {
-        queryEventCECase = (QueryEventCECase) q;
+        queryParams = (QueryEventCECase) q;
     }
     
+    public SearchParamsEventCECase getQueryParams(){
+        return (SearchParamsEventCECase) queryParams.getParamsList().get(0);
+    }
     
     
     

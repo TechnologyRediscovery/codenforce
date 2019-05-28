@@ -34,6 +34,8 @@ import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.QueryEventCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -703,15 +705,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * Convenience method for extracting the case-dependent events from their
      * Wrapper bundle for use by the CaseManager page who just needs simple events
      * for each case.
-     * The Params are passed through to the queryEvents method and the results
-     * are iterated over for object extraction and building a new list.
+     * The Params are passed through to the getEventsCECase method and the results
+ are iterated over for object extraction and building a new list.
      * 
      * @param params
      * @return
      * @throws IntegrationException 
      */
     public List<EventCECase> queryCaseDependentEvents(SearchParamsEventCECase params) throws IntegrationException, CaseLifecyleException{
-        List<EventCECaseCasePropBundle> wrappedEventList = queryEvents(params);
+        List<EventCECaseCasePropBundle> wrappedEventList = getEventsCECase(params);
         List<EventCECase> depList = new ArrayList<>();
         for(EventCECaseCasePropBundle ec: wrappedEventList){
             depList.add(ec.getEvent());
@@ -720,7 +722,20 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
 
   
-    public List<EventCECaseCasePropBundle> queryEvents(SearchParamsEventCECase params) throws IntegrationException, CaseLifecyleException {
+    public QueryEventCECase runQueryEventCECase(QueryEventCECase q) 
+            throws IntegrationException, CaseLifecyleException{
+        List<SearchParamsEventCECase> pList = q.getParmsList();
+        
+        for(SearchParamsEventCECase sp: pList){
+            q.addToResults(getEventsCECase(sp));
+        }
+        q.setExecutionTimestamp(LocalDateTime.now());
+        q.setExecutedByIntegrator(true);
+        return q;
+    }
+    
+    public List<EventCECaseCasePropBundle> getEventsCECase(SearchParamsEventCECase params) 
+            throws IntegrationException, CaseLifecyleException {
         List<EventCECaseCasePropBundle> eventList = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;

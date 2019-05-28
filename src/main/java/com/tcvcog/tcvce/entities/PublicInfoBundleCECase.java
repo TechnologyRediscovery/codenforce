@@ -55,25 +55,25 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
         sb.append("Public access code: ");
         sb.append("</span>");
         sb.append(getPacc());
-        sb.append("<br/>");
+        sb.append("<br />");
         
          sb.append("<span class=\"bold\">");
         sb.append("Property Address: ");
         sb.append("</span>");
         sb.append(getPropertyAddress());
-        sb.append("<br/>");
+        sb.append("<br />");
         
         sb.append("<span class=\"bold\">");
         sb.append("Case opening date: ");
         sb.append("</span>");
         sb.append(originiationDatePretty);
-        sb.append("<br/>");
+        sb.append("<br />");
         
         sb.append("<span class=\"bold\">");
         sb.append("Case closing date: ");
         sb.append("</span>");
         sb.append(closingDatePretty);
-        sb.append("<br/>");
+        sb.append("<br />");
         
         sb.append("</p>");
         

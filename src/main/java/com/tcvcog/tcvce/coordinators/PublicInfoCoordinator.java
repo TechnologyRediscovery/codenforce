@@ -205,12 +205,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             requestBundle = (PublicInfoBundleCEActionRequest) bundle;
             StringBuilder sb = new StringBuilder();
             sb.append(requestBundle.getPublicExternalNotes());
-            sb.append("<br/><br/>");
+            sb.append("<br /><br />");
             sb.append("CASE NOTE ADDED AT ");
             sb.append(current.toString());
-            sb.append("by public user: <br/>");
+            sb.append("by public user: <br />");
             sb.append(message);
-            sb.append("<br/>");
+            sb.append("<br />");
             sb.append("***********************");
             
             System.out.println("PublicInfoCoordinator.attachmessagToBundle | message: " + sb.toString());

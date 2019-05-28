@@ -26,6 +26,42 @@
 
                             <h1><h:outputText value="Code enforcement case manager"/></h1>
 
+
+                            <h2>CE Case docket</h2>
+                            
+                            <h:form id="caseListForm">
+
+                                <p:selectOneMenu id="casequery-som" tabindex="1" value="#{caseProfileBB.selectedBOBQuery}">
+                                    <f:converter converterId="bOBQueryConverter"/>
+                                    <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems id="querylist-si" value="#{caseProfileBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                    <p:ajax update="cease-query-desc-ot" />
+                                </p:selectOneMenu>
+
+                                <p:commandButton   id="query-allopencases-cb" 
+                                                   ajax="true" actionListener="#{caseProfileBB.executeQuery}"
+                                                   icon="fa fa-print" styleClass="button"
+                                                   value="run selected query" 
+                                                   update="caseListForm:caseTable
+                                                   cecases-messages-form"/>
+
+                                <p:spacer height="5px" />
+
+                                
+                                <ui:remove>
+                                    
+                                <p:commandButton   id="query-refreshlist-cb" 
+                                                   ajax="true" actionListener="#{caseProfileBB.refreshCaseList}"
+                                                   icon="fa fa-refresh" styleClass="button"
+                                                   value="refresh case list" 
+                                                   update="caseListForm:caseTable"/>
+                                </ui:remove>
+                                
+                                <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
+                                <h:outputText id="cease-query-desc-ot" value="#{caseProfileBB.selectedCECaseQuery.queryName.desc}" />
+                                <h:outputText id="cease-query-ts-ot" value="; timestamp: #{caseProfileBB.selectedCECaseQuery.executionTimestampPretty}" />
+                                <p:spacer height="5px" />
+                                
                             <h:form id="cecases-search-form">
                                 <p:fieldset legend="search options" 
                                             toggleable="true" collapsed="true" style="background-color: white;">
@@ -278,72 +314,15 @@
                                     <p:commandButton    id="queryButton"
                                                         ajax="true" value="Run query" actionListener="#{caseProfileBB.executeQuery}"
                                                         process="@form"
+                                                        disabled="false"
                                                         update="caseListForm:caseTable
                                                          cecases-messages-form"
-
                                                         />
                                 </p:fieldset>
                             </h:form>
-
-                            <h2>CE Case docket</h2>
-                            <h:form id="caseListForm">
-
-                                <p:selectOneMenu id="casequery-som" tabindex="1" value="#{caseProfileBB.selectedBOBQuery}">
-                                    <f:converter converterId="bOBQueryConverter"/>
-                                    <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                    <f:selectItems id="querylist-si" value="#{caseProfileBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
-                                </p:selectOneMenu>
-
-                                <p:commandButton   id="query-allopencases-cb" 
-                                                   ajax="true" actionListener="#{caseProfileBB.query_allOpenCases}"
-                                                   icon="fa fa-print" styleClass="button"
-                                                   value="view all open cases in #{sessionBean.activeMuni.muniName}" 
-                                                   update="caseListForm:caseTable"/>
-
-                                <ui:remove>
-
-
-                                    <p:commandButton   id="query-activecases1week-cb" 
-                                                       ajax="true" actionListener="#{caseProfileBB.query_openCasesActive1Week}"
-                                                       icon="fa fa-print" styleClass="button"
-                                                       value="open cases: active only (any event +/- 1 week)" 
-                                                       update="caseListForm:caseTable"/>
-
-                                    <p:commandButton   id="query-button-opencases" 
-                                                       ajax="true" actionListener="#{caseProfileBB.queryOpenCases}"
-                                                       icon="fa fa-print" styleClass="button"
-                                                       value="open cases: all" 
-                                                       update="caseListForm:caseTable"/>
-
-                                    <p:commandButton   id="query-recentlyclosed-cb" 
-                                                       ajax="true" actionListener="#{caseProfileBB.queryOpenCases}"
-                                                       icon="fa fa-print" styleClass="button"
-                                                       value="recently closed: past 30 days" 
-                                                       update="caseListForm:caseTable"/>
-
-                                    <p:commandButton   id="query-recentlyclosed-plusopen-cb" 
-                                                       ajax="true" actionListener="#{caseProfileBB.queryOpenCases}"
-                                                       icon="fa fa-print" styleClass="button"
-                                                       value="recently closed (past 30 days) + open cases" 
-                                                       update="caseListForm:caseTable"/>
-
-                                </ui:remove>
-
+                                
                                 <p:spacer height="5px" />
-
-                                <h:outputLabel value="Current query name: " for="cecases-queryname-ot" class="bold" />
-                                <h:outputText id="cecases-queryname-ot" 
-                                              value="#{caseProfileBB.searchParams.searchName}" />
-                                <p:spacer height="5px" />
-
-                                <p:commandButton   id="query-refreshlist-cb" 
-                                                   ajax="true" actionListener="#{caseProfileBB.refreshCaseList}"
-                                                   icon="fa fa-refresh" styleClass="button"
-                                                   value="refresh case list" 
-                                                   update="caseListForm:caseTable"/>
-
-
-                                <p:spacer height="5px" />
+                                
                                 <p:dataTable
                                     id="caseTable"
                                     var="c"
@@ -434,7 +413,7 @@
 
                                     <h1>
                                         <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName} | "/> 
-                                        <h:outputText id="header-id-ot" value="Case ID: #{caseProfileBB.currentCase.caseID}"/><br/>
+                                        <h:outputText id="header-id-ot" value="Case ID: #{caseProfileBB.currentCase.caseID}"/><br />
                                     </h1>
                                     <h2>
                                         <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
@@ -570,7 +549,7 @@
                                                  disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
                                 <p:spacer height="15px"/>
                                 
-                                <p:chart type="donut" model="#{reportingBB.violationDonut}" style="width:1200px; height:1000px"/>
+                               
 
                 <ui:remove>
                                     
@@ -1578,7 +1557,7 @@
                                                         <p:spacer height="5px"/>
 
                                                         <h:outputText value="#{r.requestor.firstName}"/> 
-                                                        <h:outputText value="#{r.actionRequesrequestor}"/><br/> 
+                                                        <h:outputText value="#{r.actionRequesrequestor}"/><br /> 
                                                         <h:outputText value="#{r.actionRequestorPerson.addressStreet}"/>
                                                                                                
                                                         <h:outputText value="#{r.actionRequestorPerson.addressCity}" />                                        
@@ -1596,7 +1575,7 @@
                                                     <h:outputText value="Phone (work): "/>
                                                     <h:outputText value="Phone (home): "/>
                                                     <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> 
-                                                    <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br/>
+                                                    <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br />
                                                     <h:outputText value="Email: "/>
                                                     <h:outputText value="#{r.actionRequestorPerson.email}"/>
                                                 </div>
@@ -1616,6 +1595,8 @@
 
                                 </p:rowExpansion>
                             </p:dataTable>
+                                
+                            <p:chart type="donut" model="#{reportingBB.violationDonut}" style="width:600px; height:600px"/>
 
                         </h:form>
 

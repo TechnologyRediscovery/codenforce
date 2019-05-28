@@ -58,7 +58,7 @@
                             <h:panelGroup>
                                 <h:outputLabel styleClass="bold" value="Property:"/>
                                 <div class="rowExpansion">
-                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.propertyAddress}"/><br/>
+                                    <h:outputText value="#{pIBCECaseBB.activePIBCECase.propertyAddress}"/><br />
                                     <h:outputText value="#{pIBCECaseBB.activePIBCECase.muni.muniName}"/>
                                 </div>
                             </h:panelGroup>
@@ -91,7 +91,7 @@
                                 <p:spacer height="5px"/>
                                 <div class="rowExpansion" style="leftalign">
                                     <h:outputText value="#{pIBCECaseBB.activePIBCECase.caseManagerName}"/>
-                                    <br/>
+                                    <br />
                                     <h:outputText value="#{pIBCECaseBB.activePIBCECase.caseManagerContact}"/>
                                 </div>
                             </h:panelGroup>
@@ -159,7 +159,7 @@
                                         <p:commandButton ajax="true" actionListener="#{pIBCECaseBB.attachMessageToCase}"
                                                          value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
                                                          update="pibMessages"/>
-                                        <p>Messages submitted through this portal become part of the permanent case record<br/>
+                                        <p>Messages submitted through this portal become part of the permanent case record<br />
                                         and are included in documents prepared for town councils and magistrates. </p>
                                     </h:form>
                                     </p:confirmDialog>

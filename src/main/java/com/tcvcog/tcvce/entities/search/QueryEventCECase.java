@@ -6,8 +6,10 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.EventCECase;
+import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,15 +19,21 @@ import java.util.Objects;
  */
 public class QueryEventCECase extends Query {
     
-    private QueryEventCECase queryEventCECase;
+    private QueryEventCECaseEnum queryName;
+    
     
     // should be a list of search params eventually so we can build
     // queries from a set of search params
     private List<SearchParamsEventCECase> eventSearchParamsList;
-    private List<EventCECase> results;
+    private List<EventCECaseCasePropBundle> results;
     
-    public QueryEventCECase(Municipality muni, User u) {
+    public QueryEventCECase(QueryEventCECaseEnum qName, Municipality muni, User u, List<SearchParamsEventCECase> params) {
         super(muni, u);
+        eventSearchParamsList = new ArrayList<>();
+        eventSearchParamsList.addAll(params);
+        queryName = qName;
+        results = new ArrayList<>();
+        
     }
 
     
@@ -34,7 +42,7 @@ public class QueryEventCECase extends Query {
     }
 
     @Override
-    public List getBOBResultList() {
+    public List<EventCECaseCasePropBundle> getBOBResultList() {
         return results;
     }
 
@@ -50,7 +58,7 @@ public class QueryEventCECase extends Query {
 
     @Override
     public String getQueryTitle() {
-        return queryEventCECase.getQueryTitle();
+        return queryName.getTitle();
     }
 
     @Override
@@ -58,6 +66,24 @@ public class QueryEventCECase extends Query {
         if(results != null){
             results.clear();
         }
+    }
+
+    /**
+     * @return the queryName
+     */
+    public QueryEventCECaseEnum getQueryName() {
+        return queryName;
+    }
+
+    /**
+     * @param queryName the queryName to set
+     */
+    public void setQueryName(QueryEventCECaseEnum queryName) {
+        this.queryName = queryName;
+    }
+
+    public void addToResults(List<EventCECaseCasePropBundle> eventsCECase) {
+        results.addAll(eventsCECase);
     }
 
    

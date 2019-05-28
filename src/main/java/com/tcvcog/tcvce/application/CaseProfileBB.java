@@ -25,20 +25,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.PermissionsException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseStage;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.EventCECase;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.Query;
@@ -80,7 +67,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private ArrayList<CECase> filteredCaseList;
     private SearchParamsCECases searchParams;
     
-    private List<Query> queryList;
+    private List<QueryCECase> queryList;
     private QueryCECase selectedCECaseQuery;
     private Query selectedBOBQuery;
     
@@ -135,20 +122,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * Creates a new instance of CaseManageBB
      */
     public CaseProfileBB() {
-        //TODO: move somewhere else! This is too hackey. Needs a resource bundle for
-        // changing image IDs without recompiling!
-        /**
-        imageFilenameMap = new HashMap<>();
-        imageFilenameMap.put(CasePhase.PrelimInvestigationPending, "stage1_prelim.svg");
-        imageFilenameMap.put(CasePhase.NoticeDelivery, "stage1_notice.svg");
-        imageFilenameMap.put(CasePhase.InitialComplianceTimeframe, "stage2_initial.svg");
-        imageFilenameMap.put(CasePhase.SecondaryComplianceTimeframe, "stage2_secondary.svg");
-        imageFilenameMap.put(CasePhase.AwaitingHearingDate, "stage3_awaiting.svg");
-        imageFilenameMap.put(CasePhase.HearingPreparation, "stage3_prep.svg");
-        imageFilenameMap.put(CasePhase.InitialPostHearingComplianceTimeframe, "stage3_postHearing.svg");
-        imageFilenameMap.put(CasePhase.SecondaryPostHearingComplianceTimeframe, "stage3_postHearing.svg");
-        imageFilenameMap.put(CasePhase.Closed, "stage3_closed.svg");
-        */
+       
     }
 
     
@@ -159,14 +133,31 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-        searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
-        // go fetch 
-        executeQuery();
-        List<CECase> retrievedCaseList = getSessionBean().getcECaseQueue();
+        CaseIntegrator ci = getCaseIntegrator();
+        
+        queryList = sc.buildQueryCECaseList(getSessionBean().getActiveMuni(), getSessionBean().getFacesUser());
+        selectedCECaseQuery = getSessionBean().getSessionQueryCECase();
+        searchParams = selectedCECaseQuery.getSearchParamsList().get(0);
+        if(!selectedCECaseQuery.isExecutedByIntegrator()){
+            try {
+                sc.runQuery(selectedCECaseQuery);
+            } catch (IntegrationException | CaseLifecyleException ex) {
+                System.out.println(ex);
+            }
+        }
+        
+        List<CECase> retrievedCaseList = selectedCECaseQuery.getResults();
         if (retrievedCaseList != null && !retrievedCaseList.isEmpty()) {
             currentCase = retrievedCaseList.get(0);
             caseList = retrievedCaseList;
             refreshCurrentCase();
+        } else {
+            try {
+                currentCase = ci.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("arbitraryPlaceholderCaseID")));
+                } catch (IntegrationException | CaseLifecyleException ex) {
+                System.out.println(ex);
+            }
         }
 
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
@@ -246,31 +237,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void query_allOpenCases(ActionEvent ev){
-        SearchCoordinator sc = getSearchCoordinator();
-        searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
-        executeQuery();
-    }
-    
-    public void query_anyActiveCasePast1Week(ActionEvent ev){
-        SearchCoordinator sc = getSearchCoordinator();
-        searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
-        executeQuery();
-    }
-    
-    public void query_anyActiveCasePastMonth(ActionEvent ev){
-        SearchCoordinator sc = getSearchCoordinator();
-        searchParams = sc.getSearchParams_CECase_closedPast30Days(getSessionBean().getActiveMuni());
-        executeQuery();
-    }
     
     public void executeQuery(){
-        
-        System.out.println("CaseProfileBB.executeQuery");
+        SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
+        
         try {
-            caseList = cc.queryCECases(searchParams);
+            caseList = sc.runQuery(selectedCECaseQuery).getResults();
             if (caseList != null) {
                 listSize = caseList.size();
             }
@@ -327,6 +301,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setSessionReport(reportCECase);
         // force our reportingBB to choose the right bundle
         getSessionBean().setReportConfigCECaseList(null);
+        getSessionBean().setSessionQueryCECase(selectedCECaseQuery);
 
         return "reportCECase";
     }
@@ -348,10 +323,13 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         reportCECaseList.setCreator(getSessionBean().getFacesUser());
         reportCECaseList.setMuni(getSessionBean().getActiveMuni());
         reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
+        
         getSessionBean().setReportConfigCECaseList(reportCECaseList);
         getSessionBean().setReportConfigCECase(null);
         getSessionBean().setcECaseQueue(caseList);
         getSessionBean().setSessionReport(reportCECaseList);
+        getSessionBean().setSessionQueryCECase(selectedCECaseQuery);
+        
         return "reportCECaseList";
 
     }
@@ -362,9 +340,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + reportCECase);
 
     }
-    
-    
-    
     
 
     public void rejectRequestedEvent(EventCECase ev) {
@@ -1225,17 +1200,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @return the caseList
      */
      public List<CECase> getCaseList() {
-//        List<CECase> sessionList = getSessionBean().getcECaseList();
-        CaseIntegrator ci = getCaseIntegrator();
-        if (caseList == null) {
-            searchParams.setMuni(getSessionBean().getActiveMuni());
-            try {
-                System.out.println("CaseProfileBB.getCaseList | getting list for : " + getSessionBean().getActiveMuni().getMuniName());
-                caseList = ci.queryCECases(searchParams);
-            } catch (IntegrationException | CaseLifecyleException ex) {
-                System.out.println(ex);
-            }
-        }
 
         return caseList;
     }
@@ -1704,14 +1668,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the queryList
      */
-    public List<Query> getQueryList() {
+    public List<QueryCECase> getQueryList() {
         return queryList;
     }
 
     /**
      * @param queryList the queryList to set
      */
-    public void setQueryList(List<Query> queryList) {
+    public void setQueryList(List<QueryCECase> queryList) {
         this.queryList = queryList;
     }
 

@@ -22,14 +22,14 @@
                         </div>
                         <div class="logo-title-wrapper">
                             <div class="report-title">
-                                <h:outputText id="report-title-ot"  value="#{cEEventsBB.reportConfig.title}"/> 
+                                <h:outputText id="report-title-ot"  value="#{eventCECaseReportBB.reportConfig.title}"/> 
                             </div>
                             <div class="report-title-sub">
-                                <h:outputText id="report-subtitle-ot"  value="#{cEEventsBB.reportConfig.muni.muniName}, #{cEEventsBB.reportConfig.muni.address_state}"/> 
+                                <h:outputText id="report-subtitle-ot"  value="#{eventCECaseReportBB.reportConfig.muni.muniName}, #{eventCECaseReportBB.reportConfig.muni.address_state}"/> 
                                 <h:outputText value=" | " />
-                                <h:outputText id="creator-ot" value="Created by: #{cEEventsBB.reportConfig.creator.person.firstName} #{cEEventsBB.reportConfig.creator.person.lastName}" />
+                                <h:outputText id="creator-ot" value="Created by: #{eventCECaseReportBB.reportConfig.creator.person.firstName} #{eventCECaseReportBB.reportConfig.creator.person.lastName}" />
                                 <h:outputText value=" | " />
-                                <h:outputText id="creator-ot" value="Date: #{cEEventsBB.reportConfig.generationTimestampPretty}" />
+                                <h:outputText id="creator-ot" value="Date: #{eventCECaseReportBB.reportConfig.generationTimestampPretty}" />
                             </div>
                         </div>
                     </div>
@@ -46,23 +46,23 @@
 
                             <h:panelGroup>
                                 <h:outputText styleClass="bold" value="Start date: " />
-                                <h:outputText value="#{cEEventsBB.reportConfig.queryParams.startDatePretty}" />
+                                <h:outputText value="#{eventCECaseReportBB.reportConfig.queryParams.startDatePretty}" />
                                 <br />
                                 <h:outputText styleClass="bold" value="End date:" />
-                                <h:outputText value="#{cEEventsBB.reportConfig.queryParams.endDatePretty}" />
+                                <h:outputText value="#{eventCECaseReportBB.reportConfig.queryParams.endDatePretty}" />
                                 
                                 <br />
                                 <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="Creator credentials: " />
-                                <h:outputText id="report-creator-cred-ot"  value="User: #{cEEventsBB.reportConfig.creator.username}, 
-                                              #{cEEventsBB.reportConfig.creator.roleType.label} 
-                                              (ID: #{cEEventsBB.reportConfig.creator.userID})"/>
+                                <h:outputText id="report-creator-cred-ot"  value="User: #{eventCECaseReportBB.reportConfig.creator.username}, 
+                                              #{eventCECaseReportBB.reportConfig.creator.roleType.label} 
+                                              (ID: #{eventCECaseReportBB.reportConfig.creator.userID})"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                     <h:outputText styleClass="bold" value="Event count: " />
-                                    <h:outputText styleClass="bold" value="#{cEEventsBB.eventListForEventsReport.size()}" />
+                                    <h:outputText styleClass="bold" value="#{eventCECaseReportBB.reportConfig.BOBQuery.BOBResultList.size()}" />
                                 <br />
                                     <h:outputLabel id="report-notes-ol" for="report-notes-ot" styleClass="bold" value="Report notes: "/>
-                                    <h:outputText id="report-notes-ot"  value="#{cEEventsBB.reportConfig.notes}"/>
+                                    <h:outputText id="report-notes-ot"  value="#{eventCECaseReportBB.reportConfig.notes}"/>
                             </h:panelGroup>
 
                         </h:panelGrid>
@@ -71,7 +71,7 @@
 
                     
                     <f:subview id="report-ceevents-queryparams-subview"
-                               rendered="#{cEEventsBB.reportConfig.includeCompleteQueryParamsDump}">
+                               rendered="#{eventCECaseReportBB.reportConfig.includeCompleteQueryParamsDump}">
                         <h:panelGrid   columns="2" 
                                        cellpadding="5" 
                                        footerClass="gridFooter" 
@@ -83,55 +83,55 @@
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByEventCategory}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventCategory}"
                                                 value="Event category filter: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByEventCategory}"
-                                                value="#{cEEventsBB.reportConfig.queryParams.eventCategory.eventCategoryTitle}" />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventCategory}"
+                                                value="#{eventCECaseReportBB.reportConfig.queryParams.eventCategory.eventCategoryTitle}" />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByEventType}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventType}"
                                                 value="Event type filter: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByEventType}"
-                                                value="#{cEEventsBB.reportConfig.queryParams.evtType.label}" />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventType}"
+                                                value="#{eventCECaseReportBB.reportConfig.queryParams.evtType.label}" />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByCaseID}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByCaseID}"
                                                 value="Case ID filter: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByCaseID}"
-                                                value="#{cEEventsBB.reportConfig.queryParams.caseId}" />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByCaseID}"
+                                                value="#{eventCECaseReportBB.reportConfig.queryParams.caseId}" />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByEventOwner}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventOwner}"
                                                 value="Event owner filter: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByEventOwner}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.user.username} 
-                                                (ID: #{cEEventsBB.reportConfig.queryParams.user.userID})" />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventOwner}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.user.username} 
+                                                (ID: #{eventCECaseReportBB.reportConfig.queryParams.user.userID})" />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByPerson}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByPerson}"
                                                 value="Person filter: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByPerson}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.person.firstName} 
-                                                #{cEEventsBB.reportConfig.queryParams.person.lastName} 
-                                                (ID: #{cEEventsBB.reportConfig.queryParams.person.personID})" />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByPerson}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.person.firstName} 
+                                                #{eventCECaseReportBB.reportConfig.queryParams.person.lastName} 
+                                                (ID: #{eventCECaseReportBB.reportConfig.queryParams.person.personID})" />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByActive}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByActive}"
                                                 value="Active events: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByActive}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.isActive} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByActive}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.isActive} " />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByHidden}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByHidden}"
                                                 value="Active events filter: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByHidden}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.isHidden} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByHidden}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.isHidden} " />
 
                             </h:panelGroup>
                             <h:panelGroup>
@@ -139,60 +139,60 @@
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByrequestsAction}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByrequestsAction}"
                                                 value="Requests action filter: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByrequestsAction}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.requestsAction} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByrequestsAction}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.requestsAction} " />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.useRespondedAtDateRange}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.useRespondedAtDateRange}"
                                                 value="Apply date range to response timestamp : " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.useRespondedAtDateRange}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.useRespondedAtDateRange} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.useRespondedAtDateRange}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.useRespondedAtDateRange} " />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByHasResponseEvent}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByHasResponseEvent}"
                                                 value="Reponse logged filter: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByHasResponseEvent}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.hasResponseEvent} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByHasResponseEvent}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.hasResponseEvent} " />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByRequestedResponseEventCat}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRequestedResponseEventCat}"
                                                 value="Apply event category to requested event: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByRequestedResponseEventCat}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.filterByRequestedResponseEventCat} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRequestedResponseEventCat}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.filterByRequestedResponseEventCat} " />
 
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByRequestor}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRequestor}"
                                                 value="Apply person filter to action requestor: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByRequestor}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.filterByRequestor} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRequestor}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.filterByRequestor} " />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByResponderIntended}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByResponderIntended}"
                                                 value="Apply person filter to intended responder: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByResponderIntended}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.filterByResponderIntended} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByResponderIntended}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.filterByResponderIntended} " />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByResponderActual}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByResponderActual}"
                                                 value="Apply person filter to actual responder: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByResponderActual}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.filterByResponderActual} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByResponderActual}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.filterByResponderActual} " />
 
                                 <br />
                                 <h:outputText   styleClass="bold"
-                                                rendered="#{cEEventsBB.reportConfig.queryParams.filterByRejectedRequest}"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRejectedRequest}"
                                                 value="Apply person filter to actual responder: " />
-                                <h:outputText   rendered="#{cEEventsBB.reportConfig.queryParams.filterByRejectedRequest}"
-                                                value=" #{cEEventsBB.reportConfig.queryParams.rejectedRequest} " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRejectedRequest}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.rejectedRequest} " />
 
 
                             </h:panelGroup>
@@ -203,7 +203,7 @@
                     <p:dataScroller
                         id="events-datascroller"
                         var="e"
-                        value="#{cEEventsBB.eventListForEventsReport}"
+                        value="#{eventCECaseReportBB.reportConfig.BOBQuery.BOBResultList}"
                         widgetVar="ceevent-ds-var">
 
                         <div class="event-ds-box-report">
