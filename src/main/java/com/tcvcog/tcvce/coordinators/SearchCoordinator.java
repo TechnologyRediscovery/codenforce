@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
@@ -16,14 +17,17 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
-import com.tcvcog.tcvce.entities.search.SearchParams;
+import com.tcvcog.tcvce.entities.search.QueryEventCECaseEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperties;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -85,6 +89,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         query.clearResultList();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
 //        if(query.getUser().getRoleType().getRank() > query.getQueryName().getUserRankMinimum() ){
+        //TODO: get this to actually work
         if(query.getUser().getRoleType().getRank() >9999 ){
             throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
         }
@@ -110,6 +115,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param params optional params. If this object is not null, the query will
      * automatically become a custom query
      * @return assembled instance ready for sending to runQuery
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public QueryCEAR assembleQueryCEAR(QueryCEAREnum qName, User u, Municipality m, SearchParamsCEActionRequests params) throws IntegrationException{
         QueryCEAR query;
@@ -263,12 +269,78 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         return sps;
     }
-    
-    
+     
     
     
 //    CODE ENFORCEMENT CASE QUERIES
    
+     public QueryCECase getQueryInitialCECASE(Municipality m, User u){
+         return assembleQueryCECase(QueryCECaseEnum.OPENCASES, u, m, null);
+         
+     }
+     
+     public List<QueryCECase> buildQueryCECaseList(Municipality m, User u){
+        QueryCECaseEnum[] nameArray = QueryCECaseEnum.values();
+        List<QueryCECase> queryList = new ArrayList<>();
+//        for(QueryCECaseEnum queryTitle: nameArray){
+//            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
+//            queryList.add(assembleQueryCECase(queryTitle, u, m, null));
+//        }
+
+        queryList.add(assembleQueryCECase(QueryCECaseEnum.OPENCASES, u, m, null));
+        return queryList;
+         
+     }
+     
+     public QueryCECase runQuery(QueryCECase query) throws IntegrationException, CaseLifecyleException{
+         query.clearResultList();
+         CaseIntegrator ci = getCaseIntegrator();
+         if(query.getQueryName().logQueryRun()){
+            logRun(query);
+        }
+        return ci.runQueryCEAR(query);
+     }
+     
+     public QueryCECase assembleQueryCECase(QueryCECaseEnum qName, User u, Municipality m, SearchParamsCECases params){
+         QueryCECase query;
+         List<SearchParamsCECases> paramsList = new ArrayList<>();
+         
+         if(params != null){
+             qName = QueryCECaseEnum.CUSTOM;
+         }
+         
+         switch(qName){
+            case OPENCASES:
+                paramsList.add(getDefaultSearchParams_CECase_allOpen(m));
+                 break;
+            case EXPIRED_TIMEFRAMES:
+                break;
+            case CURRENT_TIMEFRAMES:
+                break;
+            case OPENED_30DAYS:
+                break;
+            case CLOSED_30DAYS:
+                paramsList.add(getSearchParams_CECase_closedPast30Days(m));
+                break;
+            case UNRESOLVED_CITATIONS:
+                break;
+            case ANY_ACTIVITY_7Days:
+                break;
+            case ANY_ACTIVITY_30Days:
+                break;
+            case CUSTOM:
+                break;
+            default:
+         }
+         
+         query = new QueryCECase(qName, m, paramsList, u);
+         query.setExecutedByIntegrator(false);
+         return query;
+         
+         
+     }
+     
+     
     
     /**
      * Returns a SearchParams subclass for retrieving all open
@@ -322,11 +394,15 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setLimitResultCountTo100(true);
         
         // subclass specific
-        params.setUseIsOpen(true);
-        params.setIsOpen(true);
+        params.setUseIsOpen(false);
         
-        params.setDateToSearchCECases("Opening date of record");
+        params.setDateToSearchCECases("Closing date");
         params.setUseCaseManager(false);
+        
+        LocalDateTime pastXDays = LocalDateTime.now().minusDays(30);
+        
+        params.setStartDate(pastXDays);
+        params.setEndDate(LocalDateTime.now());
         
         params.setUseCasePhase(false);
         params.setUseCaseStage(false);
@@ -362,9 +438,71 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return propParams;
     }
     
+    
+    // CODE ENFORCEMENT EVENTS
+    
+     public QueryEventCECase getQueryInitialEventCECASE(Municipality m, User u){
+         return assembleQueryEventCECase(QueryEventCECaseEnum.REQUESTED_ACTIONS, u, m, null);
+         
+     }
+     
+     public List<QueryEventCECase> buildQueryEventCECaseList(Municipality m, User u){
+        QueryEventCECaseEnum[] nameArray = QueryEventCECaseEnum.values();
+        List<QueryEventCECase> queryList = new ArrayList<>();
+        for(QueryEventCECaseEnum queryTitle: nameArray){
+            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
+            queryList.add(assembleQueryEventCECase(queryTitle, u, m, null));
+        }
+
+        return queryList;
+         
+     }
+     
+     public QueryEventCECase runQuery(QueryEventCECase query) throws IntegrationException, CaseLifecyleException{
+         EventIntegrator ei = getEventIntegrator();
+         query.clearResultList();
+         
+         if(query.getQueryName().logQueryRun()){
+            logRun(query);
+        }
+        return ei.runQueryEventCECase(query);
+     }
+     
+     public QueryEventCECase assembleQueryEventCECase(QueryEventCECaseEnum qName, User u, Municipality m, SearchParamsEventCECase params){
+         QueryEventCECase query;
+         List<SearchParamsEventCECase> paramsList = new ArrayList<>();
+         
+         if(params != null){
+             qName = QueryEventCECaseEnum.CUSTOM;
+         }
+         
+         switch(qName){
+             case REQUESTED_ACTIONS:
+                paramsList.add(getSearchParamsEventsRequiringAction(u, m));
+                break;
+             case MUNICODEOFFICER_ACTIVITY_PAST30DAYS:
+                 paramsList.add(getSearchParamsOfficerActivity(u, m));
+                 break;
+             case COMPLIANCE_EVENTS:
+                 paramsList.add(getSearchParamsComplianceEvPastMonth(m));
+                 break;
+            case CUSTOM:
+                paramsList.add(params);
+                break;
+            default:
+         }
+         
+         query = new QueryEventCECase(qName, m, u, paramsList);
+         query.setExecutedByIntegrator(false);
+         return query;
+         
+         
+     }
+     
+    
+    
     public List<Query> getEventQueryList(User u, Municipality m){
         List<Query> queryList = new ArrayList<>();
-        
 //        
 //        QueryEventCECase eq = new QueryEventCECase("Compliance follow-up events: Today", m);
 //        eq.setEventSearchParams(getSearchParamsEventsRequiringAction(u, m));
@@ -378,9 +516,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //        eq = new QueryEventCECase("Compliance events: Past Month", m);
 //        eq.setEventSearchParams(getSearchParamsComplianceEvPastMonth(m));
 //        queryList.add(eq);
-//        
-        return queryList;
         
+        return queryList;
     }
     
     public SearchParamsEventCECase getSearchParamsEventsRequiringAction(User u, Municipality muni){

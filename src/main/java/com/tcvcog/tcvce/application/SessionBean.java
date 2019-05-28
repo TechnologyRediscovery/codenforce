@@ -19,25 +19,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
-import com.tcvcog.tcvce.entities.CodeSet;
-import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyWithLists;
-import com.tcvcog.tcvce.entities.PublicInfoBundle;
-import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.Report;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
@@ -79,7 +61,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<CodeViolation> violationQueue;
     private List<OccupancyInspection> inspectionQueue;
     
-    private QueryCECase queryCECase;
+    private QueryCECase sessionQueryCECase;
+    private CECase sessionCECase;
     private QueryEventCECase queryEventCECase;
    
     /* *** System Core Objects Session Shelves ***  */
@@ -657,6 +640,34 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setSessionQueryCEAR(QueryCEAR sessionQueryCEAR) {
         this.sessionQueryCEAR = sessionQueryCEAR;
+    }
+
+    /**
+     * @return the sessionCECase
+     */
+    public CECase getSessionCECase() {
+        return sessionCECase;
+    }
+
+    /**
+     * @param sessionCECase the sessionCECase to set
+     */
+    public void setSessionCECase(CECase sessionCECase) {
+        this.sessionCECase = sessionCECase;
+    }
+
+    /**
+     * @return the sessionQueryCECase
+     */
+    public QueryCECase getSessionQueryCECase() {
+        return sessionQueryCECase;
+    }
+
+    /**
+     * @param sessionQueryCECase the sessionQueryCECase to set
+     */
+    public void setSessionQueryCECase(QueryCECase sessionQueryCECase) {
+        this.sessionQueryCECase = sessionQueryCECase;
     }
 
     

@@ -29,12 +29,14 @@ import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.ArrayList;
@@ -92,7 +94,21 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return caseList;
     }
     
-    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException, CaseLifecyleException{
+     public QueryCECase runQueryCEAR(QueryCECase q) throws IntegrationException, CaseLifecyleException{
+        List<SearchParamsCECases> pList = q.getParmsList();
+        
+        for(SearchParamsCECases sp: pList){
+            q.addToResults(getCECases(sp));
+        }
+        q.setExecutionTimestamp(LocalDateTime.now());
+        System.out.println("CaseIntegrator.QueryCECases | returning list of size: " + q.getBOBResultList().size());
+        q.setExecutedByIntegrator(true);
+        return q;
+        
+    }
+    
+    
+    private List<CECase> getCECases(SearchParamsCECases params) throws IntegrationException, CaseLifecyleException{
         ArrayList<CECase> caseList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;

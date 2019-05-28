@@ -141,19 +141,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
    
     
-    /**
-     * Front door for querying cases in the DB
-     * 
-     * @param params pre-configured search parameters
-     * @return
-     * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
-     */
-    public List<CECase> queryCECases(SearchParamsCECases params) throws IntegrationException, CaseLifecyleException{
-        CaseIntegrator ci = getCaseIntegrator();
-        return ci.queryCECases(params);
-        
-    }
+   
     
     public List<CECase> getUserCaseHistoryList(User u) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator caseInt = getCaseIntegrator();
@@ -221,7 +209,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             originationEvent = ec.getInitializedEvent(newCase, originationCategory);
             StringBuilder sb = new StringBuilder();
             sb.append("Case generated from the submission of a Code Enforcement Action Request");
-            sb.append("<br/>");
+            sb.append("<br />");
             sb.append("ID#:");
             sb.append(cear.getRequestID());
             sb.append(" submitted by ");
@@ -271,7 +259,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(" with contact number: ");
         sb.append(messagerPhone);
         sb.append(": ");
-        sb.append("<br/><br/>");
+        sb.append("<br /><br />");
         sb.append(msg);
         
         EventCoordinator ec = getEventCoordinator();

@@ -171,7 +171,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public List<EventCECaseCasePropBundle> queryEvents(SearchParamsEventCECase params, User user, List<Municipality> userAuthMuniList) throws IntegrationException, CaseLifecyleException{
         EventIntegrator ei = getEventIntegrator();
-        List<EventCECaseCasePropBundle> evList = configureEventBundleList(ei.queryEvents(params),user,userAuthMuniList);
+        List<EventCECaseCasePropBundle> evList = configureEventBundleList(ei.getEventsCECase(params),user,userAuthMuniList);
         return evList;
     }
     
@@ -398,7 +398,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         StringBuilder sb = new StringBuilder();
         sb.append("Compliance with the following code violations was observed:");
-        sb.append("<br/><br/>");
+        sb.append("<br /><br />");
         
             sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdchapterNo());
             sb.append(".");
@@ -410,7 +410,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             sb.append(" (ID ");
             sb.append(violation.getViolationID());
             sb.append(")");
-            sb.append("<br/><br/>");
+            sb.append("<br /><br />");
         e.setNotes(sb.toString());
         return e;
     }

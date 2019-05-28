@@ -121,7 +121,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     private String appendNoteBlock(String previousNotes, String newNotes){
         StringBuilder sb = new StringBuilder();
         sb.append(previousNotes);
-        sb.append("<br/>**************************************<br/>");
+        sb.append("<br />**************************************<br />");
         sb.append("NOTE CREATED BY: ");
         sb.append(getSessionBean().getFacesUser().getPerson().getFirstName());
         sb.append(" ");
@@ -130,10 +130,10 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(String.valueOf(getSessionBean().getFacesUser().getUserID()));
         sb.append(") on ");
         sb.append(getPrettyDate(LocalDateTime.now()));
-        sb.append(":<br/>");
+        sb.append(":<br />");
         sb.append(newNotes);
-        sb.append("<br/>");
-        sb.append("**************************************<br/>");
+        sb.append("<br />");
+        sb.append("**************************************<br />");
         return sb.toString();
         
     }

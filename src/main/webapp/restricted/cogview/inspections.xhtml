@@ -152,7 +152,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <h:form id="case-details-form">
 
                                 <h1>
-                                    Code Enforcement Case #<h:outputText id="header-id-ot" value="#{caseProfileBB.currentCase.caseID}"/><br/> 
+                                    Code Enforcement Case #<h:outputText id="header-id-ot" value="#{caseProfileBB.currentCase.caseID}"/><br /> 
                                     <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName}"/>
                                     at <h:outputText id="header-addr-ot" value="#{caseProfileBB.currentCase.property.address} "/>  
                                     <h:outputText id="header-muni-ot" value="(#{caseProfileBB.currentCase.property.muni.muniName})"/>  
@@ -175,8 +175,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:panelGroup>
                                             <h:outputLabel styleClass="bold" value="Property:"/>
                                             <div class="rowExpansion">
-                                                <h:outputText id="selcase-addr-ot" value="#{caseProfileBB.currentCase.property.address}"/><br/>
-                                                <h:outputText id="selcase-muni-ot" value="#{caseProfileBB.currentCase.property.muni.muniName} (#{caseProfileBB.currentCase.property.propertyUseType})"/><br/>
+                                                <h:outputText id="selcase-addr-ot" value="#{caseProfileBB.currentCase.property.address}"/><br />
+                                                <h:outputText id="selcase-muni-ot" value="#{caseProfileBB.currentCase.property.muni.muniName} (#{caseProfileBB.currentCase.property.propertyUseType})"/><br />
                                             </div>
                                         </h:panelGroup>
 
@@ -987,8 +987,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="5px"/>
 
                                                         <h:outputText value="#{r.actionRequestorPerson.firstName} "/> 
-                                                        <h:outputText value="#{r.actionRequestorPerson.lastName}"/><br/> 
-                                                        <h:outputText value="#{r.actionRequestorPerson.addressStreet}"/> <br/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.lastName}"/><br /> 
+                                                        <h:outputText value="#{r.actionRequestorPerson.addressStreet}"/> <br />
                                                         <h:outputText value="#{r.actionRequestorPerson.addressCity}, "/> 
                                                         <h:outputText value="#{r.actionRequestorPerson.addressState} "/> 
                                                         <h:outputText value="#{r.actionRequestorPerson.addressZip}"/> 
@@ -1000,11 +1000,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:spacer height="5px"/>
                                                     <div class="wrapText"> 
                                                         <h:outputText value="Phone (cell): "/>
-                                                        <h:outputText value="#{r.actionRequestorPerson.phoneCell}"/> <br/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.phoneCell}"/> <br />
                                                         <h:outputText value="Phone (work): "/>
-                                                        <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> <br/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> <br />
                                                         <h:outputText value="Phone (home): "/>
-                                                        <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br/>
+                                                        <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br />
                                                         <h:outputText value="Email: "/>
                                                         <h:outputText value="#{r.actionRequestorPerson.email}"/>
                                                     </div>

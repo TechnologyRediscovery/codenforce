@@ -409,7 +409,7 @@
                                                 <h:outputLabel class="bold" value="Address" />
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion">
-                                                    <h:outputText id="selr-prop-address" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/><br/>
+                                                    <h:outputText id="selr-prop-address" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/><br />
                                                     <h:outputText id="selr-prop-muni" value="#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
                                                 </div>
                                                 <p:spacer height="5px"/>
@@ -455,8 +455,8 @@
                                                     <p:spacer height="5px"/>
 
                                                     <h:outputText id="selr-pers-fn" value="#{cEActionRequestsBB.selectedRequest.requestor.firstName}" />
-                                                    <h:outputText id="selr-pers-ln" value="#{cEActionRequestsBB.selectedRequest.requestor.lastName}"/><br/> 
-                                                    <h:outputText id="selr-pers-str" value="#{cEActionRequestsBB.selectedRequest.requestor.addressStreet}"/> <br/>
+                                                    <h:outputText id="selr-pers-ln" value="#{cEActionRequestsBB.selectedRequest.requestor.lastName}"/><br /> 
+                                                    <h:outputText id="selr-pers-str" value="#{cEActionRequestsBB.selectedRequest.requestor.addressStreet}"/> <br />
                                                     <h:outputText id="selr-pers-city" value="#{cEActionRequestsBB.selectedRequest.requestor.addressCity}, "/> 
                                                     <h:outputText id="selr-pers-state" value="#{cEActionRequestsBB.selectedRequest.requestor.addressState}"/>                                            
                                                     <h:outputText id="selr-pers-zip" value="#{cEActionRequestsBB.selectedRequest.requestor.addressZip}"/> 
@@ -477,11 +477,11 @@
                                                 <p:spacer height="5px"/>
                                                 <div class="wrapText"> 
                                                     <h:outputText value="Phone (cell): "/>
-                                                    <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneCell}"/> <br/>
+                                                    <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneCell}"/> <br />
                                                     <h:outputText value="Phone (work): "/>
                                                     <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneWork}"/> 
                                                     <h:outputText value="Phone (home): "/>
-                                                    <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneHome}"/> <br/>
+                                                    <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneHome}"/> <br />
                                                     <h:outputText value="Email: "/>
                                                     <h:outputText id="selr-pers-email" value="#{cEActionRequestsBB.selectedRequest.requestor.email}"/>
                                                 </div>
@@ -589,11 +589,11 @@
                                     id="cases-on-selected-request-property-DS"
                                     value="#{cEActionRequestsBB.caseListForSelectedProperty}"
                                     var="c">
-                                    <p>Case ID: <h:outputText value="#{c.caseID}"/> <br/>
-                                        Name: <h:outputText value="#{c.caseName}" /> <br/>
-                                        Phase: <h:outputText value="#{c.casePhase.label}"/> <br/>
-                                        Opening date: <h:outputText value="#{c.originiationDatePretty}"/> <br/>
-                                        Closing date: <h:outputText value="#{c.closingDatePretty}"/> <br/>
+                                    <p>Case ID: <h:outputText value="#{c.caseID}"/> <br />
+                                        Name: <h:outputText value="#{c.caseName}" /> <br />
+                                        Phase: <h:outputText value="#{c.casePhase.label}"/> <br />
+                                        Opening date: <h:outputText value="#{c.originiationDatePretty}"/> <br />
+                                        Closing date: <h:outputText value="#{c.closingDatePretty}"/> <br />
                                     </p>
                                     <p:commandButton value="Assign request to this case"
                                                      actionListener="#{cEActionRequestsBB.path2UseSelectedCaseForAttachment(c)}"
@@ -624,7 +624,7 @@
                                 <p:spacer height="15px"/>
                                 <p:inputTextarea id="invalidMessageITA" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.invalidMessage}"/>
                                 <p:spacer height="15px"/>
-                                <p>This message, your name, and a timestamp will be appended <br/>to the public note section of request ID 
+                                <p>This message, your name, and a timestamp will be appended <br />to the public note section of request ID 
                                     <h:outputText escape="false" value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </p>
 
                                 <p:spacer height="15px "/>
@@ -653,7 +653,7 @@
                                 <p:spacer height="15px"/>
                                 <p:inputTextarea id="noViolationMessageITA" style="width: 300px; height: 200px;" value="#{cEActionRequestsBB.noViolationFoundMessage}"/>
                                 <p:spacer height="15px"/>
-                                <p>This message, your name, and a timestamp will be appended <br/>to the public note section of request ID 
+                                <p>This message, your name, and a timestamp will be appended <br />to the public note section of request ID 
                                     <h:outputText escape="false" value="#{cEActionRequestsBB.selectedRequest.requestID}"/> </p>
 
                                 <p:spacer height="15px"/>

@@ -29,9 +29,9 @@
                                     id="eventCategories"
                                     var="c"
                                     selectionMode="single"
-                                    selection="#{eventConfigurationBB.selectedEventCategory}"
+                                    selection="#{eventCECaseConfigurationBB.selectedEventCategory}"
                                     rowKey="#{c.categoryID}"
-                                    value="#{eventConfigurationBB.eventCategoryList}"
+                                    value="#{eventCECaseConfigurationBB.eventCategoryList}"
                                     expandedRow="false"
                                     rowExpandMode="multiple"
                                     draggableColumns="true"
@@ -226,10 +226,10 @@
                             <p:spacer height="10px"/>
                             
                             <p:commandButton ajax="false" 
-                                             actionListener="#{eventConfigurationBB.editSelectedEventCategory}"
+                                             actionListener="#{eventCECaseConfigurationBB.editSelectedEventCategory}"
                                              value="Update Selected EventCateogory" tabindex="2"/>
                               <p:commandButton ajax="false" 
-                                             actionListener="#{eventConfigurationBB.deleteSelectedEventCategory}"
+                                             actionListener="#{eventCECaseConfigurationBB.deleteSelectedEventCategory}"
                                             value="Nuke Selected Category Forever" tabindex="3"/>
                
                             </h:form>
@@ -244,8 +244,8 @@
                                 <h:outputLabel for="eventTypeMenu">
                                     <h:outputText value="Event Type: "/>
                                 </h:outputLabel>
-                                 <p:selectOneMenu id="eventTypeMenu" required="true" value="#{eventConfigurationBB.formEventType}" tabindex="5">
-                                     <f:selectItems value="#{eventConfigurationBB.eventTypeList}"/>
+                                 <p:selectOneMenu id="eventTypeMenu" required="true" value="#{eventCECaseConfigurationBB.formEventType}" tabindex="5">
+                                     <f:selectItems value="#{eventCECaseConfigurationBB.eventTypeList}"/>
                                 </p:selectOneMenu>
                                 <h:message for="eventTypeMenu" showDetail="false" showSummary="true" 
                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -254,7 +254,7 @@
                                 <p:outputLabel for="catTitleIT">
                                     <h:outputText value="Category Title"/>
                                 </p:outputLabel>
-                                 <p:inputText id="catTitleIT" value="#{eventConfigurationBB.formEventCategoryTitle}" 
+                                 <p:inputText id="catTitleIT" value="#{eventCECaseConfigurationBB.formEventCategoryTitle}" 
                                           style="width: 40%;" tabindex="6" required="true" styleClass="inputText"/>
                                 <h:message for="catTitleIT" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -264,7 +264,7 @@
                                 <p:outputLabel for="catDescIT">
                                     <h:outputText value="Category Description"/>
                                 </p:outputLabel>
-                                <p:inputText id="catDescIT" value="#{eventConfigurationBB.formEventCategoryDescr}" 
+                                <p:inputText id="catDescIT" value="#{eventCECaseConfigurationBB.formEventCategoryDescr}" 
                                           style="width: 100%;" tabindex="7" required="true" styleClass="inputText"/>
                                 <h:message for="catDescIT" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -274,8 +274,8 @@
                                     <h:outputText value="Icon"/>
                                 </p:outputLabel>
                                 <p:spacer height="5px"/>
-                                <p:selectOneMenu id="icon-som" required="false" value="#{eventConfigurationBB.formCatIcon}" tabindex="8">
-                                    <f:selectItems value="#{eventConfigurationBB.iconList}" var="i" itemLabel="#{i.name}" itemValue="#{i}" />
+                                <p:selectOneMenu id="icon-som" required="false" value="#{eventCECaseConfigurationBB.formCatIcon}" tabindex="8">
+                                    <f:selectItems value="#{eventCECaseConfigurationBB.iconList}" var="i" itemLabel="#{i.name}" itemValue="#{i}" />
                                     <f:converter converterId="iconConverter" />
                                 </p:selectOneMenu>
                                 
@@ -286,7 +286,7 @@
                                             <h:outputText value="User deployable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="userdeploy" value="#{eventConfigurationBB.formUserdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="userdeploy" value="#{eventCECaseConfigurationBB.formUserdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -294,7 +294,7 @@
                                             <h:outputText value="Municipality deployable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="munideploy" value="#{eventConfigurationBB.formMunideployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="munideploy" value="#{eventCECaseConfigurationBB.formMunideployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -302,7 +302,7 @@
                                             <h:outputText value="Public deployable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="publicDeploy" value="#{eventConfigurationBB.formPublicdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="publicDeploy" value="#{eventCECaseConfigurationBB.formPublicdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -310,7 +310,7 @@
                                             <h:outputText value="Requestable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="requestable-is" value="#{eventConfigurationBB.formRequestable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="requestable-is" value="#{eventCECaseConfigurationBB.formRequestable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                    
@@ -319,7 +319,7 @@
                                             <h:outputText value="Notify Case Monitors"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="notifyCaseMonitors" value="#{eventConfigurationBB.formNotifycasemonitors}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="notifyCaseMonitors" value="#{eventCECaseConfigurationBB.formNotifycasemonitors}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -327,14 +327,14 @@
                                             <h:outputText value="Hidable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="hidable" value="#{eventConfigurationBB.formHidable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="hidable" value="#{eventCECaseConfigurationBB.formHidable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                        
                                    </h:panelGrid>
                                 
                                 <p:commandButton ajax="false" icon="fa fa-edit"
-                                           actionListener="#{eventConfigurationBB.commitUpdates}"
+                                           actionListener="#{eventCECaseConfigurationBB.commitUpdates}"
                                            value="Commit Updates" tabindex="8"/>
                                  </h:form>
                                              
@@ -349,8 +349,8 @@
                                 <h:outputLabel for="newEventTypeMenu">
                                     <h:outputText value="Event Type: "/>
                                 </h:outputLabel>
-                                 <p:selectOneMenu id="newEventTypeMenu" required="true" value="#{eventConfigurationBB.newFormSelectedEventType}" tabindex="10">
-                                     <f:selectItems value="#{eventConfigurationBB.eventTypeList}"/>
+                                 <p:selectOneMenu id="newEventTypeMenu" required="true" value="#{eventCECaseConfigurationBB.newFormSelectedEventType}" tabindex="10">
+                                     <f:selectItems value="#{eventCECaseConfigurationBB.eventTypeList}"/>
                                 </p:selectOneMenu>
                                 <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -359,7 +359,7 @@
                                 <p:outputLabel for="newCatTitleIT">
                                     <h:outputText value="Category Title"/>
                                 </p:outputLabel>
-                                 <p:inputText id="newCatTitleIT" value="#{eventConfigurationBB.newFormEventCategoryTitle}" 
+                                 <p:inputText id="newCatTitleIT" value="#{eventCECaseConfigurationBB.newFormEventCategoryTitle}" 
                                           style="width: 40%;" tabindex="11" required="true" styleClass="inputText"/>
                                 <h:message for="newCatTitleIT" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -369,7 +369,7 @@
                                 <p:outputLabel for="newCatDescIT">
                                     <h:outputText value="Category Description"/>
                                 </p:outputLabel>
-                                <p:inputText id="newCatDescIT" value="#{eventConfigurationBB.newFormEventCategoryDescr}" 
+                                <p:inputText id="newCatDescIT" value="#{eventCECaseConfigurationBB.newFormEventCategoryDescr}" 
                                           style="width: 100%;" tabindex="12" required="true" styleClass="inputText"/>
                                 <h:message for="newCatDescIT" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -379,8 +379,8 @@
                                     <h:outputText value="Icon"/>
                                 </p:outputLabel>
                                 <p:spacer height="5px"/>
-                                <p:selectOneMenu id="icon-som-new" required="false" value="#{eventConfigurationBB.newFormCatIcon}" tabindex="8">
-                                    <f:selectItems value="#{eventConfigurationBB.iconList}" var="i" itemLabel="#{i.name}" itemValue="#{i}" />
+                                <p:selectOneMenu id="icon-som-new" required="false" value="#{eventCECaseConfigurationBB.newFormCatIcon}" tabindex="8">
+                                    <f:selectItems value="#{eventCECaseConfigurationBB.iconList}" var="i" itemLabel="#{i.name}" itemValue="#{i}" />
                                     <f:converter converterId="iconConverter" />
                                 </p:selectOneMenu>
                                 
@@ -391,7 +391,7 @@
                                             <h:outputText value="User deployable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="userdeploy" value="#{eventConfigurationBB.newFormUserdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="userdeploy" value="#{eventCECaseConfigurationBB.newFormUserdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -399,7 +399,7 @@
                                             <h:outputText value="Municipality deployable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="munideploy" value="#{eventConfigurationBB.newFormMunideployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="munideploy" value="#{eventCECaseConfigurationBB.newFormMunideployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                    
@@ -408,7 +408,7 @@
                                             <h:outputText value="Public deployable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="publicDeploy" value="#{eventConfigurationBB.newFormPublicdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="publicDeploy" value="#{eventCECaseConfigurationBB.newFormPublicdeployable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                     </h:panelGroup>
                                    
                                    
@@ -417,7 +417,7 @@
                                             <h:outputText value="Requestable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="new-requestable-is" value="#{eventConfigurationBB.newFormRequestable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="new-requestable-is" value="#{eventCECaseConfigurationBB.newFormRequestable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                     </h:panelGroup>
                                    
                                     <h:panelGroup>
@@ -425,7 +425,7 @@
                                             <h:outputText value="Notify Case Monitors"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="notifyCaseMonitors" value="#{eventConfigurationBB.newFormNotifycasemonitors}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="notifyCaseMonitors" value="#{eventCECaseConfigurationBB.newFormNotifycasemonitors}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -433,14 +433,14 @@
                                             <h:outputText value="Hidable"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:inputSwitch id="hidable" value="#{eventConfigurationBB.newFormHidable}" onLabel="Yes" offLabel="No" tabindex="2"/>
+                                        <p:inputSwitch id="hidable" value="#{eventCECaseConfigurationBB.newFormHidable}" onLabel="Yes" offLabel="No" tabindex="2"/>
                                         
                                     </h:panelGroup>
                                        
                                    </h:panelGrid>
                                             
                                 <p:commandButton ajax="false" icon="fa fa-plus"
-                                    actionListener="#{eventConfigurationBB.addNewEventCategory}"
+                                    actionListener="#{eventCECaseConfigurationBB.addNewEventCategory}"
                                     value="Add Event Category" tabindex="13"/>
                                 </h:form>
                             </p:fieldset>

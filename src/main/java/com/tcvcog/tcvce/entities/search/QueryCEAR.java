@@ -90,12 +90,7 @@ public class QueryCEAR
         return queryName;
     }
 
-    /**
-     * @param queryName the queryName to set
-     */
-    public void setQueryName(QueryCEAREnum queryName) {
-        this.queryName = queryName;
-    }
+  
 
     @Override
     public void clearResultList() {

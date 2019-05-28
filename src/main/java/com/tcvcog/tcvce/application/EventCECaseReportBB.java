@@ -6,8 +6,10 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+import com.tcvcog.tcvce.entities.reports.Report;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -21,6 +23,14 @@ public class EventCECaseReportBB extends BackingBeanUtils{
      * Creates a new instance of EventCECaseReportBB
      */
     public EventCECaseReportBB() {
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        Report configs = getSessionBean().getSessionReport();
+        if(configs instanceof ReportConfigCEEventList){
+            reportConfig = (ReportConfigCEEventList) configs;
+        }
     }
 
     /**

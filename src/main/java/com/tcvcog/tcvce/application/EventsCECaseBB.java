@@ -19,6 +19,7 @@ import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -52,7 +53,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     private List<EventCategory> eventCatList;
     private List<User> userList;
     
-    private List<Query> queryList;
+    private List<QueryEventCECase> queryList;
     private Query selectedBOBQuery;
     
     private List<EventCECaseCasePropBundle> eventList;
@@ -72,9 +73,21 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
-       
-        queryList = sc.getEventQueryList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
-       
+        
+        
+        queryList = sc.buildQueryEventCECaseList(getSessionBean().getActiveMuni(),getSessionBean().getFacesUser());
+        selectedBOBQuery = sc.getQueryInitialEventCECASE(getSessionBean().getActiveMuni(), getSessionBean().getFacesUser());
+        if(!selectedBOBQuery.isExecutedByIntegrator()){
+            try {
+                sc.runQuery((QueryEventCECase) selectedBOBQuery);
+            } catch (IntegrationException|CaseLifecyleException ex) {
+                System.out.println(ex);
+            }
+            
+        }
+        eventList = selectedBOBQuery.getBOBResultList();
+        
+        searchParams = (SearchParamsEventCECase) selectedBOBQuery.getParmsList().get(0);
         // grab previously loaded event config from the session bean
         // which would have been placed there by the generateReport method in this bean
         reportConfig = getSessionBean().getReportConfigCEEventList();
@@ -124,13 +137,11 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     public void executeQuery(){
         System.out.println("CEEventsBB.executeQuery");
         EventCoordinator ec = getEventCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
         QueryEventCECase eventQuery = (QueryEventCECase) selectedBOBQuery;
         searchParams = (SearchParamsEventCECase) eventQuery.getParamsList().get(0);
         try {
-            eventList = ec.queryEvents((SearchParamsEventCECase) eventQuery.getParamsList().get(0), 
-                                        getSessionBean().getFacesUser(), 
-                                        getSessionBean().getUserAuthMuniList());
-            
+            eventList = sc.runQuery(eventQuery).getBOBResultList();
             if(eventList != null){
                 Collections.sort(eventList);
                 Collections.reverse(eventList);
@@ -211,6 +222,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
    }
    
    public String generateEventReport(){
+       SearchCoordinator sc = getSearchCoordinator();
        // put the current event list on the session bean for extraction when
        // we generate the report (and must reload the backing bean)
        if(eventList != null){
@@ -220,8 +232,19 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
             } 
            
        }
+       
+       if(!selectedBOBQuery.isExecutedByIntegrator()){
+            try {
+                selectedBOBQuery = sc.runQuery((QueryEventCECase) selectedBOBQuery);
+            } catch (IntegrationException|CaseLifecyleException ex) {
+                System.out.println(ex);
+            }
+            
+        }
+       reportConfig.setBOBQuery(selectedBOBQuery);
        getSessionBean().setcEEventWCPIQueue(eventList);
        getSessionBean().setReportConfigCEEventList(reportConfig);
+       getSessionBean().setSessionReport(reportConfig);
        return "reportCEEventList";
    }
 
@@ -352,14 +375,14 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the queryList
      */
-    public List<Query> getQueryList() {
+    public List<QueryEventCECase> getQueryList() {
         return queryList;
     }
 
     /**
      * @param queryList the queryList to set
      */
-    public void setQueryList(List<Query> queryList) {
+    public void setQueryList(List<QueryEventCECase> queryList) {
         this.queryList = queryList;
     }
 
