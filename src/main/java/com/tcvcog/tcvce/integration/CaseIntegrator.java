@@ -94,7 +94,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return caseList;
     }
     
-     public QueryCECase runQueryCEAR(QueryCECase q) throws IntegrationException, CaseLifecyleException{
+    /**
+     * Entry point for all Queries of Code Enforcement cases. Note that this 
+     * method takes in a QUery object and will inject into its results list
+     * the returned ojects from each of its searchParams.
+     * @param q
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecyleException 
+     */
+     public QueryCECase runQueryCECase(QueryCECase q) throws IntegrationException, CaseLifecyleException{
         List<SearchParamsCECases> pList = q.getParmsList();
         
         for(SearchParamsCECases sp: pList){
@@ -107,7 +116,14 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
+    /**
+     * Internal serach method for Code Enforcement case using a SearchParam
+     * subclass. Outsiders will use runQueryCECase or runQueryCECase
+     * @param params
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecyleException 
+     */
     private List<CECase> getCECases(SearchParamsCECases params) throws IntegrationException, CaseLifecyleException{
         ArrayList<CECase> caseList = new ArrayList();
         Connection con = getPostgresCon();

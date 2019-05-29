@@ -54,7 +54,7 @@ public class Event
     
     /*Case event requests fields */
     
-    // utility memvar which is true if there's a requested
+    // utility "pass through" memvar which is true if there's a requested
     // event category in actionRequestCateogry
     private boolean requestsAction;
     
