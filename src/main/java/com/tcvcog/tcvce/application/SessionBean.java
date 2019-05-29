@@ -31,7 +31,6 @@ import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
-import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
 import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
 import java.io.Serializable;
 import java.util.List;
@@ -111,9 +110,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private OccPermitApplication occPermitApplication;
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
-    private OccPermitApplicationReason occPermitApplicationReason;
-
-
+    private PersonType activePersonType;
+    
+    /* *** Public Person Search/Edit Session Shelves *** */
+    private Person activeAnonPerson;
 
     /**
      * Creates a new instance of getSessionBean()
@@ -529,20 +529,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
         this.activePropWithLists = activePropWithLists;
     }
-
-    /**
-     * @return the occPermitApplicationReason
-     */
-    public OccPermitApplicationReason getOccPermitApplicationReason() {
-        return occPermitApplicationReason;
-    }
-
-    /**
-     * @param occPermitApplicationReason the occPermitApplicationReason to set
-     */
-    public void setOccPermitApplicationReason(OccPermitApplicationReason occPermitApplicationReason) {
-        this.occPermitApplicationReason = occPermitApplicationReason;
-    }
      
     /*
      * @return the cEEventWCPIQueue
@@ -684,6 +670,32 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.sessionQueryCECase = sessionQueryCECase;
     }
 
-    
+    /**
+     * @return the activePersonType
+     */
+    public PersonType getActivePersonType() {
+        return activePersonType;
+    }
+
+    /**
+     * @param activePersonType the activePersonType to set
+     */
+    public void setActivePersonType(PersonType activePersonType) {
+        this.activePersonType = activePersonType;
+    }
+
+    /**
+     * @return the activeAnonPerson
+     */
+    public Person getActiveAnonPerson() {
+        return activeAnonPerson;
+    }
+
+    /**
+     * @param activeAnonPerson the activeAnonPerson to set
+     */
+    public void setActiveAnonPerson(Person activeAnonPerson) {
+        this.activeAnonPerson = activeAnonPerson;
+    }
     
 }

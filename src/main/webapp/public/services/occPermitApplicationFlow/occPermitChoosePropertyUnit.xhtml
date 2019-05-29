@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Choose a property</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="occPermitApplicationFlowView">
+                    
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h1>Select a property in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
+                        
+                        <h:form id="occPermitApplicationChoosePropertyForm">                          
+                            <p:panel>
+                                
+                            <p:outputLabel for="isMultiUnitSwitch">
+                                <h:outputLabel value="Is this a multiunit property?" />
+                            </p:outputLabel>
+
+                            <p:spacer height="5px" />
+
+                            <p:inputSwitch tabindex="1" id="isMultiUnitSwitch"
+                                           onLabel="Yes" offLabel="No" value="#{sessionBean.occPermitApplication.multiUnit}">
+                                <p:ajax />
+                            </p:inputSwitch>
+
+                             <p>Please search for and select the property of concern using this search tool.</p>
+
+                            <p:spacer height="10px"/>
+
+                            <p:panelGrid columns="3" layout="grid">
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="propSearchHouseNumIT">
+                                        <h:outputText value="House number:"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="propSearchHouseNumIT" value="#{occPermitApplicationBB.houseNum}" 
+                                                  tabindex="2" required="false" styleClass="inputText">
+                                    </p:inputText>
+                                    <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="propSearchStreetIT">
+                                        <h:outputText value="Street name:"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="propSearchStreetIT" value="#{occPermitApplicationBB.streetName}" 
+                                                  tabindex="3" required="false" styleClass="inputText">
+                                    </p:inputText>
+                                    <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:commandButton
+                                        value="Search in Selected Municipality" tabindex="4" ajax="false" icon="fa fa-search"
+                                        action="#{occPermitApplicationBB.searchForPropertiesSingleMuni}" 
+                                        update=    "propSearchHouseNumIT
+                                                    propSearchStreetIT
+                                                    propertyResultTable"/>
+                                </h:panelGroup>
+                            </p:panelGrid> 
+
+                            <h3>Search Results:</h3>
+                            <p>Click to select the desired property or try your search again.</p>
+
+                            <p:dataTable
+                                id="propertyResultTable"
+                                var="prop" 
+                                value="#{occPermitApplicationBB.propList}"
+                                selectionMode="single" tabindex="5"
+                                scrollable="true" scrollHeight="150" 
+                                selection="#{occPermitApplicationBB.selectedProperty}"
+                                rowKey="#{prop.propertyID}">
+
+                                <p:ajax event="rowSelect" listener="#{occPermitApplicationBB.onPropertySelection}" update="occPermitApplicationChoosePropertyForm:propertyUnitPanel"/>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Address" />
+                                    </f:facet>
+                                    <h:outputText value="#{prop.address}"/>
+                                </p:column>
+                                <p:column>
+
+                                    <f:facet name="header">
+                                        <h:outputText value="Municipality" />
+                                    </f:facet>
+                                    <h:outputText value="#{prop.muni.muniName}"/>
+
+                                </p:column>
+
+                                <p:column>
+
+                                    <f:facet name="header">
+                                        <h:outputText value="Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{prop.propertyUseType}"/>
+
+                                </p:column>
+
+                            </p:dataTable>
+                            
+                            </p:panel>
+
+
+                               
+                                <p:panel id="propertyUnitPanel" visible="#{sessionBean.occPermitApplication.multiUnit}">
+                                    
+                                <p:spacer height="10px"/>
+
+                                <p:outputLabel value="Click to select the unit:" />
+
+                                <p:dataTable
+                                    id="propertyUnitTable"
+                                    var="unit"
+                                    value="#{sessionBean.activePropWithLists.unitList}"
+                                    selectionMode="single" tabindex="6"
+                                    scrollable="true" scrollHeight="150"
+                                    selection="#{sessionBean.occPermitApplication.applicationPropertyUnit}"
+                                    rowKey="#{unit.unitID}">                                         
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Number" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.unitNumber}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rental?" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.notes}" />
+                                    </p:column>
+                                </p:dataTable>            
+
+                                <p:outputLabel value="Click to add a unit:" />                     
+
+                                <p:spacer height="5px" />
+
+                                <p:commandButton ajax="false" value="Click to add unit" action="#{occPermitApplicationBB.addPropertyUnit}" />
+
+                                <p:spacer height="10px"/>
+                                
+                                </p:panel>      
+
+                            <p:spacer height="10px"/>
+                            
+                                <p:commandButton ajax="false" value="Next step: Describe the reason for this application" 
+                                                 action="#{occPermitApplicationBB.storePropertyUnitInfo}"/>
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

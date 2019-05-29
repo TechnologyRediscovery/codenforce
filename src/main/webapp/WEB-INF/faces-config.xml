@@ -1114,7 +1114,7 @@
         <navigation-case>
             <from-view-id>/public/services/occpermitApplicationFlow/occPermitChooseMuni.xhtml</from-view-id>
             <from-outcome>chooseProperty</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</to-view-id>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitChoosePropertyUnit.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -1143,6 +1143,49 @@
             <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
             <from-outcome> addPeople </from-outcome>
             <to-view-id> /public/services/occPermitApplicationFlow/occPermitAddPeople.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
+            <from-outcome> managePeople </from-outcome>
+            <to-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtml </to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtl </from-view-id>
+            <from-outcome> searchPeople </from-outcome>
+            <to-view-id> /public/services/personSearchPublic.xhtml </to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-view-id> /public/services/personSearchPublic.xhtml </from-view-id>
+            <from-outcome> addPerson </from-outcome>
+            <to-view-id> /public/services/personAddPublic.xhtml </to-view-id>
+            <redirect /> 
+        </navigation-case>
+
+        <navigation-case>
+            <from-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtl </from-view-id>
+            <from-outcome> reviewApplication </from-outcome>
+            <to-view-id> /public/services/occPermitApplicationFlow/reviewAndSubmit.xhtml </to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        <navigation-case>
+            <from-view-id> /public/services/personSearchPublic.xhtml </from-view-id>
+            <from-outcome> managePeople </from-outcome>
+            <to-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtml </to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-view-id> /public/services/personSearchPublic.xhtml</from-view-id>
+            <from-outcome> editPerson </from-outcome>
+            <to-view-id> /public/services/personEditPublic.xhtml </to-view-id>
             <redirect />
         </navigation-case>
         
@@ -1480,5 +1523,16 @@
         <managed-bean-name>eventCECaseReportBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseReportBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
+
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>personSearchPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonSearchPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>personEditPublicBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonEditPublicBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

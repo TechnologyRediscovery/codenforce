@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <h:outputStylesheet name="css/style.css"/>
+        <title>TCVCOG Code Enforcement Home</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+
+            <ui:define name="content">
+                <f:view id="sysHomeView">
+
+                    <div class="mainContainer">
+
+                        <h:messages id="personSearchPublicMessages" globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+
+
+                        <h1>Review Application</h1>
+
+                        <h:form id="reviewAndSubmitForm">
+                            <h:panelGroup>
+                                <h:panelGrid columns="1" cellpadding="10" footerClass="gridFooter" style="width: 500px" styleClass="ui-panelgrid-blank">
+                                    <p:column>
+                                        <p:outputLabel value="Reason for application: #{sessionBean.occPermitApplication.reason.title}" />
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <p:outputLabel value="Property Address: #{sessionBean.occPermitApplication.applicationPropertyUnit.thisProperty.address}" />
+                                    </p:column>
+                                    
+                                    <p:column> 
+                                        <p:outputLabel value ="Multiunit: #{sessionBean.occPermitApplication.multiUnit ? 'Yes' : 'No'}" />
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <p:outputLabel value="Property Unit: #{sessionBean.occPermitApplication.applicationPropertyUnit.unitNumber}" />
+                                    </p:column>
+                                    
+                                    <p:column>
+                                        <p:outputLabel value="Applicant: #{sessionBean.occPermitApplication.applicantPerson.firstName} #{sessionBean.occPermitApplication.applicantPerson.lastName}" />
+                                    </p:column>
+                                    
+                                    <p:column>                                        
+                                        <p:outputLabel value="Application Persons:" />
+                                        <p:dataTable var="applicationPerson" value="#{sessionBean.occPermitApplication.attachedPersons}"
+                                         rowKey="#{applicationPerson.personID}">
+                                             
+                                            <p:column headerText="Name">
+                                                <h:outputText value="#{applicationPerson.firstName} #{applicationPerson.lastName}"/>
+                                            </p:column>
+                                             
+                                            <p:column headerText="Person Type">
+                                                <h:outputText value="#{applicationPerson.personType}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="Notes: #{sessionBean.occPermitApplication.submissionNotes}" />
+                                    </p:column>                                    
+                                </h:panelGrid>
+                            </h:panelGroup>
+
+
+                            <p:commandButton value="Submit Application" action="#{occPermitApplicationBB.submitApplication}" />
+
+                        </h:form>
+
+                        
+                        
+                    </div>
+                </f:view>
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -513,7 +513,35 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return unitList;
     }
     
-    private PropertyUnit generatePropertyUnit(ResultSet rs) throws SQLException, IntegrationException{
+    public PropertyUnit getPropertyUnit(int propId) throws IntegrationException{
+        PropertyUnit pu = new PropertyUnit();
+        String query = "SELECT unitid, unitnumber, property_propertyid, otherknownaddress, propertyunit.notes, \n" +
+                        "       rental\n" +
+                        "  FROM propertyunit JOIN property ON propertyunit.property_propertyID = property.propertyid\n" +
+                        "  WHERE unitid=?;";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        try{
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, propId);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                pu = generatePropertyUnit(rs);
+            }
+        } catch (SQLException ex) {
+            throw new IntegrationException("PropertyIntegrator.getPropertyUnit | Unable to get property unit, ", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }        
+        
+        return pu;
+    }
+    public PropertyUnit generatePropertyUnit(ResultSet rs) throws SQLException, IntegrationException{
         PersonIntegrator persInt = getPersonIntegrator();
         PropertyUnit pu = new PropertyUnit();
         pu.setUnitID(rs.getInt("unitid"));

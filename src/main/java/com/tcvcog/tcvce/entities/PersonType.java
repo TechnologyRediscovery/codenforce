@@ -22,6 +22,7 @@ package com.tcvcog.tcvce.entities;
  */
 public enum PersonType{
     User("System user"),
+    Owner("Owner"),
     CogStaff("TCVCOG Staff"),
     NonCogOfficial("Non-TCVCOG Official"),
     MuniStaff("Municipality Staff"),
@@ -29,12 +30,12 @@ public enum PersonType{
     OwnerOccupant("Owner-Occupant"),
     OwnerNonOccupant("Owner-Non Occupant"),
     FutureOwner("Future owner"),
-    Manager("Property Manager"),
+    Manager("Manager"),
     ElectedOfficial("Elected Official"),
     Public("Public"),
     LawEnforcement("Law Enforcement"),
     Other("Other"),
-    ownercntylookup("Owner from county databse"),
+    ownercntylookup("Owner from county database"),
     LegacyOwner("Legacy owner"),
     LegacyAgent("Legacy Agent");
     

@@ -17,13 +17,12 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.occupancy.entities;
 
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -34,15 +33,20 @@ public class OccPermitApplication {
     private OccPermitApplicationReason reason;
     private boolean multiUnit;
     private LocalDateTime submissionDate;
-    private java.util.Date submissionDateUtilDate;
-    private Person currentOwner;
-    private Person contactPerson;
-    private ArrayList<Person> newOccupants;
-    private Person newOwner;
+    private Date submissionDateUtilDate;;
     private String submissionNotes;
     private String internalNotes;
-    private Property applicationProperty;
-
+    private PropertyUnit applicationPropertyUnit;
+    private Person applicantPerson;
+    private Person preferredContact;
+    
+    /**
+    * This will contain either existing Person objects, new Person objects created by user, or 
+    * clones of existing Person objects whose reference persons data was changed as part of the 
+    * application. The occupancy coordinator will digest this list to determine if the requirements 
+    * have been satisfied.
+    */
+    private List<Person> attachedPersons;
 
     /**
      * @return the id
@@ -70,34 +74,6 @@ public class OccPermitApplication {
      */
     public LocalDateTime getSubmissionDate() {
         return submissionDate;
-    }
-
-    /**
-     * @return the currentOwner
-     */
-    public Person getCurrentOwner() {
-        return currentOwner;
-    }
-
-    /**
-     * @return the contactPerson
-     */
-    public Person getContactPerson() {
-        return contactPerson;
-    }
-
-    /**
-     * @return the newOccupants
-     */
-    public ArrayList<Person> getNewOccupants() {
-        return newOccupants;
-    }
-
-    /**
-     * @return the newOwner
-     */
-    public Person getNewOwner() {
-        return newOwner;
     }
 
     /**
@@ -143,34 +119,6 @@ public class OccPermitApplication {
     }
 
     /**
-     * @param currentOwner the currentOwner to set
-     */
-    public void setCurrentOwner(Person currentOwner) {
-        this.currentOwner = currentOwner;
-    }
-
-    /**
-     * @param contactPerson the contactPerson to set
-     */
-    public void setContactPerson(Person contactPerson) {
-        this.contactPerson = contactPerson;
-    }
-
-    /**
-     * @param newOccupants the newOccupants to set
-     */
-    public void setNewOccupants(ArrayList<Person> newOccupants) {
-        this.newOccupants = newOccupants;
-    }
-
-    /**
-     * @param newOwner the newOwner to set
-     */
-    public void setNewOwner(Person newOwner) {
-        this.newOwner = newOwner;
-    }
-
-    /**
      * @param submissionNotes the submissionNotes to set
      */
     public void setSubmissionNotes(String submissionNotes) {
@@ -194,12 +142,54 @@ public class OccPermitApplication {
         submissionDate = submissionDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
-    public Property getApplicationProperty() {
-        return applicationProperty;
+    public PropertyUnit getApplicationPropertyUnit() {
+        return applicationPropertyUnit;
     }
 
-    public void setApplicationProperty(Property applicationProperty) {
-        this.applicationProperty = applicationProperty;
+    public void setApplicationPropertyUnit(PropertyUnit applicationPropertyUnit) {
+        this.applicationPropertyUnit = applicationPropertyUnit;
     }    
-    
+
+    /**
+     * @return the applicantPerson
+     */
+    public Person getApplicantPerson() {
+        return applicantPerson;
+    }
+
+    /**
+     * @param applicantPerson the applicantPerson to set
+     */
+    public void setApplicantPerson(Person applicantPerson) {
+        this.applicantPerson = applicantPerson;
+    }
+
+    /**
+     * @return the attachedPersons
+     */
+    public List<Person> getAttachedPersons() {
+        return attachedPersons;
+    }
+
+    /**
+     * @param attachedPersons the attachedPersons to set
+     */
+    public void setAttachedPersons(List<Person> attachedPersons) {
+        this.attachedPersons = attachedPersons;
+    }
+
+    /**
+     * @return the preferredContact
+     */
+    public Person getPreferredContact() {
+        return preferredContact;
+    }
+
+    /**
+     * @param preferredContact the preferredContact to set
+     */
+    public void setPreferredContact(Person preferredContact) {
+        this.preferredContact = preferredContact;
+    }
+
 }

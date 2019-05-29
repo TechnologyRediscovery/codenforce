@@ -17,6 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.occupancy.entities;
 
+import java.util.Objects;
+
 /**
  *
  * @author Eric C. Darsow
@@ -27,6 +29,8 @@ public class OccPermitApplicationReason {
     private String title;
     private String description;
     private boolean active;
+    private PersonsRequirement personsRequirement;
+    private String humanFriendlyDescription;
 
     public int getId() {
         return id;
@@ -58,6 +62,62 @@ public class OccPermitApplicationReason {
 
     public void setActive(boolean active) {
         this.active = active;
-    }   
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + this.id;
+        hash = 89 * hash + Objects.hashCode(this.title);
+        hash = 89 * hash + Objects.hashCode(this.description);
+        hash = 89 * hash + (this.active ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OccPermitApplicationReason other = (OccPermitApplicationReason) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return the personsRequirement
+     */
+    public PersonsRequirement getPersonsRequirement() {
+        return personsRequirement;
+    }
+
+    /**
+     * @param personsRequirement the personsRequirement to set
+     */
+    public void setPersonsRequirement(PersonsRequirement personsRequirement) {
+        this.personsRequirement = personsRequirement;
+    }    
+
+    /**
+     * @return the humanFriendlyDescription
+     */
+    public String getHumanFriendlyDescription() {
+        return humanFriendlyDescription;
+    }
+
+    /**
+     * @param humanFriendlyDescription the humanFriendlyDescription to set
+     */
+    public void setHumanFriendlyDescription(String humanFriendlyDescription) {
+        this.humanFriendlyDescription = humanFriendlyDescription;
+    }
     
 }
