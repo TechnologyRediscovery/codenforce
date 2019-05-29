@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -189,51 +190,19 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
    
     
-    public void hideEvent(EventCECase event){
-        EventIntegrator ei = getEventIntegrator();
-        event.setHidden(true);
-        try {
-            ei.updateEvent(event);
-            getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_INFO,
-                           "Success! event ID: " + event.getEventID() + " is now hidden", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not hide event, sorry; this is a system erro", ""));
-        }
-    }
-    
-    public void unHideEvent(EventCECase event){
-        EventIntegrator ei = getEventIntegrator();
-        event.setHidden(false);
-        try {
-            ei.updateEvent(event);
-            getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_INFO,
-                           "Success! Unhid event ID: " + event.getEventID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                           "Could not unhide event, sorry; this is a system erro", ""));
-        }
-    }
-
-    public void deletePhoto(int photoID) {
+    public void deletePhoto(int blobID){
         // TODO: remove entry from linker table for deleted photos
-        for (Integer pid : this.selectedViolation.getPhotoList()) {
-            if (pid.compareTo(photoID) == 0) {
-                this.selectedViolation.getPhotoList().remove(pid);
+        for(Integer pid : this.selectedViolation.getBlobIDList()){
+            if(pid.compareTo(blobID) == 0){
+                this.selectedViolation.getBlobIDList().remove(pid);
                 break;
             }
         }
-        ImageServices is = getImageServices();
+        BlobCoordinator blobc = getBlobCoordinator();
         try {
-            is.deletePhotograph(photoID);
+            blobc.deleteBlob(blobID);
         } catch (IntegrationException ex) {
-            System.out.println("CaseProfileBB.deletePhotograph | " + ex);
+            System.out.println(ex);
         }
     }
     

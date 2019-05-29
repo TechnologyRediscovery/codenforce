@@ -3,6 +3,8 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -22,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIInput;
 import javax.faces.event.ActionEvent;
+import org.primefaces.event.FileUploadEvent;
 
 /*
  * Copyright (C) 2018 Turtle Creek Valley
@@ -116,7 +119,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     
     
-    
     public String viewPersonProfile(Person p){
         getSessionBean().getPersonQueue().add(0,p);
         return "persons";
@@ -148,6 +150,31 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
         }
         return currProp;
+    }
+    
+    /**
+     *delete blob if the blob is a photo
+     * @param blobID
+     */
+    public void deletePhoto(int blobID){
+        try {
+            Blob blob = getBlobCoordinator().getBlob(blobID);
+            if(blob.getType() == BlobType.PHOTO){
+                getBlobCoordinator().deleteBlob(blobID);
+            }
+            }
+        catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    public void handleFileUpload(FileUploadEvent ev){
+        Blob blob = getBlobCoordinator().getNewBlob();
+        blob.setBytes(ev.getFile().getContents());
+        blob.setType(BlobType.PHOTO); // TODO: BAD CHANGE THIS SOON
+        
+        // DO nothing because I'm moving on to other issues,
+        // need to be able to compile before I can do much in the way of testing
     }
     
     /**
@@ -312,7 +339,24 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.filteredPersonList = filteredPersonList;
     }
 
-    
+    /**
+     * @return the pList
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public ArrayList<Person> getpList() throws IntegrationException {
+            PropertyIntegrator pi = getPropertyIntegrator();
+        if(pList == null || currProp == null){
+            pList= pi.getPersonIntegrator().getPersonList(selectedMuni.getMuniCode());
+        }
+        return pList;
+    }
+
+    /**
+     * @param pList the pList to set
+     */
+    public void setpList(ArrayList<Person> pList) {
+        this.pList = pList;
+    }
 
     /**
      * @return the selectedMuni

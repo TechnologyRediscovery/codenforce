@@ -826,7 +826,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     public void loadViolationPhotoList(CodeViolation cv) throws IntegrationException{
-        ArrayList<Integer> photoList = new ArrayList<>();
+        ArrayList<Integer> blobList = new ArrayList<>();
         
         String query = "SELECT photodoc_photodocid FROM public.codeviolationphotodoc WHERE codeviolation_violationid = ?";
         Connection con = getPostgresCon();
@@ -839,10 +839,10 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                photoList.add((Integer)rs.getInt(1));
+                blobList.add((Integer)rs.getInt(1));
             }
             
-            cv.setPhotoList(photoList);
+            cv.setBlobIDList(blobList);
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());

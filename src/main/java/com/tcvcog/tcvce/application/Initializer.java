@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
@@ -25,6 +26,8 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
@@ -167,8 +170,11 @@ public class Initializer implements ServletContextListener{
         SearchCoordinator sc = new SearchCoordinator();
         servletContext.setAttribute("searchCoordinator", sc);
          
-        ImageServices imageServicesBean = new ImageServices();
-        servletContext.setAttribute("imageServices", imageServicesBean);
+        BlobCoordinator blobCoordinator = new BlobCoordinator();
+        servletContext.setAttribute("blobCoordinator", blobCoordinator);
+        
+        BlobIntegrator blobIntegrator = new BlobIntegrator();
+        servletContext.setAttribute("blobIntegrator", blobIntegrator);
         
         PersonCoordinator persCoor = new PersonCoordinator();
         servletContext.setAttribute("personCoordinator", persCoor);

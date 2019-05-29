@@ -123,7 +123,6 @@ public class BackingBeanUtils implements Serializable{
     private LogIntegrator logIntegrator;
     
     private SearchCoordinator searchCoordinator;
-    private ImageServices imageServices;
     
     private User facesUser;
     
@@ -749,25 +748,6 @@ public class BackingBeanUtils implements Serializable{
      */
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    /**
-     * @return the imageServices
-     */
-    public ImageServices getImageServices() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{imageServices}", ImageServices.class);
-        imageServices = (ImageServices) ve.getValue(context.getELContext());
-        
-        return imageServices;
-    }
-
-    /**
-     * @param imageServices the imageServices to set
-     */
-    public void setImageServices(ImageServices imageServices) {
-        this.imageServices = imageServices;
     }
 
     /**

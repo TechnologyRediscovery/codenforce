@@ -81,9 +81,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeElement activeCodeElement;
     
     /* *** Code Enf Action Request Session Shelves ***  */
-    
     private Person personForCEActionRequestSubmission;
-
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
     private CECase cECase;

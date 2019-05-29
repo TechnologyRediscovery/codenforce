@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
@@ -27,6 +28,8 @@ import org.primefaces.model.StreamedContent;
  */
 public class BlobCoordinator extends BackingBeanUtils implements Serializable{
     
+    private final StreamedContent image = new DefaultStreamedContent();
+    
     public Blob getNewBlob(){
         Blob blob = new Blob();
         blob.setDescription("No description.");
@@ -35,14 +38,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable{
         return blob;
     }
      
-    public StreamedContent getimage(int id) throws BlobException{
+    public StreamedContent getImage() throws BlobTypeException{
         // should use EL to verify blob type,  but this will check it anyway
         FacesContext context = FacesContext.getCurrentInstance();
         DefaultStreamedContent sc = null;
         
         if(context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-            sc = new DefaultStreamedContent();
-            return sc;
+            return image;
         } else {
             BlobIntegrator bi = getBlobIntegrator();
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
@@ -51,15 +53,23 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable{
                 if(blob.getType() == BlobType.PHOTO)
                     sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
                 else{
-                    throw new BlobException("Attmpted to display incompatible BLOB type. ");
+                    throw new BlobTypeException("Attempted to display incompatible BLOB type. ");
                 }
             } catch (IntegrationException ex) {
-                System.out.println(ex);
+                System.out.println("BlobCoordinator.getImage | " + ex);
             }
             return sc;
         }
     }
     
+    public Blob getBlob(int blobID) throws IntegrationException{
+        return getBlobIntegrator().getBlob(blobID);
+    }
     
+    // TODO: MAYBE seperate into PDF and Photo deletes, verify types appropriately,
+    // then delete with integrator.
+    public void deleteBlob(int blobID) throws IntegrationException{
+        getBlobIntegrator().deleteBlob(blobID);
+    }
     
 }

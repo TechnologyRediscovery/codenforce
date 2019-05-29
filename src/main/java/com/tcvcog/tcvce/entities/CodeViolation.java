@@ -72,12 +72,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     
     protected boolean leagacyImport;
     
-    protected LocalDateTime complianceTimeStamp;
-    protected User complianceUser;
-    protected EventCECase compTimeFrameComplianceEvent;
-    protected int complianceTimeframeEventID;
-    
-    protected List<Integer> photoList;
+    private List<Integer> blobIDList;
 
     /**
      * @return the violationID
@@ -371,17 +366,17 @@ public class CodeViolation extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the photoList
+     * @return the list of blobIDs associated with this Violation
      */
-    public List<Integer> getPhotoList() {
-        return photoList;
+    public List<Integer> getBlobIDList() {
+        return this.blobIDList;
     }
 
     /**
-     * @param photoList the photoList to set
+     * @param blobIDList the blobIDList to set
      */
-    public void setPhotoList(List<Integer> photoList) {
-        this.photoList = photoList;
+    public void setBlobIDList(List<Integer> blobIDList) {
+        this.blobIDList = blobIDList;
     }
 
     /**
@@ -515,7 +510,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
         hash = 53 * hash + Objects.hashCode(this.complianceUser);
         hash = 53 * hash + Objects.hashCode(this.compTimeFrameComplianceEvent);
         hash = 53 * hash + this.complianceTimeframeEventID;
-        hash = 53 * hash + Objects.hashCode(this.photoList);
+        hash = 53 * hash + Objects.hashCode(this.blobIDList);
         return hash;
     }
 
