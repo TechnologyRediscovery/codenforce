@@ -269,6 +269,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @param ev
      */
     public void executeQuery(ActionEvent ev) {
+        System.out.println("CaseProfileBB.executeQuery");
         executeQuery();
     }
     
@@ -558,7 +559,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void manageCECase(CECase c) {
         UserIntegrator ui = getUserIntegrator();
-//        getSessionBean().getcECaseQueue().add(0, c);
+        System.out.println("CaseProfileBB.manageCECase | caseid: " + c.getCaseID());
         try {
             ui.logObjectView(getSessionBean().getFacesUser(), c);
         } catch (IntegrationException ex) {
@@ -566,6 +567,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
         currentCase = c;
         getSessionBean().setActiveProp(c.getProperty());
+    }
+    
+    public void testButton(ActionEvent ev){
+        System.out.println("button");
     }
 
     public void changePACCAccess() {

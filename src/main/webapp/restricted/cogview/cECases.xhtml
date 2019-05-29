@@ -38,7 +38,7 @@
                                     <p:ajax update="cease-query-desc-ot" />
                                 </p:selectOneMenu>
 
-                                <p:commandButton   id="query-allopencases-cb" 
+                                <p:commandButton   id="cecases-executequery-cb" 
                                                    ajax="true" actionListener="#{caseProfileBB.executeQuery}"
                                                    icon="fa fa-print" styleClass="button"
                                                    value="run selected query" 
@@ -359,31 +359,30 @@
                                             <i class="material-icons status-display-icon-i"><h:outputText value="#{c.casePhaseIcon.materialIcon}"/></i>
                                         </div>
                                     </p:column>
-
-
-
                                     <p:column width="5%" sortBy="#{c.caseAge}">
                                         <f:facet name="header">
                                             <h:outputText value="Age" />
                                         </f:facet>
                                         <h:outputText value="#{c.caseAge}"/>
                                     </p:column>
-                                    <p:column width="12%" exportable="false">
+                                    <p:column width="12%">
                                         <f:facet name="header">
                                             <h:outputText value="view" />
                                         </f:facet>
-                                        <p:commandButton icon="fa fa-hand-o-right" value="view"
-                                                         actionListener="#{caseProfileBB.manageCECase(c)}" 
-                                                         ajax="true"
-                                                         update="
-                                                         case-details-form
-                                                         event-dt-form
-                                                         violation-form
-                                                         sessionInfoForm
-                                                         notices-form:notices-ds
-                                                         action-requests-form:actionRequestTable
-                                                         events-datascroller-form
-                                                         "/>
+                                        <p:commandButton    id="cecases-viewcase-cb"
+                                                            icon="fa fa-hand-o-right" 
+                                                            value="view"
+                                                            actionListener="#{caseProfileBB.executeQuery}"
+                                                            
+                                                            ajax="true"
+                                                            update="
+                                                            case-details-form
+                                                            event-dt-form
+                                                            violation-form
+                                                            sessionInfoForm
+                                                            notices-form:notices-ds
+                                                            action-requests-form
+                                                            events-datascroller-form" />
                                     </p:column>
                                 </p:dataTable>
 
@@ -707,7 +706,8 @@
 
 
                             <h:form id="events-datascroller-form">
-
+                                <ui:remove>
+                                    
                                 <p:dataScroller
                                     id="events-datascroller"
                                     var="e"
@@ -808,6 +808,8 @@
                                     </div>
 
                                 </p:dataScroller>
+                                                                    </ui:remove>
+
                             </h:form>
 
                             <hr />
