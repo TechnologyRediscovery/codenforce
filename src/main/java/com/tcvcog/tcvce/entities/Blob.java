@@ -5,7 +5,15 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.domain.BlobTypeException;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
+import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 /**
  *
@@ -19,6 +27,7 @@ public class Blob {
     private LocalDateTime timestamp;
     private int uploadPersonID;
     private byte[] bytes;
+    //private StreamedContent image;
     
     /**
      * @return the blobID
@@ -75,8 +84,6 @@ public class Blob {
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
-
-
 
     /**
      * @return the bytes

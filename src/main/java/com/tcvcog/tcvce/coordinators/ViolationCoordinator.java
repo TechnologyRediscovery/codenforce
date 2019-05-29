@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.application.ImageServices;
+//import com.tcvcog.tcvce.application.ImageServices;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -235,11 +235,11 @@ public class ViolationCoordinator extends BackingBeanUtils implements Serializab
     
     public void deleteViolation(CodeViolation cv) throws IntegrationException{
         CodeViolationIntegrator cvi = getCodeViolationIntegrator();
-        ImageServices is = getImageServices();
+        BlobCoordinator bc = getBlobCoordinator();
         
         // delete photos attached to this violation
-        for(Integer photoID : cv.getPhotoList()){
-            is.deletePhotograph(photoID);
+        for(Integer photoID : cv.getBlobIDList()){
+            bc.deleteBlob(photoID);
         }
         cvi.deleteCodeViolation(cv);
     }

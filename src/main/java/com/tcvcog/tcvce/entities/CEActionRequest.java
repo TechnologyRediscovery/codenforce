@@ -36,6 +36,20 @@ import java.util.Objects;
  * @author Eric Darsow
  */
 public class CEActionRequest implements Serializable{
+
+    /**
+     * @return the blobIDList
+     */
+    public List<Integer> getBlobIDList() {
+        return blobIDList;
+    }
+
+    /**
+     * @param blobIDList the blobIDList to set
+     */
+    public void setBlobIDList(List<Integer> blobIDList) {
+        this.blobIDList = blobIDList;
+    }
     
     // requests no longer have a status--remove when fully updated
     // for the full case model
@@ -83,8 +97,8 @@ public class CEActionRequest implements Serializable{
     // these are populated on the lookup when the linked
     // tables with the String values are selected
     
-    // list of photo id's associated with this request
-    private List<Integer> photoList;
+    // list of blob id's associated with this request
+    private List<Integer> blobIDList;
     
     /**
      * Creates a new instance of ActionRequest
@@ -590,21 +604,4 @@ public class CEActionRequest implements Serializable{
         this.caseAttachmentTimeStamp = caseAttachmentTimeStamp;
     }
 
-    /**
-     * @return the photoList
-     */
-    public List<Integer> getPhotoList() {
-        return photoList;
-    }
-
-    /**
-     * @param photoList the photoList to set
-     */
-    public void setPhotoList(List<Integer> photoList) {
-        this.photoList = photoList;
-    }
-
-    
-
-    
 }

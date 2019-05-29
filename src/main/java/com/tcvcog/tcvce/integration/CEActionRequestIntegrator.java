@@ -403,10 +403,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setInt(1, cear.getRequestID());
             // Retrieve action data from postgres
             rs = stmt.executeQuery();
-            // loop through the result set and reat an action request from each
-            cear.setPhotoList(new ArrayList<Integer>());
+            // loop through the result set and each to the request
+            cear.setBlobIDList(new ArrayList<Integer>());
             while (rs.next()) {
-                cear.getPhotoList().add(rs.getInt("photodoc_photodocid"));
+                cear.getBlobIDList().add(rs.getInt("photodoc_photodocid"));
             }
         } catch (SQLException ex) {
             System.out.println(ex);

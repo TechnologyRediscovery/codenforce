@@ -83,17 +83,13 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeElement activeCodeElement;
     
     /* *** Code Enf Action Request Session Shelves ***  */
-    
     private Person personForCEActionRequestSubmission;
-    
-    
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
     private CEActionRequest activeRequest;
     private CECase cECase;
     
      /* *** Code Enforcement Case Session Shelves ***  */
-    
     private NoticeOfViolation activeNotice;
     private Citation activeCitation;
     private CodeViolation activeCodeViolation;

@@ -1454,17 +1454,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <description>Utility application-scoped bean for handling image upload and download	</description>
-        <managed-bean-name>imageServices</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ImageServices</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>photoBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PhotoBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
         <managed-bean-name>cEEventsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -1483,5 +1472,22 @@
         <managed-bean-name>reportingBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ReportingBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>uploadBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Utility application-scoped bean for handling blob upload and download	</description>
+        <managed-bean-name>blobCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.BlobCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Handles storing and retrieving of BLOBs to/from the database	</description>
+        <managed-bean-name>blobIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.BlobIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
 </faces-config>

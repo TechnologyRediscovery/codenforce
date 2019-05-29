@@ -438,19 +438,18 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         
     }
     
-    public void deletePhoto(int photoID){
+    public void deletePhoto(int blobID){
         // TODO: remove entry from linker tbale for deleted photos
-        for(Integer pid : this.selectedRequest.getPhotoList()){
-            if(pid.compareTo(photoID) == 0){
-                this.selectedRequest.getPhotoList().remove(pid);
+        for(Integer bid : this.selectedRequest.getBlobIDList()){
+            if(bid.compareTo(blobID) == 0){
+                this.selectedRequest.getBlobIDList().remove(bid);
                 break;
             }
         }
-        ImageServices is = getImageServices();
         try {
-            is.deletePhotograph(photoID);
+            getBlobCoordinator().deleteBlob(blobID);
         } catch (IntegrationException ex) {
-            System.out.println("CEActionRequessBB.deletePhotograph | " + ex);
+            System.out.println(ex);
         }
     }
     
