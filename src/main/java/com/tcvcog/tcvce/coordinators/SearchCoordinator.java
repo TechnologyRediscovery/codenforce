@@ -298,7 +298,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          if(query.getQueryName().logQueryRun()){
             logRun(query);
         }
-        return ci.runQueryCEAR(query);
+        return ci.runQueryCECase(query);
      }
      
      public QueryCECase assembleQueryCECase(QueryCECaseEnum qName, User u, Municipality m, SearchParamsCECases params){

@@ -635,9 +635,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     }
     
     /**
-     * Called by runQueryCEAR() only!
-     * 
-     * Internal retrieval method for Code Enforcement Action Requests. Implements
+     * Called by runQueryCECase() only!
+ 
+ Internal retrieval method for Code Enforcement Action Requests. Implements
      * a multi-stage SQL statement building process based on the settings on the
      * SearchParams object passed into this method.
      *
