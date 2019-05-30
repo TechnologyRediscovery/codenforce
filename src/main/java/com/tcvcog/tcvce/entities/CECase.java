@@ -160,20 +160,21 @@ public class CECase extends CECaseBaseClass implements Cloneable{
      */
     public List<EventCECase> getEventListActionRequests() {
 
-//        if(completeEventList !=  null && completeEventList.size() >= 1){
-//            for(EventCECase ev: completeEventList){
-//                if(ev.getRequestedEventCat()!= null 
-//                        && 
-//                    !ev.isResponseComplete()
-//                        &&
-//                    ev.isActive()
-//                        &&
-//                    !ev.isHidden()){
-//                    // event is a case action request so add it!
-//                    eventListActionRequests.add(ev);
-//                }
-//            }
-//        }
+        eventListActionRequests = new ArrayList<>();
+        if(completeEventList !=  null && completeEventList.size() >= 1){
+            for(EventCECase ev: completeEventList){
+                if(ev.getRequestedEventCat()!= null 
+                        && 
+                    !ev.isResponseComplete()
+                        &&
+                    ev.isActive()
+                        &&
+                    !ev.isHidden()){
+                    // event is a case action request so add it!
+                    eventListActionRequests.add(ev);
+                }
+            }
+        }
         
         return eventListActionRequests;
     }
