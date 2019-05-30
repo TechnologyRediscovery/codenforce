@@ -40,7 +40,7 @@ import javax.faces.event.ActionEvent;
 public class EventCECaseConfigurationBB extends BackingBeanUtils implements Serializable{
 
     private EventCategory selectedEventCategory;
-    private ArrayList<EventCategory> eventCategoryList;
+    private List<EventCategory> eventCategoryList;
     private List<Icon> iconList;
      
     private EventType[] eventTypeList;
@@ -75,6 +75,21 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
     
     @PostConstruct
     public void initBean(){
+        
+        if(eventCategoryList == null){
+            try {
+                EventIntegrator ei = getEventIntegrator();
+                eventCategoryList = ei.getEventCategoryList();
+                //return eventCategoryList;
+            } catch (IntegrationException ex) {
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Unable to load event category list", 
+                            "This must be corrected by the System Administrator"));
+            }
+            
+        } 
+        
         SystemIntegrator si = getSystemIntegrator();
         try {
             iconList = si.getIconList();
@@ -206,23 +221,8 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
     /**
      * @return the eventCategoryList
      */
-    public ArrayList<EventCategory> getEventCategoryList() {
-        if(eventCategoryList == null){
-            try {
-                EventIntegrator ei = getEventIntegrator();
-                eventCategoryList = ei.getEventCategoryList();
-                //return eventCategoryList;
-            } catch (IntegrationException ex) {
-                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to load event category list", 
-                            "This must be corrected by the System Administrator"));
-            }
-            return eventCategoryList;
-            
-        } else {
-            return eventCategoryList;
-        }
+    public List<EventCategory> getEventCategoryList() {
+        return eventCategoryList;
         
     }
 
