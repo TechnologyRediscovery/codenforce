@@ -18,15 +18,28 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
+                        
                         <h1>Upload photos of your concern at <h:outputText value="#{sessionBean.ceactionRequestForSubmission.requestProperty.address}"/> in <h:outputText value="#{sessionBean.ceactionRequestForSubmission.muni.muniName}"/></h1>
                         
                         <h:form id="requestCEActionFlowFormUploadPhoto" enctype="multipart/form-data">
+                            
+                         <p:commandButton  ajax="false" tabindex="1"
+                                              value="Skip photo upload and continue to contact info" 
+                                              id="ceactionrequestflow-nophotos-cb"
+                                              action="#{cEActionRequestSubmitBB.savePhotos}"/>
+                        
+                        <p:spacer height="5px"/>
+                        <hr />
+                        <p:spacer height="5px"/>
+                        
+                        <h2>Choose a file and upload</h2>
+                        
                             <p:fileUpload fileUploadListener="#{cEActionRequestSubmitBB.handlePhotoUpload}"
                             mode="advanced" 
                             update="requestCEActionFlowFormDescribePhoto:photoTable"
                             multiple="true"
-                            fileLimit="3"
-                            sizeLimit="10000000" 
+                            fileLimit="3" 
+                            sizeLimit="900000000" 
                             allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
                         </h:form>
                         
@@ -71,7 +84,7 @@
                             <p:spacer height="5px"/>
                             
                             <p:commandButton  ajax="false" tabindex="12"
-                                              value="Next: Your contact details" id="continueToContactInfoButton"
+                                              value="Save photos and proceed to contact details" id="continueToContactInfoButton"
                                               action="#{cEActionRequestSubmitBB.savePhotos}"/>
                         </h:form>
                         

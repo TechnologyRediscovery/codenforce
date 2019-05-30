@@ -54,10 +54,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query = "INSERT INTO public.login(\n" +
             "            userid, userrole, username, notes, activitystartdate, \n" +
             "            activitystopdate, accesspermitted, enforcementofficial, badgenumber, \n" +
-            "       orinumber, personlink, password)\n" +
+            "       orinumber, personlink)\n" +
             "    VALUES (DEFAULT, CAST (? AS role), ?, ?, ?, ?, \n" +
             "            ?, ?, ?, ?, \n" +
-            "            ?, ?, ?);";
+            "            ?, ?);";
         
         PreparedStatement stmt = null;
         
@@ -302,7 +302,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public User getUser(int userID) throws IntegrationException{
-        System.out.println("UserIntegrator.getUser | userid: " + userID);
         Connection con = getPostgresCon();
         ResultSet rs = null;
         User newUser = new User();
@@ -606,7 +605,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 selectSB.append("AND property_propertyid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(),
                         ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                stmt.setInt(1, p.getPropertyID());
+                stmt.setInt(1, u.getUserID());
+                stmt.setInt(2, p.getPropertyID());
                 rs = stmt.executeQuery();
                 
                 if(rs.first()){ // history entry with this user and person already exists

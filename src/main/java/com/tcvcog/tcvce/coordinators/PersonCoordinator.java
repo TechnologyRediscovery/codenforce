@@ -95,6 +95,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     public Person getNewPersonSkeleton(Municipality m){
         Person newP = new Person();
+        newP.setPersonType(PersonType.Public);
         newP.setActive(true);
         newP.setPersonID(0);
         newP.setCanExpire(false);

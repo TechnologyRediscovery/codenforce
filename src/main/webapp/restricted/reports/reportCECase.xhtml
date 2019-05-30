@@ -19,7 +19,7 @@
 
                         <h1>
                             <h:outputText id="header-type-ot" value="#{caseProfileBB.currentCase.caseName}"/>
-                            <h:outputText id="header-type-ot" value=" | "/>
+                            <h:outputText id="header-type-ot-sep" value=" | "/>
                             <h:outputText id="header-id-ot" value=" Code enf. case ID: #{caseProfileBB.currentCase.caseID}"/>
                         </h1>
                         <h2>
@@ -30,11 +30,11 @@
                         <p>
                             <a href="#action-requests">next actions <h:outputText value=" (#{caseProfileBB.currentCase.eventListActionRequests.size()})" /> </a> | 
                             <a href="#add-event">new event</a> | 
-                            <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.eventList.size()})" /></a> | 
+                            <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.visibleEventList.size()})" /></a> | 
                             <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
                             <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
                             <a href="#citations">citations <h:outputText value=" (#{caseProfileBB.currentCase.citationList.size()})" /></a> | 
-                            <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.requestList.size()})" /></a>  
+                            <a href="#requests">enforcement requests <h:outputText value=" (#{caseProfileBB.currentCase.ceActionRequestList.size()})" /></a>  
                         </p>
 
 
@@ -168,7 +168,7 @@
                     <p:dataScroller
                         id="events-datascroller"
                         var="e"
-                        value="#{caseProfileBB.currentCase.eventList}"
+                        value="#{caseProfileBB.currentCase.visibleEventList}"
                         widgetVar="ceevent-ds-var">
 
                         <div class="outlinedBox event-ds-box">
@@ -383,7 +383,7 @@
                                     <p:spacer height="5px"/>
                                      
                                     <h:outputText class="bold" value="Citations: " />
-                                    <h:outputText value="#{v.citationsStringList}"/>
+                                    <h:outputText value="#{v.citationListAsString}"/>
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel styleClass="bold" value="Penalty:"/>
@@ -457,15 +457,15 @@
                         <p:spacer height="5px"/>
 
                         <h:outputText styleClass="bold"   value="Queued for Mailing: " />
-                        <h:outputText id="nov-queued-ot" value="#{notice.requestToSend}"/>
+                        <h:outputText id="nov-queued-ot" value="#{notice.lockedAndQueuedTSPretty}"/>
                         <p:spacer height="5px"/>
 
                         <h:outputText styleClass="bold"  value="Sent Date: " />
-                        <h:outputText id="nov-sent-date" value="#{notice.letterSentDatePretty}"/>
+                        <h:outputText id="nov-sent-date" value="#{notice.sentTSPretty}"/>
 
                         <p:spacer height="5px"/>
                         <h:outputText styleClass="bold"  value="Returned? " />
-                        <h:outputText id="nov-returned-date" value="#{notice.letterReturnedDatePretty}"/>
+                        <h:outputText id="nov-returned-date" value="#{notice.returnedTSPretty}"/>
 
                         <p:spacer height="5px"/>
 
@@ -475,7 +475,7 @@
                             <h:panelGroup>
 
                                 <div class="rowExpansion">
-                                    <h:outputText id="notice-text-ot" value="#{notice.noticeText}" escape="false"/>
+                                    <h:outputText id="notice-text-ot" value="#{notice.noticeTextBeforeViolations}" escape="false"/>
                                 </div>
                             </h:panelGroup>
                         </h:panelGrid>
@@ -560,7 +560,7 @@
                     <p:dataScroller
                         id="actionRequestTable"
                         var="r"
-                        value="#{caseProfileBB.currentCase.requestList}">
+                        value="#{caseProfileBB.currentCase.ceActionRequestList}">
                         <div class="outlinedBox">
 
                             <h3>Code Enforcement Action Request</h3>
@@ -613,35 +613,33 @@
                                 <h:panelGroup>
 
                                     <div class="wrapText">
-                                        <h:outputLabel styleClass="bold" value="Requestor (#{r.actionRequestorPerson.personType.label}): "/>
+                                        <h:outputLabel styleClass="bold" value="Requestor (#{r.requestor.personType.label}): "/>
                                         <p:spacer height="5px"/>
 
-                                        <h:outputText value="#{r.actionRequestorPerson.firstName} "/> 
-                                        <h:outputText value="#{r.actionRequestorPerson.lastName}"/><br/> 
-                                        <h:outputText value="#{r.actionRequestorPerson.addressStreet}"/> <br/>
-                                        <h:outputText value="#{r.actionRequestorPerson.addressCity}, "/> 
-                                        <h:outputText value="#{r.actionRequestorPerson.addressState} "/> 
-                                        <h:outputText value="#{r.actionRequestorPerson.addressZip}"/> 
+                                        <h:outputText value="#{r.requestor.firstName} "/> 
+                                        <h:outputText value="#{r.requestor.lastName}" />
+                                        <br />
+                                        <h:outputText value="#{r.requestor.addressStreet}" />                                    
+                                        <h:outputText value="#{r.requestor.addressCity}" />                                    
+                                        <h:outputText value="#{r.requestor.addressState}" />                                    
+                                        <h:outputText value="#{r.requestor.addressZip}" />          
                                     </div>
-                                </h:panelGroup>
+                            </h:panelGroup>
 
                                 <h:panelGroup>
                                     <h:outputLabel styleClass="bold" value="Contact: "/>
                                     <p:spacer height="5px"/>
                                     <div class="wrapText"> 
                                         <h:outputText value="Phone (cell): "/>
-                                        <h:outputText value="#{r.actionRequestorPerson.phoneCell}"/> <br/>
+                                        <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneCell}"/> <br/>
                                         <h:outputText value="Phone (work): "/>
-                                        <h:outputText value="#{r.actionRequestorPerson.phoneWork}"/> <br/>
+                                        <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneWork}"/> 
                                         <h:outputText value="Phone (home): "/>
-                                        <h:outputText value="#{r.actionRequestorPerson.phoneHome}"/> <br/>
+                                        <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestsBB.selectedRequest.requestor.phoneHome}"/> <br/>
                                         <h:outputText value="Email: "/>
-                                        <h:outputText value="#{r.actionRequestorPerson.email}"/>
+                                        <h:outputText id="selr-pers-email" value="#{cEActionRequestsBB.selectedRequest.requestor.email}"/>
                                     </div>
                                 </h:panelGroup>
-
-
-
                                 <f:facet name="footer" class="leftalign">
                                     <h:outputLabel styleClass="bold" value="Request description"/>
                                     <p:spacer height="15px"/>

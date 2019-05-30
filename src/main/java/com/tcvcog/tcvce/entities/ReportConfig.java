@@ -19,6 +19,7 @@ public class ReportConfig extends EntityUtils implements Serializable {
     private User creator;
     private Municipality muni;
     private String notes;
+    private boolean sortInRevChrono;
     
 
     /**
@@ -108,6 +109,20 @@ public class ReportConfig extends EntityUtils implements Serializable {
      */
     public void setGenerationTimestampPretty(String generationTimestampPretty) {
         this.generationTimestampPretty = generationTimestampPretty;
+    }
+
+    /**
+     * @return the sortInRevChrono
+     */
+    public boolean isSortInRevChrono() {
+        return sortInRevChrono;
+    }
+
+    /**
+     * @param sortInRevChrono the sortInRevChrono to set
+     */
+    public void setSortInRevChrono(boolean sortInRevChrono) {
+        this.sortInRevChrono = sortInRevChrono;
     }
 
    

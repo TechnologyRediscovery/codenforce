@@ -11,6 +11,8 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.BOBQuery;
+import com.tcvcog.tcvce.entities.search.EventQuery;
 import com.tcvcog.tcvce.entities.search.SearchParams;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
@@ -19,6 +21,8 @@ import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperties;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -32,6 +36,81 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchCoordinator() {
     }
     
+//    CODE ENFORCEMENT CASE QUERIES
+    
+    public List<SearchParams> getAvaialbleSearchParamsCECases(User u, Municipality m){
+        List<SearchParams> pList = new ArrayList<>();
+        return pList;
+        
+    }
+    
+    
+    /**
+     * Returns a SearchParams subclass for retrieving all open
+     * cases in a given municipality. Open cases are defined as a 
+     * case whose closing date is null.
+     * @param m
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCECases getDefaultSearchParams_CECase_allOpen(Municipality m){
+        SearchParamsCECases params = new SearchParamsCECases();
+        
+        // superclass 
+        params.setFilterByMuni(true);
+        params.setMuni(m);
+        params.setFilterByObjectID(false);
+        params.setLimitResultCountTo100(true);
+        
+        // subclass specific
+        params.setUseIsOpen(true);
+        params.setIsOpen(true);
+        
+        params.setDateToSearchCECases("Opening date of record");
+        params.setUseCaseManager(false);
+        
+        params.setUseCasePhase(false);
+        params.setUseCaseStage(false);
+        params.setUseProperty(false);
+        params.setUsePropertyInfoCase(false);
+        params.setUseCaseManager(false);
+        
+        return params;
+    }
+    
+     /**
+     * Returns a SearchParams subclass for retrieving all open
+     * cases in a given municipality. Open cases are defined as a 
+     * case whose closing date is null.
+     * @param m
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCECases getSearchParams_CECase_closedPast30Days (Municipality m){
+        SearchParamsCECases params = new SearchParamsCECases();
+        params.setSearchName("CECases");
+        
+        // superclass 
+        params.setFilterByMuni(true);
+        params.setMuni(m);
+        params.setFilterByObjectID(false);
+        params.setLimitResultCountTo100(true);
+        
+        // subclass specific
+        params.setUseIsOpen(true);
+        params.setIsOpen(true);
+        
+        params.setDateToSearchCECases("Opening date of record");
+        params.setUseCaseManager(false);
+        
+        params.setUseCasePhase(false);
+        params.setUseCaseStage(false);
+        params.setUseProperty(false);
+        params.setUsePropertyInfoCase(false);
+        params.setUseCaseManager(false);
+        
+        return params;
+    }
     
     
     
@@ -58,6 +137,26 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         propParams.setFilterByPerson(false);
         
         return propParams;
+    }
+    
+    public List<BOBQuery> getEventQueryList(User u, Municipality m){
+        List<BOBQuery> queryList = new ArrayList<>();
+        
+        EventQuery eq = new EventQuery("Compliance follow-up events: Today", m);
+        eq.setEventSearchParams(getSearchParamsEventsRequiringAction(u, m));
+        queryList.add(eq);
+        
+        eq = new EventQuery("Officer Activity Report", m);
+        eq.setEventSearchParams(getSearchParamsOfficerActivity(u, m));
+        queryList.add(eq);
+        
+        
+        eq = new EventQuery("Compliance events: Past Month", m);
+        eq.setEventSearchParams(getSearchParamsComplianceEvPastMonth(m));
+        queryList.add(eq);
+        
+        return queryList;
+        
     }
     
     public SearchParamsCEEvents getSearchParamsEventsRequiringAction(User u, Municipality muni){

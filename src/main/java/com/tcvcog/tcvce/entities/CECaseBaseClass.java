@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class CECaseNoLists extends EntityUtils implements Serializable, Cloneable {
+public class CECaseBaseClass extends EntityUtils implements Serializable, Cloneable {
     
     protected int caseID;
     protected int publicControlCode;
@@ -29,6 +29,7 @@ public class CECaseNoLists extends EntityUtils implements Serializable, Cloneabl
     protected boolean allowForwardLinkedPublicAccess;
     protected Property property;
     protected PropertyUnit propertyUnit;
+    
     protected User caseManager;
     protected String caseName;
     protected CasePhase casePhase;
@@ -54,7 +55,7 @@ public class CECaseNoLists extends EntityUtils implements Serializable, Cloneabl
      * @throws CloneNotSupportedException
      */
     @Override
-    public CECaseNoLists clone() throws CloneNotSupportedException{
+    public CECaseBaseClass clone() throws CloneNotSupportedException{
         super.clone();
         return null;
         
@@ -223,7 +224,9 @@ public class CECaseNoLists extends EntityUtils implements Serializable, Cloneabl
      * @return the originiationDatePretty
      */
     public String getOriginiationDatePretty() {
-        originiationDatePretty = getPrettyDate(originationDate);
+        if(originationDate != null){
+            originiationDatePretty = getPrettyDate(originationDate);
+        }
         return originiationDatePretty;
     }
 
@@ -231,6 +234,9 @@ public class CECaseNoLists extends EntityUtils implements Serializable, Cloneabl
      * @return the closingDatePretty
      */
     public String getClosingDatePretty() {
+        if(closingDate != null){
+            closingDatePretty = getPrettyDate(closingDate);
+        }
         return closingDatePretty;
     }
 
@@ -278,53 +284,9 @@ public class CECaseNoLists extends EntityUtils implements Serializable, Cloneabl
 
     /**
      * @return the caseStage
-     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
-    public CaseStage getCaseStage() throws CaseLifecyleException {
-        CaseStage stage;
-        switch (casePhase) {
-            case PrelimInvestigationPending:
-                stage = CaseStage.Investigation;
-                break;
-            case NoticeDelivery:
-                stage = CaseStage.Investigation;
-                break;
-        // Letter marked with a send date
-            case InitialComplianceTimeframe:
-                stage = CaseStage.Enforcement;
-                break;
-        // compliance inspection
-            case SecondaryComplianceTimeframe:
-                stage = CaseStage.Enforcement;
-                break;
-        // Filing of citation
-            case AwaitingHearingDate:
-                stage = CaseStage.Citation;
-                break;
-        // hearing date scheduled
-            case HearingPreparation:
-                stage = CaseStage.Citation;
-                break;
-        // hearing not resulting in a case closing
-            case InitialPostHearingComplianceTimeframe:
-                stage = CaseStage.Citation;
-                break;
-            case SecondaryPostHearingComplianceTimeframe:
-                stage = CaseStage.Citation;
-                break;
-            case Closed:
-                stage = CaseStage.Closed;
-                // TODO deal with this later
-                //                throw new CaseLifecyleException("Cannot advance a closed case to any other phase");
-                break;
-            case InactiveHolding:
-                stage = CaseStage.Closed;
-                break;
-            default:
-                stage = CaseStage.Closed;
-        }
-        caseStage = stage;
-        return caseStage;
+    public CaseStage getCaseStage() {
+              return caseStage;
     }
 
     /**
@@ -382,7 +344,7 @@ public class CECaseNoLists extends EntityUtils implements Serializable, Cloneabl
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CECaseNoLists other = (CECaseNoLists) obj;
+        final CECaseBaseClass other = (CECaseBaseClass) obj;
         if (this.caseID != other.caseID) {
             return false;
         }

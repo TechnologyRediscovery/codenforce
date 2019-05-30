@@ -7,10 +7,16 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -21,11 +27,34 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
 
     private Municipality currentMuni;
     
+    private List<User> codeOfficerUserList;
+    private Map<String, Integer> styleMap;
+    
+    
     
     /**
      * Creates a new instance of MunicipalityManageBB
      */
     public MunicipalityManageBB() {
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        UserIntegrator ui = getUserIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        try {
+            codeOfficerUserList = ui.getActiveCodeOfficerList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        try {
+            styleMap = si.getPrintStyleMap();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        
     }
     
     public String updateMuni(){
@@ -64,6 +93,34 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
      */
     public void setCurrentMuni(Municipality currentMuni) {
         this.currentMuni = currentMuni;
+    }
+
+    /**
+     * @return the codeOfficerUserList
+     */
+    public List<User> getCodeOfficerUserList() {
+        return codeOfficerUserList;
+    }
+
+    /**
+     * @param codeOfficerUserList the codeOfficerUserList to set
+     */
+    public void setCodeOfficerUserList(List<User> codeOfficerUserList) {
+        this.codeOfficerUserList = codeOfficerUserList;
+    }
+
+    /**
+     * @return the styleMap
+     */
+    public Map<String, Integer> getStyleMap() {
+        return styleMap;
+    }
+
+    /**
+     * @param styleMap the styleMap to set
+     */
+    public void setStyleMap(Map<String, Integer> styleMap) {
+        this.styleMap = styleMap;
     }
     
 }

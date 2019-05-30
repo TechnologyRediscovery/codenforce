@@ -193,7 +193,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             }
 
             stmt.setInt(4, actionRequest.getIssueType_issueTypeID());
-            stmt.setInt(5, actionRequest.getActionRequestorPerson().getPersonID());
+            stmt.setInt(5, actionRequest.getRequestor().getPersonID());
             // case ID is null since the request hasn't been assigned to a case yet
             stmt.setNull(6, java.sql.Types.NULL); // 0 is the int version of null
 
@@ -255,7 +255,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
         actionRequest.setRequestProperty(propI.getProperty(rs.getInt("property_propertyID")));
-        actionRequest.setActionRequestorPerson(pi.getPerson(rs.getInt("actrequestor_requestorid")));
+        actionRequest.setRequestor(pi.getPerson(rs.getInt("actrequestor_requestorid")));
 
         actionRequest.setIssueType_issueTypeID(rs.getInt("issuetype_issuetypeid"));
         actionRequest.setIssueTypeString(rs.getString("typename")); // field from joined table
@@ -519,7 +519,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
-            stmt.setInt(1, req.getActionRequestorPerson().getPersonID());
+            stmt.setInt(1, req.getRequestor().getPersonID());
             stmt.setInt(2, req.getRequestID());
             System.out.println("CEActionRequestorIntegrator.updateActionRequestor| statement: " + stmt.toString());
             // Retrieve action data from postgres

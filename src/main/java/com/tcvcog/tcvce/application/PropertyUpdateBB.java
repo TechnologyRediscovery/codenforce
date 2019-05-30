@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
@@ -37,58 +38,29 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     
     
     private PropertyWithLists currProp;
-//    private Property property;
-//    
-//    private int formMuniCode;
-//    private String formParID;
-//    
-//    private String formLotAndBlock;
-//    private String formAddress;
-//    private String formPropertyUseType;
-    // have not wired up property use type as an accessory table
-//    private int formPropertyUseTypeID; 
-    // also not needed
     private HashMap propertyUseTypeMap;
 
-//    private boolean formRental;
-//    private boolean formMultiUnit;
-    
-//    private String formUseGroup;
-//    private String formConstructionType;
-//    private String formCountyCode;
-    
-//    private String formNotes;
-    
-    
     /**
      * Creates a new instance of PropertyUpdateBB
      */
     public PropertyUpdateBB() {
     }
+    @PostConstruct
+    public void initBean(){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            currProp = pi.getPropertyWithLists(getSessionBean().getPropertyQueue().get(0).getPropertyID());
+        } catch (IntegrationException | CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
+    }
     
     public String updateProperty(){
         PropertyIntegrator pi = getPropertyIntegrator();
-    //    Property p = new Property();
-        
-        
-    //    p.setLotAndBlock(lotAndBlock);
-    //    p.setLotAndBlock(formLotAndBlock);
-    //    p.setAddress(formAddress);
-    //    p.setPropertyUseType(formPropertyUseType);
-    //    
-    //    p.setUseGroup(formUseGroup);
-    //    p.setConstructionType(formConstructionType);
-    //    p.setCountyCode(formCountyCode);
-    //    
-    //    p.setNotes(formNotes);
         
         try {
-            pi.updateProperty(getCurrProp());
-            // pull a new version of the property from the DB and store that in
-            // the session to avoid errors in viewing any data that's not in the DB
-            
-            // TODO: ^this^ (the integrator can only update & select as of this comment) --3/7/2019
-            getSessionBean().setActivePropWithLists(getCurrProp());
+            pi.updateProperty(currProp);
+            getSessionBean().getPropertyQueue().add(0, currProp);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Successfully updated property with ID " + getCurrProp().getPropertyID() 
@@ -105,10 +77,6 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    @PostConstruct
-    public void initBean(){
-        this.setCurrProp(getSessionBean().getActivePropWithLists());
-    }
 
     /**
      * @return the currProp

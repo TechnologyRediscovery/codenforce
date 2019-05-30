@@ -329,14 +329,14 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void updateRequestor(ActionEvent ev){
         System.out.println("CEActionRequestsBB.updateRequestor");
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        selectedRequest.setActionRequestorPerson(selectedPersonForAttachment);
+        selectedRequest.setRequestor(selectedPersonForAttachment);
         
         try {
             ceari.updateActionRequestor(selectedRequest);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Done! Requestor is now: " 
-                                + String.valueOf(selectedRequest.getActionRequestorPerson().getFirstName()) 
-                                + String.valueOf(selectedRequest.getActionRequestorPerson().getLastName())
+                                + String.valueOf(selectedRequest.getRequestor().getFirstName()) 
+                                + String.valueOf(selectedRequest.getRequestor().getLastName())
                     + " for action request ID: " + selectedRequest.getRequestID(), ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -659,6 +659,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty());
                 System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
             } catch (IntegrationException ex) {
+                System.out.println(ex);
+            } catch (CaseLifecyleException ex) {
                 System.out.println(ex);
             }
         }

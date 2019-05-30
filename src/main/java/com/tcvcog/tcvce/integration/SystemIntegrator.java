@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.occupancy.entities.OccPermit;
 import java.io.Serializable;
@@ -48,6 +49,82 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      */
     public SystemIntegrator() {
     }
+    
+    public Map<String, Integer> getPrintStyleMap() throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        Map<String, Integer> styleMap = new HashMap<>();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append(  "SELECT styleid, description FROM printstyle;");
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                styleMap.put(rs.getString("description"), rs.getInt("styleid"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate icon", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return styleMap;
+    }
+    
+    
+    
+    public PrintStyle getPrintStyle(int styleID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PrintStyle style = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append(  "SELECT styleid, description, headerimage_photodocid, headerheight, novtopmargin, \n" +
+                    "       novaddresseleftmargin, novaddressetopmargin, browserheadfootenabled, novtexttopmargin\n" +
+                    "  FROM public.printstyle WHERE styleid=?;");
+        Icon i = null;
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, styleID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                style = generatePrintStyle(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate icon", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return style;
+        
+    }
+    
+    
+    private PrintStyle generatePrintStyle(ResultSet rs) throws SQLException{
+        PrintStyle style = new PrintStyle();
+        
+        style.setStyleID(rs.getInt("styleid"));
+        
+        style.setDescription(rs.getString("description"));
+        style.setHeader_img_id(rs.getInt("headerimage_photodocid"));
+        style.setHeader_height(rs.getInt("headerheight"));
+        
+        style.setNov_page_margin_top(rs.getInt("novtopmargin"));
+        style.setNov_addressee_margin_left(rs.getInt("novaddresseleftmargin"));
+        style.setNov_addressee_margin_top(rs.getInt("novaddressetopmargin"));
+        style.setNov_text_margin_top(rs.getInt("novtexttopmargin"));
+        
+        return style;
+    }
+    
     
     public Icon getIcon(int iconID) throws IntegrationException{
         Connection con = getPostgresCon();

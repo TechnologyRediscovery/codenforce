@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -38,9 +39,9 @@ import javax.faces.event.ActionEvent;
 @ViewScoped
 public class CourtEntityBB extends BackingBeanUtils implements Serializable {
     
-    private ArrayList<CourtEntity> courtEntityList;
+    private List<CourtEntity> courtEntityList;
     private CourtEntity selectedCourtEntity;
-    private ArrayList<Municipality> muniList;
+    private List<Municipality> muniList;
     
     
     private int formCourtEntityID;
@@ -177,7 +178,7 @@ public class CourtEntityBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the courtEntityList
      */
-    public ArrayList<CourtEntity> getCourtEntityList() {
+    public List<CourtEntity> getCourtEntityList() {
         try {
             CourtEntityIntegrator courtEntityIntegrator = getCourtEntityIntegrator();
             courtEntityList = courtEntityIntegrator.getCourtEntityList();

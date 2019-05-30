@@ -57,7 +57,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query = "SELECT municode, muniname, address_street, address_city, address_state, \n" +
                         "       address_zip, phone, fax, email, managername, managerphone, population, \n" +
                         "       activeinprogram, defaultcodeset, occpermitissuingsource_sourceid, \n" +
-                        "       defaultcodeofficeruser, defaultcourtentity FROM public.municipality WHERE municode = ?;";
+                        "       defaultcodeofficeruser, defaultcourtentity, novprintstyle_styleid \n" +
+                        " FROM public.municipality WHERE municode = ?;";
         ResultSet rs = null;
  
         try {
@@ -85,6 +86,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     public Municipality generateMuni(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        UserIntegrator ui = getUserIntegrator();
+        
         Municipality muni = new Municipality();
         
         muni.setMuniCode(rs.getInt("municode"));
@@ -106,8 +111,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setActiveInProgram(rs.getBoolean("activeinprogram"));             
         muni.setDefaultCodeSetID(rs.getInt("defaultcodeset"));
         muni.setIssuingPermitCodeSourceID(rs.getInt("occpermitissuingsource_sourceid"));
-        muni.setDefaultCodeOfficerUserID(rs.getInt("defaultcodeofficeruser"));
-        muni.setDefaultCourtEntityID(rs.getInt("defaultcourtentity"));
+        muni.setDefaultCodeOfficerUser(ui.getUser(rs.getInt("defaultcodeofficeruser")));
+        muni.setDefaultCourtEntity(cei.getCourtEntity(rs.getInt("defaultcourtentity")));
+        
+        muni.setDefaultNOVStyleID(rs.getInt("novprintstyle_styleid"));
         
         return muni;
     }
@@ -183,7 +190,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "   SET muniname=?, address_street=?, address_city=?, address_state=?, \n" +
                         "       address_zip=?, phone=?, fax=?, email=?, managername=?, managerphone=?, \n" +
                         "       population=?, activeinprogram=?, defaultcodeset=?, "
-                        + "occpermitissuingsource_sourceid=?, defaultcodeofficeruser=?, defaultcourtentity=? \n" +
+                        + "occpermitissuingsource_sourceid=?, defaultcodeofficeruser=?, defaultcourtentity=?, \n" +
+                        " novprintstyle_styleid=? " +
                         " WHERE municode=?;";
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -205,9 +213,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setBoolean(12, muni.isActiveInProgram());
             stmt.setInt(13, muni.getDefaultCodeSetID());
             stmt.setInt(14, muni.getIssuingPermitCodeSourceID());
-            stmt.setInt(15, muni.getDefaultCodeOfficerUserID());
-            stmt.setInt(16, muni.getDefaultCourtEntityID());
-            stmt.setInt(17, muni.getMuniCode());
+            stmt.setInt(15, muni.getDefaultCodeOfficerUser().getUserID());
+            stmt.setInt(16, muni.getDefaultCourtEntity().getCourtEntityID());
+            stmt.setInt(17, muni.getDefaultNOVStyleID());
+            stmt.setInt(18, muni.getMuniCode());
             
             System.out.println("MunicipalityIntegrator.updateMuni | stmt: " + stmt.toString());
             stmt.executeUpdate();

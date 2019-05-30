@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
-import com.tcvcog.tcvce.domain.EventExceptionDeprecated;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -110,10 +110,14 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ec.setPublicdeployable(rs.getBoolean("publicdeployable"));
         ec.setNotifycasemonitors(rs.getBoolean("notifycasemonitors"));
         ec.setHidable(rs.getBoolean("hidable"));
-        ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         ec.setRequestable(rs.getBoolean("requestable"));
         
-        ec.setCasePhaseChangeRule(ci.getPhaseChangeRule(rs.getInt("phasechangerule_ruleid")));
+        if(rs.getInt("icon_iconid") != 0){
+            ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
+        }
+        if(rs.getInt("phasechangerule_ruleid") != 0){
+            ec.setCasePhaseChangeRule(ci.getPhaseChangeRule(rs.getInt("phasechangerule_ruleid")));
+        }
 
         return ec;
 
@@ -433,7 +437,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public void inactivateEvent(int eventIdToInactivate) throws IntegrationException {
         String query = "UPDATE public.ceevent\n"
-                + "   SET activeevent=false WHERE eventid = ?;";
+                + "   SET activeevent=false, hidden=true WHERE eventid = ?;";
 
         // TO DO: finish clearing view confirmation
         Connection con = getPostgresCon();
@@ -618,7 +622,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     
     
-    public EventCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException{
+    public EventCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException, CaseLifecyleException{
         EventCasePropBundle evCPBundle = null;
         CaseIntegrator ci = getCaseIntegrator();
 
@@ -706,7 +710,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<EventCECase> queryCaseDependentEvents(SearchParamsCEEvents params) throws IntegrationException{
+    public List<EventCECase> queryCaseDependentEvents(SearchParamsCEEvents params) throws IntegrationException, CaseLifecyleException{
         List<EventCasePropBundle> wrappedEventList = queryEvents(params);
         List<EventCECase> depList = new ArrayList<>();
         for(EventCasePropBundle ec: wrappedEventList){
@@ -716,7 +720,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
 
   
-    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params) throws IntegrationException {
+    public List<EventCasePropBundle> queryEvents(SearchParamsCEEvents params) throws IntegrationException, CaseLifecyleException {
         List<EventCasePropBundle> eventList = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1111,7 +1115,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public EventCECase getEventCECase(int eventID) throws IntegrationException {
         EventCECase ev = null;
-        EventCoordinator ec = getEventCoordinator();
 
         String query = "SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n" +
                 "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
@@ -1150,8 +1153,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;    
     }
 
-    public ArrayList<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException {
-        ArrayList<EventCECase> eventList = new ArrayList();
+    public List<EventCECase> getEventsByCaseID(int caseID) throws IntegrationException {
+        List<EventCECase> eventList = new ArrayList();
 
         String query = "SELECT eventid FROM public.ceevent WHERE cecase_caseid = ?;";
         Connection con = getPostgresCon();

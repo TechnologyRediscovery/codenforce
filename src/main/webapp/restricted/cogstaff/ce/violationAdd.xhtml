@@ -32,7 +32,9 @@
                             <p:spacer height="5px"/>
                             
 
-                            <h:outputText style="font-family: monospace; text-align: center; font-size: 1.4em;" value="#{violationAddBB.currentViolation.codeViolated.codeElement.ordTechnicalText}"/>
+                            <h:outputText style="font-family: monospace; text-align: center; font-size: 1.4em;" 
+                                          escape="false"
+                                          value="#{violationAddBB.currentViolation.codeViolated.codeElement.ordTechnicalText}"/>
 
                             <p:spacer height="5px"/>
 
@@ -63,8 +65,9 @@
                                     <p:spacer height="0px"/>
                                     <p:calendar value="#{violationAddBB.stipulatedComplianceDate}" 
                                                 mode="popup"  id="stipCompDate"
-                                                showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                 navigator="true" tabindex="1"
+                                                timeInput="true" showHour="true" showMinute="true"
                                                 showButtonPanel="true" showTodayButton="true"
                                                 required="true"/>
                                     <p:spacer height="0px"/>

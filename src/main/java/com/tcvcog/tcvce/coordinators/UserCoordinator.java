@@ -68,7 +68,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public User getCogBotUser() throws IntegrationException{
+    public User getRobotUser() throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         User u;
         u = ui.getUser(Integer.parseInt(
@@ -174,7 +174,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     true,   // cogstaff
                                     true,   // enfOfficial
                                     true,   // muniStaff
-                                    true);  // muniReader
+                                    true,
+                                    1);  // muniReader
                break;
             
             case SysAdmin:
@@ -183,7 +184,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     true,   // cogstaff
                                     true,   // enfOfficial
                                     true,   // muniStaff
-                                    true);  // muniReader
+                                    true,
+                                    2           );  // muniReader
                break;               
                
             case CogStaff:
@@ -192,7 +194,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     true,   // cogstaff
                                     false,   // enfOfficial
                                     true,   // muniStaff
-                                    true);  // muniReader
+                                    true,
+                                    3           );  // muniReader
                break;               
                
             case EnforcementOfficial:
@@ -201,7 +204,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     false,   // cogstaff
                                     true,   // enfOfficial
                                     true,   // muniStaff
-                                    true);  // muniReader
+                                    true,
+                                    4           );  // muniReader
                break;
                
             case MuniStaff:
@@ -210,7 +214,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     false,   // cogstaff
                                     false,   // enfOfficial
                                     true,   // muniStaff
-                                    true);  // muniReader
+                                    true,
+                                    5       );  // muniReader
                break;
                
             case MuniReader:
@@ -219,7 +224,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     false,   // cogstaff
                                     false,   // enfOfficial
                                     false,   // muniStaff
-                                    true);  // muniReader
+                                    true,
+                                    6       );  // muniReader
                break;               
                
             default:

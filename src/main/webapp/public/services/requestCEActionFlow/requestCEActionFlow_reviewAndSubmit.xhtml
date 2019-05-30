@@ -31,8 +31,8 @@
                                             <h:outputLabel class="bold" value="Address" />
                                             <p:spacer height="5px"/>
                                             <div class="rowExpansion">
-                                                <h:outputText id="selr-prop-address" value="#{sessionBean.ceactionRequestForSubmission.requestProperty.address}"/><br/>
-                                                <h:outputText id="selr-prop-muni" value="#{sessionBean.ceactionRequestForSubmission.requestProperty.muni.muniName}"/>
+                                                <h:outputText id="selr-prop-address" value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/><br/>
+                                                <h:outputText id="selr-prop-muni" value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.muni.muniName}"/>
                                             </div>
                                            
                                         </h:panelGroup>
@@ -43,7 +43,7 @@
                                             <h:outputLabel class="bold" value="Date Submitted" />
                                             <p:spacer height="5px"/>
                                             <div class="wrapText">
-                                                <h:outputText id="selr-submitted-ts"  value="#{sessionBean.ceactionRequestForSubmission.dateOfRecord}"/>
+                                                <h:outputText id="selr-submitted-ts"  value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecord}"/>
                                             </div>
                                         </h:panelGroup>
 
@@ -51,7 +51,7 @@
                                             <div class="wrapText">
                                                 <h:outputLabel styleClass="bold" value="Human safety issue?"/>
                                                 <p:spacer height="5px"/>
-                                                <h:outputText id="selr-isurgent"  value="#{sessionBean.ceactionRequestForSubmission.isUrgent}"/>
+                                                <h:outputText id="selr-isurgent"  value="#{cEActionRequestSubmitBB.currentRequest.isUrgent}"/>
                                             </div>
                                         </h:panelGroup>
 
@@ -59,15 +59,15 @@
 
                                             <div class="wrapText">
                                                 <h:outputLabel id="selr-persontype" styleClass="bold" 
-                                                               value="Person Role: #{sessionBean.personForCEActionRequestSubmission.personType.label}"/>
+                                                               value="Person Role: #{cEActionRequestSubmitBB.currentRequest.requestor.personType.label}"/>
                                                 <p:spacer height="5px"/>
 
-                                                <h:outputText id="selr-pers-fn" value="#{sessionBean.personForCEActionRequestSubmission.firstName} "/> 
-                                                <h:outputText id="selr-pers-ln" value="#{sessionBean.personForCEActionRequestSubmission.lastName}"/><br/> 
-                                                <h:outputText id="selr-pers-str" value="#{sessionBean.personForCEActionRequestSubmission.addressStreet}"/> <br/>
-                                                <h:outputText id="selr-pers-city" value="#{sessionBean.personForCEActionRequestSubmission.addressCity}, "/> 
-                                                <h:outputText id="selr-pers-state" value="#{sessionBean.personForCEActionRequestSubmission.addressState} "/> 
-                                                <h:outputText id="selr-pers-zip" value="#{sessionBean.personForCEActionRequestSubmission.addressZip}"/> 
+                                                <h:outputText id="selr-pers-fn" value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName} "/> 
+                                                <h:outputText id="selr-pers-ln" value="#{cEActionRequestSubmitBB.currentRequest.requestor.lastName}"/><br/> 
+                                                <h:outputText id="selr-pers-str" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}"/> <br/>
+                                                <h:outputText id="selr-pers-city" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}, "/> 
+                                                <h:outputText id="selr-pers-state" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressState} "/> 
+                                                <h:outputText id="selr-pers-zip" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}"/> 
                                             </div>
                                            
                                         </h:panelGroup>
@@ -77,13 +77,13 @@
                                             <p:spacer height="5px"/>
                                             <div class="wrapText"> 
                                                 <h:outputText value="Phone (cell): "/>
-                                                <h:outputText id="selr-pers-phone-cell" value="#{sessionBean.personForCEActionRequestSubmission.phoneCell}"/> <br/>
+                                                <h:outputText id="selr-pers-phone-cell" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}"/> <br/>
                                                 <h:outputText  value="Phone (work): "/>
-                                                <h:outputText id="selr-pers-phone-work" value="#{sessionBean.personForCEActionRequestSubmission.phoneWork}"/> <br/>
+                                                <h:outputText id="selr-pers-phone-work" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneWork}"/> <br/>
                                                 <h:outputText value="Phone (home): "/>
-                                                <h:outputText id="selr-pers-phone-home" value="#{sessionBean.personForCEActionRequestSubmission.phoneHome}"/> <br/>
+                                                <h:outputText id="selr-pers-phone-home" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneHome}"/> <br/>
                                                 <h:outputText value="Email: "/>
-                                                <h:outputText id="selr-pers-email" value="#{sessionBean.personForCEActionRequestSubmission.email}"/>
+                                                <h:outputText id="selr-pers-email" value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}"/>
                                             </div>
                                         </h:panelGroup>
                                 

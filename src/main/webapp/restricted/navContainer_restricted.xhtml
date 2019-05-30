@@ -10,7 +10,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <h:outputStylesheet name="css/style.css"/>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
         <title>CCOGConnect</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
       
 
     </h:head>
@@ -151,6 +153,8 @@
                                     </ui:remove>
                                 </div>
                                
+                                <ui:remove>
+                                    
                                 <div class="activeObjectBox">
                                     <h:outputText styleClass="infoBarDataLabel" value="case: " />
 
@@ -165,6 +169,7 @@
                                                      ajax="false"
                                                      disabled="#{navigationBB.noActiveCase}"/>
                                 </div>
+                                </ui:remove>
                             </h:form>
                         </div>
                     </f:view>

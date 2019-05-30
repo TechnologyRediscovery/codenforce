@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
@@ -51,8 +52,9 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
             }
         } catch (IntegrationException ex) {
               getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to search for info bundles, sorry!", "This is a system error."));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to search for info bundles, sorry!", "This is a system error."));
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
         }
         
     }

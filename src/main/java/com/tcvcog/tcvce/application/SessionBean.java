@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -40,6 +41,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.ReportConfig;
 import com.tcvcog.tcvce.entities.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.ReportConfigCECaseList;
+import com.tcvcog.tcvce.entities.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
@@ -102,7 +104,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
     private ReportConfig activeReport;
-    
+    private ReportConfigCEEventList reportConfigCEEventList;
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication occPermitApplication;
@@ -136,7 +138,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void refreshActiveCase() throws IntegrationException{
+    public void refreshActiveCase() throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
         if(cECase != null){
             CECase c = ci.getCECase(cECase.getCaseID());
@@ -144,7 +146,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         }
     }
 
-   
     /**
      * @return the activePerson
      */
@@ -636,6 +637,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setBlobList(List<Blob> blobList) {
         this.blobList = blobList;
+    }
+
+    /**   
+     * @return the reportConfigCEEventList
+     */
+    public ReportConfigCEEventList getReportConfigCEEventList() {
+        return reportConfigCEEventList;
+    }
+
+    /**
+     * @param reportConfigCEEventList the reportConfigCEEventList to set
+     */
+    public void setReportConfigCEEventList(ReportConfigCEEventList reportConfigCEEventList) {
+        this.reportConfigCEEventList = reportConfigCEEventList;
     }
     
 }

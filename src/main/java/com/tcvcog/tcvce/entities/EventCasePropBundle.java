@@ -16,22 +16,22 @@ import java.io.Serializable;
  * 
  * @author sylvia
  */
-public class EventCasePropBundle implements Serializable {
+public class EventCasePropBundle implements Serializable, Comparable<EventCasePropBundle> {
     
-    private CECaseNoLists eventCase;
+    private CECaseBaseClass eventCase;
     private EventCECase event;
 
     /**
      * @return the eventCase
      */
-    public CECaseNoLists getEventCaseBare() {
+    public CECaseBaseClass getEventCaseBare() {
         return eventCase;
     }
 
     /**
      * @param eventCase the eventCase to set
      */
-    public void setEventCaseBare(CECaseNoLists eventCase) {
+    public void setEventCaseBare(CECaseBaseClass eventCase) {
         this.eventCase = eventCase;
     }
 
@@ -49,6 +49,12 @@ public class EventCasePropBundle implements Serializable {
      */
     public void setEvent(EventCECase event) {
         this.event = event;
+    }
+
+    @Override
+    public int compareTo(EventCasePropBundle ev) {
+        int c = this.event.getDateOfRecord().compareTo(ev.event.getDateOfRecord());
+        return c;
     }
 
     

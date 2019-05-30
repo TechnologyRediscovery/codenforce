@@ -242,7 +242,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
                         "	INNER JOIN public.codeviolation on codeviolation.violationid = citationviolation.codeviolation_violationid\n" +
                         "	WHERE citation.citationid=?;";
         Connection con = getPostgresCon();
-        CodeViolationIntegrator cvi = getCodeViolationIntegrator();
+        ViolationIntegrator cvi = getCodeViolationIntegrator();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         ArrayList<CodeViolation> violationList = new ArrayList<>();

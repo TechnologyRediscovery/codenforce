@@ -32,12 +32,13 @@ COG yellow: #e3b73d
 */
 
 @font-face {
-    font-family: 'roboto';
-    src: url('https://fonts.googleapis.com/css?family=Roboto');
+    font-family: 'Montserrat';
+    src: url('https://fonts.googleapis.com/css?family=Montserrat');
 }
 
 body{
     margin: 0 auto;
+    font-family: sans-serif;
     
    
 }
@@ -145,7 +146,8 @@ h4{
 .action-request-header{
     display: block;
     font-weight: bold;
-    font-size: 1.6em;
+    font-size: 1.2em;
+    padding-left:5px;
     
     
     
@@ -154,7 +156,7 @@ h4{
 .action-request-subheader{
     display: block;
     clear: both;
-    font-size: 1.3em;
+    font-size: 1.1em;
     
 }
 
@@ -421,6 +423,24 @@ div.printer-friendly-report .ui-widget-content{
     
 }
 
+.event-ds-box-report{
+    font-size: .7em;
+    margin: 3px;
+    padding: 5px;
+    border: thin solid #4774A0;
+    background-color: white;
+}
+
+.event-list-halfwidth{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+.report-header-info{
+    font-size: small;
+    font-family: sans-serif;
+}
 
 
 
@@ -1105,6 +1125,10 @@ gridTd-bignum{
     background-color: white;
 }
 
+.button-float-right{
+    display: block;
+    float:right;
+}
 .sessionInfoButton{
     background: none;
     
@@ -1122,6 +1146,12 @@ gridTd-bignum{
 
 
 /* -------------------- MISC --------------------------------- */
+
+.nov-chosen-recipeint{
+    margin: 10px;
+    font-family: monospace;
+}
+
 
 p.footer{
     font-style: italic;
@@ -1186,6 +1216,16 @@ div.checkBoxLabel{
     color:blue;
 }
 
+.nov-builder-halfwidth{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+.preview-violations-box{
+    display: block;
+    width:1000px;
+}
 
 
 /* ******************** CLOSE MISC ********************************/

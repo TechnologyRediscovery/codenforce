@@ -13,20 +13,22 @@ import java.util.List;
  *
  * @author Sylvia Baskem
  */
-public class CECase extends CECaseNoLists implements Cloneable{
-    
+public class CECase extends CECaseBaseClass implements Cloneable{
     
     private List<CodeViolation> violationList;
     private List<CodeViolation> violationListResolved;
     private List<CodeViolation> violationListUnresolved;
     
+    private List<EventCECase> visibleEventList;
+    private boolean showHiddenEvents;
+    private boolean showInactiveEvents;
+    private List<EventCECase> completeEventList;
     
-    private List<EventCECase> eventList;
+    
     private List<EventCECase> eventListActionRequests;
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
-    private List<CEActionRequest> requestList;
-    
+    private List<CEActionRequest> ceActionRequestList;
     
     public CECase(){
         
@@ -38,10 +40,11 @@ public class CECase extends CECaseNoLists implements Cloneable{
      * from the incoming object to this sublcass
      * 
      * ** CONSTRUCTORS ARE NOT INHERITED!
+     * ** but member variables and methods sure are!
      * 
      * @param cnl 
      */
-    public CECase(CECaseNoLists cnl){
+    public CECase(CECaseBaseClass cnl){
         this.caseID = cnl.caseID;
         this.publicControlCode = cnl.publicControlCode;
         this.paccEnabled = cnl.paccEnabled;
@@ -69,7 +72,6 @@ public class CECase extends CECaseNoLists implements Cloneable{
         return null;
     }
     
-    
     /**
      * @return the violationList
      */
@@ -85,22 +87,31 @@ public class CECase extends CECaseNoLists implements Cloneable{
     }
 
     /**
-     * @return the eventList
+     * Implements logic to check each event for hidden status and inactive 
+     * status and based on the value of the showHiddenEvents and showInactiveEvents
+     * flags, add the event from the complete list to the visible list
+     * @return the visibleEventList
      */
-    public List<EventCECase> getEventList() {
-        
-        
-        return eventList;
+    public List<EventCECase> getVisibleEventList() {
+        visibleEventList.clear();
+        for (EventCECase ev : completeEventList) {
+            if (!ev.isActive() && !showInactiveEvents) {
+                continue;
+            }
+            if (ev.isHidden() && !showHiddenEvents) {
+                continue;
+            }
+            visibleEventList.add(ev);
+        } // close for   
+        return visibleEventList;
     }
 
     /**
-     * @param eventList the eventList to set
+     * @param visibleEventList the visibleEventList to set
      */
-    public void setEventList(List<EventCECase> eventList) {
-        this.eventList = eventList;
+    public void setVisibleEventList(List<EventCECase> visibleEventList) {
+        this.visibleEventList = visibleEventList;
     }
-
-
 
     /**
      * @return the citationList
@@ -115,7 +126,6 @@ public class CECase extends CECaseNoLists implements Cloneable{
     public void setCitationList(List<Citation> citationList) {
         this.citationList = citationList;
     }
-
 
     /**
      * @return the noticeList
@@ -132,24 +142,38 @@ public class CECase extends CECaseNoLists implements Cloneable{
     }
 
     /**
-     * @return the requestList
+     * @return the ceActionRequestList
      */
-    public List<CEActionRequest> getRequestList() {
-        return requestList;
+    public List<CEActionRequest> getCeActionRequestList() {
+        return ceActionRequestList;
     }
 
     /**
-     * @param requestList the requestList to set
+     * @param ceActionRequestList the ceActionRequestList to set
      */
-    public void setRequestList(List<CEActionRequest> requestList) {
-        this.requestList = requestList;
+    public void setCeActionRequestList(List<CEActionRequest> ceActionRequestList) {
+        this.ceActionRequestList = ceActionRequestList;
     }
 
     /**
      * @return the eventListActionRequests
      */
     public List<EventCECase> getEventListActionRequests() {
-        
+
+        if(completeEventList !=  null && completeEventList.size() >= 1){
+            for(EventCECase ev: completeEventList){
+                if(ev.getRequestedEventCat()!= null 
+                        && 
+                    !ev.isResponseComplete()
+                        &&
+                    ev.isActive()
+                        &&
+                    !ev.isHidden()){
+                    // event is a case action request so add it!
+                    eventListActionRequests.add(ev);
+                }
+            }
+        }
         
         return eventListActionRequests;
     }
@@ -207,6 +231,48 @@ public class CECase extends CECaseNoLists implements Cloneable{
      */
     public void setViolationListResolved(List<CodeViolation> violationListResolved) {
         this.violationListResolved = violationListResolved;
+    }
+
+    /**
+     * @return the completeEventList
+     */
+    public List<EventCECase> getCompleteEventList() {
+        return completeEventList;
+    }
+
+    /**
+     * @param completeEventList the completeEventList to set
+     */
+    public void setCompleteEventList(List<EventCECase> completeEventList) {
+        this.completeEventList = completeEventList;
+    }
+
+    /**
+     * @return the showInactiveEvents
+     */
+    public boolean isShowInactiveEvents() {
+        return showInactiveEvents;
+    }
+
+    /**
+     * @param showInactiveEvents the showInactiveEvents to set
+     */
+    public void setShowInactiveEvents(boolean showInactiveEvents) {
+        this.showInactiveEvents = showInactiveEvents;
+    }
+
+    /**
+     * @return the showHiddenEvents
+     */
+    public boolean isShowHiddenEvents() {
+        return showHiddenEvents;
+    }
+
+    /**
+     * @param showHiddenEvents the showHiddenEvents to set
+     */
+    public void setShowHiddenEvents(boolean showHiddenEvents) {
+        this.showHiddenEvents = showHiddenEvents;
     }
 
   

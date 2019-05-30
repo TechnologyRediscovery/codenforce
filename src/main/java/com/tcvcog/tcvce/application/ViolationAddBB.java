@@ -18,10 +18,11 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.ViolationCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -30,7 +31,6 @@ import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-//import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -60,8 +60,6 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     private String notes;
     private List<Blob> blobList;
     private Blob selectedBlob;
-    
-   
     
     /**
      * Creates a new instance of ViolationAdd
@@ -110,8 +108,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     public String addViolation(){
         
         
-        
-        ViolationCoordinator vc = getViolationCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         
         currentViolation.setStipulatedComplianceDate(getStipulatedComplianceDate()
@@ -124,7 +121,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
        
         
         try {
-             vc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, 
+             cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, 
                      getSessionBean().getcECaseQueue().get(0));
              getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
              getFacesContext().addMessage(null,
@@ -154,9 +151,8 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     }
     
     public String addViolationWithPhotos(){
-        
-        ViolationCoordinator vc = getViolationCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
+        CaseCoordinator cc = getCaseCoordinator();
         
         currentViolation.setStipulatedComplianceDate(getStipulatedComplianceDate()
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
@@ -168,7 +164,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         
         
         try {
-             currentViolation.setViolationID(vc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, getSessionBean().getcECase()));
+             currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, getSessionBean().getcECase()));
              getSessionBean().setActiveCodeViolation(currentViolation);
              getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
              getFacesContext().addMessage(null,

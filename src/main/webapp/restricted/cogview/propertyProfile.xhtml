@@ -461,13 +461,10 @@
 
                             <!--Insert occupancy inspection cases here-->
 
-                            <p:commandButton ajax="fakse" value="View " action="personProfile" disabled="true"/>
-
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
                         </h:form>
                             
+                <ui:remove>
+                                
                         <h:form id="propertyPhotoForm">    
                             <h2>Attached Photos</h2>
                             <p>View photographs of this property</p>
@@ -519,10 +516,10 @@
                         <h:form id="propertyUploadPhotoForm" enctype="multipart/form-data"> 
                             <h2>Upload Photo</h2>
                             <p>Upload a photo of this property</p>
-                            
+                
                             <p:fileUpload   fileUploadListener="#{propertyProfileBB.handleFileUpload}"
                                            mode="advanced"
-                                           sizeLimit="100000"
+                                           sizeLimit="900000000"
                                            allowTypes="/(\.|\/)(jpe?g|png)$/"
                                            update="propertyPhotoForm:photoResultTable"
                                            />
@@ -533,6 +530,7 @@
 
                         </h:form>
 
+                </ui:remove>
 
 
 

@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -23,6 +24,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -196,7 +199,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     
     public void onPropertySelection(){
         PropertyCoordinator pc = getPropertyCoordinator();
-        propWithLists = pc.checkPropertyForUnits(getSessionBean().getOccPermitApplication().getApplicationProperty());
+        try {
+            propWithLists = pc.checkPropertyForUnits(getSessionBean().getOccPermitApplication().getApplicationProperty());
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
         getSessionBean().setActivePropWithLists(propWithLists);
     }
         
