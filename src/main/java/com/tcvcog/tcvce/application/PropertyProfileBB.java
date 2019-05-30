@@ -339,28 +339,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.filteredPersonList = filteredPersonList;
     }
 
-<<<<<<< HEAD
-    /**
-     * @return the pList
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public ArrayList<Person> getpList() throws IntegrationException {
-            PropertyIntegrator pi = getPropertyIntegrator();
-        if(pList == null || currProp == null){
-            pList= pi.getPersonIntegrator().getPersonList(selectedMuni.getMuniCode());
-        }
-        return pList;
-    }
 
-    /**
-     * @param pList the pList to set
-     */
-    public void setpList(ArrayList<Person> pList) {
-        this.pList = pList;
-    }
-=======
-    
->>>>>>> master
 
     /**
      * @return the selectedMuni
