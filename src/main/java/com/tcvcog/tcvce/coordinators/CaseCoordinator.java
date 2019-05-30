@@ -115,9 +115,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         Collections.sort(cse.getNoticeList());
         Collections.reverse(cse.getNoticeList());
+        
         Collections.sort(cse.getEventListActionRequests());
         Collections.sort(cse.getVisibleEventList());
         Collections.reverse(cse.getVisibleEventList()); 
+        
+        // optionally sorted events based on action
+        // requests
         
         return cse;
     }
