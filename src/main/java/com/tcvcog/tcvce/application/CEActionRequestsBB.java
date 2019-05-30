@@ -214,11 +214,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         reportConfig = rpt;
     }
     
-    /**
-     *
-     * @param ev
-     */
-    public void prepareReportSingleCEAR(ActionEvent ev) {
+     @PostConstruct
+    public void initBean(){
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
