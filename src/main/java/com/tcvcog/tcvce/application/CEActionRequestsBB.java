@@ -82,7 +82,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     }
     
-    @PostConstruct
+     @PostConstruct
     public void initBean(){
         CaseCoordinator cc = getCaseCoordinator();
         searchParams = cc.getDefaultSearchParamsCEActionRequests(getSessionBean().getActiveMuni());

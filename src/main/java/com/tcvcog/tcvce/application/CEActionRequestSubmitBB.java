@@ -134,6 +134,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         cear = cc.getInititalizedCEActionRequest();
         cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
+        cear.setBlobIDList(new ArrayList<Integer>());
         getSessionBean().setCeactionRequestForSubmission(cear);
         return "chooseProperty";
     }
@@ -168,7 +169,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String savePhotos(){
         BlobCoordinator blobc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
-        sb.getCeactionRequestForSubmission().setBlobIDList(new ArrayList<Integer>());
         
         // before moving onto the person page, get a person's skeleton from the coordinator, put it
         // in the session for use on the next page
@@ -210,7 +210,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
         }
         getSessionBean().getCeactionRequestForSubmission().getBlobIDList().add((Integer)blob.getBlobID());
-        getSessionBean().getBlobList().add(blob);  // store blob on session bean
+        getSessionBean().getBlobList().add(blob);  // store blob on session bean for testing, take this out later probably
     }
     
     
