@@ -36,8 +36,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         String query = "SELECT photodocid, photodocdescription, photodocdate, photodoctype_typeid, \n" +
-                        "       photodocblob\n" +
-                        "       photodocuploadpersonid, photodocuploaddate \n" +
+                        "       photodocblob, \n" +
+                        "       photodocuploadpersonid \n" +
                         "  FROM public.photodoc WHERE photodocid = ?;";
         
         PreparedStatement stmt = null;
@@ -86,7 +86,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         String query =  " INSERT INTO public.photodoc(\n" +
                         "            photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocuploadpersonid, \n" +
                         "            photodocblob)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            ?);";
         
         PreparedStatement stmt = null;

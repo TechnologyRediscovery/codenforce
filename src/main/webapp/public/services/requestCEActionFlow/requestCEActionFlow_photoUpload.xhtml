@@ -42,6 +42,12 @@
                                         rowKey="#{blob.blobID}"
                                         tableStyleClass="primeDataTable"
                                         draggableRows="false" tabindex="6">
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="blobID"/>
+                                            </f:facet>
+                                            <h:outputText value="#{blob.blobID}"/>
+                                        </p:column>
                                         <p:column width="70%">
                                             <f:facet name="header">
                                                 <h:outputText value="Photo"/>

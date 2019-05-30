@@ -62,6 +62,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable{
         }
     }
     
+    public int storeBlob(Blob blob) throws BlobException, IntegrationException{
+        return getBlobIntegrator().storeBlob(blob);
+    }
+    
     public Blob getBlob(int blobID) throws IntegrationException{
         return getBlobIntegrator().getBlob(blobID);
     }

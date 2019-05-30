@@ -205,7 +205,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         blob.setBytes(ev.getFile().getContents());  // set bytes  
         blob.setType(BlobType.PHOTO);
         try {
-            blob.setBlobID(getBlobIntegrator().storeBlob(blob));
+            blob.setBlobID(blobc.storeBlob(blob));
         } catch (BlobException | IntegrationException ex) {
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
         }
@@ -241,7 +241,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         try {
             System.out.println("CEActionRequstsSubmitBB.submitActionRequest | inserting personID " + personID);
             req.setActionRequestorPerson(pi.getPerson(personID));
-            System.out.println("CEActionRequstsSubmitBB.submitActionRequest | person injected into request " + req.getActionRequestorPerson().getPersonID());
+            System.out.println("CEActionRequstsSubmitBB.submitActionRequest | person injected into request ");
         } catch (IntegrationException ex) {
             System.out.println("CEActionRequestSubmitBB.submitActionRequest | Person insert error");
             System.out.println(ex);
