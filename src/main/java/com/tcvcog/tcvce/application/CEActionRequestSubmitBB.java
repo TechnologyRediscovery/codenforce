@@ -258,7 +258,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         blob.setBytes(ev.getFile().getContents());  // set bytes  
         blob.setType(BlobType.PHOTO);
         try {
-            blob.setBlobID(getBlobIntegrator().storeBlob(blob));
+            blob.setBlobID(blobc.storeBlob(blob));
         } catch (BlobException | IntegrationException ex) {
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
         }
@@ -290,13 +290,13 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
         
-        if(currentRequest.getRequestor().getPersonID() == 0){
-             personID = insertActionRequestorNewPerson(req.getRequestor());
-            try {
-                currentRequest.setRequestor(pi.getPerson(personID));
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
+        try {
+            System.out.println("CEActionRequstsSubmitBB.submitActionRequest | inserting personID " + personID);
+            req.setActionRequestorPerson(pi.getPerson(personID));
+            System.out.println("CEActionRequstsSubmitBB.submitActionRequest | person injected into request ");
+        } catch (IntegrationException ex) {
+            System.out.println("CEActionRequestSubmitBB.submitActionRequest | Person insert error");
+            System.out.println(ex);
         }
         
         int controlCode = getControlCodeFromTime();
