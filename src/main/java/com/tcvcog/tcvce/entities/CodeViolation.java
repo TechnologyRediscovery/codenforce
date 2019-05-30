@@ -72,8 +72,13 @@ public class CodeViolation extends EntityUtils implements Serializable{
     
     protected boolean leagacyImport;
     
-    private List<Integer> blobIDList;
-
+    protected List<Integer> blobIDList;
+    
+    protected LocalDateTime complianceTimeStamp;
+    protected User complianceUser;
+    protected EventCECase compTimeFrameComplianceEvent;
+    protected int complianceTimeframeEventID;
+    
     /**
      * @return the violationID
      */

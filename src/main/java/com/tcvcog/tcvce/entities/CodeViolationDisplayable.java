@@ -28,7 +28,7 @@ public class CodeViolationDisplayable extends CodeViolation {
 
         this.violatedEnfElement = cv.violatedEnfElement;
         this.icon = cv.icon;
-        this.photoList = cv.photoList;
+        this.blobIDList = cv.blobIDList;
         this.citationIDList = cv.citationIDList;
         this.complianceUser = cv.complianceUser;
         this.compTimeFrameComplianceEvent = cv.compTimeFrameComplianceEvent;
