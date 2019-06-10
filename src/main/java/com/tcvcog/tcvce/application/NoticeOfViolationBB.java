@@ -76,7 +76,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void initBean(){
         PersonIntegrator pi = getPersonIntegrator();
         currentNotice = getSessionBean().getActiveNotice();
-        currentCase = getSessionBean().getcECaseQueue().get(0);
+        currentCase = getSessionBean().getSessionCECase();
         blockListBeforeViolations = new ArrayList<>();
         blockListAfterViolations = new ArrayList<>();
         try {
@@ -91,6 +91,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
         manualRetrievedPersonList = new ArrayList<>();
         showTextBlocksAllMuni = false;
+        
         
     }
     

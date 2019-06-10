@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <h:outputStylesheet name="css/novstyle.css"/>
@@ -165,10 +166,14 @@
 
                 </div>
 
-
+                <ui:remove>
+                    
+                
+                           rendered="#{noticeOfViolationBB.currentNotice.includeViolationPhotoAttachment}">
+                </ui:remove>
 
                 <f:subview id="subview-violation-photos"
-                           rendered="#{noticeOfViolationBB.currentNotice.includeViolationPhotoAttachment}">
+                           rendered="true">
                     <div class="violation-photo-attachments">
                         <h2>Attachments: photographs of code violations</h2>
                         <p:dataScroller id="violations-photos-ds"
@@ -181,6 +186,7 @@
                                 value="#{v.photoList}"
                                 rowKey="#{photoid}"
                                 tableStyleClass="primeDataTable"
+                                rendered="#{v.photoList.size()>0}"
                                 draggableRows="false" tabindex="6">
                                 <p:column width="100%">
                                     <f:facet name="header">
@@ -197,18 +203,8 @@
                                     </div>
                                 </p:column>
                             </p:dataTable>
-                            <p:dataScroller id="violations-photos-ds"
-                                            value="#{v.photoList}"
-                                            var="ph"
-                                            rendered="#{v.includeViolationPhotos and v.photoList.size()>0}">
-
-                                <h:outputText value="Photo: "/>
-                                <p:spacer height="5px" />
-                                <p:graphicImage width="100%" value="#{imageServices.image}">
-                                    <f:param name="photoID" value="#{ph.photoID}"/>
-                                </p:graphicImage>
-                                <h:outputText escape="false" value="#{ph.description}"/>
-                            </p:dataScroller>
+                            
+                          
                         </p:dataScroller>
                     </div>
                 </f:subview>

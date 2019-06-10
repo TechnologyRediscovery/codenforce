@@ -151,13 +151,12 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             }
         }
         
-        List<CECase> retrievedCaseList = selectedCECaseQuery.getResults();
-        if (retrievedCaseList != null && !retrievedCaseList.isEmpty()) {
-            currentCase = retrievedCaseList.get(0);
-            caseList = retrievedCaseList;
-            generateViolationDonut();
-            refreshCurrentCase();
-        } else {
+        caseList = selectedCECaseQuery.getResults();
+        currentCase = getSessionBean().getSessionCECase();
+        
+        if (currentCase == null && !caseList.isEmpty()) {
+            currentCase = caseList.get(0);
+        } else if (currentCase == null){
             try {
                 currentCase = ci.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("arbitraryPlaceholderCaseID")));
@@ -165,6 +164,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                 System.out.println(ex);
             }
         }
+        
+//        generateViolationDonut();
+        refreshCurrentCase();
 
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
         if (rpt != null) {
@@ -196,6 +198,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
            d.setLegendPosition("s");
            d.setShowDataLabels(true);
            d.setShowDatatip(true);
+           d.setSeriesColors(sytleClassClosed);
             violationDOnut = d;
           
        }
@@ -232,6 +235,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private void positionCurrentCaseAtHeadOfQueue(){
         getSessionBean().getcECaseQueue().remove(currentCase);
         getSessionBean().getcECaseQueue().add(0, currentCase);
+        getSessionBean().setSessionCECase(currentCase);
     }
 
    
@@ -582,6 +586,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
         }
         currentCase = c;
+        getSessionBean().setSessionCECase(currentCase);
         getSessionBean().setActiveProp(c.getProperty());
     }
     
@@ -730,7 +735,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
 //    Procedural vs. OO code
     public String editViolation(CodeViolation cv) {
-            getSessionBean().setActiveCodeViolation(cv);
+            getSessionBean().setSessionCodeViolation(cv);
             positionCurrentCaseAtHeadOfQueue();
             return "violationEdit";
     }
@@ -812,12 +817,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     public String addViolation() {
-        positionCurrentCaseAtHeadOfQueue();
+        getSessionBean().setSessionCECase(currentCase);
         return "violationSelectElement";
     }
 
     public String printNotice(NoticeOfViolation nov) {
-        Municipality m = getSessionBean().getActiveMuni();
         getSessionBean().setActiveNotice(nov);
         positionCurrentCaseAtHeadOfQueue();
         return "noticeOfViolationPrint";
