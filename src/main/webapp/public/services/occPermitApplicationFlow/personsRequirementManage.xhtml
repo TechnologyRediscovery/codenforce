@@ -52,8 +52,8 @@
                                     </p:column>
                                 </p:dataTable>
                             </ui:remove>
-                            <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
-                                <h:panelGroup>
+                            <h:panelGrid id="menu" columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
+                                <h:panelGroup >
                                     <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter">
                                         <h:panelGroup>
                                             <p:outputLabel id="last-name-ol" for="last-name-chkbx" value="Filter by last name?" />
@@ -139,7 +139,7 @@
                                         </p:column>
 
                                         <p:column>
-                                            <p:commandButton ajax="true" id="attach-person-cb" value="Attach" action="#{occPermitApplicationBB.addPersonToApplication(person)}"/>
+                                            <p:commandButton ajax="true" update=":personsRequirementManageForm:applicationPersonTable" id="attach-person-cb" value="Attach" action="#{occPermitApplicationBB.addPersonToApplication(person)}"/>
                                         </p:column>
                                         <!--
                                             <p:column>
@@ -147,19 +147,18 @@
                                             </p:column>
                                         -->
                                     </p:dataTable>
-
-                                    <p:outputLabel> Can't find the person you are looking for? </p:outputLabel>
-                                    <p:commandButton update="applicationPersonTable" value="Add a new person" action="#{occPermitApplicationBB.addANewPerson}" />
                                 </h:panelGroup>
                             </h:panelGrid>
+                            <p:outputLabel> Can't find the person you are looking for? </p:outputLabel>
+                            <p:commandButton update="applicationPersonTable" value="Add a new person" action="#{occPermitApplicationBB.addANewPerson}" />
+
                             <p:spacer height="10px"/>
 
                             <p:outputLabel> Please identify yourself by selecting your name from the table below: </p:outputLabel>
 
                             <p:dataTable id="applicationPersonTable"
-                                         var="applicationPerson" value="#{sessionBean.occPermitApplication.attachedPersons}" 
+                                         var="applicationPerson" value="#{OccPermitApplicationBB.attachedPersons}" 
                                          selectionMode="single"
-                                         selection="#{sessionBean.occPermitApplication.applicantPerson}"
                                          rowKey="#{applicationPerson.personID}">                                
                                 <p:column headerText="Name">
                                     <h:outputText value="#{applicationPerson.firstName} #{applicationPerson.lastName}"/>
@@ -170,6 +169,7 @@
                                 </p:column>                            
 
                             </p:dataTable>
+
 
                             <p:commandButton ajax="false" value="Review application" disabled="#{!sessionBean.occPermitApplication.reason.personsRequirement.requirementSatisfied}"
                                              action="#{occPermitApplicationBB.reviewApplication}"/>

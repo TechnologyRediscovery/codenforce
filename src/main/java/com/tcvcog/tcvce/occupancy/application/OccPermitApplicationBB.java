@@ -57,9 +57,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     private OccPermitApplicationReason selectedApplicationReason;
     private List<OccPermitApplicationReason> reasonList;
-    
+
     private List<Person> attachedPersons;
     private Person applicationPerson;
+    private Person applicant;
     private Person currentOwner;
     private Person newOwner;
     private Person contactPerson;
@@ -117,6 +118,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                 workingPropUnits = getSessionBean().getWorkingPropWithLists().getUnitList();
 
             }
+
+            if (attachedPersons == null) {
+                attachedPersons = getSessionBean().getWorkingAttachedPersons();
+                if (attachedPersons == null) {
+                    attachedPersons = new ArrayList();
+                }
+            }
+
         }
 
     }
@@ -403,6 +412,22 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         this.params = params;
     }
 
+    public Person getApplicant() {
+        return applicant;
+    }
+
+    public void setApplicant(Person applicant) {
+        this.applicant = applicant;
+    }
+
+    public List<Person> getAttachedPersons() {
+        return attachedPersons;
+    }
+
+    public void setAttachedPersons(List<Person> attachedPersons) {
+        this.attachedPersons = attachedPersons;
+    }
+
     /**
      * @return the applicationPerson
      */
@@ -684,16 +709,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         return "searchPeople";
     }
 
-    public String addPersonToApplication(Person person) {
+    public void addPersonToApplication(Person person) {
         person.setPersonType(getSessionBean().getActivePersonType());
-        //List<Person> attachedPersons = getSessionBean().getOccPermitApplication().getAttachedPersons();
-
-        if (attachedPersons == null) {
-            attachedPersons = new ArrayList();
-        }
         attachedPersons.add(person);
-
-        return "";
     }
 
     public String editPersonInfo(Person person) {
