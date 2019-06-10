@@ -61,7 +61,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         
-         currentViolation = getSessionBean().getActiveCodeViolation();
+         currentViolation = getSessionBean().getSessionCodeViolation();
          currentCase = getSessionBean().getcECaseQueue().get(0);
          formDiscloseToMuni = true;
          formDiscloseToPublic = true;

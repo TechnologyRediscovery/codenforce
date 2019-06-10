@@ -89,7 +89,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      /* *** Code Enforcement Case Session Shelves ***  */
     private NoticeOfViolation activeNotice;
     private Citation activeCitation;
-    private CodeViolation activeCodeViolation;
+    private CodeViolation sessionCodeViolation;
     
     /* *** Public Data Session Shelves ***  */
     private List<PublicInfoBundle> infoBundleList;
@@ -180,10 +180,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activeCodeViolation
+     * @return the sessionCodeViolation
      */
-    public CodeViolation getActiveCodeViolation() {
-        return activeCodeViolation;
+    public CodeViolation getSessionCodeViolation() {
+        return sessionCodeViolation;
     }
 
     /**
@@ -255,10 +255,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param activeCodeViolation the activeCodeViolation to set
+     * @param sessionCodeViolation the sessionCodeViolation to set
      */
-    public void setActiveCodeViolation(CodeViolation activeCodeViolation) {
-        this.activeCodeViolation = activeCodeViolation;
+    public void setSessionCodeViolation(CodeViolation sessionCodeViolation) {
+        this.sessionCodeViolation = sessionCodeViolation;
     }
 
     /**

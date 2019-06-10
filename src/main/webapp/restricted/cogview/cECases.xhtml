@@ -393,7 +393,7 @@
                                 
                                 
                                 
-                                    <p:chart type="donut" 
+                                <p:chart type="donut" rendered="false"
                                              model="#{caseProfileBB.violationDOnut}" 
                                              style="width:500px; height: 600px;"/>
 
@@ -1165,9 +1165,14 @@
                                                  action="#{caseProfileBB.createNewNotice}"
                                                  value="Create new notice of violation letter"
                                                  rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
-                                                 disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
+                                                 disabled="false"
+                                                 />
                                 <p:spacer height="5px"/>
 
+                                <ui:remove>
+                                    disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"
+                                </ui:remove>
+                                
                                 <p:dataScroller
                                     id="notices-ds"
                                     value="#{caseProfileBB.currentCase.noticeList}"

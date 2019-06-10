@@ -48,11 +48,7 @@ import org.primefaces.event.FileUploadEvent;
 public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     private CodeViolation currentViolation;
-    private Date dateOfRecord;
-    private Date stipulatedComplianceDate;
-    private double penalty;
-    private String description;
-    private String notes;
+    private CECase currentCase;
     private List<Photograph> photoList;
     private Photograph selectedPhoto;
     
@@ -65,7 +61,8 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
-        currentViolation = getSessionBean().getActiveCodeViolation();
+        currentViolation = getSessionBean().getSessionCodeViolation();
+        currentCase = getSessionBean().getSessionCECase();
     }
     
     public void updateDescription(Photograph photo){
@@ -79,7 +76,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     public void handlePhotoUpload(FileUploadEvent ev){
         if(this.currentViolation == null){
-            this.currentViolation = getSessionBean().getActiveCodeViolation();
+            this.currentViolation = getSessionBean().getSessionCodeViolation();
         }
         if(ev == null){
             System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
@@ -112,24 +109,13 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         
         
         CaseCoordinator cc = getCaseCoordinator();
-        CaseIntegrator ci = getCaseIntegrator();
-        
-        currentViolation.setStipulatedComplianceDate(getStipulatedComplianceDate()
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        currentViolation.setDateOfRecord(getDateOfRecord()
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        currentViolation.setPenalty(penalty);
-        currentViolation.setDescription(description);
-        currentViolation.setNotes(notes);
-       
         
         try {
-             cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, 
-                     getSessionBean().getcECaseQueue().get(0));
-             getSessionBean().setSessionCECase(ci.getCECase(currentViolation.getCeCaseID()));
+             cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase);
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
+             getSessionBean().getSessionBean().setSessionCECase(currentCase);
             return "ceCases";
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -157,19 +143,8 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
         
-        currentViolation.setStipulatedComplianceDate(stipulatedComplianceDate
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        currentViolation.setDateOfRecord(dateOfRecord
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        currentViolation.setPenalty(penalty);
-        currentViolation.setDescription(description);
-        currentViolation.setNotes(notes);
-        
-        
         try {
-             currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, getSessionBean().getSessionCECase()));
-             getSessionBean().setActiveCodeViolation(currentViolation);
-             getSessionBean().setSessionCECase(ci.getCECase(currentViolation.getCeCaseID()));
+             currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase));
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
@@ -197,7 +172,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     public String photosConfirm(){
         if(this.currentViolation == null){
-            this.currentViolation = getSessionBean().getActiveCodeViolation();
+            this.currentViolation = getSessionBean().getSessionCodeViolation();
         }
         if(this.getPhotoList() == null  ||  this.getPhotoList().isEmpty()){
             getFacesContext().addMessage(null,
@@ -229,57 +204,13 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     }
    
 
-    /**
-     * @return the penalty
-     */
-    public double getPenalty() {
-        penalty = currentViolation.getCodeViolated().getNormPenalty();
-        return penalty;
-    }
-
-    /**
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * @return the notes
-     */
-    public String getNotes() {
-        return notes;
-    }
-
-   
-
-    /**
-     * @param penalty the penalty to set
-     */
-    public void setPenalty(double penalty) {
-        this.penalty = penalty;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @param notes the notes to set
-     */
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
 
     /**
      * @return the currentViolation
      */
     public CodeViolation getCurrentViolation() {
         
-        currentViolation = getSessionBean().getActiveCodeViolation();
+        currentViolation = getSessionBean().getSessionCodeViolation();
         return currentViolation;
     }
 
@@ -288,39 +219,6 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
      */
     public void setCurrentViolation(CodeViolation currentViolation) {
         this.currentViolation = currentViolation;
-    }
-
-    /**
-     * @return the stipulatedComplianceDate
-     */
-    public Date getStipulatedComplianceDate() {
-        stipulatedComplianceDate = java.util.Date.from(
-                currentViolation.getStipulatedComplianceDate()
-                        .atZone(ZoneId.systemDefault()).toInstant());
-        return stipulatedComplianceDate;
-    }
-
-    /**
-     * @param stipulatedComplianceDate the stipulatedComplianceDate to set
-     */
-    public void setStipulatedComplianceDate(Date stipulatedComplianceDate) {
-        this.stipulatedComplianceDate = stipulatedComplianceDate;
-    }
-
-    /**
-     * @return the dateOfRecord
-     */
-    public Date getDateOfRecord() {
-        dateOfRecord = java.util.Date.from(
-                LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
-        return dateOfRecord;
-    }
-
-    /**
-     * @param dateOfRecord the dateOfRecord to set
-     */
-    public void setDateOfRecord(Date dateOfRecord) {
-        this.dateOfRecord = dateOfRecord;
     }
 
     /**
@@ -349,6 +247,20 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedPhoto(Photograph selectedPhoto) {
         this.selectedPhoto = selectedPhoto;
+    }
+
+    /**
+     * @return the currentCase
+     */
+    public CECase getCurrentCase() {
+        return currentCase;
+    }
+
+    /**
+     * @param currentCase the currentCase to set
+     */
+    public void setCurrentCase(CECase currentCase) {
+        this.currentCase = currentCase;
     }
 
   

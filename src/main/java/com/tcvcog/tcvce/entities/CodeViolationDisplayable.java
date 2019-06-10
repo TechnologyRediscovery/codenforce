@@ -51,7 +51,7 @@ public class CodeViolationDisplayable extends CodeViolation {
 
     private boolean includeOrdinanceText;
     private boolean includeHumanFriendlyText;
-    private boolean includeViolationPhotos;
+    private boolean includeViolationPhotos = true;
 
     /**
      * @return the includeOrdinanceText

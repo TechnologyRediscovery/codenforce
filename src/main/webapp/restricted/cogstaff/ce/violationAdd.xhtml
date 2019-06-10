@@ -63,7 +63,7 @@
                                         <h:outputText value="Stipulated Compliance Date"/>
                                     </h:outputLabel>
                                     <p:spacer height="0px"/>
-                                    <p:calendar value="#{violationAddBB.stipulatedComplianceDate}" 
+                                    <p:calendar value="#{violationAddBB.currentViolation.stipulatedComplianceDateUtilDate}" 
                                                 mode="popup"  id="stipCompDate"
                                                 showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                 navigator="true" tabindex="1"
@@ -84,7 +84,7 @@
                                         <h:outputText value="Date of Record"/>
                                     </h:outputLabel>
                                     <p:spacer height="0px"/>
-                                    <p:calendar value="#{violationAddBB.dateOfRecord}" 
+                                    <p:calendar value="#{violationAddBB.currentViolation.dateOfRecordUtilDate}" 
                                                 mode="popup"  id="dateOfRecord"
                                                 showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                 navigator="true" tabindex="2" timeInput="true" showHour="true" showMinute="true"
@@ -98,7 +98,7 @@
                                     <p:outputLabel for="penalty">
                                         <h:outputText value="Penalty (exclude $)"/>
                                     </p:outputLabel>
-                                    <p:inputText id="penalty" value="#{violationAddBB.penalty}"
+                                    <p:inputText id="penalty" value="#{violationAddBB.currentViolation.penalty}"
                                                  style="width: 20%;" tabindex="3" required="true" styleClass="inputText" type="currency"/>
                                     <h:message for="penalty" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -108,7 +108,7 @@
                                     <p:outputLabel for="notes">
                                         <h:outputText value="Penalty Notes"/>
                                     </p:outputLabel>
-                                    <p:inputText id="notes" value="#{violationAddBB.notes}"
+                                    <p:inputText id="notes" value="#{violationAddBB.currentViolation.notes}"
                                                  style="width: 100%;" tabindex="4" required="false" styleClass="inputText" type="text"/>
                                     <h:message for="notes" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -119,7 +119,7 @@
                                         <p:outputLabel for="desc">
                                             <h:outputText value="Description of code violation"/>
                                         </p:outputLabel>
-                                        <p:inputTextarea id="desc" value="#{violationAddBB.description}"
+                                        <p:inputTextarea id="desc" value="#{violationAddBB.currentViolation.description}"
                                                      style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
                                         <h:message for="desc" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
