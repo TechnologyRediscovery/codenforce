@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -106,7 +107,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
     private PropertyWithLists workingPropWithLists;
-
+    private ArrayList<Person> workingAttachedPersons;
     private PersonType activePersonType;
     
     /* *** Public Person Search/Edit Session Shelves *** */
@@ -667,5 +668,13 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     
+    
+    public ArrayList<Person> getWorkingAttachedPersons() {
+        return workingAttachedPersons;
+    }
+
+    public void setWorkingAttachedPersons(ArrayList<Person> workingAttachedPersons) {
+        this.workingAttachedPersons = workingAttachedPersons;
+    }
     
 }
