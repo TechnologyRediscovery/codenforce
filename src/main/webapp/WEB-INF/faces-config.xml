@@ -695,6 +695,12 @@
             <from-outcome>success</from-outcome>
             <to-view-id>/public/services/actionReqSubConf.xhtml</to-view-id>
         </navigation-case>
+        <navigation-case>
+            <from-outcome>addPropertyUnit</from-outcome>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
     </navigation-rule>
     
         
