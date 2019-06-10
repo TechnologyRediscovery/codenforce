@@ -105,6 +105,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private OccPermitApplication occPermitApplication;
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
+    private PropertyWithLists workingPropWithLists;
+
     private PersonType activePersonType;
     
     /* *** Public Person Search/Edit Session Shelves *** */
@@ -382,6 +384,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public void setQueueCEAR(List<CEActionRequest> qc) {
         if(qc != null && qc.size() > 0 ){
             setSessionQueryCEAR(null);
+    
             this.queueCEAR = qc;
         }
     }
@@ -524,7 +527,15 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
         this.activePropWithLists = activePropWithLists;
     }
-     
+    
+    public PropertyWithLists getWorkingPropWithLists() {
+        return workingPropWithLists;
+    }
+
+    public void setWorkingPropWithLists(PropertyWithLists workingPropWithLists) {
+        this.workingPropWithLists = workingPropWithLists;
+    }
+    
     /*
      * @return the cEEventWCPIQueue
      */
