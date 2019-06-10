@@ -854,7 +854,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         System.out.println("CaseCoordinator.refreshCase");
         CaseIntegrator ci = getCaseIntegrator();
         
-        getSessionBean().setcECase(ci.getCECase(c.getCaseID()));
+        getSessionBean().setSessionCECase(ci.getCECase(c.getCaseID()));
     }
     
     public int novInsertNotice(NoticeOfViolation nov, CECase cse, User usr) throws IntegrationException{
@@ -1331,6 +1331,33 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         return map;
+    }
+    
+    public Map<EnforcableCodeElement, Number> computeViolationFrequency(List<CECase> cseList){
+        Map<EnforcableCodeElement, Number> enfCdElMap = new LinkedHashMap<>();
+        for(CECase cse: cseList){
+            for(CodeViolation cdVl: cse.getViolationList()){
+                if(enfCdElMap.containsKey(cdVl.getViolatedEnfElement())){
+                    Integer count = ((Integer) enfCdElMap.get(cdVl.getViolatedEnfElement())) + 1;
+                    enfCdElMap.put(cdVl.getViolatedEnfElement(), count );
+                } else {
+                    enfCdElMap.put(cdVl.getViolatedEnfElement(), 1);
+                }
+            }
+        }
+        
+        return enfCdElMap;
+    }
+    
+    public Map<String, Number> computeViolationFrequencyStringMap(List<CECase> cseList){
+        
+        Map<EnforcableCodeElement, Number> violationMap = computeViolationFrequency(cseList);
+        Map<String, Number> violationStringMap = new LinkedHashMap<>();
+        
+        for(EnforcableCodeElement enfCdEl: violationMap.keySet()){
+            violationStringMap.put(enfCdEl.toString(), violationMap.get(enfCdEl));
+        }
+        return violationStringMap;
     }
    
 } // close class

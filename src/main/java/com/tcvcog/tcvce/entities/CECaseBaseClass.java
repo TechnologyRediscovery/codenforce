@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 /**
@@ -37,10 +38,15 @@ public class CECaseBaseClass extends EntityUtils implements Serializable, Clonea
     private String caseOpenClosed;
     
     protected Icon casePhaseIcon;
+    
+    protected java.util.Date originationDateUtilDate;
     protected LocalDateTime originationDate;
     protected String originiationDatePretty;
+    
+    protected java.util.Date closingDateUtilDate;
     protected LocalDateTime closingDate;
     protected String closingDatePretty;
+    
     protected LocalDateTime creationTimestamp;
     protected String notes;
 
@@ -368,12 +374,45 @@ public class CECaseBaseClass extends EntityUtils implements Serializable, Clonea
     }
 
     /**
-     * @param caseOpenClosed the caseOpenClosed to set
+     * @return the closingDateUtilDate
      */
-    public void setCaseOpenClosed(String caseOpenClosed) {
-        this.caseOpenClosed = caseOpenClosed;
+    public java.util.Date getClosingDateUtilDate() {
+        if(closingDate != null){
+            closingDateUtilDate = java.util.Date.from(
+                    closingDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return closingDateUtilDate;
     }
-    
-    
-    
+
+    /**
+     * @param cd     
+     */
+    public void setClosingDateUtilDate(java.util.Date cd) {
+        if(cd != null){
+            this.closingDate = cd.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        this.closingDateUtilDate = cd;
+    }
+
+    /**
+     * @return the originationDateUtilDate
+     */
+    public java.util.Date getOriginationDateUtilDate() {
+        if(originationDate != null){
+            originationDateUtilDate = java.util.Date.from(
+                    originationDate.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return originationDateUtilDate;
+    }
+
+    /**
+     * @param od     
+     */
+    public void setOriginationDateUtilDate(java.util.Date od) {
+        if(od != null){
+            originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        this.originationDateUtilDate = od;
+    }
+
 }

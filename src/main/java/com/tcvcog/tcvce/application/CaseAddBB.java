@@ -95,7 +95,7 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
         }
         
         // stick our new case on the session self for easy access
-        getSessionBean().setcECase(newCase);
+        getSessionBean().setSessionCECase(newCase);
         
         //reload page on error
         return "";

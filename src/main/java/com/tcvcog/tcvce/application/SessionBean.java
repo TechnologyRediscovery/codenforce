@@ -49,12 +49,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<Property> propertyQueue;
     private List<Person> personQueue;
     
-    
     private List<CEActionRequest> queueCEAR;
     
     private CEActionRequest sessionCEAR;
     private QueryCEAR sessionQueryCEAR;
-    
     
     private List<CECase> cECaseQueue;
     private List<EventCECaseCasePropBundle> cEEventWCPIQueue;
@@ -62,7 +60,8 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<OccupancyInspection> inspectionQueue;
     
     private QueryCECase sessionQueryCECase;
-    private CECase sessionCECase;
+   
+    
     private QueryEventCECase queryEventCECase;
    
     /* *** System Core Objects Session Shelves ***  */
@@ -83,10 +82,9 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /* *** Code Enf Action Request Session Shelves ***  */
     
     private Person personForCEActionRequestSubmission;
-
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
-    private CECase cECase;
+    private CECase sessionCECase;
     
      /* *** Code Enforcement Case Session Shelves ***  */
     private NoticeOfViolation activeNotice;
@@ -103,8 +101,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
     private ReportConfigCEEventList reportConfigCEEventList;
-    
-
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication occPermitApplication;
@@ -130,18 +126,18 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the cECase
+     * @return the sessionCECase
      */
-    public CECase getcECase() {
-        return cECase;
+    public CECase getSessionCECase() {
+        return sessionCECase;
         
     }
     
     public void refreshActiveCase() throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
-        if(cECase != null){
-            CECase c = ci.getCECase(cECase.getCaseID());
-            cECase = c;
+        if(sessionCECase != null){
+            CECase c = ci.getCECase(sessionCECase.getCaseID());
+            sessionCECase = c;
         }
     }
 
@@ -212,10 +208,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param cECase the cECase to set
+     * @param sessionCECase the sessionCECase to set
      */
-    public void setcECase(CECase cECase) {
-        this.cECase = cECase;
+    public void setSessionCECase(CECase sessionCECase) {
+        this.sessionCECase = sessionCECase;
     }
 
 
@@ -642,19 +638,9 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.sessionQueryCEAR = sessionQueryCEAR;
     }
 
-    /**
-     * @return the sessionCECase
-     */
-    public CECase getSessionCECase() {
-        return sessionCECase;
-    }
+  
 
-    /**
-     * @param sessionCECase the sessionCECase to set
-     */
-    public void setSessionCECase(CECase sessionCECase) {
-        this.sessionCECase = sessionCECase;
-    }
+   
 
     /**
      * @return the sessionQueryCECase

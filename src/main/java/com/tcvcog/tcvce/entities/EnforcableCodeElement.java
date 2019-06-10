@@ -41,6 +41,11 @@ public class EnforcableCodeElement extends CodeElement implements Serializable{
     private String daysToComplyNotes;
     private String muniSpecificNotes;
 
+    @Override
+    public String toString(){
+        return codeElement.getHeaderString();
+    }
+    
     /**
      * @return the maxPenalty
      */
