@@ -390,6 +390,14 @@
                                                    oncomplete="PF('report-caselist-profile-diaglog-var').show()"
                                                    value="generate case list report" 
                                                    update="report-caselist-profile-form"/>
+                                
+                                
+                                
+                                    <p:chart type="donut" 
+                                             model="#{caseProfileBB.violationDOnut}" 
+                                             style="width:500px; height: 600px;"/>
+
+
                             </h:form>
                         </div>
                         <div class="object-column">
@@ -1916,19 +1924,19 @@
                                     <h:outputText value="Public access control code"/>
                                 </h:panelGroup> 
                                 <h:panelGroup>
-                                    <h:inputText value="#{caseUpdateBB.formControlCode}"/>
+                                    <h:inputText value="#{caseProfileBB.currentCase.publicControlCode}"/>
                                 </h:panelGroup> 
                                 <h:panelGroup>
                                     <h:outputText value="Case name"/>
                                 </h:panelGroup> 
                                 <h:panelGroup>
-                                    <h:inputText value="#{caseUpdateBB.formCaseName}"/>
+                                    <h:inputText value="#{caseProfileBB.currentCase.caseName}"/>
                                 </h:panelGroup> 
                                 <h:panelGroup>
                                     <h:outputText value="Opening date"/>
                                 </h:panelGroup> 
                                 <h:panelGroup>
-                                    <p:calendar value="#{caseUpdateBB.formOriginDate}" 
+                                    <p:calendar value="#{caseProfileBB.currentCase.originationDateUtilDate}" 
                                                 mode="popup" tabindex="3"
                                                 id="formCaseOriginationDateCal"
                                                 showOn="button"
@@ -1945,7 +1953,7 @@
                                     <h:outputText value="Notes:"/>
                                 </h:panelGroup> 
                                 <h:panelGroup>
-                                    <h:inputTextarea value="#{caseUpdateBB.formCaseNotes}"/>
+                                    <h:inputTextarea value="#{caseProfileBB.currentCase.notes}"/>
                                 </h:panelGroup> 
                                 <h:panelGroup>
                                     <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
@@ -1967,7 +1975,7 @@
                                 </h:panelGroup>
                             </h:panelGrid>
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" value="Update Case" action="#{caseUpdateBB.updateCase}"  icon="fa fa-edit"/>
+                            <p:commandButton ajax="true" value="Update Case" action="#{caseProfileBB.updateCase}"  icon="fa fa-edit"/>
                         </h:form>
                     </p:dialog>
 

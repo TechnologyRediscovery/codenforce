@@ -457,8 +457,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
         
-        CECase c = getSessionBean().getcECase();
-        EventCECase event = getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
+        
+        EventCECase event = getInitializedEvent(currentCase, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("casePhaseChangeEventCatID"))));
         
         StringBuilder sb = new StringBuilder();
@@ -502,12 +502,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) throws IntegrationException, CaseLifecyleException, ViolationException{
+    public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) 
+            throws IntegrationException, CaseLifecyleException, ViolationException{
+        
           EventIntegrator ei = getEventIntegrator();
           CaseCoordinator cc = getCaseCoordinator();
         
-        CECase c = getSessionBean().getcECase();
-        EventCECase event = getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
+        EventCECase event = getInitializedEvent(currentCase, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("casePhaseManualOverride"))));
         
         StringBuilder sb = new StringBuilder();

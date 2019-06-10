@@ -281,8 +281,9 @@ public class CodeElement implements Serializable {
         sb.append(ordSubSecNum);
         sb.append(":");
         sb.append(ordSubSecTitle);
+        headerString = sb.toString();
         
-        return sb.toString();
+        return headerString;
     }
 
     /**

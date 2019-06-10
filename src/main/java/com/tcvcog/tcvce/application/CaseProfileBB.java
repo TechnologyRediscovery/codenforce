@@ -41,6 +41,7 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,6 +51,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
+import org.primefaces.model.chart.DonutChartModel;
 
 /**
  *
@@ -64,6 +66,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private CasePhase selectedCasePhase;
     private CaseStage[] caseStageArray;
 
+    private DonutChartModel violationDOnut;
+    
     private List<CECase> caseList;
     private ArrayList<CECase> filteredCaseList;
     private SearchParamsCECases searchParams;
@@ -151,6 +155,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         if (retrievedCaseList != null && !retrievedCaseList.isEmpty()) {
             currentCase = retrievedCaseList.get(0);
             caseList = retrievedCaseList;
+            generateViolationDonut();
             refreshCurrentCase();
         } else {
             try {
@@ -181,7 +186,48 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         return "properties";
     }
 
+   private void generateViolationDonut(){
+       CaseCoordinator cc = getCaseCoordinator();
+       if(caseList != null && caseList.size() >= 1){
+           DonutChartModel d = new DonutChartModel();
+           d.addCircle(cc.computeViolationFrequencyStringMap(caseList));
+           
+           d.setTitle("Violation frequency: all listed cases");
+           d.setLegendPosition("s");
+           d.setShowDataLabels(true);
+           d.setShowDatatip(true);
+            violationDOnut = d;
+          
+       }
+   }
    
+   public void updateCase(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.updateCoreCECaseData(currentCase);
+            cc.refreshCase(currentCase);
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        ex.getMessage(),
+                        "Please try again with a revised origination date"));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        ex.getMessage(),
+                        "This issue must be corrected by a system administrator, sorry"));
+        }
+        
+        getFacesContext().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Case details updated!",""));
+        
+    }
+
+    
+    
     
     private void positionCurrentCaseAtHeadOfQueue(){
         getSessionBean().getcECaseQueue().remove(currentCase);
@@ -217,6 +263,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             if (caseList != null) {
                 listSize = caseList.size();
             }
+            generateViolationDonut();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your query completed with " + listSize + " results", ""));
@@ -1006,7 +1053,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public List<Citation> getCitationList() {
 
-        setCitationList(getSessionBean().getcECase().getCitationList());
+        setCitationList(getSessionBean().getSessionCECase().getCitationList());
         return citationList;
     }
 
@@ -1665,6 +1712,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedBOBQuery(Query selectedBOBQuery) {
         this.selectedBOBQuery = selectedBOBQuery;
+    }
+
+    /**
+     * @return the violationDOnut
+     */
+    public DonutChartModel getViolationDOnut() {
+        return violationDOnut;
+    }
+
+    /**
+     * @param violationDOnut the violationDOnut to set
+     */
+    public void setViolationDOnut(DonutChartModel violationDOnut) {
+        this.violationDOnut = violationDOnut;
     }
 
 }

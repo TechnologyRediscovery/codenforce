@@ -58,7 +58,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     public String gotoCaseProfile(){
-        if(getSessionBean().getcECase() != null ){
+        if(getSessionBean().getSessionCECase() != null ){
             return "caseProfile";
         } else{
              getFacesContext().addMessage(null, 
@@ -86,7 +86,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveCase
      */
     public boolean isNoActiveCase() {
-        CECase c = getSessionBean().getcECase();
+        CECase c = getSessionBean().getSessionCECase();
         noActiveCase = (c == null);
         return noActiveCase; 
     }

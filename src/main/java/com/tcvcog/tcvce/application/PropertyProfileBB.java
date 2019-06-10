@@ -113,7 +113,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String viewCase(CECase c){
-        getSessionBean().setcECase(c);
+        getSessionBean().setSessionCECase(c);
         return "ceCases";
     }
     

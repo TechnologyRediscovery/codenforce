@@ -73,7 +73,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         EventCategory ec = null;
 
         try {
-
             stmt = con.prepareStatement(query);
             stmt.setInt(1, catID);
             //System.out.println("EventInteegrator.getEventCategory| sql: " + stmt.toString());
@@ -101,7 +100,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         EventCategory ec = new EventCategory();
         CaseIntegrator ci = getCaseIntegrator();
         
-        
         ec.setCategoryID(rs.getInt("categoryid"));
         ec.setEventType(EventType.valueOf(rs.getString("categoryType")));
         ec.setEventCategoryTitle(rs.getString("title"));
@@ -120,9 +118,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         if(rs.getInt("phasechangerule_ruleid") != 0){
             ec.setCasePhaseChangeRule(ci.getPhaseChangeRule(rs.getInt("phasechangerule_ruleid")));
         }
-
         return ec;
-
     }
 
     public ArrayList<EventCategory> getEventCategoryList() throws IntegrationException {
@@ -133,18 +129,14 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ArrayList<EventCategory> categoryList = new ArrayList();
 
         try {
-
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
-
             while (rs.next()) {
                 categoryList.add(getEventCategory(rs.getInt("categoryid")));
             }
-
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot generate list of event categories", ex);
-
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -162,10 +154,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ArrayList<EventCategory> categoryList = new ArrayList();
 
         try {
-
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
-
             while (rs.next()) {
                 categoryList.add(getEventCategory(rs.getInt("categoryid")));
             }
@@ -183,9 +173,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return categoryList;
     }
     
-    
-    
-
     public ArrayList<EventCategory> getEventCategoryList(EventType et) throws IntegrationException {
         String query = "SELECT categoryid FROM public.ceeventcategory WHERE categorytype = cast (? as ceeventtype);";
         Connection con = getPostgresCon();
@@ -199,7 +186,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, et.toString());
             rs = stmt.executeQuery();
             System.out.println("EventIntegrator.getEventCategoryList | SQL: " + stmt.toString());
-
             while (rs.next()) {
                 categoryList.add(getEventCategory(rs.getInt("categoryid")));
             }
@@ -248,7 +234,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(9, ec.isHidable());
             stmt.setInt(10, ec.getIcon().getIconid());
             stmt.setBoolean(11, ec.isRequestable());
-            
 
             System.out.println("EventInteegrator.insertEventCategory| sql: " + stmt.toString());
             stmt.execute();
@@ -317,7 +302,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ec.getCategoryID());
-
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -499,7 +483,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(9, event.isHidden());
             stmt.setString(10, event.getNotes());
             int paramCounter = 10;
-        if(event.getRequestedEventCat()!= null){
+            if(event.getRequestedEventCat()!= null){
             System.out.println("EventIntegrator.updateEvent: found event category to update");
             stmt.setInt(++paramCounter, event.getRequestedEventCat().getCategoryID());
             stmt.setInt(++paramCounter, event.getActionRequestedBy().getUserID());
@@ -548,9 +532,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-
     }
-
    
     /**
      * Legacy note: [Zanda was trippin when he wrote this!]

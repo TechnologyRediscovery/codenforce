@@ -193,8 +193,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return sps;
     }
     
-    
-    
      /**
       * TODO : Finish!
       * @param m
@@ -269,8 +267,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         return sps;
     }
-     
-    
     
 //    CODE ENFORCEMENT CASE QUERIES
    
@@ -286,10 +282,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
 //            queryList.add(assembleQueryCECase(queryTitle, u, m, null));
 //        }
-
         queryList.add(assembleQueryCECase(QueryCECaseEnum.OPENCASES, u, m, null));
         return queryList;
-         
      }
      
      public QueryCECase runQuery(QueryCECase query) throws IntegrationException, CaseLifecyleException{
@@ -336,8 +330,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          query = new QueryCECase(qName, m, paramsList, u);
          query.setExecutedByIntegrator(false);
          return query;
-         
-         
      }
      
      

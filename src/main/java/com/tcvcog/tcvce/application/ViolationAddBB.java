@@ -123,7 +123,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         try {
              cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, 
                      getSessionBean().getcECaseQueue().get(0));
-             getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
+             getSessionBean().setSessionCECase(ci.getCECase(currentViolation.getCeCaseID()));
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
@@ -154,9 +154,9 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
         
-        currentViolation.setStipulatedComplianceDate(getStipulatedComplianceDate()
+        currentViolation.setStipulatedComplianceDate(stipulatedComplianceDate
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        currentViolation.setDateOfRecord(getDateOfRecord()
+        currentViolation.setDateOfRecord(dateOfRecord
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         currentViolation.setPenalty(penalty);
         currentViolation.setDescription(description);
@@ -164,9 +164,9 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         
         
         try {
-             currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, getSessionBean().getcECase()));
+             currentViolation.setViolationID(cc.attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, getSessionBean().getSessionCECase()));
              getSessionBean().setActiveCodeViolation(currentViolation);
-             getSessionBean().setcECase(ci.getCECase(currentViolation.getCeCaseID()));
+             getSessionBean().setSessionCECase(ci.getCECase(currentViolation.getCeCaseID()));
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
