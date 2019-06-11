@@ -112,7 +112,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
     private PropertyWithLists workingPropWithLists;
-    private ArrayList<Person> workingAttachedPersons;
     private PersonType activePersonType;
     
     /* *** Public Person Search/Edit Session Shelves *** */
@@ -710,12 +709,5 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.activeAnonPerson = activeAnonPerson;
     }
     
-    public ArrayList<Person> getWorkingAttachedPersons() {
-        return workingAttachedPersons;
-    }
-
-    public void setWorkingAttachedPersons(ArrayList<Person> workingAttachedPersons) {
-        this.workingAttachedPersons = workingAttachedPersons;
-    }
     
 }
