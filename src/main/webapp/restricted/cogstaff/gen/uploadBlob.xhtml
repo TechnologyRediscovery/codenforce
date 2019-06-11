@@ -10,7 +10,7 @@
         <title>Upload photographs and documents</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../../navContainer_restricted.xhtml">
+        <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="uploadBlobView">
                     
@@ -25,18 +25,19 @@
                         
                         <h:form id="uploadBlobFileUploadForm" enctype="multipart/form-data">
                             <h2>Choose a file and upload</h2>
-                            <p:fileUpload fileUploadListener="#{uploadBlobBB.handleBlobUpload}"
+                                <p:fileUpload fileUploadListener="#{uploadBlobBB.handleBlobUpload}"
                                 mode="advanced" 
                                 update=":uploadBlobReviewBlobsForm:blobTable"
                                 multiple="true"
+                                fileLimit="3" 
                                 sizeLimit="900000000" 
-                                allowTypes="/(\.|\/)(jpe?g|png|pdf)$/"/>    
+                                allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
                         </h:form>
                         
                         <p:spacer height="5px"/>
                                   
                         
-                        <h:form id="uploadBlobReviewBlobsForm">
+                        <h:form id="uploadBlobsReviewBlobsForm">
                             <h2>Review and describe uploaded photos and documents</h2>
                                     <p:dataTable
                                         id="blobTable"
@@ -49,14 +50,13 @@
                                             <f:facet name="header">
                                                 <h:outputText value="File Type"/>
                                             </f:facet>
-                                            <h:outputText value="#{blob.type.typeID}"/>
                                             <!-- file type dropdown here -->
                                         </p:column>
                                         <p:column width="70%">
                                             <f:facet name="header">
                                                 <h:outputText value="Photo"/>
                                             </f:facet>
-                                            <p:graphicImage width="50%" value="#{blobCoordinator.image}">
+                                            <p:graphicImage width="100%" value="#{blobCoordinator.image}">
                                                 <f:param name="blobID" value="#{blob.blobID}" />
                                             </p:graphicImage>
                                         </p:column>
@@ -75,8 +75,8 @@
                             <p:spacer height="5px"/>
                             
                             <p:commandButton  ajax="false" tabindex="12"
-                                              value="Save file types &amp; descriptions and proceed to file attachment" id="continueToLinkButton"
-                                              action="#{uploadBlobBB.navToLinkBlob}"/>
+                                              value="Save photos and proceed to contact details" id="continueToContactInfoButton"
+                                              action="#{cEActionRequestSubmitBB.savePhotos}"/>
                         </h:form>
                         
                     </div>
