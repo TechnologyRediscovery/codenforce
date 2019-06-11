@@ -10,5 +10,5 @@ ALTER TABLE ceactionrequest ADD CONSTRAINT ceactionreq_usersub_fk FOREIGN KEY (u
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (13, 'database/patches/dbpatch_beta13.sql', '', 'ecd', 'final clean ups');
+    VALUES (13, 'database/patches/dbpatch_beta13.sql', '05-30-2019', 'ecd', 'final clean ups');
 
