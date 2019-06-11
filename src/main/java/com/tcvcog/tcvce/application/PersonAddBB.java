@@ -72,8 +72,11 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
      */
     public PersonAddBB() {
     }
-    
-    public String addPerson(){
+    /**
+     * @deprecated 
+     * @return 
+     */
+    public String oldAddPerson(){
         Person p = new Person();
         PersonIntegrator personInt = getPersonIntegrator();
         
@@ -146,6 +149,36 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         return "personSearch";
     }
 
+    public String addPerson() {
+        
+        Person temp = new Person();
+        
+        temp.setFirstName(formFirstName);
+        
+        temp.setLastName(formLastName);
+        
+        temp.setAddressStreet(formAddress_street);
+        
+        temp.setAddressCity(formAddress_city);
+        
+        temp.setAddressState(formAddress_state);
+        
+        temp.setAddressZip(formAddress_zip);
+        
+        temp.setPhoneHome(formPhoneHome);
+        
+        temp.setPhoneCell(formPhoneCell);
+        
+        temp.setPhoneWork(formPhoneWork);
+        
+        temp.setEmail(formEmail);
+        
+        getSessionBean().getOccPermitApplication().getAttachedPersons().add(temp);
+        
+        return "managePeople";
+        
+    }
+    
     /**
      * @return the person
      */

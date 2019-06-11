@@ -157,7 +157,15 @@
 
                             <p:spacer height="10px"/>
 
-                            <p:outputLabel> Please identify yourself by selecting your name from the table below: </p:outputLabel>
+                            <p:outputLabel value="#{occPermitApplicationBB.personRequirementDescription.get(0)}"/>
+                            
+                            <p:spacer height="10px"/>
+                            
+                            <p:outputLabel value="#{occPermitApplicationBB.personRequirementDescription.get(1)}"/>
+                            
+                            <p:spacer height="10px"/>
+                            
+                            <p:outputLabel value="#{occPermitApplicationBB.personRequirementDescription.get(2)}"/>
 
                             <p:dataTable id="applicationPersonTable"
                                          var="applicationPerson" value="#{occPermitApplicationBB.attachedPersons}" 

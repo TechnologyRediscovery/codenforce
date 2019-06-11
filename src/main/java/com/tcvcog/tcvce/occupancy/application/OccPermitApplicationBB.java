@@ -65,7 +65,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     private Person newOwner;
     private Person contactPerson;
     private ArrayList<Person> newOccupants;
-    
+
     private ArrayList<PersonType> requiredPersons;
     private ArrayList<PersonType> optAndReqPersons;
 
@@ -122,28 +122,26 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             }
 
-            if (attachedPersons == null) {
-                attachedPersons = getSessionBean().getWorkingAttachedPersons();
+            if (attachedPersons == null && getSessionBean().getOccPermitApplication() != null) {
+                attachedPersons = getSessionBean().getOccPermitApplication().getAttachedPersons();
                 if (attachedPersons == null) {
                     attachedPersons = new ArrayList();
                 }
             }
 
         }
-        
-        if(getSessionBean().getOccPermitApplication() != null 
-                && getSessionBean().getOccPermitApplication().getReason() != null 
-                && getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement() != null) //I apologize for the ugly code. It is necessary to prevent a null pointer exception. - Nathan
-        {
+
+        if (getSessionBean().getOccPermitApplication() != null
+                && getSessionBean().getOccPermitApplication().getReason() != null
+                && getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement() != null) { //I apologize for the ugly code. It is necessary to prevent a null pointer exception. - Nathan
 
             requiredPersons = getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getRequiredPersonTypes();
-            
+
             optAndReqPersons = requiredPersons;
-            
+
             optAndReqPersons.addAll(getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes());
-            
+
         }
-            
 
     }
 
@@ -474,7 +472,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public void setOptAndReqPersons(ArrayList<PersonType> optAndReqPersons) {
         this.optAndReqPersons = optAndReqPersons;
     }
-    
+
     /**
      * Set the user-selected municipality. The property search will be done
      * within this municipality.
@@ -662,7 +660,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         if (workingPropUnits.isEmpty()) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please add a unit.", ""));
+                            "Please add at least one unit.", ""));
             return "";
         } else if (missingUnitNum) {
             getFacesContext().addMessage(null,
@@ -685,7 +683,63 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "addReason";
         }
     }
+    /**
+    * Finalizes the unit list the user has created so that it can be compared to
+    * the existing one in the database.
+    * @return 
+    */
+    public String finalizeUnitList(){
+        
+        boolean missingUnitNum = false;
+        boolean duplicateUnitNum = false;
+        int duplicateNums = 0; //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
 
+        for (PropertyUnit firstUnit : workingPropUnits) {
+            duplicateNums = 0;
+
+            if (firstUnit.getUnitNumber().compareTo("") == 0) {
+                missingUnitNum = true;
+                break; //break for performance reasons. Can be removed if breaks are not welcome here.
+            }
+
+            for (PropertyUnit secondUnit : workingPropUnits) {
+                if (firstUnit.getUnitNumber().compareTo(secondUnit.getUnitNumber()) == 0) {
+                    duplicateNums++;
+                }
+            }
+
+            if (duplicateNums > 1) {
+                duplicateUnitNum = true;
+                break; //break for performance reasons. Can be removed if breaks are not welcome here.
+            }
+        }
+
+        if (workingPropUnits.isEmpty()) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please add at least one unit.", ""));
+            return "";
+        } else if (missingUnitNum) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "All units must have a Unit Number", ""));
+            return "";
+
+        } else if (duplicateUnitNum) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Some Units have the same Number", ""));
+            return "";
+
+        } else {
+            getSessionBean().getOccPermitApplication().setMultiUnit(workingPropUnits.size() > 1); //if there is more than one unit on the workingPropUnits list, set it to multiunit.
+            getSessionBean().getWorkingPropWithLists().setUnitList(workingPropUnits);
+            getSessionBean().getActivePropWithLists().setUnitList(workingPropUnits); //This line is different from the original method (above)
+            return "???";
+        }
+        
+    }
+    
     /**
      * Checks that the user has not selected a multiunit property without also
      * selecting a property unit. Sends user to occPermitAddReason.xhtml
@@ -743,10 +797,35 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     }
 
     public void addPersonToApplication(Person person) {
+
+        boolean duplicateFlag = false;
+
         person.setPersonType(PersonType.Other);
-        attachedPersons.add(person);
+
+        for (Person test : attachedPersons) {
+
+            if (test.getPersonID() == person.getPersonID()) {
+
+                duplicateFlag = true;
+
+                break;
+
+            }
+
+        }
+
+        if (duplicateFlag) {
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "You already attached that person to the application.", ""));
+
+        } else {
+
+            attachedPersons.add(person);
+
+        }
     }
-    
+
     public void removePersonFromApplication(Person person) {
         attachedPersons.remove(person);
     }
@@ -764,48 +843,140 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     }
 
     public String addANewPerson() {
+        OccPermitApplication temp = getSessionBean().getOccPermitApplication();
+
+        for (Person p : attachedPersons) {
+
+            if (p.isApplicant()) {
+
+                if (applicant == null) {
+
+                    applicant = p;
+
+                } else {
+
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "You have identified multiple people as yourself.", ""));
+                    return "";
+
+                }
+
+            }
+
+        }
+
+        temp.setApplicantPerson(applicant);
+
+        temp.setAttachedPersons(attachedPersons);
+
         return "addPerson";
     }
 
-    public String reviewApplication() {
-        
-        applicant = null;
-        
-        for(Person p: attachedPersons)
-        {
-        
-            if(p.isApplicant())
-            {
-            
-                if(applicant == null)
-                {
-                
-                    applicant = p;
-                    
-                    
-                    
-                }
-                else
-                {
-                
-                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "You have identified multiple people as yourself.", ""));
-            return "";
-                    
-                }
-            
-            }
-        
+    public ArrayList<String> getPersonRequirementDescription() {
+
+        ArrayList<PersonType> required = requiredPersons;
+
+        ArrayList<PersonType> optional = getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
+
+        StringBuilder description = new StringBuilder("It is required that you have these types of people: ");
+
+        ArrayList<String> descList = new ArrayList<String>();
+
+        for (PersonType type : required) {
+
+            description.append(type.getLabel() + ", ");
+
         }
-        
+
+        description.deleteCharAt(description.lastIndexOf(","));
+
+        descList.add(description.toString());
+
+        description = new StringBuilder();
+
+        description.append("You may also add these types of people: ");
+
+        for (PersonType type : optional) {
+
+            description.append(type.getLabel() + ", ");
+
+        }
+
+        description.deleteCharAt(description.lastIndexOf(","));
+
+        descList.add(description.toString());
+
+        description = new StringBuilder();
+
+        description.append("Also, please identify yourself by checking the check box in the row with your name.");
+
+        descList.add(description.toString());
+
+        return descList;
+
+    }
+
+    public String reviewApplication() {
+
+        applicant = null;
+
+        ArrayList<Integer> countTypes = new ArrayList();
+
+        for (int index = 0; index < 17; index++) {
+
+            countTypes.add(0);
+
+        }
+        for (Person p : attachedPersons) {
+
+            int index = p.getPersonType().ordinal();
+
+            int temp = countTypes.get(index) + 1;
+
+            countTypes.set(index, temp);
+
+            if (p.isApplicant()) {
+
+                if (applicant == null) {
+
+                    applicant = p;
+
+                } else {
+
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "You have identified multiple people as yourself.", ""));
+                    return "";
+
+                }
+
+            }
+
+        }
+
+        for (PersonType type : requiredPersons) {
+
+            int index = type.ordinal();
+
+            if (countTypes.get(index) < 1) {
+
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "You are missing a " + type.getLabel(), ""));
+                return "";
+
+            }
+
+        }
+
         if (applicant == null) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Please identify yourself by selecting your name from the list below.", ""));
             return "";
         }
-        
+
         getSessionBean().getOccPermitApplication().setApplicantPerson(applicant);
-        
+
+        getSessionBean().getOccPermitApplication().setAttachedPersons(attachedPersons);
+
         return "reviewApplication";
     }
 
