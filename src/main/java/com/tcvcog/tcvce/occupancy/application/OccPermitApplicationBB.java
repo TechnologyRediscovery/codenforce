@@ -65,6 +65,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     private Person newOwner;
     private Person contactPerson;
     private ArrayList<Person> newOccupants;
+    
+    private ArrayList<PersonType> requiredPersons;
+    private ArrayList<PersonType> optAndReqPersons;
 
     private SearchParamsPersons params;
 
@@ -127,6 +130,20 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             }
 
         }
+        
+        if(getSessionBean().getOccPermitApplication() != null 
+                && getSessionBean().getOccPermitApplication().getReason() != null 
+                && getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement() != null) //I apologize for the ugly code. It is necessary to prevent a null pointer exception. - Nathan
+        {
+
+            requiredPersons = getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getRequiredPersonTypes();
+            
+            optAndReqPersons = requiredPersons;
+            
+            optAndReqPersons.addAll(getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes());
+            
+        }
+            
 
     }
 
@@ -442,6 +459,22 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         this.applicationPerson = applicationPerson;
     }
 
+    public ArrayList<PersonType> getRequiredPersons() {
+        return requiredPersons;
+    }
+
+    public void setRequiredPersons(ArrayList<PersonType> requiredPersons) {
+        this.requiredPersons = requiredPersons;
+    }
+
+    public ArrayList<PersonType> getOptAndReqPersons() {
+        return optAndReqPersons;
+    }
+
+    public void setOptAndReqPersons(ArrayList<PersonType> optAndReqPersons) {
+        this.optAndReqPersons = optAndReqPersons;
+    }
+    
     /**
      * Set the user-selected municipality. The property search will be done
      * within this municipality.
@@ -710,8 +743,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     }
 
     public void addPersonToApplication(Person person) {
-        person.setPersonType(getSessionBean().getActivePersonType());
+        person.setPersonType(PersonType.Other);
         attachedPersons.add(person);
+    }
+    
+    public void removePersonFromApplication(Person person) {
+        attachedPersons.remove(person);
     }
 
     public String editPersonInfo(Person person) {
@@ -731,11 +768,44 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     }
 
     public String reviewApplication() {
-        if (getSessionBean().getOccPermitApplication().getApplicantPerson() == null) {
+        
+        applicant = null;
+        
+        for(Person p: attachedPersons)
+        {
+        
+            if(p.isApplicant())
+            {
+            
+                if(applicant == null)
+                {
+                
+                    applicant = p;
+                    
+                    
+                    
+                }
+                else
+                {
+                
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "You have identified multiple people as yourself.", ""));
+            return "";
+                    
+                }
+            
+            }
+        
+        }
+        
+        if (applicant == null) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Please identify yourself by selecting your name from the list below.", ""));
             return "";
         }
+        
+        getSessionBean().getOccPermitApplication().setApplicantPerson(applicant);
+        
         return "reviewApplication";
     }
 
