@@ -26,6 +26,9 @@
                             <h1>Add People to Application</h1>
 
                             <p:outputLabel value="The selected reason for the application is: #{sessionBean.occPermitApplication.reason.title}"/>
+                            <p:spacer height="5px"/>
+                                <p:outputLabel value="#{sessionBean.occPermitApplication.reason.humanFriendlyDescription}"/>
+                                
                             <ui:remove>
                                 <p:spacer height="5px"/>
                                 <p:outputLabel value="#{sessionBean.occPermitApplication.reason.humanFriendlyDescription}"/>
@@ -139,7 +142,7 @@
                                         </p:column>
 
                                         <p:column>
-                                            <p:commandButton ajax="true" update=":personsRequirementManageForm:applicationPersonTable" id="attach-person-cb" value="Attach" action="#{occPermitApplicationBB.addPersonToApplication(person)}"/>
+                                            <p:commandButton ajax="true" update=":personsRequirementManageForm:applicationPersonTable" action="#{occPermitApplicationBB.addPersonToApplication(person)}" id="attach-person-cb" value="Attach" />
                                         </p:column>
                                         <!--
                                             <p:column>
@@ -157,21 +160,42 @@
                             <p:outputLabel> Please identify yourself by selecting your name from the table below: </p:outputLabel>
 
                             <p:dataTable id="applicationPersonTable"
-                                         var="applicationPerson" value="#{OccPermitApplicationBB.attachedPersons}" 
+                                         var="applicationPerson" value="#{occPermitApplicationBB.attachedPersons}" 
                                          selectionMode="single"
-                                         rowKey="#{applicationPerson.personID}">                                
+                                         selection="#{occPermitApplicationBB.applicant}"
+                                         scrollable="true" scrollHeight="300"
+                                         rowKey="#{applicationPerson.personID}"
+                                         editable="true">                                
                                 <p:column headerText="Name">
                                     <h:outputText value="#{applicationPerson.firstName} #{applicationPerson.lastName}"/>
                                 </p:column>
 
                                 <p:column headerText="Person Type">
-                                    <h:outputText value="#{applicationPerson.personType}"/>
-                                </p:column>                            
+                                    <p:selectOneMenu value="#{applicationPerson.personType}">
+                                        <f:selectItems value="#{occPermitApplicationBB.optAndReqPersons}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
+                                    </p:selectOneMenu> 
+                                </p:column>  
+
+                                <p:column headerText="This is me">
+                                    <h:selectBooleanCheckbox value="#{applicationPerson.applicant}"/>
+                                </p:column>
+
+                                <p:column headerText="Edit?">
+
+                                    <p:rowEditor/>
+                                </p:column>
+
+                                <p:column>
+                                    <p:commandButton ajax="true" value="Remove" 
+                                                     action="#{occPermitApplicationBB.removePersonFromApplication(applicationPerson)}"
+                                                     update="#{p:component('applicationPersonTable')}"
+                                                     /> 
+                                </p:column>
 
                             </p:dataTable>
 
 
-                            <p:commandButton ajax="false" value="Review application" disabled="#{!sessionBean.occPermitApplication.reason.personsRequirement.requirementSatisfied}"
+                            <p:commandButton ajax="false" value="Review application"
                                              action="#{occPermitApplicationBB.reviewApplication}"/>
 
                         </h:form>
