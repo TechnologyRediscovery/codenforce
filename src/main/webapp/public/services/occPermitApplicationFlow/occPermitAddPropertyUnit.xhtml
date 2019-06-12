@@ -98,6 +98,12 @@
                                                  action="#{occPermitApplicationBB.addUnitToNewPropUnits}" 
                                                  update="propertyUnitsToAddTable"
                                                  value="Add unit"/>
+                                
+                                <p:spacer width="10px"/>
+                                
+                                <p:commandButton ajax="false"                                                   
+                                                 action="#{occPermitApplicationBB.finalizeUnitList()}" 
+                                                 value="Confirm and Continue"/>
 
                             </p:panel>
                             <h:message for="notesInputText" showDetail="true" showSummary="true" 
