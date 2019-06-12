@@ -735,7 +735,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             getSessionBean().getOccPermitApplication().setMultiUnit(workingPropUnits.size() > 1); //if there is more than one unit on the workingPropUnits list, set it to multiunit.
             getSessionBean().getWorkingPropWithLists().setUnitList(workingPropUnits);
             getSessionBean().getActivePropWithLists().setUnitList(workingPropUnits); //This line is different from the original method (above)
-            return "???";
+            return "selectForApply";
         }
         
     }
