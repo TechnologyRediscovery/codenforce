@@ -18,49 +18,8 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Step 3/5: Please select units for application</h1>                        
+                        <h1>Please select a unit</h1>                        
                         <h:form id="occPermitSelectForApplyForm">
-
-                            <p:panel>
-                                <h3>Step 1: Select Property</h3>
-                                
-                                <p:outputLabel>Chosen property:</p:outputLabel>
-
-                                <p:dataTable
-                                    id="chosenPropertyTable"
-                                    var="prop" 
-                                    value="#{sessionBean.activePropWithLists}"
-                                    rowKey="#{prop.propertyID}">
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Address" />
-                                        </f:facet>
-                                        <h:outputText value="#{prop.address}"/>
-                                    </p:column>
-
-
-                                    <p:column>
-
-                                        <f:facet name="header">
-                                            <h:outputText value="Type" />
-                                        </f:facet>
-                                        <h:outputText value="#{prop.propertyUseTypeString}"/>
-
-                                    </p:column>
-
-                                </p:dataTable>
-
-                            </p:panel>
-
-                            <p:panel>
-                                <h3>Step 2: Configure Unit List</h3>
-
-                                <p:outputLabel>You have configured your units. You may see the list below.</p:outputLabel>
-
-                            </p:panel>
-                            <h2 id="currentStep">Step 3: Select Units For Application</h2>
-
 
                             <p:outputLabel value="From here you may select the properties you would like to apply for occupancy. 
                                            You can only apply for units one at a time, but after filling out each application
@@ -70,6 +29,7 @@
                                 id="propertyUnitsToAddTable"
                                 var="unit"
                                 value="#{occPermitApplicationBB.workingPropUnits}"
+                                scrollable="true" scrollHeight="150"
                                 selectionMode="single" tabindex="1"
                                 selection="#{occPermitApplicationBB.selectedUnit}"
                                 rowKey="#{unit.unitID}"
@@ -79,21 +39,21 @@
                                     <f:facet name="header">
                                         <h:outputText value="Unit Number" />
                                     </f:facet>
-                                    <h:outputText value="#{unit.unitNumber}" />
+                                        <h:outputText value="#{unit.unitNumber}" />
                                 </p:column>
 
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Rental?" />
                                     </f:facet>
-                                    <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
                                 </p:column>
 
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Unit Description" />
                                     </f:facet>
-                                    <h:outputText value="#{unit.notes}" />
+                                        <h:outputText value="#{unit.notes}" />
                                 </p:column>
 
                                 <p:column>
@@ -108,18 +68,8 @@
 
                             <p:spacer height="5px" />
 
-                            <h3>Step 4: Choose Reason For Application</h3>
 
-                            <p:outputLabel>...</p:outputLabel>
 
-                            <h3>Step 5: Add People To Application</h3>
-
-                            <p:outputLabel>...</p:outputLabel>
-
-                            <ui:remove> <p:spacer height="10px"/>
-                                <p:commandButton ajax="false" value="Confirm and continue"/></ui:remove>
-                                
-                            
                         </h:form>
                     </div>
                 </f:view>

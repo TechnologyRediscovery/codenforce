@@ -17,40 +17,28 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
- * Models the entity: Property Unit Change Order.Public users compile lists of
- * the units in their property while applying for occupancy.Before applying any
- * changes to our records, they await approval as one of these entities.
- *
+ * Models the entity: Property Unit Change Order.Public users compile lists of the units in their property
+ * while applying for occupancy.Before applying any changes to our records, they await approval as one of
+ * these entities.
+ * 
  * @author Nathan Dietz
  */
 public class PropertyUnitChange {
-
+    
     private int unitChangeID;
-    private ChangeOrderAction action; //not in the database, used by interface
+    private int changedBy; //personID of the person who changed the unit.
     private int unitID;
-    private String unitNumber;
+    private int approvedBy; //personID of the user that approved the change (a backend operation)
     private String otherKnownAddress;
     private String notes;
     private boolean rental;
-    private boolean boolChanged; //this stores if the rental variable was changed, not whether or not the unit is a rental.
     private boolean removed;
-    private boolean added;
-    private java.sql.Timestamp changedOn;
-    private java.sql.Timestamp approvedOn; //If null, it has not been approved
-    private int propertyUnitID;
-    private User approvedBy; 
-    private int propertyID;
-    private boolean active;
-    
-    // Nathan's fields to deprecate
-    private String changedBy; 
-    
-    
+    private java.time.LocalDateTime changedOn;
+    private java.time.LocalDateTime approvedOn; //If null, it has not been approved
+
     public int getUnitChangeID() {
         return unitChangeID;
     }
@@ -59,11 +47,11 @@ public class PropertyUnitChange {
         this.unitChangeID = unitChangeID;
     }
 
-    public String getChangedBy() {
+    public int getChangedBy() {
         return changedBy;
     }
 
-    public void setChangedBy(String changedBy) {
+    public void setChangedBy(int changedBy) {
         this.changedBy = changedBy;
     }
 
@@ -75,19 +63,11 @@ public class PropertyUnitChange {
         this.unitID = unitID;
     }
 
-    public String getUnitNumber() {
-        return unitNumber;
-    }
-
-    public void setUnitNumber(String unitNumber) {
-        this.unitNumber = unitNumber;
-    }
-
-    public User getApprovedBy() {
+    public int getApprovedBy() {
         return approvedBy;
     }
 
-    public void setApprovedBy(User approvedBy) {
+    public void setApprovedBy(int approvedBy) {
         this.approvedBy = approvedBy;
     }
 
@@ -112,8 +92,6 @@ public class PropertyUnitChange {
     }
 
     public void setRental(boolean rental) {
-
-        boolChanged = true;
         this.rental = rental;
     }
 
@@ -125,156 +103,20 @@ public class PropertyUnitChange {
         this.removed = removed;
     }
 
-    public Timestamp getChangedOn() {
+    public LocalDateTime getChangedOn() {
         return changedOn;
     }
 
-    public void setChangedOn(Timestamp changedOn) {
+    public void setChangedOn(LocalDateTime changedOn) {
         this.changedOn = changedOn;
     }
 
-    public Timestamp getApprovedOn() {
+    public LocalDateTime getApprovedOn() {
         return approvedOn;
     }
 
-    public void setApprovedOn(Timestamp approvedOn) {
+    public void setApprovedOn(LocalDateTime approvedOn) {
         this.approvedOn = approvedOn;
-    }
-
-    public boolean isBoolChanged() {
-        return boolChanged;
-    }
-
-    public boolean isAdded() {
-        return added;
-    }
-
-    public void setAdded(boolean added) {
-        
-        this.added = added;
-    }
-
-  
-
-    public PropertyUnit toPropertyUnit() {
-        
-        PropertyIntegrator pi = new PropertyIntegrator();
-        
-        PropertyUnit skeleton = new PropertyUnit();
-        
-        skeleton.setUnitNumber(unitNumber);
-        
-        
-        skeleton.setNotes(notes);
-        
-        skeleton.setOtherKnownAddress(otherKnownAddress);
-        
-        try {
-            skeleton.setPropertyID(pi.getProperty(propertyID).getPropertyID());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        return skeleton;
-        
-    }
-    
-    /**
-     * USE SPARINGLY.This variable is already managed by setRental.
-     *
-     * @param boolChanged
-     */
-    public void setBoolChanged(boolean boolChanged) {
-        this.boolChanged = boolChanged;
-    }
-    
-    /**
-     * Detects if the unit has actually been changed.
-     * @return 
-     */
-    public boolean changedOccured() {
-
-        boolean temp = false;
-
-        if (otherKnownAddress != null) {
-
-            temp = true;
-        }
-
-        if (notes != null) {
-
-            temp = true;
-        }
-
-        if (boolChanged == true) {
-
-            temp = true;
-
-        }
-        
-        return temp;
-
-    }
-
-    public int getPropertyUnitID() {
-        return propertyUnitID;
-    }
-
-    public void setPropertyUnitID(int unitID) {
-        this.propertyUnitID = unitID;
-    }
-
-    public int getPropertyID() {
-        return propertyID;
-    }
-
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
-    }
-
-    public ChangeOrderAction getAction() {
-        return action;
-    }
-
-    public void setAction(ChangeOrderAction action) {
-        this.action = action;
-    }
-    
-    public String newOrRemoved(){
-        
-        String output = "";
-        
-        if(removed == true)
-        {
-            output = "Removed";
-            
-        }
-        else if(added == true) {
-            
-            output = "Added";
-        }
-        else {
-            
-            output = "Edited";
-            
-        }
-        
-        return output;
-        
-    }
-
-    /**
-     * @return the active
-     */
-    public boolean isActive() {
-        return active;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(boolean active) {
-        this.active = active;
     }
     
     
