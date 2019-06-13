@@ -14,6 +14,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitChange;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -678,17 +679,19 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             unit.setThisProperty(getSessionBean().getActivePropWithLists());
             getSessionBean().setActivePropUnit(unit);
             getSessionBean().getOccPermitApplication().setApplicationPropertyUnit(unit);
-            
+
             return "addReason";
         }
     }
+
     /**
-    * Finalizes the unit list the user has created so that it can be compared to
-    * the existing one in the database.
-    * @return 
-    */
-    public String finalizeUnitList(){
-        
+     * Finalizes the unit list the user has created so that it can be compared
+     * to the existing one in the database.
+     *
+     * @return
+     */
+    public String finalizeUnitList() {
+
         boolean missingUnitNum = false;
         boolean duplicateUnitNum = false;
         int duplicateNums = 0; //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
@@ -736,9 +739,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             getSessionBean().getActivePropWithLists().setUnitList(workingPropUnits); //This line is different from the original method (above)
             return "selectForApply";
         }
-        
+
     }
-    
+
     /**
      * Checks that the user has not selected a multiunit property without also
      * selecting a property unit. Sends user to occPermitAddReason.xhtml
@@ -901,11 +904,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
-        if(optional.size() > 0)
-        {
-        description.deleteCharAt(description.lastIndexOf(","));
+        if (optional.size() > 0) {
+            description.deleteCharAt(description.lastIndexOf(","));
         }
-        
+
         descList.add(description.toString());
 
         description = new StringBuilder();
@@ -983,7 +985,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     }
 
     public String submitApplication() {
-        
+
+        submitUnitChangeList();
+
         OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
         try {
             int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getOccPermitApplication());
@@ -995,11 +999,99 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         return "selectForApply";
     }
-    
+
     public void submitUnitChangeList() {
+
+        ArrayList<PropertyUnitChange> changeList = new ArrayList<PropertyUnitChange>();
+
+        for (PropertyUnit workingUnit : workingPropUnits) {
+
+            PropertyUnitChange skeleton = new PropertyUnitChange();
+
+            boolean added = true;
+
+            for (PropertyUnit activeUnit : propWithLists.getUnitList()) {
+
+                if (workingUnit.getUnitID() == activeUnit.getUnitID()) {
+
+                    added = false;
+
+                    skeleton.setUnitID(workingUnit.getUnitID());
+
+                    if (workingUnit.getOtherKnownAddress() != null && workingUnit.getOtherKnownAddress().compareToIgnoreCase(activeUnit.getOtherKnownAddress()) != 0) {
+
+                        skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
+
+                    }
+
+                    if (workingUnit.getNotes().compareToIgnoreCase(activeUnit.getNotes()) != 0) {
+
+                        skeleton.setNotes(workingUnit.getNotes());
+
+                    }
+
+                    if (workingUnit.isRental() != activeUnit.isRental()) {
+
+                        skeleton.setRental(workingUnit.isRental());
+
+                    }
+
+                }
+
+            }
+
+            if (added == true) {
+
+                skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
+
+                skeleton.setNotes(workingUnit.getNotes());
+
+                skeleton.setRental(workingUnit.isRental());
+
+            }
+
+            skeleton.setAdded(added);
+
+            if (skeleton.changedOccured()) {
+
+                changeList.add(skeleton);
+            }
+
+        }
+
+        for (PropertyUnit activeUnit : propWithLists.getUnitList()) {
+
+            PropertyUnitChange skeleton = new PropertyUnitChange();
+
+            boolean removed = true;
+
+            for (PropertyUnit workingUnit : workingPropUnits) {
+
+                if (workingUnit.getUnitID() == activeUnit.getUnitID()) {
+
+                    removed = false;
+
+                }
+
+            }
+
+            if (removed == true) {
+
+                skeleton.setOtherKnownAddress(activeUnit.getOtherKnownAddress());
+
+                skeleton.setNotes(activeUnit.getNotes());
+
+                skeleton.setRental(activeUnit.isRental());
+
+                skeleton.setRemoved(removed);
+
+                changeList.add(skeleton);
+
+            }
+
+        }
         
-        
-        
+        System.out.println("end of submitting unit change list");
     }
 
 }
