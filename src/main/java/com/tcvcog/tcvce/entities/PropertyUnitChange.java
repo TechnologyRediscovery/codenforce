@@ -1,0 +1,123 @@
+/*
+ * Copyright (C) 2017 Turtle Creek Valley
+Council of Governments, PA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.tcvcog.tcvce.entities;
+
+import java.time.LocalDateTime;
+
+/**
+ * Models the entity: Property Unit Change Order.Public users compile lists of the units in their property
+ * while applying for occupancy.Before applying any changes to our records, they await approval as one of
+ * these entities.
+ * 
+ * @author Nathan Dietz
+ */
+public class PropertyUnitChange {
+    
+    private int unitChangeID;
+    private int changedBy; //personID of the person who changed the unit.
+    private int unitID;
+    private int approvedBy; //personID of the user that approved the change (a backend operation)
+    private String otherKnownAddress;
+    private String notes;
+    private boolean rental;
+    private boolean removed;
+    private java.time.LocalDateTime changedOn;
+    private java.time.LocalDateTime approvedOn; //If null, it has not been approved
+
+    public int getUnitChangeID() {
+        return unitChangeID;
+    }
+
+    public void setUnitChangeID(int unitChangeID) {
+        this.unitChangeID = unitChangeID;
+    }
+
+    public int getChangedBy() {
+        return changedBy;
+    }
+
+    public void setChangedBy(int changedBy) {
+        this.changedBy = changedBy;
+    }
+
+    public int getUnitID() {
+        return unitID;
+    }
+
+    public void setUnitID(int unitID) {
+        this.unitID = unitID;
+    }
+
+    public int getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(int approvedBy) {
+        this.approvedBy = approvedBy;
+    }
+
+    public String getOtherKnownAddress() {
+        return otherKnownAddress;
+    }
+
+    public void setOtherKnownAddress(String otherKnownAddress) {
+        this.otherKnownAddress = otherKnownAddress;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public boolean isRental() {
+        return rental;
+    }
+
+    public void setRental(boolean rental) {
+        this.rental = rental;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
+
+    public LocalDateTime getChangedOn() {
+        return changedOn;
+    }
+
+    public void setChangedOn(LocalDateTime changedOn) {
+        this.changedOn = changedOn;
+    }
+
+    public LocalDateTime getApprovedOn() {
+        return approvedOn;
+    }
+
+    public void setApprovedOn(LocalDateTime approvedOn) {
+        this.approvedOn = approvedOn;
+    }
+    
+    
+}

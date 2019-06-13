@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Add reason to occupancy permit application</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="occPermitApplicationFlowView">
+
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        <h1>Please select a unit</h1>                        
+                        <h:form id="occPermitSelectForApplyForm">
+
+                            <p:outputLabel value="From here you may select the properties you would like to apply for occupancy. 
+                                           You can only apply for units one at a time, but after filling out each application
+                                           you will return to this page and may continue." />
+
+                            <p:dataTable
+                                id="propertyUnitsToAddTable"
+                                var="unit"
+                                value="#{occPermitApplicationBB.workingPropUnits}"
+                                scrollable="true" scrollHeight="150"
+                                selectionMode="single" tabindex="1"
+                                selection="#{occPermitApplicationBB.selectedUnit}"
+                                rowKey="#{unit.unitID}"
+                                >                                         
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Unit Number" />
+                                    </f:facet>
+                                        <h:outputText value="#{unit.unitNumber}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Rental?" />
+                                    </f:facet>
+                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Unit Description" />
+                                    </f:facet>
+                                        <h:outputText value="#{unit.notes}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Apply?"/>
+                                    </f:facet>
+                                    <p:commandButton ajax="false" value="Select Unit" 
+                                                     action="#{occPermitApplicationBB.selectPropertyUnit(unit)}"/>
+                                </p:column>
+
+                            </p:dataTable>
+
+                            <p:spacer height="5px" />
+
+
+
+                        </h:form>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
