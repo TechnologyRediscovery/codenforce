@@ -678,8 +678,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             unit.setThisProperty(getSessionBean().getActivePropWithLists());
             getSessionBean().setActivePropUnit(unit);
             getSessionBean().getOccPermitApplication().setApplicationPropertyUnit(unit);
-            getSessionBean().getOccPermitApplication().setMultiUnit(workingPropUnits.size() > 1); //if there is more than one unit on the workingPropUnits list, set it to multiunit.
-            getSessionBean().getWorkingPropWithLists().setUnitList(workingPropUnits);
+            
             return "addReason";
         }
     }
@@ -902,8 +901,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
+        if(optional.size() > 0)
+        {
         description.deleteCharAt(description.lastIndexOf(","));
-
+        }
+        
         descList.add(description.toString());
 
         description = new StringBuilder();
@@ -981,6 +983,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     }
 
     public String submitApplication() {
+        
         OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
         try {
             int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getOccPermitApplication());
@@ -990,6 +993,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             System.out.println(ex);
         }
 
-        return "addPropertyUnit";
+        return "selectForApply";
     }
+    
+    public void submitUnitChangeList() {
+        
+        
+        
+    }
+
 }

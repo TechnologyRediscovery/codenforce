@@ -24,9 +24,17 @@
 
                             <p:panel>
 
-                                <p:outputLabel value="Please fill out the table below with all of the units you would like to apply for occupancy. 
-                                               Press &quot;Add Unit&quot; to add an empty unit, and click the pencil in the edit column to fill out the information.
-                                               The Unit Number is required, a description may be left blank. The description should just describe what the room is (e.g. basement)" />
+                                <p:outputLabel value="Before applying for occupancy, 
+                                               please create a complete list of 
+                                               all the units in the property, including 
+                                               those that you do not want to apply for.
+                                               Press &quot;Add Unit&quot; to add
+                                               an empty unit, and click the pencil 
+                                               in the edit column to fill out the information.
+                                               The Unit Number is required, a 
+                                               description may be left blank. 
+                                               The description should just 
+                                               describe what the room is (e.g. basement)" />
                                 <p:dataTable
                                     id="propertyUnitsToAddTable"
                                     var="unit"
@@ -82,14 +90,6 @@
                                                          action="#{occPermitApplicationBB.removeSelectedUnit(unit)}"
                                                          update="#{p:component('propertyUnitsToAddTable')}
                                                          occPermitApplicationAddPropertyUnitForm"/>                                      
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Apply?"/>
-                                        </f:facet>
-                                        <p:commandButton ajax="false" value="Select property" 
-                                                         action="#{occPermitApplicationBB.selectPropertyUnit(unit)}"/>
                                     </p:column>
 
                                 </p:dataTable>

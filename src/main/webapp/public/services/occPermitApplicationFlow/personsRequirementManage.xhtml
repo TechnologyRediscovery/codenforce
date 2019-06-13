@@ -17,9 +17,10 @@
 
                     <div class="mainContainer">
 
+                        <h:form id="messageForm">
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-
+                        </h:form>
 
                         <h:form id="personsRequirementManageForm">
 
@@ -142,7 +143,11 @@
                                         </p:column>
 
                                         <p:column>
-                                            <p:commandButton ajax="true" update=":personsRequirementManageForm:applicationPersonTable" action="#{occPermitApplicationBB.addPersonToApplication(person)}" id="attach-person-cb" value="Attach" />
+                                            <p:commandButton ajax="true" 
+                                                             update=":personsRequirementManageForm:applicationPersonTable
+                                                                     :messageForm" 
+                                                             action="#{occPermitApplicationBB.addPersonToApplication(person)}" 
+                                                             id="attach-person-cb" value="Attach" />
                                         </p:column>
                                         <!--
                                             <p:column>
