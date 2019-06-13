@@ -20,14 +20,14 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- * Models the entity: Property Unit Change Order.Public users compile lists of the units in their property
- * while applying for occupancy.Before applying any changes to our records, they await approval as one of
- * these entities.
- * 
+ * Models the entity: Property Unit Change Order.Public users compile lists of
+ * the units in their property while applying for occupancy.Before applying any
+ * changes to our records, they await approval as one of these entities.
+ *
  * @author Nathan Dietz
  */
 public class PropertyUnitChange {
-    
+
     private int unitChangeID;
     private int changedBy; //personID of the person who changed the unit.
     private int unitID;
@@ -35,7 +35,9 @@ public class PropertyUnitChange {
     private String otherKnownAddress;
     private String notes;
     private boolean rental;
+    private boolean boolChanged; //this stores if the rental variable was changed, not whether or not the unit is a rental.
     private boolean removed;
+    private boolean added;
     private java.time.LocalDateTime changedOn;
     private java.time.LocalDateTime approvedOn; //If null, it has not been approved
 
@@ -92,6 +94,8 @@ public class PropertyUnitChange {
     }
 
     public void setRental(boolean rental) {
+
+        boolChanged = true;
         this.rental = rental;
     }
 
@@ -118,6 +122,57 @@ public class PropertyUnitChange {
     public void setApprovedOn(LocalDateTime approvedOn) {
         this.approvedOn = approvedOn;
     }
+
+    public boolean isBoolChanged() {
+        return boolChanged;
+    }
+
+    public boolean isAdded() {
+        return added;
+    }
+
+    public void setAdded(boolean added) {
+        
+        this.added = added;
+    }
+
     
     
+    /**
+     * USE SPARAINGLY.This variable is already managed by setRental.
+     *
+     * @param boolChanged
+     */
+    public void setBoolChanged(boolean boolChanged) {
+        this.boolChanged = boolChanged;
+    }
+    
+    /**
+     * Detects if the unit has actually been changed.
+     * @return 
+     */
+    public boolean changedOccured() {
+
+        boolean temp = false;
+
+        if (otherKnownAddress != null) {
+
+            temp = true;
+        }
+
+        if (notes != null) {
+
+            temp = true;
+        }
+
+        if (boolChanged == true) {
+
+            temp = true;
+
+        }
+        
+        return temp;
+
+    }
+
 }
