@@ -5,10 +5,11 @@ ALTER TABLE ceactionrequest ADD CONSTRAINT ceactionreq_usersub_fk FOREIGN KEY (u
 
 -- add stipulated compliance that freeze in time when added to a notice of violation
 
+ALTER TYPE ceeventtype ADD VALUE IF NOT EXISTS 'Citation' AFTER 'Compliance';
 
 CREATE SEQUENCE IF NOT EXISTS occperiodid_seq
 	START WITH 1000
-	INCREMENT BY 1
+	INCREMENT BY 1 
 	MINVALUE 1000
 	NO MAXVALUE 
 	CACHE 1;
@@ -30,7 +31,9 @@ CREATE TABLE public.occperiod
 ) ;
 
 
+-- Has not been run on remote server
+
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (13, 'database/patches/dbpatch_beta13.sql', '', 'ecd', 'final clean ups');
+    VALUES (14, 'database/patches/dbpatch_beta13.sql', '', 'ecd', 'final clean ups');
 

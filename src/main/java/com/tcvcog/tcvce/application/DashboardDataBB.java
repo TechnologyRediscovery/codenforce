@@ -115,7 +115,7 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
     private Map<String, Integer> getCaseCountMap(){
         Map<String, Integer> caseCountMap = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        SessionSystemCoordinator ssc = getSsCoordinator();
+        SessionSystemCoordinator ssc = getSessionSystemCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         try {
              caseCountMap = si.getCaseCountsByPhase(getSessionBean().getActiveMuni().getMuniCode());

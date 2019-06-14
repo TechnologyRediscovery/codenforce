@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -121,12 +122,14 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     private void generateCEARReasonDonutModel() {
+        DataCoordinator dc = getDataCoordinator();
+        
         if(requestList != null && requestList.size() > 0){
 
             CaseCoordinator cc = getCaseCoordinator();
             DonutChartModel donut =  new DonutChartModel();
 
-            donut.addCircle(cc.computeCountsByCEARReason(requestList));
+            donut.addCircle(dc.computeCountsByCEARReason(requestList));
 
             donut.setTitle("Requests by reason");
             donut.setLegendPosition("nw");

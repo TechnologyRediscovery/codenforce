@@ -596,13 +596,15 @@
                                                                 
                                                                 <div class="rowExpansion">
                                                                     <h:outputText styleClass="bold" value="Description: " />
-                                                                    <h:outputText styleClass="weight-normal" value="#{e.event.description}"/>
+                                                                    <h:outputText styleClass="weight-normal" 
+                                                                                  value="#{e.event.description}"
+                                                                                  escape="false"/>
                                                                 </div>
                                                                 <div class="rowExpansion">
                                                                     <h:outputText styleClass="bold" value="Notes: " 
                                                                                   rendered="#{!(empty e.event.notes)}"/>
                                                                     <h:outputText styleClass="weight-normal" 
-                                                                                  value="#{e.event.notes}"
+                                                                                  value="#{e.event.notes}" escape="false"
                                                                                   rendered="#{!(empty e.event.notes)}"/>
                                                                 </div>
                                                             </f:facet>

@@ -48,6 +48,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import javax.annotation.PostConstruct;
+import org.primefaces.model.DashboardModel;
 
 /**
  *
@@ -59,6 +61,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private Municipality currentMuni;
     private ArrayList<Municipality> muniList;
     private Municipality selectedMuni;
+    
+    private DashboardModel mainDash;
     
     private ArrayList<EventCECaseCasePropBundle> timelineEventList;
     private ArrayList<EventCECaseCasePropBundle> filteredEventWithCasePropList;
@@ -73,6 +77,17 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      */
     public MissionControlBB() {
     }
+    
+    @PostConstruct
+    public void initBean(){
+        
+    }
+    
+    private DashBoardModel generateMainDash(){
+        
+    }
+    
+    
     
     public void testPDF(ActionEvent ev){
         String DEST = "/home/sylvia/GlassFish_Server/glassfish/domains/domain1/applications/helloPDF.pdf";

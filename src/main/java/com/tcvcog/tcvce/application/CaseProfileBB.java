@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
@@ -65,7 +66,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private CasePhase selectedCasePhase;
     private CaseStage[] caseStageArray;
 
-    private DonutChartModel violationDOnut;
+    private DonutChartModel violationDonut;
     
     private List<CECase> caseList;
     private ArrayList<CECase> filteredCaseList;
@@ -188,17 +189,17 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
    private void generateViolationDonut(){
-       CaseCoordinator cc = getCaseCoordinator();
+       DataCoordinator dc = getDataCoordinator();
        if(caseList != null && caseList.size() >= 1){
            DonutChartModel d = new DonutChartModel();
-           d.addCircle(cc.computeViolationFrequencyStringMap(caseList));
+           d.addCircle(dc.computeViolationFrequencyStringMap(caseList));
            
            d.setTitle("Violation frequency: all listed cases");
            d.setLegendPosition("s");
            d.setShowDataLabels(true);
            d.setShowDatatip(true);
            d.setSeriesColors(sytleClassClosed);
-            violationDOnut = d;
+            violationDonut = d;
           
        }
    }
@@ -1750,17 +1751,17 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the violationDOnut
+     * @return the violationDonut
      */
-    public DonutChartModel getViolationDOnut() {
-        return violationDOnut;
+    public DonutChartModel getViolationDonut() {
+        return violationDonut;
     }
 
     /**
-     * @param violationDOnut the violationDOnut to set
+     * @param violationDonut the violationDonut to set
      */
-    public void setViolationDOnut(DonutChartModel violationDOnut) {
-        this.violationDOnut = violationDOnut;
+    public void setViolationDonut(DonutChartModel violationDonut) {
+        this.violationDonut = violationDonut;
     }
 
 }

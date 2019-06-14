@@ -1535,4 +1535,9 @@
         <managed-bean-class>com.tcvcog.tcvce.application.PersonEditPublicBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>dataCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
 </faces-config>
