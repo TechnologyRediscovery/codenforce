@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitChange;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
@@ -31,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -552,6 +554,48 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         pu.setThisProperty(getProperty(rs.getInt("property_propertyid")));
         pu.setPropertyUnitPeople(persInt.getPersonList(rs.getInt("property_propertyid")));
         return pu;
+    }
+    
+    public void insertPropertyUnitChange(PropertyUnitChange uc) throws IntegrationException{
+         String query = "INSERT INTO public.propertyunitchange(\n" +
+                        "            unitchangeid, unitnumber, unit_unitid, otherknownaddress, notes, \n" +
+                        "            rental, removed, added, changedon, approvedon)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, ?);";
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        LocalDate changedOnRaw = uc.getChangedOn().toLocalDate();
+        
+        LocalDate approvedOnRaw = uc.getApprovedOn().toLocalDate();
+        
+        java.sql.Date changedOn = java.sql.Date.valueOf(changedOnRaw);
+        
+        java.sql.Date approvedOn = java.sql.Date.valueOf(approvedOnRaw);
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, uc.getUnitNumber());
+            stmt.setInt(2, uc.getUnitID());
+            stmt.setString(3, uc.getOtherKnownAddress());
+            stmt.setString(4, uc.getNotes());
+            stmt.setBoolean(5, uc.isRental());
+            stmt.setBoolean(6, uc.isRemoved());
+            stmt.setBoolean(7, uc.isAdded());
+            stmt.setDate(8, changedOn);
+            stmt.setDate(9, approvedOn);
+            stmt.setInt(10, uc.getApprovedBy());
+            
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.insertPropertyUnitChange | Error inserting property unit change order", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
     }
     
     public void updatePropertyUnit(PropertyUnit pu) throws IntegrationException{
