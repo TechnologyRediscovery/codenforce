@@ -32,6 +32,7 @@ public class PropertyUnitChange {
     private int changedBy; //personID of the person who changed the unit.
     private int unitID;
     private int approvedBy; //personID of the user that approved the change (a backend operation)
+    private String unitNumber;
     private String otherKnownAddress;
     private String notes;
     private boolean rental;
@@ -63,6 +64,14 @@ public class PropertyUnitChange {
 
     public void setUnitID(int unitID) {
         this.unitID = unitID;
+    }
+
+    public String getUnitNumber() {
+        return unitNumber;
+    }
+
+    public void setUnitNumber(String unitNumber) {
+        this.unitNumber = unitNumber;
     }
 
     public int getApprovedBy() {
