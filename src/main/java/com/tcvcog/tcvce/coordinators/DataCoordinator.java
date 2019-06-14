@@ -6,7 +6,7 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
@@ -14,7 +14,7 @@ import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.ViolationStatusEnum;
+import com.tcvcog.tcvce.entities.ViolationStatus;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -61,7 +61,7 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
     }
 
     
-    public Map<CaseStage, Integer> getCaseCountsByStage(List<CECase> caseList) throws IntegrationException, CaseLifecycleException {
+    public Map<CaseStage, Integer> getCaseCountsByStage(List<CECase> caseList) throws IntegrationException, CaseLifecyleException {
         Map<CaseStage, Integer> stageCountMap = new LinkedHashMap<>();
         List<CaseStage> stageList = Arrays.asList(CaseStage.values());
         CaseCoordinator cc = getCaseCoordinator();
@@ -69,21 +69,21 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
             stageCountMap.put(cs, 0);
         }
         for (CECase c : caseList) {
-            CaseStage stg = c.getCasePhase().getCaseStage();
+            CaseStage stg = c.getCaseStage();
             stageCountMap.put(stg, stageCountMap.get(stg) + 1);
         }
         return stageCountMap;
     }
     
-    public Map<ViolationStatusEnum, Integer> getViolationCountsByStatus(CECase cse){
-        Map<ViolationStatusEnum, Integer> statusCountMap = new LinkedHashMap<>();
-        List<ViolationStatusEnum> statusList = Arrays.asList(ViolationStatusEnum.values());
-        for (ViolationStatusEnum vs : statusList) {
+    public Map<ViolationStatus, Integer> getViolationCountsByStatus(CECase cse){
+        Map<ViolationStatus, Integer> statusCountMap = new LinkedHashMap<>();
+        List<ViolationStatus> statusList = Arrays.asList(ViolationStatus.values());
+        for (ViolationStatus vs : statusList) {
             statusCountMap.put(vs, 0);
         }
         
         for (CodeViolation cv : cse.getViolationList()) {
-            ViolationStatusEnum status = cv.getStatus();
+            ViolationStatus status = cv.getStatus();
             statusCountMap.put(status, statusCountMap.get(status) + 1);
         }
         return statusCountMap;
@@ -92,11 +92,11 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
     
     
     public DonutChartModel generateModelViolationDonut(CECase cse){
-        Map<ViolationStatusEnum, Integer> statusCountMap = getViolationCountsByStatus(cse);
+        Map<ViolationStatus, Integer> statusCountMap = getViolationCountsByStatus(cse);
         Map<String, Number> chartMap = new LinkedHashMap<>();
         
-        List<ViolationStatusEnum> statusList = Arrays.asList(ViolationStatusEnum.values());
-        for (ViolationStatusEnum vs : statusList) {
+        List<ViolationStatus> statusList = Arrays.asList(ViolationStatus.values());
+        for (ViolationStatus vs : statusList) {
             chartMap.put(vs.getLabel(), statusCountMap.get(vs));
         }
         

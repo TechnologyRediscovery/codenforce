@@ -452,7 +452,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return cc.setCaseStage(c);
+        return c;
     }
     
     
@@ -536,9 +536,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
         c.setCaseName(rs.getString("casename"));
         
-        CasePhase cp = CasePhase.valueOf(rs.getString("casephase"));
-        c.setCasePhase(cp);
-        c.setCasePhaseIcon(si.getIcon(cp));
+        
+        // let business logic in coordinators set the icon
+//        CasePhase cp = CasePhase.valueOf(rs.getString("casephase"));
+//        c.setCasePhase(cp);
+//        c.setCasePhaseIcon(si.getIcon(cp));
 
         c.setOriginationDate(rs.getTimestamp("originationdate")
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());

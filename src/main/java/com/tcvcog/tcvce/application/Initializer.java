@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
+import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
@@ -180,6 +181,10 @@ public class Initializer implements ServletContextListener{
          
         SessionSystemCoordinator ssCoor = new SessionSystemCoordinator();
         servletContext.setAttribute("sessionSystemCoordinator", ssCoor);
+         
+         
+        DataCoordinator dc = new DataCoordinator();
+        servletContext.setAttribute("dataCoordinator", dc);
          
         
 //        SessionBean sb = new SessionBean();

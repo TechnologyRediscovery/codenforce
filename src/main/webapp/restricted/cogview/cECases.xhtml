@@ -394,7 +394,7 @@
                                 
                                 
                                 <p:chart type="donut" rendered="false"
-                                             model="#{caseProfileBB.violationDOnut}" 
+                                             model="#{caseProfileBB.violationDonut}" 
                                              style="width:500px; height: 600px;"/>
 
 
@@ -592,11 +592,11 @@
                                     </p:column>
 
 
-                                    <p:column width="6%" sortBy="#{v.statusString}">
+                                    <p:column width="6%" sortBy="#{v.status.label}">
                                         <f:facet name="header">
                                             <h:outputText value="Status" />
                                         </f:facet>
-                                        <h:outputText id="violation-status-ot" value="#{v.statusString}"/>
+                                        <h:outputText id="violation-status-ot" value="#{v.status.label}"/>
                                     </p:column>
 
                                     <p:column width="12%">
@@ -1415,7 +1415,7 @@
                                                 <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                                 <h:outputText id="v-source-year-compactlist-ot" value="#{v.violatedEnfElement.codeElement.source.sourceYear})"/>
                                                 <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                                <h:outputText id="status-compactlist-line-ot" value="#{v.statusString}"/>
+                                                <h:outputText id="status-compactlist-line-ot" value="#{v.status.label}"/>
 
                                             </p:dataScroller>
 
@@ -1604,7 +1604,7 @@
                                     </p:rowExpansion>
                                 </p:dataTable>
 
-                                <p:chart type="donut" model="#{reportingBB.violationDonut}" style="width:600px; height:600px"/>
+                                <p:chart type="donut" model="#{dataCoordinator.generateModelViolationDonut(caseProfileBB.currentCase)}" style="width:600px; height:600px"/>
 
                             </h:form>
 

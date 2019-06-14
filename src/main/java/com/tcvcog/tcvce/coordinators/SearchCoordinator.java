@@ -492,7 +492,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      }
      
     
-    
+    /**
+     * First gen queries. Replaced by the rest of this class
+     * 
+     * @deprecated 
+     * @param u
+     * @param m
+     * @return 
+     */
     public List<Query> getEventQueryList(User u, Municipality m){
         List<Query> queryList = new ArrayList<>();
 //        
@@ -608,7 +615,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // only the type
         EventCategory complianceEventCategory = ec.getInitializedEventCateogry();
         complianceEventCategory.setEventType(EventType.Compliance);
-        
         
         SearchParamsEventCECase eventParams = new SearchParamsEventCECase();
         

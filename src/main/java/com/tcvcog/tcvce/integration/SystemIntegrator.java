@@ -207,6 +207,12 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
+    /**
+     * 
+     * @param casephase
+     * @return
+     * @throws IntegrationException 
+     */
     public Icon getIcon(CasePhase casephase) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -409,6 +415,15 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return hm;
     }
     
+    /**
+     * First generation data querying method: still raw SQL!
+     * Replaced by the SearchParams* family
+     * 
+     * @deprecated 
+     * @param muniCode
+     * @return
+     * @throws IntegrationException 
+     */
       public Map<String, Integer> getCaseCountsByPhase(int muniCode) throws IntegrationException{
         
         CasePhase[] phaseValuesArray = new CasePhase[8];

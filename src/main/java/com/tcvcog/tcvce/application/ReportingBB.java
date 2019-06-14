@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -66,11 +67,11 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        SessionSystemCoordinator ssc = getSsCoordinator();
         caseList = getSessionBean().getcECaseQueue();
+        DataCoordinator dc = getDataCoordinator();
         
         try {
-            cPhaseMap = ssc.getCaseCountsByPhase(caseList);
+            cPhaseMap = dc.getCaseCountsByPhase(caseList);
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -85,30 +86,6 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         
         generateModelCaseCountByPhase();
         generateModelCaseCountsByStage();
-        generateModelViolationDonut();
-        
-    }
-    
-    private void generateModelViolationDonut(){
-        CaseCoordinator cseCoord = getCaseCoordinator();
-        CECase cse = getSessionBean().getcECaseQueue().get(0);
-        violationDonut = new DonutChartModel();
-        
-        Map<String, Number> violComp = new LinkedHashMap<>();
-        violComp.put("Resolved", cse.getViolationListResolved().size());
-        violComp.put("Inside compliance timeframe", cse.getViolationListUnresolved().size());
-        violComp.put("Expired compliance timeframe", cse.getViolationListUnresolved().size());
-        violComp.put("Citation", cse.getViolationListUnresolved().size());
-        violationDonut.addCircle(violComp);
-        
-        Map<String, Number> goalRing = new LinkedHashMap<>();
-        goalRing.put("Goal: Resolved", 10 );
-        goalRing.put("Goal: Unresolved", 90);
-        violationDonut.addCircle(goalRing);
-        
-        
-        violationDonut.setTitle("Violation status");
-        violationDonut.setLegendPosition("e");
         
     }
     
@@ -146,26 +123,26 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      
      public void generateModelCaseCountsByStage(){
          caseCountByStage = new HorizontalBarChartModel();
-        SessionSystemCoordinator ssc = getSsCoordinator();
+         DataCoordinator dc = getDataCoordinator();
         ChartSeries caseCountSeries = new ChartSeries();
         caseCountSeries.setLabel("Count of CE cases");
         Map<CaseStage, Integer> stageMap = null;
         try {
-             stageMap = ssc.getCaseCountsByStage(caseList);
-        } catch (IntegrationException ex) {
-            Logger.getLogger(ReportingBB.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (CaseLifecyleException ex) {
-            Logger.getLogger(ReportingBB.class.getName()).log(Level.SEVERE, null, ex);
+             stageMap = dc.getCaseCountsByStage(caseList);
+        } catch (IntegrationException | CaseLifecyleException ex) {
+            System.out.println(ex);
         }
-        
-        Set<CaseStage> stageSet = stageMap.keySet();
         Integer max = 0;
-        for(CaseStage s : stageSet) {
-            Integer cnt = stageMap.get(s);
-            if(cnt > max){
-                max = cnt;
+        if(stageMap != null && stageMap.keySet() != null){
+            
+            Set<CaseStage> stageSet = stageMap.keySet();
+            for(CaseStage s : stageSet) {
+                Integer cnt = stageMap.get(s);
+                if(cnt > max){
+                    max = cnt;
+                }
+                caseCountSeries.set(s,cnt);
             }
-            caseCountSeries.set(s,cnt);
         }
               
         caseCountByStage.addSeries(caseCountSeries);

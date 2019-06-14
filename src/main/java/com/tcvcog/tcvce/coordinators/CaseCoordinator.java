@@ -85,9 +85,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @return the CECase with the action request list ready to roll
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
-    public CECase configureCECase(CECase cse) throws CaseLifecyleException{
+    public CECase configureCECase(CECase cse) throws CaseLifecyleException, IntegrationException{
         
-        setCaseStage(cse);
         cse.setShowHiddenEvents(false);
         cse.setShowInactiveEvents(false);
         
@@ -111,7 +110,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         if(cse.getCeActionRequestList() == null){
             cse.setCeActionRequestList(new ArrayList<CEActionRequest>());
         }
+        cse.setActiveEventList(new ArrayList<EventCECase>());
         
+        configureCECaseStageAndPhase(cse);
         
         Collections.sort(cse.getNoticeList());
         Collections.reverse(cse.getNoticeList());
@@ -131,6 +132,141 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return si.getIcon(phase);
         
     }
+    
+   
+     /**
+     * A CECase's Stage is derived from its Phase based on the set of business
+     * rules encoded in this method.
+     * @param cse which needs its StageConfigured
+     * @return the same CECas passed in with the CaseStage configured
+     * @throws CaseLifecyleException 
+     */
+     public CECase configureCECaseStageAndPhase(CECase cse) throws CaseLifecyleException, IntegrationException {
+        
+        // First determine case stage, then dig around as needed in the case
+        // data to determine the appropriate phase
+        
+        // case stage basically emerges from violation status assessment
+         
+         
+        SystemIntegrator si = getSystemIntegrator();
+        CaseStage stage;
+        
+        int maxVStage;
+        
+        if(determineIfCaseIsOpen(cse)){
+            maxVStage = determineMaxViolationStatus(cse.getViolationList());
+
+            if(cse.getViolationList().isEmpty()){
+                // Open case, no violations yet: only one mapping
+                cse.setCaseStage(CaseStage.Investigation);
+                cse.setCasePhase(CasePhase.PrelimInvestigationPending);
+                
+              // we have at least one violation attached  
+            } else { 
+                
+                // gotta wrap up notice process
+                if(!determineIfNoticeHasBeenMailed(cse)){
+                    cse.setCaseStage(CaseStage.Investigation);
+                    cse.setCasePhase(CasePhase.NoticeDelivery);
+                  
+                // notice has been sent so we're in CaseStage.Enforcement
+                } else {
+                    switch(maxVStage){
+                        case 0:
+                            cse.setCasePhase(CasePhase.Closed);
+                            cse.setCaseStage(CaseStage.Closed);
+                            break;
+                        case 1:
+                            cse.setCaseStage(CaseStage.Enforcement);
+                            cse.setCasePhase(CasePhase.InitialComplianceTimeframe);
+                            break;
+                        case 2:
+                            cse.setCaseStage(CaseStage.Enforcement);
+                            cse.setCasePhase(CasePhase.SecondaryPostHearingComplianceTimeframe);
+                            break;
+                        case 3:
+                            cse.setCaseStage(CaseStage.Citation);
+                            determineAndSetPhase_stageCIT(cse);
+                            break;
+                        default:
+                            cse.setCasePhase(CasePhase.InactiveHolding);
+                            cse.setCaseStage(CaseStage.Unknown);
+                    }
+                    
+                }
+                
+                if(cse.getClosingDate() == null){
+
+                        cse.setCaseStage(CaseStage.Investigation);
+                } else {
+                        cse.setCasePhase(CasePhase.Closed);
+                        cse.setCaseStage(CaseStage.Closed);
+
+                }
+
+            }
+        } else {
+            
+            cse.setCaseStage(CaseStage.Closed);
+            // there is only one possible phase mapping
+            cse.setCasePhase(CasePhase.Closed);
+        }
+        //now set the icon
+        cse.setCasePhaseIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString(cse.getCaseStage().getIconPropertyLookup()))));
+        
+        
+   
+        return cse;
+    }
+     
+    public CECase determineAndSetPhase_stageCIT(CECase cse){
+        Iterator<EventCECase> iter = cse.getActiveEventList().iterator();
+        while(iter.hasNext()){
+            EventCECase ev = iter.next();
+            if(ev){
+                subcheckPasses = true;
+            }
+        }
+        
+        
+        return cse;
+    } 
+     
+    public boolean determineIfNoticeHasBeenMailed(CECase cse){
+        return true;
+    } 
+    
+    public boolean determineIfCaseIsOpen(CECase cse){
+         boolean isOpen = false;
+         if(cse.getClosingDate() == null){
+             isOpen = true;
+         }
+         return isOpen;
+     }
+     
+     /**
+      * Violation status enum values have associated ordinal values
+      * which this method looks at to determine the highest one, which
+      * it returns and then goes on break
+      * @param vList
+      * @return 
+      */
+     public int determineMaxViolationStatus(List<CodeViolation> vList){
+         int maxStatus = -1;
+         if(vList != null){
+             for(CodeViolation cv: vList){
+                 if(cv.getStatus().getOrder() > maxStatus){
+                     maxStatus = cv.getStatus().getOrder();
+                 }
+             }
+         }
+         return maxStatus;
+     }
+    
+    
+
     
    
     public ReportCEARList getInitializedReportConficCEARs(User u, Municipality m){
@@ -515,61 +651,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return typeList;
     }
     
-    /**
-     * A CECase's Stage is derived from its Phase based on the set of business
-     * rules encoded in this method.
-     * @param cs which needs its StageConfigured
-     * @return the same CECas passed in with the CaseStage configured
-     * @throws CaseLifecyleException 
-     */
-     public CECaseBaseClass setCaseStage(CECaseBaseClass cs) throws CaseLifecyleException {
-        CaseStage stage;
-        switch (cs.getCasePhase()) {
-            case PrelimInvestigationPending:
-                stage = CaseStage.Investigation;
-                break;
-            case NoticeDelivery:
-                stage = CaseStage.Investigation;
-                break;
-        // Letter marked with a send date
-            case InitialComplianceTimeframe:
-                stage = CaseStage.Enforcement;
-                break;
-        // compliance inspection
-            case SecondaryComplianceTimeframe:
-                stage = CaseStage.Enforcement;
-                break;
-        // Filing of citation
-            case AwaitingHearingDate:
-                stage = CaseStage.Citation;
-                break;
-        // hearing date scheduled
-            case HearingPreparation:
-                stage = CaseStage.Citation;
-                break;
-        // hearing not resulting in a case closing
-            case InitialPostHearingComplianceTimeframe:
-                stage = CaseStage.Citation;
-                break;
-            case SecondaryPostHearingComplianceTimeframe:
-                stage = CaseStage.Citation;
-                break;
-            case Closed:
-                stage = CaseStage.Closed;
-                // TODO deal with this later
-                //                throw new CaseLifecyleException("Cannot advance a closed case to any other phase");
-                break;
-            case InactiveHolding:
-                stage = CaseStage.Closed;
-                break;
-            default:
-                stage = CaseStage.Closed;
-        }
-        cs.setCaseStage(stage);
-        return cs;
-    }
-    
-    
+   
     
     /**
      * Iterates over all of a case's violations and checks for compliance. 
@@ -1195,8 +1277,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * Uses date fields on the populated CodeViolation to determine
      * a status string and icon for UI
      * Called by the integrator when creating a code violation
+     * 
      * @param cv
-     * @return the CodeViolation with correct icon and statusString
+     * @return the CodeViolation with correct icon and status
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public CodeViolation configureCodeViolation(CodeViolation cv) throws IntegrationException{
@@ -1204,36 +1287,29 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         if(cv.getActualComplianceDate() == null){
             // violation still within compliance timeframe
             if(cv.getDaysUntilStipulatedComplianceDate() >= 0){
-                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_withincomptimeframe_statusstring"));
-                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_withincomptimeframe_iconid"))));
-                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_withincomptimeframe_ageleadtext"));
                 
-            // violation has not been cited, but is past compliance timeframe end date
-            } else if(cv.getCitationIDList().isEmpty()) {
-                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_overdue_statusstring"));
+                cv.setStatus(ViolationStatus.UNRESOLVED_WITHINCOMPTIMEFRAME);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_overdue_iconid"))));
-                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_overdue_ageleadtext"));
+                        .getString(cv.getStatus().getIconPropertyName()))));
+                
+            // violation has NOT been cited, but is past compliance timeframe end date
+            } else if(cv.getCitationIDList().isEmpty()) {
+                
+                cv.setStatus(ViolationStatus.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME);
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString(cv.getStatus().getIconPropertyName()))));
+                
             // violation has been cited on at least one citation
             } else {
-                cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_citation_statusstring"));
+                cv.setStatus(ViolationStatus.UNRESOLVED_CITED);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_citation_iconid"))));
-                cv.setAgeLeadText(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                        .getString("codeviolation_unresolved_citation_ageleadtext"));
+                        .getString(cv.getStatus().getIconPropertyName()))));
             }
             // we have a resolved violation
         } else {
-            cv.setStatusString(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                    .getString("codeviolation_resolved_statusstring"));
-            cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
-                    .getString("codeviolation_resolved_iconid"))));
+                cv.setStatus(ViolationStatus.RESOLVED);
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString(cv.getStatus().getIconPropertyName()))));
         }
         return cv;
     }
@@ -1320,44 +1396,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return al;
     }
     
-    public Map<String, Number> computeCountsByCEARReason(List<CEActionRequest> reqList){
-        CEActionRequest cear;
-        Map<String, Number> map = new LinkedHashMap<>();
-        for(CEActionRequest req: reqList){
-            if(map.containsKey(req.getIssueTypeString())){
-                map.put(req.getIssueTypeString(), map.get(req.getIssueTypeString()).intValue() + 1);
-            } else {
-                map.put(req.getIssueTypeString(), 1);
-            }
-        }
-        return map;
-    }
-    
-    public Map<EnforcableCodeElement, Number> computeViolationFrequency(List<CECase> cseList){
-        Map<EnforcableCodeElement, Number> enfCdElMap = new LinkedHashMap<>();
-        for(CECase cse: cseList){
-            for(CodeViolation cdVl: cse.getViolationList()){
-                if(enfCdElMap.containsKey(cdVl.getViolatedEnfElement())){
-                    Integer count = ((Integer) enfCdElMap.get(cdVl.getViolatedEnfElement())) + 1;
-                    enfCdElMap.put(cdVl.getViolatedEnfElement(), count );
-                } else {
-                    enfCdElMap.put(cdVl.getViolatedEnfElement(), 1);
-                }
-            }
-        }
-        
-        return enfCdElMap;
-    }
-    
-    public Map<String, Number> computeViolationFrequencyStringMap(List<CECase> cseList){
-        
-        Map<EnforcableCodeElement, Number> violationMap = computeViolationFrequency(cseList);
-        Map<String, Number> violationStringMap = new LinkedHashMap<>();
-        
-        for(EnforcableCodeElement enfCdEl: violationMap.keySet()){
-            violationStringMap.put(enfCdEl.toString(), violationMap.get(enfCdEl));
-        }
-        return violationStringMap;
-    }
+ 
    
 } // close class

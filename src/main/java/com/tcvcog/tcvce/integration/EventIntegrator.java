@@ -547,7 +547,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     private EventCECase generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException {
         EventCECase ev = new EventCECase();
         UserIntegrator ui = getUserIntegrator();
-        SessionSystemCoordinator ssc = getSsCoordinator();
+        SessionSystemCoordinator ssc = getSessionSystemCoordinator();
         
         ev.setPropertyID(rs.getInt("property_propertyid"));
         ev.setMuniCode(rs.getInt("municipality_municode"));

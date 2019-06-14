@@ -151,7 +151,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     private Person generatePersonFromResultSet(ResultSet rs) throws IntegrationException {
         // Instantiates the new person object
         Person newPerson = new Person();
-        SessionSystemCoordinator ssc = getSsCoordinator();
+        SessionSystemCoordinator ssc = getSessionSystemCoordinator();
         
         try {
             newPerson.setPersonID(rs.getInt("personid"));

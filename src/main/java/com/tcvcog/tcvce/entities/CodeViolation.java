@@ -35,7 +35,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     protected EnforcableCodeElement violatedEnfElement;
     protected int ceCaseID;
        
-    protected String statusString;
+    protected ViolationStatus status;
     protected Icon icon;
     protected String ageLeadText;
     
@@ -472,22 +472,6 @@ public class CodeViolation extends EntityUtils implements Serializable{
         
     }
     
-    /**
-     * @return the statusString
-     */
-    public String getStatusString() {
-        
-        return statusString;
-    }
-
-    /**
-     * @param statusString the statusString to set
-     */
-    public void setStatusString(String statusString) {
-        
-        this.statusString = statusString;
-    }
-   
     @Override
     public int hashCode() {
         int hash = 7;
@@ -676,6 +660,20 @@ public class CodeViolation extends EntityUtils implements Serializable{
             actualComplianceDate = actualComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
         
+    }
+
+    /**
+     * @return the status
+     */
+    public ViolationStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(ViolationStatus status) {
+        this.status = status;
     }
 
 }

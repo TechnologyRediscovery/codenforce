@@ -95,7 +95,7 @@
                                     <div class="compact-violation-list-container">
                                         <h:outputText id="violation-compactlist-line-ot-unresolved" value="#{v}"/>
                                         <h:outputText id="sep-compactlist-line-ot-unresolved" value=" | "/>
-                                        <h:outputText id="status-compactlist-line-ot-unresolved" styleClass="italic" value="#{v.statusString}"/>
+                                        <h:outputText id="status-compactlist-line-ot-unresolved" styleClass="italic" value="#{v.status.label}"/>
                                     </div>
                                 </p:dataScroller>
 
@@ -113,7 +113,7 @@
                                     <div class="compact-violation-list-container">
                                         <h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
                                         <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
-                                        <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.statusString}"/>
+                                        <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.status.label}"/>
                                     </div>
                                 </p:dataScroller>
                                 
@@ -310,7 +310,7 @@
 
                             <h2><h:outputText value="Violation ID:  #{v.violationID}"/><h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
                                         <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
-                                        <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.statusString}"/></h2>
+                                        <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.status.label}"/></h2>
                             
 
                                         
@@ -536,7 +536,7 @@
                                             <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                             <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.codeElement.source.sourceYear})"/>
                                             <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.statusString}"/>
+                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.status.label}"/>
                                         </p:dataScroller>
                                     </div>
                                 </f:facet>

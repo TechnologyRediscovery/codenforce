@@ -32,6 +32,9 @@ public class Citation extends EntityUtils implements Serializable {
     private String citationNo;
     private CitationStatus status;
     private CourtEntity origin_courtentity;
+    
+    private List<EventCECase> eventList;
+    
     private CECaseBaseClass ceCaseNoLists;
     private User userOwner;
     
@@ -303,6 +306,20 @@ public class Citation extends EntityUtils implements Serializable {
     public String getTimeStampPretty() {
         timeStampPretty = getPrettyDate(timeStamp);
         return timeStampPretty;
+    }
+
+    /**
+     * @return the eventList
+     */
+    public List<EventCECase> getEventList() {
+        return eventList;
+    }
+
+    /**
+     * @param eventList the eventList to set
+     */
+    public void setEventList(List<EventCECase> eventList) {
+        this.eventList = eventList;
     }
     
     

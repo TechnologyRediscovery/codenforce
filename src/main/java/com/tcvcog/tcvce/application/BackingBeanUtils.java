@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
+import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
@@ -113,6 +114,7 @@ public class BackingBeanUtils implements Serializable{
     private OccupancyPermitIntegrator occupancyPermitIntegrator;
     private PaymentIntegrator paymentIntegrator;
     private OccupancyCoordinator occupancyCoordinator;
+    private DataCoordinator dataCoordinator;
     
     private BlobCoordinator blobCoordinator;
     private BlobIntegrator blobIntegrator;
@@ -791,12 +793,22 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @return the ssCoordinator
      */
-    public SessionSystemCoordinator getSsCoordinator() {
+    public SessionSystemCoordinator getSessionSystemCoordinator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
                 .createValueExpression(context.getELContext(), "#{sessionSystemCoordinator}", SessionSystemCoordinator.class);
         ssCoordinator = (SessionSystemCoordinator) ve.getValue(context.getELContext());
         return ssCoordinator;
+    }
+/**
+     * @return the ssCoordinator
+     */
+    public DataCoordinator getDataCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{dataCoordinator}", DataCoordinator.class);
+        dataCoordinator = (DataCoordinator) ve.getValue(context.getELContext());
+        return dataCoordinator;
     }
 
     /**

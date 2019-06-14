@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class CECase extends CECaseBaseClass implements Cloneable{
     private List<CodeViolation> violationListUnresolved;
     
     private List<EventCECase> visibleEventList;
+    private List<EventCECase> activeEventList;
     private boolean showHiddenEvents;
     private boolean showInactiveEvents;
     private List<EventCECase> completeEventList;
@@ -274,6 +276,29 @@ public class CECase extends CECaseBaseClass implements Cloneable{
      */
     public void setShowHiddenEvents(boolean showHiddenEvents) {
         this.showHiddenEvents = showHiddenEvents;
+    }
+
+    /**
+     * @return the activeEventList
+     */
+    public List<EventCECase> getActiveEventList() {
+        if(completeEventList != null){
+            Iterator<EventCECase> iter = completeEventList.iterator();
+                while(iter.hasNext()){
+                    EventCECase ev = iter.next();
+                    if(ev.isActive()){
+                        activeEventList.add(ev);
+                    }
+                }
+            }
+        return activeEventList;
+    }
+
+    /**
+     * @param activeEventList the activeEventList to set
+     */
+    public void setActiveEventList(List<EventCECase> activeEventList) {
+        this.activeEventList = activeEventList;
     }
 
   

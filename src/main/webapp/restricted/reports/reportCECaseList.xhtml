@@ -167,7 +167,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="Status" />
                                     </f:facet>
-                                    <h:outputText id="violation-status-ot" value="#{v.statusString}"/>
+                                    <h:outputText id="violation-status-ot" value="#{v.status.label}"/>
                                 </p:column>
 
                                 <p:column width="15%">
@@ -309,7 +309,7 @@
                                             <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                             <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.codeElement.source.sourceYear})"/>
                                             <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.statusString}"/>
+                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.status.label}"/>
                                         </p:dataScroller>
                                     </h:panelGroup>
                                 </h:panelGrid>

@@ -171,7 +171,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public List<EventCECaseCasePropBundle> queryEvents(SearchParamsEventCECase params, User user, List<Municipality> userAuthMuniList) throws IntegrationException, CaseLifecyleException{
         EventIntegrator ei = getEventIntegrator();
-        List<EventCECaseCasePropBundle> evList = configureEventBundleList(ei.getEventsCECase(params),user,userAuthMuniList);
+        List<EventCECaseCasePropBundle> evList = configureEventBundleList(  ei.getEventsCECase(params),
+                                                                            user,
+                                                                            userAuthMuniList);
         return evList;
     }
     
