@@ -25,11 +25,10 @@
                         
                         <h:form id="uploadBlobFileUploadForm" enctype="multipart/form-data">
                             <h2>Choose a file and upload</h2>
-                                <p:fileUpload fileUploadListener="#{uploadBlobBB.handleBlobUpload}"
+                            <p:fileUpload fileUploadListener="#{uploadBlobBB.handleBlobUpload}"
                                 mode="advanced" 
                                 update=":uploadBlobReviewBlobsForm:blobTable"
                                 multiple="true"
-                                fileLimit="3" 
                                 sizeLimit="900000000" 
                                 allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
                         </h:form>
@@ -50,6 +49,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="File Type"/>
                                             </f:facet>
+                                            <h:outputText value="#{blob.type.typID}"/>
                                             <!-- file type dropdown here -->
                                         </p:column>
                                         <p:column width="70%">
@@ -75,8 +75,8 @@
                             <p:spacer height="5px"/>
                             
                             <p:commandButton  ajax="false" tabindex="12"
-                                              value="Save photos and proceed to contact details" id="continueToContactInfoButton"
-                                              action="#{cEActionRequestSubmitBB.savePhotos}"/>
+                                              value="Save file types & descriptions and proceed to file attachment" id="continueToLinkButton"
+                                              action="#{uploadBlobBB.navToLinkBlob}"/>
                         </h:form>
                         
                     </div>
