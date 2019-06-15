@@ -752,6 +752,12 @@
             <to-view-id>/restricted/cogstaff/gen/selectBoxListChangeRequest.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>uploadBlob</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/uploadBlob.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     </navigation-rule>
     
     <navigation-rule>
@@ -763,7 +769,14 @@
         </navigation-case>
     </navigation-rule>
     
-   
+   <navigation-rule>
+        <from-view-id>/restricted/cogstaff/gen/uploadBlob.xhtml</from-view-id>  
+        <navigation-case>
+            <from-outcome>linkBlob</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/linkBlob.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
     
    
@@ -1517,7 +1530,7 @@
     <managed-bean>
         <managed-bean-name>uploadBlobBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
         <description>Utility application-scoped bean for handling blob upload and download	</description>
@@ -1531,9 +1544,10 @@
         <managed-bean-class>com.tcvcog.tcvce.integration.BlobIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
+    
     <managed-bean>
-        <managed-bean-name>dataCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.DataCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
+        <managed-bean-name>linkBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.linkBlobBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 </faces-config>

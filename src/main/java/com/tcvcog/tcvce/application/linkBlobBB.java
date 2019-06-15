@@ -9,7 +9,6 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import java.io.Serializable;
@@ -17,7 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import org.primefaces.context.RequestContext;
 
 /**
  *
@@ -25,7 +23,8 @@ import org.primefaces.context.RequestContext;
  */
 public class linkBlobBB extends BackingBeanUtils implements Serializable{
     
-    private int codeViolationID, propertyID, selectedBlobID, personID;
+    private Blob selectedBlob;
+    private int codeViolationID, propertyID;
 
     /**
      * Creates a new instance of linkBlobBB
@@ -43,7 +42,6 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         
         try{
             vi.getCodeViolation(codeViolationID);
-            System.out.println("linkBlobBB.linkBlobToCodeViolation | retrieved code violation");  //TESTING
         }catch(IntegrationException e){
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
@@ -52,14 +50,12 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         }
         
         try {
-            bi.linkBlobToCodeViolation(selectedBlobID, codeViolationID);
-            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
+            bi.linkBlobToCodeViolation(selectedBlob.getBlobID(), propertyID);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Failed to link file to selected violation. Sorry! " , ""));
+                            ,"Failed to link file to violation. Sorry! " , ""));
         }
-        
     }
     
     public void linkBlobToProperty() {
@@ -76,34 +72,11 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         }
         
         try {
-            bi.linkBlobToProperty(selectedBlobID, propertyID);
+            bi.linkBlobToProperty(selectedBlob.getBlobID(), propertyID);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
                             ,"Failed to link file to Property. Sorry! " , ""));
-        }
-        
-    }
-    
-    public void linkBlobToPerson() {
-        BlobIntegrator bi = getBlobIntegrator();
-        PersonIntegrator pi = getPersonIntegrator();
-        
-        try{
-            pi.getPerson(getPersonID());
-        }catch(IntegrationException e){
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Unable to find Person with that ID. " , ""));
-            return;
-        }
-        
-        try {
-            bi.linkBlobToPerson(selectedBlobID, getPersonID());
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Failed to link file to Person. Sorry! " , ""));
         }
     }
     
@@ -142,29 +115,14 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the selectedBlob
      */
-    public int getSelectedBlobID() {
-        return selectedBlobID;
+    public Blob getSelectedBlob() {
+        return selectedBlob;
     }
 
     /**
-     * @param selectedBlobID
+     * @param selectedBlob the selectedBlob to set
      */
-    public void setSelectedBlobID(int selectedBlobID) {
-        System.out.println("linkBlobBB.setSelectedBlobID | blobID = " + selectedBlobID);
-        this.selectedBlobID = selectedBlobID;
-    }
-
-    /**
-     * @return the personID
-     */
-    public int getPersonID() {
-        return personID;
-    }
-
-    /**
-     * @param personID the personID to set
-     */
-    public void setPersonID(int personID) {
-        this.personID = personID;
+    public void setSelectedBlob(Blob selectedBlob) {
+        this.selectedBlob = selectedBlob;
     }
 }
