@@ -18,19 +18,15 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -40,16 +36,17 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
  
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import javax.annotation.PostConstruct;
+
 import org.primefaces.model.DashboardModel;
+import org.primefaces.component.dashboard.Dashboard;
+import org.primefaces.model.DashboardColumn;
+import org.primefaces.model.DefaultDashboardColumn;
+import org.primefaces.model.DefaultDashboardModel;
 
 /**
  *
@@ -80,10 +77,24 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
+        generateMainDash();
         
     }
     
-    private DashBoardModel generateMainDash(){
+    private void generateMainDash(){
+        setMainDash(new DefaultDashboardModel());
+        DashboardColumn column1 = new DefaultDashboardColumn();
+        DashboardColumn column2 = new DefaultDashboardColumn();
+        DashboardColumn column3 = new DefaultDashboardColumn();
+        column1.addWidget("cears");
+        column1.addWidget("cecases");
+        column2.addWidget("occ");
+        column2.addWidget("cetodo");
+        column3.addWidget("occtodo");
+        column3.addWidget("admintodo");
+        getMainDash().addColumn(column1);
+        getMainDash().addColumn(column2);
+        getMainDash().addColumn(column3);
         
     }
     
@@ -284,6 +295,20 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      */
     public void setTimelineEventViewDateRange(int timelineEventViewDateRange) {
         this.timelineEventViewDateRange = timelineEventViewDateRange;
+    }
+
+    /**
+     * @return the mainDash
+     */
+    public DashboardModel getMainDash() {
+        return mainDash;
+    }
+
+    /**
+     * @param mainDash the mainDash to set
+     */
+    public void setMainDash(DashboardModel mainDash) {
+        this.mainDash = mainDash;
     }
 
    

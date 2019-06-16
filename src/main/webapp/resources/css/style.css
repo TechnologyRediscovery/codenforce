@@ -1181,6 +1181,35 @@ gridTd-bignum{
 /* ****************** CLOSE BUTTON STYLES ********************/
 
 
+/* -------------------- DASHBOARDS--------------------------------- */
+
+
+
+.ui-panel, div.ui-state-hover {
+                margin: 10px;
+                width:200px;
+            }
+             
+.ui-dashboard-column {
+    width:33%;
+   
+}
+
+.ui-widget-content{
+    /*background-color: gray;*/
+}
+
+
+.ui-widget, .ui-widget .ui-widget {
+    font-size: 90% !important;
+}
+
+/* ****************** CLOSE DASHBOARDS********************/
+
+
+
+
+
 /* -------------------- MISC --------------------------------- */
 
 .nov-chosen-recipeint{
