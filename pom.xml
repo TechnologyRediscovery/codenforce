@@ -78,6 +78,12 @@
     <version>6.2</version>
 </dependency>
 
+<dependency>
+    <groupId>org.primefaces.themes</groupId>
+    <artifactId>afterwork</artifactId>
+    <version>1.0.10</version>
+</dependency>
+
 <!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
 <dependency>
     <groupId>commons-fileupload</groupId>

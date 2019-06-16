@@ -225,8 +225,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         Iterator<EventCECase> iter = cse.getActiveEventList().iterator();
         while(iter.hasNext()){
             EventCECase ev = iter.next();
-            if(ev){
-                subcheckPasses = true;
+            if(ev.getCategory().getEventType() == EventType.Citation){
+                
             }
         }
         

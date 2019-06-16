@@ -32,7 +32,8 @@ public enum EventType {
     Meeting("Meeting"),
     Notice("Notice"),
     Custom("Custom"),
-    Compliance("Compliance");
+    Compliance("Compliance"),
+    Citation("Citation");
 
     private final String label;
 

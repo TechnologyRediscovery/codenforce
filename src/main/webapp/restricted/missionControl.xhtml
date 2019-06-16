@@ -8,7 +8,8 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         
-        <h:outputStylesheet name="css/style.css"/>
+        <h:outputStylesheet name="css/dashboards.css"/>
+        
         <title>Code Enforcement Dashboard</title>
     </h:head>
     <h:body>
@@ -19,53 +20,42 @@
                         <h:messages id="missionControlMessages" globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
+                        
                         <h:form id="missionControlForm">
-                            <p:dashboard model="#{missionControlBB.model}">
-                                <p:panel id="sports">
-                                </p:panel>
-                                <p:panel id="finance">
-                                </p:panel>
-                            </p:dashboard>
-                            
+                            <h1><h:outputText value="#{sessionBean.activeMuni.muniName}"/> Dashboard</h1>
                         
+                            <p:dashboard model="#{missionControlBB.mainDash}">
                             
-                        <h3>Switch municipality</h3>
-                            
-                        <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
-                            <f:converter converterId="muniConverter"/>
-                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                            <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                        </p:selectOneMenu>
-                        <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
-                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                        <p:commandButton value="switch" styleClass="button" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
-                        
-                        <h1><h:outputText value="#{sessionBean.activeMuni.muniName}"/> Dashboard</h1>
-
-                        <p:panelGrid columns="2" layout="tabular"
-                            columnClasses="gridTd-mccontainer, gridTd-mccontainer">
-                                         
-                            <h:panelGroup>
-                                <p:panelGrid columns="2" layout="tabular"
-                                    columnClasses="gridTd-bignum, gridTd-bignum">
-                                    <h:panelGroup >
-                                        <div class="dashboard-bignum">
-                                            <h:outputText styleClass="bignum" value="#{cEActionRequestsBB.requestList.size()}"/>
-                                        </div>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <div class="dashboard-rightof-bignum">
-                                            <h:outputText styleClass="bignum-header" value="New action requests"/>
-                                            <p:spacer height="5px"/>
-                                            <p:commandButton styleClass="nofill" value="Manage requests" action="cEActionRequests" ajax="false"/>
-                                        </div>
-                                    </h:panelGroup>
-                                </p:panelGrid>
-                            </h:panelGroup>
-                            
-                                         
-                            <h:panelGroup>
-                                <p:panelGrid columns="2" layout="tabular"
+                                <p:panel id="cears"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="I have a header"
+                                         footer="I have a footer"
+                                         toggleableHeader="true"
+                                         menuTitle="I have a title in the bar"
+                                         >
+                                    <h3>Code enforcement requests</h3>
+                                    <p:panelGrid columns="2" layout="tabular"
+                                        columnClasses="gridTd-bignum, gridTd-bignum">
+                                        <h:panelGroup >
+                                            <div class="dashboard-bignum">
+                                                <h:outputText styleClass="bignum" value="#{cEActionRequestsBB.requestList.size()}"/>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <div class="dashboard-rightof-bignum">
+                                                <h:outputText styleClass="bignum-header" value="New action requests"/>
+                                                <p:spacer height="5px"/>
+                                                <p:commandButton styleClass="nofill" value="Manage requests" action="cEActionRequests" ajax="false"/>
+                                            </div>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                </p:panel>
+                                
+                                <p:panel id="cecases">
+                                    <h3>Code enforcement cases</h3>
+                                    <p:panelGrid columns="2" layout="tabular"
                                     columnClasses="gridTd-bignum, gridTd-bignum">
                                     <h:panelGroup >
                                         <div class="dashboard-bignum">
@@ -82,73 +72,36 @@
                                         </div>
                                     </h:panelGroup>
                                 </p:panelGrid>
-                            </h:panelGroup>
-                                         
-                            
-                            <h:panelGroup>
-                                <p:panelGrid columns="2" layout="tabular"
-                                    columnClasses="gridTd-bignum, gridTd-bignum">
-                                    <h:panelGroup >
-                                        <div class="dashboard-bignum">
-                                            <h:outputText styleClass="bignum" value="-"/>
-                                        </div>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <div class="dashboard-rightof-bignum">
-                                            <h:outputText styleClass="bignum-header" value="Compliance timeframe"/>
-                                            <br />
-                                            <h:outputText styleClass="bignum-header" value="closings (today)"/>
-                                            <p:spacer height="5px"/>
-                                            <p:commandButton styleClass="nofill" disabled="true" value="View events" ajax="false"/>
-                                        </div>
-                                    </h:panelGroup>
-                                </p:panelGrid>
-                            </h:panelGroup>
-                            
-                                         
-                            <h:panelGroup>
-                                <p:panelGrid columns="2" layout="tabular"
-                                    columnClasses="gridTd-bignum, gridTd-bignum">
-                                    <h:panelGroup >
-                                        <div class="dashboard-bignum">
-                                            <h:outputText styleClass="bignum" value="-"/>
-                                        </div>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <div class="dashboard-rightof-bignum">
-                                            <h:outputText styleClass="bignum-header" value="Code Enforcement Cases"/>
-                                            <br />
-                                            <h:outputText styleClass="bignum-header" value="by phase"/>
-                                            <p:spacer height="5px"/>
-                                            <p:commandButton styleClass="nofill"  action="statistics" value="View chart" ajax="false"/>
-                                        </div>
-                                    </h:panelGroup>
-                                </p:panelGrid>
-                            </h:panelGroup>
-                            
-                                         
-                            <h:panelGroup>
-                                <p:panelGrid columns="2" layout="tabular"
-                                    columnClasses="gridTd-bignum, gridTd-bignum">
-                                    <h:panelGroup >
-                                        <div class="dashboard-bignum">
-                                            <h:outputText styleClass="bignum" value="-"/>
-                                        </div>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <div class="dashboard-rightof-bignum">
-                                            <h:outputText styleClass="bignum-header" value="Notices requring"/>
-                                            <br />
-                                            <h:outputText styleClass="bignum-header" value="acknowledgement"/>
-                                            <p:spacer height="5px"/>
-                                            <p:commandButton styleClass="nofill" disabled="true" value="View cases" ajax="false"/>
-                                        </div>
-                                    </h:panelGroup>
-                                </p:panelGrid>
-                            </h:panelGroup>
-                            
-                            
-                        </p:panelGrid>
+                                </p:panel>
+                                
+                                <p:panel id="switchmuni">
+                                    <h3></h3>
+                                    <h3>Switch municipality</h3>
+
+                                    <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    </p:selectOneMenu>
+                                    <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    <p:commandButton value="switch" styleClass="button" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
+                                </p:panel>
+                                
+                                <p:panel id="cetodo">
+                                    <h3>Code enforcement proposed actions</h3>
+                                     <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                                </p:panel>
+                                
+                                <p:panel id="occtodo">
+                                    <h3>Occupancy proposed actions</h3>
+                                </p:panel>
+                                
+                                <p:panel id="reporting">
+                                    <h3>System admin proposed actions</h3>
+                                </p:panel>
+                                
+                            </p:dashboard>
 
 
                         </h:form>
@@ -200,7 +153,7 @@
 
 
                             </p:dialog>
-                            <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                           
                             <p:spacer height="10px"/>
 
 
