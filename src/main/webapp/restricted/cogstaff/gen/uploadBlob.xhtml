@@ -10,7 +10,7 @@
         <title>Upload photographs and documents</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../../navContainer_public.xhtml">
+        <ui:composition template="./../../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view id="uploadBlobView">
                     
@@ -36,7 +36,7 @@
                         <p:spacer height="5px"/>
                                   
                         
-                        <h:form id="uploadBlobsReviewBlobsForm">
+                        <h:form id="uploadBlobReviewBlobsForm">
                             <h2>Review and describe uploaded photos and documents</h2>
                                     <p:dataTable
                                         id="blobTable"

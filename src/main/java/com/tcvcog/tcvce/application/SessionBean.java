@@ -106,11 +106,12 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private OccPermitApplication occPermitApplication;
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
-    private PropertyWithLists workingPropWithLists;
-    private PersonType activePersonType;
-    
-    /* *** Public Person Search/Edit Session Shelves *** */
-    private Person activeAnonPerson;
+    private OccPermitApplicationReason occPermitApplicationReason;
+
+    /* *** Blob Upload Session Shelves *** */
+    private List<Blob> blobList;
+    //linking
+
 
     /**
      * Creates a new instance of getSessionBean()
