@@ -23,8 +23,7 @@ import javax.faces.application.FacesMessage;
  */
 public class linkBlobBB extends BackingBeanUtils implements Serializable{
     
-    private Blob selectedBlob;
-    private int codeViolationID, propertyID;
+    private int codeViolationID, propertyID, selectedBlobID;
 
     /**
      * Creates a new instance of linkBlobBB
@@ -50,7 +49,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         }
         
         try {
-            bi.linkBlobToCodeViolation(selectedBlob.getBlobID(), propertyID);
+            bi.linkBlobToCodeViolation(selectedBlobID, codeViolationID);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
@@ -72,7 +71,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         }
         
         try {
-            bi.linkBlobToProperty(selectedBlob.getBlobID(), propertyID);
+            bi.linkBlobToProperty(selectedBlobID, propertyID);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
@@ -115,14 +114,15 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the selectedBlob
      */
-    public Blob getSelectedBlob() {
-        return selectedBlob;
+    public int getSelectedBlobID() {
+        return selectedBlobID;
     }
 
     /**
-     * @param selectedBlob the selectedBlob to set
+     * @param selectedBlobID
      */
-    public void setSelectedBlob(Blob selectedBlob) {
-        this.selectedBlob = selectedBlob;
+    public void setSelectedBlobID(int selectedBlobID) {
+        System.out.println("linkBlobBB.setSelectedBlobID | blobID = " + selectedBlobID);
+        this.selectedBlobID = selectedBlobID;
     }
 }

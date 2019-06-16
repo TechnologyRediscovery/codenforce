@@ -1485,6 +1485,6 @@
     <managed-bean>
         <managed-bean-name>linkBlobBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.linkBlobBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

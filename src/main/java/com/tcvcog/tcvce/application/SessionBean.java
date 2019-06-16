@@ -114,6 +114,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
 
     /* *** Blob Upload Session Shelves *** */
     private List<Blob> blobList;
+    //linking
 
 
     /**

@@ -10,7 +10,7 @@
         <title>Upload photographs and documents</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../../navContainer_public.xhtml">
+        <ui:composition template="./../../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view id="linkBlobView">
                     
@@ -58,39 +58,39 @@
                                     <f:facet name="header">
                                         <h:outputText value="Link to Code Violation"/>
                                     </f:facet>
-                                    <p:commandButton actionListener="#{linkBlobBB.setPropertyID(blob)}" onclick="PF('linkToCV-dlg').show()"/>
+                                    <p:commandButton action="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkCV-dlg').show()" update=":linkBlobForm:linkCV-dlg"/>
                                 </p:column>
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Link to Property"/>
                                     </f:facet>
-                                    <p:commandButton actionListener="#{linkBlobBB.setPropertyID(blob)}" onclick="PF('linkToProperty-dlg').show()"/>
+                                    <p:commandButton action="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkProperty-dlg').show())" update=":linkBlobForm:linkProperty-dlg"/>
                                 </p:column>
                             </p:dataTable>
                             
-                            <p:dialog header="Link selected file to Code Violation" 
-                                      widgetVar="linkToCV-dlg" 
+                            <p:dialog id="linkCV-dlg"
+                                      header="Link selected file to Code Violation" 
+                                      widgetVar="linkCV-dlg" 
                                       responsive="true" 
                                       width="400"
                                       modal="false"
                                       height="600">
                                 <h2>Enter the ID of the Code Violation</h2>
-                                <p:inputNumber value="#{linkBlobBB.codeViolationID}" thousandSeparator="" label="Code Violation ID"/>
-                                <p:commandButton actionListener="#{linkBlobBB.linkBlobToCodeViolation()}"/>
-                                
+                                <p:inputNumber value="#{linkBlobBB.codeViolationID}" thousandSeparator="" label="Code Violation ID" decimalPlaces="0"/>
+                                <p:commandButton immediate= "true" oncomplete="#{linkBlobBB.linkBlobToCodeViolation()}"/>
                                 <p:commandLink  value="close window" onclick="PF('linkToCV-dlg').hide()" styleClass="noFill"/>
                             </p:dialog>
                             
-                            <p:dialog header="Link selected file to Property" 
-                                      widgetVar="linkToProperty-dlg" 
+                            <p:dialog id="linkProperty-dlg"
+                                      header="Link selected file to Property" 
+                                      widgetVar="linkProperty-dlg" 
                                       responsive="true" 
                                       width="400"
                                       modal="false"
                                       height="600">
                                 <h2>Enter the ID of the Code Violation</h2>
-                                <p:inputNumber value="#{linkBlobBB.propertyID}" thousandSeparator="" label="Property ID"/>
-                                <p:commandButton actionListener="#{linkBlobBB.linkBlobToProperty()}"/>
-                                
+                                <p:inputNumber value="#{linkBlobBB.propertyID}" thousandSeparator="" label="Property ID" decimalPlaces="0"/>
+                                <p:commandButton immediate= "true" oncomplete="#{linkBlobBB.linkBlobToProperty()}"/>
                                 <p:commandLink  value="close window" onclick="PF('linkToProperty-dlg').hide()" styleClass="noFill"/>
                             </p:dialog>
                             
