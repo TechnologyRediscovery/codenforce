@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import org.primefaces.context.RequestContext;
 
 /**
  *
@@ -55,6 +56,9 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
                             ,"Failed to link file to violation. Sorry! " , ""));
         }
+        
+        //close dialog window on view
+        RequestContext.getCurrentInstance().execute("linkCV-dlg.hide();");
     }
     
     public void linkBlobToProperty() {
@@ -77,6 +81,9 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
                             ,"Failed to link file to Property. Sorry! " , ""));
         }
+        
+        //close dialog window on view
+        RequestContext.getCurrentInstance().execute("linkProperty-dlg.hide();");
     }
     
     public String navToDash() {

@@ -78,7 +78,7 @@
                                 <h2>Enter the ID of the Code Violation</h2>
                                 <p:inputNumber value="#{linkBlobBB.codeViolationID}" thousandSeparator="" label="Code Violation ID" decimalPlaces="0"/>
                                 <p:commandButton immediate= "true" oncomplete="#{linkBlobBB.linkBlobToCodeViolation()}"/>
-                                <p:commandLink  value="close window" onclick="PF('linkToCV-dlg').hide()" styleClass="noFill"/>
+                                <p:commandLink  value="close window" onclick="PF('linkCV-dlg').hide()" styleClass="noFill"/>
                             </p:dialog>
                             
                             <p:dialog id="linkProperty-dlg"
