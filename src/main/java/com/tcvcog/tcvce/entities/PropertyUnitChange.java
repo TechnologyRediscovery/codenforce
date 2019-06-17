@@ -17,7 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * Models the entity: Property Unit Change Order.Public users compile lists of
@@ -39,8 +39,9 @@ public class PropertyUnitChange {
     private boolean boolChanged; //this stores if the rental variable was changed, not whether or not the unit is a rental.
     private boolean removed;
     private boolean added;
-    private java.time.LocalDateTime changedOn;
-    private java.time.LocalDateTime approvedOn; //If null, it has not been approved
+    private java.time.LocalDate changedOn;
+    private java.time.LocalDate approvedOn; //If null, it has not been approved
+    private PropertyUnit thisUnit;
 
     public int getUnitChangeID() {
         return unitChangeID;
@@ -116,19 +117,19 @@ public class PropertyUnitChange {
         this.removed = removed;
     }
 
-    public LocalDateTime getChangedOn() {
+    public LocalDate getChangedOn() {
         return changedOn;
     }
 
-    public void setChangedOn(LocalDateTime changedOn) {
+    public void setChangedOn(LocalDate changedOn) {
         this.changedOn = changedOn;
     }
 
-    public LocalDateTime getApprovedOn() {
+    public LocalDate getApprovedOn() {
         return approvedOn;
     }
 
-    public void setApprovedOn(LocalDateTime approvedOn) {
+    public void setApprovedOn(LocalDate approvedOn) {
         this.approvedOn = approvedOn;
     }
 
@@ -148,7 +149,7 @@ public class PropertyUnitChange {
     
     
     /**
-     * USE SPARAINGLY.This variable is already managed by setRental.
+     * USE SPARINGLY.This variable is already managed by setRental.
      *
      * @param boolChanged
      */
@@ -184,4 +185,14 @@ public class PropertyUnitChange {
 
     }
 
+    public PropertyUnit getThisUnit() {
+        return thisUnit;
+    }
+
+    public void setThisUnit(PropertyUnit thisUnit) {
+        this.thisUnit = thisUnit;
+    }
+    
+    
+    
 }

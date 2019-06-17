@@ -556,6 +556,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return pu;
     }
     
+    public void updatePropertyUnit(PropertyUnit pu) throws IntegrationException{
+        
+        
+    }
+    
+    public void deletePropertyUnit(PropertyUnit pu){
+        
+       
+    }
+    
     public void insertPropertyUnitChange(PropertyUnitChange uc) throws IntegrationException{
          String query = "INSERT INTO public.propertyunitchange(\n" +
                         "            unitchangeid, unitnumber, unit_unitid, otherknownaddress, notes, \n" +
@@ -566,9 +576,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         
-        LocalDate changedOnRaw = uc.getChangedOn().toLocalDate();
+        LocalDate changedOnRaw = uc.getChangedOn();
         
-        LocalDate approvedOnRaw = uc.getApprovedOn().toLocalDate();
+        LocalDate approvedOnRaw = uc.getApprovedOn();
         
         java.sql.Date changedOn = java.sql.Date.valueOf(changedOnRaw);
         
@@ -598,14 +608,111 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
-    public void updatePropertyUnit(PropertyUnit pu) throws IntegrationException{
+    public PropertyUnitChange getPropertyUnitChange(int unitChangeId) throws IntegrationException{
+        PropertyUnitChange uc = new PropertyUnitChange();
+        String query = "SELECT unitchangeid, unitid, property_propertyid, property.address,\n" +
+                       "propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n" +
+                       "propertyunitchange.notes, propertyunitchange.rental,\n" +
+                       "removed, added, changedon, approvedon, approvedby\n" +
+                       "FROM propertyunitchange JOIN propertyunit ON propertyunitchange.unit_unitid = propertyunit.unitid\n" +
+                       "JOIN property ON propertyunit.property_propertyid = property.propertyid;" +
+                       " WHERE unitchangeid=?;";
         
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
         
+        try{
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, unitChangeId);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                uc = generatePropertyUnitChange(rs);
+            }
+        } catch (SQLException ex) {
+            throw new IntegrationException("PropertyIntegrator.getPropertyUnit | Unable to get property unit, ", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }        
+        
+        return uc;
     }
     
-    public void deletePropertyUnit(PropertyUnit pu){
+    public PropertyUnitChange generatePropertyUnitChange(ResultSet rs) throws SQLException, IntegrationException{
+        PersonIntegrator persInt = getPersonIntegrator();
+        PropertyUnitChange uc = new PropertyUnitChange();
+        uc.setUnitChangeID(rs.getInt("unitchangeid"));
+        uc.setUnitID(rs.getInt("unitid"));
+        uc.setUnitNumber(rs.getString("unitnumber"));
+        uc.setNotes(rs.getString("notes"));
+        uc.setOtherKnownAddress(rs.getString("otherknownaddress"));
+        uc.setRental(rs.getBoolean("rental"));
+        uc.setThisUnit(getPropertyUnit(rs.getInt("unit_unitid")));
+        uc.setAdded(rs.getBoolean("added"));
+        uc.setRemoved(rs.getBoolean("removed"));
+        uc.setChangedOn(rs.getDate("changedon").toLocalDate());
+        uc.setApprovedOn(rs.getDate("approvedon").toLocalDate());
+        uc.setApprovedBy(rs.getInt("approvedby"));
+        return uc;
+    }
+    
+    public String updatePropertyUnitChange(PropertyUnitChange changeToUpdate) throws IntegrationException{
+        String query = "UPDATE public.property\n" +
+                "   SET parid=?, lotandblock=?, \n" +
+                "       address=?, propertyusetype=?, \n" +
+                "       usegroup=?, constructiontype=?, countycode=?, notes=?, \n" +
+                "       containsrentalunits=?, vacant=?, \n" +
+                "       lastupdatedby=?, lastupdated=?" +
+                " WHERE propertyid = ?;";
         
-       
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+ 
+        LocalDate changedOnRaw = changeToUpdate.getChangedOn();
+        
+        LocalDate approvedOnRaw = changeToUpdate.getApprovedOn();
+        
+        java.sql.Date changedOn = java.sql.Date.valueOf(changedOnRaw);
+        
+        java.sql.Date approvedOn = java.sql.Date.valueOf(approvedOnRaw);
+        
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, changeToUpdate.getUnitNumber());
+            
+            stmt.setInt(2, changeToUpdate.getUnitID());
+            
+            stmt.setString(3, changeToUpdate.getOtherKnownAddress());
+            
+            stmt.setString(4, changeToUpdate.getNotes());
+            
+            stmt.setBoolean(5, changeToUpdate.isRental());
+            
+            stmt.setBoolean(6, changeToUpdate.isRemoved());
+            
+            stmt.setBoolean(7, changeToUpdate.isAdded());
+            
+            stmt.setDate(8, changedOn);
+            
+            stmt.setDate(9, approvedOn);
+            
+            stmt.setInt(10, changeToUpdate.getApprovedBy());
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update PropertyUnitChange", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return "???";
+        
     }
     
     public PropertyWithLists getNewPropertyWithLists(){
