@@ -24,9 +24,7 @@ import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyPermitIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1002,7 +1000,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         submitUnitChangeList();
 
-        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
+        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();        
         try {
             int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getOccPermitApplication());
             getSessionBean().getOccPermitApplication().setId(applicationId);
@@ -1010,14 +1008,16 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-
+        
         return "selectForApply";
     }
 
     public void submitUnitChangeList() {
 
         ArrayList<PropertyUnitChange> changeList = new ArrayList<PropertyUnitChange>();
-
+        
+        PropertyIntegrator pri = getPropertyIntegrator();
+        
         for (PropertyUnit workingUnit : workingPropUnits) {
 
             PropertyUnitChange skeleton = new PropertyUnitChange();
@@ -1105,6 +1105,18 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
+        
+        for(PropertyUnitChange order : changeList) {
+            
+            try {
+                pri.insertPropertyUnitChange(order);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+            
+            
+        }
+        
         System.out.println("end of submitting unit change list");
     }
 

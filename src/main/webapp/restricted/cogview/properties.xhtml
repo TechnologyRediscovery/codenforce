@@ -583,9 +583,37 @@
 
 
                                     <h2>Dwelling units</h2>
-                                    <p>List of each dwelling unit registered on this property.</p> 
+                                    <p>List of the dwelling units registered to this property.</p> 
 
-                                    <!--Insert dwelling unit table here-->
+                                    <p:dataTable
+                                    id="propertyUnitsTable"
+                                    var="unit"
+                                    value="#{propertyProfileBB.currProp.unitList}"
+                                    rowKey="#{unit.unitID}"
+                                    >                                         
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Number" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.unitNumber}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rental?" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.notes}" />
+                                    </p:column>
+
+                                </p:dataTable>
 
 
                                     <hr/>

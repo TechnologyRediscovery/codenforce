@@ -769,9 +769,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public void insertPropertyUnitChange(PropertyUnitChange uc) throws IntegrationException {
         String query = "INSERT INTO public.propertyunitchange(\n"
                 + "            unitchangeid, unitnumber, unit_unitid, otherknownaddress, notes, \n"
-                + "            rental, removed, added, changedon, approvedon, approvedby)\n"
+                + "            rental, removed, added, changedon, approvedon, approvedby, changedby)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, ?, ?);";
+                + "            ?, ?, ?, ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
