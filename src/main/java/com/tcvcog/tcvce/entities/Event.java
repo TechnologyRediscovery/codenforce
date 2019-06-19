@@ -51,11 +51,12 @@ public class Event
     private boolean active;
     private boolean hidden;
     private String notes;
-    private boolean currentUserCanTakeAction;
+    
         
     private List<Person> personList;
     
     private long daysUntilDue;
+    
     private EventProposal eventProposal;
     
     /**
@@ -266,19 +267,6 @@ public class Event
         this.timestampPretty = timestampPretty;
     }
 
-    /**
-     * @return the currentUserCanTakeAction
-     */
-    public boolean isCurrentUserCanTakeAction() {
-        return currentUserCanTakeAction;
-    }
-
-    /**
-     * @param currentUserCanTakeAction the currentUserCanTakeAction to set
-     */
-    public void setCurrentUserCanTakeAction(boolean currentUserCanTakeAction) {
-        this.currentUserCanTakeAction = currentUserCanTakeAction;
-    }
 
     /**
      * @return the personList
@@ -380,7 +368,7 @@ public class Event
         hash = 97 * hash + (this.active ? 1 : 0);
         hash = 97 * hash + (this.hidden ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.notes);
-        hash = 97 * hash + (this.currentUserCanTakeAction ? 1 : 0);
+        hash = 97 * hash + (eventProposal.currentUserCanRespondToProposal ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.personList);
         hash = 97 * hash + (int) (this.daysUntilDue ^ (this.daysUntilDue >>> 32));
         return hash;

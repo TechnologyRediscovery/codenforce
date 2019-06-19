@@ -17,32 +17,42 @@ public class EventProposal extends EntityUtils {
     private String title;
     private String description;
     
+    private User creator;
+    
+    boolean currentUserCanRespondToProposal;
+    
     private EventCategory choice1EventCat;
     private String choice1Description;
     private EventCategory choice2EventCat;
     private String choice2Description;
     private EventCategory choice3EventCat;
     private String choice3Description;
-    private boolean requestActionByDefaultMuniCEO;
-    private boolean requestActionByDefaultMuniStaffer;
     
-    private EventProposalResponse response;
+    private boolean directPropToDefaultMuniCEO;
+    private boolean directPropToDefaultMuniStaffer;
+    private boolean directPropToDeveloper;
     
+    private int activatesXDaysFromGeneratingEvent;
+    private int expiresXDaysFromGeneratingEvent;
+    private EventCategory expiryTrigger;
     
-
+    private boolean active;
+    
+    private EventProposalImplementation implementation;
+    
 
     /**
-     * @param requestActionByDefaultMuniCEO the requestActionByDefaultMuniCEO to set
+     * @param directPropToDefaultMuniCEO the directPropToDefaultMuniCEO to set
      */
-    public void setRequestActionByDefaultMuniCEO(boolean requestActionByDefaultMuniCEO) {
-        this.requestActionByDefaultMuniCEO = requestActionByDefaultMuniCEO;
+    public void setDirectPropToDefaultMuniCEO(boolean directPropToDefaultMuniCEO) {
+        this.directPropToDefaultMuniCEO = directPropToDefaultMuniCEO;
     }
 
     /**
-     * @return the requestActionByDefaultMuniCEO
+     * @return the directPropToDefaultMuniCEO
      */
-    public boolean isRequestActionByDefaultMuniCEO() {
-        return requestActionByDefaultMuniCEO;
+    public boolean isDirectPropToDefaultMuniCEO() {
+        return directPropToDefaultMuniCEO;
     }
 
 
@@ -174,31 +184,129 @@ public class EventProposal extends EntityUtils {
     }
 
     /**
-     * @return the response
+     * @return the implementation
      */
-    public EventProposalResponse getResponse() {
-        return response;
+    public EventProposalImplementation getImplementation() {
+        return implementation;
     }
 
     /**
-     * @param response the response to set
+     * @param implementation the implementation to set
      */
-    public void setResponse(EventProposalResponse response) {
-        this.response = response;
+    public void setImplementation(EventProposalImplementation implementation) {
+        this.implementation = implementation;
     }
 
     /**
-     * @return the requestActionByDefaultMuniStaffer
+     * @return the directPropToDefaultMuniStaffer
      */
-    public boolean isRequestActionByDefaultMuniStaffer() {
-        return requestActionByDefaultMuniStaffer;
+    public boolean isDirectPropToDefaultMuniStaffer() {
+        return directPropToDefaultMuniStaffer;
     }
 
     /**
-     * @param requestActionByDefaultMuniStaffer the requestActionByDefaultMuniStaffer to set
+     * @param directPropToDefaultMuniStaffer the directPropToDefaultMuniStaffer to set
      */
-    public void setRequestActionByDefaultMuniStaffer(boolean requestActionByDefaultMuniStaffer) {
-        this.requestActionByDefaultMuniStaffer = requestActionByDefaultMuniStaffer;
+    public void setDirectPropToDefaultMuniStaffer(boolean directPropToDefaultMuniStaffer) {
+        this.directPropToDefaultMuniStaffer = directPropToDefaultMuniStaffer;
+    }
+
+    /**
+     * @param currentUserCanRespondToProposal the currentUserCanRespondToProposal to set
+     */
+    public void setCurrentUserCanRespondToProposal(boolean currentUserCanRespondToProposal) {
+        this.currentUserCanRespondToProposal = currentUserCanRespondToProposal;
+    }
+
+    /**
+     * @return the currentUserCanRespondToProposal
+     */
+    public boolean isCurrentUserCanRespondToProposal() {
+        return currentUserCanRespondToProposal;
+    }
+
+    /**
+     * @return the directPropToDeveloper
+     */
+    public boolean isDirectPropToDeveloper() {
+        return directPropToDeveloper;
+    }
+
+    /**
+     * @return the activatesXDaysFromGeneratingEvent
+     */
+    public int getActivatesXDaysFromGeneratingEvent() {
+        return activatesXDaysFromGeneratingEvent;
+    }
+
+    /**
+     * @return the expiresXDaysFromGeneratingEvent
+     */
+    public int getExpiresXDaysFromGeneratingEvent() {
+        return expiresXDaysFromGeneratingEvent;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param directPropToDeveloper the directPropToDeveloper to set
+     */
+    public void setDirectPropToDeveloper(boolean directPropToDeveloper) {
+        this.directPropToDeveloper = directPropToDeveloper;
+    }
+
+    /**
+     * @param activatesXDaysFromGeneratingEvent the activatesXDaysFromGeneratingEvent to set
+     */
+    public void setActivatesXDaysFromGeneratingEvent(int activatesXDaysFromGeneratingEvent) {
+        this.activatesXDaysFromGeneratingEvent = activatesXDaysFromGeneratingEvent;
+    }
+
+    /**
+     * @param expiresXDaysFromGeneratingEvent the expiresXDaysFromGeneratingEvent to set
+     */
+    public void setExpiresXDaysFromGeneratingEvent(int expiresXDaysFromGeneratingEvent) {
+        this.expiresXDaysFromGeneratingEvent = expiresXDaysFromGeneratingEvent;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    /**
+     * @return the expiryTrigger
+     */
+    public EventCategory getExpiryTrigger() {
+        return expiryTrigger;
+    }
+
+    /**
+     * @param expiryTrigger the expiryTrigger to set
+     */
+    public void setExpiryTrigger(EventCategory expiryTrigger) {
+        this.expiryTrigger = expiryTrigger;
+    }
+
+    /**
+     * @return the creator
+     */
+    public User getCreator() {
+        return creator;
+    }
+
+    /**
+     * @param creator the creator to set
+     */
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
     
     

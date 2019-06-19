@@ -302,9 +302,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public User getUser(int userID) throws IntegrationException{
+        
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        User newUser = new User();
+        User newUser = null;
         // broken query
         String query = "SELECT userid, userrole, username, notes, activitystartdate, \n" +
                         "       activitystopdate, accesspermitted, enforcementofficial, badgenumber, \n" +

@@ -142,8 +142,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
        
-        ev.setCurrentUserCanTakeAction(canUserTakeRequestedAction(ev, user, userAuthMuniList));
-        if(ev.getRequestedEventCat()!= null){
+       
+        // begin configuring the event proposals assocaited with this event
+        // remember: event proposals are specified in an EventCategory object
+        // but when we build an Event object, the Proposal lives on the Event itself
+        // and the EventProposalResponse inside that
+        if(ev.getCategory().gete){
+            ev.set(canUserTakeRequestedAction(ev, user, userAuthMuniList));
             if(ev.isRequestActionByDefaultMuniCEO()){
                     ev.setResponderIntended(ci.getDefaultCodeOfficer(ev.getCaseID()));
             }
@@ -151,7 +156,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             // rejected (i.e. no event created in response to the request)
             // go get the triggering event
             if(ev.isResponseComplete() && !ev.isRequestRejected()){
-                ev.setTriggeringEvent(ei.getActionTriggeringEvent(ev));
+                ev.setTriggeringEvent(ei.getProposalImplAssociatedWithEvent(ev));
             }
         }
         
@@ -494,7 +499,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     public void logResponseToActionRequest(EventCECase ev) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.logResponseToActionRequest(ev);
+        ei.logResponseToProposal(ev);
     }
     
     
