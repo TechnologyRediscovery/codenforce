@@ -165,54 +165,45 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
               // we have at least one violation attached  
             } else { 
                 
-                // gotta wrap up notice process
+                // If we don't have a mailed notice, then we're in Notice Delivery phase
                 if(!determineIfNoticeHasBeenMailed(cse)){
                     cse.setCaseStage(CaseStage.Investigation);
                     cse.setCasePhase(CasePhase.NoticeDelivery);
                   
-                // notice has been sent so we're in CaseStage.Enforcement
+                // notice has been sent so we're in CaseStage.Enforcement or beyond
                 } else {
                     switch(maxVStage){
-                        case 0:
+                        case 0:  // all violations resolved
                             cse.setCasePhase(CasePhase.Closed);
                             cse.setCaseStage(CaseStage.Closed);
                             break;
-                        case 1:
+                        case 1: // all violations within compliance window
                             cse.setCaseStage(CaseStage.Enforcement);
                             cse.setCasePhase(CasePhase.InitialComplianceTimeframe);
                             break;
-                        case 2:
+                        case 2: // one or more EXPIRED compliance timeframes
                             cse.setCaseStage(CaseStage.Enforcement);
                             cse.setCasePhase(CasePhase.SecondaryPostHearingComplianceTimeframe);
                             break;
-                        case 3:
+                        case 3: // at least 1 violation used in a citation that's attached to case
                             cse.setCaseStage(CaseStage.Citation);
-                            determineAndSetPhase_stageCIT(cse);
+                            determineAndSetPhase_stageCITATION(cse);
                             break;
-                        default:
+                        default: // unintentional dumping ground 
                             cse.setCasePhase(CasePhase.InactiveHolding);
                             cse.setCaseStage(CaseStage.Unknown);
                     }
                     
                 }
                 
-                if(cse.getClosingDate() == null){
-
-                        cse.setCaseStage(CaseStage.Investigation);
-                } else {
-                        cse.setCasePhase(CasePhase.Closed);
-                        cse.setCaseStage(CaseStage.Closed);
-
-                }
-
             }
-        } else {
+        } else { // we have a closed case
             
             cse.setCaseStage(CaseStage.Closed);
             // there is only one possible phase mapping
             cse.setCasePhase(CasePhase.Closed);
         }
-        //now set the icon
+        //now set the icon based on what phase we just assigned the case to
         cse.setCasePhaseIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString(cse.getCaseStage().getIconPropertyLookup()))));
         
@@ -221,7 +212,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
      
-    public CECase determineAndSetPhase_stageCIT(CECase cse){
+    public CECase determineAndSetPhase_stageCITATION(CECase cse){
         Iterator<EventCECase> iter = cse.getActiveEventList().iterator();
         while(iter.hasNext()){
             EventCECase ev = iter.next();
@@ -230,7 +221,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         
-        
+         
         return cse;
     } 
      

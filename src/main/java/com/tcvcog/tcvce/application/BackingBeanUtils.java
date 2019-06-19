@@ -30,6 +30,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
 import java.sql.Connection;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -126,6 +127,8 @@ public class BackingBeanUtils implements Serializable{
     
     private DataSource dataSource;
     private Connection connx;
+    
+    
     
     /**
      * Creates a new instance of BackingBeanUtils
@@ -849,6 +852,7 @@ public class BackingBeanUtils implements Serializable{
     public void setSsCoordinator(SessionSystemCoordinator ssCoordinator) {
         this.ssCoordinator = ssCoordinator;
     }
+
 
        
 

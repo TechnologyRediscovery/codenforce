@@ -31,6 +31,8 @@ import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+import com.tcvcog.tcvce.entities.EventProposal;
+import com.tcvcog.tcvce.entities.EventProposalResponse;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
@@ -315,6 +317,123 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
+    
+    public EventProposal getEventProposal(int proposalID) throws IntegrationException{
+
+        EventProposal proposal = new EventProposal();
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(  "SELECT proposalid, title, overalldescription, creator_userid, choice1eventcat_catid, \n" +
+                    "       choice1description, choice2eventcat_catid, choice2description, \n" +
+                    "       choice3eventcat_catid, choice3description, directproposaltodefaultmuniceo, directproposaltodefaultmunistaffer\n" +
+                    "  FROM public.ceeventproposal WHERE proposalid = ?;");
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, proposalID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                proposal = generateEventProposal(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive EventProposal", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return proposal;
+        
+        
+    }
+    
+    private EventProposal generateEventProposal(ResultSet rs) throws SQLException, IntegrationException{
+        EventProposal proposal = new EventProposal();
+        
+        proposal.setProposalID(rs.getInt("proposalid"));
+        proposal.setTitle(rs.getString("title"));
+        proposal.setDescription(rs.getString("overalldescription"));
+        
+        proposal.setChoice1EventCat(getEventCategory(rs.getInt("choice1eventcat_catid")));
+        proposal.setChoice1Description(rs.getString("choice1description"));
+        proposal.setChoice2EventCat(getEventCategory(rs.getInt("choice2eventcat_catid")));
+        proposal.setChoice1Description(rs.getString("choice2description"));
+        proposal.setChoice3EventCat(getEventCategory(rs.getInt("choice3eventcat_catid")));
+        proposal.setChoice1Description(rs.getString("choice3description"));
+        
+        proposal.setRequestActionByDefaultMuniCEO(rs.getBoolean("directproposaltodefaultmuniceo"));
+        proposal.setRequestActionByDefaultMuniStaffer(rs.getBoolean("directproposaltodefaultmunistaffer"));
+        
+        return proposal;
+    }
+    
+    public EventProposalResponse getEventProposalResponse(int propResID) throws IntegrationException{
+         EventProposalResponse response = new EventProposalResponse();
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(  "SELECT responseid, prposal_proposalid, responseevent_eventid, responderintended_userid, \n" +
+                        "       responder_userid, responsetimestamp, notes, rejectproposal, initiator\n" +
+                        "  FROM public.ceeventproposalresponse WHERE responseid = ?;");
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, propResID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                response = generateEventProposalResponse(rs);
+                
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive event proposal response", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return response;
+        
+    }
+    
+    private EventProposalResponse generateEventProposalResponse(ResultSet rs) throws SQLException, IntegrationException{
+        EventProposalResponse propRes = new EventProposalResponse();
+        UserIntegrator ui = getUserIntegrator();
+        
+        propRes.setReponseID(rs.getInt("responseid"));
+        propRes.setResponseEventID(rs.getInt("responseevent_eventid"));
+        
+        propRes.setResponderIntended(ui.getUser(rs.getInt("responderintended_userid")));
+        propRes.setResponderActual(ui.getUser(rs.getInt("responder_userid")));
+        
+        propRes.setResponseTimestamp(rs.getTimestamp("responsetimestamp").toLocalDateTime());
+        propRes.setNotes(rs.getString("notes"));
+        
+        propRes.setInitiator(ui.getUser(rs.getInt("initiator")));
+        
+        return propRes;
+        
+    }
+    
+    
+    
+    
 
     /**
      * Attaches an Event to a code enforcement case. No checking of logic occurs

@@ -56,12 +56,5 @@ public class Constants implements Serializable {
     
     public final static String STYLE_CLASS_INACTIVE_CASE_PHASE = "stage-inactive";
     
-    // starting BOB Queroes
-    public final static QueryCEAREnum QUERY_INITIAL_CEAR = QueryCEAREnum.ALL_PAST30;
-    
-    
-    
-    
-    
     
 }

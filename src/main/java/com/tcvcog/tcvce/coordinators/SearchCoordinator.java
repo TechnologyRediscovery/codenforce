@@ -53,7 +53,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
      public QueryCEAR getQueryInitialCEAR(User u, Municipality m) throws IntegrationException{
-        return assembleQueryCEAR(Constants.QUERY_INITIAL_CEAR, u, m, null);
+        return assembleQueryCEAR(QueryCEAREnum.UNPROCESSED, u, m, null);
         
     }
     

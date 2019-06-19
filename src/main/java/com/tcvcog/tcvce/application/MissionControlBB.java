@@ -186,7 +186,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 "ERROR: Unable to invalidate session.", "Your system administrator has been notified."));
         }
-            return "logoutSequenceComplete";
+        return "logoutSequenceComplete";
     }
 
     
