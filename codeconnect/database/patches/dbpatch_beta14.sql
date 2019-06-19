@@ -7,25 +7,6 @@ ALTER TABLE ceactionrequest ADD CONSTRAINT ceactionreq_usersub_fk FOREIGN KEY (u
 
 ALTER TYPE ceeventtype ADD VALUE IF NOT EXISTS 'Citation' AFTER 'Compliance';
 
-CREATE SEQUENCE IF NOT EXISTS occperiodid_seq
-	START WITH 1000
-	INCREMENT BY 1 
-	MINVALUE 1000
-	NO MAXVALUE 
-	CACHE 1;
-
-CREATE TABLE public.occperiod
-(
-	periodid 						INTEGER DEFAULT nextval('occperiodid_seq') NOT NULL,
-	propertyunit_unitid
-	startdate						TIMESTAMP WITH TIME ZONE,
-	startdatecertifiedby_userid
-	startdatecertifiedts
-	enddate
-	enddatecertifiedby_userid
-	enddatecterifiedts
-	manager_userid
-) ;
 
 
 CREATE SEQUENCE IF NOT EXISTS ceeventproposal_seq
@@ -40,40 +21,42 @@ CREATE TABLE public.ceeventproposal
 	proposalid 						INTEGER DEFAULT nextval('ceeventproposal_seq') NOT NULL CONSTRAINT ceeventproposal_pk PRIMARY KEY,
 	title							TEXT,
 	overalldescription				text,
-	creator_userid 					integer,
-	choice1eventcat_catid			integer CONSTRAINT ceeventproposal_choice1_catid_fk REFERENCES ceeventcategory (categoryid),
+	creator_userid 					INTEGER,
+	choice1eventcat_catid			INTEGER CONSTRAINT ceeventproposal_choice1_catid_fk REFERENCES ceeventcategory (categoryid),
 	choice1description 				text,
-	choice2eventcat_catid			integer CONSTRAINT ceeventproposal_choice2_catid_fk REFERENCES ceeventcategory (categoryid),
+	choice2eventcat_catid			INTEGER CONSTRAINT ceeventproposal_choice2_catid_fk REFERENCES ceeventcategory (categoryid),
 	choice2description 				text,
-	choice3eventcat_catid			integer CONSTRAINT ceeventproposal_choice3_catid_fk REFERENCES ceeventcategory (categoryid),
+	choice3eventcat_catid			INTEGER CONSTRAINT ceeventproposal_choice3_catid_fk REFERENCES ceeventcategory (categoryid),
 	choice3description 				text,
 	directproposaltodefaultmuniceo 	boolean DEFAULT true,
- 	directproposaltodefaultmunistaffer boolean DEFAULT false
+ 	directproposaltodefaultmunistaffer boolean DEFAULT false,
+ 	directproposaltodeveloper		boolean DEFAULT false,
+ 	active	 						BOOLEAN DEFAULT true
 
 ) ;
 
 
-CREATE SEQUENCE IF NOT EXISTS ceeventproposalresponse_seq
+CREATE SEQUENCE IF NOT EXISTS ceeventproposalimplementation_seq
 	START WITH 1000
 	INCREMENT BY 1 
 	MINVALUE 1000
 	NO MAXVALUE 
 	CACHE 1;
 
-CREATE TABLE public.ceeventproposalresponse
+CREATE TABLE public.ceeventproposalimplementation
 (
-	responseid 						INTEGER DEFAULT nextval('ceeventproposalresponse_seq') NOT NULL  CONSTRAINT ceeventproposalresponse_pk PRIMARY KEY,
-	initiator 						INTEGER CONSTRAINT ceeventpropres_initiator_fk REFERENCES login (userid),
-	proposal_proposalid 				integer CONSTRAINT ceeventpropres_prop_fk REFERENCES ceeventproposal (proposalid),
-	responseevent_eventid 			integer CONSTRAINT ceeventpropres_resev_fk REFERENCES ceevent (eventid),
-	responderintended_userid 		integer CONSTRAINT ceeventpropres_responderintended_fk REFERENCES login (userid),
-	responder_userid 				integer CONSTRAINT ceeventpropres_responderactual_fk REFERENCES login (userid),
+	implementationid				INTEGER DEFAULT nextval('ceeventproposalimplementation_seq') NOT NULL  CONSTRAINT ceeventproposalresponse_pk PRIMARY KEY,
+	proposal_propid 				INTEGER CONSTRAINT ceeventpropimp_propid_fk REFERENCES ceeventproposal (proposalid),
+	generatingevent_eventid			INTEGER CONSTRAINT ceeventpropimp_genevent_fk REFERENCES ceevent (eventid),
+	initiator_userid				INTEGER CONSTRAINT ceeventpropimp_initiator_fk REFERENCES login (userid),
+	responderintended_userid 		INTEGER CONSTRAINT ceeventpropimp_responderintended_fk REFERENCES login (userid),
+	responderactual_userid 			INTEGER CONSTRAINT ceeventpropimp_responderactual_fk REFERENCES login (userid),
+	rejectproposal 					boolean DEFAULT false,
 	responsetimestamp 				timestamp with time zone,
-	notes 							text,
-	rejectproposal 					boolean DEFAULT false
+	responseevent_eventid 			INTEGER CONSTRAINT ceeventpropimp_resev_fk REFERENCES ceevent (eventid),
+	active							BOOLEAN DEFAULT true,
+	notes 							text
 ) ;
-
-ALTER TABLE ceeventproposal DROP COLUMN creator_userid;
 
 
 ALTER TABLE ceevent DROP COLUMN responsetimestamp; 
@@ -85,11 +68,11 @@ ALTER TABLE ceevent DROP COLUMN responseevent_eventid;
 ALTER TABLE ceevent DROP COLUMN rejeecteventrequest; 
 ALTER TABLE ceevent DROP COLUMN responderactual_userid;
 
-ALTER TABLE ceeventcategory ADD COLUMN proposal_propid INTEGER CONSTRAINT ceeventcat_proposal_propid_fk REFERENCES ceeventproposal (proposalid);
+ALTER TABLE ceeventcategory ADD COLUMN proposal_propid INTEGER CONSTRAINT ceeventcat_proposal_propid_fk REFERENCES ceeventproposal (proposalid), ;
 
 -- Has not been run on remote server
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (14, 'database/patches/dbpatch_beta13.sql', '', 'ecd', 'final clean ups');
+    VALUES (14, 'database/patches/dbpatch_beta14.sql', '', 'ecd', 'final clean ups');
 

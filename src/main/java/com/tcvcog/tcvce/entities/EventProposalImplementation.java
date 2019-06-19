@@ -11,20 +11,38 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class EventProposalResponse {
+public class EventProposalImplementation {
     
-    private int reponseID;
+    private int implementationID;
+    
+    private int proposalID;
+    private int generatingEventID;
     
     private User initiator;
     
     private User responderIntended;
     private User responderActual;
     
+    private LocalDateTime activatesOn;
+    private String activatesOnPretty;
+    
+    private LocalDateTime expiresOn;
+    private String expiresOnPretty;
+    
     private LocalDateTime responseTimestamp;
     private String responseTimePrettyDate;
+    
+    private boolean expiredorinactive;
+    
+    private int responseEventID;
+    /**
+     * Populating this has the danger of inciting infinite loops if somehow
+     * the generating event is aso the response event
+     */
+    private Event responseEvent;
+    
     private String notes;
     private boolean proposalRejected;
-    private int responseEventID;
 
     /**
      * @param responderIntended the responderIntended to set
@@ -136,17 +154,17 @@ public class EventProposalResponse {
     }
 
     /**
-     * @return the reponseID
+     * @return the implementationID
      */
-    public int getReponseID() {
-        return reponseID;
+    public int getImplementationID() {
+        return implementationID;
     }
 
     /**
-     * @param reponseID the reponseID to set
+     * @param implementationID the implementationID to set
      */
-    public void setReponseID(int reponseID) {
-        this.reponseID = reponseID;
+    public void setImplementationID(int implementationID) {
+        this.implementationID = implementationID;
     }
 
     /**
@@ -161,6 +179,119 @@ public class EventProposalResponse {
      */
     public void setResponderActual(User responderActual) {
         this.responderActual = responderActual;
+    }
+
+    /**
+     * @return the responseEvent
+     */
+    public Event getResponseEvent() {
+        return responseEvent;
+    }
+
+    /**
+     * @param responseEvent the responseEvent to set
+     */
+    public void setResponseEvent(Event responseEvent) {
+        this.responseEvent = responseEvent;
+    }
+
+    
+    /**
+     * @return the activatesOn
+     */
+    public LocalDateTime getActivatesOn() {
+        return activatesOn;
+    }
+
+    /**
+     * @return the activatesOnPretty
+     */
+    public String getActivatesOnPretty() {
+        return activatesOnPretty;
+    }
+
+    /**
+     * @return the expiresOn
+     */
+    public LocalDateTime getExpiresOn() {
+        return expiresOn;
+    }
+
+    /**
+     * @return the expiresOnPretty
+     */
+    public String getExpiresOnPretty() {
+        return expiresOnPretty;
+    }
+
+    /**
+     * @return the expiredorinactive
+     */
+    public boolean isExpiredorinactive() {
+        return expiredorinactive;
+    }
+
+    /**
+     * @param activatesOn the activatesOn to set
+     */
+    public void setActivatesOn(LocalDateTime activatesOn) {
+        this.activatesOn = activatesOn;
+    }
+
+    /**
+     * @param activatesOnPretty the activatesOnPretty to set
+     */
+    public void setActivatesOnPretty(String activatesOnPretty) {
+        this.activatesOnPretty = activatesOnPretty;
+    }
+
+    /**
+     * @param expiresOn the expiresOn to set
+     */
+    public void setExpiresOn(LocalDateTime expiresOn) {
+        this.expiresOn = expiresOn;
+    }
+
+    /**
+     * @param expiresOnPretty the expiresOnPretty to set
+     */
+    public void setExpiresOnPretty(String expiresOnPretty) {
+        this.expiresOnPretty = expiresOnPretty;
+    }
+
+    /**
+     * @param expiredorinactive the expiredorinactive to set
+     */
+    public void setExpiredorinactive(boolean expiredorinactive) {
+        this.expiredorinactive = expiredorinactive;
+    }
+
+    /**
+     * @return the proposalID
+     */
+    public int getProposalID() {
+        return proposalID;
+    }
+
+    /**
+     * @param proposalID the proposalID to set
+     */
+    public void setProposalID(int proposalID) {
+        this.proposalID = proposalID;
+    }
+
+    /**
+     * @return the generatingEventID
+     */
+    public int getGeneratingEventID() {
+        return generatingEventID;
+    }
+
+    /**
+     * @param generatingEventID the generatingEventID to set
+     */
+    public void setGeneratingEventID(int generatingEventID) {
+        this.generatingEventID = generatingEventID;
     }
     
 }
