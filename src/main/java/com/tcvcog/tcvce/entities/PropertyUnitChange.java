@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 
 /**
@@ -29,7 +30,7 @@ import java.time.LocalDate;
 public class PropertyUnitChange {
 
     private int unitChangeID;
-    private int changedBy; //personID of the person who changed the unit.
+    private String changedBy; //personID of the person who changed the unit.
     private int unitID;
     private int approvedBy; //personID of the user that approved the change (a backend operation)
     private String unitNumber;
@@ -39,8 +40,8 @@ public class PropertyUnitChange {
     private boolean boolChanged; //this stores if the rental variable was changed, not whether or not the unit is a rental.
     private boolean removed;
     private boolean added;
-    private java.time.LocalDate changedOn;
-    private java.time.LocalDate approvedOn; //If null, it has not been approved
+    private java.sql.Timestamp changedOn;
+    private java.sql.Timestamp approvedOn; //If null, it has not been approved
     private PropertyUnit thisUnit;
 
     public int getUnitChangeID() {
@@ -51,11 +52,11 @@ public class PropertyUnitChange {
         this.unitChangeID = unitChangeID;
     }
 
-    public int getChangedBy() {
+    public String getChangedBy() {
         return changedBy;
     }
 
-    public void setChangedBy(int changedBy) {
+    public void setChangedBy(String changedBy) {
         this.changedBy = changedBy;
     }
 
@@ -117,19 +118,19 @@ public class PropertyUnitChange {
         this.removed = removed;
     }
 
-    public LocalDate getChangedOn() {
+    public Timestamp getChangedOn() {
         return changedOn;
     }
 
-    public void setChangedOn(LocalDate changedOn) {
+    public void setChangedOn(Timestamp changedOn) {
         this.changedOn = changedOn;
     }
 
-    public LocalDate getApprovedOn() {
+    public Timestamp getApprovedOn() {
         return approvedOn;
     }
 
-    public void setApprovedOn(LocalDate approvedOn) {
+    public void setApprovedOn(Timestamp approvedOn) {
         this.approvedOn = approvedOn;
     }
 

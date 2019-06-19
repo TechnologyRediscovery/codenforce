@@ -18,11 +18,14 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Select a property in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
+                        <h1>Step 1/5: Select a property in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
+                        
+                        
                         
                         <h:form id="occPermitApplicationChoosePropertyForm">                          
                             <p:panel>
-                             
+                            
+                                <h2>Step 1: Select Property</h2>
 
                              <p>Please search for and select the property of concern using this search tool.</p>
 
@@ -63,7 +66,9 @@
                             </p:panelGrid> 
 
                             <h3>Search Results:</h3>
-                            <p>Click to select the desired property or try your search again.</p>
+                            <p>If the property you are looking for is not below, try searching again.
+                               If it is, please select it and click the button labeled 
+                               "Confirm and Continue" at the bottom of the page.</p>
 
                             <p:dataTable
                                 id="propertyResultTable"
@@ -96,13 +101,29 @@
                             </p:panel>
 
 
-                               
+                           <h3>Step 2: Configure Unit List</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 3: Select Units For Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 4: Choose Reason For Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 5: Add People To Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
                                       
 
                             <p:spacer height="10px"/>
                                 <p:commandButton ajax="false" value="Confirm and continue" action="#{occPermitApplicationBB.selectProperty}" />
                                 
                         </h:form>
+                        
+                        
                     </div>
                 </f:view>
             </ui:define>

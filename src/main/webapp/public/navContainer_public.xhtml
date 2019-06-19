@@ -8,32 +8,41 @@
 
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-          <h:outputStylesheet name="css/style.css"/>
-          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
-          
+        <h:outputStylesheet name="css/style.css"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+
         <title>COGConnect</title>
         <script>
-            function setSideBarHeight(){
+            function setSideBarHeight() {
                 var height = $('.contentContainer').height();
                 $('.flexing-box-sidebar').height(height);
             }
             window.onload = setSideBarHeight;
         </script>
+        <script>
+            $(document).on("keydown", ".ui-cell-editor-input input", function (event) {
+                if (event.keyCode == 13) {
+                    $(this).closest("tr").find(".ui-row-editor .ui-icon-check").click();
+                }
+            }
+            );
+
+        </script>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" />
-        
+
 
     </h:head>
 
     <h:body>
-        
+
         <div class="flex-box-container">
-            
-            
-        
+
+
+
             <ui:insert name="top">
                 <f:view id="navview">
-                     <div class="flexing-box-topbar">
+                    <div class="flexing-box-topbar">
                         <div class="logoBox">
                             <div class="logo-image-wrapper">
                                 <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
@@ -43,61 +52,61 @@
                                     <div class="sys-title" style="font-weight: bold;">COG Connect: Municipal code enforcement data platform</div>
                                 </div>
                                 <div class="report-title-sub">
-                                    
-                                <div class="sys-title-sub">Turtle Creek Valley Council of Governments</div>
+
+                                    <div class="sys-title-sub">Turtle Creek Valley Council of Governments</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </f:view>
             </ui:insert>
-                
-            
+
+
         </div>
-         
-        
+
+
         <div class="flex-box-container">
-                <div class="flexing-box-sidebar">
-                    
-                    <f:view id="sideBarView">
-                        
-                       <h:form id="panelMenu">
+            <div class="flexing-box-sidebar">
+
+                <f:view id="sideBarView">
+
+                    <h:form id="panelMenu">
                         <p:menu>
 
-                                <p:menuitem value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
-                                <p:menuitem value="Request code&lt;br /&gt; enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
-                                <p:menuitem value="Check on your case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
-                                <p:menuitem value="Apply for an &lt;br /&gt;occupancy permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false"/>
-                                <p:menuitem value="About" action="about" ajax="false" icon="fa fa-info" />
-                                <p:menuitem value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
+                            <p:menuitem value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
+                            <p:menuitem value="Request code&lt;br /&gt; enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
+                            <p:menuitem value="Check on your case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
+                            <p:menuitem value="Apply for an &lt;br /&gt;occupancy permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false"/>
+                            <p:menuitem value="About" action="about" ajax="false" icon="fa fa-info" />
+                            <p:menuitem value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
 
                             <p:submenu label="Help" expanded="true">
-                                
+
                                 <p:menuitem value="How-To Guides" action="howtos" ajax="false" 
                                             icon="fa fa-question-circle" />
-                                
+
                                 <p:menuitem value="Learn core concepts" action="coreConcepts" ajax="false" 
                                             icon="fa fa-pencil"/>
-                                
+
                                 <p:menuitem value="For developers" action="technical"  ajax="false" 
                                             icon="fa fa-database" />
                             </p:submenu>
                         </p:menu>
                     </h:form>
-                    </f:view>
-                </div>
-                    
-                
-            
+                </f:view>
+            </div>
+
+
+
             <div class="flexing-box-interior">
-                
+
                 <div class="flex-box-container-interior">
                     <f:view id="sessionInfoView">
-                        
+
 
                         <div class="flexing-box-sessioninfo">
-                           
-                                
+
+
 
                         </div>
 
@@ -115,19 +124,19 @@
         </div>
         <div class="flex-box-container">
 
-        <div class="flexing-box-footer">
-            <ui:insert name="bottom">
-                <div class="footer">
-                    <f:view id="footerView">
-                        <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
-                    </f:view>
-                </div>
-                
-            </ui:insert>
+            <div class="flexing-box-footer">
+                <ui:insert name="bottom">
+                    <div class="footer">
+                        <f:view id="footerView">
+                            <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
+                        </f:view>
+                    </div>
+
+                </ui:insert>
+            </div>
+
         </div>
-            
-    </div>
-        
+
         <!--<div class="clearFix"></div>-->
 
 
