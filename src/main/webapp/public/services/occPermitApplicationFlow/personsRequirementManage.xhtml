@@ -18,95 +18,138 @@
                     <div class="mainContainer">
 
                         <h:form id="messageForm">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
+                            <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
                         </h:form>
 
                         <h:form id="personsRequirementManageForm">
 
-                            <h1>Add People to Application</h1>
+                            <h1>Step 5/5: Add People to Application</h1>
 
-                            <p:outputLabel value="The selected reason for the application is: #{sessionBean.occPermitApplication.reason.title}"/>
-                            <p:spacer height="5px"/>
-                                <p:outputLabel value="#{sessionBean.occPermitApplication.reason.humanFriendlyDescription}"/>
+                            <p:panel>
+                                <h3>Step 1: Select Property</h3>
+
+                                <p:dataTable
+                                    id="chosenPropertyTable"
+                                    var="prop" 
+                                    value="#{sessionBean.activePropWithLists}"
+                                    rowKey="#{prop.propertyID}">
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Address" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.address}"/>
+                                    </p:column>
+
+
+                                    <p:column>
+
+                                        <f:facet name="header">
+                                            <h:outputText value="Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyUseType}"/>
+
+                                    </p:column>
+
+                                </p:dataTable>
+
+                            </p:panel>
+
+                            <p:panel>
+                                <h3>Step 2: Configure Unit List</h3>
+
+                                <p:outputLabel>You have configured your units. You may see the list below.</p:outputLabel>
+
+                            </p:panel>
+                            <p:panel>
+                                <h3>Step 3: Select Units For Application</h3>
+
+                                <p:dataTable
+                                    id="propertyUnitsToAddTable"
+                                    var="unit"
+                                    value="#{sessionBean.workingPropWithLists.unitList}"
+                                    scrollable="true" scrollHeight="150"
+                                    rowKey="#{unit.unitID}"
+                                    >                                         
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Number" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.unitNumber}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rental?" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.notes}" />
+                                    </p:column>
+
+                                </p:dataTable>
+                            </p:panel>
+
+                            <p:spacer height="5px" />
+                            <p:panel>
+                                <h3>Step 4: Choose Reason For Application</h3>
+
+                                <p:outputLabel value="The selected reason for the application is: #{sessionBean.occPermitApplication.reason.title}"/>
                                 
-                            <ui:remove>
                                 <p:spacer height="5px"/>
-                                <p:outputLabel value="#{sessionBean.occPermitApplication.reason.humanFriendlyDescription}"/>
+                                
+                                <p:outputLabel value="Your attached notes: #{sessionBean.occPermitApplication.submissionNotes}"/>
+                            </p:panel>
 
-                                <p:dataTable var="requiredPersonType" value="#{sessionBean.occPermitApplication.reason.personsRequirement.requiredPersonTypes}">
+                            <p:spacer height="5px"/>
+                            
+                            <h2>Step 5: Add People To Application</h2>
+                            
+                            <p:outputLabel value="#{sessionBean.occPermitApplication.reason.humanFriendlyDescription}"/>
 
-                                    <p:column headerText="Required Persons">
-                                        <h:outputText value="#{requiredPersonType.label}"/>
-                                    </p:column>
-
-                                    <p:column>
-                                        <p:commandButton value="Add" action="#{occPermitApplicationBB.attachPerson(requiredPersonType)}"/>
-                                    </p:column>
-                                </p:dataTable>
-
-                                <p:dataTable var="optionalPersonType" value="#{sessionBean.occPermitApplication.reason.personsRequirement.optionalPersonTypes}">
-
-                                    <p:column headerText="Optional Persons">
-                                        <h:outputText value="#{optionalPersonType.label}"/>
-                                    </p:column>
-
-                                    <p:column>
-                                        <p:commandButton value="Add" action="#{occPermitApplicationBB.attachPerson(optionalPersonType)}"/>
-                                    </p:column>
-                                </p:dataTable>
-                            </ui:remove>
                             <h:panelGrid id="menu" columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
                                 <h:panelGroup >
                                     <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter">
                                         <h:panelGroup>
-                                            <p:outputLabel id="last-name-ol" for="last-name-chkbx" value="Filter by last name?" />
-                                            <p:selectBooleanCheckbox id="last-name-chkbx" value="#{personSearchPublicBB.params.filterByLastName}" >
-                                                <p:ajax update="last-name-it"/>
-                                            </p:selectBooleanCheckbox>               
+                                            <p:outputLabel id="last-name-ol" value="Filter by last name" />
                                         </h:panelGroup>
                                         <h:panelGroup>
-                                            <p:inputText id="last-name-it" value="#{personSearchPublicBB.params.lastNameSS}" disabled="#{!personSearchPublicBB.params.filterByLastName}"/>
+                                            <p:inputText id="last-name-it" value="#{personSearchPublicBB.params.lastNameSS}"/>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <p:outputLabel id="first-name-ol" for="first-name-chkbx" value="Filter by first name?" />
-                                            <p:selectBooleanCheckbox id="first-name-chkbx" value="#{personSearchPublicBB.params.filterByFirstName}" >
-                                                <p:ajax update="first-name-it"/>
-                                            </p:selectBooleanCheckbox>               
+                                            <p:outputLabel id="first-name-ol" value="Filter by first name" />
                                         </h:panelGroup>
                                         <h:panelGroup>
-                                            <p:inputText id="first-name-it" value="#{personSearchPublicBB.params.firstNameSS}" disabled="#{!personSearchPublicBB.params.filterByFirstName}"/>
+                                            <p:inputText id="first-name-it" value="#{personSearchPublicBB.params.firstNameSS}"/>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <p:outputLabel id="email-ol" for="email-chkbx" value="Filter by email?" />
-                                            <p:selectBooleanCheckbox id="email-chkbx" value="#{personSearchPublicBB.params.filterByEmail}" >
-                                                <p:ajax update="email-it"/>
-                                            </p:selectBooleanCheckbox>               
+                                            <p:outputLabel id="email-ol" value="Filter by email" />
                                         </h:panelGroup>
                                         <h:panelGroup>
-                                            <p:inputText id="email-it" value="#{personSearchPublicBB.params.emailSS}" disabled="#{!personSearchPublicBB.params.filterByEmail}"/>
+                                            <p:inputText id="email-it" value="#{personSearchPublicBB.params.emailSS}"/>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <p:outputLabel id="phone-number-ol" for="phone-number-chkbx" value="Filter by phone?" />
-                                            <p:selectBooleanCheckbox id="phone-number-chkbx" value="#{personSearchPublicBB.params.filterByPhoneNumber}" >
-                                                <p:ajax update="phone-number-it"/>
-                                            </p:selectBooleanCheckbox>               
+                                            <p:outputLabel id="phone-number-ol" value="Filter by phone?" />
                                         </h:panelGroup>
                                         <h:panelGroup>
-                                            <p:inputText id="phone-number-it" value="#{personSearchPublicBB.params.phoneNumber}" disabled="#{!personSearchPublicBB.params.filterByPhoneNumber}"/>
+                                            <p:inputText id="phone-number-it" value="#{personSearchPublicBB.params.phoneNumber}"/>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <p:outputLabel id="street-ol" for="street-chkbx" value="Filter by street?" />
-                                            <p:selectBooleanCheckbox id="street-chkbx" value="#{personSearchPublicBB.params.filterByAddressStreet}" >
-                                                <p:ajax update="street-it"/>
-                                            </p:selectBooleanCheckbox>               
+                                            <p:outputLabel id="street-ol" value="Filter by street?" />
                                         </h:panelGroup>                                        
                                         <h:panelGroup>
-                                            <p:inputText id="street-it" value="#{personSearchPublicBB.params.addrStreetSS}" disabled="#{!personSearchPublicBB.params.filterByAddressStreet}"/>
+                                            <p:inputText id="street-it" value="#{personSearchPublicBB.params.addrStreetSS}"/>
                                         </h:panelGroup>
 
                                     </h:panelGrid>
@@ -145,7 +188,7 @@
                                         <p:column>
                                             <p:commandButton ajax="true" 
                                                              update=":personsRequirementManageForm:applicationPersonTable
-                                                                     :messageForm" 
+                                                             :messageForm" 
                                                              action="#{occPermitApplicationBB.addPersonToApplication(person)}" 
                                                              id="attach-person-cb" value="Attach" />
                                         </p:column>
@@ -163,13 +206,13 @@
                             <p:spacer height="10px"/>
 
                             <p:outputLabel value="#{occPermitApplicationBB.personRequirementDescription.get(0)}"/>
-                            
+
                             <p:spacer height="10px"/>
-                            
+
                             <p:outputLabel value="#{occPermitApplicationBB.personRequirementDescription.get(1)}"/>
-                            
+
                             <p:spacer height="10px"/>
-                            
+
                             <p:outputLabel value="#{occPermitApplicationBB.personRequirementDescription.get(2)}"/>
 
                             <p:dataTable id="applicationPersonTable"

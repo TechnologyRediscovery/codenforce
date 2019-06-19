@@ -137,8 +137,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                 && getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement() != null) { //I apologize for the ugly code. It is necessary to prevent a null pointer exception. - Nathan
 
             requiredPersons = getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getRequiredPersonTypes();
-
-            optAndReqPersons = requiredPersons;
+            
+            optAndReqPersons = new ArrayList<>();
+            
+            optAndReqPersons.addAll(requiredPersons);
 
             optAndReqPersons.addAll(getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes());
 
@@ -601,28 +603,38 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         PropertyCoordinator pc = getPropertyCoordinator();
 
-        if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
-            try {
-                propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-            } catch (CaseLifecyleException ex) {
-                System.out.println(ex);
+        if (selectedProperty != null) {
+
+            if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
+                try {
+                    propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
+                } catch (CaseLifecyleException ex) {
+                    System.out.println(ex);
+                }
+            } else {
+                try {
+                    propWithLists = pc.getPropertyUnits(selectedProperty);
+                } catch (CaseLifecyleException ex) {
+                    System.out.println(ex);
+                }
             }
+
+            getSessionBean().setActivePropWithLists(propWithLists);
+
+            if (propWithLists.getUnitList().size() == 1) {
+                List<PropertyUnit> propertyUnitList = propWithLists.getUnitList();
+                getSessionBean().setActivePropUnit(propertyUnitList.get(0));
+                getSessionBean().getOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
+            }
+            return "addPropertyUnit";
         } else {
-            try {
-                propWithLists = pc.getPropertyUnits(selectedProperty);
-            } catch (CaseLifecyleException ex) {
-                System.out.println(ex);
-            }
-        }
 
-        getSessionBean().setActivePropWithLists(propWithLists);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a property.", ""));
 
-        if (propWithLists.getUnitList().size() == 1) {
-            List<PropertyUnit> propertyUnitList = propWithLists.getUnitList();
-            getSessionBean().setActivePropUnit(propertyUnitList.get(0));
-            getSessionBean().getOccPermitApplication().setApplicationPropertyUnit(propertyUnitList.get(0));
+            return "";
         }
-        return "addPropertyUnit";
     }
 
     /**
@@ -699,6 +711,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         for (PropertyUnit firstUnit : workingPropUnits) {
             duplicateNums = 0;
 
+            firstUnit.setUnitNumber(firstUnit.getUnitNumber().replaceAll("(?i)unit", ""));
+            
             if (firstUnit.getUnitNumber().compareTo("") == 0) {
                 missingUnitNum = true;
                 break; //break for performance reasons. Can be removed if breaks are not welcome here.
@@ -1090,7 +1104,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             }
 
         }
-        
+
         System.out.println("end of submitting unit change list");
     }
 
