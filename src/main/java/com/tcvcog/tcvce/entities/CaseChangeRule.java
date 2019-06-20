@@ -9,15 +9,15 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Ushering a code enforcement case through these phases is driven by a set of rules which are encapsulated in an object called the `CasePhaseChangeRule`. These objects live on `EventCategory` objects and, when present on a given `Event`, are used by the `CaseCoordinator` during event processing to make two distinct but related determinations:
- * 
- * 1) Should this case's phase be changed? If so, to what?
- * 2) Do I need to create an Event that requests an action from a user? If so, what `EventCategory` should be requested?
- *
- * Information for making both of these determinations is bundled in the single `CasePhaseChangeRule` object because many requested event categories themselves trigger case phase changes, so designing the relationships together and writing them to a single object simplifies what is already a somewhat convoluted determination process.
+ * Ushering a code enforcement case through these phases is driven by a set of rules which are encapsulated in an object called the `CaseChangeRule`. These objects live on `EventCategory` objects and, when present on a given `Event`, are used by the `CaseCoordinator` during event processing to make two distinct but related determinations:
+ 
+ 1) Should this case's phase be changed? If so, to what?
+ 2) Do I need to create an Event that requests an action from a user? If so, what `EventCategory` should be requested?
+
+ Information for making both of these determinations is bundled in the single `CaseChangeRule` object because many requested event categories themselves trigger case phase changes, so designing the relationships together and writing them to a single object simplifies what is already a somewhat convoluted determination process.
  * @author sylvia
  */
-public class CasePhaseChangeRule extends EntityUtils implements Serializable {
+public class CaseChangeRule extends EntityUtils implements Serializable {
     
     /**
      * Rule's unique ID pulled from DB
@@ -90,8 +90,6 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
      * If the rule passes and a triggeredEventCategoryID is specified, 
      * load up that Event with an EventCategory with this ID
      */
-    private int triggeredEventCategoryRequestedEventCatID;
-    
     /**
      * Declares the rule active or inactive; inactiev rules are completely ignored
      */
@@ -233,7 +231,7 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CasePhaseChangeRule other = (CasePhaseChangeRule) obj;
+        final CaseChangeRule other = (CaseChangeRule) obj;
         if (!Objects.equals(this.ruleID, other.ruleID)) {
             return false;
         }
@@ -375,12 +373,6 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
         return forbiddenExtantEventCatID;
     }
 
-    /**
-     * @return the triggeredEventCategoryRequestedEventCatID
-     */
-    public int getTriggeredEventCategoryRequestedEventCatID() {
-        return triggeredEventCategoryRequestedEventCatID;
-    }
 
     /**
      * @param requiredExtantEventCatID the requiredExtantEventCatID to set
@@ -396,16 +388,6 @@ public class CasePhaseChangeRule extends EntityUtils implements Serializable {
         this.forbiddenExtantEventCatID = forbiddenExtantEventCatID;
     }
 
-    /**
-     * @param triggeredEventCategoryRequestedEventCatID the triggeredEventCategoryRequestedEventCatID to set
-     */
-    public void setTriggeredEventCategoryRequestedEventCatID(int triggeredEventCategoryRequestedEventCatID) {
-        this.triggeredEventCategoryRequestedEventCatID = triggeredEventCategoryRequestedEventCatID;
-    }
-
-    
-    
-    
     
     
 }

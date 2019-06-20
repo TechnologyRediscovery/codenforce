@@ -95,7 +95,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             cse.setViolationList(new ArrayList<CodeViolation>());
         }
         
-        cse.setEventListActionRequests(new ArrayList<EventCECase>());
+        cse.setEventProposalList(new ArrayList<EventCECase>());
         cse.setVisibleEventList(new ArrayList<EventCECase>());
         
         
@@ -117,7 +117,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         Collections.sort(cse.getNoticeList());
         Collections.reverse(cse.getNoticeList());
         
-        Collections.sort(cse.getEventListActionRequests());
+        Collections.sort(cse.getEventProposalList());
         Collections.sort(cse.getVisibleEventList());
         Collections.reverse(cse.getVisibleEventList()); 
         
@@ -140,6 +140,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @param cse which needs its StageConfigured
      * @return the same CECas passed in with the CaseStage configured
      * @throws CaseLifecyleException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
      public CECase configureCECaseStageAndPhase(CECase cse) throws CaseLifecyleException, IntegrationException {
         
@@ -206,12 +207,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         //now set the icon based on what phase we just assigned the case to
         cse.setCasePhaseIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString(cse.getCaseStage().getIconPropertyLookup()))));
-        
-        
-   
         return cse;
     }
      
+     /**
+      * TODO: Finish logic
+      * @param cse
+      * @return 
+      */
     public CECase determineAndSetPhase_stageCITATION(CECase cse){
         Iterator<EventCECase> iter = cse.getActiveEventList().iterator();
         while(iter.hasNext()){
@@ -220,9 +223,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 
             }
         }
-        
-         
-        return cse;
+         return cse;
     } 
      
     public boolean determineIfNoticeHasBeenMailed(CECase cse){
@@ -256,10 +257,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
          return maxStatus;
      }
     
-    
-
-    
-   
     public ReportCEARList getInitializedReportConficCEARs(User u, Municipality m){
         ReportCEARList rpt = new ReportCEARList();
         rpt.setIncludePhotos(true);
@@ -270,20 +267,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return rpt;
     }
     
-   
-    
-   
-    
     public List<CECase> getUserCaseHistoryList(User u) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator caseInt = getCaseIntegrator();
         return caseInt.getCECaseHistoryList(u);
         
     }
-    
-    
-    
-    
-    
     
     public CECase getInitializedCECase(Property p, User u){
         CECase newCase = new CECase();
@@ -482,7 +470,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     private boolean evalulateCasePhaseChangeRule(CECase cse, EventCECase event) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         
-        CasePhaseChangeRule rule = event.getCategory().getCasePhaseChangeRule();
+        CaseChangeRule rule = event.getCategory().getCasePhaseChangeRule();
         boolean rulePasses = false;
         
         if(rule.getRequiredCurrentCasePhase() != null){
@@ -520,7 +508,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    private boolean ruleSubcheck_forbiddenCasePhase(CECase cse, CasePhaseChangeRule rule){
+    private boolean ruleSubcheck_forbiddenCasePhase(CECase cse, CaseChangeRule rule){
         boolean subcheckPasses = true;
         
         if(rule.isTreatForbiddenPhaseAsThreshold()){
@@ -534,7 +522,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    private boolean ruleSubcheck_requiredEventType(CECase cse, CasePhaseChangeRule rule){
+    private boolean ruleSubcheck_requiredEventType(CECase cse, CaseChangeRule rule){
         boolean subcheckPasses = true;
         if(rule.getRequiredExtantEventType() != null){
             subcheckPasses = false;
@@ -550,7 +538,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
    
     
-    private boolean ruleSubcheck_forbiddenEventType(CECase cse, CasePhaseChangeRule rule){
+    private boolean ruleSubcheck_forbiddenEventType(CECase cse, CaseChangeRule rule){
         boolean subcheckPasses = true;
         Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
@@ -562,7 +550,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private boolean ruleSubcheck_requiredEventCategory(CECase cse, CasePhaseChangeRule rule){
+    private boolean ruleSubcheck_requiredEventCategory(CECase cse, CaseChangeRule rule){
         boolean subcheckPasses = true;
         if(rule.getRequiredExtantEventCatID() != 0){
             subcheckPasses = false;
@@ -577,7 +565,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, CasePhaseChangeRule rule){
+    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, CaseChangeRule rule){
         boolean subcheckPasses = true;
         Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
@@ -589,7 +577,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private void implementPassedCasePhaseChangeRule(CECase cse, CasePhaseChangeRule rule) 
+    private void implementPassedCasePhaseChangeRule(CECase cse, CaseChangeRule rule) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
@@ -601,9 +589,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         ec.generateAndInsertPhaseChangeEvent(cse, oldCP, rule);
         if(rule.getTriggeredEventCategoryID() != 0){
             newEvent = ec.getInitializedEvent(cse, ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryID()));
-            if(rule.getTriggeredEventCategoryRequestedEventCatID() != 0){
-                newEvent.setRequestedEventCat(ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryRequestedEventCatID()));
-            }
+            
             attachNewEventToCECase(cse, newEvent, null);
             System.out.println("CaseCoordinator.implementPassedCasePhaseChangeRule "  + newEvent.getCategory().getEventCategoryTitle());
         }
@@ -1178,9 +1164,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     * @return
     * @throws IntegrationException 
     */
-   public CasePhaseChangeRule getCasePhaseChangeRule(EventCategory ec) throws IntegrationException{
+   public CaseChangeRule getCasePhaseChangeRule(EventCategory ec) throws IntegrationException{
        CaseIntegrator ci = getCaseIntegrator();
-       return ci.getPhaseChangeRule(ec.getCasePhaseChangeRule().getRuleID());
+       return ci.getCaseChangeRule(ec.getCasePhaseChangeRule().getRuleID());
        
    }
    
@@ -1234,12 +1220,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         tfEvent = ec.getInitializedEvent(cse, eventCat);
         tfEvent.setDateOfRecord(cv.getStipulatedComplianceDate());
         tfEvent.setOwner(cse.getCaseManager());
-        tfEvent.setRequestActionByDefaultMuniCEO(true);
-        eventCat = ec.getInitiatlizedEventCategory(
-                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
-                .getString("propertyInspection")));
-        tfEvent.setRequestedEventCat(eventCat);
-        tfEvent.setActionRequestedBy(uc.getRobotUser());
         
         sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
                         .getString("complianceTimeframeEndEventDesc"));

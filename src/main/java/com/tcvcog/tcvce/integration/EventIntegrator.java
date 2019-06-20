@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.MalformedBOBException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Event;
@@ -118,7 +119,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         }
         if(rs.getInt("phasechangerule_ruleid") != 0){
-            ec.setCasePhaseChangeRule(ci.getPhaseChangeRule(rs.getInt("phasechangerule_ruleid")));
+            ec.setCasePhaseChangeRule(ci.getCaseChangeRule(rs.getInt("phasechangerule_ruleid")));
         }
         return ec;
     }
@@ -820,6 +821,72 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return propImp;
     }
     
+    public void insertEventProposalImplementation(EventProposalImplementation imp) throws MalformedBOBException, IntegrationException{
+        String query = "INSERT INTO public.ceeventproposalimplementation(\n" +
+                        "            implementationid, proposal_propid, generatingevent_eventid, initiator_userid, \n" +
+                        "            responderintended_userid, activateson, expireson, responderactual_userid, \n" +
+                        "            rejectproposal, responsetimestamp, responseevent_eventid, expiredorinactive, \n" +
+                        "            notes)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?);";
+
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, imp.getProposalID());
+            stmt.setInt(2, imp.getGeneratingEventID());
+            
+            if(imp.getInitiator() != null){
+                stmt.setInt(3, imp.getInitiator().getUserID());
+            } else { 
+                throw new MalformedBOBException("EventProposalImplementations must contain a User object as an initiator");
+            }
+            
+            if(imp.getResponderIntended()!= null){
+                stmt.setInt(4, imp.getResponderIntended().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(imp.getActivatesOn()));
+            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(imp.getExpiresOn()));
+            
+            if(imp.getResponderActual() != null){
+                stmt.setInt(7, imp.getResponderActual().getUserID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            stmt.setBoolean(8, imp.isProposalRejected());
+            
+            if(imp.getResponseTimestamp() != null){
+                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(imp.getResponseTimestamp()));
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+
+            stmt.setInt(10, imp.getResponseEventID());
+            stmt.setBoolean(11, imp.isExpiredorinactive());
+            stmt.setString(12, imp.getNotes());
+            
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to insert EventProposal", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
     /**
      * Builds an EventProposalImplementation object given the PK of the DB record
      * @param propImpID
@@ -948,8 +1015,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
         EventProposalImplementation imp;
         
-        if(ev.getEventProposal().getImplementation() != null){
-            imp = ev.getEventProposal().getImplementation();
+        if(ev.getEventProposalImplementation()!= null){
+            imp = ev.getEventProposalImplementation();
 
             try {
 
@@ -1310,12 +1377,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 ev.setActive(rs.getBoolean("activeevent"));
 
                 Timestamp ldt = rs.getTimestamp("viewconfirmedat");
-                if (ldt != null) {
-                    ev.setResponderActual(ui.getUser(rs.getInt("viewconfirmedby")));
-                    ev.setResponseTimestamp(rs.getTimestamp("viewconfirmedat").toInstant()
-                            .atZone(ZoneId.systemDefault()).toLocalDateTime());
-                    
-                }
+                // removed action requests
                 ev.setHidden(rs.getBoolean("hidden"));
                 ev.setNotes(rs.getString("notes"));
 
@@ -1377,10 +1439,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         String query = "SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n" +
                 "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
-                "       disclosetopublic, activeevent, hidden, ceevent.notes, responsetimestamp, \n" +
-                "       actionrequestedby_userid, respondernotes, responderintended_userid, \n" +
-                "       requestedeventcat_catid, responseevent_eventid, rejeecteventrequest, \n" +
-                "       responderactual_userid, directrequesttodefaultmuniceo, property_propertyid,  municipality_municode " +
+                "       disclosetopublic, activeevent, hidden, ceevent.notes, property_propertyid,  municipality_municode " +
                 "       FROM public.ceevent INNER JOIN public.cecase ON (cecase_caseid = caseid)\n" +
                 "                           INNER JOIN public.property on (property_propertyid = propertyid) " +
                 "       WHERE eventid = ?;";

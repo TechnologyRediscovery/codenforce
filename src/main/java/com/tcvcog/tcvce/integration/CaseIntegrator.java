@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseBaseClass;
 import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
+import com.tcvcog.tcvce.entities.CaseChangeRule;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
@@ -507,6 +507,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         
+        // Wrap our base class in the subclass wrapper--an odd design structure, indeed
         CECase cse = new CECase(caseBare);
 
         // *** POPULATE LISTS OF EVENTS, NOTICES, CITATIONS, AND VIOLATIONS ***
@@ -791,8 +792,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws SQLException
      */
-    private CasePhaseChangeRule generateCasePhaseChangeRule(ResultSet rs) throws SQLException, IntegrationException{
-        CasePhaseChangeRule cpcr = new CasePhaseChangeRule();
+    private CaseChangeRule generateCaseChangeRule(ResultSet rs) throws SQLException, IntegrationException{
+        CaseChangeRule cpcr = new CaseChangeRule();
         EventIntegrator ei = getEventIntegrator();
         
         cpcr.setRuleID(rs.getInt("ruleid"));
@@ -835,8 +836,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public CasePhaseChangeRule getPhaseChangeRule(int ruleid) throws IntegrationException{
-        CasePhaseChangeRule rule = null;
+    public CaseChangeRule getCaseChangeRule(int ruleid) throws IntegrationException{
+        CaseChangeRule rule = null;
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -853,7 +854,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
             rs = stmt.executeQuery();
             while(rs.next()){
-                rule = generateCasePhaseChangeRule(rs);
+                rule = generateCaseChangeRule(rs);
             }
 
         } catch (SQLException ex) {

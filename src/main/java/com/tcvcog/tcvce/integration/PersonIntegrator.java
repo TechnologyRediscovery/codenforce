@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -760,6 +761,38 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return list;
 
     }
+    
+    public List<Person> getPersonList(Event ev) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Person> list = new ArrayList<>();
+
+        try {
+            String s = "SELECT person_personid FROM public.ceeventperson WHERE ceevent_eventid = ?;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, ev.getEventID());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Person pers = getPerson(rs.getInt("person_personid"));
+                list.add(pers);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return list;
+
+    }
+
 
     public List<Person> getPersonHistory(User u) throws IntegrationException {
         Connection con = getPostgresCon();

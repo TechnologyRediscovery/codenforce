@@ -27,7 +27,7 @@ public class CECase extends CECaseBaseClass implements Cloneable{
     private List<EventCECase> completeEventList;
     
     
-    private List<EventCECase> eventListActionRequests;
+    private List<EventCECase> eventProposalList;
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
     private List<CEActionRequest> ceActionRequestList;
@@ -158,34 +158,34 @@ public class CECase extends CECaseBaseClass implements Cloneable{
     }
 
     /**
-     * @return the eventListActionRequests
+     * @return the eventProposalList
      */
-    public List<EventCECase> getEventListActionRequests() {
+    public List<EventCECase> getEventProposalList() {
 
-        eventListActionRequests = new ArrayList<>();
+        eventProposalList = new ArrayList<>();
         if(completeEventList !=  null && completeEventList.size() >= 1){
             for(EventCECase ev: completeEventList){
-                if(ev.getRequestedEventCat()!= null 
+                if(ev.getEventProposalImplementation()!= null 
                         && 
-                    !ev.isResponseComplete()
+                    ev.getEventProposalImplementation().getResponseTimestamp() != null
                         &&
                     ev.isActive()
                         &&
                     !ev.isHidden()){
                     // event is a case action request so add it!
-                    eventListActionRequests.add(ev);
+                    eventProposalList.add(ev);
                 }
             }
         }
         
-        return eventListActionRequests;
+        return eventProposalList;
     }
 
     /**
-     * @param eventListActionRequests the eventListActionRequests to set
+     * @param eventProposalList the eventProposalList to set
      */
-    public void setEventListActionRequests(List<EventCECase> eventListActionRequests) {
-        this.eventListActionRequests = eventListActionRequests;
+    public void setEventProposalList(List<EventCECase> eventProposalList) {
+        this.eventProposalList = eventProposalList;
     }
 
     /**

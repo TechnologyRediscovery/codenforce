@@ -25,12 +25,14 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CasePhaseChangeRule;
+import com.tcvcog.tcvce.entities.CaseChangeRule;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
+import com.tcvcog.tcvce.entities.EventProposal;
+import com.tcvcog.tcvce.entities.EventProposalImplementation;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
@@ -38,6 +40,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import com.tcvcog.tcvce.util.Constants;
@@ -105,8 +108,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<EventCECaseCasePropBundle> configureEventBundleList(  List<EventCECaseCasePropBundle> evList, 
-                                                                User user, List<Municipality> userAuthMuniList) throws IntegrationException{
+    public List<EventCECaseCasePropBundle> configureEventBundleList(    List<EventCECaseCasePropBundle> evList, 
+                                                                         User user, 
+                                                                         List<Municipality> userAuthMuniList) throws IntegrationException{
         Iterator<EventCECaseCasePropBundle> iter = evList.iterator();
         while(iter.hasNext()){
             configureEvent(iter.next().getEvent(), user, userAuthMuniList);
@@ -139,32 +143,26 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public EventCECase configureEvent(EventCECase ev, User user, List<Municipality> userAuthMuniList) throws IntegrationException{
-        CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
-       
+        PersonIntegrator pi = getPersonIntegrator();
        
         // begin configuring the event proposals assocaited with this event
         // remember: event proposals are specified in an EventCategory object
-        // but when we build an Event object, the Proposal lives on the Event itself
-        // and the EventProposalResponse inside that
-        if(ev.getCategory().gete){
-            ev.set(canUserTakeRequestedAction(ev, user, userAuthMuniList));
-            if(ev.isRequestActionByDefaultMuniCEO()){
-                    ev.setResponderIntended(ci.getDefaultCodeOfficer(ev.getCaseID()));
-            }
-            // as long as any existing action request is complete and it was not
-            // rejected (i.e. no event created in response to the request)
-            // go get the triggering event
-            if(ev.isResponseComplete() && !ev.isRequestRejected()){
-                ev.setTriggeringEvent(ei.getProposalImplAssociatedWithEvent(ev));
-            }
+        // but when we build an Event object, the ProposalImplementation lives on the Event itself
+        // 
+        if(ev.getCategory().getEventProposal() != null){
+            EventProposalImplementation imp = ei.getProposalImplAssociatedWithEvent(ev);
+            imp.setCurrentUserCanEvaluateProposal(determineCanUserEvaluateProposal(ev, user, userAuthMuniList));
+            ev.setEventProposalImplementation(imp);
         }
-        
-        // TODO: event persons
-        ev.setPersonList(new ArrayList<Person>());
+        ev.setPersonList(pi.getPersonList(ev));
         
         return ev;
     }
+    
+    
+    
+    
     
      /**
      * Pathway for injecting business logic into the event search process. Now its just a pass through.
@@ -190,9 +188,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param muniList
      * @return 
      */
-    public boolean canUserTakeRequestedAction(EventCECase ev, User u, List<Municipality> muniList){
-        boolean canDoRequestedEvent = false;
-        EventType evType = ev.getCategory().getEventType();
+    public boolean determineCanUserEvaluateProposal(EventCECase ev, User u, List<Municipality> muniList){
+        boolean canEvaluateProposal = false;
+        EventProposal evProp = ev.getCategory().getEventProposal();
         
         // direct event assignment allows view conf to cut across regular permissions
         // checks
@@ -204,15 +202,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             if(u.getKeyCard().isHasSysAdminPermissions()){
                 return true;
                 // only code officers can enact timeline events
-            } else if(((evType == EventType.Timeline) || (evType != EventType.Action)) 
-                    && u.getKeyCard().isHasEnfOfficialPermissions()){
+            } else if(evProp.isDirectPropToDefaultMuniCEO() && u.getKeyCard().isHasEnfOfficialPermissions()){
                 return true;
-            } else if(((evType != EventType.Action) || (evType !=EventType.Timeline)) 
-                    && u.getKeyCard().isHasMuniStaffPermissions()){
+            } else if(evProp.isDirectPropToDefaultMuniStaffer() && u.getKeyCard().isHasMuniStaffPermissions()){
                 return true;
-            }
+            } 
         }
-        return canDoRequestedEvent;
+        return canEvaluateProposal;
     }
     
     public void deleteEvent(EventCECase ev, User u) throws AuthorizationException{
@@ -458,7 +454,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws CaseLifecyleException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase, CasePhaseChangeRule rule) 
+    public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase, CaseChangeRule rule) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         
         EventIntegrator ei = getEventIntegrator();

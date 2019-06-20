@@ -37,7 +37,8 @@ public class EventCategory implements Serializable {
     
     private boolean notifycasemonitors;
     
-    private CasePhaseChangeRule casePhaseChangeRule;
+    private CaseChangeRule casePhaseChangeRule;
+    private EventProposal eventProposal;
     
     private boolean hidable;
     private boolean requestable;
@@ -244,15 +245,29 @@ public class EventCategory implements Serializable {
     /**
      * @return the casePhaseChangeRule
      */
-    public CasePhaseChangeRule getCasePhaseChangeRule() {
+    public CaseChangeRule getCasePhaseChangeRule() {
         return casePhaseChangeRule;
     }
 
     /**
      * @param casePhaseChangeRule the casePhaseChangeRule to set
      */
-    public void setCasePhaseChangeRule(CasePhaseChangeRule casePhaseChangeRule) {
+    public void setCasePhaseChangeRule(CaseChangeRule casePhaseChangeRule) {
         this.casePhaseChangeRule = casePhaseChangeRule;
+    }
+
+    /**
+     * @return the eventProposal
+     */
+    public EventProposal getEventProposal() {
+        return eventProposal;
+    }
+
+    /**
+     * @param eventProposal the eventProposal to set
+     */
+    public void setEventProposal(EventProposal eventProposal) {
+        this.eventProposal = eventProposal;
     }
 
     
