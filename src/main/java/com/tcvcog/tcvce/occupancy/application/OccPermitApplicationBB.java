@@ -1026,7 +1026,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             for (PropertyUnit activeUnit : propWithLists.getUnitList()) {
 
-                if (workingUnit.getUnitID() == activeUnit.getUnitID()) {
+                if (workingUnit.getUnitID() == activeUnit.getUnitID() && workingUnit.getUnitID() != 0) {
 
                     added = false;
 

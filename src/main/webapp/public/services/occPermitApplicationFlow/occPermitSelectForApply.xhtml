@@ -23,6 +23,8 @@
 
                             <p:panel>
                                 <h3>Step 1: Select Property</h3>
+                                
+                                <p:outputLabel>Chosen property:</p:outputLabel>
 
                                 <p:dataTable
                                     id="chosenPropertyTable"
@@ -115,8 +117,8 @@
 
                             <p:outputLabel>...</p:outputLabel>
 
-                            <p:spacer height="10px"/>
-                                <p:commandButton ajax="false" value="Confirm and continue"/>
+                            <ui:remove> <p:spacer height="10px"/>
+                                <p:commandButton ajax="false" value="Confirm and continue"/></ui:remove>
                                 
                             
                         </h:form>
