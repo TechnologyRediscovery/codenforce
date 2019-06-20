@@ -57,7 +57,7 @@ public class Event
     
     private long daysUntilDue;
     
-    private EventProposal eventProposal;
+    private EventProposalImplementation eventProposalImplementation;
     
     /**
      * @return the eventID
@@ -368,7 +368,6 @@ public class Event
         hash = 97 * hash + (this.active ? 1 : 0);
         hash = 97 * hash + (this.hidden ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.notes);
-        hash = 97 * hash + (eventProposal.currentUserCanRespondToProposal ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.personList);
         hash = 97 * hash + (int) (this.daysUntilDue ^ (this.daysUntilDue >>> 32));
         return hash;
@@ -392,18 +391,19 @@ public class Event
         return true;
     }
 
+
     /**
-     * @return the eventProposal
+     * @return the eventProposalImplementation
      */
-    public EventProposal getEventProposal() {
-        return eventProposal;
+    public EventProposalImplementation getEventProposalImplementation() {
+        return eventProposalImplementation;
     }
 
     /**
-     * @param eventProposal the eventProposal to set
+     * @param eventProposalImplementation the eventProposalImplementation to set
      */
-    public void setEventProposal(EventProposal eventProposal) {
-        this.eventProposal = eventProposal;
+    public void setEventProposalImplementation(EventProposalImplementation eventProposalImplementation) {
+        this.eventProposalImplementation = eventProposalImplementation;
     }
     
 

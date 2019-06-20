@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 public class CitationStatus extends Status {
     private boolean editsAllowed;
-    private CasePhaseChangeRule phaseChangeRule;
+    private CaseChangeRule phaseChangeRule;
     
 
     /**
@@ -46,14 +46,14 @@ public class CitationStatus extends Status {
     /**
      * @return the phaseChangeRule
      */
-    public CasePhaseChangeRule getPhaseChangeRule() {
+    public CaseChangeRule getPhaseChangeRule() {
         return phaseChangeRule;
     }
 
     /**
      * @param phaseChangeRule the phaseChangeRule to set
      */
-    public void setPhaseChangeRule(CasePhaseChangeRule phaseChangeRule) {
+    public void setPhaseChangeRule(CaseChangeRule phaseChangeRule) {
         this.phaseChangeRule = phaseChangeRule;
     }
 

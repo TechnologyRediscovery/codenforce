@@ -82,7 +82,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private ArrayList<Person> muniPeopleList;
 
     private EventCECase eventForTriggeringCasePhaseAdvancement;
-    private EventCECase triggeringEventForRequestedCaseAction;
+    private EventCECase triggeringEventForProposal;
 
     private List<EventCECase> filteredEventList;
     private EventCECase selectedEvent;
@@ -366,17 +366,19 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public void rejectRequestedEvent(EventCECase ev) {
         selectedEvent = ev;
-        rejectedEventListIndex = currentCase.getEventListActionRequests().indexOf(ev);
+        rejectedEventListIndex = currentCase.getEventProposalList().indexOf(ev);
     }
 
     /**
+     * TODO Overhaul Proposals
      * Called when the user clicks the take requested action button
      *
      * @param ev
      */
     public void initiateNewRequestedEvent(EventCECase ev) {
-        selectedEventCategory = ev.getRequestedEventCat();
-        triggeringEventForRequestedCaseAction = ev;
+        //selectedEventCategory = ev.getRequestedEventCat();
+        
+        triggeringEventForProposal = ev;
         initiateNewEvent();
     }
 
@@ -431,12 +433,18 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         selectedEvent.setCaseID(currentCase.getCaseID());
         selectedEvent.setOwner(getSessionBean().getFacesUser());
         try {
-            if (selectedEvent.isRequestsAction()) {
-                selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
-            }
+        
+            // Removed for proposal overhaul
+            
+//            if (selectedEvent.isRequestsAction()) {
+//                selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
+//            }
 
+            if(triggeringEventForProposal != null && selectedEvent.getEventProposalImplementation() != null){
+                selectedEvent.getEventProposalImplementation().setGeneratingEventID(triggeringEventForProposal.getEventID());
+                
+            }
             // writing null in here is fine if the event wasn't triggered
-            selectedEvent.setTriggeringEvent(triggeringEventForRequestedCaseAction);
 
             // main entry point for handing the new event off to the CaseCoordinator
             // only the compliance events need to pass in another object--the violation
@@ -453,17 +461,17 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             // now update the triggering event with the newly inserted event's ID
             // (We saved the triggering event when the take action button was clicked, before the event
             // add dialog was displayed and event-specific data is entered by the user
-            if (triggeringEventForRequestedCaseAction != null) {
-                triggeringEventForRequestedCaseAction.setResponseEvent(selectedEvent);
-                triggeringEventForRequestedCaseAction.setResponderActual(getSessionBean().getFacesUser());
-                ec.logResponseToActionRequest(triggeringEventForRequestedCaseAction);
+            if (triggeringEventForProposal != null) {
+                triggeringEventForProposal.getEventProposalImplementation().setResponseEvent(selectedEvent);
+                triggeringEventForProposal.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
+                ec.logResponseToActionRequest(triggeringEventForProposal);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Updated triggering event ID + "
-                                + triggeringEventForRequestedCaseAction.getEventID()
+                                + triggeringEventForProposal.getEventID()
                                 + " with response info!", ""));
                 // reset our holding var since we're done processing the event
-                triggeringEventForRequestedCaseAction = null;
+                triggeringEventForProposal = null;
             }
 
         } catch (IntegrationException ex) {
@@ -516,9 +524,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
 //        currentCase.getEventList().remove(selectedEvent);
         try {
-            if (selectedEvent.getRequestedEventCat() != null) {
-                selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
-            }
             ec.editEvent(selectedEvent, getSessionBean().getFacesUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Event udpated!", ""));
@@ -534,12 +539,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public void commitActionRequestRejection(ActionEvent ev) {
         EventCoordinator ec = getEventCoordinator();
-        selectedEvent.setResponderActual(getSessionBean().getFacesUser());
-        selectedEvent.setRequestRejected(true);
-        selectedEvent.setResponseEvent(null);
+        selectedEvent.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
+        selectedEvent.getEventProposalImplementation().setProposalRejected(true);
+        
+        // rejected Proposals by definition did not result in a new Event
+        selectedEvent.getEventProposalImplementation().setResponseEvent(null);
         try {
             ec.logResponseToActionRequest(selectedEvent);
-            currentCase.getEventListActionRequests().remove(rejectedEventListIndex);
+            currentCase.getEventProposalList().remove(rejectedEventListIndex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Action request successfully rejected for event ID " + selectedEvent.getEventID(), ""));
         } catch (IntegrationException ex) {
@@ -568,7 +575,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     public void editEvent(EventCECase ev) {
-        includeActionRequest = ev.isRequestsAction();
         selectedEvent = ev;
     }
 
@@ -740,7 +746,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             positionCurrentCaseAtHeadOfQueue();
             return "violationEdit";
     }
-
+ 
     public String createNewNotice() {
         NoticeOfViolation nov;
         CaseCoordinator cc = getCaseCoordinator();
@@ -986,21 +992,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void logActionResponse(EventCECase ev) {
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ev.setResponderActual(getSessionBean().getFacesUser());
-            ec.logResponseToActionRequest(ev);
-//            refreshCurrentEventList();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Registered view confirmation!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not confirm view, sorry.", ""));
-        }
-    }
 
     public void clearActionResponse(ActionEvent ev) {
         EventCoordinator ec = getEventCoordinator();
@@ -1490,8 +1481,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public boolean isAllowedToClearActionResponse() {
         allowedToClearActionResponse = false;
         if (selectedEvent != null) {
-            if (selectedEvent.isResponseComplete()
-                    && ((getSessionBean().getFacesUser().getUserID() == selectedEvent.getResponderActual().getUserID())
+            if (selectedEvent.getEventProposalImplementation() != null
+                    && ((getSessionBean().getFacesUser().getUserID() == selectedEvent.getEventProposalImplementation().getResponderActual().getUserID())
                     || getSessionBean().getFacesUser().getKeyCard().isHasSysAdminPermissions())) {
                 allowedToClearActionResponse = true;
             }
@@ -1508,18 +1499,18 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the triggeringEventForRequestedCaseAction
+     * @return the triggeringEventForProposal
      */
-    public EventCECase getTriggeringEventForRequestedCaseAction() {
-        return triggeringEventForRequestedCaseAction;
+    public EventCECase getTriggeringEventForProposal() {
+        return triggeringEventForProposal;
     }
 
     /**
-     * @param triggeringEventForRequestedCaseAction the
-     * triggeringEventForRequestedCaseAction to set
+     * @param triggeringEventForProposal the
+ triggeringEventForProposal to set
      */
-    public void setTriggeringEventForRequestedCaseAction(EventCECase triggeringEventForRequestedCaseAction) {
-        this.triggeringEventForRequestedCaseAction = triggeringEventForRequestedCaseAction;
+    public void setTriggeringEventForProposal(EventCECase triggeringEventForProposal) {
+        this.triggeringEventForProposal = triggeringEventForProposal;
     }
 
     

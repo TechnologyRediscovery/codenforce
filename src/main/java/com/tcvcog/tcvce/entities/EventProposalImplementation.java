@@ -15,8 +15,11 @@ public class EventProposalImplementation {
     
     private int implementationID;
     
+    
     private int proposalID;
+    private EventProposal proposal;
     private int generatingEventID;
+    private boolean currentUserCanEvaluateProposal;
     
     private User initiator;
     
@@ -292,6 +295,34 @@ public class EventProposalImplementation {
      */
     public void setGeneratingEventID(int generatingEventID) {
         this.generatingEventID = generatingEventID;
+    }
+
+    /**
+     * @return the proposal
+     */
+    public EventProposal getProposal() {
+        return proposal;
+    }
+
+    /**
+     * @param proposal the proposal to set
+     */
+    public void setProposal(EventProposal proposal) {
+        this.proposal = proposal;
+    }
+
+    /**
+     * @return the currentUserCanEvaluateProposal
+     */
+    public boolean isCurrentUserCanEvaluateProposal() {
+        return currentUserCanEvaluateProposal;
+    }
+
+    /**
+     * @param currentUserCanEvaluateProposal the currentUserCanEvaluateProposal to set
+     */
+    public void setCurrentUserCanEvaluateProposal(boolean currentUserCanEvaluateProposal) {
+        this.currentUserCanEvaluateProposal = currentUserCanEvaluateProposal;
     }
     
 }
