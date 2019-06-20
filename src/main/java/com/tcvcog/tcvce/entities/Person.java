@@ -108,7 +108,7 @@ public class Person extends EntityUtils implements Serializable{
     private ArrayList<Integer> cloneList;
     private ArrayList<Integer> mergedList;
     
-    
+    private boolean applicant; //used in applying for occupancy.
     
 
     /**
@@ -916,5 +916,12 @@ public class Person extends EntityUtils implements Serializable{
         this.mergedList = mergedList;
     }
     
+    public boolean isApplicant() {
+        return applicant;
+    }
+
+    public void setApplicant(boolean applicant) {
+        this.applicant = applicant;
+    }
 
 }

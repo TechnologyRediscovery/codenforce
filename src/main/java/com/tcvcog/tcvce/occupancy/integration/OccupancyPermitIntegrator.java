@@ -296,8 +296,9 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
     public int insertOccPermitApplicationAndReturnId(OccPermitApplication application) throws IntegrationException {
                 String query = "INSERT INTO public.occupancypermitapplication(applicationid, multiunit, "
                     + "reason_reasonid, submissiontimestamp, "
-                    + "submitternotes, internalnotes, propertyunitid) "
-                    + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?) "
+                    + "submitternotes, internalnotes, propertyunitid, "
+                    + "person_personid, rental) "
+                    + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?) "
                     + "RETURNING applicationid;";
         
         Connection con = null;
@@ -312,6 +313,8 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             stmt.setString(4, application.getSubmissionNotes());
             stmt.setString(5, application.getInternalNotes());
             stmt.setString(6, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
+            stmt.setInt(7, application.getApplicantPerson().getPersonID());
+            stmt.setBoolean(8, application.getApplicationPropertyUnit().isRental());
             stmt.execute();
             ResultSet inserted_application = stmt.getResultSet();
             inserted_application.next();
@@ -329,9 +332,10 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
     }
     
     public ArrayList<OccPermitApplicationReason> getOccPermitApplicationReasons() throws IntegrationException{
+        
         OccPermitApplicationReason reason = null;
         ArrayList<OccPermitApplicationReason> reasons = new ArrayList<>();
-        String query = "SELECT reasonid, reasontitle, reasondescription, activereason, humanfriendlydescription "
+                String query = "SELECT reasonid, reasontitle, reasondescription, activereason, humanfriendlydescription "
                 + "FROM public.occpermitapplicationreason "
                 + "WHERE activereason = 'true';";
         
@@ -445,9 +449,10 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
     
     public OccPermitApplicationReason getOccPermitApplicationReason(int reasonId) throws IntegrationException{
         OccPermitApplicationReason occpermitappreason = null;
+        
         String query = "SELECT reasonid, reasontitle, reasondescription, activereason, "
                 + "humanfriendlydescription\n "
-                + "FROM public.occpermitapplicationreason\n"
+                + "FROM public.occpermitapplicationreason \n"
                 + "WHERE reasonid = ?;";
         
         Connection con = null;

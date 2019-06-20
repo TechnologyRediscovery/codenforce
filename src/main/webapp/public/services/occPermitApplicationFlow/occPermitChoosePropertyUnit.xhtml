@@ -18,21 +18,14 @@
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        <h1>Select a property in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
+                        <h1>Step 1/5: Select a property in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
+                        
+                        
                         
                         <h:form id="occPermitApplicationChoosePropertyForm">                          
                             <p:panel>
-                                
-                            <p:outputLabel for="isMultiUnitSwitch">
-                                <h:outputLabel value="Is this a multiunit property?" />
-                            </p:outputLabel>
-
-                            <p:spacer height="5px" />
-
-                            <p:inputSwitch tabindex="1" id="isMultiUnitSwitch"
-                                           onLabel="Yes" offLabel="No" value="#{sessionBean.occPermitApplication.multiUnit}">
-                                <p:ajax />
-                            </p:inputSwitch>
+                            
+                                <h2>Step 1: Select Property</h2>
 
                              <p>Please search for and select the property of concern using this search tool.</p>
 
@@ -73,7 +66,9 @@
                             </p:panelGrid> 
 
                             <h3>Search Results:</h3>
-                            <p>Click to select the desired property or try your search again.</p>
+                            <p>If the property you are looking for is not below, try searching again.
+                               If it is, please select it and click the button labeled 
+                               "Confirm and Continue" at the bottom of the page.</p>
 
                             <p:dataTable
                                 id="propertyResultTable"
@@ -84,22 +79,13 @@
                                 selection="#{occPermitApplicationBB.selectedProperty}"
                                 rowKey="#{prop.propertyID}">
 
-                                <p:ajax event="rowSelect" listener="#{occPermitApplicationBB.onPropertySelection}" update="occPermitApplicationChoosePropertyForm:propertyUnitPanel"/>
-
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Address" />
                                     </f:facet>
                                     <h:outputText value="#{prop.address}"/>
                                 </p:column>
-                                <p:column>
-
-                                    <f:facet name="header">
-                                        <h:outputText value="Municipality" />
-                                    </f:facet>
-                                    <h:outputText value="#{prop.muni.muniName}"/>
-
-                                </p:column>
+                                
 
                                 <p:column>
 
@@ -115,59 +101,29 @@
                             </p:panel>
 
 
-                               
-                                <p:panel id="propertyUnitPanel" visible="#{sessionBean.occPermitApplication.multiUnit}">
-                                    
-                                <p:spacer height="10px"/>
-
-                                <p:outputLabel value="Click to select the unit:" />
-
-                                <p:dataTable
-                                    id="propertyUnitTable"
-                                    var="unit"
-                                    value="#{sessionBean.activePropWithLists.unitList}"
-                                    selectionMode="single" tabindex="6"
-                                    scrollable="true" scrollHeight="150"
-                                    selection="#{sessionBean.occPermitApplication.applicationPropertyUnit}"
-                                    rowKey="#{unit.unitID}">                                         
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Number" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.unitNumber}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Rental?" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}"/>
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Description" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.notes}" />
-                                    </p:column>
-                                </p:dataTable>            
-
-                                <p:outputLabel value="Click to add a unit:" />                     
-
-                                <p:spacer height="5px" />
-
-                                <p:commandButton ajax="false" value="Click to add unit" action="#{occPermitApplicationBB.addPropertyUnit}" />
-
-                                <p:spacer height="10px"/>
-                                
-                                </p:panel>      
+                           <h3>Step 2: Configure Unit List</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 3: Select Units For Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 4: Choose Reason For Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                           
+                           <h3>Step 5: Add People To Application</h3>
+                           
+                           <p:outputLabel>...</p:outputLabel>
+                                      
 
                             <p:spacer height="10px"/>
-                            
-                                <p:commandButton ajax="false" value="Next step: Describe the reason for this application" 
-                                                 action="#{occPermitApplicationBB.storePropertyUnitInfo}"/>
+                                <p:commandButton ajax="false" value="Confirm and continue" action="#{occPermitApplicationBB.selectProperty}" />
+                                
                         </h:form>
+                        
+                        
                     </div>
                 </f:view>
             </ui:define>

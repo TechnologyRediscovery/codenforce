@@ -259,7 +259,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 sb.append("%'");
             }
             if(params.isFilterByAddressStreet()){
-                sb.append("AND address_streetILIKE ");
+                sb.append("AND address_street ILIKE ");
                 sb.append("'%");
                 sb.append(params.getAddrStreetSS());
                 sb.append("%'");
@@ -1009,32 +1009,32 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         if (!params.isFilterByObjectID()){
             if (params.isFilterByLastName()){
                 if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
-                query.append("lname = ? ");
+                query.append("lname ILIKE ? ");
             }
             if (params.isFilterByFirstName()){
                 if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
-                query.append("fname = ? ");
+                query.append("fname ILIKE ? ");
             }
             if (params.isFilterByAddressStreet()){
                 if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
-                query.append("address_street = ? ");
+                query.append("address_street ILIKE ? ");
             }
             if (params.isFilterByCity()){
                 if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
-                query.append("address_city = ? ");
+                query.append("address_city ILIKE ? ");
             }
             if (params.isFilterByZipCode()){
                 if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
-                query.append("address_zip = ? ");
+                query.append("address_zip ILIKE ? ");
             }            
             if (params.isFilterByEmail()){
                 if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
-                query.append("email = ? ");
+                query.append("email ILIKE ? ");
             }
             
             if (params.isFilterByPhoneNumber()){
                 if(notFirstCriteria){query.append("AND ");} else {notFirstCriteria = true;}
-                query.append("phonecell = ? OR phonework = ? OR phonehome = ? ");
+                query.append("phonecell ILIKE ? OR phonework ILIKE ? OR phonehome ILIKE ? ");
             }
             
         } else {
