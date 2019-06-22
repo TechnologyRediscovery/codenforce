@@ -69,7 +69,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n" +
                         "       munideployable, publicdeployable, notifycasemonitors, hidable, \n" +
                         "       icon_iconid, requestable, phasechangerule_ruleid"
-                + "  FROM public.ceeventcategory WHERE categoryID = ?";
+                + "  FROM public.eventcategory WHERE categoryID = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -125,7 +125,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
 
     public ArrayList<EventCategory> getEventCategoryList() throws IntegrationException {
-        String query = "SELECT categoryid FROM public.ceeventcategory;";
+        String query = "SELECT categoryid FROM public.eventcategory;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -150,7 +150,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     public List<EventCategory> getRequestableEventCategories() throws IntegrationException {
-        String query = "SELECT categoryid FROM public.ceeventcategory WHERE requestable = TRUE;";
+        String query = "SELECT categoryid FROM public.eventcategory WHERE requestable = TRUE;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -177,7 +177,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     public ArrayList<EventCategory> getEventCategoryList(EventType et) throws IntegrationException {
-        String query = "SELECT categoryid FROM public.ceeventcategory WHERE categorytype = cast (? as ceeventtype);";
+        String query = "SELECT categoryid FROM public.eventcategory WHERE categorytype = cast (? as ceeventtype);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -208,7 +208,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public void insertEventCategory(EventCategory ec) throws IntegrationException {
 
-        String query = "INSERT INTO public.ceeventcategory(\n"
+        String query = "INSERT INTO public.eventcategory(\n"
                 + "categoryid, "
                 + "categorytype, title, description, "
                 + "userdeployable, munideployable, publicdeployable, "
@@ -253,7 +253,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public void updateEventCategory(EventCategory ec) throws IntegrationException {
 
-        String query = "UPDATE public.ceeventcategory\n"
+        String query = "UPDATE public.eventcategory\n"
                 + "   SET categorytype=CAST (? as ceeventtype), title=?, description=?, userdeployable=?, \n"
                 + "       munideployable=?, publicdeployable=?, \n"
                 + "       notifycasemonitors=?, phasechangerule_ruleid=?, hidable=?, icon_iconid=?, requestable=? \n"
@@ -297,7 +297,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
 
     public void deleteEventCategory(EventCategory ec) throws IntegrationException {
-        String query = "DELETE FROM public.ceeventcategory\n"
+        String query = "DELETE FROM public.eventcategory\n"
                 + " WHERE categoryid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1088,7 +1088,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ceevent.eventid ");
-        sb.append("FROM ceevent INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid) ");
+        sb.append("FROM ceevent INNER JOIN eventcategory ON (ceeventcategory_catid = categoryid) ");
         sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
         sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
         sb.append("WHERE ");
@@ -1128,7 +1128,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     &&
                 !params.isFilterByRequestedResponseEventCat()) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                sb.append("ceeventcategory_catid = ? ");
+                sb.append("eventcategory_catid = ? ");
             }
 
 
@@ -1329,8 +1329,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT ceevent.eventid, ceevent.ceeventcategory_catid, ceevent.dateofrecord, \n"
                 + "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.owner_userid, ceevent.disclosetomunicipality, \n"
                 + "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requestsAction, ceevent.hidden, \n"
-                + "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, cecase.caseid, ceeventcategory.categoryid\n"
-                + " FROM ceevent 	INNER JOIN ceeventcategory ON (ceeventcategory_catid = categoryid)\n"
+                + "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, cecase.caseid, eventcategory.categoryid\n"
+                + " FROM ceevent 	INNER JOIN eventcategory ON (ceeventcategory_catid = categoryid)\n"
                 + "		INNER JOIN cecase ON (cecase_caseid = caseid)\n"
                 + " WHERE categorytype = CAST ('Timeline' AS ceeventtype)\n"
                 + "		AND dateofrecord >= ? AND dateofrecord <= ? \n"
