@@ -815,7 +815,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         cpcr.setForbiddenExtantEventCatID(rs.getInt("forbiddenextanteventcat"));
 
         cpcr.setTriggeredEventCategoryID(rs.getInt("triggeredeventcat"));
-        cpcr.setTriggeredEventCategoryID(rs.getInt("triggeredeventcatreqcat"));
+
         
         cpcr.setActive(rs.getBoolean("active"));
         cpcr.setMandatory(rs.getBoolean("mandatory"));
@@ -847,8 +847,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                         "       requiredextanteventtype, forbiddenextanteventtype, requiredextanteventcat, \n" +
                         "       forbiddenextanteventcat, triggeredeventcat, active, mandatory, \n" +
                         "       treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, \n" +
-                        "       description, triggeredeventcatreqcat\n" +
-                        "  FROM public.cecasephasechangerule WHERE ruleid = ?;";
+                        "       description\n" +
+                        "  FROM public.eventrule WHERE ruleid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, ruleid);
 
