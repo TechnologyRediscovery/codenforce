@@ -240,6 +240,11 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
         
+    <managed-bean>
+        <managed-bean-name>unitChangesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UnitChangesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
     
     <managed-bean>
         <description>Utility class for producting a hash map of action requestor types</description>
@@ -848,6 +853,18 @@
         <navigation-case>
             <from-outcome>properties</from-outcome>
             <to-view-id>/restricted/cogview/properties.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>unitchanges</from-outcome>
+            <to-view-id>/restricted/cogview/unitchanges.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>unitchangedetail</from-outcome>
+            <to-view-id>/restricted/cogview/unitchangedetail.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         

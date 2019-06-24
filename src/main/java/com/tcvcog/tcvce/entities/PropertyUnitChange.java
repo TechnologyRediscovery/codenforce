@@ -18,7 +18,6 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 
 /**
  * Models the entity: Property Unit Change Order.Public users compile lists of
@@ -43,7 +42,8 @@ public class PropertyUnitChange {
     private java.sql.Timestamp changedOn;
     private java.sql.Timestamp approvedOn; //If null, it has not been approved
     private PropertyUnit thisUnit;
-
+    private int propertyID;
+    
     public int getUnitChangeID() {
         return unitChangeID;
     }
@@ -193,7 +193,38 @@ public class PropertyUnitChange {
     public void setThisUnit(PropertyUnit thisUnit) {
         this.thisUnit = thisUnit;
     }
+
+    public int getPropertyID() {
+        return propertyID;
+    }
+
+    public void setPropertyID(int propertyID) {
+        this.propertyID = propertyID;
+    }
     
+    
+    public String newOrRemoved(){
+        
+        String output = "";
+        
+        if(removed == true)
+        {
+            output = "Removed";
+            
+        }
+        else if(added == true) {
+            
+            output = "Added";
+        }
+        else {
+            
+            output = "Edited";
+            
+        }
+        
+        return output;
+        
+    }
     
     
 }
