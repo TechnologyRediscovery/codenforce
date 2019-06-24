@@ -102,6 +102,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+    public String goToChanges() {
+        
+        return "unitchanges";
+        
+    }
+    
     public String addProperty(){
         //getSessionBean().setActiveProp(new Property());  // we do this after the prop has been inserted
         return "propertyAdd";

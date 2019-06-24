@@ -26,8 +26,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -135,9 +133,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                 && getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement() != null) { //I apologize for the ugly code. It is necessary to prevent a null pointer exception. - Nathan
 
             requiredPersons = getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getRequiredPersonTypes();
-            
+
             optAndReqPersons = new ArrayList<>();
-            
+
             optAndReqPersons.addAll(requiredPersons);
 
             optAndReqPersons.addAll(getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes());
@@ -710,7 +708,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             duplicateNums = 0;
 
             firstUnit.setUnitNumber(firstUnit.getUnitNumber().replaceAll("(?i)unit", ""));
-            
+
             if (firstUnit.getUnitNumber().compareTo("") == 0) {
                 missingUnitNum = true;
                 break; //break for performance reasons. Can be removed if breaks are not welcome here.
@@ -999,8 +997,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public String submitApplication() {
 
         submitUnitChangeList();
-
-        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();        
+        
+        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
         try {
             int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getOccPermitApplication());
             getSessionBean().getOccPermitApplication().setId(applicationId);
@@ -1008,22 +1006,25 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        
+
         return "selectForApply";
     }
 
     public void submitUnitChangeList() {
 
         ArrayList<PropertyUnitChange> changeList = new ArrayList<PropertyUnitChange>();
-        
+
         PropertyIntegrator pri = getPropertyIntegrator();
-        
+
         for (PropertyUnit workingUnit : workingPropUnits) {
 
             PropertyUnitChange skeleton = new PropertyUnitChange();
 
             boolean added = true;
 
+            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getThisProperty().getPropertyID());
+
+            
             for (PropertyUnit activeUnit : propWithLists.getUnitList()) {
 
                 if (workingUnit.getUnitID() == activeUnit.getUnitID() && workingUnit.getUnitID() != 0) {
@@ -1031,7 +1032,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                     added = false;
 
                     skeleton.setUnitID(workingUnit.getUnitID());
-
+                    
                     if (workingUnit.getOtherKnownAddress() != null && workingUnit.getOtherKnownAddress().compareToIgnoreCase(activeUnit.getOtherKnownAddress()) != 0) {
 
                         skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
@@ -1105,18 +1106,16 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
-        
-        for(PropertyUnitChange order : changeList) {
-            
+        for (PropertyUnitChange order : changeList) {
+
             try {
                 pri.insertPropertyUnitChange(order);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
-            
-            
+
         }
-        
+
         System.out.println("end of submitting unit change list");
     }
 

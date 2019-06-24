@@ -129,7 +129,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Use Type"/>
                                         </f:facet>
-                                        <h:outputText value="#{prop.propertyUseTypeString}" />
+                                        <h:outputText value="#{prop.propertyUseType}" />
                                     </p:column>
 
                                     <p:column width="5%">
@@ -260,103 +260,97 @@
                                         <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.notes}"/>
                                     </h:panelGroup>
                                 </h:panelGrid>
-
+                                
                             </h:form>
-
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
-
-                            <h:form id="unitChangeListForm">                           
-
-                                <h2>Dwelling units</h2>
-                                <p>List of the dwelling units currently registered to this property.</p> 
-
-                                <p:dataTable
-                                    id="propertyUnitsTable"
-                                    var="unit"
-                                    value="#{unitChangesBB.existingUnitList}"
-                                    rowKey="#{unit.unitID}"
-                                    >                                         
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Number" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.unitNumber}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Rental?" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Description" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.notes}" />
-                                    </p:column>
-
-                                </p:dataTable>
-
-
-                                <hr/>
-
-
-                                <h2>Proposed Unit Changes</h2>
-                                <p>List of changes that have been suggested by users. If a cell is blank, the value was unchanged.</p> 
-
-                                <p:dataTable
-                                    id="unitChangesTable"
-                                    var="unit"
-                                    value="#{unitChangesBB.proposedUnitList}"
-                                    rowKey="#{unit.unitID}"
-                                    >                                         
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Number" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.unitNumber}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Rental?" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Description" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.notes}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.newOrRemoved()}" />
-                                    </p:column>
-
-                                </p:dataTable>
-
 
                                 <p:spacer height="10px"/>
                                 <hr/>
                                 <p:spacer height="10px"/>
 
-                                <p:commandButton ajax="false"
-                                                 value="Respond to this request"
-                                                 action="#{unitChangesBB.goToChangeDetail()}"
-                                                 disabled="#{unitChangesBB.selectedProperty == null}"/>
+                                <h:form id="unitChangeListForm">                           
 
-                            </h:form>
+                                    <h2>Dwelling units</h2>
+                                    <p>List of the dwelling units currently registered to this property.</p> 
+
+                                    <p:dataTable
+                                        id="propertyUnitsTable"
+                                        var="unit"
+                                        value="#{unitChangesBB.existingUnitList}"
+                                        rowKey="#{unit.unitID}"
+                                        >                                         
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Unit Number" />
+                                            </f:facet>
+                                            <h:outputText value="#{unit.unitNumber}" />
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Rental?" />
+                                            </f:facet>
+                                            <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Unit Description" />
+                                            </f:facet>
+                                            <h:outputText value="#{unit.notes}" />
+                                        </p:column>
+
+                                    </p:dataTable>
+
+
+                                    <hr/>
+
+
+                                    <h2>Proposed Unit Changes</h2>
+                                    <p>List of changes that have been suggested by users. If a cell is blank, the value was unchanged.</p> 
+
+                                    <p:dataTable
+                                        id="unitChangesTable"
+                                        var="unit"
+                                        value="#{unitChangesBB.proposedUnitList}"
+                                        rowKey="#{unit.unitID}"
+                                        >                                         
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Unit Number" />
+                                            </f:facet>
+                                            <h:outputText value="#{unit.unitNumber}" />
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Rental?" />
+                                            </f:facet>
+                                            <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Unit Description" />
+                                            </f:facet>
+                                            <h:outputText value="#{unit.notes}" />
+                                        </p:column>
+                                        
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="" />
+                                            </f:facet>
+                                            <h:outputText value="#{unit.newOrRemoved()}" />
+                                        </p:column>
+
+                                    </p:dataTable>
+
+
+                                    <p:spacer height="10px"/>
+                                    <hr/>
+                                    <p:spacer height="10px"/>
+                                </h:form>
 
                         </div>
                     </div>

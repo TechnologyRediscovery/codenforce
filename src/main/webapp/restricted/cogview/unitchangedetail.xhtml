@@ -12,16 +12,10 @@
     <h:body>
         <ui:composition template="../navContainer_restricted.xhtml">
             <ui:define name="content">
-
-                <p>On the right is the list of the unit change requests for this property.
-                    If several change requests have the same ID, that means that
-                    they are all trying to change the same unit. In this case,
-                    you can only approve one of them. However, if a unit has an ID of
-                    0, that means the unit has just been added.</p> 
-
+                
                 <f:view id="properties-view">
                     <div class="two-column-page-flex-container">
-                        <div class="list-column" style="width:35%">
+                        <div class="list-column">
                             <h:form id="messages-left-form">
                                 <h:messages id="properties-messages-global"
                                             globalOnly="true" showDetail="true" showSummary="true"
@@ -29,144 +23,612 @@
                                 </h:messages>
                             </h:form>
 
-                            <h1 class="property-blue">Existing Units at #{sessionBean.activeProp.address}</h1>
+                            <h1 class="property-blue">Unit Change Orders</h1>
+                            
+                            
+                            
+                            <h:form id="propertySearchForm">
 
+                                <p:commandButton id="propertyAddButton"
+                                                 value="Add new property in #{sessionBean.activeMuni.muniName}" icon="fa fa-plus"
+                                                 action="#{propertyProfileBB.addProperty()}"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"
+                                                 
+                                                 />
+                                <p:spacer height="10px"/>
+                                
+                                <p:panelGrid columns="2" >
 
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchITwMuni">
+                                            <h:outputText value="House number"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="propSearchITwMuni" value="#{propertyProfileBB.houseNum}" 
+                                                     style="width: 100px;" tabindex="1" required="false" styleClass="inputText"/>
+                                        <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
 
-                            <h:form id="existingUnitsForm">
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchITStreet">
+                                            <h:outputText value="Street name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="propSearchITStreet" value="#{propertyProfileBB.streetName}" 
+                                                     style="width: 200px;" tabindex="2" required="false" styleClass="inputText"/>
+
+                                        <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    
+                            <ui:remove>
+                                        
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchSelectMuni">
+                                            <h:outputText value="Municipality"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuniCode}">
+                                            <f:selectItems value="#{sessionBean.facesUser.authMunis}"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                            </ui:remove>
+                                    
+                                    <h:panelGroup>
+                                        <p:commandButton
+                                            value="Search in #{sessionBean.activeMuni.muniName}" tabindex="3" ajax="false"
+                                            icon="fa fa-search"  actionListener="#{propertyProfileBB.searchForProperties}" />
+                                    </h:panelGroup>
+                                
+                            <ui:remove>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel for="searchAllCB">
+                                            <h:outputText value="Search all municipalities"/>
+                                        </p:outputLabel>
+                                        <p:spacer height="5px"/>
+                                        <p:selectBooleanCheckbox id="searchAllCB" value="#{propertyProfileBB.allMunis}" tabindex="7"
+                                                                 widgetVar="allMuniCB" onchange="PF('muniSelectMenu').disable()"/>
+                                    </h:panelGroup>
+                            </ui:remove>
+
+                                    <h:panelGroup>
+                                        
+                                        <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" tabindex="4" styleClass="noFill" icon="fa fa-question-circle"/>
+                                    </h:panelGroup>
+                                    
+                                </p:panelGrid>
+
+                                <p:dialog header="Search Tips" 
+                                          widgetVar="helpdlg" 
+                                          responsive="true" 
+                                          width="400"
+                                          modal="false"
+                                          height="600">
+                                    <h2>Search tips</h2>
+
+                                    <p>You may enter all or only part of an address for searching in either search field:</p> 
+
+                                    <p>The property "398 HOMER DR" can be found by searching for "39" in House number and "hom" in street name.</p>
+
+                                    <p>Searches are case inSensitIVe!</p>
+
+                                    <p>You cannot "chop" characters from the middle of an address: 
+                                        So you cannot find our example 398 HOMER DR by searching for "38" and "her dr".</p>
+
+                                    <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+
+                                </p:dialog>
+                                
+                                <p:spacer height="5px"/>
+                                <p:spacer height="5px"/>
+
+                                <h2>Search Results:</h2>
+
+                                <p:spacer height="5px"/>
 
                                 <p:dataTable
-                                    id="existingUnitsTable"
-                                    var="unit"
-                                    value="#{unitChangesBB.existingUnitList}"
-                                    rowKey="#{unit.unitID}"
+                                    id="propSearchTable"
+                                    var="prop"
+                                    value="#{propertyProfileBB.propList}"
+                                    rowKey="#{prop.propertyID}"
+                                    filteredValue="#{propertyProfileBB.filteredPropList}"
+                                    tableStyleClass="primeDataTable"
                                     draggableRows="false" tabindex="6"
                                     >
-                                    <p:column width="6%">
+                                    <p:column width="8%">
                                         <f:facet name="header">
                                             <h:outputText value="ID"/>
                                         </f:facet>
-                                        <h:outputText value="#{unit.unitID}" />
+                                        <h:outputText value="#{prop.propertyID}" />
                                     </p:column>
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Number"/>
-                                        </f:facet>
-                                        <h:outputText value="#{unit.unitNumber}" />
-                                    </p:column>
-
-                                    <p:column width="8%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Rental?" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}"/>
-                                    </p:column>
-
                                     <p:column width="15%">
                                         <f:facet name="header">
-                                            <h:outputText value="Notes"/>
+                                            <h:outputText value="Address"/>
                                         </f:facet>
-                                        <h:outputText value="#{unit.notes}" />
+                                        <h:outputText value="#{prop.address}" />
                                     </p:column>
 
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Muni" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.muni.muniName}"/>
+                                    </p:column>
 
+                                    <p:column width="12%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Use Type"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyUseType}" />
+                                    </p:column>
+
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value=""/>
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-hand-o-right"
+                                                         actionListener="#{propertyProfileBB.manageProperty(prop)}" 
+                                                         ajax="true"
+                                                         update="
+                                                         property-info-form
+                                                         property-lists-form
+                                                         "/>
+                                    </p:column>
                                 </p:dataTable>
                             </h:form>
                         </div>
 
 
-                        <div class="object-column" style="width:65%">
+                        <div class="object-column">
 
                             <p:spacer height="6px;"/>
 
-                            <h1 class="property-blue">
-                                <h:outputText id="header-lob-ot" value="Proposed Units"/>  
-                            </h1>
+                            <h:form id="property-info-form">
+
+
+                                <h1 class="property-blue">
+                                    <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address} 
+                                                  (#{propertyProfileBB.currProp.muni.muniName})"/>
+                                    
+                                     <h:outputText id="header-propid-ot" value=" Prop ID: #{caseProfileBB.currentCase.property.propertyID}"/>  
+                                        <h:outputText id="header-lob-ot" value="| Lot-block: #{caseProfileBB.currentCase.property.lotAndBlock}"/>  
+                                </h1>
+
+                                <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                             columnClasses="gridTd, gridTd">
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-addr-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Address:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-addr-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-muni-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Municipality:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-muni-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.muni.muniName}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-parcelid-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Parcel ID:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-parcelid-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.parID}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-lotandblock-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Lot and Block:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-lotandblock-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.lotAndBlock}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-usetype-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Use Type:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-usetype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.propertyUseType}"/>
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-usegroup-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Use Group:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.useGroup}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-consttype-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Construction Type:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-consttype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.constructionType}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-countycode-ot" >
+                                            <h:outputText styleClass="uiLabel" value="County Code:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.countyCode}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-rental-cb" >
+                                            <h:outputText styleClass="uiLabel" value="Rental?" />
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
+                                        <p:selectBooleanCheckbox id="prop-info-rental-cb" value="#{propertyProfileBB.currProp.rental}" tabindex="14" disabled="true"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-vacant-cb" >
+                                            <h:outputText styleClass="uiLabel" value="Vacant?" />
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup> 
+                                        <p:spacer width="5px"/>
+                                        <p:selectBooleanCheckbox id="prop-info-vacant-cb" value="#{propertyProfileBB.currProp.vacant}" tabindex="14" disabled="true"/>
+                                    </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-notes-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Notes:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.notes}"/>
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                                
+                                <p:commandButton ajax="false" value="Update Selected Property Info" 
+                                                 action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"/>
+                            </h:form>
 
                             <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+                            
+                            <h2 class="property-blue">Code enforcement cases</h2>
 
+                            <h:form id="property-lists-form">
 
-
-                            <h:form id="proposedUnitsForm">
-
+                                <p:commandButton ajax="false"  icon="fa fa-plus"
+                                                 value="Open a new code enforcement case" 
+                                                 action="#{propertyProfileBB.openCECase}"
+                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                <p:spacer height="10px"/>
                                 <p:dataTable
-                                    id="propertyUnitsTable"
-                                    var="unit"
-                                    value="#{unitChangesBB.proposedUnitList}"
-                                    rowKey="#{unit.unitChangeID}"
-                                    sortBy="#{unit.unitID}"
-                                    >  
+                                    id="prop-cases-datatable"
+                                    var="c"
+                                    rowKey="#{c.caseID}"
+                                    widgetVar="propProfileCaseTable"
+                                    rowExpandMode="multiple"
+                                    value="#{propertyProfileBB.currProp.ceCaseList}"
+                                    tableStyleClass="primeDataTable">
+                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
                                     <p:column width="8%">
                                         <f:facet name="header">
-                                            <h:outputText value="Unit ID" />
+                                            <h:outputText value="ID" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.unitID}" />
+                                        <h:outputText value="#{c.caseID}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Property" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.property.address}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Name" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseName}"/>
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Phase" />
+                                        </f:facet>
+                                        <div class="wrapText">
+                                            
+                                            <h:outputText value="#{c.casePhase}"/>
+                                        </div>
+                                    </p:column>
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Date Opened" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.originiationDatePretty}"/>
+                                    </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Manager" />
+                                        </f:facet>
+                                        <h:outputText value="#{c.caseManager.person.lastName}"/>
+                                    </p:column>
+                                    <p:column width="5%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="view" />
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-clipboard"
+                                                         action="#{propertyProfileBB.viewCase(c)}" 
+                                                         ajax="false"/>
                                     </p:column>
 
-                                    <p:column width="8%">
+                                    
+                                </p:dataTable>
+
+
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+
+
+                                    <h2 class="property-blue">Property Persons</h2>
+                                    
+                                 
+                                    <p:dataTable
+                                        id="prop-persons-datatable"
+                                        var="person"
+                                        value="#{propertyProfileBB.currProp.personList}"
+                                        rowKey="#{person.personID}"
+                                        tableStyleClass="primeDataTable"
+                                        rowExpandMode="single"
+                                        expandedRow="false"
+                                        filteredValue="#{propertyProfileBB.filteredPersonList}"
+                                        >
+
+                                        <p:column width="3%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Exp"/>
+                                            </f:facet>
+                                            <p:rowToggler/>
+                                        </p:column>
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="ID" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.personID}"/>
+                                        </p:column>
+
+
+                                        <p:column width="10%" sortBy="#{person.personType.label}"
+                                                  filterBy="#{person.personType.label}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Person Type" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.personType.label}"/>
+                                        </p:column>
+
+                                        <p:column width="10%" sortBy="#{person.muniName}"
+                                                  filterBy="#{person.muniName}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Municipality" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.muniName}"/>
+                                        </p:column>
+
+                                        <p:column width="10%" sortBy="#{person.firstName}"
+                                                  filterBy="#{person.firstName}">
+                                            <f:facet name="header">
+                                                <h:outputText value="First" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.firstName}"/>
+                                        </p:column>
+
+                                        <p:column width="15%" filterBy="#{person.lastName}"
+                                                  sortBy="#{person.lastName}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Last" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.lastName}"/>
+                                        </p:column>
+                                       
+                                        <p:column width="8%" exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="Edit" />
+                                            </f:facet>
+                                            <p:commandButton icon="fa fa-clipboard"
+                                                             action="#{propertyProfileBB.viewPersonProfile(p)}" 
+                                                             ajax="false" disabled="false"/>
+                                        </p:column>
+                                        <p:rowExpansion>
+                                            <div class="outlinedBox">
+                                                <h2>Full person listing for <h:outputText value="#{person.firstName} #{person.lastName}"/> </h2>
+                                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="First Name"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.firstName}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Last Name"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.lastName}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Muni"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.muniName}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Type"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.personType.label}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Job Title"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.jobTitle}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Email"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.email}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Address"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{person.addressStreet}"/>
+                                                            <p:spacer height="5px"/>
+                                                            <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Under 19"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.under18}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Active?"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.active}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Last Updated"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.lastUpdated}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Expires"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.expiryDate.toString}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Phone home"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.phoneHome}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Phone work"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.phoneWork}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Phone cell"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.phoneCell}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <f:facet name="footer">
+                                                        <h:outputLabel styleClass="bold" value="Person notes"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{person.notes}"/>
+                                                        </div>
+                                                    </f:facet>
+                                                </h:panelGrid>
+                                            </div>
+                                        </p:rowExpansion>
+                                    </p:dataTable>
+
+
+                                    <h2>Dwelling units</h2>
+                                    <p>List of the dwelling units registered to this property.</p> 
+
+                                    <p:dataTable
+                                    id="propertyUnitsTable"
+                                    var="unit"
+                                    value="#{propertyProfileBB.currProp.unitList}"
+                                    rowKey="#{unit.unitID}"
+                                    >                                         
+
+                                    <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Unit Number" />
                                         </f:facet>
                                         <h:outputText value="#{unit.unitNumber}" />
                                     </p:column>
 
-                                    <p:column width="7%">
+                                    <p:column>
                                         <f:facet name="header">
-                                            <h:outputText value="Rental" />
+                                            <h:outputText value="Rental?" />
                                         </f:facet>
                                         <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
                                     </p:column>
 
-                                    <p:column width="12%">
+                                    <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Unit Description" />
                                         </f:facet>
                                         <h:outputText value="#{unit.notes}" />
                                     </p:column>
 
-                                    <p:column width="8%">
-                                        <f:facet name="header">
-                                            <h:outputText value="" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.newOrRemoved()}" />
-                                    </p:column>
-
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Changed on" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.changedOn.toGMTString()}" />
-                                    </p:column>
-
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Changed By" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.changedBy}" />
-                                    </p:column>
-                                    
-                                    <p:column width="15%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Approve" />
-                                        </f:facet>
-                                        <p:selectOneMenu value="#{unit.action}">
-                                            <f:selectItems value="#{unitChangesBB.actionList}" var="action" itemLabel="#{action.label}" itemValue="#{action}"/>
-                                        </p:selectOneMenu>
-                                    </p:column>
-
                                 </p:dataTable>
 
-                                <p:spacer height="5px"/>
-                                
-                                <p:commandButton ajax="false"
-                                                 value="Approve selected changes"
-                                                 action="#{unitChangesBB.submitUnitChanges()}"
-                                                 />
-                                
-                                
-                                <hr/>
-                                <p:spacer height="10px"/>
+
+                                    <hr/>
+
+
+                                    <h2>Existing Occupancy Inspection Cases</h2>
+                                    <p>A really cool blank data table--More useful functionality coming soon!</p>
+
+                                    <!--Insert occupancy inspection cases here-->
+
+                                    <p:commandButton ajax="fakse" value="View " action="personProfile" disabled="true"/>
+
+                                    <p:spacer height="10px"/>
+                                    <hr/>
+                                    <p:spacer height="10px"/>
                             </h:form>
 
                         </div>

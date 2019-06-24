@@ -32,10 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -188,6 +185,68 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 + "       notes, addr_city, addr_state, addr_zip, ownercode, propclass, \n"
                 + "       lastupdated, lastupdatedby, locationdescription, datasource, \n"
                 + "       containsrentalunits, vacant FROM property WHERE address ILIKE ? AND municipality_muniCode=?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        ArrayList<Property> propList = new ArrayList<>();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, "%" + houseNum + "%" + street + "%");
+            stmt.setInt(2, muniID);
+            rs = stmt.executeQuery();
+            System.out.println("PropertyIntegrator.searchForProperties - with muni | sql: " + stmt.toString());
+            int counter = 0;
+            while (rs.next() && counter <= MAX_RESULTS) {
+                propList.add(generateProperty(rs));
+                counter++;
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Error searching for properties", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return propList;
+
+    }
+
+    public ArrayList<Property> searchForChangedProperties(String houseNum, String street, int muniID) throws IntegrationException {
+        String query = "SELECT DISTINCT\n"
+                + "	   propertyid, unit_unitid, municipality_municode, parid, lotandblock, address,\n"
+                + "        propertyusetype, usegroup, constructiontype, countycode, apartmentno,\n"
+                + "        property.notes, addr_city, addr_state, addr_zip, ownercode, propclass,\n"
+                + "        lastupdated, lastupdatedby, locationdescription, datasource,\n"
+                + "        containsrentalunits, vacant \n"
+                + "FROM \n"
+                + "	property,\n"
+                + "	propertyunitchange\n"
+                + "	\n"
+                + "WHERE \n"
+                + "	address ILIKE ? AND municipality_muniCode=?  AND propertyid = property_propertyid;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -618,9 +677,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         ArrayList<PropertyUnit> unitList = new ArrayList();
 
         String query = "SELECT unitid, unitnumber, property_propertyid, otherknownaddress, propertyunit.notes, \n"
-                + "       rental\n"
+                + "       rental, inactive\n"
                 + "  FROM propertyunit JOIN property ON propertyunit.property_propertyID = property.propertyid\n"
-                + "  WHERE property.propertyid=? AND inactive=false;";
+                + "  WHERE property.propertyid=? AND propertyunit.inactive=false;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -709,7 +768,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         return unitList;
     }
-    
+
     public PropertyUnit getPropertyUnit(int propId) throws IntegrationException {
         PropertyUnit pu = new PropertyUnit();
         String query = "SELECT unitid, unitnumber, property_propertyid, otherknownaddress, propertyunit.notes, \n"
@@ -786,7 +845,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(2, uc.getOtherKnownAddress());
 
             stmt.setBoolean(3, uc.isRental());
-            
+
             stmt.setBoolean(4, uc.isRemoved());
 
             stmt.executeUpdate();
@@ -820,9 +879,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public void insertPropertyUnitChange(PropertyUnitChange uc) throws IntegrationException {
         String query = "INSERT INTO public.propertyunitchange(\n"
                 + "            unitchangeid, unitnumber, unit_unitid, otherknownaddress, notes, \n"
-                + "            rental, removed, added, changedon, approvedby, changedby)\n"
+                + "            rental, removed, added, changedon, approvedby, changedby, property_propertyid)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, ?, ?);";
+                + "            ?, ?, ?, ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -839,6 +898,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
             stmt.setInt(9, uc.getApprovedBy());
             stmt.setString(10, uc.getChangedBy());
+            stmt.setInt(11, uc.getPropertyID());
 
             stmt.execute();
         } catch (SQLException ex) {
@@ -916,7 +976,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         PersonIntegrator persInt = getPersonIntegrator();
         PropertyUnitChange uc = new PropertyUnitChange();
         uc.setUnitChangeID(rs.getInt("unitchangeid"));
-        uc.setUnitID(rs.getInt("unitid"));
+        uc.setUnitID(rs.getInt("unit_unitid"));
         uc.setUnitNumber(rs.getString("unitnumber"));
         uc.setNotes(rs.getString("notes"));
         uc.setOtherKnownAddress(rs.getString("otherknownaddress"));
@@ -928,6 +988,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         uc.setApprovedOn(rs.getTimestamp("approvedon"));
         uc.setApprovedBy(rs.getInt("approvedby"));
         uc.setChangedBy(rs.getString("changedby"));
+        uc.setPropertyID(rs.getInt("property_propertyid"));
         return uc;
     }
 
@@ -989,6 +1050,58 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
         } // close finally
 
+    }
+
+    public ArrayList<PropertyUnitChange> getPropertyUnitChangeList(Property property) throws IntegrationException {
+        ArrayList<PropertyUnitChange> ucl = new ArrayList<PropertyUnitChange>();
+        String query = "SELECT \n"
+                + "	unitchangeid, unit_unitid, propertyunitchange.property_propertyid, property.address,\n"
+                + "	propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
+                + "	propertyunitchange.notes, propertyunitchange.rental,\n"
+                + "	removed, added, changedon, approvedon, changedby, approvedby\n"
+                + "FROM \n"
+                + "	propertyunitchange \n"
+                + "JOIN property ON propertyunitchange.property_propertyid = property.propertyid\n"
+                + "WHERE propertyunitchange.property_propertyid=?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, property.getPropertyID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                ucl.add(generatePropertyUnitChange(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.getPropertyUnitChangeList | Unable to get property unit change, ", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+
+        return ucl;
     }
 
     public PropertyWithLists getNewPropertyWithLists() {
