@@ -836,17 +836,47 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-
+        
+        PropertyIntegrator pi = new PropertyIntegrator();
+        
+        PropertyUnit skeleton = pi.getPropertyUnit(uc.getUnitID());
+        
+        if(uc.getUnitNumber() != null) {
+        
+        skeleton.setUnitNumber(uc.getUnitNumber());
+        
+        }
+        
+        if(uc.getOtherKnownAddress() != null) {
+            
+            skeleton.setOtherKnownAddress(uc.getOtherKnownAddress());
+            
+        }
+        
+        if(uc.getNotes() != null) {
+            
+            skeleton.setNotes(uc.getNotes());
+            
+        }
+        
+        if(uc.isBoolChanged()) {
+            
+            skeleton.setRental(uc.isRental());
+            
+        }
+        
         try {
             stmt = con.prepareStatement(query);
 
-            stmt.setString(1, uc.getUnitNumber());
+            stmt.setString(1, skeleton.getUnitNumber());
 
-            stmt.setString(2, uc.getOtherKnownAddress());
+            stmt.setString(2, skeleton.getOtherKnownAddress());
 
-            stmt.setBoolean(3, uc.isRental());
+            stmt.setString(3, skeleton.getNotes());
+            
+            stmt.setBoolean(4, skeleton.isRental());
 
-            stmt.setBoolean(4, uc.isRemoved());
+            stmt.setBoolean(5, uc.isRemoved());
 
             stmt.executeUpdate();
 

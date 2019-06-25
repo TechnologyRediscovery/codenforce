@@ -17,6 +17,8 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -65,7 +67,29 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean() {
         
+        Property activeProp = getSessionBean().getActiveProp();
         
+        if(activeProp != null) {
+            
+            PropertyIntegrator pi = new PropertyIntegrator();
+            
+            try {
+                
+                existingUnitList = pi.getPropertyUnitList(activeProp);
+                
+                proposedUnitList = pi.getPropertyUnitChangeList(activeProp);
+                
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to get unit lists! ", ""));
+                
+            }
+            
+            
+            
+        }
         
     }
 
@@ -99,6 +123,14 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable{
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
+    }
+    
+    public String goToChangeDetail(){
+        
+        getSessionBean().setActiveProp(selectedProperty);
+        
+        return "unitchangedetail";
+        
     }
     
     public ArrayList<Property> getChangedPropList() {

@@ -1033,6 +1033,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                     skeleton.setUnitID(workingUnit.getUnitID());
                     
+                    if(workingUnit.getUnitNumber() != null) {
+                        
+                        skeleton.setUnitNumber(workingUnit.getUnitNumber());
+                        
+                    }
+                    
                     if (workingUnit.getOtherKnownAddress() != null && workingUnit.getOtherKnownAddress().compareToIgnoreCase(activeUnit.getOtherKnownAddress()) != 0) {
 
                         skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
@@ -1057,6 +1063,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             if (added == true) {
 
+                skeleton.setUnitNumber(workingUnit.getUnitNumber());
+                
                 skeleton.setOtherKnownAddress(workingUnit.getOtherKnownAddress());
 
                 skeleton.setNotes(workingUnit.getNotes());
@@ -1092,6 +1100,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             if (removed == true) {
 
+                skeleton.setUnitNumber(activeUnit.getUnitNumber());
+                
                 skeleton.setOtherKnownAddress(activeUnit.getOtherKnownAddress());
 
                 skeleton.setNotes(activeUnit.getNotes());
