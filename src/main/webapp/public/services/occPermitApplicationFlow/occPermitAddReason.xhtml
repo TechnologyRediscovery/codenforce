@@ -60,7 +60,6 @@
                                     id="configuredUnitTable"
                                     var="unit"
                                     value="#{sessionBean.workingPropWithLists.unitList}"
-                                    scrollable="true" scrollHeight="150"
                                     rowKey="#{unit.unitID}"
                                     >                                         
 
@@ -91,13 +90,14 @@
                             <p:panel>
                                 <h3>Step 3: Select Units For Application</h3>
                                 
+                                
+                                
                                 <p:outputLabel>Chosen Unit:</p:outputLabel>
 
                                 <p:dataTable
                                     id="chosenUnitTable"
                                     var="unit"
                                     value="#{sessionBean.activePropUnit}"
-                                    scrollable="true" scrollHeight="150"
                                     rowKey="#{unit.unitID}"
                                     >                                         
 
@@ -127,7 +127,7 @@
 
                             <p:spacer height="5px" />
 
-                            <h2>Step 4: Choose Reason For Application</h2>
+                            <h2 id="currentStep">Step 4: Choose Reason For Application</h2>
 
                             <p:outputLabel> Please choose select your reason for applying for occupancy from the drop-down menu. 
                                 Below the drop down menu, you should put any details you think are important, such as

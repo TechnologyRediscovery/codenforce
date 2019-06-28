@@ -55,7 +55,7 @@
 
                             <p:panel>
 
-                                <h2>Step 2: Configure Unit List</h2>
+                                <h2 id="currentStep">Step 2: Configure Unit List</h2>
 
                                 <p:outputLabel value="Before applying for occupancy, 
                                                please create a complete list of 
@@ -74,7 +74,6 @@
                                     rowIndexVar="rowIndex"
                                     var="unit"
                                     value="#{occPermitApplicationBB.workingPropUnits}"
-                                    scrollable="true" scrollHeight="150"
                                     selectionMode="single" tabindex="1"
                                     selection="#{occPermitApplicationBB.selectedUnit}"
                                     rowKey="#{unit.unitID}"
@@ -180,6 +179,8 @@
 
                                 </script>
 
+                                <p:spacer height="10px"/>
+                                
                                 <p:commandButton ajax="true"                                                   
                                                  action="#{occPermitApplicationBB.addUnitToNewPropUnits}" 
                                                  update="propertyUnitsToAddTable"

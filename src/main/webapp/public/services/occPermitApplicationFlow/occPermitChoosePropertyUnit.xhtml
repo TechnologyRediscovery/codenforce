@@ -25,7 +25,7 @@
                         <h:form id="occPermitApplicationChoosePropertyForm">                          
                             <p:panel>
                             
-                                <h2>Step 1: Select Property</h2>
+                                <h2 id="currentStep">Step 1: Select Property</h2>
 
                              <p>Please search for and select the property of concern using this search tool.</p>
 
@@ -75,7 +75,7 @@
                                 var="prop" 
                                 value="#{occPermitApplicationBB.propList}"
                                 selectionMode="single" tabindex="5"
-                                scrollable="true" scrollHeight="150" 
+                                scrollable="true" scrollHeight="200" 
                                 selection="#{occPermitApplicationBB.selectedProperty}"
                                 rowKey="#{prop.propertyID}">
 

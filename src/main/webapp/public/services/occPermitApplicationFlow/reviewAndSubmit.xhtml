@@ -68,9 +68,16 @@
                                 </h:panelGrid>
                             </h:panelGroup>
 
-
-                            <p:commandButton ajax="false" value="Submit Application" action="#{occPermitApplicationBB.submitApplication}" />
-
+                            <p:spacer height="10px"/>
+                            
+                            <p:outputLabel>Would you like to apply for more units?</p:outputLabel>
+                            
+                            <p:spacer height="10px"/>
+                            
+                            <p:commandButton ajax="false" value="Submit Application and Return to Unit List" action="#{occPermitApplicationBB.submitApplication('selectForApply')}"/>
+                            
+                            <p:commandButton ajax="false" value="Submit Application and Exit" action="#{occPermitApplicationBB.submitApplication('systemHome')}"/>
+                            
                         </h:form>
 
                         
