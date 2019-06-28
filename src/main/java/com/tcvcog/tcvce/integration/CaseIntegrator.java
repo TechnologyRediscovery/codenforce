@@ -836,7 +836,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public CaseChangeRule getCaseChangeRule(int ruleid) throws IntegrationException{
+    public CaseChangeRule getEventRule(int ruleid) throws IntegrationException{
         CaseChangeRule rule = null;
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;

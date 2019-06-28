@@ -119,7 +119,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         }
         if(rs.getInt("phasechangerule_ruleid") != 0){
-            ec.setCasePhaseChangeRule(ci.getCaseChangeRule(rs.getInt("phasechangerule_ruleid")));
+            ec.setCasePhaseChangeRule(ci.getEventRule(rs.getInt("phasechangerule_ruleid")));
         }
         return ec;
     }
