@@ -436,7 +436,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             cs.setDescription(rs.getString("description"));
             cs.setIcon(si.getIcon(rs.getInt("icon_iconid")));
             cs.setEditsAllowed(rs.getBoolean("editsforbidden"));
-            cs.setPhaseChangeRule(ci.getCaseChangeRule(rs.getInt("phasechangerule_ruleid")));
+            cs.setPhaseChangeRule(ci.getEventRule(rs.getInt("phasechangerule_ruleid")));
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Cannot Generate citation status object, sorry", ex);

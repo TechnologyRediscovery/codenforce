@@ -63,22 +63,59 @@ CREATE SEQUENCE IF NOT EXISTS occperiodtypeid_seq
 
 CREATE TABLE public.occperiodtype
 (
-	periodid 							INTEGER DEFAULT nextval('occperiodtypeid_seq') NOT NULL CONSTRAINT occperiodtype_pk PRIMARY KEY,
+	typeid 							INTEGER DEFAULT nextval('occperiodtypeid_seq') NOT NULL CONSTRAINT occperiodtype_pk PRIMARY KEY,
 	muni_municode						INTEGER NOT NULL CONSTRAINT occperiodtype_municode_fk REFERENCES public.municipality (municode),
 	title 								TEXT NOT NULL,
 	authorizeduses 						TEXT,
 	description 						TEXT,
 	userassignable 						BOOLEAN DEFAULT true,
-	permittable 						BOOLEAN DEFAULT true,
-	ruletopassforpermitissuance 		INTEGER CONSTRAINT occperiodtype_passedruleforopermit_ruleid_fk REFERENCES public.eventrule (ruleid),
+	permittable 						         BOOLEAN DEFAULT true,
+	ruletopassforpermitissuance 		 INTEGER CONSTRAINT occperiodtype_passedruleforopermit_ruleid_fk REFERENCES public.eventrule (ruleid),
 	startdaterequired 					BOOLEAN DEFAULT true,
 	enddaterequired 					BOOLEAN DEFAULT true,
 	completedinspectionrequired 		BOOLEAN DEFAULT true,
-	rentalcompatible 					BOOLEAN DEFAULT true,				
-	active 								BOOLEAN DEFAULT true
+	rentalcompatible 					BOOLEAN DEFAULT true,
+  commercial                BOOLEAN DEFAULT false,				
+	active 								BOOLEAN DEFAULT true,
+  allowthirdpartyinspection       BOOLEAN DEFAULT false,
+  requiredpersontypes             persontype[],
+  optionalpersontypes             persontype[],
+  fee_feeid                       INTEGER NOT NULL CONSTRAINT occinspection_feeid_fk REFERENCES public.occinspectionfee (feeID),
+  requirepersontypeentrycheck     boolean DEFAULT false
+
 
 ) ;
 
+-- ALTER TABLE occperiodtype ADD COLUMN requirepersontypeentrycheck     boolean DEFAULT false;
+
+-- Only used for test buld of DB; they are included in formal table def above
+-- ALTER TABLE occperiodtype ADD COLUMN optionalpersontypes             persontype[];
+-- ALTER TABLE occperiodtype ADD COLUMN requiredpersontypes             persontype[];
+
+ALTER TABLE occpermitapplicationreason ADD COLUMN periodtypeproposal_periodid INTEGER CONSTRAINT occpermitapprsn_pertype_fk REFERENCES public.occperiodtype (typeid);
+
+--***************************************
+--  add reasons and their type proposal mappings here
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+--***************************************
+
+
+-- TODO
+
+ALTER TABLE public.occpermitapplicationreason
+   ALTER COLUMN periodtypeproposal_periodid SET NOT NULL;
 
 
 CREATE SEQUENCE IF NOT EXISTS occperiodid_seq
@@ -107,10 +144,10 @@ CREATE TABLE public.occperiod
 	authorizationts 					TIMESTAMP WITH TIME ZONE,
 	authorizedby_userid 				INTEGER CONSTRAINT occperiod_authby_userid_fk REFERENCES public.login (userid),
 	overrideperiodtypeconfig			INTEGER CONSTRAINT occperiod_overridetype_userid_fk REFERENCES public.login (userid),
-	notes 								TEXT
+	notes 								TEXT,
+
 
 ) ;
-
 
 DROP TABLE public.occupancyinspection CASCADE;
 
@@ -119,10 +156,14 @@ CREATE TABLE public.occinspection
     inspectionID                    INTEGER DEFAULT nextval('occupancyinspectionID_seq') NOT NULL CONSTRAINT occinspection_pk PRIMARY KEY,
     occperiod_periodid 				INTEGER NOT NULL CONSTRAINT occinspection_periodid_fk REFERENCES public.occperiod (periodid),
     inspector_userid 				INTEGER NOT NULL CONSTRAINT occinspection_inspector_userid_fk REFERENCES public.login (userid),
-    fee_feeid                       INTEGER NOT NULL CONSTRAINT occinspection_feeid_fk REFERENCES occinspectionfee (feeID),
+    passedinspection_userid   INTEGER NOT NULL CONSTRAINT occinspection_pass_userid_fk REFERENCES public.login (userid),
+    maxoccupantsallowed   INTEGER NOT NULL CONSTRAINT occinspection_maxocc_userid_fk REFERENCES public.login (userid),
     publicaccesscc                  INTEGER,
     enablepacc                      BOOLEAN DEFAULT FALSE,
     notes                           TEXT
+    thirdpartyinspector_personid integer CONSTRAINT occinspection_thirdpartyuserid_fk REFERENCES public.person (personid),
+    thirdpartyinspectorapprovalts timestamp with time zone,
+    thirdpartyinspectorapprovalby INTEGER CONSTRAINT occinspectionthirdpartyapprovalby_fk REFERENCES public.login (userid)
 ) ;
 
 -- Drop all rows

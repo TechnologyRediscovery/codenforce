@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.occupancy.entities;
 
 /**
- *
+ * Mapped to fields of the spacetype table
  * @author EC Darsow
  */
 public class SpaceType {

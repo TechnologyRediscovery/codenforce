@@ -1166,7 +1166,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     */
    public CaseChangeRule getCasePhaseChangeRule(EventCategory ec) throws IntegrationException{
        CaseIntegrator ci = getCaseIntegrator();
-       return ci.getCaseChangeRule(ec.getCasePhaseChangeRule().getRuleID());
+       return ci.getEventRule(ec.getCasePhaseChangeRule().getRuleID());
        
    }
    
