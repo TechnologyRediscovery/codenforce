@@ -144,7 +144,7 @@ public class OccupancyPermitTypeBB extends BackingBeanUtils implements Serializa
     
     public String addOccupancyPermitType(){
         OccPermitType o = new OccPermitType();
-        OccupancyPermitIntegrator oi = new OccupancyPermitIntegrator();
+        OccupancyPermitIntegrator oi = getOccupancyPermitIntegrator();
         o.setOccupancyPermitTypeID(formOccupancyPermitTypeID);
         o.setMuni(getFormMuni());
         o.setOccupancyPermitTypeName(formOccupancyPermitTypeName);

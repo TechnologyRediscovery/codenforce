@@ -85,7 +85,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
 
     public void searchForProperties(ActionEvent event){
         System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
-        PropertyIntegrator pi = new PropertyIntegrator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
             setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getActiveMuni().getMuniCode()));

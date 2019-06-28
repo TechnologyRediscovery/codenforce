@@ -59,7 +59,7 @@
                                 <p:outputLabel>You have configured your units. You may see the list below.</p:outputLabel>
 
                             </p:panel>
-                            <h2>Step 3: Select Units For Application</h2>
+                            <h2 id="currentStep">Step 3: Select Units For Application</h2>
 
 
                             <p:outputLabel value="From here you may select the properties you would like to apply for occupancy. 
@@ -70,7 +70,6 @@
                                 id="propertyUnitsToAddTable"
                                 var="unit"
                                 value="#{occPermitApplicationBB.workingPropUnits}"
-                                scrollable="true" scrollHeight="150"
                                 selectionMode="single" tabindex="1"
                                 selection="#{occPermitApplicationBB.selectedUnit}"
                                 rowKey="#{unit.unitID}"

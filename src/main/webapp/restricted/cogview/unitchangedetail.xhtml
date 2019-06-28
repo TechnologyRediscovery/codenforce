@@ -21,7 +21,7 @@
 
                 <f:view id="properties-view">
                     <div class="two-column-page-flex-container">
-                        <div class="list-column">
+                        <div class="list-column" style="width:35%">
                             <h:form id="messages-left-form">
                                 <h:messages id="properties-messages-global"
                                             globalOnly="true" showDetail="true" showSummary="true"
@@ -75,7 +75,7 @@
                         </div>
 
 
-                        <div class="object-column">
+                        <div class="object-column" style="width:65%">
 
                             <p:spacer height="6px;"/>
 
@@ -111,9 +111,9 @@
                                         <h:outputText value="#{unit.unitNumber}" />
                                     </p:column>
 
-                                    <p:column width="6%">
+                                    <p:column width="7%">
                                         <f:facet name="header">
-                                            <h:outputText value="Rental?" />
+                                            <h:outputText value="Rental" />
                                         </f:facet>
                                         <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
                                     </p:column>
@@ -145,9 +145,26 @@
                                         </f:facet>
                                         <h:outputText value="#{unit.changedBy}" />
                                     </p:column>
+                                    
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Approve" />
+                                        </f:facet>
+                                        <p:selectOneMenu value="#{unit.action}">
+                                            <f:selectItems value="#{unitChangesBB.actionList}" var="action" itemLabel="#{action.label}" itemValue="#{action}"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
 
                                 </p:dataTable>
 
+                                <p:spacer height="5px"/>
+                                
+                                <p:commandButton ajax="false"
+                                                 value="Approve selected changes"
+                                                 action="#{unitChangesBB.submitUnitChanges()}"
+                                                 />
+                                
+                                
                                 <hr/>
                                 <p:spacer height="10px"/>
                             </h:form>

@@ -24,10 +24,13 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -174,6 +177,13 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         temp.setEmail(formEmail);
         
         getSessionBean().getOccPermitApplication().getAttachedPersons().add(temp);
+        
+        try {
+            ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+            
+                ec.redirect("/tcvce/public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep");
+            } catch (IOException ex) {
+            }
         
         return "managePeople";
         
