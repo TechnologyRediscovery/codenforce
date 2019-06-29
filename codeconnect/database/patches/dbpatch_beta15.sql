@@ -1,187 +1,103 @@
 
-CREATE SEQUENCE IF NOT EXISTS bobsourceid_seq
-	START WITH 10
-	INCREMENT BY 1 
-	MINVALUE 10
-	NO MAXVALUE 
-	CACHE 1;
 
-CREATE TABLE public.bobsource 
-(
-	sourceid 							INTEGER DEFAULT nextval('bobsourceid_seq') NOT NULL CONSTRAINT bobsource_pk PRIMARY KEY,
-	title 								TEXT NOT NULL,
-	description 						TEXT,
-	creator 							INTEGER CONSTRAINT bobsource_creator_userid_fk REFERENCES public.login (userid),
-	muni_municode 						INTEGER NOT NULL CONSTRAINT bobsource_municode_fk REFERENCES public.municipality (municode),
-	userattributable 					BOOLEAN DEFAULT true,
-	active 								BOOLEAN DEFAULT true,
-	notes 								TEXT
-) ;
+-- have not wired this new column up yet!
+ALTER TABLE ceactionrequest ADD COLUMN usersubmitter_userid INTEGER;
+ALTER TABLE ceactionrequest ADD CONSTRAINT ceactionreq_usersub_fk FOREIGN KEY (usersubmitter_userid) REFERENCES login (userid);
 
+-- add stipulated compliance that freeze in time when added to a notice of violation
 
--- BEGIN MAJOR OCCUPANCY OVERHAUL AND FINAL BETA IMPLEMENTATION PUSH CHANGES ---
-
-
-ALTER TABLE public.checklist RENAME TO occchecklist;
-ALTER TABLE public.checklistspaceelement RENAME TO occchecklistspaceelement;
-
-
-DROP TABLE public.occupancyinspectionstatus;
-
-
-
--- this will also drop a FK on the loginobjecthistory
-DROP TABLE occupancypermit CASCADE;
-
-CREATE TABLE public.occpermit
-(
-  permitid 								INTEGER NOT NULL DEFAULT nextval('occupancypermit_permitid_seq'::regclass) CONSTRAINT occpermit_permitid_pk PRIMARY KEY,
-  occperiod_periodid 					INTEGER NOT NULL CONSTRAINT occpermit_periodid_fk REFERENCES public.occperiod (periodid),
-  referenceno 							TEXT,
-  permittype_typeid  					INTEGER CONSTRAINT occpermit_permittype_fk REFERENCES public.occpermittype (typeid),
-  issuedto_personid 					INTEGER NOT NULL CONSTRAINT occpermit_issuedto_personid_fk REFERENCES public.person (personid),
-  issuedby_userid 						INTEGER CONSTRAINT occperiod_startcert_userid_fk REFERENCES public.login (userid), 
-  dateissued 							TIMESTAMP WITH TIME ZONE NOT NULL,
-  permitadditionaltext 					TEXT,
-  notes 								TEXT
-) ;
-
--- Since we want to be able to assocaite an occupancy permit with a permitting code source (like IPMC 2015), 
--- we had the FK on the permit to just poop it out onto the printed page. Instead, move it to the checklist itself
-
-ALTER TABLE public.occinspecchecklist RENAME TO occchecklist;
-ALTER TABLE public.occchecklist ADD COLUMN governingcodesource_sourceid INTEGER CONSTRAINT occinspecchecklist_codesourceid_fk REFERENCES codesource (sourceid);
-ALTER TABLE public.eventrule DROP CONSTRAINT phasechangerule_triggeredevcatreqcat_fk;
-ALTER TABLE public.eventrule DROP COLUMN triggeredeventproposal;
-
-CREATE SEQUENCE IF NOT EXISTS occperiodtypeid_seq
-	START WITH 1000
-	INCREMENT BY 1 
-	MINVALUE 1000
-	NO MAXVALUE 
-	CACHE 1;
-
-CREATE TABLE public.occperiodtype
-(
-	typeid 							INTEGER DEFAULT nextval('occperiodtypeid_seq') NOT NULL CONSTRAINT occperiodtype_pk PRIMARY KEY,
-	muni_municode						INTEGER NOT NULL CONSTRAINT occperiodtype_municode_fk REFERENCES public.municipality (municode),
-	title 								TEXT NOT NULL,
-	authorizeduses 						TEXT,
-	description 						TEXT,
-	userassignable 						BOOLEAN DEFAULT true,
-	permittable 						         BOOLEAN DEFAULT true,
-	ruletopassforpermitissuance 		 INTEGER CONSTRAINT occperiodtype_passedruleforopermit_ruleid_fk REFERENCES public.eventrule (ruleid),
-	startdaterequired 					BOOLEAN DEFAULT true,
-	enddaterequired 					BOOLEAN DEFAULT true,
-	completedinspectionrequired 		BOOLEAN DEFAULT true,
-	rentalcompatible 					BOOLEAN DEFAULT true,
-  commercial                BOOLEAN DEFAULT false,				
-	active 								BOOLEAN DEFAULT true,
-  allowthirdpartyinspection       BOOLEAN DEFAULT false,
-  requiredpersontypes             persontype[],
-  optionalpersontypes             persontype[],
-  fee_feeid                       INTEGER NOT NULL CONSTRAINT occinspection_feeid_fk REFERENCES public.occinspectionfee (feeID),
-  requirepersontypeentrycheck     boolean DEFAULT false
-
-
-) ;
-
--- ALTER TABLE occperiodtype ADD COLUMN requirepersontypeentrycheck     boolean DEFAULT false;
-
--- Only used for test buld of DB; they are included in formal table def above
--- ALTER TABLE occperiodtype ADD COLUMN optionalpersontypes             persontype[];
--- ALTER TABLE occperiodtype ADD COLUMN requiredpersontypes             persontype[];
-
-ALTER TABLE occpermitapplicationreason ADD COLUMN periodtypeproposal_periodid INTEGER CONSTRAINT occpermitapprsn_pertype_fk REFERENCES public.occperiodtype (typeid);
-
---***************************************
---  add reasons and their type proposal mappings here
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
---***************************************
-
-
--- TODO
-
-ALTER TABLE public.occpermitapplicationreason
-   ALTER COLUMN periodtypeproposal_periodid SET NOT NULL;
-
-
-CREATE SEQUENCE IF NOT EXISTS occperiodid_seq
-	START WITH 1000
-	INCREMENT BY 1 
-	MINVALUE 1000
-	NO MAXVALUE 
-	CACHE 1;
-
-CREATE TABLE public.occperiod
-(
-	periodid 							INTEGER DEFAULT nextval('occperiodid_seq') NOT NULL CONSTRAINT occperiod_pk PRIMARY KEY,
-	source_sourceid 					INTEGER NOT NULL CONSTRAINT occperiod_sourceid_fk REFERENCES public.bobsource (sourceid),
-	propertyunit_unitid 				INTEGER CONSTRAINT occperiod_propunit_unitid_fk REFERENCES public.propertyunit (unitid),
-	createdts	 						TIMESTAMP WITH TIME ZONE,
-	type_typeid 						INTEGER NOT NULL CONSTRAINT occperiod_periodtype_typeid_fk REFERENCES public.occperiod (periodid),
-	typecertifiedby_userid 				INTEGER CONSTRAINT occperiod_typecert_userid_fk REFERENCES public.login (userid),
-	typecertifiedts 					TIMESTAMP WITH TIME ZONE,
-	startdate							TIMESTAMP WITH TIME ZONE,
-	startdatecertifiedby_userid			INTEGER CONSTRAINT occperiod_startcert_userid_fk REFERENCES public.login (userid),
-	startdatecertifiedts				TIMESTAMP WITH TIME ZONE,
-	enddate 							TIMESTAMP WITH TIME ZONE,
-	enddatecertifiedby_userid 			INTEGER CONSTRAINT occperiod_endcert_userid_fk REFERENCES public.login (userid),
-	enddatecterifiedts 					TIMESTAMP WITH TIME ZONE,
-	manager_userid 						INTEGER CONSTRAINT occperiod_mngr_userid_fk REFERENCES public.login (userid),
-	authorizationts 					TIMESTAMP WITH TIME ZONE,
-	authorizedby_userid 				INTEGER CONSTRAINT occperiod_authby_userid_fk REFERENCES public.login (userid),
-	overrideperiodtypeconfig			INTEGER CONSTRAINT occperiod_overridetype_userid_fk REFERENCES public.login (userid),
-	notes 								TEXT,
-
-
-) ;
-
-DROP TABLE public.occupancyinspection CASCADE;
-
-CREATE TABLE public.occinspection
-(
-    inspectionID                    INTEGER DEFAULT nextval('occupancyinspectionID_seq') NOT NULL CONSTRAINT occinspection_pk PRIMARY KEY,
-    occperiod_periodid 				INTEGER NOT NULL CONSTRAINT occinspection_periodid_fk REFERENCES public.occperiod (periodid),
-    inspector_userid 				INTEGER NOT NULL CONSTRAINT occinspection_inspector_userid_fk REFERENCES public.login (userid),
-    passedinspection_userid   INTEGER NOT NULL CONSTRAINT occinspection_pass_userid_fk REFERENCES public.login (userid),
-    maxoccupantsallowed   INTEGER NOT NULL CONSTRAINT occinspection_maxocc_userid_fk REFERENCES public.login (userid),
-    publicaccesscc                  INTEGER,
-    enablepacc                      BOOLEAN DEFAULT FALSE,
-    notes                           TEXT
-    thirdpartyinspector_personid integer CONSTRAINT occinspection_thirdpartyuserid_fk REFERENCES public.person (personid),
-    thirdpartyinspectorapprovalts timestamp with time zone,
-    thirdpartyinspectorapprovalby INTEGER CONSTRAINT occinspectionthirdpartyapprovalby_fk REFERENCES public.login (userid)
-) ;
-
--- Drop all rows
-DELETE FROM payment;
-ALTER TABLE payment ADD CONSTRAINT payment_occinspectionid_fk FOREIGN KEY (occinspec_inspectionid) REFERENCES occinspection (inspectionid);
+ALTER TYPE ceeventtype ADD VALUE IF NOT EXISTS 'Citation' AFTER 'Compliance';
 
 
 ALTER TABLE public.ceeventcategory RENAME TO eventcategory;
-ALTER TABLE public.cecasephasechangerule RENAME TO eventrule;
-ALTER TABLE public.ceeventproposal RENAME TO eventproposal;
+DROP TABLE public.cecasephasechangerule;
+
+
+CREATE SEQUENCE IF NOT EXISTS ceeventproposal_seq
+  START WITH 10
+  INCREMENT BY 1 
+  MINVALUE 10
+  NO MAXVALUE 
+  CACHE 1;
+
+CREATE TABLE public.eventproposal
+(
+  proposalid            INTEGER DEFAULT nextval('ceeventproposal_seq') NOT NULL CONSTRAINT ceeventproposal_pk PRIMARY KEY,
+  title             TEXT,
+  overalldescription        text,
+  creator_userid          INTEGER,
+  directproposaltodefaultmuniceo  boolean DEFAULT true,
+  directproposaltodefaultmunistaffer boolean DEFAULT false,
+  directproposaltodeveloper   boolean DEFAULT false,
+  active              BOOLEAN DEFAULT true
+
+) ;
+
+
+CREATE TABLE public.eventrule
+(
+  ruleid integer NOT NULL DEFAULT nextval('cecasephasechangerule_seq'::regclass),
+  title text,
+  description text,
+  requiredactiveeventtype eventtype,
+  forbiddenactiveeventtype eventtype,
+  requiredactiveeventcat integer,
+  forbiddenactiveeventcat integer,
+  triggeredeventcat_facilitatingproposal integer,
+  mandatory boolean DEFAULT false,
+  treatreqphaseasthreshold boolean DEFAULT false,
+  treatforbidphaseasthreshold boolean DEFAULT false,
+  rejectrulehostifrulefails boolean DEFAULT true,
+  active boolean DEFAULT true,
+  CONSTRAINT phasechangerule_pk PRIMARY KEY (ruleid),
+  CONSTRAINT phasechangerule_forbiddenevcat_fk FOREIGN KEY (forbiddenextanteventcat)
+      REFERENCES public.eventcategory (categoryid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT phasechangerule_reqevcat_fk FOREIGN KEY (requiredextanteventcat)
+      REFERENCES public.eventcategory (categoryid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT phasechangerule_triggeredevcat_fk FOREIGN KEY (triggeredeventcat)
+      REFERENCES public.eventcategory (categoryid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+CREATE TABLE public.eventproposalchoice
+(
+  choice_choiceid       INTEGER NOT NULL, 
+  eventproposal_proposalid  INTEGER NOT NULL,
+  CONSTRAINT eventpropchoice_comppk_pk PRIMARY KEY (choice_choiceid, eventproposal_proposalid),
+  CONSTRAINT eventpopchoice_choiceid_fk FOREIGN KEY (choice_choiceid)
+    REFERENCES eventchoice (choiceid),
+  CONSTRAINT eventpropchoice_proposalid FOREIGN KEY (eventproposal_proposalid)
+    REFERENCES eventproposal (proposalid)
+
+);
+
+
+
+
+CREATE TABLE public.eventchoice
+(
+  choiceid                    INTEGER NOT NULL PRIMARY KEY,
+  title                       TEXT,
+  eventcat_catid              INTEGER NOT NULL CONSTRAINT eventchoice_eventcatid_fk REFERENCES eventcategory (categoryid),
+  addeventcat                 BOOLEAN DEFAULT true,
+  relativeorder               INTEGER NOT NULL,
+  active                      BOOLEAN DEFAULT true,
+  minimumrequireduserrank     INTEGER DEFAULT 3
+);
 
 
 CREATE SEQUENCE IF NOT EXISTS occevent_eventid_seq
-	START WITH 1000
-	INCREMENT BY 1 
-	MINVALUE 1000
-	NO MAXVALUE 
-	CACHE 1;
+  START WITH 1000
+  INCREMENT BY 1 
+  MINVALUE 1000
+  NO MAXVALUE 
+  CACHE 1;
 
 CREATE TABLE public.occevent
 (
@@ -210,12 +126,15 @@ WITH (
 );
 
 
+
+
+
 CREATE SEQUENCE IF NOT EXISTS occeventproposalimplementation_id_seq
-	START WITH 1000
-	INCREMENT BY 1 
-	MINVALUE 1000
-	NO MAXVALUE 
-	CACHE 1;
+  START WITH 1000
+  INCREMENT BY 1 
+  MINVALUE 1000
+  NO MAXVALUE 
+  CACHE 1;
 
 
 CREATE TABLE public.occeventproposalimplementation
@@ -228,10 +147,11 @@ CREATE TABLE public.occeventproposalimplementation
   activateson timestamp with time zone,
   expireson timestamp with time zone,
   responderactual_userid integer,
+  chosen_choiceid integer,
   rejectproposal boolean DEFAULT false,
   responsetimestamp timestamp with time zone,
   responseevent_eventid integer,
-  expiredorinactive boolean DEFAULT false,
+  active boolean DEFAULT true,
   notes text,
   CONSTRAINT occeventproposalresponse_pk PRIMARY KEY (implementationid),
   CONSTRAINT occeventpropimp_genevent_fk FOREIGN KEY (generatingevent_eventid)
@@ -251,6 +171,9 @@ CREATE TABLE public.occeventproposalimplementation
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT occeventpropimp_responderintended_fk FOREIGN KEY (responderintended_userid)
       REFERENCES public.login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT occeventpropimp_choice_fk FOREIGN KEY (chosen_choiceid)
+      REFERENCES eventproposalchoice (choiceid)
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
@@ -275,18 +198,54 @@ WITH (
 );
 
 
-ALTER TABLE public.space RENAME TO occspace;
-ALTER TABLE public.spaceelement RENAME TO occspaceelement;
-ALTER TABLE public.spacetype RENAME TO occspacetype;
+CREATE SEQUENCE IF NOT EXISTS ceeventproposalimplementation_seq
+  START WITH 1000
+  INCREMENT BY 1 
+  MINVALUE 1000
+  NO MAXVALUE 
+  CACHE 1;
 
-ALTER TABLE public.inspectedchecklistspaceelement RENAME TO occinspectedchecklistspaceelement;
-ALTER TABLE public.inspectedchecklistspaceelementphotodoc RENAME TO occinspectedchecklistspaceelementphotodoc;
-ALTER TABLE public.locationdescription RENAME TO occlocationdescription;
+CREATE TABLE public.ceeventproposalimplementation
+(
+  implementationid        INTEGER DEFAULT nextval('ceeventproposalimplementation_seq') NOT NULL  CONSTRAINT ceeventproposalresponse_pk PRIMARY KEY,
+  proposal_propid         INTEGER CONSTRAINT ceeventpropimp_propid_fk REFERENCES ceeventproposal (proposalid),
+  generatingevent_eventid     INTEGER CONSTRAINT ceeventpropimp_genevent_fk REFERENCES ceevent (eventid),
+  initiator_userid        INTEGER CONSTRAINT ceeventpropimp_initiator_fk REFERENCES login (userid),
+  responderintended_userid    INTEGER CONSTRAINT ceeventpropimp_responderintended_fk REFERENCES login (userid),
+  responderactual_userid      INTEGER CONSTRAINT ceeventpropimp_responderactual_fk REFERENCES login (userid),
+  rejectproposal          boolean DEFAULT false,
+  responsetimestamp         timestamp with time zone,
+  responseevent_eventid       INTEGER CONSTRAINT ceeventpropimp_resev_fk REFERENCES ceevent (eventid),
+  active              BOOLEAN DEFAULT true,
+  notes               text
+) ;
+
+
+ALTER TABLE ceevent DROP COLUMN responsetimestamp; 
+ALTER TABLE ceevent DROP COLUMN actionrequestedby_userid;
+ALTER TABLE ceevent DROP COLUMN respondernotes;
+ALTER TABLE ceevent DROP COLUMN responderintended_userid;
+ALTER TABLE ceevent DROP COLUMN requestedeventcat_catid;
+ALTER TABLE ceevent DROP COLUMN responseevent_eventid;
+ALTER TABLE ceevent DROP COLUMN rejeecteventrequest; 
+ALTER TABLE ceevent DROP COLUMN responderactual_userid;
+
+ALTER TABLE ceeventcategory ADD COLUMN proposal_propid INTEGER CONSTRAINT ceeventcat_proposal_propid_fk REFERENCES ceeventproposal (proposalid), ;
+
+-- Has not been run on remote server
+
+
+CREATE TABLE public.occperiodtypeeventrule
+(
+  eventrule_ruleid            INTEGER NOT NULL CONSTRAINT occperiodeventrule_ruleid_fk REFERENCES eventrule (ruleid),
+  occperiodtype_typeid          INTEGER NOT NULL CONSTRAINT occperiodeventrule_periodid_fk REFERENCES occperiodtype (typeid)
+  CONSTRAINT occperiodtypeeventrule_pk_comp PRIMARY KEY (eventrule_ruleid, occperiod_periodid)
+);
 
 
 
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (15, 'database/patches/dbpatch_beta15.sql', '', 'ecd', 'occupancy adjustments');
+    VALUES (15, 'database/patches/dbpatch_beta14.sql', '', 'ecd', 'event and proposals: major overhaul');
 

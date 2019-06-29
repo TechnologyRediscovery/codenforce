@@ -42,7 +42,7 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 
 import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyPermitIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 
@@ -151,8 +151,8 @@ public class Initializer implements ServletContextListener{
         OccupancyInspectionIntegrator occupancyInspectionIntegrator = new OccupancyInspectionIntegrator();
         servletContext.setAttribute("occupancyInspectionIntegrator", occupancyInspectionIntegrator);
         
-        OccupancyPermitIntegrator occupancyPermitIntegrator = new OccupancyPermitIntegrator();
-        servletContext.setAttribute("occupancyPermitIntegrator", occupancyPermitIntegrator);
+        OccupancyIntegrator occupancyIntegrator = new OccupancyIntegrator();
+        servletContext.setAttribute("occupancyIntegrator", occupancyIntegrator);
         
         OccupancyCoordinator occupancyCoordinator = new OccupancyCoordinator();
         servletContext.setAttribute("occupancyCoordinator", occupancyCoordinator);

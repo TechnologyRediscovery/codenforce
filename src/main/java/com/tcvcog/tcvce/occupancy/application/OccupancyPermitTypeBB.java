@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyPermitIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitType;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class OccupancyPermitTypeBB extends BackingBeanUtils implements Serializa
     }
     
     public void addNewOccupancyPermitType(ActionEvent e){
-        OccupancyPermitIntegrator oi = getOccupancyPermitIntegrator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
         OccPermitType o = new OccPermitType();
         
         o.setOccupancyPermitTypeID(newFormOccupancyPermitTypeID);
@@ -83,7 +83,7 @@ public class OccupancyPermitTypeBB extends BackingBeanUtils implements Serializa
     }
     
      public void deleteSelectedOccupancyPermitType(ActionEvent e){
-        OccupancyPermitIntegrator opti = getOccupancyPermitIntegrator();
+        OccupancyIntegrator opti = getOccupancyIntegrator();
         if(getSelectedOccupancyPermitType() != null){
             try {
                 opti.deleteOccupancyPermitType(getSelectedOccupancyPermitType());
@@ -120,7 +120,7 @@ public class OccupancyPermitTypeBB extends BackingBeanUtils implements Serializa
     }
     
     public void commitUpdates(ActionEvent e){
-        OccupancyPermitIntegrator oi = getOccupancyPermitIntegrator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
         OccPermitType o = selectedOccupancyPermitType;
         
         //o.setOccupancyPermitTypeID(getFormOccupancyPermitTypeID());
@@ -144,7 +144,7 @@ public class OccupancyPermitTypeBB extends BackingBeanUtils implements Serializa
     
     public String addOccupancyPermitType(){
         OccPermitType o = new OccPermitType();
-        OccupancyPermitIntegrator oi = getOccupancyPermitIntegrator();
+        OccupancyIntegrator oi = new OccupancyIntegrator();
         o.setOccupancyPermitTypeID(formOccupancyPermitTypeID);
         o.setMuni(getFormMuni());
         o.setOccupancyPermitTypeName(formOccupancyPermitTypeName);
@@ -174,7 +174,7 @@ public class OccupancyPermitTypeBB extends BackingBeanUtils implements Serializa
      */
     public ArrayList<OccPermitType> getOccupancyPermitTypeList() {
         try {
-            OccupancyPermitIntegrator oi = getOccupancyPermitIntegrator();
+            OccupancyIntegrator oi = getOccupancyIntegrator();
             occupancyPermitTypeList = oi.getOccupancyPermitTypeList();
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null, 

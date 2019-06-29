@@ -22,8 +22,7 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyPermitIntegrator;
-import java.io.IOException;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -86,7 +85,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     @PostConstruct
     public void initBean() {
 
-        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
+        OccupancyIntegrator opi = getOccupancyIntegrator();
         PropertyIntegrator pri = getPropertyIntegrator();
 
         try {
@@ -1040,8 +1039,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public String submitApplication(String redir) {
 
         submitUnitChangeList();
-        
-        OccupancyPermitIntegrator opi = getOccupancyPermitIntegrator();
+
+        OccupancyIntegrator opi = getOccupancyIntegrator();        
         try {
             int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getOccPermitApplication());
             getSessionBean().getOccPermitApplication().setId(applicationId);
