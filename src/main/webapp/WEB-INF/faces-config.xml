@@ -144,10 +144,10 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>occupancyPermitIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.OccupancyPermitIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>occupancyIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>courtEntityIntegrator</managed-bean-name>

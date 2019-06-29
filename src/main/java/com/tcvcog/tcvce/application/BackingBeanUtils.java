@@ -47,7 +47,7 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 
 // occupancy integrators
 import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyPermitIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 
@@ -110,7 +110,7 @@ public class BackingBeanUtils implements Serializable{
     
     private ChecklistIntegrator checklistIntegrator;
     private OccupancyInspectionIntegrator occupancyInspectionIntegrator;
-    private OccupancyPermitIntegrator occupancyPermitIntegrator;
+    private OccupancyIntegrator occupancyIntegrator;
     private PaymentIntegrator paymentIntegrator;
     private OccupancyCoordinator occupancyCoordinator;
     private DataCoordinator dataCoordinator;
@@ -612,22 +612,22 @@ public class BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the occupancyPermitIntegrator
+     * @return the occupancyIntegrator
      */
-    public OccupancyPermitIntegrator getOccupancyPermitIntegrator() {
+    public OccupancyIntegrator getOccupancyIntegrator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{occupancyPermitIntegrator}", OccupancyPermitIntegrator.class);
-        occupancyPermitIntegrator = (OccupancyPermitIntegrator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{occupancyIntegrator}", OccupancyIntegrator.class);
+        occupancyIntegrator = (OccupancyIntegrator) ve.getValue(context.getELContext());
         
-        return occupancyPermitIntegrator;
+        return occupancyIntegrator;
     }
 
     /**
-     * @param occupancyPermitIntegrator the occupancyPermitIntegrator to set
+     * @param occupancyIntegrator the occupancyIntegrator to set
      */
-    public void setOccupancyPermitIntegrator(OccupancyPermitIntegrator occupancyPermitIntegrator) {
-        this.occupancyPermitIntegrator = occupancyPermitIntegrator;
+    public void setOccupancyIntegrator(OccupancyIntegrator occupancyIntegrator) {
+        this.occupancyIntegrator = occupancyIntegrator;
     }
 
     /**

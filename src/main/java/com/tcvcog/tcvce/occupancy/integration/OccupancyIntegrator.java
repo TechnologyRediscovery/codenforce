@@ -45,12 +45,12 @@ import java.util.List;
  *
  * @author Eric C. Darsow
  */
-public class OccupancyPermitIntegrator extends BackingBeanUtils implements Serializable {
+public class OccupancyIntegrator extends BackingBeanUtils implements Serializable {
 
     /**
-     * Creates a new instance of OccupancyPermitIntegrator
+     * Creates a new instance of OccupancyIntegrator
      */
-    public OccupancyPermitIntegrator() {
+    public OccupancyIntegrator() {
     }
     
     public OccPermit getOccupancyPermit(int permitID) throws IntegrationException{
@@ -285,7 +285,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             stmt.execute();
             
         } catch (SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.insertOccPermitApplication"
+            throw new IntegrationException("OccupancyIntegrator.insertOccPermitApplication"
                     + "| IntegrationError: unable to insert occupancy permit application ", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -321,7 +321,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             applicationId = inserted_application.getInt(1);
             
         } catch (SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.insertOccPermitApplicationAndReturnId"
+            throw new IntegrationException("OccupancyIntegrator.insertOccPermitApplicationAndReturnId"
                     + "| IntegrationError: unable to insert occupancy permit application ", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -492,7 +492,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             occpermitappreason.setHumanFriendlyDescription(rs.getString("humanfriendlydescription"));
             occpermitappreason.setPersonsRequirement(getPersonsRequirement(rs.getInt("reasonid")));
         } catch(SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.generateOccPermitApplicationReason | "
+            throw new IntegrationException("OccupancyIntegrator.generateOccPermitApplicationReason | "
                     + "Integration Error: Unable to generate occupancy permit application reason ", ex);
         }
         
@@ -515,7 +515,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
                 personsRequirement = generatePersonsRequirement(rs);
             }
         } catch(SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.getPersonsRequirement | "
+            throw new IntegrationException("OccupancyIntegrator.getPersonsRequirement | "
                     + "IntegrationError: Unable to get PersonsRequirement ", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -535,7 +535,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             personsRequirement.setRequiredPersonTypes(getRequiredPersonTypes(rs.getInt("reasonid")));
             personsRequirement.setOptionalPersonTypes(getOptionalPersonTypes(rs.getInt("reasonid")));
         } catch(SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.generatePersonsRequirement | "
+            throw new IntegrationException("OccupancyIntegrator.generatePersonsRequirement | "
                     + "IntegrationError: Unable to generate PersonsRequirement. ", ex);
         }
         
@@ -558,7 +558,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
                 requiredPersonTypes = generateRequiredPersonTypes(rs);
             }            
         } catch(SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.getRequiredPersonTypes | "
+            throw new IntegrationException("OccupancyIntegrator.getRequiredPersonTypes | "
                     + "IntegrationError: Unable to get required person types ", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -578,7 +578,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             convertedPersonTypes = (String[]) personTypes.getArray();
             
         } catch(SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.generateRequiredPersonTypes | "
+            throw new IntegrationException("OccupancyIntegrator.generateRequiredPersonTypes | "
                     + "IntegrationError: Unable to generate required person types ", ex);
         }         
         for (String personType:convertedPersonTypes){
@@ -604,7 +604,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
                 optionalPersonTypes = generateOptionalPersonTypes(rs);
             }            
         } catch(SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.getOptionalPersonTypes | "
+            throw new IntegrationException("OccupancyIntegrator.getOptionalPersonTypes | "
                     + "IntegrationError: Unable to get optional person types. ", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -626,7 +626,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
             }
             
         } catch(SQLException ex) {
-            throw new IntegrationException("OccupancyPermitIntegrator.generateOptionalPersonTypes | "
+            throw new IntegrationException("OccupancyIntegrator.generateOptionalPersonTypes | "
                     + "IntegrationError: Unable to generate optional person types. ", ex);
         }
         if (convertedPersonTypes != null){
@@ -680,7 +680,7 @@ public class OccupancyPermitIntegrator extends BackingBeanUtils implements Seria
                 stmt.setString(5, person.getPersonType().getLabel());
                 stmt.execute();
             } catch(SQLException ex) {
-                throw new IntegrationException("OccupancyPermitIntegrator.insertOccPermitPersons"
+                throw new IntegrationException("OccupancyIntegrator.insertOccPermitPersons"
                         + " | IntegrationException: Unable to update occupancy permit application ", ex);
             }
         }   
