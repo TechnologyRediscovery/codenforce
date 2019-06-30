@@ -143,7 +143,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     
     public String addOccupancyInspectionFee(){
         OccInspecFee oif = new OccInspecFee();
-        OccupancyInspectionIntegrator oifi = new OccupancyInspectionIntegrator();
+        OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
         oif.setOccupancyInspectionFeeID(formOccupancyInspectionFeeID);
         oif.setMuni(getFormMuni());
         oif.setOccupancyInspectionFeeName(formOccupancyInspectionFeeName);

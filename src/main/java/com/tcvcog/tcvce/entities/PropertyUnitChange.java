@@ -17,8 +17,9 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 
 /**
  * Models the entity: Property Unit Change Order.Public users compile lists of
@@ -43,7 +44,10 @@ public class PropertyUnitChange {
     private java.sql.Timestamp changedOn;
     private java.sql.Timestamp approvedOn; //If null, it has not been approved
     private PropertyUnit thisUnit;
-
+    private int propertyID;
+    private java.sql.Timestamp inactive;
+    private ChangeOrderAction action; //not in the database, used by interface
+    
     public int getUnitChangeID() {
         return unitChangeID;
     }
@@ -147,7 +151,37 @@ public class PropertyUnitChange {
         this.added = added;
     }
 
-    
+    public Timestamp getInactive() {
+        return inactive;
+    }
+
+    public void setInactive(Timestamp inactive) {
+        this.inactive = inactive;
+    }
+
+    public PropertyUnit toPropertyUnit() {
+        
+        PropertyIntegrator pi = new PropertyIntegrator();
+        
+        PropertyUnit skeleton = new PropertyUnit();
+        
+        skeleton.setUnitNumber(unitNumber);
+        
+        skeleton.setRental(rental);
+        
+        skeleton.setNotes(notes);
+        
+        skeleton.setOtherKnownAddress(otherKnownAddress);
+        
+        try {
+            skeleton.setThisProperty(pi.getProperty(propertyID));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        return skeleton;
+        
+    }
     
     /**
      * USE SPARINGLY.This variable is already managed by setRental.
@@ -193,7 +227,45 @@ public class PropertyUnitChange {
     public void setThisUnit(PropertyUnit thisUnit) {
         this.thisUnit = thisUnit;
     }
+
+    public int getPropertyID() {
+        return propertyID;
+    }
+
+    public void setPropertyID(int propertyID) {
+        this.propertyID = propertyID;
+    }
+
+    public ChangeOrderAction getAction() {
+        return action;
+    }
+
+    public void setAction(ChangeOrderAction action) {
+        this.action = action;
+    }
     
+    public String newOrRemoved(){
+        
+        String output = "";
+        
+        if(removed == true)
+        {
+            output = "Removed";
+            
+        }
+        else if(added == true) {
+            
+            output = "Added";
+        }
+        else {
+            
+            output = "Edited";
+            
+        }
+        
+        return output;
+        
+    }
     
     
 }

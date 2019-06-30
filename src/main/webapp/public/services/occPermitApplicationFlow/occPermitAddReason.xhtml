@@ -23,6 +23,8 @@
 
                             <p:panel>
                                 <h3>Step 1: Select Property</h3>
+                                
+                                <p:outputLabel>Chosen property:</p:outputLabel>
 
                                 <p:dataTable
                                     id="chosenPropertyTable"
@@ -53,18 +55,49 @@
 
                             <p:panel>
                                 <h3>Step 2: Configure Unit List</h3>
-
-                                <p:outputLabel>You have configured your units. You may see the list below.</p:outputLabel>
-
-                            </p:panel>
-                            <p:panel>
-                                <h3>Step 3: Select Units For Application</h3>
-
+                                <p:outputLabel>Configured Unit List:</p:outputLabel>
                                 <p:dataTable
-                                    id="propertyUnitsToAddTable"
+                                    id="configuredUnitTable"
                                     var="unit"
                                     value="#{sessionBean.workingPropWithLists.unitList}"
-                                    scrollable="true" scrollHeight="150"
+                                    rowKey="#{unit.unitID}"
+                                    >                                         
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Number" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.unitNumber}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rental?" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.notes}" />
+                                    </p:column>
+
+                                </p:dataTable>
+                            </p:panel>
+
+                            <p:panel>
+                                <h3>Step 3: Select Units For Application</h3>
+                                
+                                
+                                
+                                <p:outputLabel>Chosen Unit:</p:outputLabel>
+
+                                <p:dataTable
+                                    id="chosenUnitTable"
+                                    var="unit"
+                                    value="#{sessionBean.activePropUnit}"
                                     rowKey="#{unit.unitID}"
                                     >                                         
 
@@ -94,7 +127,7 @@
 
                             <p:spacer height="5px" />
 
-                            <h2>Step 4: Choose Reason For Application</h2>
+                            <h2 id="currentStep">Step 4: Choose Reason For Application</h2>
 
                             <p:outputLabel> Please choose select your reason for applying for occupancy from the drop-down menu. 
                                 Below the drop down menu, you should put any details you think are important, such as

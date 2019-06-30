@@ -36,6 +36,7 @@ public class PropertyUnit {
     private ArrayList<Person> propertyUnitPeople;
     private ArrayList<OccPermit> occupancyPermitList;
     private ArrayList<OccPermitApplication> occPermitApplicationList;
+    private boolean inactive;
     
 
     /**
@@ -163,5 +164,15 @@ public class PropertyUnit {
     public void setOccPermitApplicationList(ArrayList<OccPermitApplication> occPermitApplicationList) {
         this.occPermitApplicationList = occPermitApplicationList;
     }
+
+    public boolean isInactive() {
+        return inactive;
+    }
+
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
+    }
+ 
+    
     
 }

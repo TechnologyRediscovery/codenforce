@@ -85,7 +85,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
 
     public void searchForProperties(ActionEvent event){
         System.out.println("PropSearchBean.searchForPropertiesSingleMuni");
-        PropertyIntegrator pi = new PropertyIntegrator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
             setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getActiveMuni().getMuniCode()));
@@ -98,6 +98,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Unable to complete search! ", ""));
         }
+    }
+    
+    public String goToChanges() {
+        
+        return "unitchanges";
+        
     }
     
     public String addProperty(){

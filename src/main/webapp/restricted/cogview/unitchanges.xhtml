@@ -1,0 +1,369 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Unit Change Orders</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../navContainer_restricted.xhtml">
+            <ui:define name="content">
+
+                <f:view id="properties-view">
+                    <div class="two-column-page-flex-container">
+                        <div class="list-column">
+                            <h:form id="messages-left-form">
+                                <h:messages id="properties-messages-global"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
+
+                            <h1 class="property-blue">Unit Change Orders</h1>
+
+
+
+                            <h:form id="propertySearchForm">
+
+
+                                <p:spacer height="10px"/>
+
+                                <p:panelGrid columns="2" >
+
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchITwMuni">
+                                            <h:outputText value="House number"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="propSearchITwMuni" value="#{unitChangesBB.houseNum}" 
+                                                     style="width: 100px;" tabindex="1" required="false" styleClass="inputText"/>
+                                        <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel for="propSearchITStreet">
+                                            <h:outputText value="Street name"/>
+                                        </p:outputLabel>
+                                        <p:inputText id="propSearchITStreet" value="#{unitChangesBB.streetName}" 
+                                                     style="width: 200px;" tabindex="2" required="false" styleClass="inputText"/>
+
+                                        <h:message for="propSearchITwMuni" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup>
+                                        <p:commandButton
+                                            value="Search in #{sessionBean.activeMuni.muniName}" tabindex="3" ajax="false"
+                                            icon="fa fa-search"  actionListener="#{unitChangesBB.searchForChangedProperties}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+
+                                        <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" tabindex="4" styleClass="noFill" icon="fa fa-question-circle"/>
+                                    </h:panelGroup>
+
+                                </p:panelGrid>
+
+                                <p:dialog header="Search Tips" 
+                                          widgetVar="helpdlg" 
+                                          responsive="true" 
+                                          width="400"
+                                          modal="false"
+                                          height="600">
+                                    <h2>Search tips</h2>
+
+                                    <p>You may enter all or only part of an address for searching in either search field:</p> 
+
+                                    <p>The property "398 HOMER DR" can be found by searching for "39" in House number and "hom" in street name.</p>
+
+                                    <p>Searches are case inSensitIVe!</p>
+
+                                    <p>You cannot "chop" characters from the middle of an address: 
+                                        So you cannot find our example 398 HOMER DR by searching for "38" and "her dr".</p>
+
+                                    <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+
+                                </p:dialog>
+
+                                <p:spacer height="5px"/>
+                                <p:spacer height="5px"/>
+
+                                <h2>Search Results:</h2>
+
+                                <p:spacer height="5px"/>
+
+                                <p:dataTable
+                                    id="propSearchTable"
+                                    var="prop"
+                                    value="#{unitChangesBB.changedPropList}"
+                                    rowKey="#{prop.propertyID}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6"
+                                    >
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyID}" />
+                                    </p:column>
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Address"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.address}" />
+                                    </p:column>
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Muni" />
+                                        </f:facet>
+                                        <h:outputText value="#{prop.muni.muniName}"/>
+                                    </p:column>
+
+                                    <p:column width="12%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Use Type"/>
+                                        </f:facet>
+                                        <h:outputText value="#{prop.propertyUseType}" />
+                                    </p:column>
+
+                                    <p:column width="5%">
+                                        <f:facet name="header">
+                                            <h:outputText value=""/>
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-hand-o-right"
+                                                         actionListener="#{unitChangesBB.manageProperty(prop)}" 
+                                                         ajax="true"
+                                                         update="
+                                                         property-info-form
+                                                         unitChangeListForm
+                                                         "/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:form>
+                        </div>
+
+
+                        <div class="object-column">
+
+                            <p:spacer height="6px;"/>
+
+                            <h:form id="property-info-form">
+
+
+                                <h1 class="property-blue">
+                                    <h:outputText id="header-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.address} 
+                                                  (#{unitChangesBB.selectedProperty.muni.muniName})"/>
+
+                                    <h:outputText id="header-propid-ot" value=" Prop ID: #{caseProfileBB.currentCase.property.propertyID}"/>  
+                                    <h:outputText id="header-lob-ot" value="| Lot-block: #{caseProfileBB.currentCase.property.lotAndBlock}"/>  
+                                </h1>
+
+                                <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                             columnClasses="gridTd, gridTd">
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-addr-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Address:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-addr-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.address}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-muni-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Municipality:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-muni-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.muni.muniName}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-parcelid-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Parcel ID:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-parcelid-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.parID}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-lotandblock-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Lot and Block:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-lotandblock-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.lotAndBlock}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-usetype-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Use Type:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-usetype-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.propertyUseType}"/>
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-usegroup-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Use Group:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-usegroup-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.useGroup}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-consttype-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Construction Type:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-consttype-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.constructionType}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-countycode-ot" >
+                                            <h:outputText styleClass="uiLabel" value="County Code:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.countyCode}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-rental-cb" >
+                                            <h:outputText styleClass="uiLabel" value="Rental?" />
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:spacer width="5px"/>
+                                        <p:selectBooleanCheckbox id="prop-info-rental-cb" value="#{unitChangesBB.selectedProperty.rental}" tabindex="14" disabled="true"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-vacant-cb" >
+                                            <h:outputText styleClass="uiLabel" value="Vacant?" />
+                                        </h:outputLabel>
+                                    </h:panelGroup>
+                                    <h:panelGroup> 
+                                        <p:spacer width="5px"/>
+                                        <p:selectBooleanCheckbox id="prop-info-vacant-cb" value="#{unitChangesBB.selectedProperty.vacant}" tabindex="14" disabled="true"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <h:outputLabel for="prop-info-notes-ot" >
+                                            <h:outputText styleClass="uiLabel" value="Notes:" />
+                                        </h:outputLabel>
+                                        <p:spacer width="5px"/>
+                                        <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{unitChangesBB.selectedProperty.notes}"/>
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+                            </h:form>
+
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+
+                            <h:form id="unitChangeListForm">                           
+
+                                <h2>Dwelling units</h2>
+                                <p>List of the dwelling units currently registered to this property.</p> 
+
+                                <p:dataTable
+                                    id="propertyUnitsTable"
+                                    var="unit"
+                                    value="#{unitChangesBB.existingUnitList}"
+                                    rowKey="#{unit.unitID}"
+                                    >                                         
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Number" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.unitNumber}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rental?" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.notes}" />
+                                    </p:column>
+
+                                </p:dataTable>
+
+
+                                <hr/>
+
+
+                                <h2>Proposed Unit Changes</h2>
+                                <p>List of changes that have been suggested by users. If a cell is blank, the value was unchanged.</p> 
+
+                                <p:dataTable
+                                    id="unitChangesTable"
+                                    var="unit"
+                                    value="#{unitChangesBB.proposedUnitList}"
+                                    rowKey="#{unit.unitID}"
+                                    >                                         
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Number" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.unitNumber}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rental?" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.notes}" />
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="" />
+                                        </f:facet>
+                                        <h:outputText value="#{unit.newOrRemoved()}" />
+                                    </p:column>
+
+                                </p:dataTable>
+
+
+                                <p:spacer height="10px"/>
+                                <hr/>
+                                <p:spacer height="10px"/>
+
+                                <p:commandButton ajax="false"
+                                                 value="Respond to this request"
+                                                 action="#{unitChangesBB.goToChangeDetail()}"
+                                                 disabled="#{unitChangesBB.selectedProperty == null}"/>
+
+                            </h:form>
+
+                        </div>
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
+
