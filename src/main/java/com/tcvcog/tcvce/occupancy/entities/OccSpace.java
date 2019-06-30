@@ -24,17 +24,17 @@ import java.util.ArrayList;
  *
  * @author Eric Darsow echocharliedelta@protonmail.com
  */
-public class Space implements Serializable {
+public class OccSpace implements Serializable {
     
     private int spaceid;
-    private SpaceType spaceType;
+    private OccSpaceType spaceType;
     private String name;
     private ArrayList<CodeElement> elementList;
 
     /**
      * @return the spaceType
      */
-    public SpaceType getSpaceType() {
+    public OccSpaceType getSpaceType() {
         return spaceType;
     }
 
@@ -48,7 +48,7 @@ public class Space implements Serializable {
     /**
      * @param spaceType the spaceType to set
      */
-    public void setSpaceType(SpaceType spaceType) {
+    public void setSpaceType(OccSpaceType spaceType) {
         this.spaceType = spaceType;
     }
 

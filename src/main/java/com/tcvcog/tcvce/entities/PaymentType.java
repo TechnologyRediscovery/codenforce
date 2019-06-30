@@ -26,7 +26,7 @@ public class PaymentType {
     
     private int paymentTypeId;
     private String paymentTypeTitle;
-    
+
     @Override
     public int hashCode() {
         int hash = 5;

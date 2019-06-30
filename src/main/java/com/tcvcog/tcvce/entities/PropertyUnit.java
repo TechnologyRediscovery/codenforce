@@ -28,14 +28,15 @@ import java.util.ArrayList;
 public class PropertyUnit {
     
     private int unitID;
+    private Property property;
+    
     private String unitNumber;
+    
     private String notes;
     private String otherKnownAddress;
+    
     private boolean rental;
-    private Property thisProperty;
-    private ArrayList<Person> propertyUnitPeople;
-    private ArrayList<OccPermit> occupancyPermitList;
-    private ArrayList<OccPermitApplication> occPermitApplicationList;
+    
     private boolean inactive;
     
 
@@ -81,19 +82,6 @@ public class PropertyUnit {
         this.notes = notes;
     }
 
-    /**
-     * @return the propertyUnitPeople
-     */
-    public ArrayList<Person> getPropertyUnitPeople() {
-        return propertyUnitPeople;
-    }
-
-    /**
-     * @param propertyUnitPeople the propertyUnitPeople to set
-     */
-    public void setPropertyUnitPeople(ArrayList<Person> propertyUnitPeople) {
-        this.propertyUnitPeople = propertyUnitPeople;
-    }
 
     /**
      * @return the otherKnownAddress
@@ -123,46 +111,19 @@ public class PropertyUnit {
         this.rental = rental;
     }
 
+
     /**
-     * @return the occupancyPermitList
+     * @return the property
      */
-    public ArrayList<OccPermit> getOccupancyPermitList() {
-        return occupancyPermitList;
+    public Property getProperty() {
+        return property;
     }
 
     /**
-     * @param occupancyPermitList the occupancyPermitList to set
+     * @param property the property to set
      */
-    public void setOccupancyPermitList(ArrayList<OccPermit> occupancyPermitList) {
-        this.occupancyPermitList = occupancyPermitList;
-    }
-
-    /**
-     * @return the thisProperty
-     */
-    public Property getThisProperty() {
-        return thisProperty;
-    }
-
-    /**
-     * @param thisProperty the thisProperty to set
-     */
-    public void setThisProperty(Property thisProperty) {
-        this.thisProperty = thisProperty;
-    }
-
-    /**
-     * @return the occPermitApplicationList
-     */
-    public ArrayList<OccPermitApplication> getOccPermitApplicationList() {
-        return occPermitApplicationList;
-    }
-
-    /**
-     * @param occPermitApplicationList the occPermitApplicationList to set
-     */
-    public void setOccPermitApplicationList(ArrayList<OccPermitApplication> occPermitApplicationList) {
-        this.occPermitApplicationList = occPermitApplicationList;
+    public void setProperty(Property property) {
+        this.property = property;
     }
 
     public boolean isInactive() {

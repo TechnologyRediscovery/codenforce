@@ -14,15 +14,14 @@ public interface Proposable {
     public int getChoiceID();
     public String getTitle();
     public String getDescription();
+    public EventCategory getEventCategory();
+    public EventRule getEventRule();
+    public boolean isAddEventRule();
     public int getRelativeOrder();
     public boolean isActive();
     public int getMinimumRequiredUserRankToView();
     public int getMinimumRequiredUserRankToChoose();
     public Icon getIcon();
-    public boolean isHidden();
-    public void setHidden(boolean h);
-    public boolean isCanChoose();
-    public void setCanChoose(boolean ch);
     
     
 }

@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseBaseClass;
 import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseChangeRule;
+import com.tcvcog.tcvce.entities.EventRule;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
@@ -792,8 +792,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws SQLException
      */
-    private CaseChangeRule generateCaseChangeRule(ResultSet rs) throws SQLException, IntegrationException{
-        CaseChangeRule cpcr = new CaseChangeRule();
+    private EventRule generateCaseChangeRule(ResultSet rs) throws SQLException, IntegrationException{
+        EventRule cpcr = new EventRule();
         EventIntegrator ei = getEventIntegrator();
         
         cpcr.setRuleID(rs.getInt("ruleid"));
@@ -836,8 +836,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public CaseChangeRule getEventRule(int ruleid) throws IntegrationException{
-        CaseChangeRule rule = null;
+    public EventRule getEventRule(int ruleid) throws IntegrationException{
+        EventRule rule = null;
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;

@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
-import com.tcvcog.tcvce.occupancy.entities.PaymentType;
+import com.tcvcog.tcvce.entities.PaymentType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.inject.Named;

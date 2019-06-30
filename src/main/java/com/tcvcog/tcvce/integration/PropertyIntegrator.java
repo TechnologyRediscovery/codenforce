@@ -707,7 +707,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, pu.getUnitNumber());
-            stmt.setInt(2, pu.getThisProperty().getPropertyID());
+            stmt.setInt(2, pu.getProperty().getPropertyID());
             stmt.setString(3, pu.getOtherKnownAddress());
             stmt.setString(4, pu.getNotes());
             stmt.setBoolean(5, pu.isRental());
@@ -886,9 +886,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         pu.setNotes(rs.getString("notes"));
         pu.setOtherKnownAddress(rs.getString("otherknownaddress"));
         pu.setRental(rs.getBoolean("rental"));
-        pu.setThisProperty(getProperty(rs.getInt("property_propertyid")));
+        pu.setProperty(getProperty(rs.getInt("property_propertyid")));
         pu.setInactive(rs.getBoolean("inactive"));
-        pu.setPropertyUnitPeople(persInt.getPersonList(rs.getInt("property_propertyid")));
+        pu.setPropertyUnitPersonList(persInt.getPersonList(rs.getInt("property_propertyid")));
         return pu;
     }
 

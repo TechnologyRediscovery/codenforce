@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -17,29 +18,28 @@ public class EventProposal extends EntityUtils {
     private String title;
     private String description;
     
+    private List<Proposable> choiceList;
+    
     private User creator;
-    
-    boolean currentUserCanRespondToProposal;
-    
-    private EventCategory choice1EventCat;
-    private String choice1Description;
-    private EventCategory choice2EventCat;
-    private String choice2Description;
-    private EventCategory choice3EventCat;
-    private String choice3Description;
     
     private boolean directPropToDefaultMuniCEO;
     private boolean directPropToDefaultMuniStaffer;
     private boolean directPropToDeveloper;
     
-    private int activatesXDaysFromGeneratingEvent;
-    private int expiresXDaysFromGeneratingEvent;
-    private EventCategory expiryTrigger;
+    private boolean executeChoiceIfLoneWolf;
+    private boolean inactivateGeneratingEventOnEvaluation;
+    private boolean maintainRelativeDateWindow;
+    private boolean instantiateMultipleOnBOB;
+    private boolean applyToClosedBOBs;
+    private boolean autoInactiveOnBOBClose;
+    private boolean autoInactiveOnGenEventInactivation;
+    
+    private int minimumRequiredUserRankToView;
+    private int minimumRequiredUserRankToEvaluate;
     
     private boolean active;
     
-    private EventProposalImplementation implementation;
-    
+    private Icon icon;
 
     /**
      * @param directPropToDefaultMuniCEO the directPropToDefaultMuniCEO to set
@@ -78,47 +78,6 @@ public class EventProposal extends EntityUtils {
         return description;
     }
 
-    /**
-     * @return the choice1EventCat
-     */
-    public EventCategory getChoice1EventCat() {
-        return choice1EventCat;
-    }
-
-    /**
-     * @return the choice1Description
-     */
-    public String getChoice1Description() {
-        return choice1Description;
-    }
-
-    /**
-     * @return the choice2EventCat
-     */
-    public EventCategory getChoice2EventCat() {
-        return choice2EventCat;
-    }
-
-    /**
-     * @return the choice2Description
-     */
-    public String getChoice2Description() {
-        return choice2Description;
-    }
-
-    /**
-     * @return the choice3EventCat
-     */
-    public EventCategory getChoice3EventCat() {
-        return choice3EventCat;
-    }
-
-    /**
-     * @return the choice3Description
-     */
-    public String getChoice3Description() {
-        return choice3Description;
-    }
 
     /**
      * @param proposalID the proposalID to set
@@ -141,61 +100,6 @@ public class EventProposal extends EntityUtils {
         this.description = description;
     }
 
-    /**
-     * @param choice1EventCat the choice1EventCat to set
-     */
-    public void setChoice1EventCat(EventCategory choice1EventCat) {
-        this.choice1EventCat = choice1EventCat;
-    }
-
-    /**
-     * @param choice1Description the choice1Description to set
-     */
-    public void setChoice1Description(String choice1Description) {
-        this.choice1Description = choice1Description;
-    }
-
-    /**
-     * @param choice2EventCat the choice2EventCat to set
-     */
-    public void setChoice2EventCat(EventCategory choice2EventCat) {
-        this.choice2EventCat = choice2EventCat;
-    }
-
-    /**
-     * @param choice2Description the choice2Description to set
-     */
-    public void setChoice2Description(String choice2Description) {
-        this.choice2Description = choice2Description;
-    }
-
-    /**
-     * @param choice3EventCat the choice3EventCat to set
-     */
-    public void setChoice3EventCat(EventCategory choice3EventCat) {
-        this.choice3EventCat = choice3EventCat;
-    }
-
-    /**
-     * @param choice3Description the choice3Description to set
-     */
-    public void setChoice3Description(String choice3Description) {
-        this.choice3Description = choice3Description;
-    }
-
-    /**
-     * @return the implementation
-     */
-    public EventProposalImplementation getImplementation() {
-        return implementation;
-    }
-
-    /**
-     * @param implementation the implementation to set
-     */
-    public void setImplementation(EventProposalImplementation implementation) {
-        this.implementation = implementation;
-    }
 
     /**
      * @return the directPropToDefaultMuniStaffer
@@ -211,39 +115,12 @@ public class EventProposal extends EntityUtils {
         this.directPropToDefaultMuniStaffer = directPropToDefaultMuniStaffer;
     }
 
-    /**
-     * @param currentUserCanRespondToProposal the currentUserCanRespondToProposal to set
-     */
-    public void setCurrentUserCanRespondToProposal(boolean currentUserCanRespondToProposal) {
-        this.currentUserCanRespondToProposal = currentUserCanRespondToProposal;
-    }
-
-    /**
-     * @return the currentUserCanRespondToProposal
-     */
-    public boolean isCurrentUserCanRespondToProposal() {
-        return currentUserCanRespondToProposal;
-    }
 
     /**
      * @return the directPropToDeveloper
      */
     public boolean isDirectPropToDeveloper() {
         return directPropToDeveloper;
-    }
-
-    /**
-     * @return the activatesXDaysFromGeneratingEvent
-     */
-    public int getActivatesXDaysFromGeneratingEvent() {
-        return activatesXDaysFromGeneratingEvent;
-    }
-
-    /**
-     * @return the expiresXDaysFromGeneratingEvent
-     */
-    public int getExpiresXDaysFromGeneratingEvent() {
-        return expiresXDaysFromGeneratingEvent;
     }
 
     /**
@@ -261,38 +138,10 @@ public class EventProposal extends EntityUtils {
     }
 
     /**
-     * @param activatesXDaysFromGeneratingEvent the activatesXDaysFromGeneratingEvent to set
-     */
-    public void setActivatesXDaysFromGeneratingEvent(int activatesXDaysFromGeneratingEvent) {
-        this.activatesXDaysFromGeneratingEvent = activatesXDaysFromGeneratingEvent;
-    }
-
-    /**
-     * @param expiresXDaysFromGeneratingEvent the expiresXDaysFromGeneratingEvent to set
-     */
-    public void setExpiresXDaysFromGeneratingEvent(int expiresXDaysFromGeneratingEvent) {
-        this.expiresXDaysFromGeneratingEvent = expiresXDaysFromGeneratingEvent;
-    }
-
-    /**
      * @param active the active to set
      */
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    /**
-     * @return the expiryTrigger
-     */
-    public EventCategory getExpiryTrigger() {
-        return expiryTrigger;
-    }
-
-    /**
-     * @param expiryTrigger the expiryTrigger to set
-     */
-    public void setExpiryTrigger(EventCategory expiryTrigger) {
-        this.expiryTrigger = expiryTrigger;
     }
 
     /**
@@ -307,6 +156,160 @@ public class EventProposal extends EntityUtils {
      */
     public void setCreator(User creator) {
         this.creator = creator;
+    }
+
+    /**
+     * @return the choiceList
+     */
+    public List<Proposable> getChoiceList() {
+        return choiceList;
+    }
+
+    /**
+     * @param choiceList the choiceList to set
+     */
+    public void setChoiceList(List<Proposable> choiceList) {
+        this.choiceList = choiceList;
+    }
+
+    /**
+     * @return the executeChoiceIfLoneWolf
+     */
+    public boolean isExecuteChoiceIfLoneWolf() {
+        return executeChoiceIfLoneWolf;
+    }
+
+    /**
+     * @return the inactivateGeneratingEventOnEvaluation
+     */
+    public boolean isInactivateGeneratingEventOnEvaluation() {
+        return inactivateGeneratingEventOnEvaluation;
+    }
+
+    /**
+     * @return the maintainRelativeDateWindow
+     */
+    public boolean isMaintainRelativeDateWindow() {
+        return maintainRelativeDateWindow;
+    }
+
+    /**
+     * @return the instantiateMultipleOnBOB
+     */
+    public boolean isInstantiateMultipleOnBOB() {
+        return instantiateMultipleOnBOB;
+    }
+
+    /**
+     * @return the applyToClosedBOBs
+     */
+    public boolean isApplyToClosedBOBs() {
+        return applyToClosedBOBs;
+    }
+
+    /**
+     * @return the autoInactiveOnBOBClose
+     */
+    public boolean isAutoInactiveOnBOBClose() {
+        return autoInactiveOnBOBClose;
+    }
+
+    /**
+     * @return the autoInactiveOnGenEventInactivation
+     */
+    public boolean isAutoInactiveOnGenEventInactivation() {
+        return autoInactiveOnGenEventInactivation;
+    }
+
+    /**
+     * @return the minimumRequiredUserRankToView
+     */
+    public int getMinimumRequiredUserRankToView() {
+        return minimumRequiredUserRankToView;
+    }
+
+    /**
+     * @return the minimumRequiredUserRankToEvaluate
+     */
+    public int getMinimumRequiredUserRankToEvaluate() {
+        return minimumRequiredUserRankToEvaluate;
+    }
+
+    /**
+     * @param executeChoiceIfLoneWolf the executeChoiceIfLoneWolf to set
+     */
+    public void setExecuteChoiceIfLoneWolf(boolean executeChoiceIfLoneWolf) {
+        this.executeChoiceIfLoneWolf = executeChoiceIfLoneWolf;
+    }
+
+    /**
+     * @param inactivateGeneratingEventOnEvaluation the inactivateGeneratingEventOnEvaluation to set
+     */
+    public void setInactivateGeneratingEventOnEvaluation(boolean inactivateGeneratingEventOnEvaluation) {
+        this.inactivateGeneratingEventOnEvaluation = inactivateGeneratingEventOnEvaluation;
+    }
+
+    /**
+     * @param maintainRelativeDateWindow the maintainRelativeDateWindow to set
+     */
+    public void setMaintainRelativeDateWindow(boolean maintainRelativeDateWindow) {
+        this.maintainRelativeDateWindow = maintainRelativeDateWindow;
+    }
+
+    /**
+     * @param instantiateMultipleOnBOB the instantiateMultipleOnBOB to set
+     */
+    public void setInstantiateMultipleOnBOB(boolean instantiateMultipleOnBOB) {
+        this.instantiateMultipleOnBOB = instantiateMultipleOnBOB;
+    }
+
+    /**
+     * @param applyToClosedBOBs the applyToClosedBOBs to set
+     */
+    public void setApplyToClosedBOBs(boolean applyToClosedBOBs) {
+        this.applyToClosedBOBs = applyToClosedBOBs;
+    }
+
+    /**
+     * @param autoInactiveOnBOBClose the autoInactiveOnBOBClose to set
+     */
+    public void setAutoInactiveOnBOBClose(boolean autoInactiveOnBOBClose) {
+        this.autoInactiveOnBOBClose = autoInactiveOnBOBClose;
+    }
+
+    /**
+     * @param autoInactiveOnGenEventInactivation the autoInactiveOnGenEventInactivation to set
+     */
+    public void setAutoInactiveOnGenEventInactivation(boolean autoInactiveOnGenEventInactivation) {
+        this.autoInactiveOnGenEventInactivation = autoInactiveOnGenEventInactivation;
+    }
+
+    /**
+     * @param minimumRequiredUserRankToView the minimumRequiredUserRankToView to set
+     */
+    public void setMinimumRequiredUserRankToView(int minimumRequiredUserRankToView) {
+        this.minimumRequiredUserRankToView = minimumRequiredUserRankToView;
+    }
+
+    /**
+     * @param minimumRequiredUserRankToEvaluate the minimumRequiredUserRankToEvaluate to set
+     */
+    public void setMinimumRequiredUserRankToEvaluate(int minimumRequiredUserRankToEvaluate) {
+        this.minimumRequiredUserRankToEvaluate = minimumRequiredUserRankToEvaluate;
+    }
+
+    /**
+     * @return the icon
+     */
+    public Icon getIcon() {
+        return icon;
+    }
+
+    /**
+     * @param icon the icon to set
+     */
+    public void setIcon(Icon icon) {
+        this.icon = icon;
     }
     
     

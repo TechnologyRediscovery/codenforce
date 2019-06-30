@@ -30,27 +30,13 @@ public class Payment {
     private LocalDateTime paymentDateDeposited;
     private LocalDateTime paymentDateReceived;
     private double paymentAmount;
-    private Person paymentPayer;
+    private int paymentPayerID;
     private String paymentReferenceNum;
     private int checkNum;
     private boolean cleared;
     private String notes;
 
-   public Payment() {
-       
-       notes = " ";
-       
-       paymentPayer = new Person();
-       
-       paymentDateReceived = LocalDateTime.now();
-       
-       paymentDateDeposited = LocalDateTime.now();
-       
-       paymentType = new PaymentType();
-       
-       paymentType.setPaymentTypeId(2);
-       
-   }
+   
 
     /**
      * @return the occupancyInspectionID
@@ -167,15 +153,15 @@ public class Payment {
     /**
      * @return the paymentPayerID
      */
-    public Person getPaymentPayer() {
-        return paymentPayer;
+    public int getPaymentPayerID() {
+        return paymentPayerID;
     }
 
     /**
      * @param paymentPayerID the paymentPayerID to set
      */
-    public void setPaymentPayer(Person paymentPayer) {
-        this.paymentPayer = paymentPayer;
+    public void setPaymentPayerID(int paymentPayerID) {
+        this.paymentPayerID = paymentPayerID;
     }
 
     /**

@@ -20,7 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
+import com.tcvcog.tcvce.occupancy.entities.OccInspection;
 import com.tcvcog.tcvce.occupancy.entities.OccInspecFee;
 import com.tcvcog.tcvce.occupancy.entities.OccInspecStatus;
 import java.sql.Connection;
@@ -44,12 +44,12 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         return new ArrayList();
     }
     
-    public void updateOccInspecStatus(OccupancyInspection oi, OccInspecStatus updatedStatus){
+    public void updateOccInspecStatus(OccInspection oi, OccInspecStatus updatedStatus){
         
         
     }
     
-    public void insertOccupanyInspection(OccupancyInspection occupancyInspection) throws IntegrationException{
+    public void insertOccupanyInspection(OccInspection occupancyInspection) throws IntegrationException{
         String query = "INSERT INTO public.occupancyinspection(\n" +
                 "   inspectionid, propertyunitid, login_userid, firstinspectiondate, "
             +   "firstinspectionpass, secondinspectiondate, secondinspectionpass, "
@@ -91,7 +91,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
                 
     }
     
-    public void updateOccupancyInspection(OccupancyInspection occInspection) throws IntegrationException {
+    public void updateOccupancyInspection(OccInspection occInspection) throws IntegrationException {
         String query = "UPDATE public.occupancyinspection\n" +
                         "   SET propertyunitid=?, login_userid=?, firstinspectiondate=?, \n" +
                         "       firstinspectionpass=?, secondinspectiondate=?, secondinspectionpass=?, \n" +
@@ -136,7 +136,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         
     }
     
-    public void deleteOccupancyInspection(OccupancyInspection occInspection) throws IntegrationException{
+    public void deleteOccupancyInspection(OccInspection occInspection) throws IntegrationException{
          String query = "DELETE FROM public.occupancyinspection\n" +
                         " WHERE inspectionid=?;";
         Connection con = getPostgresCon();
@@ -158,8 +158,8 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         } // close finally
     }
     
-    private OccupancyInspection generateOccupancyInspection(ResultSet rs) throws IntegrationException{
-        OccupancyInspection newInspection = new OccupancyInspection();
+    private OccInspection generateOccupancyInspection(ResultSet rs) throws IntegrationException{
+        OccInspection newInspection = new OccInspection();
         
         try{
             newInspection.setInspectionID(rs.getInt("inspectionid"));
@@ -188,12 +188,12 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         return newInspection;
     }
     
-    public OccupancyInspection getOccupancyInspection(int inspectionID){
+    public OccInspection getOccupancyInspection(int inspectionID){
         
-        return new OccupancyInspection();
+        return new OccInspection();
     }
     
-    public ArrayList<OccupancyInspection> getOccupancyInspectionList(PropertyUnit pu) throws IntegrationException{
+    public ArrayList<OccInspection> getOccupancyInspectionList(PropertyUnit pu) throws IntegrationException{
         String query = "SELECT inspectionid, propertyunitid, login_userid, firstinspectiondate, \n" +
                     "       firstinspectionpass, secondinspectiondate, secondinspectionpass, \n" +
                     "       resolved, totalfeepaid, notes\n" +
@@ -201,7 +201,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     Connection con = getPostgresCon();
     ResultSet rs = null;
     PreparedStatement stmt = null;
-    ArrayList<OccupancyInspection> occupancyInspectionList = new ArrayList();
+    ArrayList<OccInspection> occupancyInspectionList = new ArrayList();
     
     try{
         stmt = con.prepareStatement(query);

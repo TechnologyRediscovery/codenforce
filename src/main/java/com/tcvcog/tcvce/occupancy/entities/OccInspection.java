@@ -16,21 +16,22 @@
  */
 package com.tcvcog.tcvce.occupancy.entities;
 
+import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
  *
- * @author Adam Gutonski
+ * @author Adam Gutonski and Sylvia
  */
-public class OccupancyInspection {
+public class OccInspection {
     
     private int inspectionID;
-    private User caseManager;
+    private User inspector;
     
-    private ArrayList<InspectedSpace> inspectedSpaceList;
-    private ArrayList<InspectedSpace> spacesWithFailedElements;
+    private ArrayList<OccInspectedSpace> inspectedSpaceList;
+    private OccChecklistBlueprint blueprint;
     
     private boolean totalFeePaid;
     
@@ -46,10 +47,6 @@ public class OccupancyInspection {
     
     private int pacc;
     private boolean enablePacc;
-    private User muniAuthGrantedBy;
-    private String muniAuthNotes;
-    
-    private OccPermit permit;
     
     private ArrayList<Payment> payments;
 
@@ -168,17 +165,17 @@ public class OccupancyInspection {
     }
 
     /**
-     * @return the caseManager
+     * @return the inspector
      */
-    public User getCaseManager() {
-        return caseManager;
+    public User getInspector() {
+        return inspector;
     }
 
     /**
-     * @param caseManager the caseManager to set
+     * @param inspector the inspector to set
      */
-    public void setCaseManager(User caseManager) {
-        this.caseManager = caseManager;
+    public void setInspector(User inspector) {
+        this.inspector = inspector;
     }
 
     /**
@@ -282,30 +279,30 @@ public class OccupancyInspection {
     /**
      * @return the inspectedSpaceList
      */
-    public ArrayList<InspectedSpace> getInspectedSpaceList() {
+    public ArrayList<OccInspectedSpace> getInspectedSpaceList() {
         return inspectedSpaceList;
     }
 
     /**
      * @param inspectedSpaceList the inspectedSpaceList to set
      */
-    public void setInspectedSpaceList(ArrayList<InspectedSpace> inspectedSpaceList) {
+    public void setInspectedSpaceList(ArrayList<OccInspectedSpace> inspectedSpaceList) {
         this.inspectedSpaceList = inspectedSpaceList;
     }
 
     /**
-     * @return the spacesWithFailedElements
+     * @return the blueprint
      */
-    public ArrayList<InspectedSpace> getSpacesWithFailedElements() {
-        return spacesWithFailedElements;
+    public OccChecklistBlueprint getBlueprint() {
+        return blueprint;
     }
 
     /**
-     * @param spacesWithFailedElements the spacesWithFailedElements to set
+     * @param blueprint the blueprint to set
      */
-    public void setSpacesWithFailedElements(ArrayList<InspectedSpace> spacesWithFailedElements) {
-        this.spacesWithFailedElements = spacesWithFailedElements;
+    public void setBlueprint(OccChecklistBlueprint blueprint) {
+        this.blueprint = blueprint;
     }
-    
+
     
 }

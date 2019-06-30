@@ -23,13 +23,13 @@ import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.occupancy.entities.ChecklistBlueprint;
-import com.tcvcog.tcvce.occupancy.entities.InspectedElement;
-import com.tcvcog.tcvce.occupancy.entities.InspectedSpace;
-import com.tcvcog.tcvce.occupancy.entities.LocationDescriptor;
-import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
-import com.tcvcog.tcvce.occupancy.entities.Space;
-import com.tcvcog.tcvce.occupancy.entities.SpaceType;
+import com.tcvcog.tcvce.occupancy.entities.OccChecklistBlueprint;
+import com.tcvcog.tcvce.occupancy.entities.OccInspectedElement;
+import com.tcvcog.tcvce.occupancy.entities.OccInspectedSpace;
+import com.tcvcog.tcvce.occupancy.entities.OccLocationDescriptor;
+import com.tcvcog.tcvce.occupancy.entities.OccInspection;
+import com.tcvcog.tcvce.occupancy.entities.OccSpace;
+import com.tcvcog.tcvce.occupancy.entities.OccSpaceType;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,7 +51,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     public ChecklistIntegrator() {
     }
     
-    public void createChecklistBlueprintMetadata(ChecklistBlueprint bpMetaData) throws IntegrationException{
+    public void createChecklistBlueprintMetadata(OccChecklistBlueprint bpMetaData) throws IntegrationException{
         
         String query = "INSERT INTO public.checklist(\n" +
                         " checklistid, title, description, muni_municode, active)\n" +
@@ -79,7 +79,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
     }
     
-    public void updateChecklistBlueprintMetadata(ChecklistBlueprint blueprint) throws IntegrationException{
+    public void updateChecklistBlueprintMetadata(OccChecklistBlueprint blueprint) throws IntegrationException{
         
         String query = "UPDATE public.checklist\n" +
                         " SET title=?, description=?, muni_municode=?, active=?\n" +
@@ -108,7 +108,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     // maybe don't need this one
-    public void insertChecklistBlueprint(ChecklistBlueprint blueprint) throws IntegrationException{
+    public void insertChecklistBlueprint(OccChecklistBlueprint blueprint) throws IntegrationException{
         
         String query = "";
         Connection con = getPostgresCon();
@@ -133,7 +133,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
     }
     
-    public void insertSpaceMetaData(Space s) throws IntegrationException{
+    public void insertSpaceMetaData(OccSpace s) throws IntegrationException{
         
         String query = "INSERT INTO public.space(\n" +
                         " spaceid, name, spacetype)\n" +
@@ -158,7 +158,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
     }
     
-    public void updateSpaceMetaData(Space s) throws IntegrationException{
+    public void updateSpaceMetaData(OccSpace s) throws IntegrationException{
         
         String query =  "UPDATE public.space\n" +
                         " SET name=?, spacetype=?\n" +
@@ -184,14 +184,14 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
     }
     
-    public Space getSpaceWithElements(int spaceID) throws IntegrationException{
+    public OccSpace getSpaceWithElements(int spaceID) throws IntegrationException{
         
         String query =  "SELECT name, spacetype_id\n" +
                         "  FROM public.space WHERE spaceid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        Space s = new Space();
+        OccSpace s = new OccSpace();
         
         try {
 
@@ -219,7 +219,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         return s;
     }
     
-     public InspectedSpace populateInspectedSpaceMetadata(InspectedSpace is) throws IntegrationException{
+     public OccInspectedSpace populateInspectedSpaceMetadata(OccInspectedSpace is) throws IntegrationException{
         
         String query =  "SELECT name, spacetype_id\n" +
                         "  FROM public.space WHERE spaceid = ?;";
@@ -252,15 +252,15 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     /**
-     * Takes in a Space object, extracts its ID, then uses that to query for
-     * all of the codeelements attached to that space. Used to compose a checklist
+     * Takes in a OccSpace object, extracts its ID, then uses that to query for
+ all of the codeelements attached to that space. Used to compose a checklist
      * blueprint which can be converted into an implemented checklist
      * @param s the space Object to load up with elements. When passed in, only the ID
      * needs to be held in the object
-     * @return a Space object populated with CodeElement objects
+     * @return a OccSpace object populated with CodeElement objects
      * @throws IntegrationException 
      */
-    private Space populateSpaceWithCodeElements(Space s) throws IntegrationException{
+    private OccSpace populateSpaceWithCodeElements(OccSpace s) throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
         String query =  "SELECT spaceelementid, space_id, codeelement_id\n" +
                         " FROM public.spaceelement WHERE spaceid = ?;";
@@ -294,12 +294,12 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     /**
-     * Connects a Space with Code Elements. 
+     * Connects a OccSpace with Code Elements. 
      * @param s the space to which the elements should be connected
      * @param elementsToAttach a list of CodeElements that should be inspected in this space
      * @throws IntegrationException 
      */
-    public void attachCodeElementsToSpace(Space s, ArrayList<CodeElement> elementsToAttach) throws IntegrationException{
+    public void attachCodeElementsToSpace(OccSpace s, ArrayList<CodeElement> elementsToAttach) throws IntegrationException{
         
         String query =  "INSERT INTO public.spaceelement(\n" +
                         " spaceelementid, space_id, codeelement_id)\n" +
@@ -332,12 +332,12 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     /**
-     * Removes the connection between a Space and a Code Element. Handy for adjusting ChecklistBlueprints
+     * Removes the connection between a OccSpace and a Code Element. Handy for adjusting ChecklistBlueprints
      * @param s
      * @param elementToDetach
      * @throws IntegrationException 
      */
-    public void detachCodeElementFromSpace(Space s, CodeElement elementToDetach) throws IntegrationException{
+    public void detachCodeElementFromSpace(OccSpace s, CodeElement elementToDetach) throws IntegrationException{
         
         String query = "DELETE FROM public.spaceelement\n" +
                         " WHERE space_id = ? AND spaceelementid = ?;";
@@ -369,13 +369,13 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * @return a fully-baked space list, meaning each space has its elements intact
      * @throws IntegrationException 
      */
-    public ArrayList<Space> getSpaceList() throws IntegrationException{
+    public ArrayList<OccSpace> getSpaceList() throws IntegrationException{
         
         String query = "SELECT spaceid FROM public.space;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<Space> spaceAL = new ArrayList();
+        ArrayList<OccSpace> spaceAL = new ArrayList();
 
         try {
 
@@ -405,7 +405,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * @param s
      * @throws IntegrationException 
      */
-    public void deleteSpace(Space s) throws IntegrationException{
+    public void deleteSpace(OccSpace s) throws IntegrationException{
         
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -438,7 +438,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     }    
     
     
-    public ChecklistBlueprint getChecklistBlueprint(int blueprintID) throws IntegrationException{
+    public OccChecklistBlueprint getChecklistBlueprint(int blueprintID) throws IntegrationException{
         
         String blueprintMetadataQuery = "SELECT checklistid, title, description, muni_municode, active\n" +
                                         "  FROM public.checklist WHERE checklistid = ?;";
@@ -450,8 +450,8 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ChecklistBlueprint bp = null;
-        ArrayList<Space> spaceList = new ArrayList<>();
+        OccChecklistBlueprint bp = null;
+        ArrayList<OccSpace> spaceList = new ArrayList<>();
 
         try {
             
@@ -492,12 +492,12 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     /**
-     * Utility method for populating a ChecklistBlueprint with metadata
+     * Utility method for populating a OccChecklistBlueprint with metadata
      * @param rs containing all metadata fields from the checklist table
-     * @return half-baked ChecklistBlueprint object (no element lists)
+     * @return half-baked OccChecklistBlueprint object (no element lists)
      */
-    private ChecklistBlueprint generateChecklistBlueprint(ResultSet rs) throws SQLException, IntegrationException{
-        ChecklistBlueprint bp = new ChecklistBlueprint();
+    private OccChecklistBlueprint generateChecklistBlueprint(ResultSet rs) throws SQLException, IntegrationException{
+        OccChecklistBlueprint bp = new OccChecklistBlueprint();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         bp.setInspectionChecklistID(rs.getInt("checklistid"));
@@ -516,13 +516,13 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws IntegrationException 
      */
-    public ArrayList<ChecklistBlueprint> getCompleteChecklistBlueprintList(Municipality muni) throws IntegrationException{
+    public ArrayList<OccChecklistBlueprint> getCompleteChecklistBlueprintList(Municipality muni) throws IntegrationException{
         
         String query = "SELECT checklistid from checklist;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<ChecklistBlueprint> bpList = new ArrayList<>();
+        ArrayList<OccChecklistBlueprint> bpList = new ArrayList<>();
 
         try {
 
@@ -552,7 +552,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * @param blueprint
      * @throws IntegrationException 
      */
-    public void updateChecklistBlueprintSpaceList(ChecklistBlueprint blueprint) throws IntegrationException{
+    public void updateChecklistBlueprintSpaceList(OccChecklistBlueprint blueprint) throws IntegrationException{
         
         String query = "";
         Connection con = getPostgresCon();
@@ -581,15 +581,15 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     
     
     /**
-     * Called by the OccupancyIntegrator during the construction of an OccupancyInspection
-     * object. This method, in turn, calls the private getInspectedSpaceList method in this
+     * Called by the OccupancyIntegrator during the construction of an OccInspection
+ object. This method, in turn, calls the private getInspectedSpaceList method in this
      * class to populate the actual inspection data.
      * @param inspectionID
      * @return a fully-baked ImplementedChecklist
      * @throws IntegrationException 
      */
-    public ArrayList<InspectedSpace> getInspectedSpaceList(int inspectionID) throws IntegrationException{
-        ArrayList<InspectedSpace> inspSpaceList = new ArrayList<>();
+    public ArrayList<OccInspectedSpace> getInspectedSpaceList(int inspectionID) throws IntegrationException{
+        ArrayList<OccInspectedSpace> inspSpaceList = new ArrayList<>();
         
         String query_spaceIDs =  "SELECT DISTINCT spaceid\n" +
             " FROM inspectedchecklistspaceelement INNER JOIN checklistspaceelement ON (checklistspaceelementid = checklistspaceelement_id)\n" +
@@ -628,7 +628,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         return inspSpaceList;
     }
     
-    private InspectedSpace getInspectedSpace(int inspectionID, int spaceID) throws IntegrationException, SQLException{
+    private OccInspectedSpace getInspectedSpace(int inspectionID, int spaceID) throws IntegrationException, SQLException{
         
         // this gets us a list of inspectedchecklistspaceelements
         String query_inspectedElementsBySpace = 
@@ -641,8 +641,8 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        InspectedSpace is = new InspectedSpace();
-        ArrayList<InspectedElement> insElementList = new ArrayList<>();
+        OccInspectedSpace is = new OccInspectedSpace();
+        ArrayList<OccInspectedElement> insElementList = new ArrayList<>();
 
         try {
             
@@ -678,9 +678,9 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         return is;
     }
     
-    private InspectedElement generateInspectedElement(ResultSet rs) throws SQLException, IntegrationException{
+    private OccInspectedElement generateInspectedElement(ResultSet rs) throws SQLException, IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
-        InspectedElement ie = new InspectedElement();
+        OccInspectedElement ie = new OccInspectedElement();
         
         ie.setId(rs.getInt("inspectedchecklistspaceelementid"));
         ie.setInspected(rs.getBoolean("inspected"));
@@ -689,7 +689,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         ie.setNotes(rs.getString("notes"));
         // note this is the same location object as on the InspectedSPace to allow
-        // the severing of the InspectedElement from the space without losing
+        // the severing of the OccInspectedElement from the space without losing
         // location specific information
         // an UN-elegant solution
         ie.setLocation(getLocation(rs.getInt("locationdescription_id")));
@@ -697,14 +697,14 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         return ie;
     }
     
-    public LocationDescriptor getLocation(int locationID) throws IntegrationException{
+    public OccLocationDescriptor getLocation(int locationID) throws IntegrationException{
          String query_spaceIDs =  "SELECT locationdescriptionid, description\n" +
                                   "  FROM public.locationdescription WHERE locationdescriptionid = ?;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        LocationDescriptor loc = null;
+        OccLocationDescriptor loc = null;
         try {
 
             // this gets us a list of all of the spaces that have been inspected for this
@@ -715,7 +715,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
 
             // chugg down the list of spaceids and fetch an Inspected space for each
             while(rs.next()){
-                loc = new LocationDescriptor();
+                loc = new OccLocationDescriptor();
                 loc.setLocationID(rs.getInt("locationdescriptionid"));
                 loc.setLocationDescription(rs.getString("description"));
                 
@@ -736,20 +736,20 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
     
     
     /**
-     * Inserts an InspectedSpace to the inspectedchecklistspaceelement table which has not 
-     * previously been inspected. The InspectedSpace object and its composed elements
-     * do not have an ID number generated from the DB yet, and these will come from the DB
-     * sequences ;
+     * Inserts an OccInspectedSpace to the inspectedchecklistspaceelement table which has not 
+ previously been inspected. The OccInspectedSpace object and its composed elements
+ do not have an ID number generated from the DB yet, and these will come from the DB
+ sequences ;
+ 
+ Remember: The db doesn't have a concept of an "inspected space", only 
+ an inspectedSpaceElement so this method will iterate over the inspected
+ elements in the OccInspectedSpace, executing an insert statement for each.
      * 
-     * Remember: The db doesn't have a concept of an "inspected space", only 
-     * an inspectedSpaceElement so this method will iterate over the inspected
-     * elements in the InspectedSpace, executing an insert statement for each.
-     * 
-     * @param oi the current OccupancyInspection
-     * @param is an InspectedSpace that was NOT retrieved from the DB
+     * @param oi the current OccInspection
+     * @param is an OccInspectedSpace that was NOT retrieved from the DB
      * @throws IntegrationException 
      */
-    public void insertNewlyInspectedSpace(OccupancyInspection oi, InspectedSpace is) throws IntegrationException{
+    public void insertNewlyInspectedSpace(OccInspection oi, OccInspectedSpace is) throws IntegrationException{
         
         String query_locationInsert =  "INSERT INTO public.locationdescription(\n" +
                                         "            locationdescriptionid, description)\n" +
@@ -770,8 +770,8 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         ResultSet rs = null;
         PreparedStatement stmt = null;
 
-        ListIterator<InspectedElement> inspectedElementListIterator = is.getInspectedElementList().listIterator();
-        InspectedElement ie;
+        ListIterator<OccInspectedElement> inspectedElementListIterator = is.getInspectedElementList().listIterator();
+        OccInspectedElement ie;
 
         try {
             stmt = con.prepareStatement(query_locationInsert);
@@ -820,9 +820,9 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * @param oi
      * @param is
      * @throws IntegrationException thrown for standard SQL errors and this method being 
-     * given an InspectedSpace object whose constituent members lack ID numbers for the updates.
+ given an OccInspectedSpace object whose constituent members lack ID numbers for the updates.
      */
-    public void updateInspectedSpace(OccupancyInspection oi, InspectedSpace is) throws IntegrationException{
+    public void updateInspectedSpace(OccInspection oi, OccInspectedSpace is) throws IntegrationException{
         
         String query = "";
         Connection con = getPostgresCon();
@@ -850,7 +850,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
 
     }
     
-    public void deleteInspectedSpace(InspectedSpace is) throws IntegrationException{
+    public void deleteInspectedSpace(OccInspectedSpace is) throws IntegrationException{
         
         String query = "";
         Connection con = getPostgresCon();
@@ -878,13 +878,13 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         
     }
     
-    public SpaceType getSpaceType(int spacetypeid) throws IntegrationException{
+    public OccSpaceType getSpaceType(int spacetypeid) throws IntegrationException{
         String query =  "SELECT spacetypeid, spacetitle, description\n" +
                         " FROM public.spacetype WHERE spacetypeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        SpaceType st = null;
+        OccSpaceType st = null;
 
         try {
 
@@ -910,14 +910,14 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         
     }
     
-    public ArrayList<SpaceType> getSpaceTypeList() throws IntegrationException{
+    public ArrayList<OccSpaceType> getSpaceTypeList() throws IntegrationException{
 
         String query = "SELECT spacetypeid, spacetitle, description" +
                 "  FROM public.spacetype;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<SpaceType> spaceTypeList = new ArrayList();
+        ArrayList<OccSpaceType> spaceTypeList = new ArrayList();
 
         try {
 
@@ -949,8 +949,8 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         return spaceTypeList;
     }
     
-    private SpaceType generateSpaceType(ResultSet rs) throws IntegrationException{
-        SpaceType newSpaceType = new SpaceType();
+    private OccSpaceType generateSpaceType(ResultSet rs) throws IntegrationException{
+        OccSpaceType newSpaceType = new OccSpaceType();
 
 
         try {
@@ -973,7 +973,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
 
     }
     
-    public void insertSpaceType(SpaceType spaceType) throws IntegrationException{
+    public void insertSpaceType(OccSpaceType spaceType) throws IntegrationException{
         String query = "INSERT INTO public.spacetype(\n" +
                 "         spacetypeid, spacetitle, description) \n" +
                 "    VALUES (DEFAULT, ?, ?)";
@@ -1014,7 +1014,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         
     }
     
-      public void deleteSpaceType(SpaceType spaceType) throws IntegrationException {
+      public void deleteSpaceType(OccSpaceType spaceType) throws IntegrationException {
          String query = "DELETE FROM public.spacetype\n" +
                         " WHERE spacetypeid= ?;";
         Connection con = getPostgresCon();
@@ -1036,7 +1036,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } // close finally
     }
       
-    public void updateSpaceType(SpaceType spaceType) throws IntegrationException {
+    public void updateSpaceType(OccSpaceType spaceType) throws IntegrationException {
         String query = "UPDATE public.spacetype\n" +
                     "   SET spacetitle=?, description=?\n" +
                     " WHERE spacetypeid=?;";

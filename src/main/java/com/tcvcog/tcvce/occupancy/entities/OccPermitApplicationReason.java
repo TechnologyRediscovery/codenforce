@@ -29,7 +29,7 @@ public class OccPermitApplicationReason {
     private String title;
     private String description;
     private boolean active;
-    private PersonsRequirement personsRequirement;
+    private OccAppPersonRequirement personsRequirement;
     private String humanFriendlyDescription;
 
     public int getId() {
@@ -95,14 +95,14 @@ public class OccPermitApplicationReason {
     /**
      * @return the personsRequirement
      */
-    public PersonsRequirement getPersonsRequirement() {
+    public OccAppPersonRequirement getPersonsRequirement() {
         return personsRequirement;
     }
 
     /**
      * @param personsRequirement the personsRequirement to set
      */
-    public void setPersonsRequirement(PersonsRequirement personsRequirement) {
+    public void setPersonsRequirement(OccAppPersonRequirement personsRequirement) {
         this.personsRequirement = personsRequirement;
     }    
 

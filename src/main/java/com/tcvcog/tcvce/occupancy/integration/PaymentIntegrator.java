@@ -18,8 +18,8 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.occupancy.entities.Payment;
-import com.tcvcog.tcvce.occupancy.entities.PaymentType;
+import com.tcvcog.tcvce.entities.Payment;
+import com.tcvcog.tcvce.entities.PaymentType;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;

@@ -30,8 +30,8 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermit;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
-import com.tcvcog.tcvce.occupancy.entities.OccPermitType;
-import com.tcvcog.tcvce.occupancy.entities.PersonsRequirement;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriodType;
+import com.tcvcog.tcvce.occupancy.entities.OccAppPersonRequirement;
 import java.io.Serializable;
 import java.sql.Array;
 import java.sql.Connection;
@@ -140,7 +140,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     
     
-    public void updateOccupancyPermitType(OccPermitType opt) throws IntegrationException {
+    public void updateOccupancyPermitType(OccPeriodType opt) throws IntegrationException {
         String query = "UPDATE public.occpermittype\n" +
                     "   SET typename=?, typedescription=?\n" +
                     " WHERE typeid=?;";
@@ -166,7 +166,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         
     }
     
-    public void deleteOccupancyPermitType(OccPermitType opt) throws IntegrationException{
+    public void deleteOccupancyPermitType(OccPeriodType opt) throws IntegrationException{
          String query = "DELETE FROM public.occpermittype\n" +
                         " WHERE typeid=?;";
         Connection con = getPostgresCon();
@@ -189,13 +189,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    public ArrayList<OccPermitType> getOccupancyPermitTypeList() throws IntegrationException{
+    public ArrayList<OccPeriodType> getOccupancyPermitTypeList() throws IntegrationException{
         String query = "SELECT typeid, muni_municode, typename, typedescription\n" +
                        "  FROM public.occpermittype";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<OccPermitType> occupancyPermitTypeList = new ArrayList();
+        ArrayList<OccPeriodType> occupancyPermitTypeList = new ArrayList();
         
         try {
             stmt = con.prepareStatement(query);
@@ -217,7 +217,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    public void insertOccupancyPermitType(OccPermitType occupancyPermitType) throws IntegrationException{
+    public void insertOccupancyPermitType(OccPeriodType occupancyPermitType) throws IntegrationException{
         String query = "INSERT INTO public.occpermittype(\n" +
                     "  typeid, muni_municode, typename, typedescription)\n" +
                     "  VALUES (DEFAULT, ?, ?, ?)";
@@ -245,8 +245,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     
     
-    private OccPermitType generateOccupancyPermitType(ResultSet rs) throws IntegrationException{
-        OccPermitType newOpt = new OccPermitType();
+    private OccPeriodType generateOccupancyPermitType(ResultSet rs) throws IntegrationException{
+        OccPeriodType newOpt = new OccPeriodType();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try{
@@ -499,8 +499,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return occpermitappreason;
     }
     
-    public PersonsRequirement getPersonsRequirement(int reasonId) throws IntegrationException {
-        PersonsRequirement personsRequirement = null;
+    public OccAppPersonRequirement getPersonsRequirement(int reasonId) throws IntegrationException {
+        OccAppPersonRequirement personsRequirement = null;
         String query = "SELECT reasonid, humanfriendlydescription FROM public.occpermitapplicationreason "
                 + "WHERE reasonid = ?";
         Connection con = getPostgresCon();
@@ -526,8 +526,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return personsRequirement;
     }
     
-    public PersonsRequirement generatePersonsRequirement(ResultSet rs) throws IntegrationException{
-        PersonsRequirement personsRequirement = new PersonsRequirement();
+    public OccAppPersonRequirement generatePersonsRequirement(ResultSet rs) throws IntegrationException{
+        OccAppPersonRequirement personsRequirement = new OccAppPersonRequirement();
         
         try {
             personsRequirement.setRequirementSatisfied(false);

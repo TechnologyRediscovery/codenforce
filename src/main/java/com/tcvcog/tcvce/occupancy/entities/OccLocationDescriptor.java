@@ -21,7 +21,7 @@ package com.tcvcog.tcvce.occupancy.entities;
  *
  * @author sylvia
  */
-public class LocationDescriptor {
+public class OccLocationDescriptor {
     private int locationID;
     private String locationDescription;
 

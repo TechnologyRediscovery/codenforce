@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
-import com.tcvcog.tcvce.entities.CaseChangeRule;
+import com.tcvcog.tcvce.entities.EventRule;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCECase;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -454,7 +454,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws CaseLifecyleException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      */
-    public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase, CaseChangeRule rule) 
+    public void generateAndInsertPhaseChangeEvent(CECase currentCase, CasePhase pastPhase, EventRule rule) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         
         EventIntegrator ei = getEventIntegrator();
