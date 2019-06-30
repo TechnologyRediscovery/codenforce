@@ -30,38 +30,23 @@ ALTER TABLE public.checklistspaceelement RENAME TO occchecklistspaceelement;
 ALTER TABLE public.occupancypermitapplication ADD COLUMN declaredtotaladults integer;
 ALTER TABLE public.occupancypermitapplication ADD COLUMN declaredtotalyouth integer;
 
-ALTER TABLE public.eventcategory RENAME phasechangerule_ruleid  TO eventrule_ruleid;
+ALTER TABLE public.ceeventcategory RENAME phasechangerule_ruleid  TO eventrule_ruleid;
 
-ALTER TABLE public.eventcategory
+ALTER TABLE public.ceeventcategory
   RENAME CONSTRAINT ceeventcat_phasechange_fk TO ceeventcat_ruleid_fk;
 
 
 
-DROP TABLE public.occupancyinspectionstatus;
+DROP TABLE public.occupancyinspectionstatus CASCADE;
 
 -- this will also drop a FK on the loginobjecthistory
-DROP TABLE occupancypermit CASCADE;
-
-CREATE TABLE public.occpermit
-(
-  permitid 								INTEGER NOT NULL DEFAULT nextval('occupancypermit_permitid_seq'::regclass) CONSTRAINT occpermit_permitid_pk PRIMARY KEY,
-  occperiod_periodid 					INTEGER NOT NULL CONSTRAINT occpermit_periodid_fk REFERENCES public.occperiod (periodid),
-  referenceno 							TEXT,
-  permittype_typeid  					INTEGER CONSTRAINT occpermit_permittype_fk REFERENCES public.occpermittype (typeid),
-  issuedto_personid 					INTEGER NOT NULL CONSTRAINT occpermit_issuedto_personid_fk REFERENCES public.person (personid),
-  issuedby_userid 						INTEGER CONSTRAINT occperiod_startcert_userid_fk REFERENCES public.login (userid), 
-  dateissued 							TIMESTAMP WITH TIME ZONE NOT NULL,
-  permitadditionaltext 					TEXT,
-  notes 								TEXT
-) ;
 
 -- Since we want to be able to assocaite an occupancy permit with a permitting code source (like IPMC 2015), 
 -- we had the FK on the permit to just poop it out onto the printed page. Instead, move it to the checklist itself
 
-ALTER TABLE public.occinspecchecklist RENAME TO occchecklist;
-ALTER TABLE public.occchecklist ADD COLUMN governingcodesource_sourceid INTEGER CONSTRAINT occinspecchecklist_codesourceid_fk REFERENCES codesource (sourceid);
-ALTER TABLE public.eventrule DROP CONSTRAINT phasechangerule_triggeredevcatreqcat_fk;
-ALTER TABLE public.eventrule DROP COLUMN triggeredeventproposal;
+
+ALTER TABLE public.occchecklist ADD COLUMN governingcodesource_sourceid INTEGER CONSTRAINT occchecklist_codesourceid_fk REFERENCES codesource (sourceid);
+
 
 DROP TABLE occpermittype CASCADE;
 
@@ -105,16 +90,6 @@ CREATE TABLE public.occperiodtype
 
 ALTER TABLE occpermitapplicationreason ADD COLUMN periodtypeproposal_periodid INTEGER CONSTRAINT occpermitapprsn_pertype_fk REFERENCES public.occperiodtype (typeid);
 
---***************************************
---  add reasons and their type proposal mappings here
---***************************************
---***************************************
-
-
--- TODO
-
-ALTER TABLE public.occpermitapplicationreason
-   ALTER COLUMN periodtypeproposal_periodid SET NOT NULL;
 
 
 CREATE SEQUENCE IF NOT EXISTS occperiodid_seq
@@ -143,10 +118,25 @@ CREATE TABLE public.occperiod
 	authorizationts 					TIMESTAMP WITH TIME ZONE,
 	authorizedby_userid 				INTEGER CONSTRAINT occperiod_authby_userid_fk REFERENCES public.login (userid),
 	overrideperiodtypeconfig			INTEGER CONSTRAINT occperiod_overridetype_userid_fk REFERENCES public.login (userid),
-	notes 								TEXT,
+	notes 								TEXT
 
 
 ) ;
+
+DROP TABLE occupancypermit CASCADE;
+
+CREATE TABLE public.occpermit
+(
+  permitid                INTEGER NOT NULL DEFAULT nextval('occupancypermit_permitid_seq'::regclass) CONSTRAINT occpermit_permitid_pk PRIMARY KEY,
+  occperiod_periodid          INTEGER NOT NULL CONSTRAINT occpermit_periodid_fk REFERENCES public.occperiod (periodid),
+  referenceno               TEXT,
+  issuedto_personid           INTEGER NOT NULL CONSTRAINT occpermit_issuedto_personid_fk REFERENCES public.person (personid),
+  issuedby_userid             INTEGER CONSTRAINT occperiod_startcert_userid_fk REFERENCES public.login (userid), 
+  dateissued              TIMESTAMP WITH TIME ZONE NOT NULL,
+  permitadditionaltext          TEXT,
+  notes                 TEXT
+) ;
+
 
 
 CREATE TABLE public.occperiodphotodoc
@@ -177,7 +167,7 @@ CREATE TABLE public.occinspection
     maxoccupantsallowed   INTEGER NOT NULL CONSTRAINT occinspection_maxocc_userid_fk REFERENCES public.login (userid),
     publicaccesscc                  INTEGER,
     enablepacc                      BOOLEAN DEFAULT FALSE,
-    notes                           TEXT
+    notes                           TEXT,
     thirdpartyinspector_personid integer CONSTRAINT occinspection_thirdpartyuserid_fk REFERENCES public.person (personid),
     thirdpartyinspectorapprovalts timestamp with time zone,
     thirdpartyinspectorapprovalby INTEGER CONSTRAINT occinspectionthirdpartyapprovalby_fk REFERENCES public.login (userid)
@@ -201,7 +191,7 @@ ALTER TABLE public.inspectedchecklistspaceelementphotodoc RENAME TO occinspected
 ALTER TABLE public.locationdescription RENAME TO occlocationdescription;
 
 ALTER TABLE public.occinspectedchecklistspaceelement DROP COLUMN inspected;
-ALTER TABLE public.occinspectedchecklistspaceelement DROP COLUMN compliance;
+ALTER TABLE public.occinspectedchecklistspaceelement DROP COLUMN compliancedate;
 ALTER TABLE public.occinspectedchecklistspaceelement ADD COLUMN lastinspectedby_userid INTEGER CONSTRAINT occinspectedchklstspel_lastinspecby_userid_fk REFERENCES public.login (userid);
 ALTER TABLE public.occinspectedchecklistspaceelement ADD COLUMN lastinspectedbyts TIMESTAMP WITH TIME ZONE;
 ALTER TABLE public.occinspectedchecklistspaceelement ADD COLUMN compliancegrantedby_userid INTEGER CONSTRAINT occinspectedchklstspel_complianceby_userid_fk REFERENCES public.login (userid);
@@ -216,12 +206,12 @@ DROP TABLE codesetelementclass CASCADE;
 ALTER TABLE codesetelement RENAME COLUMN class_classid TO defaultseverityclass_classid; 
 ALTER TABLE codesetelement 
   ADD CONSTRAINT codesetele_severityclassdefault_classid_fk 
-  FOREIGN KEY (severityclass_classid) 
+  FOREIGN KEY (defaultseverityclass_classid) 
   REFERENCES codeviolationseverityclass (classid);
 
 ALTER TABLE codesetelement ADD COLUMN fee_feeid INTEGER CONSTRAINT codesetelement_feeid_fk REFERENCES occinspectionfee (feeid);
 
-DROP TABLE occperiodapplicationperson CASCADE;
+DROP TABLE occpermitapplicationperson CASCADE;
 -- DROP TABLE occperiodperson CASCADE;
 
 CREATE TABLE public.occperiodperson
@@ -247,5 +237,5 @@ WITH (
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (14, 'database/patches/dbpatch_beta15.sql', '', 'ecd', 'occupancy adjustments');
+    VALUES (14, 'database/patches/dbpatch_beta15.sql', '06-29-2019', 'ecd', 'occupancy adjustments');
 
