@@ -1,4 +1,7 @@
 
+-- This must be run all by itself and THEN COMMENTED OUT for running the rest of the patch
+ALTER TYPE ceeventtype ADD VALUE IF NOT EXISTS 'Citation' AFTER 'Compliance';
+
 
 -- have not wired this new column up yet!
 ALTER TABLE ceactionrequest ADD COLUMN usersubmitter_userid INTEGER;
@@ -6,14 +9,27 @@ ALTER TABLE ceactionrequest ADD CONSTRAINT ceactionreq_usersub_fk FOREIGN KEY (u
 
 -- add stipulated compliance that freeze in time when added to a notice of violation
 
-ALTER TYPE ceeventtype ADD VALUE IF NOT EXISTS 'Citation' AFTER 'Compliance';
+
+
+-- proposals have choices and those choices can point to rules, but a category cannot point to a rule, only a proposal
 
 
 ALTER TABLE public.ceeventcategory RENAME TO eventcategory;
-DROP TABLE public.cecasephasechangerule;
+
+-- already deprecated
+DROP TYPE public.ceeventclass;
 
 
-CREATE SEQUENCE IF NOT EXISTS ceeventproposal_seq
+ALTER TYPE public.ceeventtype
+  RENAME TO "eventtype";
+
+
+ALTER TABLE public.eventcategory ADD COLUMN relativeorderwithintype INTEGER default 0;
+ALTER TABLE public.eventcategory ADD COLUMN relativeorderacrossallevents INTEGER default 0;
+ALTER TABLE public.eventcategory ADD COLUMN hosteventdescriptionsuggtext  TEXT;
+
+
+CREATE SEQUENCE IF NOT EXISTS eventproposal_seq
   START WITH 10
   INCREMENT BY 1 
   MINVALUE 10
@@ -22,46 +38,95 @@ CREATE SEQUENCE IF NOT EXISTS ceeventproposal_seq
 
 CREATE TABLE public.eventproposal
 (
-  proposalid            INTEGER DEFAULT nextval('ceeventproposal_seq') NOT NULL CONSTRAINT ceeventproposal_pk PRIMARY KEY,
-  title             TEXT,
+  proposalid                INTEGER DEFAULT nextval('eventproposal_seq') NOT NULL CONSTRAINT eventproposal_pk PRIMARY KEY,
+  title                     TEXT,
   overalldescription        text,
-  creator_userid          INTEGER,
+  creator_userid            INTEGER,
   directproposaltodefaultmuniceo  boolean DEFAULT true,
   directproposaltodefaultmunistaffer boolean DEFAULT false,
   directproposaltodeveloper   boolean DEFAULT false,
-  active              BOOLEAN DEFAULT true
+  executechoiceiflonewolf     boolean DEFAULT false,
+  applytoclosedentities       boolean DEFAULT true,
+  instantiatemultiple                             boolean DEFAULT true,
+  inactivategeneventoneval                        boolean DEFAULT false,
+  maintainreldatewindow                           boolean DEFAULT true,
+  autoinactivateonbobclose                         boolean DEFAULT true,
+  autoinactiveongeneventinactivation               boolean DEFAULT true,
+  minimumrequireduserranktoview                    INTEGER DEFAULT 3,
+  minimumrequireduserranktoevaluate               INTEGER DEFAULT 3,
+  active                                          BOOLEAN DEFAULT true
 
 ) ;
+
+ALTER TABLE eventcategory ADD COLUMN proposal_propid INTEGER;
+
+ALTER TABLE public.eventcategory
+  ADD CONSTRAINT ceeventcat_proposal_fk FOREIGN KEY (proposal_propid)
+      REFERENCES public.eventproposal (proposalid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+
+
 
 
 CREATE TABLE public.eventrule
 (
-  ruleid integer NOT NULL DEFAULT nextval('cecasephasechangerule_seq'::regclass),
-  title text,
-  description text,
-  requiredactiveeventtype eventtype,
-  forbiddenactiveeventtype eventtype,
-  requiredactiveeventcat integer,
-  forbiddenactiveeventcat integer,
-  triggeredeventcat_facilitatingproposal integer,
-  mandatory boolean DEFAULT false,
-  treatreqphaseasthreshold boolean DEFAULT false,
-  treatforbidphaseasthreshold boolean DEFAULT false,
-  rejectrulehostifrulefails boolean DEFAULT true,
-  active boolean DEFAULT true,
-  CONSTRAINT phasechangerule_pk PRIMARY KEY (ruleid),
-  CONSTRAINT phasechangerule_forbiddenevcat_fk FOREIGN KEY (forbiddenextanteventcat)
-      REFERENCES public.eventcategory (categoryid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT phasechangerule_reqevcat_fk FOREIGN KEY (requiredextanteventcat)
-      REFERENCES public.eventcategory (categoryid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT phasechangerule_triggeredevcat_fk FOREIGN KEY (triggeredeventcat)
-      REFERENCES public.eventcategory (categoryid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-WITH (
-  OIDS=FALSE
+  ruleid                                          integer NOT NULL DEFAULT nextval('cecasephasechangerule_seq'::regclass) PRIMARY KEY,
+  title                                           text,
+  description                                     text,
+  requiredeventtype                               eventtype,
+  forbiddeneventtype                              eventtype,
+  requiredeventcat_catid                          integer CONSTRAINT eventrule_requiredeventcatid_fk REFERENCES public.eventcategory (categoryid),  
+  requiredeventcatthresholdtypeintorder           BOOLEAN DEFAULT false,
+  requiredeventcatupperboundtypeintorder          BOOLEAN DEFAULT false,
+  requiredeventcatthresholdglobalorder            BOOLEAN DEFAULT false,
+  requiredeventcatupperboundglobalorder           BOOLEAN DEFAULT false,
+  forbiddeneventcat_catid                         integer CONSTRAINT eventrule_forbiddeneventcatid_fk REFERENCES public.eventcategory (categoryid),
+  forbiddeneventcatthresholdtypeintorder          BOOLEAN DEFAULT false,
+  forbiddeneventcatupperboundtypeintorder         BOOLEAN DEFAULT false,
+  forbiddeneventcatthresholdglobalorder           BOOLEAN DEFAULT false,
+  forbiddeneventcatupperboundglobalorder          BOOLEAN DEFAULT false,
+  mandatorypassreqtocloseentity                   boolean DEFAULT true,
+  autoremoveonentityclose                         boolean DEFAULT true,
+  promptingproposal_proposalid                    integer,
+  triggeredeventcatonpass                         INTEGER CONSTRAINT eventrule_triggpasseventcatid_fk REFERENCES public.eventcategory (categoryid),
+  triggeredeventcatonfail                         INTEGER CONSTRAINT eventrule_triggfaileventcatid_fk REFERENCES public.eventcategory (categoryid),
+  active                                          boolean DEFAULT true
+);
+
+ALTER TABLE public.citationstatus RENAME COLUMN phasechangerule_ruleid TO eventrule_ruleid;
+
+ALTER TABLE public.citationstatus
+  ADD CONSTRAINT citationstatus_eventruleid_fk FOREIGN KEY (eventrule_ruleid)
+      REFERENCES public.eventrule (ruleid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+
+
+CREATE SEQUENCE IF NOT EXISTS choice_choiceid_seq
+  START WITH 1000
+  INCREMENT BY 1 
+  MINVALUE 1000
+  NO MAXVALUE 
+  CACHE 1;
+
+
+CREATE TABLE public.choice
+(
+  choiceid                          INTEGER NOT NULL PRIMARY KEY DEFAULT nextval('choice_choiceid_seq'),
+  title                             TEXT,
+  description                       TEXT,
+  eventcat_catid                    INTEGER CONSTRAINT eventchoice_eventcatid_fk REFERENCES eventcategory (categoryid),
+  addeventcat                       BOOLEAN DEFAULT true,
+  eventrule_ruleid                  INTEGER CONSTRAINT eventchoice_ruleid_fk REFERENCES eventrule (ruleid),
+  addeventrule                      BOOLEAN DEFAULT true,
+  relativeorder                     INTEGER NOT NULL,
+  active                            BOOLEAN DEFAULT true,
+  minimumrequireduserranktoview     INTEGER DEFAULT 3,
+  minimumrequireduserranktochoose   INTEGER DEFAULT 3
+
 );
 
 
@@ -71,25 +136,12 @@ CREATE TABLE public.eventproposalchoice
   eventproposal_proposalid  INTEGER NOT NULL,
   CONSTRAINT eventpropchoice_comppk_pk PRIMARY KEY (choice_choiceid, eventproposal_proposalid),
   CONSTRAINT eventpopchoice_choiceid_fk FOREIGN KEY (choice_choiceid)
-    REFERENCES eventchoice (choiceid),
+    REFERENCES choice (choiceid),
   CONSTRAINT eventpropchoice_proposalid FOREIGN KEY (eventproposal_proposalid)
     REFERENCES eventproposal (proposalid)
 
 );
 
-
-
-
-CREATE TABLE public.eventchoice
-(
-  choiceid                    INTEGER NOT NULL PRIMARY KEY,
-  title                       TEXT,
-  eventcat_catid              INTEGER NOT NULL CONSTRAINT eventchoice_eventcatid_fk REFERENCES eventcategory (categoryid),
-  addeventcat                 BOOLEAN DEFAULT true,
-  relativeorder               INTEGER NOT NULL,
-  active                      BOOLEAN DEFAULT true,
-  minimumrequireduserrank     INTEGER DEFAULT 3
-);
 
 
 CREATE SEQUENCE IF NOT EXISTS occevent_eventid_seq
@@ -173,12 +225,13 @@ CREATE TABLE public.occeventproposalimplementation
       REFERENCES public.login (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT occeventpropimp_choice_fk FOREIGN KEY (chosen_choiceid)
-      REFERENCES eventproposalchoice (choiceid)
+      REFERENCES choice (choiceid)
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
+
 
 
 CREATE TABLE public.occeventperson
@@ -208,7 +261,7 @@ CREATE SEQUENCE IF NOT EXISTS ceeventproposalimplementation_seq
 CREATE TABLE public.ceeventproposalimplementation
 (
   implementationid        INTEGER DEFAULT nextval('ceeventproposalimplementation_seq') NOT NULL  CONSTRAINT ceeventproposalresponse_pk PRIMARY KEY,
-  proposal_propid         INTEGER CONSTRAINT ceeventpropimp_propid_fk REFERENCES ceeventproposal (proposalid),
+  proposal_propid         INTEGER CONSTRAINT ceeventpropimp_propid_fk REFERENCES eventproposal (proposalid),
   generatingevent_eventid     INTEGER CONSTRAINT ceeventpropimp_genevent_fk REFERENCES ceevent (eventid),
   initiator_userid        INTEGER CONSTRAINT ceeventpropimp_initiator_fk REFERENCES login (userid),
   responderintended_userid    INTEGER CONSTRAINT ceeventpropimp_responderintended_fk REFERENCES login (userid),
@@ -221,6 +274,7 @@ CREATE TABLE public.ceeventproposalimplementation
 ) ;
 
 
+
 ALTER TABLE ceevent DROP COLUMN responsetimestamp; 
 ALTER TABLE ceevent DROP COLUMN actionrequestedby_userid;
 ALTER TABLE ceevent DROP COLUMN respondernotes;
@@ -230,7 +284,6 @@ ALTER TABLE ceevent DROP COLUMN responseevent_eventid;
 ALTER TABLE ceevent DROP COLUMN rejeecteventrequest; 
 ALTER TABLE ceevent DROP COLUMN responderactual_userid;
 
-ALTER TABLE ceeventcategory ADD COLUMN proposal_propid INTEGER CONSTRAINT ceeventcat_proposal_propid_fk REFERENCES ceeventproposal (proposalid), ;
 
 -- Has not been run on remote server
 
@@ -238,8 +291,8 @@ ALTER TABLE ceeventcategory ADD COLUMN proposal_propid INTEGER CONSTRAINT ceeven
 CREATE TABLE public.occperiodtypeeventrule
 (
   eventrule_ruleid            INTEGER NOT NULL CONSTRAINT occperiodeventrule_ruleid_fk REFERENCES eventrule (ruleid),
-  occperiodtype_typeid          INTEGER NOT NULL CONSTRAINT occperiodeventrule_periodid_fk REFERENCES occperiodtype (typeid)
-  CONSTRAINT occperiodtypeeventrule_pk_comp PRIMARY KEY (eventrule_ruleid, occperiod_periodid)
+  occperiodtype_typeid          INTEGER NOT NULL CONSTRAINT occperiodeventrule_periodid_fk REFERENCES occperiodtype (typeid),
+  CONSTRAINT occperiodtypeeventrule_pk_comp PRIMARY KEY (eventrule_ruleid, occperiodtype_typeid)
 );
 
 
@@ -247,5 +300,5 @@ CREATE TABLE public.occperiodtypeeventrule
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (15, 'database/patches/dbpatch_beta14.sql', '', 'ecd', 'event and proposals: major overhaul');
+    VALUES (15, 'database/patches/dbpatch_beta14.sql', '06-29-2019', 'ecd', 'event and proposals: major overhaul');
 
