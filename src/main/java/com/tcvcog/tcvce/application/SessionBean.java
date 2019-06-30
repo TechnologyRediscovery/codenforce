@@ -31,7 +31,7 @@ import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
-import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
+import com.tcvcog.tcvce.occupancy.entities.OccInspection;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<CECase> cECaseQueue;
     private List<EventCECaseCasePropBundle> cEEventWCPIQueue;
     private List<CodeViolation> violationQueue;
-    private List<OccupancyInspection> inspectionQueue;
+    private List<OccInspection> inspectionQueue;
     
     private QueryCECase sessionQueryCECase;
    
@@ -568,14 +568,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the inspectionQueue
      */
-    public List<OccupancyInspection> getInspectionQueue() {
+    public List<OccInspection> getInspectionQueue() {
         return inspectionQueue;
     }
 
     /**
      * @param inspectionQueue the inspectionQueue to set
      */
-    public void setInspectionQueue(List<OccupancyInspection> inspectionQueue) {
+    public void setInspectionQueue(List<OccInspection> inspectionQueue) {
         this.inspectionQueue = inspectionQueue;
     }
 

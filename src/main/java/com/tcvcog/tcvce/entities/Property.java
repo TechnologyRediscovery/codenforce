@@ -29,7 +29,9 @@ public class Property implements Serializable{
     private String constructionType;
     private String countyCode;
     
-    private boolean multiUnit, rental, vacant;
+    private boolean multiUnit;
+    private boolean rental;
+    private boolean vacant;
     
     private String notes;
     

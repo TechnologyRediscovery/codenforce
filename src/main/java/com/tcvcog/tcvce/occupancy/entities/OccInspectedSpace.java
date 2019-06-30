@@ -29,43 +29,43 @@ import java.util.ArrayList;
  * 
  * @author Eric C. Darsow, Technology Rediscovery LLC 
  */
-public class InspectedSpace extends BackingBeanUtils implements Serializable{
+public class OccInspectedSpace extends BackingBeanUtils implements Serializable{
     
     private int spaceid;
-    private SpaceType spaceType;
+    private OccSpaceType spaceType;
     private String name;
-    private ArrayList<InspectedElement> inspectedElementList;
-    private LocationDescriptor location;
+    private ArrayList<OccInspectedElement> inspectedElementList;
+    private OccLocationDescriptor location;
     
-    public InspectedSpace(){
+    public OccInspectedSpace(){
         inspectedElementList = new ArrayList<>();
     }
 
     /**
      * @return the inspectedElementList
      */
-    public ArrayList<InspectedElement> getInspectedElementList() {
+    public ArrayList<OccInspectedElement> getInspectedElementList() {
         return inspectedElementList;
     }
 
     /**
      * @param inspectedElementList the inspectedElementList to set
      */
-    public void setInspectedElementList(ArrayList<InspectedElement> inspectedElementList) {
+    public void setInspectedElementList(ArrayList<OccInspectedElement> inspectedElementList) {
         this.inspectedElementList = inspectedElementList;
     }
 
     /**
      * @return the location
      */
-    public LocationDescriptor getLocation() {
+    public OccLocationDescriptor getLocation() {
         return location;
     }
 
     /**
      * @param location the location to set
      */
-    public void setLocation(LocationDescriptor location) {
+    public void setLocation(OccLocationDescriptor location) {
         this.location = location;
     }
 
@@ -79,7 +79,7 @@ public class InspectedSpace extends BackingBeanUtils implements Serializable{
     /**
      * @return the spaceType
      */
-    public SpaceType getSpaceType() {
+    public OccSpaceType getSpaceType() {
         return spaceType;
     }
 
@@ -100,7 +100,7 @@ public class InspectedSpace extends BackingBeanUtils implements Serializable{
     /**
      * @param spaceType the spaceType to set
      */
-    public void setSpaceType(SpaceType spaceType) {
+    public void setSpaceType(OccSpaceType spaceType) {
         this.spaceType = spaceType;
     }
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
  *
  * @author Dominic Pimpinella and Eric Darsow
  */
-public class PersonsRequirement extends EntityUtils implements Serializable {
+public class OccAppPersonRequirement extends EntityUtils implements Serializable {
    
     private boolean requirementSatisfied;
     private ArrayList<PersonType> requiredPersonTypes;

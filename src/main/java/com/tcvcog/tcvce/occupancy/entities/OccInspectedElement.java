@@ -25,13 +25,13 @@ import java.time.LocalDateTime;
  *
  * @author Eric C. Darsow
  */
-public class InspectedElement implements Serializable{
+public class OccInspectedElement implements Serializable{
     private int id;
     private boolean inspected;
     private CodeElement element;
     private LocalDateTime complianceDate;
     private String notes;
-    private LocationDescriptor location;
+    private OccLocationDescriptor location;
 
     /**
      * @return the id
@@ -106,14 +106,14 @@ public class InspectedElement implements Serializable{
     /**
      * @return the location
      */
-    public LocationDescriptor getLocation() {
+    public OccLocationDescriptor getLocation() {
         return location;
     }
 
     /**
      * @param location the location to set
      */
-    public void setLocation(LocationDescriptor location) {
+    public void setLocation(OccLocationDescriptor location) {
         this.location = location;
     }
 }

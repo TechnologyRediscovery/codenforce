@@ -896,10 +896,17 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    public ArrayList<Person> getPersonList(int propertyUnitID) throws IntegrationException{
+    
+    /**
+     * TODO: Finish!
+     * @param occPeriodID
+     * @return
+     * @throws IntegrationException 
+     */
+    public ArrayList<Person> getPersonList(int occPeriodID) throws IntegrationException{
         ArrayList<Person> personList = new ArrayList();
         String query =  "SELECT person_personid\n" +
-                        "  FROM public.propertyunitperson WHERE propertyunit_unitid=?;";
+                        "  FROM public.occperiodperson WHERE period_periodid=?;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -907,14 +914,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
  
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, propertyUnitID);
+            stmt.setInt(1, occPeriodID);
             rs = stmt.executeQuery();
             while(rs.next()){
                 personList.add(getPerson(rs.getInt("person_personid")));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
+            throw new IntegrationException("PersonIntegrator | Unable to retrieve person list by occ period", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

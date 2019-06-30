@@ -174,7 +174,7 @@ public class PropertyUnitChange {
         skeleton.setOtherKnownAddress(otherKnownAddress);
         
         try {
-            skeleton.setThisProperty(pi.getProperty(propertyID));
+            skeleton.setProperty(pi.getProperty(propertyID));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

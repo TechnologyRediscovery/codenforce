@@ -1,3 +1,5 @@
+-- Already integrated into patch cycle
+
 BEGIN;
 
 /*Add applicant flag for case when applicant is not a required or optional person on 

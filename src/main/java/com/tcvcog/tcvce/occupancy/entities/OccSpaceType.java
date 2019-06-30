@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.occupancy.entities;
  * Mapped to fields of the spacetype table
  * @author EC Darsow
  */
-public class SpaceType {
+public class OccSpaceType {
     private int spaceTypeID;
     private String spaceTypeTitle;
     private String spaceTypeDescription;

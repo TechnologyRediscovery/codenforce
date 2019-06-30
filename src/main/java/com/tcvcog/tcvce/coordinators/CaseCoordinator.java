@@ -470,7 +470,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     private boolean evalulateCasePhaseChangeRule(CECase cse, EventCECase event) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         
-        CaseChangeRule rule = event.getCategory().getCasePhaseChangeRule();
+        EventRule rule = event.getCategory().getCasePhaseChangeRule();
         boolean rulePasses = false;
         
         if(rule.getRequiredCurrentCasePhase() != null){
@@ -508,7 +508,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    private boolean ruleSubcheck_forbiddenCasePhase(CECase cse, CaseChangeRule rule){
+    private boolean ruleSubcheck_forbiddenCasePhase(CECase cse, EventRule rule){
         boolean subcheckPasses = true;
         
         if(rule.isTreatForbiddenPhaseAsThreshold()){
@@ -522,7 +522,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    private boolean ruleSubcheck_requiredEventType(CECase cse, CaseChangeRule rule){
+    private boolean ruleSubcheck_requiredEventType(CECase cse, EventRule rule){
         boolean subcheckPasses = true;
         if(rule.getRequiredExtantEventType() != null){
             subcheckPasses = false;
@@ -538,7 +538,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
    
     
-    private boolean ruleSubcheck_forbiddenEventType(CECase cse, CaseChangeRule rule){
+    private boolean ruleSubcheck_forbiddenEventType(CECase cse, EventRule rule){
         boolean subcheckPasses = true;
         Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
@@ -550,7 +550,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private boolean ruleSubcheck_requiredEventCategory(CECase cse, CaseChangeRule rule){
+    private boolean ruleSubcheck_requiredEventCategory(CECase cse, EventRule rule){
         boolean subcheckPasses = true;
         if(rule.getRequiredExtantEventCatID() != 0){
             subcheckPasses = false;
@@ -565,7 +565,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, CaseChangeRule rule){
+    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, EventRule rule){
         boolean subcheckPasses = true;
         Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
@@ -577,7 +577,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private void implementPassedCasePhaseChangeRule(CECase cse, CaseChangeRule rule) 
+    private void implementPassedCasePhaseChangeRule(CECase cse, EventRule rule) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
@@ -1164,7 +1164,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     * @return
     * @throws IntegrationException 
     */
-   public CaseChangeRule getCasePhaseChangeRule(EventCategory ec) throws IntegrationException{
+   public EventRule getCasePhaseChangeRule(EventCategory ec) throws IntegrationException{
        CaseIntegrator ci = getCaseIntegrator();
        return ci.getEventRule(ec.getCasePhaseChangeRule().getRuleID());
        

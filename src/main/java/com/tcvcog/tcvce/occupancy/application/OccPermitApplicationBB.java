@@ -698,7 +698,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "";
 
         } else {
-            unit.setThisProperty(getSessionBean().getActivePropWithLists());
+            unit.setProperty(getSessionBean().getActivePropWithLists());
             getSessionBean().setActivePropUnit(unit);
             getSessionBean().getOccPermitApplication().setApplicationPropertyUnit(unit);
 
@@ -826,7 +826,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     /*
     DP 5/20/2019: The methods below relating to people must be reworked. The goal is to make sure 
-    all of the correct people are added per the PersonsRequirement for the selected 
+    all of the correct people are added per the OccAppPersonRequirement for the selected 
     OccPermitApplicationReason. The user must be able to find people in the database via a search, 
     edit the person if necessary, or alternatively, create and attach a brand new Person to the application.
     
@@ -837,7 +837,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         - Using clones avoids public users overwriting existing fields in person table in the database
     - person add
     - set applicant and preferredContact booleans on OccPermitApplication object
-    - Verify that the PersonsRequirement is met (use OccupancyCoordinator.verifyOccPermitPersonsRequirement())    
+    - Verify that the OccAppPersonRequirement is met (use OccupancyCoordinator.verifyOccPermitPersonsRequirement())    
      */
     public String attachPerson(PersonType personType) {
         getSessionBean().setActivePersonType(personType);
@@ -1077,7 +1077,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             boolean added = true;
 
-            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getThisProperty().getPropertyID());
+            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getProperty().getPropertyID());
             
             if (changedby.getPersonID() != 0)
             {
@@ -1165,7 +1165,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             PropertyUnitChange skeleton = new PropertyUnitChange();
 
-            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getThisProperty().getPropertyID());
+            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getProperty().getPropertyID());
             
             if (changedby.getPersonID() != 0)
             {

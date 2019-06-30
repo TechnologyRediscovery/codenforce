@@ -24,13 +24,13 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.occupancy.entities.InspectedElement;
-import com.tcvcog.tcvce.occupancy.entities.InspectedSpace;
-import com.tcvcog.tcvce.occupancy.entities.LocationDescriptor;
+import com.tcvcog.tcvce.occupancy.entities.OccInspectedElement;
+import com.tcvcog.tcvce.occupancy.entities.OccInspectedSpace;
+import com.tcvcog.tcvce.occupancy.entities.OccLocationDescriptor;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
-import com.tcvcog.tcvce.occupancy.entities.OccupancyInspection;
-import com.tcvcog.tcvce.occupancy.entities.PersonsRequirement;
-import com.tcvcog.tcvce.occupancy.entities.Space;
+import com.tcvcog.tcvce.occupancy.entities.OccInspection;
+import com.tcvcog.tcvce.occupancy.entities.OccAppPersonRequirement;
+import com.tcvcog.tcvce.occupancy.entities.OccSpace;
 import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -51,25 +51,25 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccupancyCoordinator() {
     }
     
-    public InspectedSpace generateNewlyInspectedSpace(Space space, String locationDescription){
-        InspectedSpace is = new InspectedSpace();
-        LocationDescriptor ld = new LocationDescriptor();
+    public OccInspectedSpace generateNewlyInspectedSpace(OccSpace space, String locationDescription){
+        OccInspectedSpace is = new OccInspectedSpace();
+        OccLocationDescriptor ld = new OccLocationDescriptor();
         ld.setLocationDescription(locationDescription);
         ListIterator<CodeElement> elementIterator = space.getElementList().listIterator();
-        InspectedElement ie;
+        OccInspectedElement ie;
         
         while(elementIterator.hasNext()){
             CodeElement ce = elementIterator.next();
-            ie = new InspectedElement();
+            ie = new OccInspectedElement();
             ie.setElement(ce);
             is.getInspectedElementList().add(ie);
-            // each element in this space gets a reference to the same LocationDescriptor object
+            // each element in this space gets a reference to the same OccLocationDescriptor object
             is.setLocation(ld);
         }
         return is;
     }    
     
-    public void saveNewlyInspectedSpace(OccupancyInspection oi, InspectedSpace is) throws IntegrationException{
+    public void saveNewlyInspectedSpace(OccInspection oi, OccInspectedSpace is) throws IntegrationException{
         ChecklistIntegrator ci = getChecklistIntegrator();
         ci.insertNewlyInspectedSpace(oi, is);
     }
@@ -88,7 +88,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      */
     public void verifyOccPermitPersonsRequirement (OccPermitApplication opa){
         boolean isRequirementSatisfied = true;
-        PersonsRequirement pr = opa.getReason().getPersonsRequirement();        
+        OccAppPersonRequirement pr = opa.getReason().getPersonsRequirement();        
         List<PersonType> requiredPersonTypes = pr.getRequiredPersonTypes();
         List<Person> applicationPersons = opa.getAttachedPersons();
         List<PersonType> applicationPersonTypes = new ArrayList<>();

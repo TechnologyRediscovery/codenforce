@@ -21,7 +21,7 @@ import javax.faces.bean.ViewScoped;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
 
-import com.tcvcog.tcvce.occupancy.entities.SpaceType;
+import com.tcvcog.tcvce.occupancy.entities.OccSpaceType;
 
 import java.io.Serializable;
 //imported when adding  and @ViewScoped
@@ -37,8 +37,8 @@ import javax.faces.application.FacesMessage;
 @ViewScoped
 public class SpaceTypeBB extends BackingBeanUtils implements Serializable {
 
-    private ArrayList<SpaceType> spaceTypeList;
-    private SpaceType selectedSpaceType;
+    private ArrayList<OccSpaceType> spaceTypeList;
+    private OccSpaceType selectedSpaceType;
     private int formSpaceTypeID;
     private String formSpaceTypeTitle;
     private String formSpaceTypeDescription;
@@ -54,7 +54,7 @@ public class SpaceTypeBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the spaceTypeList
      */
-    public ArrayList<SpaceType> getSpaceTypeList() {
+    public ArrayList<OccSpaceType> getSpaceTypeList() {
         
         try {
             ChecklistIntegrator si = getChecklistIntegrator();
@@ -77,21 +77,21 @@ public class SpaceTypeBB extends BackingBeanUtils implements Serializable {
     /**
      * @param spaceTypeList the spaceTypeList to set
      */
-    public void setSpaceTypeList(ArrayList<SpaceType> spaceTypeList) {
+    public void setSpaceTypeList(ArrayList<OccSpaceType> spaceTypeList) {
         this.spaceTypeList = spaceTypeList;
     }
 
     /**
      * @return the selectedSpaceType
      */
-    public SpaceType getSelectedSpaceType() {
+    public OccSpaceType getSelectedSpaceType() {
         return selectedSpaceType;
     }
 
     /**
      * @param selectedSpaceType the selectedSpaceType to set
      */
-    public void setSelectedSpaceType(SpaceType selectedSpaceType) {
+    public void setSelectedSpaceType(OccSpaceType selectedSpaceType) {
         this.selectedSpaceType = selectedSpaceType;
     }
 
