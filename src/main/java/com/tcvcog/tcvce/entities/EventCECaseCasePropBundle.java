@@ -20,7 +20,7 @@ public class EventCECaseCasePropBundle
         implements Serializable, Comparable<EventCECaseCasePropBundle> {
     
     private CECaseBaseClass eventCase;
-    private EventCECase event;
+    private CECaseEvent event;
 
     /**
      * @return the eventCase
@@ -39,7 +39,7 @@ public class EventCECaseCasePropBundle
     /**
      * @return the event
      */
-    public EventCECase getEvent() {
+    public CECaseEvent getEvent() {
         return event;
     }
 
@@ -48,7 +48,7 @@ public class EventCECaseCasePropBundle
     /**
      * @param event the event to set
      */
-    public void setEvent(EventCECase event) {
+    public void setEvent(CECaseEvent event) {
         this.event = event;
     }
 

@@ -14,5 +14,21 @@ import java.io.Serializable;
  * @author sylvia
  */
 public class OccEvent extends Event implements Serializable {
+    private int occPeriodID;
+
+    /**
+     * @return the occPeriodID
+     */
+    public int getOccPeriodID() {
+        return occPeriodID;
+    }
+
+    /**
+     * @param occPeriodID the occPeriodID to set
+     */
+    public void setOccPeriodID(int occPeriodID) {
+        this.occPeriodID = occPeriodID;
+    }
+    
     
 }

@@ -78,14 +78,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private Query selectedBOBQuery;
     
     private ArrayList<CECase> filteredCaseHistoryList;
-    private ArrayList<EventCECase> recentEventList;
+    private ArrayList<CECaseEvent> recentEventList;
     private ArrayList<Person> muniPeopleList;
 
-    private EventCECase eventForTriggeringCasePhaseAdvancement;
-    private EventCECase triggeringEventForProposal;
+    private CECaseEvent eventForTriggeringCasePhaseAdvancement;
+    private CECaseEvent triggeringEventForProposal;
 
-    private List<EventCECase> filteredEventList;
-    private EventCECase selectedEvent;
+    private List<CECaseEvent> filteredEventList;
+    private CECaseEvent selectedEvent;
 
     private boolean allowedToClearActionResponse;
     private int rejectedEventListIndex;
@@ -241,7 +241,39 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
    
     
-    public void deletePhoto(int blobID){
+    public void hideEvent(CECaseEvent event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(true);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! event ID: " + event.getEventID() + " is now hidden", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not hide event, sorry; this is a system erro", ""));
+        }
+    }
+    
+    public void unHideEvent(CECaseEvent event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(false);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! Unhid event ID: " + event.getEventID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           "Could not unhide event, sorry; this is a system erro", ""));
+        }
+    }
+
+    public void deletePhoto(int photoID) {
         // TODO: remove entry from linker table for deleted photos
         for(Integer pid : this.selectedViolation.getBlobIDList()){
             if(pid.compareTo(blobID) == 0){
@@ -364,7 +396,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
     
 
-    public void rejectRequestedEvent(EventCECase ev) {
+    public void rejectRequestedEvent(CECaseEvent ev) {
         selectedEvent = ev;
         rejectedEventListIndex = currentCase.getEventProposalList().indexOf(ev);
     }
@@ -375,7 +407,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      *
      * @param ev
      */
-    public void initiateNewRequestedEvent(EventCECase ev) {
+    public void initiateNewRequestedEvent(CECaseEvent ev) {
         //selectedEventCategory = ev.getRequestedEventCat();
         
         triggeringEventForProposal = ev;
@@ -574,7 +606,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public void editEvent(EventCECase ev) {
+    public void editEvent(CECaseEvent ev) {
         selectedEvent = ev;
     }
 
@@ -721,7 +753,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         selectedViolation = cv;
         // build event details package
-        EventCECase e = null;
+        CECaseEvent e = null;
         try {
             selectedViolation.setComplianceUser(getSessionBean().getFacesUser());
             e = ec.generateViolationComplianceEvent(selectedViolation);
@@ -1019,7 +1051,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the selectedEvent
      */
-    public EventCECase getSelectedEvent() {
+    public CECaseEvent getSelectedEvent() {
         return selectedEvent;
     }
 
@@ -1033,7 +1065,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param selectedEvent the selectedEvent to set
      */
-    public void setSelectedEvent(EventCECase selectedEvent) {
+    public void setSelectedEvent(CECaseEvent selectedEvent) {
         this.selectedEvent = selectedEvent;
     }
 
@@ -1075,14 +1107,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
     public String takeNextAction() {
-        EventCECase e = getEventForTriggeringCasePhaseAdvancement();
+        CECaseEvent e = getEventForTriggeringCasePhaseAdvancement();
         return "eventAdd";
     }
 
     /**
      * @return the eventForTriggeringCasePhaseAdvancement
      */
-    public EventCECase getEventForTriggeringCasePhaseAdvancement() {
+    public CECaseEvent getEventForTriggeringCasePhaseAdvancement() {
         EventCoordinator ec = getEventCoordinator();
 
         try {
@@ -1106,7 +1138,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @param eventForTriggeringCasePhaseAdvancement the
      * eventForTriggeringCasePhaseAdvancement to set
      */
-    public void setEventForTriggeringCasePhaseAdvancement(EventCECase eventForTriggeringCasePhaseAdvancement) {
+    public void setEventForTriggeringCasePhaseAdvancement(CECaseEvent eventForTriggeringCasePhaseAdvancement) {
         this.eventForTriggeringCasePhaseAdvancement = eventForTriggeringCasePhaseAdvancement;
     }
 
@@ -1159,14 +1191,14 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredEventList
      */
-    public List<EventCECase> getFilteredEventList() {
+    public List<CECaseEvent> getFilteredEventList() {
         return filteredEventList;
     }
 
     /**
      * @param fel
      */
-    public void setFilteredEventList(ArrayList<EventCECase> fel) {
+    public void setFilteredEventList(ArrayList<CECaseEvent> fel) {
         filteredEventList = fel;
     }
 
@@ -1238,7 +1270,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the recentEventList
      */
-    public ArrayList<EventCECase> getRecentEventList() {
+    public ArrayList<CECaseEvent> getRecentEventList() {
         return recentEventList;
     }
 
@@ -1281,7 +1313,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param recentEventList the recentEventList to set
      */
-    public void setRecentEventList(ArrayList<EventCECase> recentEventList) {
+    public void setRecentEventList(ArrayList<CECaseEvent> recentEventList) {
         this.recentEventList = recentEventList;
     }
 
@@ -1295,7 +1327,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventCECase> filteredEventList) {
+    public void setFilteredEventList(List<CECaseEvent> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 
@@ -1501,7 +1533,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the triggeringEventForProposal
      */
-    public EventCECase getTriggeringEventForProposal() {
+    public CECaseEvent getTriggeringEventForProposal() {
         return triggeringEventForProposal;
     }
 
@@ -1509,7 +1541,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      * @param triggeringEventForProposal the
  triggeringEventForProposal to set
      */
-    public void setTriggeringEventForProposal(EventCECase triggeringEventForProposal) {
+    public void setTriggeringEventForProposal(CECaseEvent triggeringEventForProposal) {
         this.triggeringEventForProposal = triggeringEventForProposal;
     }
 

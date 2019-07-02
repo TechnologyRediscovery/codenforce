@@ -23,27 +23,6 @@ public class CECaseEvent
     
     private int caseID;
     
-    public CECaseEvent(Event ev){
-        this.eventID = ev.getEventID();
-        this.muniCode = ev.getMuniCode();
-        this.muniName = ev.getMuniName();
-        this.propertyID = ev.getPropertyID();
-        this.category = ev.getCategory();
-
-        this.dateOfRecord = ev.getDateOfRecord();
-        this.timestamp = ev.getTimestamp();
-        this.description = ev.getDescription();
-        
-        this.owner = ev.getOwner();
-        this.discloseToMunicipality = ev.isDiscloseToMunicipality(); 
-        this.discloseToPublic = ev.isDiscloseToPublic();
-        this.active = ev.isActive();
-        
-        this.hidden = ev.isHidden();
-        this.notes = ev.getNotes();
-        this.personList = ev.getPersonList();
-    }
-    
     
    
     /**
