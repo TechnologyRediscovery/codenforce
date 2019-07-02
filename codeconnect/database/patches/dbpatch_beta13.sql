@@ -26,7 +26,7 @@ WHERE reasonid = '1';
 -- Add person friendly descriptions
 
 UPDATE occpermitapplicationreason
-SET personfriendlydescription = description.descriptiontext
+SET humanfriendlydescription = description.descriptiontext
 FROM (VALUES 
 	(1, 'An owner must be added to an occupancy permit application for a new rental property. Optionally, a property manager and the tenants who will be renting the property can also be added.'),
 	(2, 'Both the current owner and future owner must be added to an occupancy permit application that is being created due to the sale of a property.'),
@@ -46,6 +46,6 @@ DROP COLUMN newowner_personid;
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (13, 'database/patches/dbpatch_beta13.sql', '', 'ecd', 'occ permit application revisions');
+    VALUES (13, 'database/patches/dbpatch_beta13.sql', '05-05-2019', 'ecd', 'occ permit application revisions');
 
 
