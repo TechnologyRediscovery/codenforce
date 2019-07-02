@@ -40,87 +40,128 @@ ALTER TABLE public.payment
   RENAME TO moneypayment;
 ALTER TABLE paymenttype RENAME TO moneypaymenttype;
 
-
-
-
 ALTER TABLE public.moneypayment DROP COLUMN occperiod_periodid;
 ALTER TABLE public.moneypayment RENAME COLUMN payerid TO payer_personid;
 ALTER TABLE public.moneypayment RENAME COLUMN recordedby TO recordedby_userid;
 ALTER TABLE public.moneypayment ALTER COLUMN amount TYPE MONEY;
 
-
-
-
-CREATE SEQUENCE IF NOT EXISTS moneycodesetelementfeeid_seq
+CREATE SEQUENCE IF NOT EXISTS moneyfeeassignedid_seq
   START WITH 1000
   INCREMENT BY 1 
   MINVALUE 1000
   NO MAXVALUE 
   CACHE 1;
 
-
-CREATE TABLE public.moneycodesetelementfee
-(
-  codesetelementfeeid				INTEGER NOT NULL DEFAULT nextval('moneycodesetelementfeeid_seq'::regclass) PRIMARY KEY,
-  assignedby_userid 				INTEGER CONSTRAINT moneycodesetelementfee_assignedby_fk REFERENCES login (userid),
-  assignedbyts 						TIMESTAMP WITH TIME ZONE,
-  fee_feeid 						INTEGER NOT NULL CONSTRAINT moneycodesetelefee_feeid_fk REFERENCES moneyfee (feeid),		
-  codesetelement_elementid 			INTEGER NOT NULL CONSTRAINT moneycodesetelefee_cdseteleid_fk REFERENCES codesetelement (codesetelementid),
-  waivedby_userid		 			INTEGER CONSTRAINT moneycodesetelementfee_wavedbyuserid_fk REFERENCES login (userid),
-  lastmodifiedts 					TIMESTAMP WITH TIME ZONE,
-  reduceby 							MONEY,
-  reduceby_userid					INTEGER CONSTRAINT moneycodesetelementfee_reducedbyuserid_fk REFERENCES login (userid),
-  notes 							text
+  CREATE TABLE public.moneyfeeassigned
+  (
+	
+  	moneyfeeassignedid 				INTEGER NOT NULL DEFAULT nextval('moneyfeeassignedid_seq') PRIMARY KEY,
+	assignedby_userid 				INTEGER CONSTRAINT moneycodesetelementfee_assignedby_fk REFERENCES login (userid),
+  	assignedbyts 					TIMESTAMP WITH TIME ZONE,
+  	waivedby_userid		 			INTEGER CONSTRAINT moneycodesetelementfee_wavedbyuserid_fk REFERENCES login (userid),
+  	lastmodifiedts 					TIMESTAMP WITH TIME ZONE,
+  	reduceby 						MONEY,
+  	reduceby_userid					INTEGER CONSTRAINT moneycodesetelementfee_reducedbyuserid_fk REFERENCES login (userid),
+  	notes 							text
 );
 
 
-CREATE SEQUENCE IF NOT EXISTS moneyoccperiodtypefeeid_seq
+
+CREATE SEQUENCE IF NOT EXISTS moneycecasefeeassignedid_seq
   START WITH 1000
   INCREMENT BY 1 
   MINVALUE 1000
   NO MAXVALUE 
   CACHE 1;
+
+
+CREATE TABLE public.moneycecasefeeassigned
+(
+  cecaseassignedfeeid 				INTEGER NOT NULL DEFAULT nextval('moneycecasefeeassignedid_seq') PRIMARY KEY,
+  moneyfeeassigned_assignedid		INTEGER NOT NULL CONSTRAINT moneyfeeassignedcodesetelement_assigned_fk REFERENCES moneyfeeassigned (moneyfeeassignedid),		
+  codesetelement_elementid 			INTEGER NOT NULL CONSTRAINT moneycodesetelefee_cdseteleid_fk REFERENCES codesetelement (codesetelementid)
+);
+
+
+CREATE SEQUENCE IF NOT EXISTS moneyoccperiodfeeassignedid_seq
+  START WITH 1000
+  INCREMENT BY 1 
+  MINVALUE 1000
+  NO MAXVALUE 
+  CACHE 1;
+
+
+CREATE TABLE public.moneyoccperiodfeeassigned
+(
+	moneyoccperassignedfeeid 		INTEGER NOT NULL DEFAULT nextval('moneyoccperiodfeeassignedid_seq') PRIMARY KEY,
+  moneyfeeassigned_assignedid		INTEGER NOT NULL CONSTRAINT moneyfeeassignedcodesetelement_assigned_fk REFERENCES moneyfeeassigned (moneyfeeassignedid),		
+  occperiod_periodid  				INTEGER NOT NULL CONSTRAINT moneyoccperiodfeeassigned REFERENCES occperiod (periodid)
+  
+);
+
+CREATE TABLE public.moneycodesetelementfee
+(
+  
+  fee_feeid integer NOT NULL,
+  codesetelement_elementid integer NOT NULL,
+  CONSTRAINT moneycodesetelementfee_pkey PRIMARY KEY (fee_feeid, codesetelement_elementid),
+  CONSTRAINT moneycodesetelefee_cdseteleid_fk FOREIGN KEY (codesetelement_elementid)
+      REFERENCES public.codesetelement (codesetelementid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT moneycodesetelefee_feeid_fk FOREIGN KEY (fee_feeid)
+      REFERENCES public.moneyfee (feeid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);
 
 
 CREATE TABLE public.moneyoccperiodtypefee
 (
-  occperiodtypefeeid				INTEGER NOT NULL DEFAULT nextval('moneyoccperiodtypefeeid_seq'::regclass) PRIMARY KEY,
-  assignedby_userid 				INTEGER CONSTRAINT moneyoccperiodtypefee_assignedby_fk REFERENCES login (userid),
-  assignedbyts 						TIMESTAMP WITH TIME ZONE,
   fee_feeid 						INTEGER NOT NULL CONSTRAINT moneyoccperiodtypefee_feeid_fk REFERENCES moneyfee (feeid),		
   occperiodtype_typeid 				INTEGER NOT NULL CONSTRAINT moneyoccperiodtypefee_typeid_fk REFERENCES occperiodtype (typeid),
-  waivedby_userid		 			INTEGER CONSTRAINT moneyoccperiodtypefee_wavedbyuserid_fk REFERENCES login (userid),
-  lastmodifiedts 					TIMESTAMP WITH TIME ZONE,
-  reduceby 							MONEY,
-  reduceby_userid					INTEGER CONSTRAINT moneyoccperiodtypefee_reducedbyuserid_fk REFERENCES login (userid),
-  notes 							text
+  CONSTRAINT moneyoccperiodtypefee_comp_pk PRIMARY KEY (fee_feeid, occperiodtype_typeid)
 );
 
 
 
-CREATE TABLE public.moneyoccpermittypefeepayment
+
+
+CREATE TABLE public.moneyoccperiodfeepayment
 (
-	occperiod_periodid 				INTEGER NOT NULL,
-	payment_paymentid 				INTEGER NOT NULL,
-	occperiodtypefee_pertypefeeid	INTEGER NOT NULL,
-	CONSTRAINT moneyoccpermittypefeepayment_comp_pk PRIMARY KEY (occperiod_periodid, payment_paymentid, occperiodtypefee_pertypefeeid)
+	payment_paymentid 					INTEGER NOT NULL CONSTRAINT moneyoccperiodfeepayment_paymentid_fk REFERENCES payment (paymentid),
+	occperiodassignedfee_id 			INTEGER NOT NULL CONSTRAINT moneyoccpermittypefeepayment_occperassignedfee_fk REFERENCES moneyoccperiodfeeassigned (moneyoccperassignedfeeid),
+	CONSTRAINT moneyoccperiodfeepayment_comp_pk PRIMARY KEY (payment_paymentid, occperiodassignedfee_id)
+
+
 );
 
 
 
-CREATE TABLE public.moneycodesetelementfeepayment
+CREATE TABLE public.moneycecasefeepayment
 (
-	codesetelementfee_elefeeid 		INTEGER NOT NULL,
-	payment_paymentid 				INTEGER NOT NULL,
-	codeviolation_violationid 		INTEGER NOT NULL,
-	CONSTRAINT moneycodesetelementfeepayment_comp_pk PRIMARY KEY (codesetelementfee_elefeeid, payment_paymentid, codeviolation_violationid)
-);
+	payment_paymentid 					INTEGER NOT NULL CONSTRAINT moneycecasefeepayment_paymentid_fk REFERENCES moneypayment (paymentid),
+	cecaseassignedfee_id 			INTEGER NOT NULL CONSTRAINT moneycecasefeepayment_occperassignedfee_fk REFERENCES moneycecasefeeassigned (cecaseassignedfeeid),
+	CONSTRAINT moneycecasefeepayment_comp_pk PRIMARY KEY (payment_paymentid, cecaseassignedfee_id)
 
+);
 
 
 --- END MONEY
 
 
+DROP TABLE occeventproposalimplementation;
+ALTER TABLE ceeventproposalimplementation RENAME TO eventproposalimplementation;
+
+CREATE TABLE public.cecaserule
+(
+	cecase_caseid 				INTEGER NOT NULL CONSTRAINT cecaserule_caseid_fk REFERENCES cecase (caseid),
+	eventrule_ruleid			INTEGER NOT NULL CONSTRAINT cecaserule_ruleid_fk REFERENCES eventrule (ruleid),
+	CONSTRAINT cecaserule_comp_pk PRIMARY KEY (cecase_caseid, eventrule_ruleid)
+);
+
+
+ALTER TABLE public.eventproposalimplementation RENAME expiredorinactive  TO active;
+ALTER TABLE public.eventproposalimplementation
+   ALTER COLUMN active SET DEFAULT true;
 
 
 
