@@ -181,8 +181,8 @@ ALTER TABLE public.eventproposalimplementation
 
 -- TODO
 -- run this after proposals
-ALTER TABLE public.occpermitapplicationreason
-   ALTER COLUMN periodtypeproposal_periodid SET NOT NULL;
+-- ALTER TABLE public.occpermitapplicationreason
+--    ALTER COLUMN periodtypeproposal_periodid SET NOT NULL;
 
 
 
@@ -190,5 +190,5 @@ ALTER TABLE public.occpermitapplicationreason
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (13, 'database/patches/dbpatch_beta13.sql', '05-05-2019', 'ecd', 'occ permit application revisions');
+    VALUES (16, 'database/patches/dbpatch_beta16.sql', '07-02-2019', 'ecd', 'occ permit application revisions');
 
