@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * attributes on Event. 
  * @author sylvia
  */
-public class EventCECase 
+public class CECaseEvent 
         extends Event 
         implements Serializable{
     

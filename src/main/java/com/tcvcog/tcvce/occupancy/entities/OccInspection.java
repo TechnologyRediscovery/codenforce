@@ -17,9 +17,11 @@
 package com.tcvcog.tcvce.occupancy.entities;
 
 import com.tcvcog.tcvce.entities.Payment;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -29,27 +31,27 @@ public class OccInspection {
     
     private int inspectionID;
     private User inspector;
+    private int occPeriodID;
     
-    private ArrayList<OccInspectedSpace> inspectedSpaceList;
     private OccChecklistBlueprint blueprint;
-    
-    private boolean totalFeePaid;
-    
-    private OccPermitApplication application;
-    private OccInspecStatus status;
-    
-    private LocalDateTime firstInspectionDate;
-    private boolean firstInspectionPass;
-    private LocalDateTime secondInspectionDate;
-    private boolean SecondInspectionPass;
-    
-    private String occupancyInspectionNotes; 
+    private List<OccInspectedSpace> inspectedSpaceList;
     
     private int pacc;
     private boolean enablePacc;
     
-    private ArrayList<Payment> payments;
+    private User passCertifiedBy;
+    private LocalDateTime passTS;
+    
+    private int maxOccupantsAllowed;
+    private int numBedrooms;
+    private int numBathrooms;
+    
+    private Person thirdPartyInspector_personid;
+    private LocalDateTime thirdPartyApprovalTS;
+    private User thirdPartyApprovalBy;
 
+    private String notes; 
+    
     /**
      * @return the inspectionID
      */
@@ -64,105 +66,22 @@ public class OccInspection {
         this.inspectionID = inspectionID;
     }
 
+
     /**
-     * @return the firstInspectionDate
+     * @return the notes
      */
-    public LocalDateTime getFirstInspectionDate() {
-        return firstInspectionDate;
+    public String getNotes() {
+        return notes;
     }
 
     /**
-     * @param firstInspectionDate the firstInspectionDate to set
+     * @param notes the notes to set
      */
-    public void setFirstInspectionDate(LocalDateTime firstInspectionDate) {
-        this.firstInspectionDate = firstInspectionDate;
-    }
-
-    /**
-     * @return the firstInspectionPass
-     */
-    public boolean isFirstInspectionPass() {
-        return firstInspectionPass;
-    }
-
-    /**
-     * @param firstInspectionPass the firstInspectionPass to set
-     */
-    public void setFirstInspectionPass(boolean firstInspectionPass) {
-        this.firstInspectionPass = firstInspectionPass;
-    }
-
-    /**
-     * @return the secondInspectionDate
-     */
-    public LocalDateTime getSecondInspectionDate() {
-        return secondInspectionDate;
-    }
-
-    /**
-     * @param secondInspectionDate the secondInspectionDate to set
-     */
-    public void setSecondInspectionDate(LocalDateTime secondInspectionDate) {
-        this.secondInspectionDate = secondInspectionDate;
-    }
-
-    /**
-     * @return the SecondInspectionPass
-     */
-    public boolean isSecondInspectionPass() {
-        return SecondInspectionPass;
-    }
-
-    /**
-     * @param SecondInspectionPass the SecondInspectionPass to set
-     */
-    public void setSecondInspectionPass(boolean SecondInspectionPass) {
-        this.SecondInspectionPass = SecondInspectionPass;
-    }
-
-    /**
-     * @return the totalFeePaid
-     */
-    public boolean isTotalFeePaid() {
-        return totalFeePaid;
-    }
-
-    /**
-     * @param totalFeePaid the totalFeePaid to set
-     */
-    public void setTotalFeePaid(boolean totalFeePaid) {
-        this.totalFeePaid = totalFeePaid;
-    }
-
-    /**
-     * @return the occupancyInspectionNotes
-     */
-    public String getOccupancyInspectionNotes() {
-        return occupancyInspectionNotes;
-    }
-
-    /**
-     * @param occupancyInspectionNotes the occupancyInspectionNotes to set
-     */
-    public void setOccupancyInspectionNotes(String occupancyInspectionNotes) {
-        this.occupancyInspectionNotes = occupancyInspectionNotes;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
   
-
-    /**
-     * @return the permit
-     */
-    public OccPermit getPermit() {
-        return permit;
-    }
-
-    /**
-     * @param permit the permit to set
-     */
-    public void setPermit(OccPermit permit) {
-        this.permit = permit;
-    }
 
     /**
      * @return the inspector
@@ -178,33 +97,6 @@ public class OccInspection {
         this.inspector = inspector;
     }
 
-    /**
-     * @return the application
-     */
-    public OccPermitApplication getApplication() {
-        return application;
-    }
-
-    /**
-     * @param application the application to set
-     */
-    public void setApplication(OccPermitApplication application) {
-        this.application = application;
-    }
-
-    /**
-     * @return the status
-     */
-    public OccInspecStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(OccInspecStatus status) {
-        this.status = status;
-    }
 
     /**
      * @return the pacc
@@ -220,19 +112,6 @@ public class OccInspection {
         return enablePacc;
     }
 
-    /**
-     * @return the muniAuthGrantedBy
-     */
-    public User getMuniAuthGrantedBy() {
-        return muniAuthGrantedBy;
-    }
-
-    /**
-     * @return the muniAuthNotes
-     */
-    public String getMuniAuthNotes() {
-        return muniAuthNotes;
-    }
 
     /**
      * @param pacc the pacc to set
@@ -248,47 +127,11 @@ public class OccInspection {
         this.enablePacc = enablePacc;
     }
 
-    /**
-     * @param muniAuthGrantedBy the muniAuthGrantedBy to set
-     */
-    public void setMuniAuthGrantedBy(User muniAuthGrantedBy) {
-        this.muniAuthGrantedBy = muniAuthGrantedBy;
-    }
-
-    /**
-     * @param muniAuthNotes the muniAuthNotes to set
-     */
-    public void setMuniAuthNotes(String muniAuthNotes) {
-        this.muniAuthNotes = muniAuthNotes;
-    }
-
-    /**
-     * @return the payments
-     */
-    public ArrayList<Payment> getPayments() {
-        return payments;
-    }
-
-    /**
-     * @param payments the payments to set
-     */
-    public void setPayments(ArrayList<Payment> payments) {
-        this.payments = payments;
-    }
-
-    /**
-     * @return the inspectedSpaceList
-     */
-    public ArrayList<OccInspectedSpace> getInspectedSpaceList() {
+    public List<OccInspectedSpace> getInspectedSpaceList() {
         return inspectedSpaceList;
     }
 
-    /**
-     * @param inspectedSpaceList the inspectedSpaceList to set
-     */
-    public void setInspectedSpaceList(ArrayList<OccInspectedSpace> inspectedSpaceList) {
-        this.inspectedSpaceList = inspectedSpaceList;
-    }
+   
 
     /**
      * @return the blueprint
@@ -302,6 +145,139 @@ public class OccInspection {
      */
     public void setBlueprint(OccChecklistBlueprint blueprint) {
         this.blueprint = blueprint;
+    }
+
+    /**
+     * @return the occPeriodID
+     */
+    public int getOccPeriodID() {
+        return occPeriodID;
+    }
+
+    /**
+     * @param occPeriodID the occPeriodID to set
+     */
+    public void setOccPeriodID(int occPeriodID) {
+        this.occPeriodID = occPeriodID;
+    }
+
+    /**
+     * @return the passCertifiedBy
+     */
+    public User getPassCertifiedBy() {
+        return passCertifiedBy;
+    }
+
+    /**
+     * @param passCertifiedBy the passCertifiedBy to set
+     */
+    public void setPassCertifiedBy(User passCertifiedBy) {
+        this.passCertifiedBy = passCertifiedBy;
+    }
+
+    /**
+     * @return the maxOccupantsAllowed
+     */
+    public int getMaxOccupantsAllowed() {
+        return maxOccupantsAllowed;
+    }
+
+    /**
+     * @return the numBedrooms
+     */
+    public int getNumBedrooms() {
+        return numBedrooms;
+    }
+
+    /**
+     * @return the numBathrooms
+     */
+    public int getNumBathrooms() {
+        return numBathrooms;
+    }
+
+    /**
+     * @param maxOccupantsAllowed the maxOccupantsAllowed to set
+     */
+    public void setMaxOccupantsAllowed(int maxOccupantsAllowed) {
+        this.maxOccupantsAllowed = maxOccupantsAllowed;
+    }
+
+    /**
+     * @param numBedrooms the numBedrooms to set
+     */
+    public void setNumBedrooms(int numBedrooms) {
+        this.numBedrooms = numBedrooms;
+    }
+
+    /**
+     * @param numBathrooms the numBathrooms to set
+     */
+    public void setNumBathrooms(int numBathrooms) {
+        this.numBathrooms = numBathrooms;
+    }
+
+    /**
+     * @return the thirdPartyInspector_personid
+     */
+    public Person getThirdPartyInspector_personid() {
+        return thirdPartyInspector_personid;
+    }
+
+    /**
+     * @return the thirdPartyApprovalTS
+     */
+    public LocalDateTime getThirdPartyApprovalTS() {
+        return thirdPartyApprovalTS;
+    }
+
+    /**
+     * @return the thirdPartyApprovalBy
+     */
+    public User getThirdPartyApprovalBy() {
+        return thirdPartyApprovalBy;
+    }
+
+    /**
+     * @param thirdPartyInspector_personid the thirdPartyInspector_personid to set
+     */
+    public void setThirdPartyInspector_personid(Person thirdPartyInspector_personid) {
+        this.thirdPartyInspector_personid = thirdPartyInspector_personid;
+    }
+
+    /**
+     * @param thirdPartyApprovalTS the thirdPartyApprovalTS to set
+     */
+    public void setThirdPartyApprovalTS(LocalDateTime thirdPartyApprovalTS) {
+        this.thirdPartyApprovalTS = thirdPartyApprovalTS;
+    }
+
+    /**
+     * @param thirdPartyApprovalBy the thirdPartyApprovalBy to set
+     */
+    public void setThirdPartyApprovalBy(User thirdPartyApprovalBy) {
+        this.thirdPartyApprovalBy = thirdPartyApprovalBy;
+    }
+
+    /**
+     * @param inspectedSpaceList the inspectedSpaceList to set
+     */
+    public void setInspectedSpaceList(List<OccInspectedSpace> inspectedSpaceList) {
+        this.inspectedSpaceList = inspectedSpaceList;
+    }
+
+    /**
+     * @return the passTS
+     */
+    public LocalDateTime getPassTS() {
+        return passTS;
+    }
+
+    /**
+     * @param passTS the passTS to set
+     */
+    public void setPassTS(LocalDateTime passTS) {
+        this.passTS = passTS;
     }
 
     

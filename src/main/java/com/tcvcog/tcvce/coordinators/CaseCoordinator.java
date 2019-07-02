@@ -95,8 +95,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             cse.setViolationList(new ArrayList<CodeViolation>());
         }
         
-        cse.setEventProposalList(new ArrayList<EventCECase>());
-        cse.setVisibleEventList(new ArrayList<EventCECase>());
+        cse.setEventProposalList(new ArrayList<CECaseEvent>());
+        cse.setVisibleEventList(new ArrayList<CECaseEvent>());
         
         
         if(cse.getCitationList() == null){
@@ -110,7 +110,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         if(cse.getCeActionRequestList() == null){
             cse.setCeActionRequestList(new ArrayList<CEActionRequest>());
         }
-        cse.setActiveEventList(new ArrayList<EventCECase>());
+        cse.setActiveEventList(new ArrayList<CECaseEvent>());
         
         configureCECaseStageAndPhase(cse);
         
@@ -216,9 +216,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
       * @return 
       */
     public CECase determineAndSetPhase_stageCITATION(CECase cse){
-        Iterator<EventCECase> iter = cse.getActiveEventList().iterator();
+        Iterator<CECaseEvent> iter = cse.getActiveEventList().iterator();
         while(iter.hasNext()){
-            EventCECase ev = iter.next();
+            CECaseEvent ev = iter.next();
             if(ev.getCategory().getEventType() == EventType.Citation){
                 
             }
@@ -309,7 +309,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         EventCoordinator ec = getEventCoordinator();
         EventCategory originationCategory;
-        EventCECase originationEvent;
+        CECaseEvent originationEvent;
         
         // set default status to prelim investigation pending
         newCase.setCasePhase(initialCECasePphase);
@@ -430,7 +430,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public int attachNewEventToCECase(CECase c, EventCECase e, CodeViolation viol) 
+    public int attachNewEventToCECase(CECase c, CECaseEvent e, CodeViolation viol) 
             throws CaseLifecyleException, IntegrationException, ViolationException{
         EventType eventType = e.getCategory().getEventType();
         EventIntegrator ei = getEventIntegrator();
@@ -467,7 +467,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return insertedEventID;
     } // close method
     
-    private boolean evalulateCasePhaseChangeRule(CECase cse, EventCECase event) 
+    private boolean evalulateCasePhaseChangeRule(CECase cse, CECaseEvent event) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         
         EventRule rule = event.getCategory().getCasePhaseChangeRule();
@@ -526,9 +526,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         boolean subcheckPasses = true;
         if(rule.getRequiredExtantEventType() != null){
             subcheckPasses = false;
-            Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
+            Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
             while(iter.hasNext()){
-                EventCECase ev = iter.next();
+                CECaseEvent ev = iter.next();
                 if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
                     subcheckPasses = true;
                 }
@@ -540,9 +540,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     private boolean ruleSubcheck_forbiddenEventType(CECase cse, EventRule rule){
         boolean subcheckPasses = true;
-        Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
+        Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
-            EventCECase ev = iter.next();
+            CECaseEvent ev = iter.next();
             if(ev.getCategory().getEventType() == rule.getRequiredExtantEventType()){
                 subcheckPasses = false;
             }
@@ -554,9 +554,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         boolean subcheckPasses = true;
         if(rule.getRequiredExtantEventCatID() != 0){
             subcheckPasses = false;
-            Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
+            Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
             while(iter.hasNext()){
-                EventCECase ev = iter.next();
+                CECaseEvent ev = iter.next();
                 if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
                     subcheckPasses = true;
                 }
@@ -567,9 +567,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
     private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, EventRule rule){
         boolean subcheckPasses = true;
-        Iterator<EventCECase> iter = cse.getVisibleEventList().iterator();
+        Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
-            EventCECase ev = iter.next();
+            CECaseEvent ev = iter.next();
             if(ev.getCategory().getCategoryID() == rule.getRequiredExtantEventCatID()){
                 subcheckPasses = false;
             }
@@ -581,7 +581,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
-        EventCECase newEvent = null;
+        CECaseEvent newEvent = null;
         
         CasePhase oldCP = cse.getCasePhase();
         cse.setCasePhase(rule.getTargetCasePhase());
@@ -665,7 +665,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             }
         } // close while
         
-        EventCECase complianceClosingEvent;
+        CECaseEvent complianceClosingEvent;
         if (complianceWithAllViolations){
             complianceClosingEvent = ec.getInitializedEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
@@ -675,7 +675,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
     }
      
-    private int processClosingEvent(CECase c, EventCECase e) throws IntegrationException, CaseLifecyleException{
+    private int processClosingEvent(CECase c, CECaseEvent e) throws IntegrationException, CaseLifecyleException{
         CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
         
@@ -704,7 +704,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException
      * @throws ViolationException 
      */
-    private void checkForAndCarryOutCasePhaseChange(CECase c, EventCECase e) throws CaseLifecyleException, IntegrationException, ViolationException{
+    private void checkForAndCarryOutCasePhaseChange(CECase c, CECaseEvent e) throws CaseLifecyleException, IntegrationException, ViolationException{
         
         CaseIntegrator ci = getCaseIntegrator();
         CasePhase initialCasePhase = c.getCasePhase();
@@ -896,7 +896,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             throw new CaseLifecyleException("Notice is already locked and queued for sending");
         }
         
-        EventCECase noticeEvent = evCoord.getInitializedEvent(c, evCoord.getInitiatlizedEventCategory(Integer.parseInt(getResourceBundle(
+        CECaseEvent noticeEvent = evCoord.getInitializedEvent(c, evCoord.getInitiatlizedEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
         noticeEvent.setDescription(queuedNoticeEventNotes);
@@ -1127,10 +1127,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
        // one we used throughout the ceCases.xhtml
        CECase c = ci.getCECase(rptCse.getCse().getCaseID());
        
-       List<EventCECase> evList =  new ArrayList<>();
-       Iterator<EventCECase> iter = c.getVisibleEventList().iterator();
+       List<CECaseEvent> evList =  new ArrayList<>();
+       Iterator<CECaseEvent> iter = c.getVisibleEventList().iterator();
        while(iter.hasNext()){
-            EventCECase ev = iter.next();
+            CECaseEvent ev = iter.next();
             
             // toss out hidden events unless the user wants them
             if(ev.isHidden() && !rptCse.isIncludeHiddenEvents()) continue;
@@ -1208,7 +1208,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-        EventCECase tfEvent;
+        CECaseEvent tfEvent;
         int insertedViolationID;
         int eventID;
         StringBuilder sb = new StringBuilder();
@@ -1315,7 +1315,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 } else {
                     violTimeframeEventID = cv.getComplianceTimeframeEventID();
                 }
-                EventCECase tfEvent = ei.getEventCECase(violTimeframeEventID);
+                CECaseEvent tfEvent = ei.getEventCECase(violTimeframeEventID);
                 tfEvent.setDateOfRecord(cv.getStipulatedComplianceDate());
                 ec.editEvent(tfEvent, u);
                 System.out.println("CaseCoordinator.updateCodeViolation | updated timeframe event ID: " + tfEvent.getEventID());

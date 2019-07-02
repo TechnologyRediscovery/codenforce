@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.occupancy.entities;
 
 import com.tcvcog.tcvce.entities.Municipality;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a set of space types and their associated code elements
@@ -39,7 +40,7 @@ public class OccChecklistBlueprint {
     private String description;
     private boolean active;
     
-    private ArrayList<OccSpace> spaceList;
+    private List<OccSpace> spaceList;
 
     /**
      * @return the muni

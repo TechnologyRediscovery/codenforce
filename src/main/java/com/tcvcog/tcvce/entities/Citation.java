@@ -33,7 +33,7 @@ public class Citation extends EntityUtils implements Serializable {
     private CitationStatus status;
     private CourtEntity origin_courtentity;
     
-    private List<EventCECase> eventList;
+    private List<CECaseEvent> eventList;
     
     private CECaseBaseClass ceCaseNoLists;
     private User userOwner;
@@ -311,14 +311,14 @@ public class Citation extends EntityUtils implements Serializable {
     /**
      * @return the eventList
      */
-    public List<EventCECase> getEventList() {
+    public List<CECaseEvent> getEventList() {
         return eventList;
     }
 
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventCECase> eventList) {
+    public void setEventList(List<CECaseEvent> eventList) {
         this.eventList = eventList;
     }
     

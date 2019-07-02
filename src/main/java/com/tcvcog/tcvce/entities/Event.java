@@ -37,6 +37,7 @@ public class Event
     private String muniName;
     private int propertyID;
     private EventCategory category;
+    private EventProposalImplementation eventProposalImplementation;
     
     private LocalDateTime dateOfRecord;
     private String dateOfRecordPretty;
@@ -52,12 +53,10 @@ public class Event
     private boolean hidden;
     private String notes;
     
-        
     private List<Person> personList;
     
     private long daysUntilDue;
     
-    private EventProposalImplementation eventProposalImplementation;
     
     /**
      * @return the eventID

@@ -34,7 +34,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     
     private String closingDatePretty;
     
-    private List<EventCECase> publicEventList;
+    private List<CECaseEvent> publicEventList;
     
     private LocalDateTime mostRecentLoggedEvent;
     
@@ -266,7 +266,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @return the publicEventList
      */
-    public List<EventCECase> getPublicEventList() {
+    public List<CECaseEvent> getPublicEventList() {
         return publicEventList;
     }
 
@@ -324,7 +324,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle implements Serializ
     /**
      * @param publicEventList the publicEventList to set
      */
-    public void setPublicEventList(List<EventCECase> publicEventList) {
+    public void setPublicEventList(List<CECaseEvent> publicEventList) {
         this.publicEventList = publicEventList;
     }
     

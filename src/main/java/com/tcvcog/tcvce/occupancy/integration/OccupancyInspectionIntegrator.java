@@ -76,7 +76,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
             }
             stmt.setBoolean(6, occupancyInspection.isSecondInspectionPass());
             stmt.setBoolean(8, occupancyInspection.isTotalFeePaid());
-            stmt.setString(9, occupancyInspection.getOccupancyInspectionNotes());
+            stmt.setString(9, occupancyInspection.getNotes());
             
             
         } catch (SQLException ex) {
@@ -122,7 +122,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
             }
             stmt.setBoolean(6, occInspection.isSecondInspectionPass());
             stmt.setBoolean(8, occInspection.isTotalFeePaid());
-            stmt.setString(9, occInspection.getOccupancyInspectionNotes());
+            stmt.setString(9, occInspection.getNotes());
             stmt.setInt(10, occInspection.getInspectionID());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
             stmt.executeUpdate();
@@ -179,7 +179,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
                 newInspection.setSecondInspectionDate(null);
             }
             newInspection.setTotalFeePaid(rs.getBoolean("totalfeepaid"));
-            newInspection.setOccupancyInspectionNotes(rs.getString("notes"));
+            newInspection.setNotes(rs.getString("notes"));
             
         }catch (SQLException ex){
             System.out.println(ex.toString());

@@ -123,7 +123,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             rs = stmt.executeQuery();
             while(rs.next()){
                 //permitList.add(generateOccupancyPermit(rs.getInt("permitid")));
-                
             }
             
         } catch (SQLException ex) {
@@ -163,7 +162,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         }
-        
     }
     
     public void deleteOccupancyPermitType(OccPeriodType opt) throws IntegrationException{
