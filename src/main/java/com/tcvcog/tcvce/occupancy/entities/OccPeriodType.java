@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.occupancy.entities;
 
+import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonType;
 import java.util.List;
@@ -42,7 +43,7 @@ public class OccPeriodType {
     private List<PersonType> optionalpersontypeList;
     private List<PersonType> requiredPersontypeList;
     private boolean commercial;
-    private OccInspecFee fee;
+    private List<Fee> feeList;
     private boolean requirepersontypeentrycheck;
 
     /**
@@ -160,8 +161,8 @@ public class OccPeriodType {
     /**
      * @return the fee
      */
-    public OccInspecFee getFee() {
-        return fee;
+    public List<Fee> getFeeList() {
+        return feeList;
     }
 
     /**
@@ -286,8 +287,8 @@ public class OccPeriodType {
     /**
      * @param fee the fee to set
      */
-    public void setFee(OccInspecFee fee) {
-        this.fee = fee;
+    public void setFee(List<Fee> fee) {
+        this.feeList = fee;
     }
 
     /**

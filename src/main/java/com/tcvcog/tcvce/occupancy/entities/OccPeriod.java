@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.occupancy.entities;
 
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.EntityUtils;
+import com.tcvcog.tcvce.entities.EventProposalImplementation;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.User;
@@ -26,7 +27,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private List<OccPermitApplication> applicationList;
     private List<Person> personList;
     private List<OccEvent> eventList;
-    private List<OccEventProposal> eventProposalList;
+    private List<EventProposalImplementation> eventProposalList;
     private List<OccInspection> inspectionList;
     private List<OccPermit> permitList;
     private List<Integer> photoIDList;
@@ -94,7 +95,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     /**
      * @return the eventProposalList
      */
-    public List<OccEventProposal> getEventProposalList() {
+    public List<EventProposalImplementation> getEventProposalList() {
         return eventProposalList;
     }
 
@@ -276,7 +277,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     /**
      * @param eventProposalList the eventProposalList to set
      */
-    public void setEventProposalList(List<OccEventProposal> eventProposalList) {
+    public void setEventProposalList(List<EventProposalImplementation> eventProposalList) {
         this.eventProposalList = eventProposalList;
     }
 

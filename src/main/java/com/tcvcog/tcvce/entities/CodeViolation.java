@@ -78,6 +78,8 @@ public class CodeViolation extends EntityUtils implements Serializable{
     protected int complianceTimeframeEventID;
     
     protected List<Integer> photoList;
+    
+    protected List<Fee> feeList;
 
     /**
      * @return the violationID

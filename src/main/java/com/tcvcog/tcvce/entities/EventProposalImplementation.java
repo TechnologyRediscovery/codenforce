@@ -5,24 +5,21 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  *
  * @author sylvia
  */
-public class EventProposalImplementation {
+public class EventProposalImplementation extends EventProposal implements Serializable {
     
     private int implementationID;
     
-    
-    private int proposalID;
-    private EventProposal proposal;
     private int generatingEventID;
     private boolean currentUserCanEvaluateProposal;
     
     private User initiator;
-    
     private User responderIntended;
     private User responderActual;
     
@@ -35,7 +32,7 @@ public class EventProposalImplementation {
     private LocalDateTime responseTimestamp;
     private String responseTimePrettyDate;
     
-    private boolean expiredorinactive;
+    private boolean active;
     
     private int responseEventID;
     /**
@@ -227,12 +224,6 @@ public class EventProposalImplementation {
         return expiresOnPretty;
     }
 
-    /**
-     * @return the expiredorinactive
-     */
-    public boolean isExpiredorinactive() {
-        return expiredorinactive;
-    }
 
     /**
      * @param activatesOn the activatesOn to set
@@ -262,26 +253,6 @@ public class EventProposalImplementation {
         this.expiresOnPretty = expiresOnPretty;
     }
 
-    /**
-     * @param expiredorinactive the expiredorinactive to set
-     */
-    public void setExpiredorinactive(boolean expiredorinactive) {
-        this.expiredorinactive = expiredorinactive;
-    }
-
-    /**
-     * @return the proposalID
-     */
-    public int getProposalID() {
-        return proposalID;
-    }
-
-    /**
-     * @param proposalID the proposalID to set
-     */
-    public void setProposalID(int proposalID) {
-        this.proposalID = proposalID;
-    }
 
     /**
      * @return the generatingEventID
@@ -297,19 +268,6 @@ public class EventProposalImplementation {
         this.generatingEventID = generatingEventID;
     }
 
-    /**
-     * @return the proposal
-     */
-    public EventProposal getProposal() {
-        return proposal;
-    }
-
-    /**
-     * @param proposal the proposal to set
-     */
-    public void setProposal(EventProposal proposal) {
-        this.proposal = proposal;
-    }
 
     /**
      * @return the currentUserCanEvaluateProposal
@@ -323,6 +281,20 @@ public class EventProposalImplementation {
      */
     public void setCurrentUserCanEvaluateProposal(boolean currentUserCanEvaluateProposal) {
         this.currentUserCanEvaluateProposal = currentUserCanEvaluateProposal;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
     
 }

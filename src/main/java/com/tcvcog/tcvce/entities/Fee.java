@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.occupancy.entities;
+package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.Municipality;
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  *
  * @author Adam Gutonski
  */
-public class OccInspecFee {
+public class Fee {
     private int occupancyInspectionFeeID;
     private Municipality muni;
     private String occupancyInspectionFeeName;
