@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Technology Rediscovery, LLC.
+ * Copyright (C) 2018 Adam Gutonski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,22 +21,17 @@ import java.time.LocalDateTime;
 
 /**
  *
- * @author Nathan Dietz
+ * @author Adam Gutonski
  */
 public class Fee {
     private int occupancyInspectionFeeID;
     private Municipality muni;
+    private String occupancyInspectionFeeName;
+    private double occupancyInspectionFeeAmount;
+    private LocalDateTime occupancyInspectionFeeEffDate;
+    private LocalDateTime occupancyInspectionFeeExpDate;
+    private String occupancyInspectionFeeNotes;
 
-    private String feeName;
-    private double feeAmount;
-    private LocalDateTime effectiveDate;
-    private LocalDateTime expiryDate;
-    private String notes;
-
-    public Fee(){
-        
-    }
-    
     /**
      * @return the occupancyInspectionFeeID
      */
@@ -65,45 +60,73 @@ public class Fee {
         this.muni = muni;
     }
 
-    public String getFeeName() {
-        return feeName;
+    /**
+     * @return the occupancyInspectionFeeName
+     */
+    public String getOccupancyInspectionFeeName() {
+        return occupancyInspectionFeeName;
     }
 
-    public void setFeeName(String feeName) {
-        this.feeName = feeName;
+    /**
+     * @param occupancyInspectionFeeName the occupancyInspectionFeeName to set
+     */
+    public void setOccupancyInspectionFeeName(String occupancyInspectionFeeName) {
+        this.occupancyInspectionFeeName = occupancyInspectionFeeName;
     }
 
-    public double getFeeAmount() {
-        return feeAmount;
+    /**
+     * @return the occupancyInspectionFeeAmount
+     */
+    public double getOccupancyInspectionFeeAmount() {
+        return occupancyInspectionFeeAmount;
     }
 
-    public void setFeeAmount(double feeAmount) {
-        this.feeAmount = feeAmount;
+    /**
+     * @param occupancyInspectionFeeAmount the occupancyInspectionFeeAmount to set
+     */
+    public void setOccupancyInspectionFeeAmount(double occupancyInspectionFeeAmount) {
+        this.occupancyInspectionFeeAmount = occupancyInspectionFeeAmount;
     }
 
-    public LocalDateTime getEffectiveDate() {
-        return effectiveDate;
+    /**
+     * @return the occupancyInspectionFeeEffDate
+     */
+    public LocalDateTime getOccupancyInspectionFeeEffDate() {
+        return occupancyInspectionFeeEffDate;
     }
 
-    public void setEffectiveDate(LocalDateTime effectiveDate) {
-        this.effectiveDate = effectiveDate;
+    /**
+     * @param occupancyInspectionFeeEffDate the occupancyInspectionFeeEffDate to set
+     */
+    public void setOccupancyInspectionFeeEffDate(LocalDateTime occupancyInspectionFeeEffDate) {
+        this.occupancyInspectionFeeEffDate = occupancyInspectionFeeEffDate;
     }
 
-    public LocalDateTime getExpiryDate() {
-        return expiryDate;
+    /**
+     * @return the occupancyInspectionFeeExpDate
+     */
+    public LocalDateTime getOccupancyInspectionFeeExpDate() {
+        return occupancyInspectionFeeExpDate;
     }
 
-    public void setExpiryDate(LocalDateTime expiryDate) {
-        this.expiryDate = expiryDate;
+    /**
+     * @param occupancyInspectionFeeExpDate the occupancyInspectionFeeExpDate to set
+     */
+    public void setOccupancyInspectionFeeExpDate(LocalDateTime occupancyInspectionFeeExpDate) {
+        this.occupancyInspectionFeeExpDate = occupancyInspectionFeeExpDate;
     }
 
-    public String getNotes() {
-        return notes;
+    /**
+     * @return the occupancyInspectionFeeNotes
+     */
+    public String getOccupancyInspectionFeeNotes() {
+        return occupancyInspectionFeeNotes;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    /**
+     * @param occupancyInspectionFeeNotes the occupancyInspectionFeeNotes to set
+     */
+    public void setOccupancyInspectionFeeNotes(String occupancyInspectionFeeNotes) {
+        this.occupancyInspectionFeeNotes = occupancyInspectionFeeNotes;
     }
-
-    
 }

@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.occupancy.entities.OccInspection;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
-import com.tcvcog.tcvce.occupancy.entities.OccInspecFee;
+import com.tcvcog.tcvce.entities.Fee;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.*;
@@ -38,8 +38,8 @@ import javax.faces.event.ActionEvent;
 @ViewScoped
 public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serializable {
     
-    private ArrayList<OccInspecFee> occupancyInspectionFeeList;
-    private OccInspecFee selectedOccupancyInspectionFee;
+    private ArrayList<Fee> occupancyInspectionFeeList;
+    private Fee selectedOccupancyInspectionFee;
     private int formOccupancyInspectionFeeID;
     private Municipality formMuni;
     private String formOccupancyInspectionFeeName;
@@ -49,7 +49,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     private String formOccupancyInspectionFeeNotes;
     
     //create data fields for user editing/updating of occ. inspection fees
-    private OccInspecFee newFormSelectedOccupancyInspectionFee;
+    private Fee newFormSelectedOccupancyInspectionFee;
     private int newFormOccupancyInspectionFeeID;
     private String newFormOccupancyInspectionFeeName;
     private double newFormOccupancyInspectionFeeAmount;
@@ -86,7 +86,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     
     public void commitOccupancyInspectionFeeUpdates(ActionEvent e){
         OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
-        OccInspecFee oif = selectedOccupancyInspectionFee;
+        Fee oif = selectedOccupancyInspectionFee;
         
         oif.setMuni(formMuni);
         oif.setOccupancyInspectionFeeName(formOccupancyInspectionFeeName);
@@ -113,7 +113,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     
     public void addNewOccupancyInspectionFee(ActionEvent e){
         OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
-        OccInspecFee oif = new OccInspecFee();
+        Fee oif = new Fee();
         
         oif.setOccupancyInspectionFeeID(newFormOccupancyInspectionFeeID);
         oif.setMuni(formMuni);
@@ -142,7 +142,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     }
     
     public String addOccupancyInspectionFee(){
-        OccInspecFee oif = new OccInspecFee();
+        Fee oif = new Fee();
         OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
         oif.setOccupancyInspectionFeeID(formOccupancyInspectionFeeID);
         oif.setMuni(getFormMuni());
@@ -198,10 +198,10 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     /**
      * @return the occupancyInspectionFeeList
      */
-    public ArrayList<OccInspecFee> getOccupancyInspectionFeeList() {
+    public ArrayList<Fee> getOccupancyInspectionFeeList() {
         try {
             OccupancyInspectionIntegrator oi = getOccupancyInspectionIntegrator();
-            ArrayList<OccInspecFee> oil = oi.getOccupancyInspectionFeeList();
+            ArrayList<Fee> oil = oi.getOccupancyInspectionFeeList();
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -219,21 +219,21 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     /**
      * @param occupancyInspectionFeeList the occupancyInspectionFeeList to set
      */
-    public void setOccupancyInspectionFeeList(ArrayList<OccInspecFee> occupancyInspectionFeeList) {
+    public void setOccupancyInspectionFeeList(ArrayList<Fee> occupancyInspectionFeeList) {
         this.occupancyInspectionFeeList = occupancyInspectionFeeList;
     }
 
     /**
      * @return the selectedOccupancyInspectionFee
      */
-    public OccInspecFee getSelectedOccupancyInspectionFee() {
+    public Fee getSelectedOccupancyInspectionFee() {
         return selectedOccupancyInspectionFee;
     }
 
     /**
      * @param selectedOccupancyInspectionFee the selectedOccupancyInspectionFee to set
      */
-    public void setSelectedOccupancyInspectionFee(OccInspecFee selectedOccupancyInspectionFee) {
+    public void setSelectedOccupancyInspectionFee(Fee selectedOccupancyInspectionFee) {
         this.selectedOccupancyInspectionFee = selectedOccupancyInspectionFee;
     }
 
@@ -338,14 +338,14 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     /**
      * @return the newFormSelectedOccupancyInspectionFee
      */
-    public OccInspecFee getNewFormSelectedOccupancyInspectionFee() {
+    public Fee getNewFormSelectedOccupancyInspectionFee() {
         return newFormSelectedOccupancyInspectionFee;
     }
 
     /**
      * @param newFormSelectedOccupancyInspectionFee the newFormSelectedOccupancyInspectionFee to set
      */
-    public void setNewFormSelectedOccupancyInspectionFee(OccInspecFee newFormSelectedOccupancyInspectionFee) {
+    public void setNewFormSelectedOccupancyInspectionFee(Fee newFormSelectedOccupancyInspectionFee) {
         this.newFormSelectedOccupancyInspectionFee = newFormSelectedOccupancyInspectionFee;
     }
 

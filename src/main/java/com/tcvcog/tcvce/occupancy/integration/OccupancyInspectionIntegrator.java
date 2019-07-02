@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccInspection;
-import com.tcvcog.tcvce.occupancy.entities.OccInspecFee;
+import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.occupancy.entities.OccInspecStatus;
 import java.sql.Connection;
 import java.io.Serializable;
@@ -223,7 +223,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     
     }
     
-     public void updateOccupancyInspectionFee(OccInspecFee oif) throws IntegrationException {
+     public void updateOccupancyInspectionFee(Fee oif) throws IntegrationException {
         String query = "UPDATE public.occinspectionfee\n" +
                     "   SET muni_municode=?, feename=?, feeamount=?, effectivedate=?, \n" +
                     "       expirydate=?, notes=? \n" +
@@ -265,14 +265,14 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     }
     
     
-    public ArrayList<OccInspecFee> getOccupancyInspectionFeeList() throws IntegrationException {
+    public ArrayList<Fee> getOccupancyInspectionFeeList() throws IntegrationException {
             String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" +
                             "       notes\n" +
                             "  FROM public.occinspectionfee";
             Connection con = getPostgresCon();
             ResultSet rs = null;
             PreparedStatement stmt = null;
-            ArrayList<OccInspecFee> occupancyInspectionFeeList = new ArrayList();
+            ArrayList<Fee> occupancyInspectionFeeList = new ArrayList();
         
         try {
             stmt = con.prepareStatement(query);
@@ -295,7 +295,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     }
     
        
-    public void insertOccupancyInspectionFee(OccInspecFee occupancyInspectionFee) throws IntegrationException {
+    public void insertOccupancyInspectionFee(Fee occupancyInspectionFee) throws IntegrationException {
         String query = "INSERT INTO public.occinspectionfee(\n" +
                         "            feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" +
                         "            notes)\n" +
@@ -335,7 +335,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         
     }
     
-    public void deleteOccupancyInspectionFee(OccInspecFee oif) throws IntegrationException{
+    public void deleteOccupancyInspectionFee(Fee oif) throws IntegrationException{
          String query = "DELETE FROM public.occinspectionfee\n" +
                 " WHERE feeid= ?;";
         Connection con = getPostgresCon();
@@ -358,8 +358,8 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
     }
     
     
-    private OccInspecFee generateOccupancyInspectionFee(ResultSet rs) throws IntegrationException {
-        OccInspecFee newOif = new OccInspecFee();
+    private Fee generateOccupancyInspectionFee(ResultSet rs) throws IntegrationException {
+        Fee newOif = new Fee();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
     
         try {
