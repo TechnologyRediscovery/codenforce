@@ -127,7 +127,7 @@ CREATE TABLE public.moneyoccperiodtypefee
 
 CREATE TABLE public.moneyoccperiodfeepayment
 (
-	payment_paymentid 					INTEGER NOT NULL CONSTRAINT moneyoccperiodfeepayment_paymentid_fk REFERENCES payment (paymentid),
+	payment_paymentid 					INTEGER NOT NULL CONSTRAINT moneyoccperiodfeepayment_paymentid_fk REFERENCES moneypayment (paymentid),
 	occperiodassignedfee_id 			INTEGER NOT NULL CONSTRAINT moneyoccpermittypefeepayment_occperassignedfee_fk REFERENCES moneyoccperiodfeeassigned (moneyoccperassignedfeeid),
 	CONSTRAINT moneyoccperiodfeepayment_comp_pk PRIMARY KEY (payment_paymentid, occperiodassignedfee_id)
 
@@ -159,7 +159,7 @@ CREATE TABLE public.cecaserule
 );
 
 
-ALTER TABLE public.eventproposalimplementation RENAME expiredorinactive  TO active;
+ALTER TABLE public.eventproposalimplementation RENAME expiredorinactive TO active;
 ALTER TABLE public.eventproposalimplementation
    ALTER COLUMN active SET DEFAULT true;
 
