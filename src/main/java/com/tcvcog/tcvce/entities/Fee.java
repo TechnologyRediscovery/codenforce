@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Adam Gutonski
+ * Copyright (C) 2018 Technology Rediscovery, LLC.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,17 +21,23 @@ import java.time.LocalDateTime;
 
 /**
  *
- * @author Adam Gutonski
+ * @author Nathan Dietz
  */
 public class Fee {
     private int occupancyInspectionFeeID;
     private Municipality muni;
+    
+    //the rest of these DIE
     private String occupancyInspectionFeeName;
     private double occupancyInspectionFeeAmount;
     private LocalDateTime occupancyInspectionFeeEffDate;
     private LocalDateTime occupancyInspectionFeeExpDate;
     private String occupancyInspectionFeeNotes;
 
+    public Fee(){
+        
+    }
+    
     /**
      * @return the occupancyInspectionFeeID
      */

@@ -18,11 +18,20 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriod;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriodType;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -31,6 +40,106 @@ import java.util.ArrayList;
 public class PaymentIntegrator extends BackingBeanUtils implements Serializable {
     
     public PaymentIntegrator() {
+        
+    }
+    
+    public ArrayList<MoneyOccPeriodFeeAssigned> getFeeAssigned(OccPeriod period) {
+        
+        ArrayList<MoneyOccPeriodFeeAssigned> assignedFees = new ArrayList<>();
+        
+        /*
+        query moneyoccperiodfeeassigned and any associated payments through a linking table,
+        build the fee assigned objects, and then return them.
+        */
+        
+        
+        
+        return assignedFees;
+    }
+    
+    public ArrayList<MoneyCECaseFeeAssigned> getFeeAssigned(CECase cse) {
+        
+        ArrayList<MoneyCECaseFeeAssigned> assignedFees = new ArrayList<>();
+        
+        /*
+        query moneyoccperiodfeeassigned and any associated payments through a linking table,
+        build the fee assigned objects, and then return them.
+        */
+        
+        
+        
+        return assignedFees;
+        
+    }
+    
+    public ArrayList<Fee> getFeeList(OccPeriodType type){
+        
+
+        //Go to moneyoccpermitfeetype table and extract all associated fees!
+        
+        
+        
+    }
+    
+    public List<Fee> getFeeList(EnforcableCodeElement element){
+        
+
+        //Go to moneyoccpermitfeetype table and extract all associated fees!
+        
+        
+        
+    }
+
+    
+    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
+        
+        MoneyOccPeriodFeeAssigned fee = new MoneyOccPeriodFeeAssigned();
+        
+        try {
+            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
+            fee.setAssignedBy(rs.getInt("assignedby_userid"));
+            fee.setWaivedBy(rs.getInt("waivedby_userid"));
+            //fee.setLastmodified(rs.get); not sure how to do this, I can't find another generate method that sets the timestamp
+            fee.setReducedBy(rs.getDouble("reducedby"));
+            fee.setReducedByUser(rs.getInt("reduceby_userid"));
+            fee.setNotes(rs.getString("notes"));
+            fee.setFeeID(rs.getInt("fee_feeid"));
+            
+            fee.setOccPeriodID(rs.getInt("occperiod_periodid"));
+            fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
+            fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating OccPeriodFeeAssigned from ResultSet", ex);
+        }
+        
+        return fee;
+        
+    }
+    
+    public MoneyCECaseFeeAssigned generateCECaseFeeAssigned(ResultSet rs) throws IntegrationException {
+        
+        MoneyCECaseFeeAssigned fee = new MoneyCECaseFeeAssigned();
+        
+        try {
+            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
+            fee.setAssignedBy(rs.getInt("assignedby_userid"));
+            fee.setWaivedBy(rs.getInt("waivedby_userid"));
+            //fee.setLastmodified(rs.get); not sure how to do this, I can't find another generate method that sets the timestamp
+            fee.setReducedBy(rs.getDouble("reducedby"));
+            fee.setReducedByUser(rs.getInt("reduceby_userid"));
+            fee.setNotes(rs.getString("notes"));
+            fee.setFeeID(rs.getInt("fee_feeid"));
+            
+            fee.setCeCaseAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
+            fee.setCaseID(rs.getInt("cecase_caseid"));
+            fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating CECaseFeeAssigned from ResultSet", ex);
+        }
+        
+        return fee;
         
     }
     
