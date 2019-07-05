@@ -32,7 +32,7 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
     private int waivedBy;
     private LocalDateTime lastModified;
     private double reducedBy;
-    private int reducedByUser;
+    private User reducedByUser;
     private String notes;
     private int feeID;
 
@@ -84,11 +84,11 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
         this.reducedBy = reducedBy;
     }
 
-    public int getReducedByUser() {
+    public User getReducedByUser() {
         return reducedByUser;
     }
 
-    public void setReducedByUser(int reducedByUser) {
+    public void setReducedByUser(User reducedByUser) {
         this.reducedByUser = reducedByUser;
     }
 

@@ -988,7 +988,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-
+        
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, uc.getUnitNumber());
@@ -999,7 +999,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setBoolean(6, uc.isRemoved());
             stmt.setBoolean(7, uc.isAdded());
             stmt.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
-            stmt.setInt(9, uc.getApprovedBy());
+            stmt.setInt(9, uc.getApprovedBy().getUserID());
             stmt.setString(10, uc.getChangedBy());
             stmt.setInt(11, uc.getPropertyID());
 
@@ -1079,6 +1079,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     public PropertyUnitChange generatePropertyUnitChange(ResultSet rs) throws SQLException, IntegrationException {
         PersonIntegrator persInt = getPersonIntegrator();
+        UserIntegrator ui = getUserIntegrator();
         PropertyUnitChange uc = new PropertyUnitChange();
         uc.setUnitChangeID(rs.getInt("unitchangeid"));
         uc.setUnitID(rs.getInt("unit_unitid"));
@@ -1091,7 +1092,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         uc.setRemoved(rs.getBoolean("removed"));
         uc.setChangedOn(rs.getTimestamp("changedon"));
         uc.setApprovedOn(rs.getTimestamp("approvedon"));
-        uc.setApprovedBy(rs.getInt("approvedby"));
+        uc.setApprovedBy(ui.getUser(rs.getInt("approvedby")));
         uc.setChangedBy(rs.getString("changedby"));
         uc.setPropertyID(rs.getInt("property_propertyid"));
         uc.setInactive(rs.getTimestamp("inactive"));
@@ -1128,7 +1129,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
             stmt.setTimestamp(9, changeToUpdate.getApprovedOn());
 
-            stmt.setInt(10, changeToUpdate.getApprovedBy());
+            stmt.setInt(10, changeToUpdate.getApprovedBy().getUserID());
 
             stmt.setString(11, changeToUpdate.getChangedBy());
 
