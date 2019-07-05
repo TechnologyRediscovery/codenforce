@@ -18,52 +18,335 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
+import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriod;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriodType;
 import java.io.Serializable;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Adam Gutonski
  */
 public class PaymentIntegrator extends BackingBeanUtils implements Serializable {
-    
+
     public PaymentIntegrator() {
+
+    }
+
+    public List<MoneyOccPeriodFeeAssigned> getFeeAssigned(OccPeriod period) throws IntegrationException {
+
+        List<MoneyOccPeriodFeeAssigned> assignedFees = new ArrayList<>();
+
+        String query = "SELECT * FROM moneyoccperiodfeeassigned WHERE occperiod_periodid = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, period.getPeriodid());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                assignedFees.add(generateOccPeriodFeeAssigned(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.getFeeAssigned | Unable to retrieve fees assigned to OccPeriod", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return assignedFees;
+    }
+
+    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECase cse) throws IntegrationException {
+
+        List<MoneyCECaseFeeAssigned> assignedFees = new ArrayList<>();
+
+        String query = "SELECT * FROM moneycecasefeeassigned WHERE cecase_caseid = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cse.getCaseID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                assignedFees.add(generateCECaseFeeAssigned(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.getFeeAssigned | Unable to retrieve fees assigned to CECase", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return assignedFees;
+
+    }
+
+    public List<Fee> getFeeList(OccPeriodType type) throws IntegrationException {
+
+        List<Fee> feeList = new ArrayList<>();
+
+        String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
+                + "FROM moneyfee, moneyoccperiodtypefee\n"
+                + "WHERE moneyfee.feeid = moneyoccperiodtypefee.fee_feeid AND moneyoccperiodtypefee.occperiodtype_typeid = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, type.getTypeid());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                feeList.add(generateFee(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.getFeeAssigned | Unable to retrieve fees associated with occPeriodType", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return feeList;
+    }
+
+    public List<Fee> getFeeList(EnforcableCodeElement element) throws IntegrationException {
+
+        List<Fee> feeList = new ArrayList<>();
+
+        String query = "SELECT moneyfee.feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
+                + "FROM moneyfee, moneycodesetelementfee\n"
+                + "WHERE moneyfee.feeid = moneycodesetelementfee.fee_feeid AND moneycodesetelementfee. = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, element.getCodeSetElementID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                feeList.add(generateFee(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.getFeeAssigned | Unable to retrieve fees associated with EnforcableCodeElement", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return feeList;
+    }
+
+    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
+
+        UserIntegrator ui = getUserIntegrator();
         
+        MoneyOccPeriodFeeAssigned fee = new MoneyOccPeriodFeeAssigned();
+
+        try {
+            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
+            fee.setAssignedBy(rs.getInt("assignedby_userid"));
+            fee.setWaivedBy(rs.getInt("waivedby_userid"));
+            fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
+            fee.setReducedBy(rs.getDouble("reducedby"));
+            fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
+            fee.setNotes(rs.getString("notes"));
+            fee.setFeeID(rs.getInt("fee_feeid"));
+
+            fee.setOccPeriodID(rs.getInt("occperiod_periodid"));
+            fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
+            fee.setOccPerAssignedFeeID(rs.getInt("moneyoccperassignedfeeid"));
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating OccPeriodFeeAssigned from ResultSet", ex);
+        }
+
+        return fee;
+
+    }
+
+    public MoneyCECaseFeeAssigned generateCECaseFeeAssigned(ResultSet rs) throws IntegrationException {
+
+        UserIntegrator ui = getUserIntegrator();
+        
+        MoneyCECaseFeeAssigned fee = new MoneyCECaseFeeAssigned();
+
+        try {
+            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
+            fee.setAssignedBy(rs.getInt("assignedby_userid"));
+            fee.setWaivedBy(rs.getInt("waivedby_userid"));
+            fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
+            fee.setReducedBy(rs.getDouble("reducedby"));
+            fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
+            fee.setNotes(rs.getString("notes"));
+            fee.setFeeID(rs.getInt("fee_feeid"));
+
+            fee.setCeCaseAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
+            fee.setCaseID(rs.getInt("cecase_caseid"));
+            fee.setCodeSetElement(rs.getInt("codesetelement_elementid"));
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating CECaseFeeAssigned from ResultSet", ex);
+        }
+
+        return fee;
+
+    }
+
+    public Fee generateFee(ResultSet rs) throws IntegrationException {
+
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        
+        Fee fee = new Fee();
+
+        try {
+            fee.setOccupancyInspectionFeeID(rs.getInt("feeid"));
+            fee.setMuni(mi.getMuni(rs.getInt("muni_municode")));
+            fee.setFeeName(rs.getString("feename"));
+            fee.setFeeAmount(rs.getDouble("feeamount"));
+            fee.setEffectiveDate(rs.getTimestamp("effectivedate").toLocalDateTime());
+            fee.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
+            fee.setNotes(rs.getString("notes"));
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating Fee from ResultSet", ex);
+        }
+
+        return fee;
+
     }
     
     public void updatePayment(Payment payment) throws IntegrationException {
-        String query = "UPDATE public.payment\n" +
-                    "   SET occinspec_inspectionid=?, paymenttype_typeid=?, \n" +
-                    "       datereceived=?, datedeposited=?, amount=?, payerid=?, referencenum=?, \n" +
-                    "       checkno=?, cleared=?, notes=?\n" +
-                    " WHERE paymentid=?;";
-        
+        String query = "UPDATE public.payment\n"
+                + "   SET occinspec_inspectionid=?, paymenttype_typeid=?, \n"
+                + "       datereceived=?, datedeposited=?, amount=?, payerid=?, referencenum=?, \n"
+                + "       checkno=?, cleared=?, notes=?\n"
+                + " WHERE paymentid=?;";
+
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-        
-        try{
+
+        try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, payment.getOccupancyInspectionID());
             stmt.setInt(2, payment.getPaymentType().getPaymentTypeId());
             //update date received
-            if(payment.getPaymentDateReceived() != null){
+            if (payment.getPaymentDateReceived() != null) {
                 stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getPaymentDateReceived()));
-                
+
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
             //update date deposited
-            if(payment.getPaymentDateDeposited() != null){
+            if (payment.getPaymentDateDeposited() != null) {
                 stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getPaymentDateDeposited()));
-                
+
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
             stmt.setDouble(5, payment.getPaymentAmount());
-            stmt.setInt(6, payment.getPaymentPayerID());
+            stmt.setInt(6, payment.getPaymentPayer().getPersonID());
             stmt.setString(7, payment.getPaymentReferenceNum());
             stmt.setInt(8, payment.getCheckNum());
             stmt.setBoolean(9, payment.isCleared());
@@ -71,70 +354,99 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(11, payment.getPaymentID());
             System.out.println("PaymentBB.editPayment | sql: " + stmt.toString());
             stmt.executeUpdate();
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to update payment", ex);
         } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
         }
-        
+
     }
-    
+
     public ArrayList<Payment> getPaymentList() throws IntegrationException {
-        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n" +
-                    "       datedeposited, amount, payerid, referencenum, checkno, cleared, notes\n" +
-                    "  FROM public.payment;";
-            Connection con = getPostgresCon();
-            ResultSet rs = null;
-            PreparedStatement stmt = null;
-            ArrayList<Payment> paymentList = new ArrayList();
-        
+        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
+                + "       datedeposited, amount, payerid, referencenum, checkno, cleared, notes\n"
+                + "  FROM public.payment;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
         try {
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             System.out.println("PaymentIntegrator.getPaymentList | SQL: " + stmt.toString());
-            while(rs.next()){
+            while (rs.next()) {
                 paymentList.add(generatePayment(rs));
             }
-            
-            } catch (SQLException ex) {
-                System.out.println(ex.toString());
-                throw new IntegrationException("Cannot get Payment List", ex);
-            } finally {
-                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-                if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
             }
-            return paymentList;  
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList;
     }
-    
+
     public void insertPayment(Payment payment) throws IntegrationException {
-        String query = "INSERT INTO public.payment(\n" +
-                        "            paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n" +
-                        "            datedeposited, amount, payerid, referencenum, checkno, cleared, notes)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?, DEFAULT, ?);";
+        String query = "INSERT INTO public.payment(\n"
+                + "            paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
+                + "            datedeposited, amount, payerid, referencenum, checkno, cleared, notes)\n"
+                + "    VALUES (DEFAULT, ?, ?, ?, \n"
+                + "            ?, ?, ?, ?, ?, DEFAULT, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-        
+
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, payment.getOccupancyInspectionID());
             stmt.setInt(2, payment.getPaymentType().getPaymentTypeId());
-            if(payment.getPaymentDateReceived() != null){
+            if (payment.getPaymentDateReceived() != null) {
                 stmt.setTimestamp(3, java.sql.Timestamp.valueOf(payment.getPaymentDateReceived()));
-                
+
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
-            if(payment.getPaymentDateDeposited() != null){
+            if (payment.getPaymentDateDeposited() != null) {
                 stmt.setTimestamp(4, java.sql.Timestamp.valueOf(payment.getPaymentDateDeposited()));
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
             stmt.setDouble(5, payment.getPaymentAmount());
-            stmt.setInt(6, payment.getPaymentPayerID());
+            stmt.setInt(6, payment.getPaymentPayer().getPersonID());
             stmt.setString(7, payment.getPaymentReferenceNum());
             stmt.setInt(8, payment.getCheckNum());
             stmt.setString(9, payment.getNotes());
@@ -144,16 +456,28 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot insert payment", ex);
 
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
         } // close finally
-        
+
     }
-    
+
     public void deletePayment(Payment payment) throws IntegrationException {
-         String query = "DELETE FROM public.payment\n" +
-                        " WHERE paymentid=?;";
+        String query = "DELETE FROM public.payment\n"
+                + " WHERE paymentid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -167,14 +491,28 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             throw new IntegrationException("Cannot delete payment record--probably because another"
                     + "part of the database has a reference item.", ex);
 
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
         } // close finally
     }
-    
+
     private Payment generatePayment(ResultSet rs) throws IntegrationException {
         Payment newPayment = new Payment();
+
+        PersonIntegrator pi = getPersonIntegrator();
         
         try {
             newPayment.setPaymentID(rs.getInt("paymentid"));
@@ -182,26 +520,25 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             newPayment.setPaymentType(getPaymentTypeFromPaymentTypeID(rs.getInt("paymenttype_typeid")));
             java.sql.Timestamp dateReceived = rs.getTimestamp("datereceived");
             //for effective date
-            if(dateReceived != null) {
+            if (dateReceived != null) {
                 newPayment.setPaymentDateReceived(dateReceived.toLocalDateTime());
             } else {
                 newPayment.setPaymentDateReceived(null);
             }
             java.sql.Timestamp dateDeposited = rs.getTimestamp("datedeposited");
             //for expiration date
-            if(dateDeposited != null) {
+            if (dateDeposited != null) {
                 newPayment.setPaymentDateDeposited(dateDeposited.toLocalDateTime());
             } else {
                 newPayment.setPaymentDateDeposited(null);
             }
             newPayment.setPaymentAmount(rs.getDouble("amount"));
-            newPayment.setPaymentPayerID(rs.getInt("payerid"));
+            newPayment.setPaymentPayer(pi.getPerson(rs.getInt("payerid")));
             newPayment.setPaymentReferenceNum(rs.getString("referencenum"));
             newPayment.setCheckNum(rs.getInt("checkno"));
             newPayment.setCleared(rs.getBoolean("cleared"));
             newPayment.setNotes(rs.getString("notes"));
-            
-            
+
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generating Payment from result set", ex);
@@ -209,102 +546,145 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return newPayment;
     }
 
-
     public PaymentType getPaymentTypeFromPaymentTypeID(int paymentTypeID) throws IntegrationException {
         PaymentType paymentType = new PaymentType();
         PreparedStatement stmt = null;
         Connection con = null;
         // note that paymentTypeID is not returned in this query since it is specified in the WHERE
-        String query = "SELECT typeid, pmttypetitle \n" +
-                    "  FROM public.paymenttype" +
-                    " WHERE typeid = ?;";
+        String query = "SELECT typeid, pmttypetitle \n"
+                + "  FROM public.paymenttype"
+                + " WHERE typeid = ?;";
         ResultSet rs = null;
- 
+
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, paymentTypeID);
             //System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | query: " + stmt.toString());
             rs = stmt.executeQuery();
-            
-            while(rs.next()){
+
+            while (rs.next()) {
                 paymentType.setPaymentTypeId(rs.getInt("typeid"));
                 paymentType.setPaymentTypeTitle(rs.getString("pmttypetitle"));
-                          
+
             }
         } catch (SQLException ex) {
             System.out.println("PaymentTypeIntegrator.getPaymentTypeFromPaymentTypeID | " + ex.toString());
             throw new IntegrationException("Exception in PaymentTypeIntegrator.getPaymentTypeFromPaymentTypeID", ex);
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {/* ignored */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
         } // close finally
-        
+
         return paymentType;
-        
+
     }
-    
+
     public void updatePaymentType(PaymentType paymentType) throws IntegrationException {
-        String query = "UPDATE public.paymenttype\n" +
-                        "   SET pmttypetitle=?\n" +
-                        "   WHERE typeid=?;";
-        
+        String query = "UPDATE public.paymenttype\n"
+                + "   SET pmttypetitle=?\n"
+                + "   WHERE typeid=?;";
+
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-        
-        try{
+
+        try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, paymentType.getPaymentTypeTitle());
             stmt.setInt(2, paymentType.getPaymentTypeId());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
             stmt.executeUpdate();
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to update payment type", ex);
         } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
         }
-        
+
     }
-    
+
     public ArrayList<PaymentType> getPaymentTypeList() throws IntegrationException {
-            String query = "SELECT typeid, pmttypetitle\n" +
-                            "  FROM public.paymenttype;";
-            Connection con = getPostgresCon();
-            ResultSet rs = null;
-            PreparedStatement stmt = null;
-            ArrayList<PaymentType> paymentTypeList = new ArrayList();
-        
+        String query = "SELECT typeid, pmttypetitle\n"
+                + "  FROM public.paymenttype;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<PaymentType> paymentTypeList = new ArrayList();
+
         try {
             stmt = con.prepareStatement(query);
             System.out.println("");
             System.out.println("TRYING TO GET PAYMENT TYPE LIST");
             rs = stmt.executeQuery();
             System.out.println("PaymentTypeIntegrator.getPaymentTypeList | SQL: " + stmt.toString());
-            while(rs.next()){
+            while (rs.next()) {
                 paymentTypeList.add(generatePaymentType(rs));
             }
-            
-            } catch (SQLException ex) {
-                System.out.println(ex.toString());
-                throw new IntegrationException("Cannot get payment type List", ex);
-            } finally {
-                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-                if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get payment type List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
             }
-            return paymentTypeList;   
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentTypeList;
     }
-    
+
     public void insertPaymentType(PaymentType paymentType) throws IntegrationException {
-        String query = "INSERT INTO public.paymenttype(\n" +
-                    "    typeid, pmttypetitle)\n" +
-                    "    VALUES (DEFAULT, ?);";
+        String query = "INSERT INTO public.paymenttype(\n"
+                + "    typeid, pmttypetitle)\n"
+                + "    VALUES (DEFAULT, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-        
+
         try {
             stmt = con.prepareStatement(query);
             //stmt.setInt(1, paymentType.getPaymentTypeId());
@@ -316,17 +696,28 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot insert Payment Type", ex);
 
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
         } // close finally
-        
+
     }
-    
-    
-    public void deletePaymentType(PaymentType pt) throws IntegrationException{
-         String query = "DELETE FROM public.paymenttype\n" +
-                        " WHERE typeid = ?;";
+
+    public void deletePaymentType(PaymentType pt) throws IntegrationException {
+        String query = "DELETE FROM public.paymenttype\n"
+                + " WHERE typeid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -340,12 +731,24 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             throw new IntegrationException("Cannot delete payment type--probably because another"
                     + "part of the database has a reference item.", ex);
 
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
         } // close finally
     }
-    
+
     private PaymentType generatePaymentType(ResultSet rs) throws IntegrationException {
         PaymentType newPtype = new PaymentType();
         try {
@@ -357,34 +760,49 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         }
         return newPtype;
     }
-    
-    public ArrayList<PaymentType> getPaymentTypeTitleList() throws IntegrationException{
+
+    public ArrayList<PaymentType> getPaymentTypeTitleList() throws IntegrationException {
         ArrayList<PaymentType> payTypeList = new ArrayList<>();
-        
+
         Connection con = getPostgresCon();
         String query = "SELECT typeid FROM paymenttype;";
         ResultSet rs = null;
         Statement stmt = null;
- 
+
         try {
             stmt = con.createStatement();
             rs = stmt.executeQuery(query);
-            while(rs.next()){
+            while (rs.next()) {
                 payTypeList.add(getPaymentTypeFromPaymentTypeID(rs.getInt("typeid")));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Exception in PaymentTypeIntegrator.getPaymentTypeTitleList", ex);
 
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {/* ignored */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
         } // close finally
-        
+
         return payTypeList;
     }
-    
+
     /* I think I built this all by accident while trying to de-bug my converter...
         public void generatePaymentTypeTitleIDMap() throws IntegrationException{
         HashMap<String, Integer> payMap = new HashMap<>();
@@ -427,7 +845,5 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     public void setPaymentTypeMap(HashMap paymentTypeMap) {
         this.paymentTypeMap = paymentTypeMap;
     }
-    */
-    
-    
+     */
 }

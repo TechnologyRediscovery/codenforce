@@ -30,7 +30,7 @@ public class Payment {
     private LocalDateTime paymentDateDeposited;
     private LocalDateTime paymentDateReceived;
     private double paymentAmount;
-    private int paymentPayerID;
+    private Person paymentPayer;
     private String paymentReferenceNum;
     private int checkNum;
     private boolean cleared;
@@ -153,15 +153,15 @@ public class Payment {
     /**
      * @return the paymentPayerID
      */
-    public int getPaymentPayerID() {
-        return paymentPayerID;
+    public Person getPaymentPayer() {
+        return paymentPayer;
     }
 
     /**
      * @param paymentPayerID the paymentPayerID to set
      */
-    public void setPaymentPayerID(int paymentPayerID) {
-        this.paymentPayerID = paymentPayerID;
+    public void setPaymentPayer(Person paymentPayer) {
+        this.paymentPayer = paymentPayer;
     }
 
     /**
