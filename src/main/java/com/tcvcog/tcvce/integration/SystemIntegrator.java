@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
@@ -207,7 +208,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    /**
+    /** 
      * 
      * @param casephase
      * @return
@@ -473,4 +474,54 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         
         
     }
+     
+      
+      public BOBSource getBOBSource(int sourceID) throws IntegrationException{
+        BOBSource bs = null;
+          
+          String query =    "   SELECT sourceid, title, description, creator, muni_municode, userattributable, \n" +
+                            "           active, notes\n" +
+                            "           FROM public.bobsource WHERE sourceid = ?;";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+ 
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, sourceID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                bs = generateBOBSource(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { } }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) {  } }
+        } // close finally
+        return bs;
+      }
+     
+      private BOBSource generateBOBSource(ResultSet rs) throws SQLException, IntegrationException{
+          UserIntegrator ui = getUserIntegrator();
+          MunicipalityIntegrator mi = getMunicipalityIntegrator();
+          BOBSource bs = new BOBSource();
+          bs.setSourceid(rs.getInt("sourceid"));
+          bs.setTitle(rs.getString("title"));;
+          bs.setDescription(rs.getString("description"));
+          bs.setCreator(ui.getUser(rs.getInt("creator")));
+          bs.setMuni(mi.getMuni(rs.getInt("muni_municode")));;
+          bs.setActive(rs.getBoolean("active"));;
+          bs.setNotes(rs.getString("notes"));
+          return bs;
+          
+      }
+      
+      
+      
 }

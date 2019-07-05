@@ -5,10 +5,14 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author sylvia
  */
-public class FeeAssigned {
+public class FeeAssigned extends Fee implements Serializable {
+    
+    
     
 }

@@ -40,14 +40,6 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         
     }
     
-    public ArrayList<OccInspecStatus> getOccInspecStatusList(){
-        return new ArrayList();
-    }
-    
-    public void updateOccInspecStatus(OccInspection oi, OccInspecStatus updatedStatus){
-        
-        
-    }
     
     public void insertOccupanyInspection(OccInspection occupancyInspection) throws IntegrationException{
         String query = "INSERT INTO public.occupancyinspection(\n" +

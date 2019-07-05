@@ -32,83 +32,83 @@ import java.util.Objects;
  */
 public class Person extends EntityUtils implements Serializable{
     
-    private int personID;
+    protected int personID;
     
-    private PersonType personType;
-    private int muniCode;
-    private String muniName;
+    protected PersonType personType;
+    protected int muniCode;
+    protected String muniName;
     
-    private int sourceID;
-    private String sourceTitle;
-    private int creatorUserID;
-    private LocalDateTime creationTimeStamp;
+    protected int sourceID;
+    protected String sourceTitle;
+    protected int creatorUserID;
+    protected LocalDateTime creationTimeStamp;
     
     // for backwards compatability
     
-    private String firstName;
-    private String lastName;
+    protected String firstName;
+    protected String lastName;
     
     // frist, middle initial, and last all in lastName
-    private boolean compositeLastName;
-    private boolean businessEntity;
+    protected boolean compositeLastName;
+    protected boolean businessEntity;
     
-    private String jobTitle;
+    protected String jobTitle;
     
-    private String phoneCell;
-    private String phoneHome;
-    private String phoneWork;
+    protected String phoneCell;
+    protected String phoneHome;
+    protected String phoneWork;
     
-    private String email;
-    private String addressStreet;
-    private String addressCity;
+    protected String email;
+    protected String addressStreet;
+    protected String addressCity;
     
-    private String addressZip;
-    private String addressState;
+    protected String addressZip;
+    protected String addressState;
     
-    private boolean useSeparateMailingAddress;
-    private String mailingAddressStreet;
-    private String mailingAddressThirdLine;
-    private String mailingAddressCity;
-    private String mailingAddressZip;
+    protected boolean useSeparateMailingAddress;
+    protected String mailingAddressStreet;
+    protected String mailingAddressThirdLine;
+    protected String mailingAddressCity;
+    protected String mailingAddressZip;
     
-    private String mailingAddressState;
+    protected String mailingAddressState;
     
-    private String notes;
+    protected String notes;
     
-    private LocalDateTime lastUpdated;
-    private String lastUpdatedPretty;
+    protected LocalDateTime lastUpdated;
+    protected String lastUpdatedPretty;
     
-    private boolean canExpire;
-    private LocalDateTime expiryDate;
-    private String expireString;
-    private java.util.Date expiryDateUtilDate;
-    private String expiryNotes;
-    private boolean active;
-    private int linkedUserID;
+    protected boolean canExpire;
+    protected LocalDateTime expiryDate;
+    protected String expireString;
+    protected java.util.Date expiryDateUtilDate;
+    protected String expiryNotes;
+    protected boolean active;
+    protected int linkedUserID;
     
     /**
      * Tenancy tracking
      */
-    private boolean under18;
-    private int verifiedByUserID;
+    protected boolean under18;
+    protected int verifiedByUserID;
     
-    private boolean referencePerson;
+    protected boolean referencePerson;
     
-    private LocalDateTime ghostCreatedDate;
-    private String ghostCreatedDatePretty;
-    private int ghostOf;
-    private int ghostCreatedByUserID;
+    protected LocalDateTime ghostCreatedDate;
+    protected String ghostCreatedDatePretty;
+    protected int ghostOf;
+    protected int ghostCreatedByUserID;
     
-    private LocalDateTime cloneCreatedDate;
-    private String cloneCreatedDatePretty;
-    private int cloneOf;
-    private int cloneCreatedByUserID;
+    protected LocalDateTime cloneCreatedDate;
+    protected String cloneCreatedDatePretty;
+    protected int cloneOf;
+    protected int cloneCreatedByUserID;
     
-    private ArrayList<Integer> ghostsList;
-    private ArrayList<Integer> cloneList;
-    private ArrayList<Integer> mergedList;
+    protected ArrayList<Integer> ghostsList;
+    protected ArrayList<Integer> cloneList;
+    protected ArrayList<Integer> mergedList;
+    //used in applying for occupancy.
     
-    private boolean applicant; //used in applying for occupancy.
     
 
     /**
@@ -916,12 +916,5 @@ public class Person extends EntityUtils implements Serializable{
         this.mergedList = mergedList;
     }
     
-    public boolean isApplicant() {
-        return applicant;
-    }
-
-    public void setApplicant(boolean applicant) {
-        this.applicant = applicant;
-    }
 
 }

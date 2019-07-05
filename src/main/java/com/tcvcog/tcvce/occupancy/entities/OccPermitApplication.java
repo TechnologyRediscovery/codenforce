@@ -31,7 +31,6 @@ import java.util.List;
 public class OccPermitApplication {
     private int id;
     private OccPermitApplicationReason reason;
-    private boolean multiUnit;
     private LocalDateTime submissionDate;
     private Date submissionDateUtilDate;;
     private String submissionNotes;
@@ -62,12 +61,6 @@ public class OccPermitApplication {
         return reason;
     }
 
-    /**
-     * @return the multiUnit
-     */
-    public boolean isMultiUnit() {
-        return multiUnit;
-    }
 
     /**
      * @return the submissionDate
@@ -104,12 +97,6 @@ public class OccPermitApplication {
         this.reason = reason;
     }
 
-    /**
-     * @param multiUnit the multiUnit to set
-     */
-    public void setMultiUnit(boolean multiUnit) {
-        this.multiUnit = multiUnit;
-    }
 
     /**
      * @param submissionDate the submissionDate to set

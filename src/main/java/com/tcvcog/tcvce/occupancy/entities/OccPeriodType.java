@@ -33,19 +33,24 @@ public class OccPeriodType {
     private String authorizeduses;
     private String description;
     private boolean userassignable;
+    
     private boolean permittable;
     private boolean startdaterequired;
     private boolean enddaterequired;
-    private boolean completedinspectionrequired;
+    private boolean passedInspectionRequired;
+    
     private boolean rentalcompatible;
     private boolean active;
     private boolean allowthirdpartyinspection;
     private List<PersonType> optionalpersontypeList;
+    
     private List<PersonType> requiredPersontypeList;
     private boolean commercial;
-    private List<Fee> feeList;
     private boolean requirepersontypeentrycheck;
+    
+    private int defaultValidityPeriodDays;
 
+    private List<Fee> feeList;
     /**
      * @return the typeid
      */
@@ -110,10 +115,10 @@ public class OccPeriodType {
     }
 
     /**
-     * @return the completedinspectionrequired
+     * @return the passedInspectionRequired
      */
-    public boolean isCompletedinspectionrequired() {
-        return completedinspectionrequired;
+    public boolean isPassedInspectionRequired() {
+        return passedInspectionRequired;
     }
 
     /**
@@ -236,10 +241,10 @@ public class OccPeriodType {
     }
 
     /**
-     * @param completedinspectionrequired the completedinspectionrequired to set
+     * @param passedInspectionRequired the passedInspectionRequired to set
      */
-    public void setCompletedinspectionrequired(boolean completedinspectionrequired) {
-        this.completedinspectionrequired = completedinspectionrequired;
+    public void setPassedInspectionRequired(boolean passedInspectionRequired) {
+        this.passedInspectionRequired = passedInspectionRequired;
     }
 
     /**
@@ -287,7 +292,7 @@ public class OccPeriodType {
     /**
      * @param fee the fee to set
      */
-    public void setFee(List<Fee> fee) {
+    public void setFeeList(List<Fee> fee) {
         this.feeList = fee;
     }
 
@@ -296,6 +301,20 @@ public class OccPeriodType {
      */
     public void setRequirepersontypeentrycheck(boolean requirepersontypeentrycheck) {
         this.requirepersontypeentrycheck = requirepersontypeentrycheck;
+    }
+
+    /**
+     * @return the defaultValidityPeriodDays
+     */
+    public int getDefaultValidityPeriodDays() {
+        return defaultValidityPeriodDays;
+    }
+
+    /**
+     * @param defaultValidityPeriodDays the defaultValidityPeriodDays to set
+     */
+    public void setDefaultValidityPeriodDays(int defaultValidityPeriodDays) {
+        this.defaultValidityPeriodDays = defaultValidityPeriodDays;
     }
     
 }
