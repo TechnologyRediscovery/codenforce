@@ -26,13 +26,12 @@ import java.time.LocalDateTime;
 public class Fee {
     private int occupancyInspectionFeeID;
     private Municipality muni;
-    
-    //the rest of these DIE
-    private String occupancyInspectionFeeName;
-    private double occupancyInspectionFeeAmount;
-    private LocalDateTime occupancyInspectionFeeEffDate;
-    private LocalDateTime occupancyInspectionFeeExpDate;
-    private String occupancyInspectionFeeNotes;
+
+    private String feeName;
+    private double feeAmount;
+    private LocalDateTime effectiveDate;
+    private LocalDateTime expiryDate;
+    private String notes;
 
     public Fee(){
         
@@ -66,73 +65,45 @@ public class Fee {
         this.muni = muni;
     }
 
-    /**
-     * @return the occupancyInspectionFeeName
-     */
-    public String getOccupancyInspectionFeeName() {
-        return occupancyInspectionFeeName;
+    public String getFeeName() {
+        return feeName;
     }
 
-    /**
-     * @param occupancyInspectionFeeName the occupancyInspectionFeeName to set
-     */
-    public void setOccupancyInspectionFeeName(String occupancyInspectionFeeName) {
-        this.occupancyInspectionFeeName = occupancyInspectionFeeName;
+    public void setFeeName(String feeName) {
+        this.feeName = feeName;
     }
 
-    /**
-     * @return the occupancyInspectionFeeAmount
-     */
-    public double getOccupancyInspectionFeeAmount() {
-        return occupancyInspectionFeeAmount;
+    public double getFeeAmount() {
+        return feeAmount;
     }
 
-    /**
-     * @param occupancyInspectionFeeAmount the occupancyInspectionFeeAmount to set
-     */
-    public void setOccupancyInspectionFeeAmount(double occupancyInspectionFeeAmount) {
-        this.occupancyInspectionFeeAmount = occupancyInspectionFeeAmount;
+    public void setFeeAmount(double feeAmount) {
+        this.feeAmount = feeAmount;
     }
 
-    /**
-     * @return the occupancyInspectionFeeEffDate
-     */
-    public LocalDateTime getOccupancyInspectionFeeEffDate() {
-        return occupancyInspectionFeeEffDate;
+    public LocalDateTime getEffectiveDate() {
+        return effectiveDate;
     }
 
-    /**
-     * @param occupancyInspectionFeeEffDate the occupancyInspectionFeeEffDate to set
-     */
-    public void setOccupancyInspectionFeeEffDate(LocalDateTime occupancyInspectionFeeEffDate) {
-        this.occupancyInspectionFeeEffDate = occupancyInspectionFeeEffDate;
+    public void setEffectiveDate(LocalDateTime effectiveDate) {
+        this.effectiveDate = effectiveDate;
     }
 
-    /**
-     * @return the occupancyInspectionFeeExpDate
-     */
-    public LocalDateTime getOccupancyInspectionFeeExpDate() {
-        return occupancyInspectionFeeExpDate;
+    public LocalDateTime getExpiryDate() {
+        return expiryDate;
     }
 
-    /**
-     * @param occupancyInspectionFeeExpDate the occupancyInspectionFeeExpDate to set
-     */
-    public void setOccupancyInspectionFeeExpDate(LocalDateTime occupancyInspectionFeeExpDate) {
-        this.occupancyInspectionFeeExpDate = occupancyInspectionFeeExpDate;
+    public void setExpiryDate(LocalDateTime expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
-    /**
-     * @return the occupancyInspectionFeeNotes
-     */
-    public String getOccupancyInspectionFeeNotes() {
-        return occupancyInspectionFeeNotes;
+    public String getNotes() {
+        return notes;
     }
 
-    /**
-     * @param occupancyInspectionFeeNotes the occupancyInspectionFeeNotes to set
-     */
-    public void setOccupancyInspectionFeeNotes(String occupancyInspectionFeeNotes) {
-        this.occupancyInspectionFeeNotes = occupancyInspectionFeeNotes;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
+
+    
 }

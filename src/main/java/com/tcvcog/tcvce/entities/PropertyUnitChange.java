@@ -31,9 +31,9 @@ import java.sql.Timestamp;
 public class PropertyUnitChange {
 
     private int unitChangeID;
-    private String changedBy; //personID of the person who changed the unit.
+    private String changedBy; 
     private int unitID;
-    private int approvedBy; //personID of the user that approved the change (a backend operation)
+    private User approvedBy; 
     private String unitNumber;
     private String otherKnownAddress;
     private String notes;
@@ -80,11 +80,11 @@ public class PropertyUnitChange {
         this.unitNumber = unitNumber;
     }
 
-    public int getApprovedBy() {
+    public User getApprovedBy() {
         return approvedBy;
     }
 
-    public void setApprovedBy(int approvedBy) {
+    public void setApprovedBy(User approvedBy) {
         this.approvedBy = approvedBy;
     }
 
