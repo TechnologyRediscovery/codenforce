@@ -931,7 +931,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private EventProposalImplementation generateEventProposalImplementation(ResultSet rs) throws SQLException, IntegrationException{
+     private EventProposalImplementation generateEventProposalImplementation(ResultSet rs) throws SQLException, IntegrationException{
         EventProposalImplementation propImp = new EventProposalImplementation();
         UserIntegrator ui = getUserIntegrator();
         

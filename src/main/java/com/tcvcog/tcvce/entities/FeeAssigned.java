@@ -17,97 +17,12 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class FeeAssigned  extends EntityUtils implements Serializable {
-
-    private List<Payment> paymentList;
-    private int moneyFeeAssigned;
-    private int assignedBy;
-    private int waivedBy;
-    private LocalDateTime lastModified;
-    private double reducedBy;
-    private User reducedByUser;
-    private String notes;
-    private int feeID;
-
-    public List<Payment> getPaymentList() {
-        return paymentList;
-    }
-
-    public void setPaymentList(List<Payment> paymentList) {
-        this.paymentList = paymentList;
-    }
-
-    public int getMoneyFeeAssigned() {
-        return moneyFeeAssigned;
-    }
-
-    public void setMoneyFeeAssigned(int moneyFeeAssigned) {
-        this.moneyFeeAssigned = moneyFeeAssigned;
-    }
-
-    public int getAssignedBy() {
-        return assignedBy;
-    }
-
-    public void setAssignedBy(int assignedBy) {
-        this.assignedBy = assignedBy;
-    }
-
-    public int getWaivedBy() {
-        return waivedBy;
-    }
-
-    public void setWaivedBy(int waivedBy) {
-        this.waivedBy = waivedBy;
-    }
-
-    public LocalDateTime getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(LocalDateTime lastModified) {
-        this.lastModified = lastModified;
-    }
-
-    public double getReducedBy() {
-        return reducedBy;
-    }
-
-    public void setReducedBy(double reducedBy) {
-        this.reducedBy = reducedBy;
-    }
-
-    public User getReducedByUser() {
-        return reducedByUser;
-    }
-
-    public void setReducedByUser(User reducedByUser) {
-        this.reducedByUser = reducedByUser;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public int getFeeID() {
-        return feeID;
-    }
-
-    public void setFeeID(int feeID) {
-        this.feeID = feeID;
-    }
-    
+public class FeeAssigned extends Fee implements Serializable {
     
     
     

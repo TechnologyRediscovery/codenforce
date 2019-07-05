@@ -70,7 +70,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
         o.setOccupancyPermitTypeDescription(newFormOccupancyPermitTypeDescription);
         
         try{
-            oi.insertOccupancyPermitType(o);
+            oi.insertOccPeriodType(o);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Occupancy Permit Type updated!", ""));
@@ -87,7 +87,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
         OccupancyIntegrator opti = getOccupancyIntegrator();
         if(getSelectedOccupancyPermitType() != null){
             try {
-                opti.deleteOccupancyPermitType(getSelectedOccupancyPermitType());
+                opti.deleteOccPeriodType(getSelectedOccupancyPermitType());
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Occupancy permit type deleted forever!", ""));
@@ -130,7 +130,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
         o.setOccupancyPermitTypeDescription(formOccupancyPermitTypeDescription);
         
         try{
-            oi.updateOccupancyPermitType(o);
+            oi.updateOccPeriodType(o);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Occupancy Permit Type updated!", ""));
@@ -152,7 +152,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
         o.setOccupancyPermitTypeDescription(formOccupancyPermitTypeDescription);
         
         try {
-            oi.insertOccupancyPermitType(o);
+            oi.insertOccPeriodType(o);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Successfully added occupancy permit type to database!", ""));
@@ -176,7 +176,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
     public ArrayList<OccPeriodType> getOccupancyPermitTypeList() {
         try {
             OccupancyIntegrator oi = getOccupancyIntegrator();
-            occupancyPermitTypeList = oi.getOccupancyPermitTypeList();
+            occupancyPermitTypeList = oi.getCompleteOccPeriodTypeList();
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

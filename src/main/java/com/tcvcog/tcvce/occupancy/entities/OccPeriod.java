@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.EventProposalImplementation;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
@@ -25,7 +26,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private int propertyUnitID;
     
     private List<OccPermitApplication> applicationList;
-    private List<Person> personList;
+    private List<PersonOccPeriod> personList;
     private List<OccEvent> eventList;
     private List<EventProposalImplementation> eventProposalList;
     private List<OccInspection> inspectionList;
@@ -49,6 +50,8 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private LocalDateTime endDate;
     private LocalDateTime endDateCertifiedTS;
     private User endDateCertifiedBy;
+    
+    private int defaultValidityPeriodDays;
     
     private LocalDateTime authorizedTS;
     private User authorizedBy;
@@ -81,7 +84,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     /**
      * @return the personList
      */
-    public List<Person> getPersonList() {
+    public List<PersonOccPeriod> getPersonList() {
         return personList;
     }
 
@@ -263,7 +266,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     /**
      * @param personList the personList to set
      */
-    public void setPersonList(List<Person> personList) {
+    public void setPersonList(List<PersonOccPeriod> personList) {
         this.personList = personList;
     }
 
@@ -419,6 +422,20 @@ public class OccPeriod extends EntityUtils implements Serializable{
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the defaultValidityPeriodDays
+     */
+    public int getDefaultValidityPeriodDays() {
+        return defaultValidityPeriodDays;
+    }
+
+    /**
+     * @param defaultValidityPeriodDays the defaultValidityPeriodDays to set
+     */
+    public void setDefaultValidityPeriodDays(int defaultValidityPeriodDays) {
+        this.defaultValidityPeriodDays = defaultValidityPeriodDays;
     }
      
     

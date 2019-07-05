@@ -28,7 +28,7 @@ public class PersonOccPeriod extends Person implements Serializable{
     this. muniName = p.muniName;
     
     this.sourceID = p.sourceID;
-    this.source = p.source;
+    this. sourceTitle = p.sourceTitle;
     this.creatorUserID = p.creatorUserID;
     this.creationTimeStamp = p.creationTimeStamp;
     
