@@ -107,8 +107,5 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
     public void setFeeID(int feeID) {
         this.feeID = feeID;
     }
-    
-    
-    
-    
+        
 }

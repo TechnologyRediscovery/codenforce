@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -27,11 +28,14 @@ import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPermit;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
 import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
 import com.tcvcog.tcvce.occupancy.entities.OccPeriodType;
 import com.tcvcog.tcvce.occupancy.entities.OccAppPersonRequirement;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriod;
 import java.io.Serializable;
 import java.sql.Array;
 import java.sql.Connection;
@@ -42,7 +46,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Integration methods that return populated business objects with all their
+ * composite elements all nicely situated on shelves and in Lists
+ * 
+ * High-level object families produced here include:
+ * OccPeriod
+ * OccPeriodType
+ * OccPermit
+ * OccPermitApplication
+ * 
  * @author Eric C. Darsow
  */
 public class OccupancyIntegrator extends BackingBeanUtils implements Serializable {
@@ -53,7 +65,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     public OccupancyIntegrator() {
     }
     
-    public OccPermit getOccupancyPermit(int permitID) throws IntegrationException{
+    public OccPermit getOccPermit(int permitID) throws IntegrationException{
         OccPermit op = null;
         
         String query =  "SELECT permitid, referenceno, occinspec_inspectionid, permittype, dateissued, \n" +
@@ -70,7 +82,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(1, permitID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                op = generateOccupancyPermit(rs);
+                op = generateOccPermit(rs);
             }
             
         } catch (SQLException ex) {
@@ -85,7 +97,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         
     }
     
-    public OccPermit generateOccupancyPermit(ResultSet rs) throws SQLException, IntegrationException{
+    private OccPermit generateOccPermit(ResultSet rs) throws SQLException, IntegrationException{
         OccupancyInspectionIntegrator ii = getOccupancyInspectionIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         
@@ -103,11 +115,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return op;
     }
     
-    public ArrayList<OccPermit> getOccupancyPermitList(PropertyUnit pu){
+    public ArrayList<OccPermit> getOccPermitList(PropertyUnit pu){
         return new ArrayList();
     }
     
-    public ArrayList<OccPermit> getOccupancyPermitList(Property p) throws IntegrationException{
+    public ArrayList<OccPermit> getOccPermitList(Property p) throws IntegrationException{
         
         ArrayList<OccPermit> permitList = new ArrayList();
         String query =  " ";
@@ -139,7 +151,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     
     
-    public void updateOccupancyPermitType(OccPeriodType opt) throws IntegrationException {
+    public void updateOccPeriodType(OccPeriodType opt) throws IntegrationException {
         String query = "UPDATE public.occpermittype\n" +
                     "   SET typename=?, typedescription=?\n" +
                     " WHERE typeid=?;";
@@ -164,7 +176,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
     }
     
-    public void deleteOccupancyPermitType(OccPeriodType opt) throws IntegrationException{
+    public void deleteOccPeriodType(OccPeriodType opt) throws IntegrationException{
          String query = "DELETE FROM public.occpermittype\n" +
                         " WHERE typeid=?;";
         Connection con = getPostgresCon();
@@ -187,20 +199,51 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    public ArrayList<OccPeriodType> getOccupancyPermitTypeList() throws IntegrationException{
-        String query = "SELECT typeid, muni_municode, typename, typedescription\n" +
-                       "  FROM public.occpermittype";
+    public OccPeriodType getOccPeriodType(int typeid) throws IntegrationException{
+        OccPeriodType tpe = null;
+        String query =  "   SELECT typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
+                            "       permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n" +
+                            "       rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
+                            "       requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
+                            "       defaultvalidityperioddays\n" +
+                            "  FROM public.occperiodtype WHERE typeid=?;";
+        
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<OccPeriodType> occupancyPermitTypeList = new ArrayList();
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, typeid);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                tpe = generateOccPeriodType(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return tpe;
+    }
+    
+    
+    public List<OccPeriodType> getCompleteOccPeriodTypeList(Municipality m) throws IntegrationException{
+        ArrayList<OccPeriodType> occPeriodTypeList = new ArrayList<>();
+        String query = "SELECT typeid\n" +
+                        "  FROM public.occperiodtype WHERE muni_municode = ?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
-            System.out.println("OccupancyPermitTypeIntegrator.getOccupancyPermitTypeList | SQL: " + stmt.toString());
+            System.out.println("OccupancyPermitTypeIntegrator.getCompleteOccPeriodTypelist| SQL: " + stmt.toString());
             while(rs.next()){
-                occupancyPermitTypeList.add(generateOccupancyPermitType(rs));
+                occPeriodTypeList.add(getOccPeriodType(rs.getInt("typeid")));
             }
             
         } catch (SQLException ex) {
@@ -211,25 +254,50 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         }
-        return occupancyPermitTypeList;        
+        return occPeriodTypeList;        
     }
     
     
-    public void insertOccupancyPermitType(OccPeriodType occupancyPermitType) throws IntegrationException{
-        String query = "INSERT INTO public.occpermittype(\n" +
-                    "  typeid, muni_municode, typename, typedescription)\n" +
-                    "  VALUES (DEFAULT, ?, ?, ?)";
+    public void insertOccPeriodType(OccPeriodType periodType) throws IntegrationException{
+        String query = "INSERT INTO public.occperiodtype(\n" +
+                        "            typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
+                        "            permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n" +
+                        "            rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
+                        "            requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
+                        "            defaultvalidityperioddays)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, \n" +
+                        "            ?);";
     
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         
         try{
             stmt = con.prepareStatement(query);
-            //stmt.setInt(1, occupancyPermitType.getOccupancyPermitTypeMuniCodeID());
-            stmt.setInt(1, occupancyPermitType.getMuni().getMuniCode());
-            stmt.setString(2, occupancyPermitType.getOccupancyPermitTypeName());
-            stmt.setString(3, occupancyPermitType.getOccupancyPermitTypeDescription());
-            System.out.println("OccupancyPermitTypeIntegrator.occupancyPermitTypeIntegrator | sql: " + stmt.toString());
+            stmt.setInt(1, periodType.getMuni().getMuniCode());
+            stmt.setString(2, periodType.getTitle());
+            stmt.setString(3, periodType.getAuthorizeduses());
+            stmt.setString(4, periodType.getDescription());
+            stmt.setBoolean(5, periodType.isUserassignable());
+            
+            stmt.setBoolean(6, periodType.isPermittable());
+            stmt.setBoolean(7, periodType.isStartdaterequired());
+            stmt.setBoolean(8, periodType.isEnddaterequired());
+            stmt.setBoolean(8, periodType.isPassedInspectionRequired());
+            
+            stmt.setBoolean(9, periodType.isRentalcompatible());
+            stmt.setBoolean(10, periodType.isActive());
+            stmt.setBoolean(11, periodType.isAllowthirdpartyinspection());
+            stmt.setArray(12, con.createArrayOf("integer", periodType.getOptionalpersontypeList().toArray()));
+            
+            stmt.setArray(13, con.createArrayOf("integer", periodType.getRequiredPersontypeList().toArray()));
+            stmt.setBoolean(14, periodType.isCommercial());
+            stmt.setBoolean(15, periodType.isRequirepersontypeentrycheck());
+            
+            stmt.setInt(16, periodType.getDefaultValidityPeriodDays());
+            
             stmt.execute();
         } catch (SQLException ex){
             System.out.println(ex.toString());
@@ -243,22 +311,40 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     
     
-    private OccPeriodType generateOccupancyPermitType(ResultSet rs) throws IntegrationException{
-        OccPeriodType newOpt = new OccPeriodType();
+    private OccPeriodType generateOccPeriodType(ResultSet rs) throws IntegrationException{
+        OccPeriodType opt = new OccPeriodType();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try{
-            newOpt.setOccupancyPermitTypeID(rs.getInt("typeid"));
-            newOpt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
-            newOpt.setOccupancyPermitTypeName(rs.getString("typename"));
-            newOpt.setOccupancyPermitTypeDescription(rs.getString("typedescription"));
+            opt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
+            opt.setTitle(rs.getString("title"));
+            opt.setAuthorizeduses(rs.getString("authorizeduses"));
+            opt.setDescription(rs.getString("description"));
+            opt.setUserassignable(rs.getBoolean("userassignable"));
+            opt.setPermittable(rs.getBoolean("permittable"));
+            
+            opt.setStartdaterequired(rs.getBoolean("startdaterequired"));
+            opt.setEnddaterequired(rs.getBoolean("enddaterequired"));
+            opt.setPassedInspectionRequired(rs.getBoolean("passedinspectionrequired"));
+            opt.setRentalcompatible(rs.getBoolean("rentalcompatible"));
+            opt.setActive(rs.getBoolean("active"));
+            opt.setAllowthirdpartyinspection(rs.getBoolean("allowthirdpartyinspection"));
+            opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
+            
+            opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
+            opt.setCommercial(rs.getBoolean("commercial"));
+            opt.setRequirepersontypeentrycheck(rs.getBoolean("requirepersontypeentrycheck"));
+            opt.setDefaultValidityPeriodDays(rs.getInt("defaultvalidityperioddays"));
+            
+            // wire up when nathan is done
+            // opt.setFeeList(fee);
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generating OccPermitType from ResultSet", ex);
         }
         
-         return newOpt;
+         return opt;
     }
     
     public void insertOccPermitApplication(OccPermitApplication application) throws IntegrationException{
@@ -364,10 +450,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     public OccPermitApplication getOccPermitApplication(int applicationID) throws IntegrationException {
         OccPermitApplication occpermitapp = null;     
-        String query = "SELECT applicationid, multiunit, reason_reasonid, submissiontimestamp, "
-                + "occupancyinspection_id, submitternotes, internalnotes, propertyunitid\n"
-                + "FROM occupancypermitapplication\n"
-                + "WHERE occupancypermitapplication.applicationid = ?;";
+        String query =  "   SELECT applicationid, reason_reasonid, submissiontimestamp, occupancyinspection_id, \n" +
+                        "       submitternotes, internalnotes, propertyunitid, declaredtotaladults, \n" +
+                        "       declaredtotalyouth\n" +
+                        "  FROM public.occpermitapplication WHERE applicationid=?;";
         
         Connection con = null;
         PreparedStatement stmt = null;
@@ -399,7 +485,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             occpermitapp.setId(rs.getInt("applicationid"));
             occpermitapp.setReason(getOccPermitApplicationReason(rs.getInt("reasonid")));
-            occpermitapp.setMultiUnit(rs.getBoolean("multiunit"));
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
             occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
@@ -410,6 +495,34 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                     + "IntegrationException: Unable to generate occupancy permit application ", ex);
         }
         return occpermitapp;
+    }
+    
+    public List<OccPermitApplication> getOccPermitApplicationList(OccPeriod op) throws IntegrationException{
+        List<OccPermitApplication> occpermitappList = new ArrayList<>();
+        String query =  "SELECT occpermitapp_applicationid\n" +
+                        "  FROM public.occperiodpermitapplication WHERE occperiod_periodid = ?;   ";
+        
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, op.getPeriodid());
+            rs= stmt.executeQuery();
+            
+            while (rs.next()) {
+                occpermitappList.add(getOccPermitApplication(rs.getInt("occpermitapp_applicationid")));
+            }
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyIntegrator.getOccPermitApplicationList", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        return occpermitappList;
+        
     }
     
     public void updateOccPermitApplication(OccPermitApplication application) throws IntegrationException{
@@ -572,6 +685,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         String[] convertedPersonTypes = null;
         
         try {
+            
             Array personTypes = rs.getArray("requiredpersontypes");
             convertedPersonTypes = (String[]) personTypes.getArray();
             
@@ -618,9 +732,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         String[] convertedPersonTypes = null;
         
         try {
-            Array personTypes = rs.getArray("optionalpersontypes");
-            if (personTypes != null){ 
-            convertedPersonTypes = (String[]) personTypes.getArray();
+            java.sql.Array persTypesSQLArray = rs.getArray("optionalpersontypes");
+            if (persTypesSQLArray != null){ 
+            convertedPersonTypes = (String[]) persTypesSQLArray.getArray();
             }
             
         } catch(SQLException ex) {
@@ -646,7 +760,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      */
     public void insertOccPermitPersons (OccPermitApplication application) throws IntegrationException{
         
-        String query = "INSERT INTO public.occpermitapplicationperson(permitapp_applicationid, "
+        String query = "INSERT INTO public.occperiodperson(period_periodid, "
                 + "person_personid, applicant, preferredcontact, applicationpersontype)\n"
                 + "VALUES (?, ?, ?, ?, CAST (? AS persontype));";                
 
@@ -683,5 +797,152 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
         }   
     }
+    
+    
+    public OccPeriod getOccPeriod(int periodid) throws IntegrationException{
+        OccPeriod op = null;
+        String query =  "SELECT periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n" +
+                        "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n" +
+                        "       startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n" +
+                        "       manager_userid, authorizationts, authorizedby_userid, overrideperiodtypeconfig, \n" +
+                        "       notes, createdby_userid\n" +
+                        "  FROM public.occperiod WHERE periodid=?;";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+ 
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, periodid);
+            
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                op = generateOccPeriod(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return op;
+        
+        
+    }
+    
+    
+    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
+        ChecklistIntegrator ci = getChecklistIntegrator();
+        OccupancyInspectionIntegrator oii = getOccupancyInspectionIntegrator();
+        PersonIntegrator pi = getPersonIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        UserIntegrator ui = getUserIntegrator();
+        
+        OccPeriod op = new OccPeriod();
+        
+        op.setPeriodid(rs.getInt("periodid"));
+        
+        op.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+               
+        op.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        op.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
+        op.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+        op.setPeriodType(getOccPeriodType(rs.getInt("type_typeid")));
+        op.setPeriodTypeCertifiedBy(ui.getUser("typecertifiedby_userid"));
+        op.setPeriodTypeCertifiedTS(rs.getTimestamp("typecertifiedts").toLocalDateTime());
+        op.setStartDate(rs.getTimestamp("startdate").toLocalDateTime());
+        op.setStartDateCertifiedBy(ui.getUser(rs.getInt("startdatecertifiedby_userid")));
+        op.setStartDateCertifiedTS(rs.getTimestamp("startdatecertifiedts").toLocalDateTime());
+        op.setEndDate(rs.getTimestamp("enddate").toLocalDateTime());
+        op.setEndDateCertifiedBy(ui.getUser(rs.getInt("enddatecertifiedby_userid")));
+        op.setEndDateCertifiedTS(rs.getTimestamp("enddatecterifiedts").toLocalDateTime());
+        op.setManager(ui.getUser(rs.getInt("manager_userid")));
+        op.setAuthorizedTS(rs.getTimestamp("authorizationts").toLocalDateTime());
+        op.setAuthorizedBy(ui.getUser(rs.getInt("authorizedby_userid")));
+        op.setOverrideTypeConfig(rs.getBoolean("overrideperiodtypeconfig"));
+        op.setNotes(rs.getString("notes"));
+        
+        // now get all the lists from their respective integrators
+        // this is the Java version of table joins in SQL; we're doing them interatively
+        // in our integrators for each BOB
+        
+        
+        op.setApplicationList(getOccPermitApplicationList(op));
+        op.setPersonList(pi.getPersonList(op));
+        
+        op.setEventList(eventList);
+        op.setEventProposalList(eventProposalList);
+        op.setInspectionList(inspectionList);;
+        op.setPermitList(permitList);;
+        op.setPhotoIDList(photoIDList);
+        
+        
+        
+        
+        
+        return op;
+    }
+    
+    public void updateOccPeriod(OccPeriod op){
+        
+        
+        
+    }
+    
+    public void inactivateOccPeriod(OccPeriod op){
+        
+        
+        
+    }
+    
+    /*
+    
+     OccPeriodType tpe = null;
+        ArrayList<OccPermit> permitList = new ArrayList();
+        String query =  "SELECT typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
+                        "       permittable, startdaterequired, enddaterequired, completedinspectionrequired, \n" +
+                        "       rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
+                        "       requiredpersontypes, commercial, fee_feeid, requirepersontypeentrycheck\n" +
+                        "  FROM public.occperiodtype; ";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+ 
+        try {
+            
+            stmt = con.prepareStatement(query);
+//            stmt.setInt(1, permitID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                //permitList.add(generateOccupancyPermit(rs.getInt("permitid")));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { } }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) {  } }
+        } // close finally
+        return new ArrayList();
+        
+    **/
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 }
