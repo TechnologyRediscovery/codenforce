@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import java.io.Serializable;
@@ -24,7 +25,7 @@ import org.primefaces.context.RequestContext;
  */
 public class linkBlobBB extends BackingBeanUtils implements Serializable{
     
-    private int codeViolationID, propertyID, selectedBlobID;
+    private int codeViolationID, propertyID, selectedBlobID, personID;
 
     /**
      * Creates a new instance of linkBlobBB
@@ -84,6 +85,28 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         
     }
     
+    public void linkBlobToPerson() {
+        BlobIntegrator bi = getBlobIntegrator();
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        try{
+            pi.getPerson(getPersonID());
+        }catch(IntegrationException e){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR
+                            ,"Unable to find Person with that ID. " , ""));
+            return;
+        }
+        
+        try {
+            bi.linkBlobToPerson(selectedBlobID, getPersonID());
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR
+                            ,"Failed to link file to Person. Sorry! " , ""));
+        }
+    }
+    
     public String navToDash() {
         return "missionControl";
     }
@@ -129,5 +152,19 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
     public void setSelectedBlobID(int selectedBlobID) {
         System.out.println("linkBlobBB.setSelectedBlobID | blobID = " + selectedBlobID);
         this.selectedBlobID = selectedBlobID;
+    }
+
+    /**
+     * @return the personID
+     */
+    public int getPersonID() {
+        return personID;
+    }
+
+    /**
+     * @param personID the personID to set
+     */
+    public void setPersonID(int personID) {
+        this.personID = personID;
     }
 }

@@ -49,4 +49,7 @@ public enum BlobType {
     public void setTypeIcon(Icon typeIcon) {
         this.typeIcon = typeIcon;
     }
+    
+    
+    
 }
