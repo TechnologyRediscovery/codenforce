@@ -32,7 +32,7 @@ public enum BlobType {
     
     
     
-    public int getTypID(){
+    public int getTypeID(){
         return this.typeID;
     }
 
