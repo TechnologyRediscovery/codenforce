@@ -30,7 +30,7 @@
                                 update=":uploadBlobReviewBlobsForm:blobTable"
                                 multiple="true"
                                 sizeLimit="900000000" 
-                                allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
+                                allowTypes="/(\.|\/)(jpe?g|png|pdf)$/"/>    
                         </h:form>
                         
                         <p:spacer height="5px"/>
@@ -56,7 +56,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Photo"/>
                                             </f:facet>
-                                            <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                            <p:graphicImage width="50%" value="#{blobCoordinator.image}">
                                                 <f:param name="blobID" value="#{blob.blobID}" />
                                             </p:graphicImage>
                                         </p:column>
