@@ -17,7 +17,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -68,6 +72,53 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
         
         return blob;
+        
+    }
+    
+    /**
+     * 
+     * @return list of blobs uploaded in the past month
+     * @throws IntegrationException 
+     */
+    public List<Blob> getRecentBlobs() throws IntegrationException{
+        Blob blob = null;
+        ArrayList<Blob> blobList = new ArrayList();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT photodocid, photodocdescription, photodocdate, photodoctype_typeid, \n" +
+                        "       photodocblob, \n" +
+                        "       photodocuploadpersonid \n" +
+                        "  FROM public.photodoc WHERE photodocdate > ?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setTimestamp(1, java.sql.Timestamp.from(LocalDateTime.now().minusMonths(1)  // past month offset
+                    .atZone(ZoneId.systemDefault()).toInstant()));
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                blob = new Blob();
+                blob.setBlobID(rs.getInt("photodocid"));
+                blob.setDescription(rs.getString("photodocdescription"));
+                blob.setTimestamp(rs.getTimestamp("photodocdate").toLocalDateTime());
+                blob.setType(BlobType.blobTypeFromInt(rs.getInt("photodoctype_typeid")));
+                blob.setBytes(rs.getBytes("photodocblob"));
+                blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
+                blobList.add(blob);
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving list of recent blobs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return blobList;
         
     }
     
@@ -147,7 +198,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.executeQuery();
         } catch (SQLException ex) {
             //System.out.println(ex);
-            throw new IntegrationException("Error deleting blob. ", ex);
+            throw new IntegrationException("Error deleting link. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -164,7 +215,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.executeQuery();
         } catch (SQLException ex) {
             //System.out.println(ex);
-            throw new IntegrationException("Error deleting blob. ", ex);
+            throw new IntegrationException("Error deleting link. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -183,7 +234,25 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.executeQuery();
         } catch (SQLException ex) {
             //System.out.println(ex);
-            throw new IntegrationException("Error deleting blob. ", ex);
+            throw new IntegrationException("Error deleting link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        //person linker table
+        query = "DELETE" +
+                        "  FROM public.personphotodoc WHERE photodoc_photodocid = ?;";
+        
+        stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.executeQuery();
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error deleting link. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -275,7 +344,31 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             //System.out.println(ex);
-            throw new IntegrationException("Error linking Blob to CodeViolation", ex);
+            throw new IntegrationException("Error linking Blob to Property", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public void linkBlobToPerson(int blobID, int personID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.personphotodoc(\n" +
+                        "            photodoc_photodocid, person_personid)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, personID);
+            stmt.execute();
+            System.out.println("BlobIntegrator.linkBlobToProperty | link succesfull. ");
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error linking Blob to Person", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

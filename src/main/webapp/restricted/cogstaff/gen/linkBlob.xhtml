@@ -66,6 +66,12 @@
                                     </f:facet>
                                     <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkProperty-dlg').show()" update=":linkBlobForm:linkProperty-dlg"/>
                                 </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Link to Person"/>
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkPerson-dlg').show()" update=":linkBlobForm:linkPerson-dlg"/>
+                                </p:column>
                             </p:dataTable>
                             
                             <p:dialog id="linkCV-dlg"
@@ -90,6 +96,18 @@
                                 <h2>Enter the ID of the Property</h2>
                                 <p:inputNumber value="#{linkBlobBB.propertyID}" thousandSeparator="" label="Property ID" decimalPlaces="0"/>
                                 <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.linkBlobToProperty()}" oncomplete="PF('linkProperty-dlg').hide()" update=":linkBlobForm:linkProperty-dlg"/>
+                            </p:dialog>
+                            
+                            <p:dialog id="linkPerson-dlg"
+                                      header="Link selected file to Person" 
+                                      widgetVar="linkPerson-dlg" 
+                                      responsive="true" 
+                                      width="400"
+                                      modal="false"
+                                      height="600">
+                                <h2>Enter the ID of the Person</h2>
+                                <p:inputNumber value="#{linkBlobBB.personID}" thousandSeparator="" label="Person ID" decimalPlaces="0"/>
+                                <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.linkBlobToPerson()}" oncomplete="PF('linkPerson-dlg').hide()" update=":linkBlobForm:linkPerson-dlg"/>
                             </p:dialog>
                             
                             <p:spacer height="5px"/>
