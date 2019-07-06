@@ -763,6 +763,13 @@
             <to-view-id>/restricted/cogstaff/gen/uploadBlob.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>manageBlob</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/manageBlob.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
     </navigation-rule>
     
     <navigation-rule>

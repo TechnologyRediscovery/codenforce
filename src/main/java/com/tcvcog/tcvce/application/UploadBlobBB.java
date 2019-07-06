@@ -55,6 +55,10 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable{
         Blob blob = blobc.getNewBlob();  //init new blob
         blob.setBytes(ev.getFile().getContents());  // set bytes 
         
+        // set filename
+        blob.setFilename(ev.getFile().getFileName());
+        
+        // set type
         if(fileType.contains("jpg") || fileType.contains("gif") || fileType.contains("png")) blob.setType(BlobType.PHOTO);
         else if(fileType.contains("pdf"))blob.setType(BlobType.PDF);
         

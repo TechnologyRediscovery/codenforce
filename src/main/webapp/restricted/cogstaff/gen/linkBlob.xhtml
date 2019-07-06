@@ -37,14 +37,14 @@
                                     <f:facet name="header">
                                         <h:outputText value="File Type"/>
                                     </f:facet>
-                                    <h:outputText value="#{blob.type.typID}"/>
+                                    <h:outputText value="#{blob.type.typeID}"/>
                                     <!-- type icon here -->
                                 </p:column>
                                 <p:column width="70%">
                                     <f:facet name="header">
-                                        <h:outputText value="Photo"/>
+                                        <h:outputText value="File"/>
                                     </f:facet>
-                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                    <p:graphicImage width="50%" value="#{blobCoordinator.image}">
                                         <f:param name="blobID" value="#{blob.blobID}" />
                                     </p:graphicImage>
                                 </p:column>

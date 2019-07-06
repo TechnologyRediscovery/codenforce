@@ -23,7 +23,7 @@ public class Blob {
 
     private int blobID;
     private BlobType type;
-    private String description;
+    private String description, filename;
     private LocalDateTime timestamp;
     private int uploadPersonID;
     private byte[] bytes;
@@ -111,6 +111,20 @@ public class Blob {
      */
     public void setUploadPersonID(int uploadPersonID) {
         this.uploadPersonID = uploadPersonID;
+    }
+
+    /**
+     * @return the filename
+     */
+    public String getFilename() {
+        return filename;
+    }
+
+    /**
+     * @param filename the filename to set
+     */
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
     
 }
