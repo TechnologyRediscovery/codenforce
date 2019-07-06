@@ -58,13 +58,13 @@
                                     <f:facet name="header">
                                         <h:outputText value="Link to Code Violation"/>
                                     </f:facet>
-                                    <p:commandButton action="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkCV-dlg').show()" update=":linkBlobForm:linkCV-dlg"/>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkCV-dlg').show()" update=":linkBlobForm:linkCV-dlg"/>
                                 </p:column>
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Link to Property"/>
                                     </f:facet>
-                                    <p:commandButton action="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkProperty-dlg').show())" update=":linkBlobForm:linkProperty-dlg"/>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkProperty-dlg').show()" update=":linkBlobForm:linkProperty-dlg"/>
                                 </p:column>
                             </p:dataTable>
                             
@@ -77,8 +77,7 @@
                                       height="600">
                                 <h2>Enter the ID of the Code Violation</h2>
                                 <p:inputNumber value="#{linkBlobBB.codeViolationID}" thousandSeparator="" label="Code Violation ID" decimalPlaces="0"/>
-                                <p:commandButton immediate= "true" oncomplete="#{linkBlobBB.linkBlobToCodeViolation()}"/>
-                                <p:commandLink  value="close window" onclick="PF('linkCV-dlg').hide()" styleClass="noFill"/>
+                                <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.linkBlobToCodeViolation()}" oncomplete="PF('linkCV-dlg').hide()" update=":linkBlobForm:linkCV-dlg"/>
                             </p:dialog>
                             
                             <p:dialog id="linkProperty-dlg"
@@ -88,16 +87,15 @@
                                       width="400"
                                       modal="false"
                                       height="600">
-                                <h2>Enter the ID of the Code Violation</h2>
+                                <h2>Enter the ID of the Property</h2>
                                 <p:inputNumber value="#{linkBlobBB.propertyID}" thousandSeparator="" label="Property ID" decimalPlaces="0"/>
-                                <p:commandButton immediate= "true" oncomplete="#{linkBlobBB.linkBlobToProperty()}"/>
-                                <p:commandLink  value="close window" onclick="PF('linkToProperty-dlg').hide()" styleClass="noFill"/>
+                                <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.linkBlobToProperty()}" oncomplete="PF('linkProperty-dlg').hide()" update=":linkBlobForm:linkProperty-dlg"/>
                             </p:dialog>
                             
                             <p:spacer height="5px"/>
                             
                             <p:commandButton  ajax="false" tabindex="12"
-                                              value="Back to Dashboard" id="continueToLinkButton"
+                                              value="Back to Dashboard" id="backToDashButton"
                                               action="#{linkBlobBB.navToDash}"/>
                         </h:form>
                         

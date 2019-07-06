@@ -13,6 +13,9 @@ import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.logging.Level;
@@ -50,13 +53,22 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable{
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
             try {
                 Blob blob = bi.getBlob(blobID);
-                if(blob.getType() == BlobType.PHOTO)
-                    sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
-                else{
-                    throw new BlobTypeException("Attempted to display incompatible BLOB type. ");
+                if(null == blob.getType()) {
+                    throw new BlobTypeException("BlobType is null. ");
+                } else switch (blob.getType()) {
+                    case PHOTO:
+                        sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
+                        break;
+                    case PDF:
+                        sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
+                        break;
+                    default:
+                        throw new BlobTypeException("Attempted to display incompatible BLOB type. ");
                 }
             } catch (IntegrationException ex) {
                 System.out.println("BlobCoordinator.getImage | " + ex);
+            } catch (FileNotFoundException ex) {
+                System.out.println("BlobCoordinator.getImage | could not find pdf-icon.png ");
             }
             return sc;
         }

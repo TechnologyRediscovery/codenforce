@@ -42,6 +42,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         
         try{
             vi.getCodeViolation(codeViolationID);
+            System.out.println("linkBlobBB.linkBlobToCodeViolation | retrieved code violation");  //TESTING
         }catch(IntegrationException e){
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
@@ -51,14 +52,13 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         
         try {
             bi.linkBlobToCodeViolation(selectedBlobID, codeViolationID);
+            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Failed to link file to violation. Sorry! " , ""));
+                            ,"Failed to link file to selected violation. Sorry! " , ""));
         }
         
-        //close dialog window on view
-        RequestContext.getCurrentInstance().execute("linkCV-dlg.hide();");
     }
     
     public void linkBlobToProperty() {
@@ -82,8 +82,6 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
                             ,"Failed to link file to Property. Sorry! " , ""));
         }
         
-        //close dialog window on view
-        RequestContext.getCurrentInstance().execute("linkProperty-dlg.hide();");
     }
     
     public String navToDash() {
