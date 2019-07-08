@@ -6,7 +6,6 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,7 +19,6 @@ public class Directive extends EntityUtils {
     private String description;
     
     private List<Proposable> choiceList;
-    private List<Proposable> choiceListVisible;
     
     private User creator;
     
@@ -41,36 +39,7 @@ public class Directive extends EntityUtils {
     
     private boolean active;
     
-    /**
-     * Remember, for Directive and Proposal stuff, the hidden property
-     * only lives in JavaLand and not DB as it's determined programatically based
-     * on current User viewing and the Date/Time
-     */
-    private boolean hidden;
-    
     private Icon icon;
-    
-    private int relativeorder;
-    private boolean directPropToMuniSysAdmin;
-    private boolean requiredEvaluationForBOBClose;
-    private boolean forceHidePrecedingProps;
-    private boolean forceHideTrailingProps;
-    private boolean refuseToBeHidden;
-    
-    public Directive(){
-        
-    }
-    
-    
-      /**
-     * @param choiceListVisible the choiceListVisible to set
-     */
-    public void setChoiceListVisible(List<Proposable> choiceListVisible) {
-       
-    }
-    
-    
-    
 
     /**
      * @param directPropToDefaultMuniCEO the directPropToDefaultMuniCEO to set
@@ -340,122 +309,7 @@ public class Directive extends EntityUtils {
     public void setDirectiveID(int directiveID) {
         this.directiveID = directiveID;
     }
-
-    /**
-     * @return the directPropToMuniSysAdmin
-     */
-    public boolean isDirectPropToMuniSysAdmin() {
-        return directPropToMuniSysAdmin;
-    }
-
-    /**
-     * @return the requiredEvaluationForBOBClose
-     */
-    public boolean isRequiredEvaluationForBOBClose() {
-        return requiredEvaluationForBOBClose;
-    }
-
-    /**
-     * @return the forceHidePrecedingProps
-     */
-    public boolean isForceHidePrecedingProps() {
-        return forceHidePrecedingProps;
-    }
-
-    /**
-     * @return the forceHideTrailingProps
-     */
-    public boolean isForceHideTrailingProps() {
-        return forceHideTrailingProps;
-    }
-
-    /**
-     * @return the refuseToBeHidden
-     */
-    public boolean isRefuseToBeHidden() {
-        return refuseToBeHidden;
-    }
-
-    /**
-     * @param directPropToMuniSysAdmin the directPropToMuniSysAdmin to set
-     */
-    public void setDirectPropToMuniSysAdmin(boolean directPropToMuniSysAdmin) {
-        this.directPropToMuniSysAdmin = directPropToMuniSysAdmin;
-    }
-
-    /**
-     * @param requiredEvaluationForBOBClose the requiredEvaluationForBOBClose to set
-     */
-    public void setRequiredEvaluationForBOBClose(boolean requiredEvaluationForBOBClose) {
-        this.requiredEvaluationForBOBClose = requiredEvaluationForBOBClose;
-    }
-
-    /**
-     * @param forceHidePrecedingProps the forceHidePrecedingProps to set
-     */
-    public void setForceHidePrecedingProps(boolean forceHidePrecedingProps) {
-        this.forceHidePrecedingProps = forceHidePrecedingProps;
-    }
-
-    /**
-     * @param forceHideTrailingProps the forceHideTrailingProps to set
-     */
-    public void setForceHideTrailingProps(boolean forceHideTrailingProps) {
-        this.forceHideTrailingProps = forceHideTrailingProps;
-    }
-
-    /**
-     * @param refuseToBeHidden the refuseToBeHidden to set
-     */
-    public void setRefuseToBeHidden(boolean refuseToBeHidden) {
-        this.refuseToBeHidden = refuseToBeHidden;
-    }
-
-    /**
-     * @return the relativeorder
-     */
-    public int getRelativeorder() {
-        return relativeorder;
-    }
-
-    /**
-     * @param relativeorder the relativeorder to set
-     */
-    public void setRelativeorder(int relativeorder) {
-        this.relativeorder = relativeorder;
-    }
-
-    /**
-     * @return the hidden
-     */
-    public boolean isHidden() {
-        return hidden;
-    }
-
-    /**
-     * @param hidden the hidden to set
-     */
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
-
-    /**
-     * @return the choiceListVisible
-     */
-    public List<Proposable> getChoiceListVisible() {
-        List<Proposable> prvl = new ArrayList<>();
-        if(choiceList != null){
-             for(Proposable pr: choiceList ){
-                 if(pr.isActive() && !pr.isHidden()){
-                     prvl.add(pr);
-                 }
-             }
-        }
-        
-        choiceListVisible = prvl;
-        return choiceListVisible;
-    }
-
-  
+    
+    
     
 }

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
@@ -30,6 +31,7 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
@@ -185,6 +187,13 @@ public class Initializer implements ServletContextListener{
          
         DataCoordinator dc = new DataCoordinator();
         servletContext.setAttribute("dataCoordinator", dc);
+        
+        ChoiceCoordinator choiceCoord = new ChoiceCoordinator();
+        servletContext.setAttribute("choiceCoordinator", choiceCoord);
+        
+        ChoiceIntegrator choiceInt = new ChoiceIntegrator();
+        servletContext.setAttribute("choiceIntegrator", choiceInt);
+        
          
         
 //        SessionBean sb = new SessionBean();

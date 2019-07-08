@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,12 +64,15 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     public OccupancyIntegrator() {
     }
     
-    public OccPermit getOccPermit(int permitID) throws IntegrationException{
-        OccPermit op = null;
-        
-        String query =  "SELECT permitid, referenceno, occinspec_inspectionid, permittype, dateissued, \n" +
-                        " dateexpires, issuedunder, specialconditions, notes\n" +
-                        " FROM public.occupancypermit WHERE permitid=?;";
+    
+    public OccPeriod getOccPeriod(int periodid) throws IntegrationException{
+        OccPeriod op = null;
+        String query =  "SELECT periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n" +
+                        "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n" +
+                        "       startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n" +
+                        "       manager_userid, authorizationts, authorizedby_userid, overrideperiodtypeconfig, \n" +
+                        "       notes, createdby_userid\n" +
+                        "  FROM public.occperiod WHERE periodid=?;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -79,12 +81,110 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             
             stmt = con.prepareStatement(query);
+            stmt.setInt(1, periodid);
+            
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                op = generateOccPeriod(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return op;
+        
+        
+    }
+    
+    
+    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
+        ChecklistIntegrator ci = getChecklistIntegrator();
+        OccupancyInspectionIntegrator oii = getOccupancyInspectionIntegrator();
+        PersonIntegrator pi = getPersonIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        UserIntegrator ui = getUserIntegrator();
+        
+        OccPeriod op = new OccPeriod();
+        
+        op.setPeriodid(rs.getInt("periodid"));
+        
+        op.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+               
+        op.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        op.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
+        op.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+        
+        op.setPeriodType(getOccPeriodType(rs.getInt("type_typeid")));
+        op.setPeriodTypeCertifiedBy(ui.getUser("typecertifiedby_userid"));
+        op.setPeriodTypeCertifiedTS(rs.getTimestamp("typecertifiedts").toLocalDateTime());
+        
+        op.setStartDate(rs.getTimestamp("startdate").toLocalDateTime());
+        op.setStartDateCertifiedBy(ui.getUser(rs.getInt("startdatecertifiedby_userid")));
+        op.setStartDateCertifiedTS(rs.getTimestamp("startdatecertifiedts").toLocalDateTime());
+        
+        op.setEndDate(rs.getTimestamp("enddate").toLocalDateTime());
+        op.setEndDateCertifiedBy(ui.getUser(rs.getInt("enddatecertifiedby_userid")));
+        op.setEndDateCertifiedTS(rs.getTimestamp("enddatecterifiedts").toLocalDateTime());
+        
+        op.setManager(ui.getUser(rs.getInt("manager_userid")));
+        
+        op.setAuthorizedTS(rs.getTimestamp("authorizationts").toLocalDateTime());
+        op.setAuthorizedBy(ui.getUser(rs.getInt("authorizedby_userid")));
+        
+        op.setOverrideTypeConfig(rs.getBoolean("overrideperiodtypeconfig"));
+        op.setNotes(rs.getString("notes"));
+        
+        // now get all the lists from their respective integrators
+        // this is the Java version of table joins in SQL; we're doing them interatively
+        // in our integrators for each BOB
+        op.setApplicationList(getOccPermitApplicationList(op));
+        op.setPersonList(pi.getPersonList(op));
+        
+        op.setEventList(eventList);
+        op.setEventProposalList(eventProposalList);
+        op.setInspectionList(inspectionList);;
+        op.setPermitList(permitList);;
+        op.setPhotoIDList(photoIDList);
+        
+        
+        
+        
+        
+        return op;
+    }
+    
+    public void updateOccPeriod(OccPeriod op){
+        
+        
+        
+    }
+    
+    public void inactivateOccPeriod(OccPeriod op){
+        
+        
+        
+    }
+    
+    public OccPermit getOccPermit(int permitID) throws IntegrationException{
+        OccPermit op = null;
+        String query =  "SELECT permitid, referenceno, occinspec_inspectionid, permittype, dateissued, \n" +
+                        " dateexpires, issuedunder, specialconditions, notes\n" +
+                        " FROM public.occupancypermit WHERE permitid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
             stmt.setInt(1, permitID);
             rs = stmt.executeQuery();
             while(rs.next()){
                 op = generateOccPermit(rs);
             }
-            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
@@ -148,7 +248,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return new ArrayList();
         
     }
-    
     
     
     public void updateOccPeriodType(OccPeriodType opt) throws IntegrationException {
@@ -348,10 +447,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     public void insertOccPermitApplication(OccPermitApplication application) throws IntegrationException{
-        String query = "INSERT INTO public.occupancypermitapplication(applicationid, multiunit, "
-                + "reason_reasonid, submissiontimestamp, contactperson_personid, "
-                + "submitternotes, internalnotes, propertyunitid) "
-                + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "    INSERT INTO public.occpermitapplication(\n" +
+                        "            applicationid, reason_reasonid, submissiontimestamp, submitternotes, \n" +
+                        "            internalnotes, propertyunitid, declaredtotaladults, declaredtotalyouth, \n" +
+                        "            occperiod_periodid)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?);";
         
         Connection con = null;
         PreparedStatement stmt = null;
@@ -359,9 +461,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setBoolean(1, application.isMultiUnit());
-            stmt.setInt(2, application.getReason().getId());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
+            
+            stmt.setInt(1, application.getReason().getId());
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
             stmt.setInt(4, application.getApplicantPerson().getPersonID());
             stmt.setString(5, application.getSubmissionNotes());
             stmt.setString(6, application.getInternalNotes());
@@ -377,8 +479,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
     }
     
+    
     public int insertOccPermitApplicationAndReturnId(OccPermitApplication application) throws IntegrationException {
-                String query = "INSERT INTO public.occupancypermitapplication(applicationid, multiunit, "
+                String query = "INSERT INTO public.occupancypermitapplication(applicationid,  "
                     + "reason_reasonid, submissiontimestamp, "
                     + "submitternotes, internalnotes, propertyunitid, "
                     + "person_personid, rental) "
@@ -391,7 +494,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setBoolean(1, application.isMultiUnit());
             stmt.setInt(2, application.getReason().getId());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
             stmt.setString(4, application.getSubmissionNotes());
@@ -415,7 +517,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return applicationId;
     }
     
-    public ArrayList<OccPermitApplicationReason> getOccPermitApplicationReasons() throws IntegrationException{
+    public List<OccPermitApplicationReason> getOccPermitApplicationReasons() throws IntegrationException{
         
         OccPermitApplicationReason reason = null;
         ArrayList<OccPermitApplicationReason> reasons = new ArrayList<>();
@@ -444,7 +546,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         }
-        
         return reasons;
     }
     
@@ -536,7 +637,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setBoolean(1,application.isMultiUnit());
             stmt.setInt(2,application.getReason().getId());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
             stmt.setString(4,application.getSubmissionNotes());
@@ -758,7 +858,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @param application
      * @throws IntegrationException 
      */
-    public void insertOccPermitPersons (OccPermitApplication application) throws IntegrationException{
+    public void insertOccPeriodPersons (OccPermitApplication application) throws IntegrationException{
         
         String query = "INSERT INTO public.occperiodperson(period_periodid, "
                 + "person_personid, applicant, preferredcontact, applicationpersontype)\n"
@@ -799,106 +899,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    public OccPeriod getOccPeriod(int periodid) throws IntegrationException{
-        OccPeriod op = null;
-        String query =  "SELECT periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n" +
-                        "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n" +
-                        "       startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n" +
-                        "       manager_userid, authorizationts, authorizedby_userid, overrideperiodtypeconfig, \n" +
-                        "       notes, createdby_userid\n" +
-                        "  FROM public.occperiod WHERE periodid=?;";
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
- 
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, periodid);
-            
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                op = generateOccPeriod(rs);
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return op;
-        
-        
-    }
-    
-    
-    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        ChecklistIntegrator ci = getChecklistIntegrator();
-        OccupancyInspectionIntegrator oii = getOccupancyInspectionIntegrator();
-        PersonIntegrator pi = getPersonIntegrator();
-        SystemIntegrator si = getSystemIntegrator();
-        UserIntegrator ui = getUserIntegrator();
-        
-        OccPeriod op = new OccPeriod();
-        
-        op.setPeriodid(rs.getInt("periodid"));
-        
-        op.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
-               
-        op.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
-        op.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
-        op.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
-        op.setPeriodType(getOccPeriodType(rs.getInt("type_typeid")));
-        op.setPeriodTypeCertifiedBy(ui.getUser("typecertifiedby_userid"));
-        op.setPeriodTypeCertifiedTS(rs.getTimestamp("typecertifiedts").toLocalDateTime());
-        op.setStartDate(rs.getTimestamp("startdate").toLocalDateTime());
-        op.setStartDateCertifiedBy(ui.getUser(rs.getInt("startdatecertifiedby_userid")));
-        op.setStartDateCertifiedTS(rs.getTimestamp("startdatecertifiedts").toLocalDateTime());
-        op.setEndDate(rs.getTimestamp("enddate").toLocalDateTime());
-        op.setEndDateCertifiedBy(ui.getUser(rs.getInt("enddatecertifiedby_userid")));
-        op.setEndDateCertifiedTS(rs.getTimestamp("enddatecterifiedts").toLocalDateTime());
-        op.setManager(ui.getUser(rs.getInt("manager_userid")));
-        op.setAuthorizedTS(rs.getTimestamp("authorizationts").toLocalDateTime());
-        op.setAuthorizedBy(ui.getUser(rs.getInt("authorizedby_userid")));
-        op.setOverrideTypeConfig(rs.getBoolean("overrideperiodtypeconfig"));
-        op.setNotes(rs.getString("notes"));
-        
-        // now get all the lists from their respective integrators
-        // this is the Java version of table joins in SQL; we're doing them interatively
-        // in our integrators for each BOB
-        
-        
-        op.setApplicationList(getOccPermitApplicationList(op));
-        op.setPersonList(pi.getPersonList(op));
-        
-        op.setEventList(eventList);
-        op.setEventProposalList(eventProposalList);
-        op.setInspectionList(inspectionList);;
-        op.setPermitList(permitList);;
-        op.setPhotoIDList(photoIDList);
-        
-        
-        
-        
-        
-        return op;
-    }
-    
-    public void updateOccPeriod(OccPeriod op){
-        
-        
-        
-    }
-    
-    public void inactivateOccPeriod(OccPeriod op){
-        
-        
-        
-    }
     
     /*
     

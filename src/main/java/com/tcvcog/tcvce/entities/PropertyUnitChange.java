@@ -31,9 +31,8 @@ import java.sql.Timestamp;
 public class PropertyUnitChange {
 
     private int unitChangeID;
-    private String changedBy; 
+    private ChangeOrderAction action; //not in the database, used by interface
     private int unitID;
-    private User approvedBy; 
     private String unitNumber;
     private String otherKnownAddress;
     private String notes;
@@ -43,10 +42,14 @@ public class PropertyUnitChange {
     private boolean added;
     private java.sql.Timestamp changedOn;
     private java.sql.Timestamp approvedOn; //If null, it has not been approved
-    private PropertyUnit thisUnit;
+    private int propertyUnitID;
+    private User approvedBy; 
     private int propertyID;
-    private java.sql.Timestamp inactive;
-    private ChangeOrderAction action; //not in the database, used by interface
+    private boolean active;
+    
+    // Nathan's fields to deprecate
+    private String changedBy; 
+    
     
     public int getUnitChangeID() {
         return unitChangeID;
@@ -151,13 +154,7 @@ public class PropertyUnitChange {
         this.added = added;
     }
 
-    public Timestamp getInactive() {
-        return inactive;
-    }
-
-    public void setInactive(Timestamp inactive) {
-        this.inactive = inactive;
-    }
+  
 
     public PropertyUnit toPropertyUnit() {
         
@@ -220,12 +217,12 @@ public class PropertyUnitChange {
 
     }
 
-    public PropertyUnit getThisUnit() {
-        return thisUnit;
+    public int getPropertyUnitID() {
+        return propertyUnitID;
     }
 
-    public void setThisUnit(PropertyUnit thisUnit) {
-        this.thisUnit = thisUnit;
+    public void setPropertyUnitID(int unitID) {
+        this.propertyUnitID = unitID;
     }
 
     public int getPropertyID() {
@@ -265,6 +262,20 @@ public class PropertyUnitChange {
         
         return output;
         
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
     
     

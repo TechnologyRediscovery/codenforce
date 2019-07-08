@@ -14,9 +14,6 @@ public interface Proposable {
     public int getChoiceID();
     public String getTitle();
     public String getDescription();
-    public EventCategory getEventCategory();
-    public EventRule getEventRule();
-    public boolean isAddEventRule();
     public int getRelativeOrder();
     public boolean isActive();
     public int getMinimumRequiredUserRankToView();

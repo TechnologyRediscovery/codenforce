@@ -31,8 +31,8 @@ import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
-import com.tcvcog.tcvce.entities.EventProposal;
-import com.tcvcog.tcvce.entities.EventProposalImplementation;
+import com.tcvcog.tcvce.entities.Directive;
+import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
@@ -151,7 +151,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // but when we build an Event object, the ProposalImplementation lives on the Event itself
         // 
         if(ev.getCategory().getEventProposal() != null){
-            EventProposalImplementation imp = ei.getProposalImplAssociatedWithEvent(ev);
+            Proposal imp = ei.getProposalImplAssociatedWithEvent(ev);
             imp.setCurrentUserCanEvaluateProposal(determineCanUserEvaluateProposal(ev, user, userAuthMuniList));
             ev.setEventProposalImplementation(imp);
         }
@@ -190,7 +190,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public boolean determineCanUserEvaluateProposal(CECaseEvent ev, User u, List<Municipality> muniList){
         boolean canEvaluateProposal = false;
-        EventProposal evProp = ev.getCategory().getEventProposal();
+        Directive evProp = ev.getCategory().getEventProposal();
         
         // direct event assignment allows view conf to cut across regular permissions
         // checks

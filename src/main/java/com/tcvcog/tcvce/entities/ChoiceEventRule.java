@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class ChoiceEventRule 
         extends Choice {
     
-    private EventRuleAbstract rule;
+    private EventRule rule;
     
     /**
      * When true, add the proposed rule to the BOB
@@ -39,14 +39,14 @@ public class ChoiceEventRule
     /**
      * @return the rule
      */
-    public EventRuleAbstract getRule() {
+    public EventRule getRule() {
         return rule;
     }
 
     /**
      * @param rule the rule to set
      */
-    public void setRule(EventRuleAbstract rule) {
+    public void setRule(EventRule rule) {
         this.rule = rule;
     }
     

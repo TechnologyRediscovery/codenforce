@@ -18,8 +18,8 @@ package com.tcvcog.tcvce.integration;
 
 import com.sun.org.apache.xalan.internal.xsltc.compiler.Constants;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.MalformedBOBException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Choice;
@@ -29,18 +29,12 @@ import com.tcvcog.tcvce.entities.ChoiceEventPageNavigation;
 import com.tcvcog.tcvce.entities.ChoiceEventRule;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Event;
-import com.tcvcog.tcvce.entities.Proposable;
-import com.tcvcog.tcvce.entities.ProposalCECase;
-import com.tcvcog.tcvce.entities.ProposalOccPeriod;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.OccEvent;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriod;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +42,7 @@ import java.util.List;
  * A Choice is given to the user in a Directive and can take one of the
  following forms:
  An EventCategory
- An EventRuleAbstract
+ An EventRule
  A page redirection via JSF navigation subsystem
  * @author sylvia
  */
@@ -60,7 +54,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     public ChoiceIntegrator() {
     }
     
-    public Choice getChoice(int choiceID) throws IntegrationException{
+    public Choice getChoice(int choiceID) throws IntegrationException, MalformedBOBException{
+        
        Choice c = null;
   
         StringBuilder sb = new StringBuilder();
@@ -71,6 +66,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
+
         try {
 
             stmt = con.prepareStatement(sb.toString());
@@ -90,42 +86,37 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return c;
+        return new ChoiceEventCat();
     }
     
-    public List<Proposable> getChoiceList(int directiveID) throws IntegrationException{
-        List<Proposable> choiceList = new ArrayList<>();
-  
-        StringBuilder sb = new StringBuilder();
-        sb.append(  "SELECT choice_choiceid, directive_directiveid\n" +
-                    "  FROM public.choicedirectivechoice WHERE directive_directiveid=?; ");
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        try {
-
-            stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, directiveID);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                choiceList.add(getChoice(rs.getInt("choice_choiceid")));
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive chocielist ", ex);
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return choiceList;
+    public List<Choice> getChoiceList(int proposalID){
+        
+        return new ArrayList<>();
+        
     }
     
-    private Choice generateChoice(ResultSet rs) throws SQLException, IntegrationException{
+    public List<Proposal> getProposal(CECase cse){
+        
+        return new ArrayList<>();
+        
+    }
+    
+    public List<Proposal> getProposalList(OccPeriod occPer){
+        
+        
+        return new ArrayList<>();
+        
+    }
+    
+    public Directive getDirective(int propID){
+        
+        
+        return new Directive();
+        
+    }
+    
+    
+    private Choice generateChoice(ResultSet rs) throws SQLException, MalformedBOBException, IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         Choice choice;
@@ -140,7 +131,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             choice = choiceEvCat;
         } else if (rs.getInt("eventrule_ruleid") != 0) {
             ChoiceEventRule choiceEvRule = new ChoiceEventRule();
-            choiceEvRule.setRule(ei.rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
+            choiceEvRule.setRule(ei.getEventRule(rs.getInt("eventrule_ruleid")));
             choiceEvRule.setAddRuleFuncSwitch(rs.getBoolean("addeventrule"));
             choice = choiceEvRule;
         } else if (rs.getString("worflowpagetriggerconstantvar") != null){
@@ -148,7 +139,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             choiceNav.setNavigationKeyConstant(rs.getString("worflowpagetriggerconstantvar"));
             choice = choiceNav;
         } else {
-            throw new IntegrationException("Choice does not have any content!");
+            throw new MalformedBOBException("Choice does not have any content!");
         }
         
         choice.setChoiceID(rs.getInt("choiceid"));
@@ -159,299 +150,144 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         choice.setMinimumRequiredUserRankToChoose(rs.getInt("minimumrequireduserranktochoose"));
         choice.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         choice.setRelativeOrder(rs.getInt("relativeorder"));
-        
         return choice;
     }
     
-    public Proposal getProposal(int propID) throws IntegrationException{
-        Proposal prop = null;
-        ChoiceCoordinator cc = getChoiceCoordinator();
-        
-        StringBuilder sb = new StringBuilder();
-        sb.append(  "SELECT proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
-                    "       initiator_userid, responderintended_userid, activateson, expireson, \n" +
-                    "       responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" +
-                    "       active, notes, relativeorder, generatingevent_occeventid, \n" +
-                    "       responseevent_occeventid, occperiod_periodid, cecase_caseid \n" +
-                    "  FROM public.choiceproposal WHERE proposalid=?;");
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, propID);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                prop = generateProposal(rs);
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive event proposal response", ex);
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return prop;
-        
-    }
-    
-    public List<Proposal> getProposalList(CECase cse) throws IntegrationException{
-        List<Proposal> proposalList = new ArrayList<>();
-  
-        StringBuilder sb = new StringBuilder();
-        sb.append(  "SELECT proposalid\n" +
-                    "  FROM public.choiceproposal\n" +
-                    "  WHERE cecase_caseid=?;");
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-
-        try {
-
-            stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, cse.getCaseID());
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                proposalList.add(getProposal(rs.getInt("proposalid")));
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive event proposal response", ex);
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return proposalList;
-    }
-    
-    public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException{
-        
-        List<Proposal> proposalList = new ArrayList<>();
-  
-        StringBuilder sb = new StringBuilder();
-        sb.append(  "SELECT proposalid\n" +
-                    "  FROM public.choiceproposal\n" +
-                    "  WHERE occperiod_periodid=?;");
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, occPer.getPeriodID());
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                proposalList.add(getProposal(rs.getInt("proposalid")));
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive proposal list", ex);
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return proposalList;
-    }
-    
-    /**
-     * TODO: complete for occbeta
-     * @param rs
-     * @return
-     * @throws SQLException
-     * @throws IntegrationException 
-     */
      private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException{
-        Proposal prop = new Proposal();
+        Proposal propImp = new Proposal();
         UserIntegrator ui = getUserIntegrator();
-        EventIntegrator ei = getEventIntegrator();
         
-        prop.setProposalID(rs.getInt("proposalid"));
+        propImp.setImplementationID(rs.getInt("implementationid"));
+        propImp.setProposalID(rs.getInt("proposal_propid"));
         
-        prop.setDirective(getDirective(rs.getInt("directive_directiveid")));
-        if(rs.getInt("generatingevent_cecaseeventid") != 0){
-            prop.setGeneratingEvent(ei.getEventCECase(rs.getInt("generatingevent_cecaseeventid")));
-        }
-        if(rs.getInt("generatingevent_occeventid") != 0){
-            prop.setGeneratingEvent(ei.getOccEvent(rs.getInt("generatingevent_occeventid")));
-        }
-        if(rs.getInt("responseevent_cecaseeventid") != 0){
-            prop.setResponseEvent(ei.getEventCECase(rs.getInt("responseevent_cecaseeventid")));
-        }
-        if(rs.getInt("responseevent_occeventid") != 0){
-            prop.setResponseEvent(ei.getOccEvent(rs.getInt("responseevent_occeventid")));
-        }
-               
-        prop.setInitiator(ui.getUser(rs.getInt("initiator_userid")));
+        propImp.setInitiator(ui.getUser(rs.getInt("initiator")));
+        propImp.setResponderIntended(ui.getUser(rs.getInt("responderintended_userid")));
+        propImp.setResponderActual(ui.getUser(rs.getInt("responder_userid")));
         
-        prop.setResponderIntended(ui.getUser(rs.getInt("responderintended_userid")));
         if(rs.getTimestamp("activateson") != null){
-            prop.setActivatesOn(rs.getTimestamp("activateson").toLocalDateTime());
+            propImp.setActivatesOn(rs.getTimestamp("activateson").toLocalDateTime());
         }
         if(rs.getTimestamp("expireson") != null){
-            prop.setExpiresOn(rs.getTimestamp("expireson").toLocalDateTime());
+            propImp.setExpiresOn(rs.getTimestamp("expireson").toLocalDateTime());
         }
-        
-        prop.setResponderActual(ui.getUser(rs.getInt("responderactual_userid")));
-        prop.setProposalRejected(rs.getBoolean("rejectproposal"));
+        propImp.setResponseEventID(rs.getInt("responseevent_eventid"));
         if(rs.getTimestamp("responsetimestamp") != null){
-            prop.setResponseTS(rs.getTimestamp("responsetimestamp").toLocalDateTime());
+            propImp.setResponseTimestamp(rs.getTimestamp("responsetimestamp").toLocalDateTime());
         }
+        propImp.setProposalRejected(rs.getBoolean("rejectproposal"));
         
-        prop.setActive(rs.getBoolean("active"));
+        propImp.setExpiredorinactive(rs.getBoolean("expiredorinactive"));
+        propImp.setNotes(rs.getString("notes"));
         
-        prop.setNotes(rs.getString("notes"));
-        prop.setOrder(rs.getInt("relativeorder"));
-        
-        if(rs.getInt("cecase_caseid") != 0){
-            ProposalCECase propCECase = new ProposalCECase(prop);
-            propCECase.setCeCaseID(rs.getInt("cecase_caseid"));
-            return propCECase;
-        }
-        
-        if(rs.getInt("occperiod_periodid") != 0){
-            ProposalOccPeriod propPeriod = new ProposalOccPeriod(prop);
-            propPeriod.setOccperiodID(rs.getInt("occperiod_periodid"));
-            return propPeriod;
-        }
-        return prop;
+        return propImp;
         
     }
     
-    public void updateProposal(Proposal prop) throws IntegrationException{
-          String query =    "UPDATE public.choiceproposal\n" +
-                            "   SET directive_directiveid=?, generatingevent_cecaseeventid=?, \n" +  //1-2
-                            "       initiator_userid=?, responderintended_userid=?, activateson=?, \n" + //3-5
-                            "       expireson=?, responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" + // 6-9
-                            "       responseevent_cecaseeventid=?, active=?, notes=?, relativeorder=?, \n" + //10-13
-                            "       generatingevent_occeventid=?, responseevent_occeventid=?, occperiod_periodid=?, \n" + //14-16
-                            "       cecase_caseid=?, chosen_choiceid=?\n" + //17-18
-                            " WHERE proposalid=?;"; // 19
+    public void updateProposal(Proposal imp) throws IntegrationException{
+          String query =    "UPDATE public.ceeventproposalimplementation\n" +
+                            "   SET proposal_propid=?, generatingevent_eventid=?, \n" +
+                            "       initiator_userid=?, responderintended_userid=?, activateson=?, \n" +
+                            "       expireson=?, expiredorinactive=?, notes=?\n" +
+                            " WHERE implementationid=?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getDirective().getDirectiveID());
-            Event ev = prop.getGeneratingEvent();
-            if(ev != null){
-                if(ev instanceof CECaseEvent){
-                    stmt.setInt(2, prop.getGeneratingEvent().getEventID());
-                    stmt.setNull(14, java.sql.Types.NULL);
-                } else if (ev instanceof OccEvent){
-                    stmt.setInt(14, prop.getGeneratingEvent().getEventID());
-                    stmt.setNull(2, java.sql.Types.NULL);
-                } else {
-                    stmt.setNull(14, java.sql.Types.NULL);
-                    stmt.setNull(2, java.sql.Types.NULL);
-                }
-            }
-            if(prop.getInitiator().getUserID() != 0){
-                stmt.setInt(3, prop.getInitiator().getUserID());
-            }
+            stmt.setInt(1, imp.getProposalID());
+            stmt.setInt(2, imp.getGeneratingEventID());
+            stmt.setInt(3, imp.getInitiator().getUserID());
+            stmt.setInt(4, imp.getResponderIntended().getUserID());
             
-            if(prop.getResponderIntended() != null){
-                stmt.setInt(4, prop.getResponderIntended().getUserID());
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-            
-            if(prop.getActivatesOn() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(prop.getActivatesOn()));
+            if(imp.getActivatesOn() != null){
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(imp.getActivatesOn()));
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
-
-            if(prop.getExpiresOn() != null){
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(prop.getExpiresOn()));
+            
+            if(imp.getExpiresOn() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(imp.getExpiresOn()));
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
             
-            if(prop.getResponderActual() != null){
-                stmt.setInt(7, prop.getResponderActual().getUserID());
-            } else {
-                stmt.setNull(7, java.sql.Types.NULL);
-            }
-            
-            stmt.setBoolean(8, prop.isProposalRejected());
-            if(prop.getResponseTS() != null){
-                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTS()));
-            } else {
-                stmt.setNull(9, java.sql.Types.NULL);
-            }
-            
-            ev = prop.getResponseEvent();
-            
-            if(ev != null){
-                if(ev instanceof CECaseEvent){
-                    stmt.setInt(10, prop.getResponseEvent().getEventID());
-                    stmt.setNull(15, java.sql.Types.NULL);
-                } else if (ev instanceof OccEvent){
-                    stmt.setInt(15, prop.getResponseEvent().getEventID());
-                    stmt.setNull(10, java.sql.Types.NULL);
-                } else {
-                    stmt.setNull(10, java.sql.Types.NULL);
-                    stmt.setNull(15, java.sql.Types.NULL);
-                }
-            }
-            stmt.setBoolean(11, prop.isActive());
-            stmt.setString(12, prop.getNotes());
-            stmt.setInt(13, prop.getOrder());
-
-            
-            if(prop instanceof ProposalCECase){
-                ProposalCECase pcec = (ProposalCECase) prop;
-                stmt.setInt(17, pcec.getCeCaseID());
-            } else {
-                ProposalOccPeriod pop = (ProposalOccPeriod) prop;
-                stmt.setInt(16, pop.getOccperiodID());
-            }
-            
-            if(prop.getChosenChoice() != null){
-                stmt.setInt(18, prop.getChosenChoice().getChoiceID());
-            } else {
-                stmt.setNull(18, java.sql.Types.NULL);
-            }
-            stmt.setInt(19, prop.getProposalID());
-            
-            
+            stmt.setString(7, imp.getNotes());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot udpate proposal implementation, sorry", ex);
+            throw new IntegrationException("Cannot udpate event proposal implementation, sorry", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         }
+        
+        
     }
     
-    public Directive getDirective(int directiveID) throws IntegrationException{
+    public void logResponseToProposal(CECaseEvent ev) throws IntegrationException {
 
-        Directive dir = new Directive();
+       String query = "UPDATE public.ceeventproposalimplementation\n" +
+                        "   SET responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" +
+                        "       responseevent_eventid=?, notes=?\n" +
+                        " WHERE implementationid = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        Proposal imp;
+        
+        if(ev.getEventProposalImplementation()!= null){
+            imp = ev.getEventProposalImplementation();
+
+            try {
+
+                stmt = con.prepareStatement(query);
+                stmt.setInt(1, imp.getResponderActual().getUserID());
+                stmt.setBoolean(2, imp.isProposalRejected());
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(imp.getResponseTimestamp()));
+                int responseEventID;
+                if(imp.getResponseEvent()!= null){
+                    responseEventID = imp.getResponseEvent().getEventID();
+                    stmt.setInt(4, responseEventID);
+                } else {
+                    stmt.setNull(4, java.sql.Types.NULL);
+                }
+                stmt.setString(5, imp.getNotes());
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Cannot udpate event proposal implementation, sorry", ex);
+
+            } finally {
+                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            }
+        }
+    }
+    
+    
+    
+    /**
+     * Builds an Directive object from the eventproposal table in the DB.
+     * An Directive contains up to three EventCategory objects which the user 
+ can select to create next in their case management workflow
+     * @param proposalID
+     * @return all fields populated
+     * @throws IntegrationException 
+     */
+    public Directive getProposal(int proposalID) throws IntegrationException{
+
+        Directive proposal = new Directive();
         
         StringBuilder sb = new StringBuilder();
-        sb.append(      "SELECT directiveid, title, overalldescription, creator_userid, directtodefaultmuniceo, \n" +
-                        "       directtodefaultmunistaffer, directtodeveloper, executechoiceiflonewolf, \n" +
-                        "       applytoclosedentities, instantiatemultiple, inactivategeneventoneval, \n" +
-                        "       maintainreldatewindow, autoinactivateonbobclose, autoinactiveongeneventinactivation, \n" +
-                        "       minimumrequireduserranktoview, minimumrequireduserranktoevaluate, \n" +
-                        "       active, icon_iconid, relativeorder, directtomunisysadmin, requiredevaluationforbobclose, \n" +
-                        "       forcehideprecedingproposals, forcehidetrailingproposals, refusetobehidden \n" +
-                        "  FROM public.choicedirective WHERE directiveid=?");
+        sb.append(      "SELECT proposalid, title, overalldescription, creator_userid, choice1eventcat_catid, \n" +
+                        "       choice1description, choice2eventcat_catid, choice2description, \n" +
+                        "       choice3eventcat_catid, choice3description, directproposaltodefaultmuniceo, \n" +
+                        "       directproposaltodefaultmunistaffer, directproposaltodeveloper, \n" +
+                        "       activatesxdaysfromgenevent, expiresxdaysfromgenevent, expirytrigger_eventcatid, \n" +
+                        "       active\n" +
+                        "  FROM public.ceeventproposal WHERE proposalid = ?;");
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -459,133 +295,111 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         try {
 
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, directiveID);
+            stmt.setInt(1, proposalID);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                dir = generateDirective(rs);
+                proposal = generateEventProposal(rs);
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive Directive", ex);
+            throw new IntegrationException("Cannot retrive EventProposal", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        System.out.println("ChoiceIntegrator.getDirective | directive retrieved with ID: " + dir.getDirectiveID());
 
-        return dir;
+        return proposal;
+        
+        
     }
     
     /**
-     
+     * Site of EventPropsal instantiation.
+     * Populates fields of EventProposals given a ResultSet returned from a DB query
      * 
      * @param rs
      * @return
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException{
-        UserIntegrator ui = getUserIntegrator();
-        SystemIntegrator si = getSystemIntegrator();
-
-        Directive dir = new Directive();
+    private Directive generateEventProposal(ResultSet rs) throws SQLException, IntegrationException{
+        Directive proposal = new Directive();
         
-        dir.setDirectiveID(rs.getInt("directiveid"));
-        dir.setTitle(rs.getString("title"));
-        dir.setDescription(rs.getString("overalldescription"));
-        dir.setCreator(ui.getUser(rs.getInt("creator_userid")));
-        dir.setDirectPropToDefaultMuniCEO(rs.getBoolean("directtodefaultmuniceo"));
+        proposal.setProposalID(rs.getInt("proposalid"));
+        proposal.setTitle(rs.getString("title"));
+        proposal.setDescription(rs.getString("overalldescription"));
         
-        dir.setDirectPropToDefaultMuniStaffer(rs.getBoolean("directtodefaultmunistaffer"));
-        dir.setDirectPropToDeveloper(rs.getBoolean("directtodeveloper"));
-        dir.setExecuteChoiceIfLoneWolf(rs.getBoolean("executechoiceiflonewolf"));
+        proposal.setChoice1EventCat(getEventCategory(rs.getInt("choice1eventcat_catid")));
+        proposal.setChoice1Description(rs.getString("choice1description"));
+        proposal.setChoice2EventCat(getEventCategory(rs.getInt("choice2eventcat_catid")));
+        proposal.setChoice1Description(rs.getString("choice2description"));
+        proposal.setChoice3EventCat(getEventCategory(rs.getInt("choice3eventcat_catid")));
+        proposal.setChoice1Description(rs.getString("choice3description"));
         
-        dir.setApplyToClosedBOBs(rs.getBoolean("applytoclosedentities"));
-        dir.setInstantiateMultipleOnBOB(rs.getBoolean("instantiatemultiple"));
-        dir.setInactivateGeneratingEventOnEvaluation(rs.getBoolean("inactivategeneventoneval"));
+        proposal.setDirectPropToDefaultMuniCEO(rs.getBoolean("directproposaltodefaultmuniceo"));
+        proposal.setDirectPropToDefaultMuniStaffer(rs.getBoolean("directproposaltodefaultmunistaffer"));
+        proposal.setDirectPropToDeveloper(rs.getBoolean("directproposaltodeveloper"));
         
-        dir.setMaintainRelativeDateWindow(rs.getBoolean("maintainreldatewindow"));
-        dir.setAutoInactiveOnBOBClose(rs.getBoolean("autoinactivateonbobclose"));
-        dir.setAutoInactiveOnGenEventInactivation(rs.getBoolean("autoinactiveongeneventinactivation"));
+        proposal.setActivatesXDaysFromGeneratingEvent(rs.getInt("activatesxdaysfromgenevent"));
+        proposal.setExpiresXDaysFromGeneratingEvent(rs.getInt("expiresxdaysfromgenevent"));
+        proposal.setExpiryTrigger(getEventCategory(rs.getInt("expirytrigger_eventcatid")));
         
-        dir.setMinimumRequiredUserRankToView(rs.getInt("minimumrequireduserranktoview"));
-        dir.setMinimumRequiredUserRankToEvaluate(rs.getInt("minimumrequireduserranktoevaluate"));
+        proposal.setActive(rs.getBoolean("active"));
         
-        dir.setActive(rs.getBoolean("active"));
-        dir.setIcon(si.getIcon(rs.getInt("icon_iconid")));
-        dir.setRelativeorder(rs.getInt("relativeorder"));
-        dir.setDirectPropToMuniSysAdmin(rs.getBoolean("directtomunisysadmin"));
-        dir.setRequiredEvaluationForBOBClose(rs.getBoolean("requiredevaluationforbobclose"));
-        
-        dir.setForceHidePrecedingProps(rs.getBoolean("forcehideprecedingproposals"));
-        dir.setForceHideTrailingProps(rs.getBoolean("forcehidetrailingproposals"));
-        dir.setRefuseToBeHidden(rs.getBoolean("refusetobehidden"));
-        
-        dir.setChoiceList(getChoiceList(dir.getDirectiveID()));
-        
-        return dir;
+        return proposal;
     }
     
-    public void insertDirective(Directive dir) throws IntegrationException{
-         String query = "INSERT INTO public.choicedirective(\n" +
-                        "            directiveid, title, overalldescription, creator_userid, directtodefaultmuniceo, \n" +
-                        "            directtodefaultmunistaffer, directtodeveloper, executechoiceiflonewolf, \n" +
-                        "            applytoclosedentities, instantiatemultiple, inactivategeneventoneval, \n" +
-                        "            maintainreldatewindow, autoinactivateonbobclose, autoinactiveongeneventinactivation, \n" +
-                        "            minimumrequireduserranktoview, minimumrequireduserranktoevaluate, \n" +
-                        "            active, icon_iconid, relativeorder, directtomunisysadmin, requiredevaluationforbobclose, \n" +
-                        "            forcehideprecedingproposals, forcehidetrailingproposals, refusetobehidden)\n" +
+    public void insertEventProposal(Directive prop) throws IntegrationException{
+         String query = "INSERT INTO public.ceeventproposal(\n" +
+                        "            proposalid, title, overalldescription, creator_userid, choice1eventcat_catid, \n" +
+                        "            choice1description, choice2eventcat_catid, choice2description, \n" +
+                        "            choice3eventcat_catid, choice3description, directproposaltodefaultmuniceo, \n" +
+                        "            directproposaltodefaultmunistaffer, directproposaltodeveloper, \n" +
+                        "            activatesxdaysfromgenevent, expiresxdaysfromgenevent, expirytrigger_eventcatid, \n" +
+                        "            active)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, \n" +
                         "            ?, ?, ?, \n" +
-                        "            ?, ?, ?, \n" +
                         "            ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?);";
+                        "            ?, ?, ?, \n" +
+                        "            ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setString(1, dir.getTitle());
-            stmt.setString(2, dir.getDescription());
-            stmt.setInt(3, dir.getCreator().getUserID());
-            stmt.setBoolean(4, dir.isDirectPropToDefaultMuniCEO());
+            stmt.setString(1, prop.getTitle());
+            stmt.setString(2, prop.getDescription());
+            stmt.setInt(3, prop.getCreator().getUserID());
+            stmt.setInt(4, prop.getChoice1EventCat().getCategoryID());
             
-            stmt.setBoolean(5, dir.isDirectPropToDefaultMuniStaffer());
-            stmt.setBoolean(6, dir.isDirectPropToDeveloper());
-            stmt.setBoolean(7, dir.isExecuteChoiceIfLoneWolf());
+            stmt.setString(5, prop.getChoice1Description());
+            stmt.setInt(6, prop.getChoice2EventCat().getCategoryID());
+            stmt.setString(7, prop.getChoice2Description());
             
-            stmt.setBoolean(8, dir.isApplyToClosedBOBs());
-            stmt.setBoolean(9, dir.isInstantiateMultipleOnBOB());
-            stmt.setBoolean(10, dir.isInactivateGeneratingEventOnEvaluation());
+            stmt.setInt(8, prop.getChoice3EventCat().getCategoryID());
+            stmt.setString(9, prop.getChoice3Description());
+            stmt.setBoolean(10, prop.isDirectPropToDefaultMuniCEO());
             
-            stmt.setBoolean(11, dir.isMaintainRelativeDateWindow());
-            stmt.setBoolean(12, dir.isAutoInactiveOnBOBClose());
-            stmt.setBoolean(13, dir.isAutoInactiveOnGenEventInactivation());
+            stmt.setBoolean(11, prop.isDirectPropToDefaultMuniStaffer());
+            stmt.setBoolean(12, prop.isDirectPropToDeveloper());
             
-            stmt.setInt(14, dir.getMinimumRequiredUserRankToView());
-            stmt.setInt(15, dir.getMinimumRequiredUserRankToEvaluate());
+            stmt.setInt(13, prop.getActivatesXDaysFromGeneratingEvent());
+            stmt.setInt(14, prop.getExpiresXDaysFromGeneratingEvent());
+            stmt.setInt(15, prop.getExpiryTrigger().getCategoryID());
             
-            stmt.setBoolean(16, dir.isActive());
-            stmt.setInt(17, dir.getIcon().getIconid());
-            stmt.setInt(18, dir.getRelativeorder());
-            stmt.setBoolean(19, dir.isDirectPropToMuniSysAdmin());
-            stmt.setBoolean(20, dir.isRequiredEvaluationForBOBClose());
-            
-            stmt.setBoolean(21, dir.isForceHidePrecedingProps());
-            stmt.setBoolean(22, dir.isForceHideTrailingProps());
-            stmt.setBoolean(23, dir.isRefuseToBeHidden());
+            stmt.setBoolean(16, prop.isActive());
+
             stmt.execute();
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert directive", ex);
+            throw new IntegrationException("Unable to insert EventProposal", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -594,186 +408,174 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public void recordProposalEvaluation(Proposal p) throws IntegrationException{
-        StringBuilder sb = new StringBuilder("UPDATE public.choiceproposal ");
-        sb.append("   SET responderactual_userid=?, responsetimestamp=now(), \n");
-        sb.append("       notes=?, chosen_choiceid=?, \n");
-                        
-        if(p instanceof ProposalCECase){
-            sb.append(" cecase_caseid=?, responseevent_cecaseeventid=?, \n");
-        } else if (p instanceof ProposalOccPeriod){
-            sb.append(" occperiod_periodid=?, responseevent_occeventid=? \n");
-        } else {
-            throw new IntegrationException("Cannot record given proposal due to incorrect Proposal object type");
-        }
-            sb.append(" WHERE proposalid=?;");
+     /**
+     * 
+     * @param event for which we will search for a creation trigger 
+     * @return the Event that lists the incoming event as its response
+     * @throws IntegrationException 
+     */
+    public Proposal getProposalImplAssociatedWithEvent(Event event) throws IntegrationException{
+        Proposal propImp = null;
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT implementationid "
+                + "FROM ceeventproposalimplementation "
+                + "INNER JOIN ceevent ON generatingevent_eventid = eventid "
+                + "WHERE eventid = ?");
         Connection con = getPostgresCon();
+        ResultSet rs = null;
         PreparedStatement stmt = null;
 
         try {
+
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, p.getResponderActual().getUserID());
-            stmt.setString(2, p.getNotes());
-            stmt.setInt(3, p.getChosenChoice().getChoiceID());
-            if(p instanceof ProposalCECase){
-                ProposalCECase pcec = (ProposalCECase) p;
-                stmt.setInt(4, pcec.getCeCaseID());
-            } else if (p instanceof ProposalOccPeriod){
-                ProposalOccPeriod pop = (ProposalOccPeriod) p;
-                stmt.setInt(4, pop.getOccperiodID());
-            } 
-            
-            stmt.setInt(5, p.getResponseEvent().getEventID());
-            stmt.setInt(6, p.getProposalID());
-            
-            stmt.executeUpdate();
+            stmt.setInt(1, event.getEventID());
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                propImp = getEventProposalImplementation(rs.getInt("implementationid"));
+            }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to record proposal evaluation", ex);
+            throw new IntegrationException("Cannot retrive event", ex);
 
         } finally {
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        
+
+        return propImp;
     }
     
     
+    
+    /**
+     * Builds an Proposal object given the PK of the DB record
+     * @param propImpID
+     * @return
+     * @throws IntegrationException 
+     */
+    public Proposal getEventProposalImplementation(int propImpID) throws IntegrationException{
+         Proposal response = new Proposal();
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(  "SELECT implementationid, proposal_propid, generatingevent_eventid, initiator_userid, \n" +
+                    "       responderintended_userid, activateson, expireson, responderactual_userid, \n" +
+                    "       rejectproposal, responsetimestamp, responseevent_eventid, expiredorinactive, \n" +
+                    "       notes\n" +
+                    "  FROM public.ceeventproposalimplementation WHERE implementationid = ?;");
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
 
-    public int insertProposal(Proposal prop) throws IntegrationException{
-        String query = "INSERT INTO public.choiceproposal(\n" +
-                        "            proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
-                        "            initiator_userid, responderintended_userid, activateson, expireson, \n" +
-                        "            responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" +
-                        "            active, notes, relativeorder, generatingevent_occeventid, responseevent_occeventid, \n" +
-                        "            occperiod_periodid, cecase_caseid, chosen_choiceid)\n" +
-                        "    VALUES (DEFAULT, ?, ?, \n" +
+        try {
+
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, propImpID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                response = generateProposal(rs);
+                
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive event proposal response", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return response;
+        
+    }
+
+    public void insertChoiceProposal(Proposal prop) throws MalformedBOBException, IntegrationException{
+        String query = "INSERT INTO public.ceeventproposalimplementation(\n" +
+                        "            implementationid, proposal_propid, generatingevent_eventid, initiator_userid, \n" +
+                        "            responderintended_userid, activateson, expireson, responderactual_userid, \n" +
+                        "            rejectproposal, responsetimestamp, responseevent_eventid, expiredorinactive, \n" +
+                        "            notes)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?);";
+                        "            ?);";
+
         
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-        ResultSet rs = null;
-        int freshPropID = 0;
-        
+
         try {
             stmt = con.prepareStatement(query);
-             stmt.setInt(1, prop.getDirective().getDirectiveID());
-            Event ev = prop.getGeneratingEvent();
-            if(ev != null){
-                if(ev instanceof CECaseEvent){
-                    stmt.setInt(2, prop.getGeneratingEvent().getEventID());
-                    stmt.setNull(14, java.sql.Types.NULL);
-                } else if (ev instanceof OccEvent){
-                    stmt.setInt(14, prop.getGeneratingEvent().getEventID());
-                    stmt.setNull(2, java.sql.Types.NULL);
-                } else {
-                    stmt.setNull(14, java.sql.Types.NULL);
-                    stmt.setNull(2, java.sql.Types.NULL);
-                }
-            } else {
-                    stmt.setNull(14, java.sql.Types.NULL);
-                    stmt.setNull(2, java.sql.Types.NULL);
-                
-            }
+            stmt.setInt(1, prop.getProposalID());
+            stmt.setInt(2, prop.getGeneratingEventID());
             
             if(prop.getInitiator() != null){
                 stmt.setInt(3, prop.getInitiator().getUserID());
-            } else {
-                stmt.setNull(3, java.sql.Types.NULL);
+            } else { 
+                throw new MalformedBOBException("EventProposalImplementations must contain a User object as an initiator");
             }
             
-            if(prop.getResponderIntended() != null){
+            if(prop.getResponderIntended()!= null){
                 stmt.setInt(4, prop.getResponderIntended().getUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            if(prop.getActivatesOn() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(prop.getActivatesOn()));
-            } else {
-                stmt.setNull(5, java.sql.Types.NULL);
-            }
-
-            if(prop.getExpiresOn() != null){
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(prop.getExpiresOn()));
-            } else {
-                stmt.setNull(6, java.sql.Types.NULL);
-            }
+            
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(prop.getActivatesOn()));
+            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(prop.getExpiresOn()));
+            
             if(prop.getResponderActual() != null){
                 stmt.setInt(7, prop.getResponderActual().getUserID());
             } else {
                 stmt.setNull(7, java.sql.Types.NULL);
             }
+            
             stmt.setBoolean(8, prop.isProposalRejected());
-            if(prop.getResponseTS() != null){
-                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTS()));
+            
+            if(prop.getResponseTimestamp() != null){
+                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTimestamp()));
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
             }
-            ev = prop.getResponseEvent();
-            if(ev != null){
-                if(ev instanceof CECaseEvent){
-                    stmt.setInt(10, prop.getResponseEvent().getEventID());
-                    stmt.setNull(15, java.sql.Types.NULL);
-                } else if (ev instanceof OccEvent){
-                    stmt.setInt(15, prop.getResponseEvent().getEventID());
-                    stmt.setNull(10, java.sql.Types.NULL);
-                } else {
-                    stmt.setNull(10, java.sql.Types.NULL);
-                    stmt.setNull(15, java.sql.Types.NULL);
-                }
-            } else {
-                    stmt.setNull(10, java.sql.Types.NULL);
-                    stmt.setNull(15, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(11, prop.isActive());
+
+            stmt.setInt(10, prop.getResponseEventID());
+            stmt.setBoolean(11, prop.isExpiredorinactive());
+            stmt.setString(12, prop.getNotes());
             
-            if(prop.getNotes() != null){
-                stmt.setString(12, prop.getNotes());
-            } else {
-                stmt.setNull(12, java.sql.Types.NULL);
-            }
-            
-            stmt.setInt(13, prop.getOrder());
-            
-             if(prop instanceof ProposalCECase){
-                ProposalCECase pcec = (ProposalCECase) prop;
-                stmt.setInt(17, pcec.getCeCaseID());
-                stmt.setNull(16, java.sql.Types.NULL);
-            } else if(prop instanceof ProposalOccPeriod){
-                ProposalOccPeriod pop = (ProposalOccPeriod) prop;
-                stmt.setInt(16, pop.getOccperiodID());
-                stmt.setNull(17, java.sql.Types.NULL);
-            } else {
-                stmt.setNull(16, java.sql.Types.NULL);
-                stmt.setNull(17, java.sql.Types.NULL);
-            }
-             
-            // chosen choice id
-            stmt.setNull(18, java.sql.Types.NULL);
-             
             stmt.execute();
-            
-            String retrievalQuery = "SELECT currval('ceeventproposalimplementation_seq');";
-            stmt = con.prepareStatement(retrievalQuery);
-            rs = stmt.executeQuery();
-            
-            while(rs.next()){
-                 freshPropID= rs.getInt(1);
-            }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert Proposal", ex);
+            throw new IntegrationException("Unable to insert EventProposal", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        return freshPropID;
+        
     }
+    
+    private Directive generateDirective(ResultSet rs){
+       
+        
+        
+    }
+    
+    private Proposal generateProposal(ResultSet rs, Directive dir){
+        Proposal proposal = new Proposal();
+        
+        
+        return proposal;
+        
+    }
+
+    
+    
+    
 }

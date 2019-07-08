@@ -7,42 +7,45 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 /**
- * Abstract because you can't propose to add an item in a set of things to nothin'
+ *
  * Mapped to database table choiceproposal
  * 
  * @author sylvia
  */
-public class Proposal extends EntityUtils implements Serializable, Comparable<Proposal> {
+public class Proposal implements Serializable {
     
-    protected int proposalID ;
-    protected Directive directive;
+    private int implementationID;
+    private Directive directive;
     
-    protected boolean readOnlyCurrentUser;
+    private int generatingEventID;
+    private boolean currentUserCanEvaluateProposal;
     
-    protected User initiator;
-    protected User responderIntended;
-    protected User responderActual;
+    private User initiator;
+    private User responderIntended;
+    private User responderActual;
     
-    protected LocalDateTime activatesOn;
-    protected LocalDateTime expiresOn;
-    protected LocalDateTime responseTS;
+    private LocalDateTime activatesOn;
+    private String activatesOnPretty;
     
-    protected boolean active;
-    protected boolean hidden;
+    private LocalDateTime expiresOn;
+    private String expiresOnPretty;
     
-    protected int generatingEventID;
-    protected Event generatingEvent;
-    protected Event responseEvent;
-
-    protected String notes;
-    protected boolean proposalRejected;
+    private LocalDateTime responseTimestamp;
+    private String responseTimePrettyDate;
     
-    protected int order;
+    private boolean active;
     
-    protected Proposable chosenChoice;
+    private int responseEventID;
+    /**
+     * Populating this has the danger of inciting infinite loops if somehow
+     * the generating event is aso the response event
+     */
+    private Event responseEvent;
+    
+    private String notes;
+    private boolean proposalRejected;
 
     /**
      * @param responderIntended the responderIntended to set
@@ -66,7 +69,15 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         return responderActual;
     }
 
-   
+    /**
+     * @param event
+     * @return the responseTimePrettyDate
+     */
+    public String getResponseTimePrettyDate(Event event) {
+        String pretty = event.getPrettyDate(responseTimestamp);
+        responseTimePrettyDate = pretty;
+        return getResponseTimePrettyDate();
+    }
 
     /**
      * @param proposalRejected the proposalRejected to set
@@ -82,7 +93,20 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.notes = notes;
     }
 
-   
+    /**
+     * @param responseTimePrettyDate the responseTimePrettyDate to set
+     */
+    public void setResponseTimePrettyDate(String responseTimePrettyDate) {
+        this.responseTimePrettyDate = responseTimePrettyDate;
+    }
+
+    /**
+     * @return the responseEventID
+     */
+    public int getResponseEventID() {
+        return responseEventID;
+    }
+
     /**
      * @return the proposalRejected
      */
@@ -98,18 +122,24 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     }
 
     /**
-     * @param responseTS the responseTS to set
+     * @param responseTimestamp the responseTimestamp to set
      */
-    public void setResponseTS(LocalDateTime responseTS) {
-        this.responseTS = responseTS;
+    public void setResponseTimestamp(LocalDateTime responseTimestamp) {
+        this.responseTimestamp = responseTimestamp;
     }
 
+    /**
+     * @param responseEventID the responseEventID to set
+     */
+    public void setResponseEventID(int responseEventID) {
+        this.responseEventID = responseEventID;
+    }
 
     /**
-     * @return the responseTS
+     * @return the responseTimestamp
      */
-    public LocalDateTime getResponseTS() {
-        return responseTS;
+    public LocalDateTime getResponseTimestamp() {
+        return responseTimestamp;
     }
 
     /**
@@ -127,20 +157,25 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     }
 
     /**
-     * @return the proposalID
+     * @return the implementationID
      */
-    public int getProposalID() {
-        return proposalID;
+    public int getImplementationID() {
+        return implementationID;
     }
 
     /**
-     * @param proposalID the proposalID to set
+     * @param implementationID the implementationID to set
      */
-    public void setProposalID(int proposalID) {
-        this.proposalID = proposalID;
+    public void setImplementationID(int implementationID) {
+        this.implementationID = implementationID;
     }
 
-    
+    /**
+     * @return the responseTimePrettyDate
+     */
+    public String getResponseTimePrettyDate() {
+        return responseTimePrettyDate;
+    }
 
     /**
      * @param responderActual the responderActual to set
@@ -149,6 +184,19 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.responderActual = responderActual;
     }
 
+    /**
+     * @return the responseEvent
+     */
+    public Event getResponseEvent() {
+        return responseEvent;
+    }
+
+    /**
+     * @param responseEvent the responseEvent to set
+     */
+    public void setResponseEvent(Event responseEvent) {
+        this.responseEvent = responseEvent;
+    }
 
     
     /**
@@ -158,7 +206,12 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         return activatesOn;
     }
 
-    
+    /**
+     * @return the activatesOnPretty
+     */
+    public String getActivatesOnPretty() {
+        return activatesOnPretty;
+    }
 
     /**
      * @return the expiresOn
@@ -167,7 +220,13 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         return expiresOn;
     }
 
-    
+    /**
+     * @return the expiresOnPretty
+     */
+    public String getExpiresOnPretty() {
+        return expiresOnPretty;
+    }
+
 
     /**
      * @param activatesOn the activatesOn to set
@@ -176,7 +235,12 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.activatesOn = activatesOn;
     }
 
-    
+    /**
+     * @param activatesOnPretty the activatesOnPretty to set
+     */
+    public void setActivatesOnPretty(String activatesOnPretty) {
+        this.activatesOnPretty = activatesOnPretty;
+    }
 
     /**
      * @param expiresOn the expiresOn to set
@@ -185,7 +249,12 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.expiresOn = expiresOn;
     }
 
-    
+    /**
+     * @param expiresOnPretty the expiresOnPretty to set
+     */
+    public void setExpiresOnPretty(String expiresOnPretty) {
+        this.expiresOnPretty = expiresOnPretty;
+    }
 
 
     /**
@@ -204,17 +273,17 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
 
 
     /**
-     * @return the readOnlyCurrentUser
+     * @return the currentUserCanEvaluateProposal
      */
-    public boolean isReadOnlyCurrentUser() {
-        return readOnlyCurrentUser;
+    public boolean isCurrentUserCanEvaluateProposal() {
+        return currentUserCanEvaluateProposal;
     }
 
     /**
-     * @param readOnlyCurrentUser the readOnlyCurrentUser to set
+     * @param currentUserCanEvaluateProposal the currentUserCanEvaluateProposal to set
      */
-    public void setReadOnlyCurrentUser(boolean readOnlyCurrentUser) {
-        this.readOnlyCurrentUser = readOnlyCurrentUser;
+    public void setCurrentUserCanEvaluateProposal(boolean currentUserCanEvaluateProposal) {
+        this.currentUserCanEvaluateProposal = currentUserCanEvaluateProposal;
     }
 
     /**
@@ -244,137 +313,5 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     public void setDirective(Directive directive) {
         this.directive = directive;
     }
-
-    /**
-     * @return the hidden
-     */
-    public boolean isHidden() {
-        return hidden;
-    }
-
-    /**
-     * @return the generatingEvent
-     */
-    public Event getGeneratingEvent() {
-        return generatingEvent;
-    }
-
-    /**
-     * @return the responseEvent
-     */
-    public Event getResponseEvent() {
-        return responseEvent;
-    }
-
-    /**
-     * @param hidden the hidden to set
-     */
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
-
-    /**
-     * @param generatingEvent the generatingEvent to set
-     */
-    public void setGeneratingEvent(Event generatingEvent) {
-        this.generatingEvent = generatingEvent;
-    }
-
-    /**
-     * @param responseEvent the responseEvent to set
-     */
-    public void setResponseEvent(Event responseEvent) {
-        this.responseEvent = responseEvent;
-    }
-
-    /**
-     * @return the order
-     */
-    public int getOrder() {
-        return order;
-    }
-
-    /**
-     * @param order the order to set
-     */
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-   
-
-
-    @Override
-    public int compareTo(Proposal p) {
-        if(this.order < p.getOrder()){
-            return -1;
-            
-        } else if (this.order > p.getOrder()){
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 47 * hash + this.proposalID;
-        hash = 47 * hash + Objects.hashCode(this.directive);
-        hash = 47 * hash + this.generatingEventID;
-        hash = 47 * hash + (this.readOnlyCurrentUser ? 1 : 0);
-        hash = 47 * hash + Objects.hashCode(this.initiator);
-        hash = 47 * hash + Objects.hashCode(this.responderIntended);
-        hash = 47 * hash + Objects.hashCode(this.responderActual);
-        hash = 47 * hash + Objects.hashCode(this.activatesOn);
-        hash = 47 * hash + Objects.hashCode(this.expiresOn);
-        hash = 47 * hash + Objects.hashCode(this.responseTS);
-        hash = 47 * hash + (this.active ? 1 : 0);
-        hash = 47 * hash + (this.hidden ? 1 : 0);
-        hash = 47 * hash + Objects.hashCode(this.generatingEvent);
-        hash = 47 * hash + Objects.hashCode(this.responseEvent);
-        hash = 47 * hash + Objects.hashCode(this.notes);
-        hash = 47 * hash + (this.proposalRejected ? 1 : 0);
-        hash = 47 * hash + this.order;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Proposal other = (Proposal) obj;
-        if (this.proposalID != other.proposalID) {
-            return false;
-        }
-        if (!Objects.equals(this.directive, other.directive)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return the chosenChoice
-     */
-    public Proposable getChosenChoice() {
-        return chosenChoice;
-    }
-
-    /**
-     * @param chosenChoice the chosenChoice to set
-     */
-    public void setChosenChoice(Proposable chosenChoice) {
-        this.chosenChoice = chosenChoice;
-    }
-
-    
-    
     
 }

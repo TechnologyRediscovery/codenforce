@@ -21,12 +21,15 @@ public class EventRule extends EntityUtils implements Serializable {
     
     private boolean requiredeventcatthresholdtypeintorder;
     private boolean requiredeventcatupperboundtypeintorder;
+    
     private boolean requiredeventcatthresholdglobalorder;
     private boolean requiredeventcatupperboundglobalorder;
     
     private EventCategory forbiddeneventcat_catid;
+    
     private boolean forbiddeneventcatthresholdtypeintorder;
     private boolean forbiddeneventcatupperboundtypeintorder;
+    
     private boolean forbiddeneventcatthresholdglobalorder;
     private boolean forbiddeneventcatupperboundglobalorder;
     

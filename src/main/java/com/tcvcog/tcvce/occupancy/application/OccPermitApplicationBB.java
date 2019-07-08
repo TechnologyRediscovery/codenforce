@@ -99,7 +99,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         if (propWithLists != null) {
 
-            if (getSessionBean().getWorkingPropWithLists() == null || !getSessionBean().getWorkingPropWithLists().getAddress().equalsIgnoreCase(propWithLists.getAddress())) {
+            if (getSessionBean().getWorkingPropWithLists() == null 
+                    || 
+                !getSessionBean().getWorkingPropWithLists().getAddress().equalsIgnoreCase(propWithLists.getAddress())) {
 
                 workingPropUnits = propWithLists.getUnitList();
 
@@ -770,6 +772,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             
             try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+   
             
                 ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitSelectForApply.xhtml#currentStep");
             } catch (IOException ex) {
@@ -1044,7 +1047,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         try {
             int applicationId = opi.insertOccPermitApplicationAndReturnId(getSessionBean().getOccPermitApplication());
             getSessionBean().getOccPermitApplication().setId(applicationId);
-            opi.insertOccPermitPersons(getSessionBean().getOccPermitApplication());
+            opi.insertOccPeriodPersons(getSessionBean().getOccPermitApplication());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
