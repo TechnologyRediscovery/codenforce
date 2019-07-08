@@ -68,8 +68,8 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
         if(getSelectedOccupancyInspectionFee() != null){
             setFormOccupancyInspectionFeeID(selectedOccupancyInspectionFee.getOccupancyInspectionFeeID());
             setFormMuni(selectedOccupancyInspectionFee.getMuni());
-            setFormOccupancyInspectionFeeName(selectedOccupancyInspectionFee.getOccupancyInspectionFeeName());
-            setFormOccupancyInspectionFeeAmount(selectedOccupancyInspectionFee.getOccupancyInspectionFeeAmount());
+            setFormOccupancyInspectionFeeName(selectedOccupancyInspectionFee.getFeeName());
+            setFormOccupancyInspectionFeeAmount(selectedOccupancyInspectionFee.getFeeAmount());
             //setFormOccupancyInspectionFeeNotes(selectedOccupancyInspectionFee.getOccupancyInspectionFeeNotes());
             /*
             Have to figure out what to do w/ setting dates...
@@ -89,12 +89,12 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
         Fee oif = selectedOccupancyInspectionFee;
         
         oif.setMuni(formMuni);
-        oif.setOccupancyInspectionFeeName(formOccupancyInspectionFeeName);
-        oif.setOccupancyInspectionFeeAmount(formOccupancyInspectionFeeAmount);
-        oif.setOccupancyInspectionFeeEffDate(formOccupancyInspectionFeeEffDate.toInstant()
+        oif.setFeeName(formOccupancyInspectionFeeName);
+        oif.setFeeAmount(formOccupancyInspectionFeeAmount);
+        oif.setEffectiveDate(formOccupancyInspectionFeeEffDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        oif.setOccupancyInspectionFeeExpDate(formOccupancyInspectionFeeExpDate.toInstant()
+        oif.setExpiryDate(formOccupancyInspectionFeeExpDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
         //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
@@ -117,15 +117,15 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
         
         oif.setOccupancyInspectionFeeID(newFormOccupancyInspectionFeeID);
         oif.setMuni(formMuni);
-        oif.setOccupancyInspectionFeeName(newFormOccupancyInspectionFeeName);
-        oif.setOccupancyInspectionFeeAmount(newFormOccupancyInspectionFeeAmount);
-        oif.setOccupancyInspectionFeeEffDate(newFormOccupancyInspectionFeeEffDate.toInstant()
+        oif.setFeeName(newFormOccupancyInspectionFeeName);
+        oif.setFeeAmount(newFormOccupancyInspectionFeeAmount);
+        oif.setEffectiveDate(newFormOccupancyInspectionFeeEffDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        oif.setOccupancyInspectionFeeExpDate(newFormOccupancyInspectionFeeExpDate.toInstant()
+        oif.setExpiryDate(newFormOccupancyInspectionFeeExpDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        oif.setOccupancyInspectionFeeNotes(newFormOccupancyInspectionFeeNotes);
+        oif.setNotes(newFormOccupancyInspectionFeeNotes);
         
         try{
             oifi.insertOccupancyInspectionFee(oif);
@@ -146,15 +146,15 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
         OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
         oif.setOccupancyInspectionFeeID(formOccupancyInspectionFeeID);
         oif.setMuni(getFormMuni());
-        oif.setOccupancyInspectionFeeName(formOccupancyInspectionFeeName);
-        oif.setOccupancyInspectionFeeAmount(formOccupancyInspectionFeeAmount);
-        oif.setOccupancyInspectionFeeEffDate(formOccupancyInspectionFeeEffDate.toInstant()
+        oif.setFeeName(formOccupancyInspectionFeeName);
+        oif.setFeeAmount(formOccupancyInspectionFeeAmount);
+        oif.setEffectiveDate(formOccupancyInspectionFeeEffDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        oif.setOccupancyInspectionFeeExpDate(formOccupancyInspectionFeeExpDate.toInstant()
+        oif.setExpiryDate(formOccupancyInspectionFeeExpDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
+        oif.setNotes(formOccupancyInspectionFeeNotes);
         try {
             oifi.insertOccupancyInspectionFee(oif);
             getFacesContext().addMessage(null,

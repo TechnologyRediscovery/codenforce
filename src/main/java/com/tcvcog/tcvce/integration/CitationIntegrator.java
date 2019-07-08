@@ -436,7 +436,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             cs.setDescription(rs.getString("description"));
             cs.setIcon(si.getIcon(rs.getInt("icon_iconid")));
             cs.setEditsAllowed(rs.getBoolean("editsforbidden"));
-            cs.setPhaseChangeRule(ci.getEventRule(rs.getInt("phasechangerule_ruleid")));
+            cs.setPhaseChangeRule(ei.getEventRule(rs.getInt("eventrule_ruleid")));
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Cannot Generate citation status object, sorry", ex);
@@ -449,7 +449,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         
         String query =  "INSERT INTO public.citationstatus(\n" +
                         "            statusid, statusname, description, icon_iconid, editsforbidden, \n" +
-                        "       phasechangerule_ruleid)\n" +
+                        "       eventrule_ruleid)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -460,7 +460,12 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(2, cs.getDescription());
             stmt.setInt(3, cs.getIcon().getIconid());
             stmt.setBoolean(4, cs.isEditsAllowed());
-            stmt.setInt(5, cs.getPhaseChangeRule().getRuleID());
+            if(cs.getPhaseChangeRule() != null){
+                stmt.setInt(5, cs.getPhaseChangeRule().getRuleid());
+                
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
             stmt.execute();
             
         } catch (SQLException ex) {
@@ -503,7 +508,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
     public void updateCitationStatus(CitationStatus cs) throws IntegrationException{
         
         String query =  "UPDATE public.citationstatus\n" +
-                        "   SET statusname=?, description=?, icon_iconid=?, editsforbidden=?, phasechangerule_ruleid=?\n" +
+                        "   SET statusname=?, description=?, icon_iconid=?, editsforbidden=?, eventrule_ruleid=?\n" +
                         " WHERE statusid=?;";
         
         Connection con = getPostgresCon();
@@ -515,7 +520,12 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(2, cs.getDescription());
             stmt.setInt(3, cs.getIcon().getIconid());
             stmt.setBoolean(4, cs.isEditsAllowed());
-            stmt.setInt(5, cs.getPhaseChangeRule().getRuleID());
+             if(cs.getPhaseChangeRule() != null){
+                stmt.setInt(5, cs.getPhaseChangeRule().getRuleid());
+                
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
             
             stmt.execute();
 

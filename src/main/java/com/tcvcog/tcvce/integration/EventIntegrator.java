@@ -18,31 +18,23 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
-import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.MalformedBOBException;
-import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
-import com.tcvcog.tcvce.entities.Directive;
 import com.tcvcog.tcvce.entities.EventRule;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.occupancy.entities.OccEvent;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriod;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,7 +43,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,10 +60,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public EventCategory getEventCategory(int catID) throws IntegrationException {
 
-        String query = "SELECT categoryid, categorytype, title, description, userdeployable, \n" +
+        String query = " SELECT categoryid, categorytype, title, description, userdeployable, \n" +
                         "       munideployable, publicdeployable, notifycasemonitors, hidable, \n" +
-                        "       icon_iconid, requestable, phasechangerule_ruleid"
-                + "  FROM public.eventcategory WHERE categoryID = ?";
+                        "       icon_iconid, relativeorderwithintype, relativeorderglobal, hosteventdescriptionsuggtext, \n" +
+                        "       directive_directiveid\n" +
+                        "  FROM public.eventcategory WHERE categoryid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -104,25 +96,28 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     private EventCategory generateEventCategoryFromRS(ResultSet rs) throws SQLException, IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         EventCategory ec = new EventCategory();
-        CaseIntegrator ci = getCaseIntegrator();
+        ChoiceIntegrator choiceInt = getChoiceIntegrator();
         
         ec.setCategoryID(rs.getInt("categoryid"));
         ec.setEventType(EventType.valueOf(rs.getString("categoryType")));
         ec.setEventCategoryTitle(rs.getString("title"));
         ec.setEventCategoryDesc(rs.getString("description"));
-
         ec.setUserdeployable(rs.getBoolean("userdeployable"));
+        
         ec.setMunideployable(rs.getBoolean("munideployable"));
         ec.setPublicdeployable(rs.getBoolean("publicdeployable"));
         ec.setNotifycasemonitors(rs.getBoolean("notifycasemonitors"));
         ec.setHidable(rs.getBoolean("hidable"));
-        ec.setRequestable(rs.getBoolean("requestable"));
         
         if(rs.getInt("icon_iconid") != 0){
             ec.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         }
-        if(rs.getInt("phasechangerule_ruleid") != 0){
-            ec.setCasePhaseChangeRule(ci.getEventRule(rs.getInt("phasechangerule_ruleid")));
+        ec.setRelativeOrderWithinType(rs.getInt("relativeorderwithintype"));
+        ec.setRelativeOrderGlobal(rs.getInt("relativeorderglobal"));
+        ec.setHostEventDescriptionSuggestedText(rs.getString("hosteventdescriptionsuggtext"));
+        
+        if(rs.getInt("directive_directiveid") != 0){
+            ec.setDirective(choiceInt.getDirective(rs.getInt("directive_directiveid")));
         }
         return ec;
     }
@@ -142,11 +137,14 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
 
         try {
-            String s = "SELECT ruleid, title, targetcasephase, requiredcurrentcasephase, forbiddencurrentcasephase, \n" +
-                        "       requiredextanteventtype, forbiddenextanteventtype, requiredextanteventcat, \n" +
-                        "       forbiddenextanteventcat, triggeredeventcat, active, mandatory, \n" +
-                        "       treatreqphaseasthreshold, treatforbidphaseasthreshold, rejectrulehostifrulefails, \n" +
-                        "       description\n" +
+            String s = "    SELECT ruleid, title, description, requiredeventtype, forbiddeneventtype, \n" +
+                        "       requiredeventcat_catid, requiredeventcatthresholdtypeintorder, \n" +
+                        "       requiredeventcatupperboundtypeintorder, requiredeventcatthresholdglobalorder, \n" +
+                        "       requiredeventcatupperboundglobalorder, forbiddeneventcat_catid, \n" +
+                        "       forbiddeneventcatthresholdtypeintorder, forbiddeneventcatupperboundtypeintorder, \n" +
+                        "       forbiddeneventcatthresholdglobalorder, forbiddeneventcatupperboundglobalorder, \n" +
+                        "       mandatorypassreqtocloseentity, autoremoveonentityclose, promptingproposal_proposalid, \n" +
+                        "       triggeredeventcatonpass, triggeredeventcatonfail, active, notes\n" +
                         "  FROM public.eventrule WHERE ruleid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, ruleid);
@@ -181,60 +179,22 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         EventRule cpcr = new EventRule();
         EventIntegrator ei = getEventIntegrator();
         
-        cpcr.setRuleID(rs.getInt("ruleid"));
-        cpcr.setTitle(rs.getString("title"));
-        
-        if(rs.getString("targetcasephase") != null) 
-            cpcr.setTargetCasePhase(CasePhase.valueOf(rs.getString("targetcasephase")));
-        if(rs.getString("requiredcurrentcasephase") != null) 
-            cpcr.setRequiredCurrentCasePhase(CasePhase.valueOf(rs.getString("requiredcurrentcasephase")));
-        if(rs.getString("forbiddencurrentcasephase") != null) 
-            cpcr.setForbiddenCurrentCasePhase(CasePhase.valueOf(rs.getString("forbiddencurrentcasephase")));
-        
-        if(rs.getString("requiredextanteventtype") != null)
-            cpcr.setRequiredExtantEventType(EventType.valueOf(rs.getString("requiredextanteventtype")));
-        if(rs.getString("forbiddenextanteventtype") != null)
-            cpcr.setForbiddenExtantEventType(EventType.valueOf(rs.getString("forbiddenextanteventtype")));
-        
-        cpcr.setRequiredExtantEventCatID(rs.getInt("requiredextanteventcat"));
-        cpcr.setForbiddenExtantEventCatID(rs.getInt("forbiddenextanteventcat"));
-
-        cpcr.setTriggeredEventCategoryID(rs.getInt("triggeredeventcat"));
-
-        
-        cpcr.setActive(rs.getBoolean("active"));
-        cpcr.setMandatory(rs.getBoolean("mandatory"));
-        cpcr.setTreatRequiredPhaseAsThreshold(rs.getBoolean("treatreqphaseasthreshold"));
-        cpcr.setTreatRequiredPhaseAsThreshold(rs.getBoolean("treatforbidphaseasthreshold"));
-        cpcr.setRejectRuleHostIfRuleFails(rs.getBoolean("rejectrulehostifrulefails"));
-        cpcr.setDescription(rs.getString("description"));
         
         return cpcr;
     }
     
     public List<EventRule> getEventRuleList(int ruleSetID){
         
-        
+        return new ArrayList<>();
         
     }
     
     public List<EventRule> getEventRuleList(OccPeriod op){
         
-        
-        
-    }
-    
-    
-    public List<EventRule> getEventRuleList(CECase op){
-        
-        
+        return new ArrayList<>();
         
     }
     
-    
-    
-    
-
     public ArrayList<EventCategory> getEventCategoryList() throws IntegrationException {
         String query = "SELECT categoryid FROM public.eventcategory;";
         Connection con = getPostgresCon();
@@ -319,15 +279,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public void insertEventCategory(EventCategory ec) throws IntegrationException {
 
-        String query = "INSERT INTO public.eventcategory(\n"
-                + "categoryid, "
-                + "categorytype, title, description, "
-                + "userdeployable, munideployable, publicdeployable, "
-                + "notifycasemonitors, phasechangerule_ruleid"
-                + "hidable, icon_iconid, requestable )\n"
-                + "    VALUES (DEFAULT, CAST (? as ceeventtype), ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?);";
+        String query = "INSERT INTO public.eventcategory(\n" +
+                        "            categoryid, categorytype, title, description, userdeployable, \n" +
+                        "            munideployable, publicdeployable, notifycasemonitors, hidable, \n" +
+                        "            icon_iconid, relativeorderwithintype, relativeorderglobal, hosteventdescriptionsuggtext, \n" +
+                        "            directive_directiveid)\n" +
+                        "    VALUES (?, ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -337,19 +297,24 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, ec.getEventType().name());
             stmt.setString(2, ec.getEventCategoryTitle());
             stmt.setString(3, ec.getEventCategoryDesc());
-
             stmt.setBoolean(4, ec.isUserdeployable());
+            
             stmt.setBoolean(5, ec.isMunideployable());
             stmt.setBoolean(6, ec.isPublicdeployable());
-
             stmt.setBoolean(7, ec.isNotifycasemonitors());
-            stmt.setInt(8, ec.getCasePhaseChangeRule().getRuleID());
+            stmt.setBoolean(8, ec.isHidable());
 
-            stmt.setBoolean(9, ec.isHidable());
-            stmt.setInt(10, ec.getIcon().getIconid());
-            stmt.setBoolean(11, ec.isRequestable());
+            stmt.setInt(9, ec.getIcon().getIconid());
+            stmt.setInt(10, ec.getRelativeOrderWithinType());
+            stmt.setInt(11, ec.getRelativeOrderGlobal());
+            stmt.setString(12, ec.getHostEventDescriptionSuggestedText());
+            
+            if(ec.getDirective() != null){
+                    stmt.setInt(13, ec.getDirective().getDirectiveID());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
 
-            System.out.println("EventInteegrator.insertEventCategory| sql: " + stmt.toString());
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -364,11 +329,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
     public void updateEventCategory(EventCategory ec) throws IntegrationException {
 
-        String query = "UPDATE public.eventcategory\n"
-                + "   SET categorytype=CAST (? as ceeventtype), title=?, description=?, userdeployable=?, \n"
-                + "       munideployable=?, publicdeployable=?, \n"
-                + "       notifycasemonitors=?, phasechangerule_ruleid=?, hidable=?, icon_iconid=?, requestable=? \n"
-                + " WHERE categoryid = ?;";
+        String query = "UPDATE public.eventcategory\n" +
+                        "   SET categorytype=?, title=?, description=?, userdeployable=?, \n" +
+                        "       munideployable=?, publicdeployable=?, notifycasemonitors=?, hidable=?, \n" +
+                        "       icon_iconid=?, relativeorderwithintype=?, relativeorderglobal=?, \n" +
+                        "       hosteventdescriptionsuggtext=?, directive_directiveid=?\n" +
+                        " WHERE categoryid = ?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -378,23 +344,31 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, ec.getEventType().name());
             stmt.setString(2, ec.getEventCategoryTitle());
             stmt.setString(3, ec.getEventCategoryDesc());
-
             stmt.setBoolean(4, ec.isUserdeployable());
+
             stmt.setBoolean(5, ec.isMunideployable());
             stmt.setBoolean(6, ec.isPublicdeployable());
-
             stmt.setBoolean(7, ec.isNotifycasemonitors());
-            stmt.setInt(8, ec.getCasePhaseChangeRule().getRuleID());
+            stmt.setBoolean(8, ec.isHidable());
 
-            stmt.setBoolean(9, ec.isHidable());
             if(ec.getIcon() != null){
-                stmt.setInt(10, ec.getIcon().getIconid());
+                stmt.setInt(9, ec.getIcon().getIconid());
             } else {
-                stmt.setNull(10, java.sql.Types.NULL);
+                stmt.setNull(9, java.sql.Types.NULL);
             }
-            stmt.setBoolean(11, ec.isRequestable());
-            stmt.setInt(12, ec.getCategoryID());
+            stmt.setInt(10, ec.getRelativeOrderWithinType());
+            stmt.setInt(11, ec.getRelativeOrderGlobal());
+            
+            stmt.setString(12, ec.getHostEventDescriptionSuggestedText());
 
+            if(ec.getDirective() != null){
+                stmt.setInt(13, ec.getDirective().getDirectiveID());
+                
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(14, ec.getCategoryID());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
@@ -770,20 +744,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 sb.append("BETWEEN ? AND ? "); // parm 2 and 3 without ID
             }
 
-            if (params.isFilterByEventType() 
-                    && 
-                !params.isFilterByrequestsAction()
-                    &&
-                !params.isFilterByRequestedResponseEventCat()) {
+            if (params.isFilterByEventType() ) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 sb.append("categorytype = CAST (? AS ceeventtype) ");
             }
 
-            if (params.isFilterByEventCategory() 
-                    && 
-                !params.isFilterByrequestsAction()
-                    &&
-                !params.isFilterByRequestedResponseEventCat()) {
+            if (params.isFilterByEventCategory() ) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 sb.append("eventcategory_catid = ? ");
             }
@@ -822,56 +788,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     sb.append("hidden = FALSE ");
                 }
             }
-
-            if (params.isFilterByrequestsAction()) {
-                if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                if (params.isRequestsAction()) {
-                    sb.append("requestedeventcat_catid IS NOT NULL ");
-                } else {
-                    sb.append("requestedeventcat_catid IS NULL ");
-                }
-            }
-
-            //      ALL of these criteria are only evaluated if filtering by case action request
-            if(params.isFilterByrequestsAction()){
-                if (params.isFilterByHasResponseEvent()) {
-                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                    if (params.isHasResponseEvent()) {
-                        sb.append("responseevent_eventid IS NOT NULL ");
-                    } else {
-                        sb.append("responseevent_eventid IS NULL ");
-                    }
-                }
-
-                if (params.isFilterByRequestedResponseEventCat()) {
-                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                    sb.append("requestedeventcat_catid = ? ");
-                }
-                
-                if (params.isFilterByRequestor()) {
-                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                    sb.append("actionrequestedby_userid = ? ");
-                }
-                 
-                if (params.isFilterByResponderIntended()) {
-                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                    sb.append("responderintended_userid = ? ");
-                }
-                
-                if (params.isFilterByResponderActual()) {
-                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                    sb.append("responderactual_userid = ? ");
-                }
-                
-                if (params.isFilterByRejectedRequest()) {
-                    if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                    if (params.isRejectedRequest()) {
-                        sb.append("rejeecteventrequest = TRUE ");
-                    } else {
-                        sb.append("rejeecteventrequest = FALSE ");
-                    }
-                } // close if for rejected
-            } // close if for requested action
         } else {
             sb.append("eventid = ? "); // will be param 1 with ID search
         }
@@ -912,28 +828,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 //                    stmt.setInt(++paramCounter, params.getPerson().getPersonID());
                 }
                 
-                // ALL of these criteria are only evaluated if filtering by case action request
-                if(params.isFilterByrequestsAction()){
-
-                    if (params.isFilterByRequestedResponseEventCat()) {
-                        stmt.setInt(++paramCounter, params.getEventCategory().getCategoryID());
-                    }
-
-                    if (params.isFilterByRequestor()) {
-                        stmt.setInt(++paramCounter, params.getUser().getUserID());
-                    }
-
-                    if (params.isFilterByResponderIntended()) {
-                        stmt.setInt(++paramCounter, params.getUser().getUserID());
-                    }
-
-                    if (params.isFilterByResponderActual()) {
-                        stmt.setInt(++paramCounter, params.getUser().getUserID());
-                    }
-                } // close if for requests action
-            
-
-                // ignore all other criteria and just search by ID
             } else {
                 stmt.setInt(++paramCounter, params.getObjectID());
             }
@@ -1060,7 +954,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
    
     
-    
+    /**
+     * @deprecated 
+     * @param ec
+     * @throws IntegrationException 
+     */
     public void clearResponseToActionRequest(CECaseEvent ec) throws IntegrationException{
          String query = "UPDATE public.ceevent\n" +
             "   SET responsetimestamp=NULL, respondernotes=NULL, \n" +
@@ -1138,6 +1036,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     public List<OccEvent> getOccEvents(int occPeriodID){
         
+        return new ArrayList<>();
         
         
     }

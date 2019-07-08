@@ -133,7 +133,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
                 if (change.getAction() == ChangeOrderAction.Accept) {
 
-                    change.setApprovedBy(getSessionBean().getFacesUser().getUserID());
+//                    change.setApprovedBy(getSessionBean().getFacesUser().getUserID());
                     change.setApprovedOn(Timestamp.valueOf(LocalDateTime.now()));
 
                     if (change.isAdded()) {
@@ -160,10 +160,10 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
                     
                 } else if (change.getAction() == ChangeOrderAction.Reject) {
                     
-                    change.setApprovedBy(getSessionBean().getFacesUser().getUserID());
-                    
-                    change.setInactive(Timestamp.valueOf(LocalDateTime.now()));
-                    
+//                    change.setApprovedBy(getSessionBean().getFacesUser().getUserID());
+//                    
+//                    change.setInactive(Timestamp.valueOf(LocalDateTime.now()));
+//                    
                     pi.updatePropertyUnitChange(change);
                     
                 }

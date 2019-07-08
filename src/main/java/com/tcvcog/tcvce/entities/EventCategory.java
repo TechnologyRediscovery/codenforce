@@ -37,10 +37,9 @@ public class EventCategory implements Serializable {
     
     private boolean notifycasemonitors;
     
-    private Directive eventProposal;
+    private Directive directive;
     
     private boolean hidable;
-    private boolean requestable;
     
     private Icon icon;
     
@@ -231,33 +230,20 @@ public class EventCategory implements Serializable {
         this.icon = icon;
     }
 
+
+
     /**
-     * @return the requestable
+     * @return the directive
      */
-    public boolean isRequestable() {
-        return requestable;
+    public Directive getDirective() {
+        return directive;
     }
 
     /**
-     * @param requestable the requestable to set
+     * @param directive the directive to set
      */
-    public void setRequestable(boolean requestable) {
-        this.requestable = requestable;
-    }
-
-
-    /**
-     * @return the eventProposal
-     */
-    public Directive getEventProposal() {
-        return eventProposal;
-    }
-
-    /**
-     * @param eventProposal the eventProposal to set
-     */
-    public void setEventProposal(Directive eventProposal) {
-        this.eventProposal = eventProposal;
+    public void setDirective(Directive directive) {
+        this.directive = directive;
     }
 
     /**

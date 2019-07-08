@@ -547,12 +547,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByrequestsAction(true);
-        eventParams.setRequestsAction(true);
-        
-        eventParams.setFilterByHasResponseEvent(true);
-        eventParams.setHasResponseEvent(false);
-        
         eventParams.setFilterByPerson(false);
         eventParams.setUseRespondedAtDateRange(false);
         
@@ -592,11 +586,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
-        
-        eventParams.setFilterByrequestsAction(false);
-        
-        eventParams.setFilterByHasResponseEvent(false);
-        eventParams.setHasResponseEvent(false);
         
         eventParams.setFilterByPerson(false);
         eventParams.setUseRespondedAtDateRange(false);
@@ -641,10 +630,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByActive(true);
         eventParams.setIsActive(true);
         
-        eventParams.setFilterByrequestsAction(false);
-        
-        eventParams.setFilterByHasResponseEvent(false);
-        eventParams.setHasResponseEvent(false);
         
         eventParams.setFilterByPerson(false);
         eventParams.setUseRespondedAtDateRange(false);

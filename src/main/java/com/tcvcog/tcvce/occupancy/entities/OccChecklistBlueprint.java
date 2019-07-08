@@ -103,7 +103,7 @@ public class OccChecklistBlueprint {
     /**
      * @return the spaceList
      */
-    public ArrayList<OccSpace> getSpaceList() {
+    public List<OccSpace> getSpaceList() {
         return spaceList;
     }
 

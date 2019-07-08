@@ -87,7 +87,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
         payment.setPaymentAmount(formPaymentAmount);
-        payment.setPaymentPayerID(formPaymentPayerID);
+//        payment.setPaymentPayerID(formPaymentPayerID);
         payment.setPaymentReferenceNum(formPaymentReferenceNum);
         payment.setCheckNum(formCheckNum);
         payment.setCleared(formCleared);
@@ -113,7 +113,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             setFormPaymentPaymentType(selectedPayment.getPaymentType());
             setFormPaymentOccupancyInspectionID(selectedPayment.getOccupancyInspectionID());
             setFormPaymentAmount(selectedPayment.getPaymentAmount());
-            setFormPaymentPayerID(selectedPayment.getPaymentPayerID());
+//            setFormPaymentPayerID(selectedPayment.getPaymentPayerID());
             setFormPaymentReferenceNum(selectedPayment.getPaymentReferenceNum());
             setFormCheckNum(selectedPayment.getCheckNum());
             setFormCleared(selectedPayment.isCleared());
@@ -142,7 +142,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
         payment.setPaymentAmount(formPaymentAmount);
-        payment.setPaymentPayerID(formPaymentPayerID);
+//        payment.setPaymentPayerID(formPaymentPayerID);
         payment.setPaymentReferenceNum(formPaymentReferenceNum);
         payment.setCheckNum(formCheckNum);
         payment.setCleared(formCleared);
