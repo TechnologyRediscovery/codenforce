@@ -110,7 +110,7 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
             setFormUserdeployable(selectedEventCategory.isUserdeployable());
             setFormMunideployable(selectedEventCategory.isMunideployable());
             setFormPublicdeployable(selectedEventCategory.isPublicdeployable());
-            setFormRequestable(selectedEventCategory.isRequestable());
+//            setFormRequestable(selectedEventCategory.isRequestable());
             setFormNotifycasemonitors(selectedEventCategory.isNotifycasemonitors());
             setFormHidable(selectedEventCategory.isHidable());
             
@@ -135,7 +135,7 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
         ec.setUserdeployable(formUserdeployable);
         ec.setMunideployable(formMunideployable);
         ec.setPublicdeployable(formPublicdeployable);
-        ec.setRequestable(formRequestable);
+//        ec.setRequestable(formRequestable);
         ec.setNotifycasemonitors(formNotifycasemonitors);
         ec.setHidable(formHidable);
         
@@ -167,7 +167,7 @@ public class EventCECaseConfigurationBB extends BackingBeanUtils implements Seri
         ec.setUserdeployable(newFormUserdeployable);
         ec.setMunideployable(newFormMunideployable);
         ec.setPublicdeployable(newFormPublicdeployable);
-        ec.setRequestable(newFormRequestable);
+//        ec.setRequestable(newFormRequestable);
         ec.setNotifycasemonitors(newFormNotifycasemonitors);
         ec.setHidable(newFormHidable);
         

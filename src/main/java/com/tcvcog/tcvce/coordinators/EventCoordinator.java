@@ -150,10 +150,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // remember: event proposals are specified in an EventCategory object
         // but when we build an Event object, the ProposalImplementation lives on the Event itself
         // 
-        if(ev.getCategory().getEventProposal() != null){
-            Proposal imp = ei.getProposalImplAssociatedWithEvent(ev);
-            imp.setCurrentUserCanEvaluateProposal(determineCanUserEvaluateProposal(ev, user, userAuthMuniList));
-            ev.setEventProposalImplementation(imp);
+        if(ev.getCategory().getDirective() != null){
+//            TODO: OccBeta
+//            Proposal imp = ei.getProposalImplAssociatedWithEvent(ev);
+//            imp.setCurrentUserCanEvaluateProposal(determineCanUserEvaluateProposal(ev, user, userAuthMuniList));
+//            ev.setEventProposalImplementation(imp);
         }
         ev.setPersonList(pi.getPersonList(ev));
         
@@ -190,7 +191,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public boolean determineCanUserEvaluateProposal(CECaseEvent ev, User u, List<Municipality> muniList){
         boolean canEvaluateProposal = false;
-        Directive evProp = ev.getCategory().getEventProposal();
+        Directive evProp = ev.getCategory().getDirective();
         
         // direct event assignment allows view conf to cut across regular permissions
         // checks
@@ -473,7 +474,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             sb.append("following the passing of CasePhaseChangeRule:  ");
             sb.append(rule.getTitle());
             sb.append(", no. ");
-            sb.append(rule.getRuleID());
         }
         event.setDescription(sb.toString());
         
@@ -492,9 +492,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 
     } // close method
     
+
+
+    /**
+     * TODO occbeta
+     * 
+     * @deprecated 
+     * @param ev
+     * @throws IntegrationException 
+     */
     public void logResponseToActionRequest(CECaseEvent ev) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        ei.logResponseToProposal(ev);
     }
     
     

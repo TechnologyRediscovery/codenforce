@@ -108,12 +108,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public Directive getDirective(int propID){
-        
-        
-        return new Directive();
-        
-    }
+  
     
     
     private Choice generateChoice(ResultSet rs) throws SQLException, MalformedBOBException, IntegrationException{
@@ -153,12 +148,18 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         return choice;
     }
     
+    /**
+     * TODO: complete for occbeta
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
      private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException{
         Proposal propImp = new Proposal();
         UserIntegrator ui = getUserIntegrator();
         
         propImp.setImplementationID(rs.getInt("implementationid"));
-        propImp.setProposalID(rs.getInt("proposal_propid"));
         
         propImp.setInitiator(ui.getUser(rs.getInt("initiator")));
         propImp.setResponderIntended(ui.getUser(rs.getInt("responderintended_userid")));
@@ -176,7 +177,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         }
         propImp.setProposalRejected(rs.getBoolean("rejectproposal"));
         
-        propImp.setExpiredorinactive(rs.getBoolean("expiredorinactive"));
         propImp.setNotes(rs.getString("notes"));
         
         return propImp;
@@ -195,7 +195,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, imp.getProposalID());
             stmt.setInt(2, imp.getGeneratingEventID());
             stmt.setInt(3, imp.getInitiator().getUserID());
             stmt.setInt(4, imp.getResponderIntended().getUserID());
@@ -268,26 +267,20 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     
     
     
-    /**
-     * Builds an Directive object from the eventproposal table in the DB.
-     * An Directive contains up to three EventCategory objects which the user 
- can select to create next in their case management workflow
-     * @param proposalID
-     * @return all fields populated
-     * @throws IntegrationException 
-     */
-    public Directive getProposal(int proposalID) throws IntegrationException{
+  
+    public Directive getDirective(int directiveID) throws IntegrationException{
 
         Directive proposal = new Directive();
         
         StringBuilder sb = new StringBuilder();
-        sb.append(      "SELECT proposalid, title, overalldescription, creator_userid, choice1eventcat_catid, \n" +
-                        "       choice1description, choice2eventcat_catid, choice2description, \n" +
-                        "       choice3eventcat_catid, choice3description, directproposaltodefaultmuniceo, \n" +
-                        "       directproposaltodefaultmunistaffer, directproposaltodeveloper, \n" +
-                        "       activatesxdaysfromgenevent, expiresxdaysfromgenevent, expirytrigger_eventcatid, \n" +
-                        "       active\n" +
-                        "  FROM public.ceeventproposal WHERE proposalid = ?;");
+        sb.append(      "SELECT directiveid, title, overalldescription, creator_userid, directtodefaultmuniceo, \n" +
+                        "       directtodefaultmunistaffer, directtodeveloper, executechoiceiflonewolf, \n" +
+                        "       applytoclosedentities, instantiatemultiple, inactivategeneventoneval, \n" +
+                        "       maintainreldatewindow, autoinactivateonbobclose, autoinactiveongeneventinactivation, \n" +
+                        "       minimumrequireduserranktoview, minimumrequireduserranktoevaluate, \n" +
+                        "       active, icon_iconid, directproposaltodefaultmuniadmin, relativeorder, \n" +
+                        "       directtomunisysadmin\n" +
+                        "  FROM public.choicedirective WHERE directiveid = ?;");
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -295,11 +288,11 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         try {
 
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, proposalID);
+            stmt.setInt(1, directiveID);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                proposal = generateEventProposal(rs);
+                proposal = generateDirective(rs);
             }
 
         } catch (SQLException ex) {
@@ -326,46 +319,36 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private Directive generateEventProposal(ResultSet rs) throws SQLException, IntegrationException{
-        Directive proposal = new Directive();
+    private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException{
+        Directive directive = new Directive();
         
-        proposal.setProposalID(rs.getInt("proposalid"));
-        proposal.setTitle(rs.getString("title"));
-        proposal.setDescription(rs.getString("overalldescription"));
+        directive.setTitle(rs.getString("title"));
+        directive.setDescription(rs.getString("overalldescription"));
         
-        proposal.setChoice1EventCat(getEventCategory(rs.getInt("choice1eventcat_catid")));
-        proposal.setChoice1Description(rs.getString("choice1description"));
-        proposal.setChoice2EventCat(getEventCategory(rs.getInt("choice2eventcat_catid")));
-        proposal.setChoice1Description(rs.getString("choice2description"));
-        proposal.setChoice3EventCat(getEventCategory(rs.getInt("choice3eventcat_catid")));
-        proposal.setChoice1Description(rs.getString("choice3description"));
+        directive.setDirectPropToDefaultMuniCEO(rs.getBoolean("directproposaltodefaultmuniceo"));
+        directive.setDirectPropToDefaultMuniStaffer(rs.getBoolean("directproposaltodefaultmunistaffer"));
+        directive.setDirectPropToDeveloper(rs.getBoolean("directproposaltodeveloper"));
         
-        proposal.setDirectPropToDefaultMuniCEO(rs.getBoolean("directproposaltodefaultmuniceo"));
-        proposal.setDirectPropToDefaultMuniStaffer(rs.getBoolean("directproposaltodefaultmunistaffer"));
-        proposal.setDirectPropToDeveloper(rs.getBoolean("directproposaltodeveloper"));
+        directive.setActive(rs.getBoolean("active"));
         
-        proposal.setActivatesXDaysFromGeneratingEvent(rs.getInt("activatesxdaysfromgenevent"));
-        proposal.setExpiresXDaysFromGeneratingEvent(rs.getInt("expiresxdaysfromgenevent"));
-        proposal.setExpiryTrigger(getEventCategory(rs.getInt("expirytrigger_eventcatid")));
-        
-        proposal.setActive(rs.getBoolean("active"));
-        
-        return proposal;
+        return directive;
     }
     
-    public void insertEventProposal(Directive prop) throws IntegrationException{
-         String query = "INSERT INTO public.ceeventproposal(\n" +
-                        "            proposalid, title, overalldescription, creator_userid, choice1eventcat_catid, \n" +
-                        "            choice1description, choice2eventcat_catid, choice2description, \n" +
-                        "            choice3eventcat_catid, choice3description, directproposaltodefaultmuniceo, \n" +
-                        "            directproposaltodefaultmunistaffer, directproposaltodeveloper, \n" +
-                        "            activatesxdaysfromgenevent, expiresxdaysfromgenevent, expirytrigger_eventcatid, \n" +
-                        "            active)\n" +
+    public void insertDirective(Directive prop) throws IntegrationException{
+         String query = "INSERT INTO public.choicedirective(\n" +
+                        "            directiveid, title, overalldescription, creator_userid, directtodefaultmuniceo, \n" +
+                        "            directtodefaultmunistaffer, directtodeveloper, executechoiceiflonewolf, \n" +
+                        "            applytoclosedentities, instantiatemultiple, inactivategeneventoneval, \n" +
+                        "            maintainreldatewindow, autoinactivateonbobclose, autoinactiveongeneventinactivation, \n" +
+                        "            minimumrequireduserranktoview, minimumrequireduserranktoevaluate, \n" +
+                        "            active, icon_iconid, directproposaltodefaultmuniadmin, relativeorder, \n" +
+                        "            directtomunisysadmin)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, \n" +
                         "            ?, ?, ?, \n" +
-                        "            ?, ?, \n" +
                         "            ?, ?, ?, \n" +
+                        "            ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
                         "            ?);";
 
         Connection con = getPostgresCon();
@@ -376,22 +359,11 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, prop.getTitle());
             stmt.setString(2, prop.getDescription());
             stmt.setInt(3, prop.getCreator().getUserID());
-            stmt.setInt(4, prop.getChoice1EventCat().getCategoryID());
-            
-            stmt.setString(5, prop.getChoice1Description());
-            stmt.setInt(6, prop.getChoice2EventCat().getCategoryID());
-            stmt.setString(7, prop.getChoice2Description());
-            
-            stmt.setInt(8, prop.getChoice3EventCat().getCategoryID());
-            stmt.setString(9, prop.getChoice3Description());
             stmt.setBoolean(10, prop.isDirectPropToDefaultMuniCEO());
             
             stmt.setBoolean(11, prop.isDirectPropToDefaultMuniStaffer());
             stmt.setBoolean(12, prop.isDirectPropToDeveloper());
             
-            stmt.setInt(13, prop.getActivatesXDaysFromGeneratingEvent());
-            stmt.setInt(14, prop.getExpiresXDaysFromGeneratingEvent());
-            stmt.setInt(15, prop.getExpiryTrigger().getCategoryID());
             
             stmt.setBoolean(16, prop.isActive());
 
@@ -512,7 +484,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getProposalID());
             stmt.setInt(2, prop.getGeneratingEventID());
             
             if(prop.getInitiator() != null){
@@ -545,7 +516,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             }
 
             stmt.setInt(10, prop.getResponseEventID());
-            stmt.setBoolean(11, prop.isExpiredorinactive());
             stmt.setString(12, prop.getNotes());
             
             stmt.execute();
@@ -561,11 +531,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private Directive generateDirective(ResultSet rs){
-       
-        
-        
-    }
     
     private Proposal generateProposal(ResultSet rs, Directive dir){
         Proposal proposal = new Proposal();

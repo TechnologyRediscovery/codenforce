@@ -22,7 +22,6 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccInspection;
 import com.tcvcog.tcvce.entities.Fee;
-import com.tcvcog.tcvce.occupancy.entities.OccInspecStatus;
 import java.sql.Connection;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -55,20 +54,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
             stmt = con.prepareStatement(query);
 //            stmt.setInt(1, occupancyInspection.getPropertyUnitID());
 //            stmt.setInt(2, occupancyInspection.getLoginUserID());
-            if(occupancyInspection.getFirstInspectionDate() != null){
-                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(occupancyInspection.getFirstInspectionDate()));
-            } else {
-                stmt.setNull(3, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(4, occupancyInspection.isFirstInspectionPass());
-            if(occupancyInspection.getSecondInspectionDate() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(occupancyInspection.getSecondInspectionDate()));
-            } else {
-                stmt.setNull(5, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(6, occupancyInspection.isSecondInspectionPass());
-            stmt.setBoolean(8, occupancyInspection.isTotalFeePaid());
-            stmt.setString(9, occupancyInspection.getNotes());
+            
             
             
         } catch (SQLException ex) {
@@ -98,22 +84,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
 //            stmt.setInt(1, occInspection.getPropertyUnitID());
 //            stmt.setInt(2, occInspection.getLoginUserID());
             //update first inspection date
-            if(occInspection.getFirstInspectionDate() != null){
-                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(occInspection.getFirstInspectionDate()));
-                
-            } else {
-                stmt.setNull(3, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(4, occInspection.isFirstInspectionPass());
-            //update second inspection date
-            if(occInspection.getSecondInspectionDate() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(occInspection.getSecondInspectionDate()));
-                
-            } else {
-                stmt.setNull(5, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(6, occInspection.isSecondInspectionPass());
-            stmt.setBoolean(8, occInspection.isTotalFeePaid());
+           
             stmt.setString(9, occInspection.getNotes());
             stmt.setInt(10, occInspection.getInspectionID());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
@@ -157,20 +128,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
             newInspection.setInspectionID(rs.getInt("inspectionid"));
 //            newInspection.setPropertyUnitID(rs.getInt("propertyunitid"));
 //            newInspection.setLoginUserID(rs.getInt("login_userid"));
-            java.sql.Timestamp stamp = rs.getTimestamp("firstinspectiondate");
-            if(stamp != null){
-                newInspection.setFirstInspectionDate(stamp.toLocalDateTime());
-            } else {
-                newInspection.setFirstInspectionDate(null);
-            }
-            newInspection.setFirstInspectionPass(rs.getBoolean("firstinspectionpass"));
-            java.sql.Timestamp t = rs.getTimestamp("secondinspectiondate");
-            if(t != null){
-                newInspection.setSecondInspectionDate(t.toLocalDateTime());
-            } else {
-                newInspection.setSecondInspectionDate(null);
-            }
-            newInspection.setTotalFeePaid(rs.getBoolean("totalfeepaid"));
+           
             newInspection.setNotes(rs.getString("notes"));
             
         }catch (SQLException ex){
@@ -227,23 +185,8 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         try{
             stmt = con.prepareStatement(query);
             stmt.setInt(1, oif.getMuni().getMuniCode());
-            stmt.setString(2, oif.getOccupancyInspectionFeeName());
-            stmt.setDouble(3, oif.getOccupancyInspectionFeeAmount());
-            //update effective date
-            if(oif.getOccupancyInspectionFeeEffDate() != null){
-                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(oif.getOccupancyInspectionFeeEffDate()));
-                
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-            //update expiry date
-            if(oif.getOccupancyInspectionFeeExpDate() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(oif.getOccupancyInspectionFeeExpDate()));
-                
-            } else {
-                stmt.setNull(5, java.sql.Types.NULL);
-            }
-            stmt.setString(6, oif.getOccupancyInspectionFeeNotes());
+           
+           
             stmt.setInt(7, oif.getOccupancyInspectionFeeID());
             stmt.executeUpdate();
         } catch (SQLException ex){
@@ -299,20 +242,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, occupancyInspectionFee.getMuni().getMuniCode());
-            stmt.setString(2, occupancyInspectionFee.getOccupancyInspectionFeeName());
-            stmt.setDouble(3, occupancyInspectionFee.getOccupancyInspectionFeeAmount());
-            if(occupancyInspectionFee.getOccupancyInspectionFeeEffDate() != null){
-                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(occupancyInspectionFee.getOccupancyInspectionFeeEffDate()));
-                
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-            if(occupancyInspectionFee.getOccupancyInspectionFeeExpDate() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(occupancyInspectionFee.getOccupancyInspectionFeeExpDate()));
-            } else {
-                stmt.setNull(5, java.sql.Types.NULL);
-            }
-            stmt.setString(6, occupancyInspectionFee.getOccupancyInspectionFeeNotes());
+            
             System.out.println("OccupancyInspectionFeeIntegrator.occupancyInspectionFeeIntegrator | sql: " + stmt.toString());
             System.out.println("TRYING TO EXECUTE INSERT METHOD");
             stmt.execute();
@@ -357,24 +287,7 @@ public class OccupancyInspectionIntegrator extends BackingBeanUtils implements S
         try {
             newOif.setOccupancyInspectionFeeID(rs.getInt("feeid"));
             newOif.setMuni(mi.getMuni(rs.getInt("muni_municode")));
-            newOif.setOccupancyInspectionFeeName(rs.getString("feename"));
-            newOif.setOccupancyInspectionFeeAmount(rs.getDouble("feeamount"));
-            java.sql.Timestamp eff = rs.getTimestamp("effectivedate");
-            //for effective date
-            if(eff != null) {
-                newOif.setOccupancyInspectionFeeEffDate(eff.toLocalDateTime());
-            } else {
-                newOif.setOccupancyInspectionFeeEffDate(null);
-            }
-            java.sql.Timestamp exp = rs.getTimestamp("expirydate");
-            //for expiration date
-            if(exp != null) {
-                newOif.setOccupancyInspectionFeeExpDate(exp.toLocalDateTime());
-            } else {
-                newOif.setOccupancyInspectionFeeExpDate(null);
-            }
-            newOif.setOccupancyInspectionFeeNotes(rs.getString("notes"));            
-            
+           
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generation OccInspectionFee from result set", ex);

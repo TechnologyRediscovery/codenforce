@@ -62,7 +62,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         propUnit.setUnitNumber(DEFAULTUNITNUMBER);
         propUnit.setRental(DEFAULTRENTAL);
-        propUnit.setPropertyUnitPersonList(new ArrayList<Person>());
+//        propUnit.setPropertyUnitPersonList(new ArrayList<Person>());
 
         return propUnit;
     }

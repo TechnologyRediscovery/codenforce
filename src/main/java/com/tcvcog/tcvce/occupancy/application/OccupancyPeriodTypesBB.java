@@ -64,11 +64,11 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccPeriodType o = new OccPeriodType();
         
-        o.setOccupancyPermitTypeID(newFormOccupancyPermitTypeID);
-        o.setMuni(formMuni);
-        o.setOccupancyPermitTypeName(newFormOccupancyPermitTypeName);
-        o.setOccupancyPermitTypeDescription(newFormOccupancyPermitTypeDescription);
-        
+//        o.setOccupancyPermitTypeID(newFormOccupancyPermitTypeID);
+//        o.setMuni(formMuni);
+//        o.setOccupancyPermitTypeName(newFormOccupancyPermitTypeName);
+//        o.setOccupancyPermitTypeDescription(newFormOccupancyPermitTypeDescription);
+//        
         try{
             oi.insertOccPeriodType(o);
             getFacesContext().addMessage(null,
@@ -111,8 +111,8 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
         if (getSelectedOccupancyPermitType() != null) {
             //setFormOccupancyPermitTypeID(selectedOccupancyPermitType.getOccupancyPermitTypeID());
             //setFormOccupancyPermitTypeMuniCodeID(selectedOccupancyPermitType.getOccupancyPermitTypeMuniCodeID());
-            setFormOccupancyPermitTypeName(selectedOccupancyPermitType.getOccupancyPermitTypeName());
-            setFormOccupancyPermitTypeDescription(selectedOccupancyPermitType.getOccupancyPermitTypeDescription());
+//            setFormOccupancyPermitTypeName(selectedOccupancyPermitType.getOccupancyPermitTypeName());
+//            setFormOccupancyPermitTypeDescription(selectedOccupancyPermitType.getOccupancyPermitTypeDescription());
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -126,8 +126,8 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
         
         //o.setOccupancyPermitTypeID(getFormOccupancyPermitTypeID());
         //o.setOccupancyPermitTypeMuniCodeID(getFormOccupancyPermitTypeMuniCodeID());
-        o.setOccupancyPermitTypeName(formOccupancyPermitTypeName);
-        o.setOccupancyPermitTypeDescription(formOccupancyPermitTypeDescription);
+//        o.setOccupancyPermitTypeName(formOccupancyPermitTypeName);
+//        o.setOccupancyPermitTypeDescription(formOccupancyPermitTypeDescription);
         
         try{
             oi.updateOccPeriodType(o);
@@ -146,10 +146,10 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
     public String addOccupancyPermitType(){
         OccPeriodType o = new OccPeriodType();
         OccupancyIntegrator oi = new OccupancyIntegrator();
-        o.setOccupancyPermitTypeID(formOccupancyPermitTypeID);
-        o.setMuni(getFormMuni());
-        o.setOccupancyPermitTypeName(formOccupancyPermitTypeName);
-        o.setOccupancyPermitTypeDescription(formOccupancyPermitTypeDescription);
+//        o.setOccupancyPermitTypeID(formOccupancyPermitTypeID);
+//        o.setMuni(getFormMuni());
+//        o.setOccupancyPermitTypeName(formOccupancyPermitTypeName);
+//        o.setOccupancyPermitTypeDescription(formOccupancyPermitTypeDescription);
         
         try {
             oi.insertOccPeriodType(o);
@@ -174,15 +174,15 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
      * @return the occupancyPermitTypeList
      */
     public ArrayList<OccPeriodType> getOccupancyPermitTypeList() {
-        try {
-            OccupancyIntegrator oi = getOccupancyIntegrator();
-            occupancyPermitTypeList = oi.getCompleteOccPeriodTypeList();
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null, 
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Unable to load OccupancyPermitTypeList",
-                        "This must be corrected by the system administrator"));
-        }
+//        try {
+//            OccupancyIntegrator oi = getOccupancyIntegrator();
+//            occupancyPermitTypeList = oi.getCompleteOccPeriodTypeList();
+//        } catch (IntegrationException ex) {
+//            getFacesContext().addMessage(null, 
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                        "Unable to load OccupancyPermitTypeList",
+//                        "This must be corrected by the system administrator"));
+//        }
         if(occupancyPermitTypeList != null){
         return occupancyPermitTypeList;
         }else{

@@ -17,7 +17,7 @@ public class EventRule extends EntityUtils implements Serializable {
     private String description;
     private EventType requiredeventtype;
     private EventType forbiddeneventtype;
-    private EventCategory requiredeventcat_catid;
+    private EventCategory requiredEventCat;
     
     private boolean requiredeventcatthresholdtypeintorder;
     private boolean requiredeventcatupperboundtypeintorder;
@@ -41,6 +41,7 @@ public class EventRule extends EntityUtils implements Serializable {
     private EventCategory triggeredeventcatonfail;
     
     private boolean active;
+    private String notes;
 
     /**
      * @return the ruleid
@@ -78,10 +79,10 @@ public class EventRule extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the requiredeventcat_catid
+     * @return the requiredEventCat
      */
-    public EventCategory getRequiredeventcat_catid() {
-        return requiredeventcat_catid;
+    public EventCategory getRequiredEventCat() {
+        return requiredEventCat;
     }
 
     /**
@@ -225,10 +226,10 @@ public class EventRule extends EntityUtils implements Serializable {
     }
 
     /**
-     * @param requiredeventcat_catid the requiredeventcat_catid to set
+     * @param requiredEventCat the requiredEventCat to set
      */
-    public void setRequiredeventcat_catid(EventCategory requiredeventcat_catid) {
-        this.requiredeventcat_catid = requiredeventcat_catid;
+    public void setRequiredEventCat(EventCategory requiredEventCat) {
+        this.requiredEventCat = requiredEventCat;
     }
 
     /**
@@ -334,6 +335,20 @@ public class EventRule extends EntityUtils implements Serializable {
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     

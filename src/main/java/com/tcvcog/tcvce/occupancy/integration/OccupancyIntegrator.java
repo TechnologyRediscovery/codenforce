@@ -145,12 +145,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setApplicationList(getOccPermitApplicationList(op));
         op.setPersonList(pi.getPersonList(op));
         
-        op.setEventList(eventList);
-        op.setEventProposalList(eventProposalList);
-        op.setInspectionList(inspectionList);;
-        op.setPermitList(permitList);;
-        op.setPhotoIDList(photoIDList);
-        
+//        op.setEventList(eventList);
+//        op.setEventProposalList(eventProposalList);
+//        op.setInspectionList(inspectionList);;
+//        op.setPermitList(permitList);;
+//        op.setPhotoIDList(photoIDList);
+//        
         
         
         
@@ -262,9 +262,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt = con.prepareStatement(query);
             //stmt.setInt(1, opt.getOccupancyPermitTypeID());
             //stmt.setInt(2, opt.getOccupancyPermitTypeMuniCodeID());
-            stmt.setString(1, opt.getOccupancyPermitTypeName());
-            stmt.setString(2, opt.getOccupancyPermitTypeDescription());
-            stmt.setInt(3, opt.getOccupancyPermitTypeID());
+            
             stmt.executeUpdate();
         } catch (SQLException ex){
             System.out.println(ex.toString());
@@ -283,7 +281,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, opt.getOccupancyPermitTypeID());
+//            stmt.setInt(1, opt.getOccupancyPermitTypeID());
             stmt.execute();
 
         } catch (SQLException ex) {

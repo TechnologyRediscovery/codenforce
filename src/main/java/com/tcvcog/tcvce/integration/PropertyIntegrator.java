@@ -888,7 +888,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         pu.setRental(rs.getBoolean("rental"));
         pu.setProperty(getProperty(rs.getInt("property_propertyid")));
         pu.setInactive(rs.getBoolean("inactive"));
-        pu.setPropertyUnitPersonList(persInt.getPersonList(rs.getInt("property_propertyid")));
         return pu;
     }
 
@@ -1087,7 +1086,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         uc.setNotes(rs.getString("notes"));
         uc.setOtherKnownAddress(rs.getString("otherknownaddress"));
         uc.setRental(rs.getBoolean("rental"));
-        uc.setThisUnit(getPropertyUnit(rs.getInt("unit_unitid")));
         uc.setAdded(rs.getBoolean("added"));
         uc.setRemoved(rs.getBoolean("removed"));
         uc.setChangedOn(rs.getTimestamp("changedon"));
@@ -1095,10 +1093,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         uc.setApprovedBy(ui.getUser(rs.getInt("approvedby")));
         uc.setChangedBy(rs.getString("changedby"));
         uc.setPropertyID(rs.getInt("property_propertyid"));
-        uc.setInactive(rs.getTimestamp("inactive"));
+        uc.setActive(rs.getBoolean("active"));
         return uc;
     }
 
+    /**
+     * TODO occbeta
+     * @param changeToUpdate
+     * @throws IntegrationException 
+     */
     public void updatePropertyUnitChange(PropertyUnitChange changeToUpdate) throws IntegrationException {
         String query = "UPDATE public.propertyunitchange\n"
                 + "SET unitnumber=?, unit_unitid=?, otherknownaddress=?, notes=?, rental=?,\n"
@@ -1133,7 +1136,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
             stmt.setString(11, changeToUpdate.getChangedBy());
 
-            stmt.setTimestamp(12, changeToUpdate.getInactive());
+            stmt.setBoolean(12, changeToUpdate.isActive());
 
             stmt.setInt(13, changeToUpdate.getUnitChangeID());
             

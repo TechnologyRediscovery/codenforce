@@ -227,13 +227,25 @@ ALTER TABLE choicedirective RENAME COLUMN directproposaltodefaultmunistaffer TO 
 ALTER TABLE choicedirective RENAME COLUMN directproposaltodeveloper TO directtodeveloper;
 ALTER TABLE choicedirective ADD COLUMN directtomunisysadmin BOOLEAN DEFAULT false;
 
-
-  
-
-
+ALTER TABLE choiceproposalset RENAME TO choicedirectiveset;
+ALTER TABLE choiceproposalchoice RENAME TO choicedirectivechoice;
 
 
+DROP TABLE public.choiceproppropset;
 
+ALTER TABLE choicedirectiveset RENAME COLUMN proposalsetid TO directivesetid;
+CREATE TABLE public.choicedirectivedirectiveset
+(
+	directiveset_setid 						INTEGER NOT NULL CONSTRAINT choicedirdirset_dirsetid_fk REFERENCES choicedirectiveset (directivesetid),
+	directive_dirid 	 					INTEGER NOT NULL CONSTRAINT choicedirdirset_dirid_fk REFERENCES choicedirective (directiveid),
+	CONSTRAINT choicedirdirset_comp_pf PRIMARY KEY (directiveset_setid, directive_dirid)
+
+);
+
+ALTER TABLE choicedirectivechoice RENAME COLUMN eventproposal_proposalid TO directive_directiveid;
+
+
+ALTER SEQUENCE choiceproposalsetid_seq RENAME TO choicedirectivesetid_seq;
 
 
 
