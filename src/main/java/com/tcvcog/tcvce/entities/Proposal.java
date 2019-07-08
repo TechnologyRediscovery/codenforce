@@ -1,7 +1,7 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * and open the template in the editor. 
  */
 package com.tcvcog.tcvce.entities;
 
@@ -10,11 +10,14 @@ import java.time.LocalDateTime;
 
 /**
  *
+ * Mapped to database table choiceproposal
+ * 
  * @author sylvia
  */
-public class EventProposalImplementation extends EventProposal implements Serializable {
+public class Proposal implements Serializable {
     
     private int implementationID;
+    private Directive directive;
     
     private int generatingEventID;
     private boolean currentUserCanEvaluateProposal;
@@ -295,6 +298,20 @@ public class EventProposalImplementation extends EventProposal implements Serial
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * @return the directive
+     */
+    public Directive getDirective() {
+        return directive;
+    }
+
+    /**
+     * @param directive the directive to set
+     */
+    public void setDirective(Directive directive) {
+        this.directive = directive;
     }
     
 }

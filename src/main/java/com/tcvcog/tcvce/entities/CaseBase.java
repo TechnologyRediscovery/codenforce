@@ -15,7 +15,7 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class CECaseBaseClass extends EntityUtils implements Serializable, Cloneable {
+public class CaseBase extends EntityUtils implements Serializable, Cloneable {
     
     protected int caseID;
     protected int publicControlCode;
@@ -49,6 +49,8 @@ public class CECaseBaseClass extends EntityUtils implements Serializable, Clonea
     
     protected LocalDateTime creationTimestamp;
     protected String notes;
+    
+    private BOBSource source;
 
     @Override
     public String toString() {
@@ -61,7 +63,7 @@ public class CECaseBaseClass extends EntityUtils implements Serializable, Clonea
      * @throws CloneNotSupportedException
      */
     @Override
-    public CECaseBaseClass clone() throws CloneNotSupportedException{
+    public CaseBase clone() throws CloneNotSupportedException{
         super.clone();
         return null;
         
@@ -350,7 +352,7 @@ public class CECaseBaseClass extends EntityUtils implements Serializable, Clonea
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CECaseBaseClass other = (CECaseBaseClass) obj;
+        final CaseBase other = (CaseBase) obj;
         if (this.caseID != other.caseID) {
             return false;
         }
@@ -413,6 +415,20 @@ public class CECaseBaseClass extends EntityUtils implements Serializable, Clonea
             originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
         this.originationDateUtilDate = od;
+    }
+
+    /**
+     * @return the source
+     */
+    public BOBSource getSource() {
+        return source;
+    }
+
+    /**
+     * @param source the source to set
+     */
+    public void setSource(BOBSource source) {
+        this.source = source;
     }
 
 }

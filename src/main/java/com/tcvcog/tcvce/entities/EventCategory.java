@@ -37,7 +37,7 @@ public class EventCategory implements Serializable {
     
     private boolean notifycasemonitors;
     
-    private EventProposal eventProposal;
+    private Directive eventProposal;
     
     private boolean hidable;
     private boolean requestable;
@@ -249,14 +249,14 @@ public class EventCategory implements Serializable {
     /**
      * @return the eventProposal
      */
-    public EventProposal getEventProposal() {
+    public Directive getEventProposal() {
         return eventProposal;
     }
 
     /**
      * @param eventProposal the eventProposal to set
      */
-    public void setEventProposal(EventProposal eventProposal) {
+    public void setEventProposal(Directive eventProposal) {
         this.eventProposal = eventProposal;
     }
 

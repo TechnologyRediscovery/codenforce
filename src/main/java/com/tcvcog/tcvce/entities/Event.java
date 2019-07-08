@@ -37,7 +37,7 @@ public class Event
     private String muniName;
     private int propertyID;
     private EventCategory category;
-    private EventProposalImplementation eventProposalImplementation;
+    private Proposal eventProposalImplementation;
     
     private LocalDateTime dateOfRecord;
     private String dateOfRecordPretty;
@@ -394,14 +394,14 @@ public class Event
     /**
      * @return the eventProposalImplementation
      */
-    public EventProposalImplementation getEventProposalImplementation() {
+    public Proposal getEventProposalImplementation() {
         return eventProposalImplementation;
     }
 
     /**
      * @param eventProposalImplementation the eventProposalImplementation to set
      */
-    public void setEventProposalImplementation(EventProposalImplementation eventProposalImplementation) {
+    public void setEventProposalImplementation(Proposal eventProposalImplementation) {
         this.eventProposalImplementation = eventProposalImplementation;
     }
     

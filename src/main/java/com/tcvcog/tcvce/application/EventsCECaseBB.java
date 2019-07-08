@@ -11,7 +11,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseBaseClass;
+import com.tcvcog.tcvce.entities.CaseBase;
 import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
@@ -174,7 +174,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
     
     public String editEventInCaseManager(EventCECaseCasePropBundle ev){
         CaseIntegrator ci = getCaseIntegrator();
-        CECaseBaseClass caseNoLists = ev.getEventCaseBare();
+        CaseBase caseNoLists = ev.getEventCaseBare();
         try {
             getSessionBean().getcECaseQueue().add(0, ci.generateCECase(caseNoLists));
         } catch (SQLException ex) {

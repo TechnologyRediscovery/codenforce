@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
@@ -35,6 +36,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
@@ -853,8 +855,22 @@ public class BackingBeanUtils implements Serializable{
         this.ssCoordinator = ssCoordinator;
     }
 
-
-       
-
-
+    
+    public ChoiceCoordinator getChoiceCoordinator(){
+        ChoiceCoordinator cc;;
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{ChoiceCoordinator}", ChoiceCoordinator.class);
+        cc = (ChoiceCoordinator) ve.getValue(context.getELContext());
+        return cc;
+    }
+    
+    public ChoiceIntegrator getChoiceIntegrator(){
+        ChoiceIntegrator ci;
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{ChoiceIntegrator}", ChoiceIntegrator.class);
+        ci = (ChoiceIntegrator) ve.getValue(context.getELContext());
+        return ci;
+    }
 }

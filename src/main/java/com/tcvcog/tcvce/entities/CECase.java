@@ -14,11 +14,9 @@ import java.util.List;
  *
  * @author Sylvia Baskem
  */
-public class CECase extends CECaseBaseClass implements Cloneable{
+public class CECase extends CaseBase implements Cloneable{
     
     private List<CodeViolation> violationList;
-    private List<CodeViolation> violationListResolved;
-    private List<CodeViolation> violationListUnresolved;
     
     private List<CECaseEvent> visibleEventList;
     private List<CECaseEvent> activeEventList;
@@ -27,6 +25,8 @@ public class CECase extends CECaseBaseClass implements Cloneable{
     private List<CECaseEvent> completeEventList;
     
     
+    private List<Proposal> proposalList;
+    private List<EventRule> eventRuleList;
     private List<CECaseEvent> eventProposalList;
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
@@ -46,7 +46,7 @@ public class CECase extends CECaseBaseClass implements Cloneable{
      * 
      * @param cnl 
      */
-    public CECase(CECaseBaseClass cnl){
+    public CECase(CaseBase cnl){
         this.caseID = cnl.caseID;
         this.publicControlCode = cnl.publicControlCode;
         this.paccEnabled = cnl.paccEnabled;
@@ -193,7 +193,7 @@ public class CECase extends CECaseBaseClass implements Cloneable{
      */
     public List<CodeViolation> getViolationListUnresolved() {
         
-        violationListUnresolved = new ArrayList<>();
+        List<CodeViolation> violationListUnresolved = new ArrayList<>();
         if(violationList != null && violationList.size() > 0){
             for(CodeViolation v: violationList){
                 if(v.getActualComplianceDate() == null){
@@ -206,18 +206,12 @@ public class CECase extends CECaseBaseClass implements Cloneable{
         return violationListUnresolved;
     }
 
-    /**
-     * @param violationListUnresolved the violationListUnresolved to set
-     */
-    public void setViolationListUnresolved(List<CodeViolation> violationListUnresolved) {
-        this.violationListUnresolved = violationListUnresolved;
-    }
 
     /**
      * @return the violationListResolved
      */
     public List<CodeViolation> getViolationListResolved() {
-        violationListResolved = new ArrayList<>();
+        List<CodeViolation>violationListResolved = new ArrayList<>();
         if(violationList != null && violationList.size() > 0){
             for(CodeViolation v: violationList){
                 if(v.getActualComplianceDate() != null){
@@ -229,12 +223,6 @@ public class CECase extends CECaseBaseClass implements Cloneable{
         return violationListResolved;
     }
 
-    /**
-     * @param violationListResolved the violationListResolved to set
-     */
-    public void setViolationListResolved(List<CodeViolation> violationListResolved) {
-        this.violationListResolved = violationListResolved;
-    }
 
     /**
      * @return the completeEventList
@@ -299,6 +287,34 @@ public class CECase extends CECaseBaseClass implements Cloneable{
      */
     public void setActiveEventList(List<CECaseEvent> activeEventList) {
         this.activeEventList = activeEventList;
+    }
+
+    /**
+     * @return the proposalList
+     */
+    public List<Proposal> getProposalList() {
+        return proposalList;
+    }
+
+    /**
+     * @param proposalList the proposalList to set
+     */
+    public void setProposalList(List<Proposal> proposalList) {
+        this.proposalList = proposalList;
+    }
+
+    /**
+     * @return the eventRuleList
+     */
+    public List<EventRule> getEventRuleList() {
+        return eventRuleList;
+    }
+
+    /**
+     * @param eventRuleList the eventRuleList to set
+     */
+    public void setEventRuleList(List<EventRule> eventRuleList) {
+        this.eventRuleList = eventRuleList;
     }
 
   

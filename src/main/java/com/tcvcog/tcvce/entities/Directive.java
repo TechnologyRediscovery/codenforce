@@ -12,9 +12,9 @@ import java.util.List;
  *
  * @author sylvia
  */
-public class EventProposal extends EntityUtils {
+public class Directive extends EntityUtils {
 
-    private int proposalID;
+    private int directiveID;
     private String title;
     private String description;
     
@@ -55,15 +55,6 @@ public class EventProposal extends EntityUtils {
         return directPropToDefaultMuniCEO;
     }
 
-
-
-    /**
-     * @return the proposalID
-     */
-    public int getProposalID() {
-        return proposalID;
-    }
-
     /**
      * @return the title
      */
@@ -78,13 +69,6 @@ public class EventProposal extends EntityUtils {
         return description;
     }
 
-
-    /**
-     * @param proposalID the proposalID to set
-     */
-    public void setProposalID(int proposalID) {
-        this.proposalID = proposalID;
-    }
 
     /**
      * @param title the title to set
@@ -310,6 +294,20 @@ public class EventProposal extends EntityUtils {
      */
     public void setIcon(Icon icon) {
         this.icon = icon;
+    }
+
+    /**
+     * @return the directiveID
+     */
+    public int getDirectiveID() {
+        return directiveID;
+    }
+
+    /**
+     * @param directiveID the directiveID to set
+     */
+    public void setDirectiveID(int directiveID) {
+        this.directiveID = directiveID;
     }
     
     
