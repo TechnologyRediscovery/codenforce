@@ -125,17 +125,6 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>occupancyPermitApplicationIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.OccupancyPermitApplicationIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>inspectedSpaceTypeICEIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.InspectedSpaceTypeICEIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>inspectionChecklistIntegrator</managed-bean-name>
@@ -246,12 +235,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
     
-    <managed-bean>
-        <description>Utility class for producting a hash map of action requestor types</description>
-        <managed-bean-name>publicViolationSet</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.resultsets.PublicViolationSet</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
     <managed-bean>
         <managed-bean-name>codeSetBB</managed-bean-name>
@@ -362,12 +345,6 @@
     
     
     <managed-bean>
-        <managed-bean-name>ceCasesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECasesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
         <managed-bean-name>caseProfileBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CaseProfileBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -380,12 +357,6 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>eventConfigurationBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseConfigurationBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-    
-    <managed-bean>
         <managed-bean-name>violationAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -394,12 +365,6 @@
     <managed-bean>
         <managed-bean-name>violationSelectElementBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationSelectElementBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>inspectableCodeElementBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.InspectableCodeElementBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
@@ -415,12 +380,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>eventManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventManageBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-   
 
     <managed-bean>
         <managed-bean-name>personConnectBB</managed-bean-name>
@@ -431,11 +390,6 @@
     <managed-bean>
         <managed-bean-name>citationBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>caseUpdateBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CaseUpdateBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
@@ -483,15 +437,6 @@
         <managed-bean-class>com.tcvcog.tcvce.application.NavigationBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
-    
-      <managed-bean>
-        <description>Backing bean for ActReqSubConf.xhtml confirmation of action request - public</description>
-        <managed-bean-name>actReqSubConfBean</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ActReqSubConfBean</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
-    
-    
   
   
     <!-- dependent scope -->
@@ -504,14 +449,6 @@
     </managed-bean>
  
     
-    <!--none-scoped beans-->
-
-    <managed-bean>
-        <description>Creates a result set of possible municipalities</description>
-        <managed-bean-name>muniMap</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.resultsets.MuniMap</managed-bean-class>
-        <managed-bean-scope>none</managed-bean-scope>
-    </managed-bean>
     
     <!--**************** navigation configurations *******************************-->
 
@@ -1453,11 +1390,6 @@
     </navigation-rule>
     
     
-    <managed-bean>
-        <managed-bean-name>ceActionRequestsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CeActionRequestsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     <managed-bean>
         <managed-bean-name>textBlockBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>

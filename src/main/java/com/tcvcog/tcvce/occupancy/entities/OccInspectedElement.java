@@ -31,7 +31,7 @@ public class OccInspectedElement implements Serializable{
     private CodeElement element;
     private LocalDateTime complianceDate;
     private String notes;
-    private OccLocationDescriptor location;
+    
 
     /**
      * @return the id
@@ -101,19 +101,5 @@ public class OccInspectedElement implements Serializable{
      */
     public void setElement(CodeElement element) {
         this.element = element;
-    }
-
-    /**
-     * @return the location
-     */
-    public OccLocationDescriptor getLocation() {
-        return location;
-    }
-
-    /**
-     * @param location the location to set
-     */
-    public void setLocation(OccLocationDescriptor location) {
-        this.location = location;
     }
 }

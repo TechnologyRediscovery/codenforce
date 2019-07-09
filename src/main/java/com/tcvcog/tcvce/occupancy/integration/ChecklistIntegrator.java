@@ -692,7 +692,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         // the severing of the OccInspectedElement from the space without losing
         // location specific information
         // an UN-elegant solution
-        ie.setLocation(getLocation(rs.getInt("locationdescription_id")));
+//        ie.set(getLocation(rs.getInt("locationdescription_id")));
         
         return ie;
     }
