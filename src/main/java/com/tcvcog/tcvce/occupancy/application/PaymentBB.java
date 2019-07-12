@@ -21,12 +21,15 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Date;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.*;
 import javax.faces.event.ActionEvent;
 
 /**
@@ -34,23 +37,28 @@ import javax.faces.event.ActionEvent;
  * @author Adam Gutonski
  */
 
-@ViewScoped
 public class PaymentBB extends BackingBeanUtils implements Serializable {
     
     private ArrayList<Payment> paymentList;
     private Payment selectedPayment;
-    private int formPaymentID;
-    private int formPaymentOccupancyInspectionID;
-    private PaymentType formPaymentPaymentType;
-    private java.util.Date formPaymentDateDeposited;
-    private java.util.Date formPaymentDateReceived;
-    private double formPaymentAmount;
-    private int formPaymentPayerID;
-    private String formPaymentReferenceNum;
-    private int formCheckNum;
-    private boolean formCleared;
-    private String formNotes;
+    private Payment formPayment;
+    private ArrayList<PaymentType> paymentTypeList;
+    private ArrayList<PaymentType> paymentTypeTitleList;
+    private PaymentType selectedPaymentType;
+    private PaymentType formPaymentType;
+    private PaymentType newSelectedPaymentType;
+    private PaymentType newPaymentType;
 
+    public PaymentBB() {
+    }
+    
+        @PostConstruct
+    public void initBean() {
+        
+        formPayment = new Payment();
+        
+        formPaymentType = new PaymentType();
+    }
     
     /**
      * @return the paymentList
@@ -77,21 +85,16 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
         Payment payment = selectedPayment;
         
-        payment.setPaymentType(formPaymentPaymentType);
-        payment.setOccupancyInspectionID(formPaymentOccupancyInspectionID);
-        payment.setPaymentType(formPaymentPaymentType);
-        payment.setPaymentDateDeposited(formPaymentDateDeposited.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        payment.setPaymentDateReceived(formPaymentDateReceived.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        payment.setPaymentAmount(formPaymentAmount);
-//        payment.setPaymentPayerID(formPaymentPayerID);
-        payment.setPaymentReferenceNum(formPaymentReferenceNum);
-        payment.setCheckNum(formCheckNum);
-        payment.setCleared(formCleared);
-        payment.setNotes(formNotes);
+        payment.setPaymentType(formPayment.getPaymentType());
+        payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
+        payment.setPaymentDateDeposited(formPayment.getPaymentDateDeposited());
+        payment.setPaymentDateReceived(formPayment.getPaymentDateReceived());
+        payment.setPaymentAmount(formPayment.getPaymentAmount());
+        payment.setPaymentPayer(formPayment.getPaymentPayer());
+        payment.setPaymentReferenceNum(formPayment.getPaymentReferenceNum());
+        payment.setCheckNum(formPayment.getCheckNum());
+        payment.setCleared(formPayment.isCleared());
+        payment.setNotes(formPayment.getNotes());
         //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
         try{
             paymentIntegrator.updatePayment(payment);
@@ -109,19 +112,17 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     
     public void editPayment(ActionEvent e){
         if(getSelectedPayment() != null){
-            setFormPaymentID(selectedPayment.getPaymentID());
-            setFormPaymentPaymentType(selectedPayment.getPaymentType());
-            setFormPaymentOccupancyInspectionID(selectedPayment.getOccupancyInspectionID());
-            setFormPaymentAmount(selectedPayment.getPaymentAmount());
-//            setFormPaymentPayerID(selectedPayment.getPaymentPayerID());
-            setFormPaymentReferenceNum(selectedPayment.getPaymentReferenceNum());
-            setFormCheckNum(selectedPayment.getCheckNum());
-            setFormCleared(selectedPayment.isCleared());
-            setFormPaymentDateReceived(java.util.Date.from(selectedPayment.getPaymentDateDeposited()
-                    .atZone(ZoneId.systemDefault()).toInstant()));
-            setFormPaymentDateDeposited(java.util.Date.from(selectedPayment.getPaymentDateDeposited()
-                    .atZone(ZoneId.systemDefault()).toInstant()));
-            setFormNotes(selectedPayment.getNotes());
+            formPayment.setPaymentID(selectedPayment.getPaymentID());
+            formPayment.setPaymentType(selectedPayment.getPaymentType());
+            formPayment.setOccupancyInspectionID(selectedPayment.getOccupancyInspectionID());
+            formPayment.setPaymentAmount(selectedPayment.getPaymentAmount());
+            formPayment.setPaymentPayer(selectedPayment.getPaymentPayer());
+            formPayment.setPaymentReferenceNum(selectedPayment.getPaymentReferenceNum());
+            formPayment.setCheckNum(selectedPayment.getCheckNum());
+            formPayment.setCleared(selectedPayment.isCleared());
+            formPayment.setPaymentDateDeposited(selectedPayment.getPaymentDateDeposited());
+            formPayment.setPaymentDateReceived(selectedPayment.getPaymentDateReceived());
+            formPayment.setNotes(selectedPayment.getNotes());
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -132,21 +133,34 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     public String addPayment(){
         Payment payment = new Payment();
         PaymentIntegrator paymentIntegrator = new PaymentIntegrator();
-        payment.setPaymentID(formPaymentID);
-        payment.setOccupancyInspectionID(formPaymentOccupancyInspectionID);
-        payment.setPaymentType(getFormPaymentPaymentType());
-        payment.setPaymentDateDeposited(formPaymentDateDeposited.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        payment.setPaymentDateReceived(formPaymentDateReceived.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        payment.setPaymentAmount(formPaymentAmount);
-//        payment.setPaymentPayerID(formPaymentPayerID);
-        payment.setPaymentReferenceNum(formPaymentReferenceNum);
-        payment.setCheckNum(formCheckNum);
-        payment.setCleared(formCleared);
-        payment.setNotes(formNotes);
+        payment.setPaymentID(formPayment.getPaymentID());
+        payment.setOccupancyInspectionID(formPayment.getOccupancyInspectionID());
+        payment.setPaymentType(formPayment.getPaymentType());
+        payment.setPaymentDateDeposited(formPayment.getPaymentDateDeposited());
+        payment.setPaymentDateReceived(formPayment.getPaymentDateReceived());
+        payment.setPaymentAmount(formPayment.getPaymentAmount());
+        payment.setPaymentPayer(formPayment.getPaymentPayer());
+        payment.setPaymentReferenceNum(formPayment.getPaymentReferenceNum());
+        payment.setCheckNum(formPayment.getCheckNum());
+        payment.setCleared(formPayment.isCleared());
+        payment.setNotes(formPayment.getNotes());
+        
+        
+        if(payment.getPaymentPayer() == null) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "The Payer's ID is not in our database, please make sure it's correct.", " "));
+            formPayment.setPaymentPayer(new Person());
+            return "";
+        }
+        
+        if(payment.getPaymentType().getPaymentTypeId() == 1 
+                && (payment.getCheckNum() == 0)){
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "A payment by check requires a check number.", " "));
+            return "";
+        }
         
         try {
             paymentIntegrator.insertPayment(payment);
@@ -211,159 +225,305 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.selectedPayment = selectedPayment;
     }
 
-    /**
-     * @return the formPaymentID
-     */
-    public int getFormPaymentID() {
-        return formPaymentID;
+    public Payment getFormPayment() {
+        return formPayment;
     }
 
-    /**
-     * @param formPaymentID the formPaymentID to set
-     */
-    public void setFormPaymentID(int formPaymentID) {
-        this.formPaymentID = formPaymentID;
+    public void setFormPayment(Payment formPayment) {
+        this.formPayment = formPayment;
     }
-
-    /**
-     * @return the formPaymentOccupancyInspectionID
-     */
+    
+    // Below are the methods to driectly access the fields of formPayment
+    
     public int getFormPaymentOccupancyInspectionID() {
-        return formPaymentOccupancyInspectionID;
+        return formPayment.getOccupancyInspectionID();
     }
 
-    /**
-     * @param formPaymentOccupancyInspectionID the formPaymentOccupancyInspectionID to set
-     */
-    public void setFormPaymentOccupancyInspectionID(int formPaymentOccupancyInspectionID) {
-        this.formPaymentOccupancyInspectionID = formPaymentOccupancyInspectionID;
+    public void setFormPaymentOccupancyInspectionID(int occupancyInspectionID) {
+        formPayment.setOccupancyInspectionID(occupancyInspectionID);
     }
 
-    /**
-     * @return the formPaymentPaymentType
-     */
-    public PaymentType getFormPaymentPaymentType() {
-        return formPaymentPaymentType;
+    public Date getFormPaymentDateDeposited() {
+        return Date.from(formPayment.getPaymentDateDeposited()
+                        .atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    /**
-     * @param formPaymentPaymentType the formPaymentTypeID to set
-     */
-    public void setFormPaymentPaymentType(PaymentType formPaymentPaymentType) {
-        this.formPaymentPaymentType = formPaymentPaymentType;
+    public void setFormPaymentDateDeposited(Date paymentDateDeposited) {
+        formPayment.setPaymentDateDeposited(LocalDateTime.ofInstant(
+                paymentDateDeposited.toInstant(), ZoneId.systemDefault()));
     }
 
-    /**
-     * @return the formPaymentDateDeposited
-     */
-    public java.util.Date getFormPaymentDateDeposited() {
-        return formPaymentDateDeposited;
+   public Date getFormPaymentDateReceived() {
+       return Date.from(formPayment.getPaymentDateReceived()
+                        .atZone(ZoneId.systemDefault()).toInstant());
+    }
+    
+    public void setFormPaymentDateReceived(Date paymentDateReceived) {
+        
+        formPayment.setPaymentDateReceived(LocalDateTime.ofInstant(
+                paymentDateReceived.toInstant(), ZoneId.systemDefault()));
     }
 
-    /**
-     * @param formPaymentDateDeposited the formPaymentDateDeposited to set
-     */
-    public void setFormPaymentDateDeposited(java.util.Date formPaymentDateDeposited) {
-        this.formPaymentDateDeposited = formPaymentDateDeposited;
-    }
-
-    /**
-     * @return the formPaymentDateReceived
-     */
-    public java.util.Date getFormPaymentDateReceived() {
-        return formPaymentDateReceived;
-    }
-
-    /**
-     * @param formPaymentDateReceived the formPaymentDateReceived to set
-     */
-    public void setFormPaymentDateReceived(java.util.Date formPaymentDateReceived) {
-        this.formPaymentDateReceived = formPaymentDateReceived;
-    }
-
-    /**
-     * @return the formPaymentAmount
-     */
     public double getFormPaymentAmount() {
-        return formPaymentAmount;
+        return formPayment.getPaymentAmount();
     }
 
-    /**
-     * @param formPaymentAmount the formPaymentAmount to set
-     */
-    public void setFormPaymentAmount(double formPaymentAmount) {
-        this.formPaymentAmount = formPaymentAmount;
+    public void setFormPaymentAmount(double paymentAmount) {
+        formPayment.setPaymentAmount(paymentAmount);
     }
 
-    /**
-     * @return the formPaymentPayerID
-     */
-    public int getFormPaymentPayerID() {
-        return formPaymentPayerID;
-    }
-
-    /**
-     * @param formPaymentPayerID the formPaymentPayerID to set
-     */
-    public void setFormPaymentPayerID(int formPaymentPayerID) {
-        this.formPaymentPayerID = formPaymentPayerID;
-    }
-
-    /**
-     * @return the formPaymentReferenceNum
-     */
     public String getFormPaymentReferenceNum() {
-        return formPaymentReferenceNum;
+        return formPayment.getPaymentReferenceNum();
+    }
+
+    public void setFormPaymentReferenceNum(String paymentReferenceNum) {
+        formPayment.setPaymentReferenceNum(paymentReferenceNum);
+    }
+
+    public int getFormPaymentCheckNum() {
+        return formPayment.getCheckNum();
+    }
+
+    public void setFormPaymentCheckNum(int checkNum) {
+        formPayment.setCheckNum(checkNum);
+    }
+
+    public boolean isFormPaymentCleared() {
+        return formPayment.isCleared();
+    }
+
+    public void setFormPaymentCleared(boolean cleared) {
+        formPayment.setCleared(cleared);
+    }
+
+    public int getFormPaymentID() {
+        return formPayment.getPaymentID();
+    }
+
+    public void setFormPaymentID(int paymentID) {
+        formPayment.setPaymentID(paymentID);
+    }
+
+    public int getFormPaymentPayer() {
+        return formPayment.getPaymentPayer().getPersonID();
+    }
+
+    public void setFormPaymentPayer(int personID) {
+        
+        PersonIntegrator pi = new PersonIntegrator();
+        
+        try {
+            formPayment.setPaymentPayer(pi.getPerson(personID));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            
+        }
+        
+    }
+
+    public PaymentType getFormPaymentPaymentType() {
+        System.out.println("get Form Payment Type ran! the type ID is:" + formPayment.getPaymentType().getPaymentTypeId());
+        
+        return formPayment.getPaymentType();
+    }
+
+    public void setFormPaymentPaymentType(PaymentType paymentType) {
+        formPayment.setPaymentType(paymentType);
+        System.out.println("Form Payment Type has been set! the type ID is:" + formPayment.getPaymentType().getPaymentTypeId() + " The type was supposed to be set to: " + paymentType.getPaymentTypeId());
+
+    }
+
+    public String getFormPaymentNotes() {
+        return formPayment.getNotes();
+    }
+
+    public void setFormPaymentNotes(String notes) {
+        formPayment.setNotes(notes);
+    }
+    
+    /*METHODS IMPORTED FROM PAYMENTTYPEBB*/
+    
+    public void editPaymentType(ActionEvent e){
+        if(getSelectedPaymentType() != null){
+            formPaymentType.setPaymentTypeId(selectedPaymentType.getPaymentTypeId());
+            formPaymentType.setPaymentTypeTitle(selectedPaymentType.getPaymentTypeTitle());
+            
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Please select a payment type to update", ""));
+        }
+    }
+    
+    public void commitPaymentTypeUpdates(ActionEvent e){
+        PaymentIntegrator pti = getPaymentIntegrator();
+        PaymentType pt = selectedPaymentType;
+        
+        pt.setPaymentTypeTitle(formPaymentType.getPaymentTypeTitle());
+        //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
+        try{
+            pti.updatePaymentType(pt);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Payment type updated!", ""));
+        } catch (IntegrationException ex){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to update Payment type in database.",
+                    "This must be corrected by the System Administrator"));
+        }
+    }
+    
+    public String addPaymentType(){
+        PaymentType pt = new PaymentType();
+        PaymentIntegrator pti = new PaymentIntegrator();
+        pt.setPaymentTypeId(formPaymentType.getPaymentTypeId());
+        pt.setPaymentTypeTitle(formPaymentType.getPaymentTypeTitle());
+        try {
+            pti.insertPaymentType(pt);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Successfully added payment type to database!", ""));
+        } catch(IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to add payment type to database, sorry!", "Check server print out..."));
+            return "";
+        }
+        
+        return "paymentTypeManage";  
+    }
+    
+    /**
+     * @return the paymentTypeList
+     */
+    public ArrayList<PaymentType> getPaymentTypeList() {
+         try {
+            PaymentIntegrator pti = getPaymentIntegrator();
+            paymentTypeList = pti.getPaymentTypeList();
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Unable to load Payment Type",
+                        "This must be corrected by the system administrator"));
+        }
+        if(paymentTypeList != null){
+        return paymentTypeList;
+        }else{
+         paymentTypeList = new ArrayList();
+         return paymentTypeList;
+        }
+    }
+    
+    public void deleteSelectedPaymentType(ActionEvent e){
+        PaymentIntegrator pti = getPaymentIntegrator();
+        if(getSelectedPaymentType() != null){
+            try {
+                pti.deletePaymentType(getSelectedPaymentType());
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Payment type deleted forever!", ""));
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Unable to delete payment type--probably because it is used "
+                                    + "somewhere in the database. Sorry.", 
+                            "This category will always be with us."));
+            }
+            
+        } else {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Please select a payment type from the table to delete", ""));
+        }
     }
 
     /**
-     * @param formPaymentReferenceNum the formPaymentReferenceNum to set
+     * @param paymentTypeList the paymentTypeList to set
      */
-    public void setFormPaymentReferenceNum(String formPaymentReferenceNum) {
-        this.formPaymentReferenceNum = formPaymentReferenceNum;
+    public void setPaymentTypeList(ArrayList<PaymentType> paymentTypeList) {
+        this.paymentTypeList = paymentTypeList;
     }
 
     /**
-     * @return the formCheckNum
+     * @return the selectedPaymentType
      */
-    public int getFormCheckNum() {
-        return formCheckNum;
+    public PaymentType getSelectedPaymentType() {
+        return selectedPaymentType;
     }
 
     /**
-     * @param formCheckNum the formCheckNum to set
+     * @param selectedPaymentType the selectedPaymentType to set
      */
-    public void setFormCheckNum(int formCheckNum) {
-        this.formCheckNum = formCheckNum;
+    public void setSelectedPaymentType(PaymentType selectedPaymentType) {
+        this.selectedPaymentType = selectedPaymentType;
     }
 
     /**
-     * @return the formCleared
+     * @return the newFormSelectedPaymentType
      */
-    public boolean isFormCleared() {
-        return formCleared;
+    public PaymentType getNewSelectedPaymentType() {
+        return newSelectedPaymentType;
     }
 
     /**
-     * @param formCleared the formCleared to set
+     * @param newSelectedPaymentType the newFormSelectedPaymentType to set
      */
-    public void setFormCleared(boolean formCleared) {
-        this.formCleared = formCleared;
+    public void setNewSelectedPaymentType(PaymentType newSelectedPaymentType) {
+        this.newSelectedPaymentType = newSelectedPaymentType;
+    }
+
+    public PaymentType getFormPaymentType() {
+        return formPaymentType;
+    }
+
+    public void setFormPaymentType(PaymentType formPaymentType) {
+        this.formPaymentType = formPaymentType;
+    }
+
+    //Below are the methods to directly access formPaymentType's fields
+    
+    public int getFormPaymentTypeId() {
+        return formPaymentType.getPaymentTypeId();
+    }
+
+    public void setFormPaymentTypeId(int paymentTypeId) {
+        formPaymentType.setPaymentTypeId(paymentTypeId);
+    }
+
+    public String getFormPaymentTypeTitle() {
+        return formPaymentType.getPaymentTypeTitle();
+    }
+
+    public void setFormPaymentTypeTitle(String paymentTypeTitle) {
+        formPaymentType.setPaymentTypeTitle(paymentTypeTitle);
+    }
+    
+    public PaymentType getNewPaymentType() {
+        return newPaymentType;
+    }
+
+    public void setNewPaymentType(PaymentType newPaymentType) {
+        this.newPaymentType = newPaymentType;
+    }
+
+    
+    
+    /**
+     * @return the paymentTypeTitleList
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public ArrayList<PaymentType> getPaymentTypeTitleList() throws IntegrationException {
+        PaymentIntegrator pi = getPaymentIntegrator();
+        paymentTypeTitleList = pi.getPaymentTypeList();
+        return paymentTypeTitleList;
     }
 
     /**
-     * @return the formNotes
+     * @param paymentTypeTitleList the paymentTypeTitleList to set
      */
-    public String getFormNotes() {
-        return formNotes;
+    public void setPaymentTypeTitleList(ArrayList<PaymentType> paymentTypeTitleList) {
+        this.paymentTypeTitleList = paymentTypeTitleList;
     }
-
-    /**
-     * @param formNotes the formNotes to set
-     */
-    public void setFormNotes(String formNotes) {
-        this.formNotes = formNotes;
-    }
-
-
+    
 }

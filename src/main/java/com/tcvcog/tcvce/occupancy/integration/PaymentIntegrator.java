@@ -21,7 +21,6 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Fee;
-import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
@@ -32,10 +31,8 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.occupancy.entities.OccPeriod;
 import com.tcvcog.tcvce.occupancy.entities.OccPeriodType;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -318,9 +315,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
     
     public void updatePayment(Payment payment) throws IntegrationException {
-        String query = "UPDATE public.payment\n"
+        String query = "UPDATE public.moneypayment\n"
                 + "   SET occinspec_inspectionid=?, paymenttype_typeid=?, \n"
-                + "       datereceived=?, datedeposited=?, amount=?, payerid=?, referencenum=?, \n"
+                + "       datereceived=?, datedeposited=?, amount=?, payer_personid=?, referencenum=?, \n"
                 + "       checkno=?, cleared=?, notes=?\n"
                 + " WHERE paymentid=?;";
 
@@ -345,7 +342,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            stmt.setDouble(5, payment.getPaymentAmount());
+            stmt.setBigDecimal(5, BigDecimal.valueOf(payment.getPaymentAmount()));
             stmt.setInt(6, payment.getPaymentPayer().getPersonID());
             stmt.setString(7, payment.getPaymentReferenceNum());
             stmt.setInt(8, payment.getCheckNum());
@@ -378,8 +375,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public ArrayList<Payment> getPaymentList() throws IntegrationException {
         String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
-                + "       datedeposited, amount, payerid, referencenum, checkno, cleared, notes\n"
-                + "  FROM public.payment;";
+                + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes\n"
+                + "  FROM public.moneypayment;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -422,9 +419,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void insertPayment(Payment payment) throws IntegrationException {
-        String query = "INSERT INTO public.payment(\n"
+        String query = "INSERT INTO public.moneypayment(\n"
                 + "            paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
-                + "            datedeposited, amount, payerid, referencenum, checkno, cleared, notes)\n"
+                + "            datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, ?, DEFAULT, ?);";
         Connection con = getPostgresCon();
@@ -445,7 +442,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            stmt.setDouble(5, payment.getPaymentAmount());
+            stmt.setBigDecimal(5, BigDecimal.valueOf(payment.getPaymentAmount()));
             stmt.setInt(6, payment.getPaymentPayer().getPersonID());
             stmt.setString(7, payment.getPaymentReferenceNum());
             stmt.setInt(8, payment.getCheckNum());
@@ -476,7 +473,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void deletePayment(Payment payment) throws IntegrationException {
-        String query = "DELETE FROM public.payment\n"
+        String query = "DELETE FROM public.moneypayment\n"
                 + " WHERE paymentid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -533,7 +530,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 newPayment.setPaymentDateDeposited(null);
             }
             newPayment.setPaymentAmount(rs.getDouble("amount"));
-            newPayment.setPaymentPayer(pi.getPerson(rs.getInt("payerid")));
+            newPayment.setPaymentPayer(pi.getPerson(rs.getInt("payer_personid")));
             newPayment.setPaymentReferenceNum(rs.getString("referencenum"));
             newPayment.setCheckNum(rs.getInt("checkno"));
             newPayment.setCleared(rs.getBoolean("cleared"));
@@ -552,7 +549,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         Connection con = null;
         // note that paymentTypeID is not returned in this query since it is specified in the WHERE
         String query = "SELECT typeid, pmttypetitle \n"
-                + "  FROM public.paymenttype"
+                + "  FROM public.moneypaymenttype"
                 + " WHERE typeid = ?;";
         ResultSet rs = null;
 
@@ -597,7 +594,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void updatePaymentType(PaymentType paymentType) throws IntegrationException {
-        String query = "UPDATE public.paymenttype\n"
+        String query = "UPDATE public.moneypaymenttype\n"
                 + "   SET pmttypetitle=?\n"
                 + "   WHERE typeid=?;";
 
@@ -634,7 +631,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public ArrayList<PaymentType> getPaymentTypeList() throws IntegrationException {
         String query = "SELECT typeid, pmttypetitle\n"
-                + "  FROM public.paymenttype;";
+                + "  FROM public.moneypaymenttype;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -679,7 +676,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void insertPaymentType(PaymentType paymentType) throws IntegrationException {
-        String query = "INSERT INTO public.paymenttype(\n"
+        String query = "INSERT INTO public.moneypaymenttype(\n"
                 + "    typeid, pmttypetitle)\n"
                 + "    VALUES (DEFAULT, ?);";
         Connection con = getPostgresCon();
@@ -716,7 +713,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public void deletePaymentType(PaymentType pt) throws IntegrationException {
-        String query = "DELETE FROM public.paymenttype\n"
+        String query = "DELETE FROM public.moneypaymenttype\n"
                 + " WHERE typeid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -765,7 +762,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         ArrayList<PaymentType> payTypeList = new ArrayList<>();
 
         Connection con = getPostgresCon();
-        String query = "SELECT typeid FROM paymenttype;";
+        String query = "SELECT typeid FROM moneypaymenttype;";
         ResultSet rs = null;
         Statement stmt = null;
 
