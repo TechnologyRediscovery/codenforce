@@ -111,7 +111,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         
         OccPeriod op = new OccPeriod();
         
-        op.setPeriodid(rs.getInt("periodid"));
+        op.setPeriodID(rs.getInt("periodid"));
         
         op.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
                
@@ -324,6 +324,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return tpe;
+    }
+    
+    public List<OccPeriodType> getOccPeriodTypeList(int muniProfileID){
+        return new ArrayList<>();
     }
     
     
@@ -607,7 +611,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, op.getPeriodid());
+            stmt.setInt(1, op.getPeriodID());
             rs= stmt.executeQuery();
             
             while (rs.next()) {

@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class OccPeriod extends EntityUtils implements Serializable{
     
-    private int periodid;
+    private int periodID;
     private int propertyUnitID;
     
     private List<OccPermitApplication> applicationList;
@@ -63,10 +63,10 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private String notes;
 
     /**
-     * @return the periodid
+     * @return the periodID
      */
-    public int getPeriodid() {
-        return periodid;
+    public int getPeriodID() {
+        return periodID;
     }
 
     /**
@@ -245,10 +245,10 @@ public class OccPeriod extends EntityUtils implements Serializable{
     }
 
     /**
-     * @param periodid the periodid to set
+     * @param periodID the periodID to set
      */
-    public void setPeriodid(int periodid) {
-        this.periodid = periodid;
+    public void setPeriodID(int periodID) {
+        this.periodID = periodID;
     }
 
     /**

@@ -101,6 +101,12 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    public Proposal getProposal(int propID){
+        
+        return new Proposal();
+        
+    }
+    
     public List<Proposal> getProposalList(OccPeriod occPer){
         
         

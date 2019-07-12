@@ -61,7 +61,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, period.getPeriodid());
+            stmt.setInt(1, period.getPeriodID());
             rs = stmt.executeQuery();
             while (rs.next()) {
                 assignedFees.add(generateOccPeriodFeeAssigned(rs));

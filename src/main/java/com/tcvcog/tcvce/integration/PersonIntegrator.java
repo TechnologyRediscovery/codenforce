@@ -231,7 +231,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         try {
             stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setInt(1, period.getPeriodid());
+            stmt.setInt(1, period.getPeriodID());
             rs = stmt.executeQuery();
             while(rs.next()){
                 personList.add(generatePersonOccPeriod(rs));
