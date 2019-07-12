@@ -36,7 +36,21 @@ public class Payment {
     private boolean cleared;
     private String notes;
 
-   
+   public Payment() {
+       
+       notes = " ";
+       
+       paymentPayer = new Person();
+       
+       paymentDateReceived = LocalDateTime.now();
+       
+       paymentDateDeposited = LocalDateTime.now();
+       
+       paymentType = new PaymentType();
+       
+       paymentType.setPaymentTypeId(2);
+       
+   }
 
     /**
      * @return the occupancyInspectionID

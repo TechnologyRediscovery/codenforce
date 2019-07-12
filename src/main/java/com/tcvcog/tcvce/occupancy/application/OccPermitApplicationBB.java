@@ -1239,5 +1239,17 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         System.out.println("end of submitting unit change list");
     }
+    
+    //DELETE AFTER BACKEND CAN BE ACCESSED, AND DEFINITELY BEFORE UPLOAD!
+    
+    public String goToPaymentManage() {
+        
+        return "payments";
+    }
+    
+    public String goToPaymentTypeManage() {
+        
+        return "paymentTypeManage";
+    }
 
 }

@@ -32,8 +32,9 @@ import javax.faces.convert.FacesConverter;
 @FacesConverter(value="muniConverter")
 public class MuniConverter extends EntityConverter implements Converter {
     
-     @Override
+    @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
+        System.out.println("Muni was gotten" + titleS);
         if(titleS.isEmpty()) {
             return null; 
         }
