@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.occupancy.entities.OccPeriodType;
 import java.time.LocalDateTime;
 import java.util.List;
 

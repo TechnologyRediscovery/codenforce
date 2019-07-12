@@ -95,7 +95,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             
             } catch (SQLException ex) {
                 System.out.println(ex.toString());
-                throw new IntegrationException("Cannot get Occupancy Inspection Fee List", ex);
+                throw new IntegrationException("cannot generate court entity list", ex);
             } finally {
                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -103,6 +103,35 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             }
             return ceList;   
     }
+    
+    
+    public ArrayList<CourtEntity> getCourtEntityList(int muniCode) throws IntegrationException {
+            String query = "";
+            Connection con = getPostgresCon();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+            ArrayList<CourtEntity> ceList = new ArrayList();
+        
+        try {
+            stmt = con.prepareStatement(query);
+            System.out.println("");
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                ceList.add(generateCourtEntity(rs));
+            }
+            
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Cannot generate court entity list", ex);
+            } finally {
+                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+                if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            }
+            return ceList;   
+    }
+    
+    
     
     public void insertCourtEntity(CourtEntity courtEntity) throws IntegrationException {
         String query = "INSERT INTO public.courtentity(\n" +

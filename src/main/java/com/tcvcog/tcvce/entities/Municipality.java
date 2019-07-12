@@ -19,6 +19,8 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,25 +34,37 @@ public class Municipality extends EntityUtils implements Serializable{
     private String address_street;
     private String address_city;
     private String address_state;
+    
     private String address_zip;
     private String phone;
     private String fax;
     private String email;
-    private String managerName;
-    private String managerPhone;
     private int population;
     private boolean activeInProgram;
-    private int defaultCodeSetID;
-    private int issuingPermitCodeSourceID;
     
-    private User defaultCodeOfficerUser;
-    
-    private CourtEntity defaultCourtEntity;
-    
+    private CodeSet codeSet;
+    private CodeSource issuingCodeSource;
     private int defaultNOVStyleID;
+
+    private MuniProfile profile;
+    private boolean enableCodeEnforcement;
+    private boolean enableOccupancy;
+    private boolean enablePublicCEActionRequestSubmissions;
     
+    private boolean enablePublicCEActionRequestInfo;
+    private boolean enablePublicOccPermitApp;
+    private boolean enablePublicOccInspectionTODOs;
     
+    private User muniManager;
+    private Property muniOfficeProperty;
+    private String notes; 
+    private LocalDateTime lastUpdatedTS;
+    private User lastUpdaetdBy;
+    private User primaryStaffContact;
     
+    private List<User> codeOfficers;
+    private List<CourtEntity> courtEntities;
+    private List<Integer> photoDocList;
     
     /**
      * @return the muniCode
@@ -178,33 +192,6 @@ public class Municipality extends EntityUtils implements Serializable{
         this.email = email;
     }
 
-    /**
-     * @return the managerName
-     */
-    public String getManagerName() {
-        return managerName;
-    }
-
-    /**
-     * @param managerName the managerName to set
-     */
-    public void setManagerName(String managerName) {
-        this.managerName = managerName;
-    }
-
-    /**
-     * @return the managerPhone
-     */
-    public String getManagerPhone() {
-        return managerPhone;
-    }
-
-    /**
-     * @param managerPhone the managerPhone to set
-     */
-    public void setManagerPhone(String managerPhone) {
-        this.managerPhone = managerPhone;
-    }
 
     /**
      * @return the activeInProgram
@@ -246,8 +233,6 @@ public class Municipality extends EntityUtils implements Serializable{
         hash = 67 * hash + Objects.hashCode(this.phone);
         hash = 67 * hash + Objects.hashCode(this.fax);
         hash = 67 * hash + Objects.hashCode(this.email);
-        hash = 67 * hash + Objects.hashCode(this.managerName);
-        hash = 67 * hash + Objects.hashCode(this.managerPhone);
         hash = 67 * hash + this.population;
         hash = 67 * hash + (this.activeInProgram ? 1 : 0);
         return hash;
@@ -273,39 +258,6 @@ public class Municipality extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the defaultCodeSetID
-     */
-    public int getDefaultCodeSetID() {
-        return defaultCodeSetID;
-    }
-
-
-    /**
-     * @param defaultCodeSetID the defaultCodeSetID to set
-     */
-    public void setDefaultCodeSetID(int defaultCodeSetID) {
-        this.defaultCodeSetID = defaultCodeSetID;
-    }
-
-    /**
-     * @return the issuingPermitCodeSourceID
-     */
-    public int getIssuingPermitCodeSourceID() {
-        return issuingPermitCodeSourceID;
-    }
-
-    /**
-     * @param issuingPermitCodeSourceID the issuingPermitCodeSourceID to set
-     */
-    public void setIssuingPermitCodeSourceID(int issuingPermitCodeSourceID) {
-        this.issuingPermitCodeSourceID = issuingPermitCodeSourceID;
-    }
-
-    
-
-   
-
-    /**
      * @return the defaultNOVStyleID
      */
     public int getDefaultNOVStyleID() {
@@ -320,35 +272,257 @@ public class Municipality extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the defaultCourtEntity
+     * @return the codeSet
      */
-    public CourtEntity getDefaultCourtEntity() {
-        
-        return defaultCourtEntity;
+    public CodeSet getCodeSet() {
+        return codeSet;
     }
 
     /**
-     * @param defaultCourtEntity the defaultCourtEntity to set
+     * @return the issuingCodeSource
      */
-    public void setDefaultCourtEntity(CourtEntity defaultCourtEntity) {
-        this.defaultCourtEntity = defaultCourtEntity;
+    public CodeSource getIssuingCodeSource() {
+        return issuingCodeSource;
     }
 
     /**
-     * @return the defaultCodeOfficerUser
+     * @return the profile
      */
-    public User getDefaultCodeOfficerUser() {
-        return defaultCodeOfficerUser;
+    public MuniProfile getProfile() {
+        return profile;
     }
 
     /**
-     * @param defaultCodeOfficerUser the defaultCodeOfficerUser to set
+     * @return the enableCodeEnforcement
      */
-    public void setDefaultCodeOfficerUser(User defaultCodeOfficerUser) {
-        this.defaultCodeOfficerUser = defaultCodeOfficerUser;
+    public boolean isEnableCodeEnforcement() {
+        return enableCodeEnforcement;
     }
 
-   
+    /**
+     * @return the enableOccupancy
+     */
+    public boolean isEnableOccupancy() {
+        return enableOccupancy;
+    }
+
+    /**
+     * @return the enablePublicCEActionRequestSubmissions
+     */
+    public boolean isEnablePublicCEActionRequestSubmissions() {
+        return enablePublicCEActionRequestSubmissions;
+    }
+
+    /**
+     * @return the enablePublicCEActionRequestInfo
+     */
+    public boolean isEnablePublicCEActionRequestInfo() {
+        return enablePublicCEActionRequestInfo;
+    }
+
+    /**
+     * @return the enablePublicOccPermitApp
+     */
+    public boolean isEnablePublicOccPermitApp() {
+        return enablePublicOccPermitApp;
+    }
+
+    /**
+     * @return the enablePublicOccInspectionTODOs
+     */
+    public boolean isEnablePublicOccInspectionTODOs() {
+        return enablePublicOccInspectionTODOs;
+    }
+
+    /**
+     * @return the muniManager
+     */
+    public User getMuniManager() {
+        return muniManager;
+    }
+
+    /**
+     * @return the muniOfficeProperty
+     */
+    public Property getMuniOfficeProperty() {
+        return muniOfficeProperty;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @return the lastUpdatedTS
+     */
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    /**
+     * @return the codeOfficers
+     */
+    public List<User> getCodeOfficers() {
+        return codeOfficers;
+    }
+
+    /**
+     * @return the courtEntities
+     */
+    public List<CourtEntity> getCourtEntities() {
+        return courtEntities;
+    }
+
+    /**
+     * @return the photoDocList
+     */
+    public List<Integer> getPhotoDocList() {
+        return photoDocList;
+    }
+
+    /**
+     * @param codeSet the codeSet to set
+     */
+    public void setCodeSet(CodeSet codeSet) {
+        this.codeSet = codeSet;
+    }
+
+    /**
+     * @param issuingCodeSource the issuingCodeSource to set
+     */
+    public void setIssuingCodeSource(CodeSource issuingCodeSource) {
+        this.issuingCodeSource = issuingCodeSource;
+    }
+
+    /**
+     * @param profile the profile to set
+     */
+    public void setProfile(MuniProfile profile) {
+        this.profile = profile;
+    }
+
+    /**
+     * @param enableCodeEnforcement the enableCodeEnforcement to set
+     */
+    public void setEnableCodeEnforcement(boolean enableCodeEnforcement) {
+        this.enableCodeEnforcement = enableCodeEnforcement;
+    }
+
+    /**
+     * @param enableOccupancy the enableOccupancy to set
+     */
+    public void setEnableOccupancy(boolean enableOccupancy) {
+        this.enableOccupancy = enableOccupancy;
+    }
+
+    /**
+     * @param enablePublicCEActionRequestSubmissions the enablePublicCEActionRequestSubmissions to set
+     */
+    public void setEnablePublicCEActionRequestSubmissions(boolean enablePublicCEActionRequestSubmissions) {
+        this.enablePublicCEActionRequestSubmissions = enablePublicCEActionRequestSubmissions;
+    }
+
+    /**
+     * @param enablePublicCEActionRequestInfo the enablePublicCEActionRequestInfo to set
+     */
+    public void setEnablePublicCEActionRequestInfo(boolean enablePublicCEActionRequestInfo) {
+        this.enablePublicCEActionRequestInfo = enablePublicCEActionRequestInfo;
+    }
+
+    /**
+     * @param enablePublicOccPermitApp the enablePublicOccPermitApp to set
+     */
+    public void setEnablePublicOccPermitApp(boolean enablePublicOccPermitApp) {
+        this.enablePublicOccPermitApp = enablePublicOccPermitApp;
+    }
+
+    /**
+     * @param enablePublicOccInspectionTODOs the enablePublicOccInspectionTODOs to set
+     */
+    public void setEnablePublicOccInspectionTODOs(boolean enablePublicOccInspectionTODOs) {
+        this.enablePublicOccInspectionTODOs = enablePublicOccInspectionTODOs;
+    }
+
+    /**
+     * @param muniManager the muniManager to set
+     */
+    public void setMuniManager(User muniManager) {
+        this.muniManager = muniManager;
+    }
+
+    /**
+     * @param muniOfficeProperty the muniOfficeProperty to set
+     */
+    public void setMuniOfficeProperty(Property muniOfficeProperty) {
+        this.muniOfficeProperty = muniOfficeProperty;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    /**
+     * @param lastUpdatedTS the lastUpdatedTS to set
+     */
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @param codeOfficers the codeOfficers to set
+     */
+    public void setCodeOfficers(List<User> codeOfficers) {
+        this.codeOfficers = codeOfficers;
+    }
+
+    /**
+     * @param courtEntities the courtEntities to set
+     */
+    public void setCourtEntities(List<CourtEntity> courtEntities) {
+        this.courtEntities = courtEntities;
+    }
+
+    /**
+     * @param photoDocList the photoDocList to set
+     */
+    public void setPhotoDocList(List<Integer> photoDocList) {
+        this.photoDocList = photoDocList;
+    }
+
+    /**
+     * @return the lastUpdaetdBy
+     */
+    public User getLastUpdaetdBy() {
+        return lastUpdaetdBy;
+    }
+
+    /**
+     * @param lastUpdaetdBy the lastUpdaetdBy to set
+     */
+    public void setLastUpdaetdBy(User lastUpdaetdBy) {
+        this.lastUpdaetdBy = lastUpdaetdBy;
+    }
+
+    /**
+     * @return the primaryStaffContact
+     */
+    public User getPrimaryStaffContact() {
+        return primaryStaffContact;
+    }
+
+    /**
+     * @param primaryStaffContact the primaryStaffContact to set
+     */
+    public void setPrimaryStaffContact(User primaryStaffContact) {
+        this.primaryStaffContact = primaryStaffContact;
+    }
+
 
     
 }

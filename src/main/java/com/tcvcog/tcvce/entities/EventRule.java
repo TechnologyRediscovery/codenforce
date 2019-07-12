@@ -12,36 +12,36 @@ import java.io.Serializable;
  */
 public class EventRule extends EntityUtils implements Serializable {
     
-    private int ruleid;
-    private String title;
-    private String description;
-    private EventType requiredeventtype;
-    private EventType forbiddeneventtype;
-    private EventCategory requiredEventCat;
+    protected int ruleid;
+    protected String title;
+    protected String description;
+    protected EventType requiredeventtype;
+    protected EventType forbiddeneventtype;
+    protected EventCategory requiredEventCat;
+    protected EventCategory forbiddenEventCat;
     
-    private boolean requiredeventcatthresholdtypeintorder;
-    private boolean requiredeventcatupperboundtypeintorder;
+    protected int requiredeventcatthresholdtypeintorder;
+    protected boolean requiredeventcatupperboundtypeintorder;
     
-    private boolean requiredeventcatthresholdglobalorder;
-    private boolean requiredeventcatupperboundglobalorder;
+    protected int requiredeventcatthresholdglobalorder;
+    protected boolean requiredeventcatupperboundglobalorder;
     
-    private EventCategory forbiddeneventcat_catid;
     
-    private boolean forbiddeneventcatthresholdtypeintorder;
-    private boolean forbiddeneventcatupperboundtypeintorder;
+    protected int forbiddeneventcatthresholdtypeintorder;
+    protected boolean forbiddeneventcatupperboundtypeintorder;
     
-    private boolean forbiddeneventcatthresholdglobalorder;
-    private boolean forbiddeneventcatupperboundglobalorder;
+    protected int forbiddeneventcatthresholdglobalorder;
+    protected boolean forbiddeneventcatupperboundglobalorder;
     
-    private boolean mandatorypassreqtocloseentity;
-    private boolean autoremoveonentityclose;
-    private int promptingproposal_proposalid;
+    protected boolean mandatorypassreqtocloseentity;
+    protected boolean autoremoveonentityclose;
+    protected Proposal promptingProposal;
     
-    private EventCategory triggeredeventcatonpass;
-    private EventCategory triggeredeventcatonfail;
+    protected EventCategory triggeredeventcatonpass;
+    protected EventCategory triggeredeventcatonfail;
     
-    private boolean active;
-    private String notes;
+    protected boolean active;
+    protected String notes;
 
     /**
      * @return the ruleid
@@ -88,7 +88,7 @@ public class EventRule extends EntityUtils implements Serializable {
     /**
      * @return the requiredeventcatthresholdtypeintorder
      */
-    public boolean isRequiredeventcatthresholdtypeintorder() {
+    public int isRequiredeventcatthresholdtypeintorder() {
         return requiredeventcatthresholdtypeintorder;
     }
 
@@ -102,7 +102,7 @@ public class EventRule extends EntityUtils implements Serializable {
     /**
      * @return the requiredeventcatthresholdglobalorder
      */
-    public boolean isRequiredeventcatthresholdglobalorder() {
+    public int isRequiredeventcatthresholdglobalorder() {
         return requiredeventcatthresholdglobalorder;
     }
 
@@ -113,17 +113,11 @@ public class EventRule extends EntityUtils implements Serializable {
         return requiredeventcatupperboundglobalorder;
     }
 
-    /**
-     * @return the forbiddeneventcat_catid
-     */
-    public EventCategory getForbiddeneventcat_catid() {
-        return forbiddeneventcat_catid;
-    }
 
     /**
      * @return the forbiddeneventcatthresholdtypeintorder
      */
-    public boolean isForbiddeneventcatthresholdtypeintorder() {
+    public int isForbiddeneventcatthresholdtypeintorder() {
         return forbiddeneventcatthresholdtypeintorder;
     }
 
@@ -137,7 +131,7 @@ public class EventRule extends EntityUtils implements Serializable {
     /**
      * @return the forbiddeneventcatthresholdglobalorder
      */
-    public boolean isForbiddeneventcatthresholdglobalorder() {
+    public int isForbiddeneventcatthresholdglobalorder() {
         return forbiddeneventcatthresholdglobalorder;
     }
 
@@ -163,10 +157,10 @@ public class EventRule extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the promptingproposal_proposalid
+     * @return the promptingProposal
      */
-    public int getPromptingproposal_proposalid() {
-        return promptingproposal_proposalid;
+    public Proposal getPromptingProposal() {
+        return promptingProposal;
     }
 
     /**
@@ -235,7 +229,7 @@ public class EventRule extends EntityUtils implements Serializable {
     /**
      * @param requiredeventcatthresholdtypeintorder the requiredeventcatthresholdtypeintorder to set
      */
-    public void setRequiredeventcatthresholdtypeintorder(boolean requiredeventcatthresholdtypeintorder) {
+    public void setRequiredeventcatthresholdtypeintorder(int requiredeventcatthresholdtypeintorder) {
         this.requiredeventcatthresholdtypeintorder = requiredeventcatthresholdtypeintorder;
     }
 
@@ -249,7 +243,7 @@ public class EventRule extends EntityUtils implements Serializable {
     /**
      * @param requiredeventcatthresholdglobalorder the requiredeventcatthresholdglobalorder to set
      */
-    public void setRequiredeventcatthresholdglobalorder(boolean requiredeventcatthresholdglobalorder) {
+    public void setRequiredeventcatthresholdglobalorder(int requiredeventcatthresholdglobalorder) {
         this.requiredeventcatthresholdglobalorder = requiredeventcatthresholdglobalorder;
     }
 
@@ -260,17 +254,11 @@ public class EventRule extends EntityUtils implements Serializable {
         this.requiredeventcatupperboundglobalorder = requiredeventcatupperboundglobalorder;
     }
 
-    /**
-     * @param forbiddeneventcat_catid the forbiddeneventcat_catid to set
-     */
-    public void setForbiddeneventcat_catid(EventCategory forbiddeneventcat_catid) {
-        this.forbiddeneventcat_catid = forbiddeneventcat_catid;
-    }
 
     /**
      * @param forbiddeneventcatthresholdtypeintorder the forbiddeneventcatthresholdtypeintorder to set
      */
-    public void setForbiddeneventcatthresholdtypeintorder(boolean forbiddeneventcatthresholdtypeintorder) {
+    public void setForbiddeneventcatthresholdtypeintorder(int forbiddeneventcatthresholdtypeintorder) {
         this.forbiddeneventcatthresholdtypeintorder = forbiddeneventcatthresholdtypeintorder;
     }
 
@@ -284,7 +272,7 @@ public class EventRule extends EntityUtils implements Serializable {
     /**
      * @param forbiddeneventcatthresholdglobalorder the forbiddeneventcatthresholdglobalorder to set
      */
-    public void setForbiddeneventcatthresholdglobalorder(boolean forbiddeneventcatthresholdglobalorder) {
+    public void setForbiddeneventcatthresholdglobalorder(int forbiddeneventcatthresholdglobalorder) {
         this.forbiddeneventcatthresholdglobalorder = forbiddeneventcatthresholdglobalorder;
     }
 
@@ -310,10 +298,10 @@ public class EventRule extends EntityUtils implements Serializable {
     }
 
     /**
-     * @param promptingproposal_proposalid the promptingproposal_proposalid to set
+     * @param promptingProposal the promptingProposal to set
      */
-    public void setPromptingproposal_proposalid(int promptingproposal_proposalid) {
-        this.promptingproposal_proposalid = promptingproposal_proposalid;
+    public void setPromptingProposal(Proposal promptingProposal) {
+        this.promptingProposal = promptingProposal;
     }
 
     /**
@@ -349,6 +337,20 @@ public class EventRule extends EntityUtils implements Serializable {
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the forbiddenEventCat
+     */
+    public EventCategory getForbiddenEventCat() {
+        return forbiddenEventCat;
+    }
+
+    /**
+     * @param forbiddenEventCat the forbiddenEventCat to set
+     */
+    public void setForbiddenEventCat(EventCategory forbiddenEventCat) {
+        this.forbiddenEventCat = forbiddenEventCat;
     }
 
     

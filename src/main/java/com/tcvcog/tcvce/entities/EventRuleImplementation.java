@@ -23,51 +23,49 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class EventRuleImplementation 
-        extends EventRuleAbstract 
-        implements Serializable{
+public class EventRuleImplementation extends EventRule implements Serializable{
     
     protected LocalDateTime attachedTS;
     protected User attachedBy;
     protected LocalDateTime lastEvaluatedTS;
     protected LocalDateTime passedRuleTS;
-    private boolean activeRuleImp;
-    private boolean hidden;
     
-    public EventRuleImplementation(EventRuleAbstract rule){
-        
+    public EventRuleImplementation(EventRule rule){
         this.ruleid = rule.getRuleid();
         this.title = rule.getTitle();
         this.description = rule.getDescription();
-        this.requiredEventType = rule.getRequiredEventType();
-        this.forbiddenEventType = rule.getForbiddenEventType();
-        this.requiredEventCategory = rule.getRequiredEventCategory();
-        this.forbiddenEventCategory = rule.getForbiddenEventCategory();
+        this.requiredeventtype = rule.getRequiredeventtype();
+        this.forbiddeneventtype = rule.getForbiddeneventtype();
+        this.requiredEventCat = rule.getRequiredEventCat();
+        this.forbiddenEventCat = rule.getForbiddenEventCat();
 
-        this.requiredECThreshold_typeInternalOrder = rule.isRequiredeventcatthresholdtypeintorder();
-        this.requiredECThreshold_typeInternalOrder_treatAsUpperBound = rule.isRequiredECThreshold_typeInternalOrder_treatAsUpperBound();
+        this.requiredeventcatthresholdtypeintorder = rule.isRequiredeventcatthresholdtypeintorder();
+        this.requiredeventcatupperboundtypeintorder = rule.isRequiredeventcatupperboundtypeintorder();
 
-        this.requiredECThreshold_globalOrder = rule.isRequiredeventcatthresholdglobalorder();
-        this.requiredECThreshold_globalOrder_treatAsUpperBound = rule.isRequiredECThreshold_globalOrder_treatAsUpperBound();
+        this.requiredeventcatthresholdglobalorder = rule.isRequiredeventcatthresholdglobalorder();
+        this.requiredeventcatupperboundglobalorder = rule.isRequiredeventcatupperboundglobalorder();
 
-        this.forbiddenECThreshold_typeInternalOrder = rule.isForbiddeneventcatthresholdtypeintorder();
-        this.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound = rule.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound();
 
-        this.forbiddenECThreshold_globalOrder = rule.isForbiddeneventcatthresholdglobalorder();
-        this.forbiddenECThreshold_globalOrder_treatAsUpperBound = rule.isForbiddenECThreshold_globalOrder_treatAsUpperBound();
+        this.forbiddeneventcatthresholdtypeintorder = rule.isForbiddeneventcatthresholdtypeintorder();
+        this.forbiddeneventcatupperboundtypeintorder = rule.isForbiddeneventcatupperboundtypeintorder();
 
-        this.mandatoryRulePassRequiredToCloseEntity = rule.isMandatoryRulePassRequiredToCloseEntity();
-        this.inactivateRuleOnEntityClose = rule.isInactivateRuleOnEntityClose();
+        this.forbiddeneventcatthresholdglobalorder = rule.isForbiddeneventcatthresholdglobalorder();
+        this.forbiddeneventcatupperboundglobalorder = rule.isForbiddeneventcatupperboundglobalorder();
 
-        this.triggeredECOnRulePass = rule.getTriggeredECOnRulePass();
-        this.triggeredECOnRuleFail = rule.getTriggeredECOnRuleFail();
+        this.mandatorypassreqtocloseentity = rule.isMandatorypassreqtocloseentity();
+        this.autoremoveonentityclose = rule.isAutoremoveonentityclose();
+        this.promptingProposal = rule.getPromptingProposal();
 
-        this.activeRuleAbstract = rule.isActiveRuleAbstract();
+        this.triggeredeventcatonpass = rule.getTriggeredeventcatonpass();
+        this.triggeredeventcatonfail = rule.getTriggeredeventcatonfail();
+
+        this.active = rule.isActive();
         this.notes = rule.getNotes();
-        this.promptingDirective = rule.getPromptingDirective();
-        this.formPromptingDirectiveID = rule.getFormPromptingDirectiveID();
+        
+        
         
     }
+    
 
     /**
      * @return the attachedTS
@@ -123,34 +121,6 @@ public class EventRuleImplementation
      */
     public void setPassedRuleTS(LocalDateTime passedRuleTS) {
         this.passedRuleTS = passedRuleTS;
-    }
-
-    /**
-     * @return the hidden
-     */
-    public boolean isHidden() {
-        return hidden;
-    }
-
-    /**
-     * @param hidden the hidden to set
-     */
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
-
-    /**
-     * @return the activeRuleImp
-     */
-    public boolean isActiveRuleImp() {
-        return activeRuleImp;
-    }
-
-    /**
-     * @param activeRuleImp the activeRuleImp to set
-     */
-    public void setActiveRuleImp(boolean activeRuleImp) {
-        this.activeRuleImp = activeRuleImp;
     }
     
     
