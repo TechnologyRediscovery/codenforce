@@ -30,12 +30,15 @@ import com.tcvcog.tcvce.entities.ChoiceEventRule;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.Proposable;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,13 +90,39 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return new ChoiceEventCat();
+        return c;
     }
     
-    public List<Proposable> getChoiceList(int directiveID){
-        
-        return new ArrayList<>();
-        
+    public List<Proposable> getChoiceList(int directiveID) throws IntegrationException, MalformedBOBException{
+        List<Proposable> choiceList = new ArrayList<>();
+  
+        StringBuilder sb = new StringBuilder();
+        sb.append(  "SELECT choice_choiceid, directive_directiveid\n" +
+                    "  FROM public.choicedirectivechoice WHERE directive_directiveid=?; ");
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, directiveID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                choiceList.add(getChoice(rs.getInt("choice_choiceid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive chocielist ", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return choiceList;
     }
     
   
@@ -133,10 +162,11 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         choice.setMinimumRequiredUserRankToChoose(rs.getInt("minimumrequireduserranktochoose"));
         choice.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         choice.setRelativeOrder(rs.getInt("relativeorder"));
+        
         return choice;
     }
     
-    public Proposal getProposal(int propID) throws IntegrationException{
+    public Proposal getProposal(int propID) throws IntegrationException, MalformedBOBException{
         Proposal prop = null;
         StringBuilder sb = new StringBuilder();
         sb.append(  "SELECT proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
@@ -173,7 +203,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public List<Proposal> getProposalList(CECase cse) throws IntegrationException{
+    public List<Proposal> getProposalList(CECase cse) throws IntegrationException, MalformedBOBException{
         List<Proposal> proposalList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
@@ -209,7 +239,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException{
+    public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException, MalformedBOBException{
         
          List<Proposal> proposalList = new ArrayList<>();
   
@@ -251,7 +281,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException 
      */
-     private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException{
+     private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException, MalformedBOBException{
         Proposal prop = new Proposal();
         UserIntegrator ui = getUserIntegrator();
         EventIntegrator ei = getEventIntegrator();
@@ -297,35 +327,86 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         return prop;
     }
     
-    public void updateProposal(Proposal imp) throws IntegrationException{
-          String query =    "UPDATE public.ceeventproposalimplementation\n" +
-                            "   SET proposal_propid=?, generatingevent_eventid=?, \n" +
+    public void updateProposal(Proposal prop) throws IntegrationException{
+          String query =    "UPDATE public.choiceproposal\n" +
+                            "   SET directive_directiveid=?, generatingevent_cecaseeventid=?, \n" +
                             "       initiator_userid=?, responderintended_userid=?, activateson=?, \n" +
-                            "       expireson=?, expiredorinactive=?, notes=?\n" +
-                            " WHERE implementationid=?;";
+                            "       expireson=?, responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" +
+                            "       responseevent_cecaseeventid=?, active=?, notes=?, relativeorder=?, \n" +
+                            "       hidden=?, generatingevent_occeventid=?, responseevent_occeventid=?, \n" +
+                            "       occperiod_periodid=?, cecase_caseid=?\n" +
+                            " WHERE proposalid=?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(2, imp.getGeneratingEventID());
-            stmt.setInt(3, imp.getInitiator().getUserID());
-            stmt.setInt(4, imp.getResponderIntended().getUserID());
+            stmt.setInt(1, prop.getDirective().getDirectiveID());
+            Event ev = prop.getGeneratingEvent();
+            if(ev != null){
+                if(ev instanceof CECaseEvent){
+                    stmt.setInt(2, prop.getGeneratingEvent().getEventID());
+                    stmt.setNull(15, java.sql.Types.NULL);
+                } else if (ev instanceof OccEvent){
+                    stmt.setInt(15, prop.getGeneratingEvent().getEventID());
+                    stmt.setNull(2, java.sql.Types.NULL);
+                } else {
+                    stmt.setNull(15, java.sql.Types.NULL);
+                    stmt.setNull(2, java.sql.Types.NULL);
+                }
+            }
             
-            if(imp.getActivatesOn() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(imp.getActivatesOn()));
+            stmt.setInt(3, prop.getInitiator().getUserID());
+            if(prop.getResponderIntended() != null){
+                stmt.setInt(4, prop.getResponderIntended().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            if(prop.getActivatesOn() != null){
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(prop.getActivatesOn()));
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
-            
-            if(imp.getExpiresOn() != null){
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(imp.getExpiresOn()));
+
+            if(prop.getExpiresOn() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(prop.getExpiresOn()));
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
+            if(prop.getResponderActual() != null){
+                stmt.setInt(7, prop.getResponderActual().getUserID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(8, prop.isProposalRejected());
+            if(prop.getResponseTimestamp() != null){
+                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTimestamp()));
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            ev = prop.getResponseEvent();
+            if(ev != null){
+                if(ev instanceof CECaseEvent){
+                    stmt.setInt(10, prop.getResponseEvent().getEventID());
+                    stmt.setNull(16, java.sql.Types.NULL);
+                } else if (ev instanceof OccEvent){
+                    stmt.setInt(16, prop.getResponseEvent().getEventID());
+                    stmt.setNull(10, java.sql.Types.NULL);
+                } else {
+                    stmt.setNull(10, java.sql.Types.NULL);
+                    stmt.setNull(16, java.sql.Types.NULL);
+                }
+            }
+            stmt.setBoolean(11, prop.isActive());
+            stmt.setString(12, prop.getNotes());
+            stmt.setInt(13, prop.getOrder());
             
-            stmt.setString(7, imp.getNotes());
+            stmt.setBoolean(14, prop.isHidden());
+            stmt.setInt(17, prop.getOccperiodID());
+            stmt.setInt(18, prop.getCecaseID());
+            
+            
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -335,54 +416,12 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         }
-        
-        
     }
-    
-    public void logResponseToProposal(CECaseEvent ev) throws IntegrationException {
-
-       String query = "UPDATE public.ceeventproposalimplementation\n" +
-                        "   SET responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" +
-                        "       responseevent_eventid=?, notes=?\n" +
-                        " WHERE implementationid = ?;";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        Proposal imp;
-        
-//        if(ev.getEventProposalImplementation()!= null){
-//            imp = ev.getEventProposalImplementation();
-//
-//            try {
-//
-//                stmt = con.prepareStatement(query);
-//                stmt.setInt(1, imp.getResponderActual().getUserID());
-//                stmt.setBoolean(2, imp.isProposalRejected());
-//                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(imp.getResponseTimestamp()));
-//                int responseEventID;
-//                if(imp.getResponseEvent()!= null){
-//                    responseEventID = imp.getResponseEvent().getEventID();
-//                    stmt.setInt(4, responseEventID);
-//                } else {
-//                    stmt.setNull(4, java.sql.Types.NULL);
-//                }
-//                stmt.setString(5, imp.getNotes());
-//                stmt.executeUpdate();
-//            } catch (SQLException ex) {
-//                System.out.println(ex.toString());
-//                throw new IntegrationException("Cannot udpate event proposal implementation, sorry", ex);
-//
-//            } finally {
-//                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-//                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-//            }
-//        }
-    }
-    
-    
     
   
-    public Directive getDirective(int directiveID) throws IntegrationException{
+    
+  
+    public Directive getDirective(int directiveID) throws IntegrationException, MalformedBOBException{
 
         Directive proposal = new Directive();
         
@@ -432,7 +471,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException{
+    private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException, MalformedBOBException{
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
 
@@ -537,20 +576,19 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-   
-    
-   
 
-    public void insertChoiceProposal(Proposal prop) throws MalformedBOBException, IntegrationException{
-        String query = "INSERT INTO public.ceeventproposalimplementation(\n" +
-                        "            implementationid, proposal_propid, generatingevent_eventid, initiator_userid, \n" +
-                        "            responderintended_userid, activateson, expireson, responderactual_userid, \n" +
-                        "            rejectproposal, responsetimestamp, responseevent_eventid, expiredorinactive, \n" +
-                        "            notes)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?);";
+    public void insertProposal(Proposal prop) throws MalformedBOBException, IntegrationException{
+                        String query = "INSERT INTO public.choiceproposal(\n" +
+                "            proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
+                "            initiator_userid, responderintended_userid, activateson, expireson, \n" +
+                "            responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" +
+                "            active, notes, relativeorder, hidden, generatingevent_occeventid, \n" +
+                "            responseevent_occeventid, occperiod_periodid, cecase_caseid)\n" +
+                "    VALUES (DEFAULT, ?, ?, \n" +
+                "            ?, ?, ?, ?, \n" +
+                "            ?, ?, ?, ?, \n" +
+                "            ?, ?, ?, ?, ?, \n" +
+                "            ?, ?, ?);";
 
         
         Connection con = getPostgresCon();
@@ -558,39 +596,70 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(2, prop.getGeneratingEventID());
-            
-            if(prop.getInitiator() != null){
-                stmt.setInt(3, prop.getInitiator().getUserID());
-            } else { 
-                throw new MalformedBOBException("EventProposalImplementations must contain a User object as an initiator");
+             stmt.setInt(1, prop.getDirective().getDirectiveID());
+            Event ev = prop.getGeneratingEvent();
+            if(ev != null){
+                if(ev instanceof CECaseEvent){
+                    stmt.setInt(2, prop.getGeneratingEvent().getEventID());
+                    stmt.setNull(15, java.sql.Types.NULL);
+                } else if (ev instanceof OccEvent){
+                    stmt.setInt(15, prop.getGeneratingEvent().getEventID());
+                    stmt.setNull(2, java.sql.Types.NULL);
+                } else {
+                    stmt.setNull(15, java.sql.Types.NULL);
+                    stmt.setNull(2, java.sql.Types.NULL);
+                }
             }
             
-            if(prop.getResponderIntended()!= null){
+            stmt.setInt(3, prop.getInitiator().getUserID());
+            if(prop.getResponderIntended() != null){
                 stmt.setInt(4, prop.getResponderIntended().getUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            
-            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(prop.getActivatesOn()));
-            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(prop.getExpiresOn()));
-            
+            if(prop.getActivatesOn() != null){
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(prop.getActivatesOn()));
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+
+            if(prop.getExpiresOn() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(prop.getExpiresOn()));
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
             if(prop.getResponderActual() != null){
                 stmt.setInt(7, prop.getResponderActual().getUserID());
             } else {
                 stmt.setNull(7, java.sql.Types.NULL);
             }
-            
             stmt.setBoolean(8, prop.isProposalRejected());
-            
             if(prop.getResponseTimestamp() != null){
                 stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTimestamp()));
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
             }
-
-//            stmt.setInt(10, prop.getResponseEventID());
+            ev = prop.getResponseEvent();
+            if(ev != null){
+                if(ev instanceof CECaseEvent){
+                    stmt.setInt(10, prop.getResponseEvent().getEventID());
+                    stmt.setNull(16, java.sql.Types.NULL);
+                } else if (ev instanceof OccEvent){
+                    stmt.setInt(16, prop.getResponseEvent().getEventID());
+                    stmt.setNull(10, java.sql.Types.NULL);
+                } else {
+                    stmt.setNull(10, java.sql.Types.NULL);
+                    stmt.setNull(16, java.sql.Types.NULL);
+                }
+            }
+            stmt.setBoolean(11, prop.isActive());
             stmt.setString(12, prop.getNotes());
+            stmt.setInt(13, prop.getOrder());
+            
+            stmt.setBoolean(14, prop.isHidden());
+            stmt.setInt(17, prop.getOccperiodID());
+            stmt.setInt(18, prop.getCecaseID());
+            
             
             stmt.execute();
 
@@ -606,14 +675,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    private Proposal generateProposal(ResultSet rs, Directive dir){
-        Proposal proposal = new Proposal();
-        
-        
-        return proposal;
-        
-    }
-
     
     
     
