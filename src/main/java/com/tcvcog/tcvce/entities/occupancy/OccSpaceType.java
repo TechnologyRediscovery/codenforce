@@ -16,18 +16,16 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import java.util.List;
-
 /**
  * Mapped to fields of the spacetype table
  * @author EC Darsow
  */
 public class OccSpaceType {
-    protected int spaceTypeID;
-    protected String spaceTypeTitle;
-    protected String spaceTypeDescription;
-    protected boolean required;
-    
+    private int spaceTypeID;
+    private String spaceTypeTitle;
+    private String spaceTypeDescription;
+    private boolean required;
+
     /**
      * @return the spaceTypeID
      */
@@ -83,8 +81,5 @@ public class OccSpaceType {
     public void setRequired(boolean required) {
         this.required = required;
     }
-
-
-    
     
 }

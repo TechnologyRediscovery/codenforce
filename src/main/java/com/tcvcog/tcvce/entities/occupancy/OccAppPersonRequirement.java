@@ -4,7 +4,6 @@ import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.PersonType;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -13,8 +12,8 @@ import java.util.List;
 public class OccAppPersonRequirement extends EntityUtils implements Serializable {
    
     private boolean requirementSatisfied;
-    private List<PersonType> requiredPersonTypes;
-    private List<PersonType> optionalPersonTypes;
+    private ArrayList<PersonType> requiredPersonTypes;
+    private ArrayList<PersonType> optionalPersonTypes;
     private String requirementExplanation;
     
     /**
@@ -34,28 +33,28 @@ public class OccAppPersonRequirement extends EntityUtils implements Serializable
     /**
      * @return the requiredPersonTypes
      */
-    public List<PersonType> getRequiredPersonTypes() {
+    public ArrayList<PersonType> getRequiredPersonTypes() {
         return requiredPersonTypes;
     }
 
     /**
      * @param requiredPersonTypes the requiredPersonTypes to set
      */
-    public void setRequiredPersonTypes(List<PersonType> requiredPersonTypes) {
+    public void setRequiredPersonTypes(ArrayList<PersonType> requiredPersonTypes) {
         this.requiredPersonTypes = requiredPersonTypes;
     }
 
     /**
      * @return the optionalPersonTypes
      */
-    public List<PersonType> getOptionalPersonTypes() {
+    public ArrayList<PersonType> getOptionalPersonTypes() {
         return optionalPersonTypes;
     }
 
     /**
      * @param optionalPersonTypes the optionalPersonTypes to set
      */
-    public void setOptionalPersonTypes(List<PersonType> optionalPersonTypes) {
+    public void setOptionalPersonTypes(ArrayList<PersonType> optionalPersonTypes) {
         this.optionalPersonTypes = optionalPersonTypes;
     }
 

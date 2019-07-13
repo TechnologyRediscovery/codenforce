@@ -16,84 +16,41 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
-import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
  * @author Adam Gutonski and Sylvia
  */
-public class OccInspection extends EntityUtils implements Comparable<OccInspection> {
+public class OccInspection {
     
     private int inspectionID;
     private User inspector;
     private int occPeriodID;
     
-    private boolean active;
-    
-    // This template object provides us the raw lists of uninspected
-    // space types, from which we extract a list of Spaces and their CodeElements
-    private OccChecklistTemplate checklistTemplate;
-    
+    private OccChecklistBlueprint blueprint;
     private List<OccInspectedSpace> inspectedSpaceList;
-    private List<OccInspectedSpace> inspectedSpaceListVisible;
-    private ViewOptionsOccChecklistItemsEnum viewSetting;
-    private boolean includeEmtpySpaces;
     
     private int pacc;
     private boolean enablePacc;
     
-    private boolean readyForPassedCertification;
-    private User passedInspectionCertifiedBy;
-    private LocalDateTime passedInspectionTS;
-    
-    private LocalDateTime effectiveDateOfRecord;
-    protected java.util.Date effectiveDateOfRecordUtilDate;
-    
-    private LocalDateTime creationTS;
+    private User passCertifiedBy;
+    private LocalDateTime passTS;
     
     private int maxOccupantsAllowed;
     private int numBedrooms;
     private int numBathrooms;
     
-    private Person thirdPartyInspector;
-    private LocalDateTime thirdPartyInspectorApprovalTS;
+    private Person thirdPartyInspector_personid;
+    private LocalDateTime thirdPartyApprovalTS;
     private User thirdPartyApprovalBy;
 
     private String notes; 
-    
-    public OccInspection(){
-        inspectedSpaceList = new ArrayList<>();
-        inspectedSpaceListVisible = new ArrayList<>();
-        viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
-    }
-    
-    public void addSpaceToInspectedSpaces(OccInspectedSpace spc){
-        inspectedSpaceList.add(spc);
-    }
-    
-    public void configureVisibleSpaceElementList(){
-        inspectedSpaceListVisible.clear();
-        for(Iterator<OccInspectedSpace> it = inspectedSpaceList.iterator(); it.hasNext(); ){
-            OccInspectedSpace ois = it.next(); 
-            ois.setViewSetting(viewSetting);
-            ois.configureVisibleElementList();
-            if(!ois.getInspectedElementListVisible().isEmpty()
-                    || (ois.getInspectedElementListVisible().isEmpty() && includeEmtpySpaces)){
-                inspectedSpaceListVisible.add(ois);
-            }
-        } // close for over inspectedspaces
-    }
     
     /**
      * @return the inspectionID
@@ -123,6 +80,8 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     public void setNotes(String notes) {
         this.notes = notes;
     }
+
+  
 
     /**
      * @return the inspector
@@ -175,17 +134,17 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
    
 
     /**
-     * @return the checklistTemplate
+     * @return the blueprint
      */
-    public OccChecklistTemplate getChecklistTemplate() {
-        return checklistTemplate;
+    public OccChecklistBlueprint getBlueprint() {
+        return blueprint;
     }
 
     /**
-     * @param checklistTemplate the checklistTemplate to set
+     * @param blueprint the blueprint to set
      */
-    public void setChecklistTemplate(OccChecklistTemplate checklistTemplate) {
-        this.checklistTemplate = checklistTemplate;
+    public void setBlueprint(OccChecklistBlueprint blueprint) {
+        this.blueprint = blueprint;
     }
 
     /**
@@ -203,17 +162,17 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     }
 
     /**
-     * @return the passedInspectionCertifiedBy
+     * @return the passCertifiedBy
      */
-    public User getPassedInspectionCertifiedBy() {
-        return passedInspectionCertifiedBy;
+    public User getPassCertifiedBy() {
+        return passCertifiedBy;
     }
 
     /**
-     * @param passedInspectionCertifiedBy the passedInspectionCertifiedBy to set
+     * @param passCertifiedBy the passCertifiedBy to set
      */
-    public void setPassedInspectionCertifiedBy(User passedInspectionCertifiedBy) {
-        this.passedInspectionCertifiedBy = passedInspectionCertifiedBy;
+    public void setPassCertifiedBy(User passCertifiedBy) {
+        this.passCertifiedBy = passCertifiedBy;
     }
 
     /**
@@ -259,17 +218,17 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     }
 
     /**
-     * @return the thirdPartyInspector
+     * @return the thirdPartyInspector_personid
      */
-    public Person getThirdPartyInspector() {
-        return thirdPartyInspector;
+    public Person getThirdPartyInspector_personid() {
+        return thirdPartyInspector_personid;
     }
 
     /**
-     * @return the thirdPartyInspectorApprovalTS
+     * @return the thirdPartyApprovalTS
      */
-    public LocalDateTime getThirdPartyInspectorApprovalTS() {
-        return thirdPartyInspectorApprovalTS;
+    public LocalDateTime getThirdPartyApprovalTS() {
+        return thirdPartyApprovalTS;
     }
 
     /**
@@ -280,17 +239,17 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     }
 
     /**
-     * @param thirdPartyInspector the thirdPartyInspector to set
+     * @param thirdPartyInspector_personid the thirdPartyInspector_personid to set
      */
-    public void setThirdPartyInspector(Person thirdPartyInspector) {
-        this.thirdPartyInspector = thirdPartyInspector;
+    public void setThirdPartyInspector_personid(Person thirdPartyInspector_personid) {
+        this.thirdPartyInspector_personid = thirdPartyInspector_personid;
     }
 
     /**
-     * @param thirdPartyInspectorApprovalTS the thirdPartyInspectorApprovalTS to set
+     * @param thirdPartyApprovalTS the thirdPartyApprovalTS to set
      */
-    public void setThirdPartyInspectorApprovalTS(LocalDateTime thirdPartyInspectorApprovalTS) {
-        this.thirdPartyInspectorApprovalTS = thirdPartyInspectorApprovalTS;
+    public void setThirdPartyApprovalTS(LocalDateTime thirdPartyApprovalTS) {
+        this.thirdPartyApprovalTS = thirdPartyApprovalTS;
     }
 
     /**
@@ -308,258 +267,17 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     }
 
     /**
-     * @return the passedInspectionTS
+     * @return the passTS
      */
-    public LocalDateTime getPassedInspectionTS() {
-        return passedInspectionTS;
+    public LocalDateTime getPassTS() {
+        return passTS;
     }
 
     /**
-     * @param passedInspectionTS the passedInspectionTS to set
+     * @param passTS the passTS to set
      */
-    public void setPassedInspectionTS(LocalDateTime passedInspectionTS) {
-        this.passedInspectionTS = passedInspectionTS;
-    }
-
-    /**
-     * @return the effectiveDateOfRecord
-     */
-    public LocalDateTime getEffectiveDateOfRecord() {
-        return effectiveDateOfRecord;
-    }
-
-    /**
-     * @param effectiveDateOfRecord the effectiveDateOfRecord to set
-     */
-    public void setEffectiveDateOfRecord(LocalDateTime effectiveDateOfRecord) {
-        this.effectiveDateOfRecord = effectiveDateOfRecord;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + this.inspectionID;
-        hash = 53 * hash + Objects.hashCode(this.inspector);
-        hash = 53 * hash + this.occPeriodID;
-        hash = 53 * hash + Objects.hashCode(this.checklistTemplate);
-        hash = 53 * hash + Objects.hashCode(this.inspectedSpaceList);
-        hash = 53 * hash + this.pacc;
-        hash = 53 * hash + (this.enablePacc ? 1 : 0);
-        hash = 53 * hash + Objects.hashCode(this.passedInspectionCertifiedBy);
-        hash = 53 * hash + Objects.hashCode(this.passedInspectionTS);
-        hash = 53 * hash + Objects.hashCode(this.effectiveDateOfRecord);
-        hash = 53 * hash + this.maxOccupantsAllowed;
-        hash = 53 * hash + this.numBedrooms;
-        hash = 53 * hash + this.numBathrooms;
-        hash = 53 * hash + Objects.hashCode(this.thirdPartyInspector);
-        hash = 53 * hash + Objects.hashCode(this.thirdPartyInspectorApprovalTS);
-        hash = 53 * hash + Objects.hashCode(this.thirdPartyApprovalBy);
-        hash = 53 * hash + Objects.hashCode(this.notes);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OccInspection other = (OccInspection) obj;
-        if (this.inspectionID != other.inspectionID) {
-            return false;
-        }
-        if (this.occPeriodID != other.occPeriodID) {
-            return false;
-        }
-        if (this.pacc != other.pacc) {
-            return false;
-        }
-        if (this.enablePacc != other.enablePacc) {
-            return false;
-        }
-        if (this.maxOccupantsAllowed != other.maxOccupantsAllowed) {
-            return false;
-        }
-        if (this.numBedrooms != other.numBedrooms) {
-            return false;
-        }
-        if (this.numBathrooms != other.numBathrooms) {
-            return false;
-        }
-        if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.inspector, other.inspector)) {
-            return false;
-        }
-        if (!Objects.equals(this.checklistTemplate, other.checklistTemplate)) {
-            return false;
-        }
-        if (!Objects.equals(this.inspectedSpaceList, other.inspectedSpaceList)) {
-            return false;
-        }
-        if (!Objects.equals(this.passedInspectionCertifiedBy, other.passedInspectionCertifiedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.passedInspectionTS, other.passedInspectionTS)) {
-            return false;
-        }
-        if (!Objects.equals(this.effectiveDateOfRecord, other.effectiveDateOfRecord)) {
-            return false;
-        }
-        if (!Objects.equals(this.thirdPartyInspector, other.thirdPartyInspector)) {
-            return false;
-        }
-        if (!Objects.equals(this.thirdPartyInspectorApprovalTS, other.thirdPartyInspectorApprovalTS)) {
-            return false;
-        }
-        if (!Objects.equals(this.thirdPartyApprovalBy, other.thirdPartyApprovalBy)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return the effectiveDateOfRecordUtilDate
-     */
-    public java.util.Date getEffectiveDateOfRecordUtilDate() {
-        if(effectiveDateOfRecord != null){
-            effectiveDateOfRecordUtilDate = java.util.Date.from(effectiveDateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        
-        return effectiveDateOfRecordUtilDate;
-    }
-
-    /**
-     * @param effectiveDateOfRecordUtilDate the effectiveDateOfRecordUtilDate to set
-     */
-    public void setEffectiveDateOfRecordUtilDate(java.util.Date effectiveDateOfRecordUtilDate) {
-        this.effectiveDateOfRecordUtilDate = effectiveDateOfRecordUtilDate;
-        if(effectiveDateOfRecordUtilDate != null){
-            effectiveDateOfRecord = effectiveDateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
-
-    /**
-     * @return the active
-     */
-    public boolean isActive() {
-        return active;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-    
-    /**
-     * Utility method for determining which date to use for comparison.
-     * Note that inspections that haven't been approved probably won't have an
-     * effective date of record so we should just use the creation timestamp
-     * @param ins
-     * @return the selected date for comparison
-     */
-    private LocalDateTime getDateForComparison(OccInspection ins){
-        if(ins.getEffectiveDateOfRecord() == null){
-            return ins.getCreationTS();
-        } else {
-            return ins.getEffectiveDateOfRecord();
-        }
-    }
-    
-
-    @Override
-    public int compareTo(OccInspection ins) {
-        int compRes = getDateForComparison(this).compareTo(getDateForComparison(ins));
-
-//        if(getDateForComparison(this).isBefore(getDateForComparison(ins))){
-//            return 1;
-//        } else if (getDateForComparison(this).isAfter(getDateForComparison(ins))){
-//            return -1;
-//        } else {
-//            return 0;
-//        }
-        return compRes;
-    }
-
-    /**
-     * @return the creationTS
-     */
-    public LocalDateTime getCreationTS() {
-        return creationTS;
-    }
-
-    /**
-     * @param creationTS the creationTS to set
-     */
-    public void setCreationTS(LocalDateTime creationTS) {
-        this.creationTS = creationTS;
-    }
-
-    /**
-     * @return the inspectedSpaceListVisible
-     */
-    public List<OccInspectedSpace> getInspectedSpaceListVisible() {
-        configureVisibleSpaceElementList();
-
-        return inspectedSpaceListVisible;
-    }
-
-    /**
-     * @param inspectedSpaceListVisible the inspectedSpaceListVisible to set
-     */
-    public void setInspectedSpaceListVisible(List<OccInspectedSpace> inspectedSpaceListVisible) {
-        this.inspectedSpaceListVisible = inspectedSpaceListVisible;
-    }
-
-    /**
-     * @return the readyForPassedCertification
-     */
-    public boolean isReadyForPassedCertification() {
-        return readyForPassedCertification;
-    }
-
-    /**
-     * @param readyForPassedCertification the readyForPassedCertification to set
-     */
-    public void setReadyForPassedCertification(boolean readyForPassedCertification) {
-        this.readyForPassedCertification = readyForPassedCertification;
-    }
-
-    /**
-     * @return the viewSetting
-     */
-    public ViewOptionsOccChecklistItemsEnum getViewSetting() {
-        return viewSetting;
-    }
-
-    /**
-     * @param viewSetting the viewSetting to set
-     */
-    public void setViewSetting(ViewOptionsOccChecklistItemsEnum viewSetting) {
-        
-        this.viewSetting = viewSetting;
-    }
-
-    /**
-     * @return the includeEmtpySpaces
-     */
-    public boolean isIncludeEmtpySpaces() {
-        return includeEmtpySpaces;
-    }
-
-    /**
-     * @param includeEmtpySpaces the includeEmtpySpaces to set
-     */
-    public void setIncludeEmtpySpaces(boolean includeEmtpySpaces) {
-        this.includeEmtpySpaces = includeEmtpySpaces;
+    public void setPassTS(LocalDateTime passTS) {
+        this.passTS = passTS;
     }
 
     

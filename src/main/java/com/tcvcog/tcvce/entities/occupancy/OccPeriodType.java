@@ -20,7 +20,6 @@ import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonType;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -28,13 +27,12 @@ import java.util.Objects;
  * @author Adam Gutonski and Sylvia
  */
 public class OccPeriodType {
-    private int typeID;
+    private int typeid;
     private Municipality muni;
     private String title;
     private String authorizeduses;
     private String description;
     private boolean userassignable;
-    
     
     private boolean permittable;
     private boolean startdaterequired;
@@ -44,34 +42,20 @@ public class OccPeriodType {
     private boolean rentalcompatible;
     private boolean active;
     private boolean allowthirdpartyinspection;
-    
     private List<PersonType> optionalpersontypeList;
-    private List<PersonType> requiredPersontypeList;
     
+    private List<PersonType> requiredPersontypeList;
     private boolean commercial;
     private boolean requirepersontypeentrycheck;
     
-    /**
-     * Used to build a checklist template for the occperiod
-     */
-    private int checklistID;
-    private boolean asynchronousValidityPeriod;
-    private int defaultPermitValidityPeriodDays;
-    
-    private int defaultInspectionValidityPeriodDays;
-    
-    private int eventRuleSetID;
-    private boolean inspectable;
-    
-    private String permitTitle;
-    private String permitTitleSub;
+    private int defaultValidityPeriodDays;
 
     private List<Fee> feeList;
     /**
-     * @return the typeID
+     * @return the typeid
      */
-    public int getTypeID() {
-        return typeID;
+    public int getTypeid() {
+        return typeid;
     }
 
     /**
@@ -194,10 +178,10 @@ public class OccPeriodType {
     }
 
     /**
-     * @param typeID the typeID to set
+     * @param typeid the typeid to set
      */
-    public void setTypeID(int typeID) {
-        this.typeID = typeID;
+    public void setTypeid(int typeid) {
+        this.typeid = typeid;
     }
 
     /**
@@ -320,159 +304,17 @@ public class OccPeriodType {
     }
 
     /**
-     * @return the defaultPermitValidityPeriodDays
+     * @return the defaultValidityPeriodDays
      */
-    public int getDefaultPermitValidityPeriodDays() {
-        return defaultPermitValidityPeriodDays;
+    public int getDefaultValidityPeriodDays() {
+        return defaultValidityPeriodDays;
     }
 
     /**
-     * @param defaultPermitValidityPeriodDays the defaultPermitValidityPeriodDays to set
+     * @param defaultValidityPeriodDays the defaultValidityPeriodDays to set
      */
-    public void setDefaultPermitValidityPeriodDays(int defaultPermitValidityPeriodDays) {
-        this.defaultPermitValidityPeriodDays = defaultPermitValidityPeriodDays;
-    }
-
-    /**
-     * @return the inspectable
-     */
-    public boolean isInspectable() {
-        return inspectable;
-    }
-
-    /**
-     * @param inspectable the inspectable to set
-     */
-    public void setInspectable(boolean inspectable) {
-        this.inspectable = inspectable;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 23 * hash + this.typeID;
-        hash = 23 * hash + Objects.hashCode(this.muni);
-        hash = 23 * hash + Objects.hashCode(this.title);
-        hash = 23 * hash + Objects.hashCode(this.authorizeduses);
-        hash = 23 * hash + Objects.hashCode(this.description);
-        hash = 23 * hash + (this.userassignable ? 1 : 0);
-        hash = 23 * hash + (this.permittable ? 1 : 0);
-        hash = 23 * hash + (this.startdaterequired ? 1 : 0);
-        hash = 23 * hash + (this.enddaterequired ? 1 : 0);
-        hash = 23 * hash + (this.inspectable ? 1 : 0);
-        hash = 23 * hash + (this.passedInspectionRequired ? 1 : 0);
-        hash = 23 * hash + (this.rentalcompatible ? 1 : 0);
-        hash = 23 * hash + (this.active ? 1 : 0);
-        hash = 23 * hash + (this.allowthirdpartyinspection ? 1 : 0);
-        hash = 23 * hash + Objects.hashCode(this.optionalpersontypeList);
-        hash = 23 * hash + Objects.hashCode(this.requiredPersontypeList);
-        hash = 23 * hash + (this.commercial ? 1 : 0);
-        hash = 23 * hash + (this.requirepersontypeentrycheck ? 1 : 0);
-        hash = 23 * hash + this.defaultPermitValidityPeriodDays;
-        hash = 23 * hash + Objects.hashCode(this.feeList);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OccPeriodType other = (OccPeriodType) obj;
-        if (this.typeID != other.typeID) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return the permitTitle
-     */
-    public String getPermitTitle() {
-        return permitTitle;
-    }
-
-    /**
-     * @return the permitTitleSub
-     */
-    public String getPermitTitleSub() {
-        return permitTitleSub;
-    }
-
-    /**
-     * @param permitTitle the permitTitle to set
-     */
-    public void setPermitTitle(String permitTitle) {
-        this.permitTitle = permitTitle;
-    }
-
-    /**
-     * @param permitTitleSub the permitTitleSub to set
-     */
-    public void setPermitTitleSub(String permitTitleSub) {
-        this.permitTitleSub = permitTitleSub;
-    }
-
-    /**
-     * @return the checklistID
-     */
-    public int getChecklistID() {
-        return checklistID;
-    }
-
-    /**
-     * @param checklistID the checklistID to set
-     */
-    public void setChecklistID(int checklistID) {
-        this.checklistID = checklistID;
-    }
-
-    /**
-     * @return the eventRuleSetID
-     */
-    public int getEventRuleSetID() {
-        return eventRuleSetID;
-    }
-
-    /**
-     * @param eventRuleSetID the eventRuleSetID to set
-     */
-    public void setEventRuleSetID(int eventRuleSetID) {
-        this.eventRuleSetID = eventRuleSetID;
-    }
-
-    /**
-     * @return the asynchronousValidityPeriod
-     */
-    public boolean isAsynchronousValidityPeriod() {
-        return asynchronousValidityPeriod;
-    }
-
-    /**
-     * @param asynchronousValidityPeriod the asynchronousValidityPeriod to set
-     */
-    public void setAsynchronousValidityPeriod(boolean asynchronousValidityPeriod) {
-        this.asynchronousValidityPeriod = asynchronousValidityPeriod;
-    }
-
-    /**
-     * @return the defaultInspectionValidityPeriodDays
-     */
-    public int getDefaultInspectionValidityPeriodDays() {
-        return defaultInspectionValidityPeriodDays;
-    }
-
-    /**
-     * @param defaultInspectionValidityPeriodDays the defaultInspectionValidityPeriodDays to set
-     */
-    public void setDefaultInspectionValidityPeriodDays(int defaultInspectionValidityPeriodDays) {
-        this.defaultInspectionValidityPeriodDays = defaultInspectionValidityPeriodDays;
+    public void setDefaultValidityPeriodDays(int defaultValidityPeriodDays) {
+        this.defaultValidityPeriodDays = defaultValidityPeriodDays;
     }
     
 }

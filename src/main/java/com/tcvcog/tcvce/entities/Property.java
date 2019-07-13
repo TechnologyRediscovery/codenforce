@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.occupancy.entities.OccPermit;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
 import java.util.ArrayList;
 

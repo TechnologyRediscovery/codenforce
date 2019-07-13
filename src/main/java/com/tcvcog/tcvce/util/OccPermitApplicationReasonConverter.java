@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.occupancy.entities.OccPermitApplicationReason;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;

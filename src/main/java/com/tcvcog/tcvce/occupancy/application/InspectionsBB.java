@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.occupancy.entities.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
 import java.io.Serializable;
 import java.time.ZoneId;

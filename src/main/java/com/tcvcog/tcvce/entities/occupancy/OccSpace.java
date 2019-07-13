@@ -16,50 +16,61 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.entities.CodeElement;
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  *
  * @author Eric Darsow echocharliedelta@protonmail.com
  */
-public class OccSpace extends BackingBeanUtils implements Serializable {
+public class OccSpace implements Serializable {
     
-    protected int spaceID;
-    protected int occSpaceTypeID;
-    protected String name;
-    protected boolean required;
-    protected String description;
-    
-    protected List<OccSpaceElement> spaceElementList;
+    private int spaceid;
+    private OccSpaceType spaceType;
+    private String name;
+    private ArrayList<CodeElement> elementList;
 
-    
-    //xiaohong add
-    protected boolean selected;
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-    
-   
     /**
-     * @return the spaceID
+     * @return the spaceType
      */
-    public int getSpaceID() {
-        return spaceID;
+    public OccSpaceType getSpaceType() {
+        return spaceType;
     }
 
     /**
-     * @param spaceID the spaceID to set
+     * @return the elementList
      */
-    public void setSpaceID(int spaceID) {
-        this.spaceID = spaceID;
+    public ArrayList<CodeElement> getElementList() {
+        return elementList;
+    }
+
+    /**
+     * @param spaceType the spaceType to set
+     */
+    public void setSpaceType(OccSpaceType spaceType) {
+        this.spaceType = spaceType;
+    }
+
+    /**
+     * @param elementList the elementList to set
+     */
+    public void setElementList(ArrayList<CodeElement> elementList) {
+        this.elementList = elementList;
+    }
+
+    /**
+     * @return the spaceid
+     */
+    public int getSpaceid() {
+        return spaceid;
+    }
+
+    /**
+     * @param spaceid the spaceid to set
+     */
+    public void setSpaceid(int spaceid) {
+        this.spaceid = spaceid;
     }
 
     /**
@@ -75,64 +86,6 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-
-    /**
-     * @return the required
-     */
-    public boolean isRequired() {
-        return required;
-    }
-
-    /**
-     * @param required the required to set
-     */
-    public void setRequired(boolean required) {
-        this.required = required;
-    }
-
-    /**
-     * @return the occSpaceTypeID
-     */
-    public int getOccSpaceTypeID() {
-        return occSpaceTypeID;
-    }
-
-    /**
-     * @param occSpaceTypeID the occSpaceTypeID to set
-     */
-    public void setOccSpaceTypeID(int occSpaceTypeID) {
-        this.occSpaceTypeID = occSpaceTypeID;
-    }
-
-    /**
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @return the spaceElementList
-     */
-    public List<OccSpaceElement> getSpaceElementList() {
-        return spaceElementList;
-    }
-
-    /**
-     * @param spaceElementList the spaceElementList to set
-     */
-    public void setSpaceElementList(List<OccSpaceElement> spaceElementList) {
-        this.spaceElementList = spaceElementList;
-    }
-
-   
     
    
 }

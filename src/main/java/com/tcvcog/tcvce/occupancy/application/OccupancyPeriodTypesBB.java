@@ -20,7 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.occupancy.entities.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.inject.Named;

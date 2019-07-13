@@ -27,7 +27,7 @@ import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.occupancy.entities.OccPermit;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

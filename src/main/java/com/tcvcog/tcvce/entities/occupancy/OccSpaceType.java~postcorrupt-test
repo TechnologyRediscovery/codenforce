@@ -14,18 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.occupancy.entities;
+package com.tcvcog.tcvce.entities.occupancy;
+
+import java.util.List;
 
 /**
  * Mapped to fields of the spacetype table
  * @author EC Darsow
  */
 public class OccSpaceType {
-    private int spaceTypeID;
-    private String spaceTypeTitle;
-    private String spaceTypeDescription;
-    private boolean required;
-
+    protected int spaceTypeID;
+    protected String spaceTypeTitle;
+    protected String spaceTypeDescription;
+    protected boolean required;
+    
     /**
      * @return the spaceTypeID
      */
@@ -81,5 +83,8 @@ public class OccSpaceType {
     public void setRequired(boolean required) {
         this.required = required;
     }
+
+
+    
     
 }

@@ -17,17 +17,9 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
-import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.application.BackingBeanUtils;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Subclass of Space: stores inspection-specific data about each space element
@@ -37,100 +29,29 @@ import java.util.logging.Logger;
  * 
  * @author Eric C. Darsow, Technology Rediscovery LLC 
  */
-public class OccInspectedSpace 
-        extends OccSpace 
-        implements Serializable, Cloneable, Comparable<OccInspectedSpace>{
-
+public class OccInspectedSpace extends BackingBeanUtils implements Serializable{
     
-    private int inspectedSpaceID;
-    
-    private List<OccInspectedSpaceElement> inspectedElementList;
-    private List<OccInspectedSpaceElement> inspectedElementListVisible;
-    private ViewOptionsOccChecklistItemsEnum viewSetting;
-    
+    private int spaceid;
+    private OccSpaceType spaceType;
+    private String name;
+    private ArrayList<OccInspectedElement> inspectedElementList;
     private OccLocationDescriptor location;
-    private OccSpaceType type;
     
-    private User addedToChecklistBy;
-    private LocalDateTime addedToChecklistTS;
-    
-    private OccInspectableStatus status;
-    
-    
-    public OccInspectedSpace(OccSpace spc){
-        this.spaceID = spc.getSpaceID();
-        this.occSpaceTypeID = spc.getOccSpaceTypeID();
-        this.name = spc.getName();
-        this.required = spc.isRequired();
-        
-        inspectedElementListVisible = new ArrayList<>();
-        viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
+    public OccInspectedSpace(){
+        inspectedElementList = new ArrayList<>();
     }
-    
-    public void configureVisibleElementList(){
-        inspectedElementListVisible.clear();
-        for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){
-            OccInspectedSpaceElement oise = itEle.next();
-            switch(viewSetting){
-                case ALL_ITEMS:
-                    inspectedElementListVisible.add(oise);
-                    break;
-                case FAILED_ITEMS_ONLY:
-                    // look for failed items
-                    if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
-                        inspectedElementListVisible.add(oise);
-                    } 
-                    break;
-                case UNISPECTED_ITEMS_ONLY:
-                    // look for failed items
-                    if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
-                        inspectedElementListVisible.add(oise);
-                    } 
-                    break;
-                default:
-                    inspectedElementListVisible.add(oise);
-            }
-        }
-    }
-    
-    /**
-     *
-     * @return
-     */
-    @Override
-    public Object clone() {
-        
-        try { 
-            OccInspectedSpace ois = (OccInspectedSpace) super.clone();
-            return ois;
-        } catch (CloneNotSupportedException ex) {
-            return null;
-        }
-    }
-    
-    public List<CodeElement> getInspectedCodeElementsWithoutShell(){
-        List<CodeElement> eleList = new ArrayList<>();
-        if(inspectedElementList != null){
-            Iterator<OccInspectedSpaceElement> iter = inspectedElementList.iterator();
-            while(iter.hasNext()){
-                eleList.add(iter.next());
-            }
-        }
-        return eleList;
-    }
-    
 
     /**
      * @return the inspectedElementList
      */
-    public List<OccInspectedSpaceElement> getInspectedElementList() {
+    public ArrayList<OccInspectedElement> getInspectedElementList() {
         return inspectedElementList;
     }
 
     /**
      * @param inspectedElementList the inspectedElementList to set
      */
-    public void setInspectedElementList(List<OccInspectedSpaceElement> inspectedElementList) {
+    public void setInspectedElementList(ArrayList<OccInspectedElement> inspectedElementList) {
         this.inspectedElementList = inspectedElementList;
     }
 
@@ -148,173 +69,46 @@ public class OccInspectedSpace
         this.location = location;
     }
 
-   
+    /**
+     * @return the spaceid
+     */
+    public int getSpaceid() {
+        return spaceid;
+    }
+
     /**
      * @return the spaceType
      */
     public OccSpaceType getSpaceType() {
-        return type;
+        return spaceType;
     }
 
-  
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param spaceid the spaceid to set
+     */
+    public void setSpaceid(int spaceid) {
+        this.spaceid = spaceid;
+    }
 
     /**
      * @param spaceType the spaceType to set
      */
     public void setSpaceType(OccSpaceType spaceType) {
-        this.type = spaceType;
-    }
-
-   
-
-    /**
-     * @return the type
-     */
-    public OccSpaceType getType() {
-        return type;
+        this.spaceType = spaceType;
     }
 
     /**
-     * @param type the type to set
+     * @param name the name to set
      */
-    public void setType(OccSpaceType type) {
-        this.type = type;
+    public void setName(String name) {
+        this.name = name;
     }
-
-    /**
-     * @return the addedToChecklistBy
-     */
-    public User getAddedToChecklistBy() {
-        return addedToChecklistBy;
-    }
-
-    /**
-     * @return the addedToChecklistTS
-     */
-    public LocalDateTime getAddedToChecklistTS() {
-        return addedToChecklistTS;
-    }
-
-    /**
-     * @param addedToChecklistBy the addedToChecklistBy to set
-     */
-    public void setAddedToChecklistBy(User addedToChecklistBy) {
-        this.addedToChecklistBy = addedToChecklistBy;
-    }
-
-    /**
-     * @param addedToChecklistTS the addedToChecklistTS to set
-     */
-    public void setAddedToChecklistTS(LocalDateTime addedToChecklistTS) {
-        this.addedToChecklistTS = addedToChecklistTS;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + Objects.hashCode(this.inspectedElementList);
-        hash = 53 * hash + Objects.hashCode(this.location);
-        hash = 53 * hash + Objects.hashCode(this.type);
-        hash = 53 * hash + Objects.hashCode(this.addedToChecklistBy);
-        hash = 53 * hash + Objects.hashCode(this.addedToChecklistTS);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OccInspectedSpace other = (OccInspectedSpace) obj;
-        if (!Objects.equals(this.inspectedElementList, other.inspectedElementList)) {
-            return false;
-        }
-        if (!Objects.equals(this.location, other.location)) {
-            return false;
-        }
-        if (!Objects.equals(this.type, other.type)) {
-            return false;
-        }
-        if (!Objects.equals(this.addedToChecklistBy, other.addedToChecklistBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.addedToChecklistTS, other.addedToChecklistTS)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return the inspectedSpaceID
-     */
-    public int getInspectedSpaceID() {
-        return inspectedSpaceID;
-    }
-
-    /**
-     * @param inspectedSpaceID the inspectedSpaceID to set
-     */
-    public void setInspectedSpaceID(int inspectedSpaceID) {
-        this.inspectedSpaceID = inspectedSpaceID;
-    }
-
-    
-
-    /**
-     * @return the status
-     */
-    public OccInspectableStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(OccInspectableStatus status) {
-        this.status = status;
-    }
-
-    /**
-     * @return the inspectedElementListVisible
-     */
-    public List<OccInspectedSpaceElement> getInspectedElementListVisible() {
-        configureVisibleElementList();
-        return inspectedElementListVisible;
-    }
-
-    /**
-     * @param inspectedElementListVisible the inspectedElementListVisible to set
-     */
-    public void setInspectedElementListVisible(List<OccInspectedSpaceElement> inspectedElementListVisible) {
-        this.inspectedElementListVisible = inspectedElementListVisible;
-    }
-
-    /**
-     * @return the viewSetting
-     */
-    public ViewOptionsOccChecklistItemsEnum getViewSetting() {
-        
-        return viewSetting;
-    }
-
-    /**
-     * @param viewSetting the viewSetting to set
-     */
-    public void setViewSetting(ViewOptionsOccChecklistItemsEnum viewSetting) {
-        this.viewSetting = viewSetting;
-    }
-
-    @Override
-    public int compareTo(OccInspectedSpace o) {
-        return this.addedToChecklistTS.compareTo(o.addedToChecklistTS);
-    }
-
-   
     
 }

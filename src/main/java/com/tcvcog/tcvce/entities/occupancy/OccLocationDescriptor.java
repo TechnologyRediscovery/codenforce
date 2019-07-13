@@ -17,8 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import java.util.Objects;
-
 /**
  *
  * @author sylvia
@@ -26,7 +24,6 @@ import java.util.Objects;
 public class OccLocationDescriptor {
     private int locationID;
     private String locationDescription;
-    private int buildingFloorNo;
 
     /**
      * @return the locationID
@@ -55,56 +52,5 @@ public class OccLocationDescriptor {
     public void setLocationDescription(String locationDescription) {
         this.locationDescription = locationDescription;
     }
-
-   
-
-    /**
-     * @return the buildingFloorNo
-     */
-    public int getBuildingFloorNo() {
-        return buildingFloorNo;
-    }
-
-    /**
-     * @param buildingFloorNo the buildingFloorNo to set
-     */
-    public void setBuildingFloorNo(int buildingFloorNo) {
-        this.buildingFloorNo = buildingFloorNo;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + this.locationID;
-        hash = 97 * hash + Objects.hashCode(this.locationDescription);
-        hash = 97 * hash + this.buildingFloorNo;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OccLocationDescriptor other = (OccLocationDescriptor) obj;
-        if (this.locationID != other.locationID) {
-            return false;
-        }
-        if (this.buildingFloorNo != other.buildingFloorNo) {
-            return false;
-        }
-        if (!Objects.equals(this.locationDescription, other.locationDescription)) {
-            return false;
-        }
-        return true;
-    }
-    
-    
     
 }

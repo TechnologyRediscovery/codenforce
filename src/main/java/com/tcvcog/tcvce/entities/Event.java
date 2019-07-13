@@ -31,31 +31,30 @@ public class Event
         extends EntityUtils 
         implements Serializable, Comparable<Event> {
     
-    private int eventID;
+    protected int eventID;
     
-    private int muniCode;
-    private String muniName;
-    private int propertyID;
-    private EventCategory category;
-    private Proposal eventProposalImplementation;
+    protected int muniCode;
+    protected String muniName;
+    protected int propertyID;
+    protected EventCategory category;
     
-    private LocalDateTime dateOfRecord;
-    private String dateOfRecordPretty;
-    private java.util.Date dateOfRecordUtilDate;
-    private LocalDateTime timestamp;
-    private String timestampPretty;
+    protected LocalDateTime dateOfRecord;
+    protected String dateOfRecordPretty;
+    protected java.util.Date dateOfRecordUtilDate;
+    protected LocalDateTime timestamp;
+    protected String timestampPretty;
     
-    private String description;
-    private User owner;
-    private boolean discloseToMunicipality; 
-    private boolean discloseToPublic;
-    private boolean active;
-    private boolean hidden;
-    private String notes;
+    protected String description;
+    protected User owner;
+    protected boolean discloseToMunicipality; 
+    protected boolean discloseToPublic;
+    protected boolean active;
+    protected boolean hidden;
+    protected String notes;
     
-    private List<Person> personList;
+    protected List<Person> personList;
     
-    private long daysUntilDue;
+    protected long daysUntilDue;
     
     
     /**
@@ -391,19 +390,6 @@ public class Event
     }
 
 
-    /**
-     * @return the eventProposalImplementation
-     */
-    public Proposal getEventProposalImplementation() {
-        return eventProposalImplementation;
-    }
-
-    /**
-     * @param eventProposalImplementation the eventProposalImplementation to set
-     */
-    public void setEventProposalImplementation(Proposal eventProposalImplementation) {
-        this.eventProposalImplementation = eventProposalImplementation;
-    }
     
 
     

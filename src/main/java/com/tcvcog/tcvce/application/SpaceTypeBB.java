@@ -21,7 +21,7 @@ import javax.faces.bean.ViewScoped;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
 
-import com.tcvcog.tcvce.occupancy.entities.OccSpaceType;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 
 import java.io.Serializable;
 //imported when adding  and @ViewScoped
