@@ -17,8 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.occupancy.entities.OccPermit;
-import com.tcvcog.tcvce.occupancy.entities.OccPermitApplication;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import java.util.ArrayList;
 
 /**

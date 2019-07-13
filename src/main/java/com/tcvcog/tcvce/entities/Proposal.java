@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
  * 
  * @author sylvia
  */
-public class Proposal implements Serializable {
+public class Proposal extends EntityUtils implements Serializable {
     
-    private int implementationID;
+    private int proposalID ;
     private Directive directive;
     
     private int generatingEventID;
@@ -36,16 +36,17 @@ public class Proposal implements Serializable {
     private String responseTimePrettyDate;
     
     private boolean active;
+    private boolean hidden;
     
-    private int responseEventID;
-    /**
-     * Populating this has the danger of inciting infinite loops if somehow
-     * the generating event is aso the response event
-     */
+    private Event generatingEvent;
     private Event responseEvent;
-    
+
     private String notes;
     private boolean proposalRejected;
+    
+    private int order;
+    private int cecaseID;
+    private int occperiodID;
 
     /**
      * @param responderIntended the responderIntended to set
@@ -100,12 +101,6 @@ public class Proposal implements Serializable {
         this.responseTimePrettyDate = responseTimePrettyDate;
     }
 
-    /**
-     * @return the responseEventID
-     */
-    public int getResponseEventID() {
-        return responseEventID;
-    }
 
     /**
      * @return the proposalRejected
@@ -128,12 +123,6 @@ public class Proposal implements Serializable {
         this.responseTimestamp = responseTimestamp;
     }
 
-    /**
-     * @param responseEventID the responseEventID to set
-     */
-    public void setResponseEventID(int responseEventID) {
-        this.responseEventID = responseEventID;
-    }
 
     /**
      * @return the responseTimestamp
@@ -157,17 +146,17 @@ public class Proposal implements Serializable {
     }
 
     /**
-     * @return the implementationID
+     * @return the proposalID
      */
-    public int getImplementationID() {
-        return implementationID;
+    public int getProposalID() {
+        return proposalID;
     }
 
     /**
-     * @param implementationID the implementationID to set
+     * @param proposalID the proposalID to set
      */
-    public void setImplementationID(int implementationID) {
-        this.implementationID = implementationID;
+    public void setProposalID(int proposalID) {
+        this.proposalID = proposalID;
     }
 
     /**
@@ -184,19 +173,6 @@ public class Proposal implements Serializable {
         this.responderActual = responderActual;
     }
 
-    /**
-     * @return the responseEvent
-     */
-    public Event getResponseEvent() {
-        return responseEvent;
-    }
-
-    /**
-     * @param responseEvent the responseEvent to set
-     */
-    public void setResponseEvent(Event responseEvent) {
-        this.responseEvent = responseEvent;
-    }
 
     
     /**
@@ -312,6 +288,90 @@ public class Proposal implements Serializable {
      */
     public void setDirective(Directive directive) {
         this.directive = directive;
+    }
+
+    /**
+     * @return the hidden
+     */
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    /**
+     * @return the generatingEvent
+     */
+    public Event getGeneratingEvent() {
+        return generatingEvent;
+    }
+
+    /**
+     * @return the responseEvent
+     */
+    public Event getResponseEvent() {
+        return responseEvent;
+    }
+
+    /**
+     * @param hidden the hidden to set
+     */
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    /**
+     * @param generatingEvent the generatingEvent to set
+     */
+    public void setGeneratingEvent(Event generatingEvent) {
+        this.generatingEvent = generatingEvent;
+    }
+
+    /**
+     * @param responseEvent the responseEvent to set
+     */
+    public void setResponseEvent(Event responseEvent) {
+        this.responseEvent = responseEvent;
+    }
+
+    /**
+     * @return the order
+     */
+    public int getOrder() {
+        return order;
+    }
+
+    /**
+     * @param order the order to set
+     */
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    /**
+     * @return the cecaseID
+     */
+    public int getCecaseID() {
+        return cecaseID;
+    }
+
+    /**
+     * @return the occperiodID
+     */
+    public int getOccperiodID() {
+        return occperiodID;
+    }
+
+    /**
+     * @param cecaseID the cecaseID to set
+     */
+    public void setCecaseID(int cecaseID) {
+        this.cecaseID = cecaseID;
+    }
+
+    /**
+     * @param occperiodID the occperiodID to set
+     */
+    public void setOccperiodID(int occperiodID) {
+        this.occperiodID = occperiodID;
     }
     
 }

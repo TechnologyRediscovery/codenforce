@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 
-import com.tcvcog.tcvce.occupancy.entities.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 
 /**
  *

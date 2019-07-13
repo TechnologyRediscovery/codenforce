@@ -40,6 +40,15 @@ public class Directive extends EntityUtils {
     private boolean active;
     
     private Icon icon;
+    
+    private int relativeorder;
+    private boolean directPropToMuniSysAdmin;
+    private boolean requiredEvaluationForBOBClose;
+    private boolean forceHidePrecedingProps;
+    private boolean forceHideTrailingProps;
+    private boolean refuseToBeHidden;
+    
+    
 
     /**
      * @param directPropToDefaultMuniCEO the directPropToDefaultMuniCEO to set
@@ -308,6 +317,90 @@ public class Directive extends EntityUtils {
      */
     public void setDirectiveID(int directiveID) {
         this.directiveID = directiveID;
+    }
+
+    /**
+     * @return the directPropToMuniSysAdmin
+     */
+    public boolean isDirectPropToMuniSysAdmin() {
+        return directPropToMuniSysAdmin;
+    }
+
+    /**
+     * @return the requiredEvaluationForBOBClose
+     */
+    public boolean isRequiredEvaluationForBOBClose() {
+        return requiredEvaluationForBOBClose;
+    }
+
+    /**
+     * @return the forceHidePrecedingProps
+     */
+    public boolean isForceHidePrecedingProps() {
+        return forceHidePrecedingProps;
+    }
+
+    /**
+     * @return the forceHideTrailingProps
+     */
+    public boolean isForceHideTrailingProps() {
+        return forceHideTrailingProps;
+    }
+
+    /**
+     * @return the refuseToBeHidden
+     */
+    public boolean isRefuseToBeHidden() {
+        return refuseToBeHidden;
+    }
+
+    /**
+     * @param directPropToMuniSysAdmin the directPropToMuniSysAdmin to set
+     */
+    public void setDirectPropToMuniSysAdmin(boolean directPropToMuniSysAdmin) {
+        this.directPropToMuniSysAdmin = directPropToMuniSysAdmin;
+    }
+
+    /**
+     * @param requiredEvaluationForBOBClose the requiredEvaluationForBOBClose to set
+     */
+    public void setRequiredEvaluationForBOBClose(boolean requiredEvaluationForBOBClose) {
+        this.requiredEvaluationForBOBClose = requiredEvaluationForBOBClose;
+    }
+
+    /**
+     * @param forceHidePrecedingProps the forceHidePrecedingProps to set
+     */
+    public void setForceHidePrecedingProps(boolean forceHidePrecedingProps) {
+        this.forceHidePrecedingProps = forceHidePrecedingProps;
+    }
+
+    /**
+     * @param forceHideTrailingProps the forceHideTrailingProps to set
+     */
+    public void setForceHideTrailingProps(boolean forceHideTrailingProps) {
+        this.forceHideTrailingProps = forceHideTrailingProps;
+    }
+
+    /**
+     * @param refuseToBeHidden the refuseToBeHidden to set
+     */
+    public void setRefuseToBeHidden(boolean refuseToBeHidden) {
+        this.refuseToBeHidden = refuseToBeHidden;
+    }
+
+    /**
+     * @return the relativeorder
+     */
+    public int getRelativeorder() {
+        return relativeorder;
+    }
+
+    /**
+     * @param relativeorder the relativeorder to set
+     */
+    public void setRelativeorder(int relativeorder) {
+        this.relativeorder = relativeorder;
     }
     
     

@@ -15,7 +15,7 @@ Council of Governments, PA
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.occupancy.entities;
+package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.*;
 

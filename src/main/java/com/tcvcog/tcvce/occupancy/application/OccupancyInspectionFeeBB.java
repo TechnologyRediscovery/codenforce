@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.occupancy.entities.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
 import com.tcvcog.tcvce.entities.Fee;
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-package com.tcvcog.tcvce.occupancy.entities;
+package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.PersonType;
