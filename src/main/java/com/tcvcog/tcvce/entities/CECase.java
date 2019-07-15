@@ -165,10 +165,11 @@ public class CECase extends CaseBase implements Cloneable{
         eventProposalList = new ArrayList<>();
         if(completeEventList !=  null && completeEventList.size() >= 1){
             for(CECaseEvent ev: completeEventList){
-                if(ev.getEventProposalImplementation()!= null 
-                        && 
-                    ev.getEventProposalImplementation().getResponseTimestamp() != null
-                        &&
+                if(
+//                        ev.getEventProposalImplementation()!= null 
+//                        && 
+//                    ev.getEventProposalImplementation().getResponseTimestamp() != null
+//                        &&
                     ev.isActive()
                         &&
                     !ev.isHidden()){

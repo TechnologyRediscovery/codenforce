@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
@@ -32,7 +31,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -171,7 +169,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return mp;
     }
     
-    private MuniProfile generateMuniProfile(ResultSet rs) throws SQLException, IntegrationException{
+    private MuniProfile generateMuniProfile(ResultSet rs) 
+            throws SQLException, IntegrationException{
         MuniProfile mp = new MuniProfile();
         EventIntegrator ei = getEventIntegrator();
         UserIntegrator ui = getUserIntegrator();
@@ -186,7 +185,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setContinuousoccupancybufferdays(rs.getInt("continuousoccupancybufferdays"));
         mp.setMinimumuserranktodeclarerentalintent(rs.getInt("minimumuserranktodeclarerentalintent"));
         
-        mp.setEventRuleSetCE(ei.getEventRuleList(rs.getInt("profileid")));
+        mp.setEventRuleSetCE(ei.getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPeriodTypeList(oi.getOccPeriodTypeList(rs.getInt("profileid")));
         return mp;
         

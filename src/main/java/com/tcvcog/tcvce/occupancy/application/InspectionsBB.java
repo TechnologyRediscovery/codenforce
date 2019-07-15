@@ -9,7 +9,8 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
       * @param e 
       */
     public void deleteSelectedOccupancyInspection(ActionEvent e){
-        OccupancyInspectionIntegrator oii = getOccupancyInspectionIntegrator();
+        OccupancyIntegrator oii = getOccupancyIntegrator();
             
     }
 
@@ -94,10 +95,11 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
      * @param e 
      */
     public void commitOccupancyInspectionUpdates(ActionEvent e){
-        OccupancyInspectionIntegrator oii = getOccupancyInspectionIntegrator();
-
+        OccupancyIntegrator oii = getOccupancyIntegrator();
+        ChecklistIntegrator ci = getChecklistIntegrator();
+        
         try{
-            oii.updateOccupancyInspection(currentInspection, this);
+            ci.updateOccInspection(currentInspection);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Occupancy Inspection Record updated!", ""));
@@ -111,10 +113,12 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
     
     public void addOccupancyInspection(){
         OccInspection o = null;
-        OccupancyInspectionIntegrator oii =  getOccupancyInspectionIntegrator();
+        OccupancyIntegrator oii =  getOccupancyIntegrator();
+        ChecklistIntegrator ci = getChecklistIntegrator();
+        
 
         try{
-            oii.insertOccupanyInspection(o, this);
+            ci.insertOccupanyInspection(currentInspection);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Succcessfully added occupancy inspection to the database!", ""));

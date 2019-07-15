@@ -28,43 +28,17 @@ public class OccPeriodEventRule extends EventRuleImplementation{
     private int OccPeriodID;
     private OccEvent passedRuleEvent;
     
-    public OccPeriodEventRule(EventRuleImplementation imp){
-         this.ruleid = imp.getRuleid();
-        this.title = imp.getTitle();
-        this.description = imp.getDescription();
-        this.requiredeventtype = imp.getRequiredeventtype();
-        this.forbiddeneventtype = imp.getForbiddeneventtype();
-        this.requiredEventCat = imp.getRequiredEventCat();
-        this.forbiddenEventCat = imp.getForbiddenEventCat();
-
-        this.requiredeventcatthresholdtypeintorder = imp.isRequiredeventcatthresholdtypeintorder();
-        this.requiredeventcatupperboundtypeintorder = imp.isRequiredeventcatupperboundtypeintorder();
-
-        this.requiredeventcatthresholdglobalorder = imp.isRequiredeventcatthresholdglobalorder();
-        this.requiredeventcatupperboundglobalorder = imp.isRequiredeventcatupperboundglobalorder();
-
-
-        this.forbiddeneventcatthresholdtypeintorder = imp.isForbiddeneventcatthresholdtypeintorder();
-        this.forbiddeneventcatupperboundtypeintorder = imp.isForbiddeneventcatupperboundtypeintorder();
-
-        this.forbiddeneventcatthresholdglobalorder = imp.isForbiddeneventcatthresholdglobalorder();
-        this.forbiddeneventcatupperboundglobalorder = imp.isForbiddeneventcatupperboundglobalorder();
-
-        this.mandatorypassreqtocloseentity = imp.isMandatorypassreqtocloseentity();
-        this.autoremoveonentityclose = imp.isAutoremoveonentityclose();
-        this.promptingProposal = imp.getPromptingProposal();
-
-        this.triggeredeventcatonpass = imp.getTriggeredeventcatonpass();
-        this.triggeredeventcatonfail = imp.getTriggeredeventcatonfail();
-
-        this.active = imp.isActive();
-        this.notes = imp.getNotes();
-        
+    /**
+     *
+     * @param impl
+     */
+    public OccPeriodEventRule(EventRuleImplementation impl){
+        super(impl);
         // implementation subclass
-        this.attachedTS = imp.getAttachedTS();
-        this.attachedBy = imp.getAttachedBy();
-        this.lastEvaluatedTS = imp.getLastEvaluatedTS();
-        this.passedRuleTS = imp.getPassedRuleTS();
+        this.attachedTS = impl.getAttachedTS();
+        this.attachedBy = impl.getAttachedBy();
+        this.lastEvaluatedTS = impl.getLastEvaluatedTS();
+        this.passedRuleTS = impl.getPassedRuleTS();
     }
 
     /**

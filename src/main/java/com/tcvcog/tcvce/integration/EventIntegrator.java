@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.EventRule;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.EventRuleSet;
+import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -244,6 +245,34 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    public EventRuleSet getEventRuleSet(MuniProfile profile) throws IntegrationException{
+        EventRuleSet set = null;
+        String query = "SELECT muniprofile_profileid, ruleset_setid\n" +
+"  FROM public.muniprofileeventruleset WHERE muniprofile_profileid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, profile.getProfileID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                set = getEventRuleSet(rs.getInt("ruleset_setid"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate list of event rules", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return set;
+        
+    }
+    
     public EventRuleSet getEventRuleSet(int setID) throws IntegrationException{
         EventRuleSet set = null;
         String query = "SELECT rulesetid, title, description\n" +
@@ -311,7 +340,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private CECaseEventRule generateCECaseEventRule(ResultSet rs, EventRuleImplementation imp) throws SQLException, IntegrationException{
+    private CECaseEventRule generateCECaseEventRule(ResultSet rs, EventRuleImplementation imp) 
+            throws SQLException, IntegrationException{
         CECaseEventRule evRule = new CECaseEventRule(imp);
         evRule.setCeCaseID(rs.getInt("cecase_caseid"));
         evRule.setPassedRuleEvent(getEventCECase(rs.getInt("passedrule_eventid")));
@@ -397,7 +427,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return categoryList;
     }
     
-    public List<EventCategory> getRequestableEventCategories() throws IntegrationException {
+    public List<EventCategory> getRequestableEventCategories() 
+            throws IntegrationException {
         String query = "SELECT categoryid FROM public.eventcategory WHERE requestable = TRUE;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -424,6 +455,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return categoryList;
     }
     
+    /**
+     * 
+     * @param et
+     * @return
+     * @throws IntegrationException
+     */
     public ArrayList<EventCategory> getEventCategoryList(EventType et) throws IntegrationException {
         String query = "SELECT categoryid FROM public.eventcategory WHERE categorytype = cast (? as ceeventtype);";
         Connection con = getPostgresCon();

@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.integration;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.Constants;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.MalformedBOBException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Choice;
@@ -58,7 +57,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     public ChoiceIntegrator() {
     }
     
-    public Choice getChoice(int choiceID) throws IntegrationException, MalformedBOBException{
+    public Choice getChoice(int choiceID) throws IntegrationException{
         
        Choice c = null;
   
@@ -93,7 +92,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         return c;
     }
     
-    public List<Proposable> getChoiceList(int directiveID) throws IntegrationException, MalformedBOBException{
+    public List<Proposable> getChoiceList(int directiveID) throws IntegrationException{
         List<Proposable> choiceList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
@@ -128,7 +127,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
   
     
     
-    private Choice generateChoice(ResultSet rs) throws SQLException, MalformedBOBException, IntegrationException{
+    private Choice generateChoice(ResultSet rs) throws SQLException, IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         Choice choice;
@@ -151,7 +150,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             choiceNav.setNavigationKeyConstant(rs.getString("worflowpagetriggerconstantvar"));
             choice = choiceNav;
         } else {
-            throw new MalformedBOBException("Choice does not have any content!");
+            throw new IntegrationException("Choice does not have any content!");
         }
         
         choice.setChoiceID(rs.getInt("choiceid"));
@@ -166,7 +165,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         return choice;
     }
     
-    public Proposal getProposal(int propID) throws IntegrationException, MalformedBOBException{
+    public Proposal getProposal(int propID) throws IntegrationException{
         Proposal prop = null;
         StringBuilder sb = new StringBuilder();
         sb.append(  "SELECT proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
@@ -203,7 +202,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public List<Proposal> getProposalList(CECase cse) throws IntegrationException, MalformedBOBException{
+    public List<Proposal> getProposalList(CECase cse) throws IntegrationException{
         List<Proposal> proposalList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
@@ -239,7 +238,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException, MalformedBOBException{
+    public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException{
         
          List<Proposal> proposalList = new ArrayList<>();
   
@@ -281,7 +280,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException 
      */
-     private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException, MalformedBOBException{
+     private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException{
         Proposal prop = new Proposal();
         UserIntegrator ui = getUserIntegrator();
         EventIntegrator ei = getEventIntegrator();
@@ -421,7 +420,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
   
     
   
-    public Directive getDirective(int directiveID) throws IntegrationException, MalformedBOBException{
+    public Directive getDirective(int directiveID) throws IntegrationException{
 
         Directive proposal = new Directive();
         
@@ -471,7 +470,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException, MalformedBOBException{
+    private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
 
@@ -577,7 +576,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     }
     
 
-    public void insertProposal(Proposal prop) throws MalformedBOBException, IntegrationException{
+    public void insertProposal(Proposal prop) throws IntegrationException{
                         String query = "INSERT INTO public.choiceproposal(\n" +
                 "            proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
                 "            initiator_userid, responderintended_userid, activateson, expireson, \n" +

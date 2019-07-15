@@ -23,11 +23,19 @@ public class Property implements Serializable{
     
     private String lotAndBlock;
     private String address;
+    private String address_city;
+    private String address_state;
+    private String address_zip;
+    
     private String propertyUseType;
-
+    
+    
+    
     private String useGroup;
     private String constructionType;
     private String countyCode;
+    private String apartmentno;
+    
     
     private boolean multiUnit;
     private boolean rental;
@@ -238,6 +246,62 @@ public class Property implements Serializable{
      */
     public void setVacant(boolean vacant) {
         this.vacant = vacant;
+    }
+
+    /**
+     * @return the address_city
+     */
+    public String getAddress_city() {
+        return address_city;
+    }
+
+    /**
+     * @return the address_state
+     */
+    public String getAddress_state() {
+        return address_state;
+    }
+
+    /**
+     * @return the address_zip
+     */
+    public String getAddress_zip() {
+        return address_zip;
+    }
+
+    /**
+     * @param address_city the address_city to set
+     */
+    public void setAddress_city(String address_city) {
+        this.address_city = address_city;
+    }
+
+    /**
+     * @param address_state the address_state to set
+     */
+    public void setAddress_state(String address_state) {
+        this.address_state = address_state;
+    }
+
+    /**
+     * @param address_zip the address_zip to set
+     */
+    public void setAddress_zip(String address_zip) {
+        this.address_zip = address_zip;
+    }
+
+    /**
+     * @return the apartmentno
+     */
+    public String getApartmentno() {
+        return apartmentno;
+    }
+
+    /**
+     * @param apartmentno the apartmentno to set
+     */
+    public void setApartmentno(String apartmentno) {
+        this.apartmentno = apartmentno;
     }
   
 }

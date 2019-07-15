@@ -96,7 +96,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
-                getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getDefaultCodeSetID()));
+                getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getCodeSet().getCodeSetID()));
                 
                 populateSessionObjectQueues(extractedUser, muni);
 

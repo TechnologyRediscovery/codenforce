@@ -1513,13 +1513,13 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
      */
     public boolean isAllowedToClearActionResponse() {
         allowedToClearActionResponse = false;
-        if (selectedEvent != null) {
-            if (selectedEvent.getEventProposalImplementation() != null
-                    && ((getSessionBean().getFacesUser().getUserID() == selectedEvent.getEventProposalImplementation().getResponderActual().getUserID())
-                    || getSessionBean().getFacesUser().getKeyCard().isHasSysAdminPermissions())) {
-                allowedToClearActionResponse = true;
-            }
-        }
+//        if (selectedEvent != null) {
+//            if (selectedEvent.getEventProposalImplementation() != null
+//                    && ((getSessionBean().getFacesUser().getUserID() == selectedEvent.getEventProposalImplementation().getResponderActual().getUserID())
+//                    || getSessionBean().getFacesUser().getKeyCard().isHasSysAdminPermissions())) {
+//                allowedToClearActionResponse = true;
+//            }
+//        }
         return allowedToClearActionResponse;
     }
 

@@ -21,11 +21,14 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.occupancy.integration.OccupancyInspectionIntegrator;
 import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
 import javax.faces.event.ActionEvent;
@@ -85,7 +88,8 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     }
     
     public void commitOccupancyInspectionFeeUpdates(ActionEvent e){
-        OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
+        OccupancyIntegrator oifi = getOccupancyIntegrator();
+        PaymentIntegrator pi = getPaymentIntegrator();
         Fee oif = selectedOccupancyInspectionFee;
         
         oif.setMuni(formMuni);
@@ -97,22 +101,18 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
         oif.setExpiryDate(formOccupancyInspectionFeeExpDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime());
-        //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
-        try{
-            oifi.updateOccupancyInspectionFee(oif, this);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Occupancy Inspection Fee updated!", ""));
-        } catch (IntegrationException ex){
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Unable to update occupancy inspection fee in database.",
-                    "This must be corrected by the System Administrator"));
+        try {
+            //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
+            pi.updateOccupancyInspectionFee(oif);
+        } catch (IntegrationException ex) {
         }
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Occupancy Inspection Fee updated!", ""));
     }
     
     public void addNewOccupancyInspectionFee(ActionEvent e){
-        OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
+        PaymentIntegrator pi = getPaymentIntegrator();
         Fee oif = new Fee();
         
         oif.setOccupancyInspectionFeeID(newFormOccupancyInspectionFeeID);
@@ -127,23 +127,19 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
                 .toLocalDateTime());
         oif.setNotes(newFormOccupancyInspectionFeeNotes);
         
-        try{
-            oifi.insertOccupancyInspectionFee(oif, this);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Occupancy Inspection Fee updated!", ""));
-        } catch (IntegrationException ex){
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Unable to add new Occupancy Inspection Fee to database.",
-                    "This must be corrected by the System Administrator"));
+        try {
+            pi.insertOccupancyInspectionFee(oif);
+        } catch (IntegrationException ex) {
         }
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Occupancy Inspection Fee updated!", ""));
     
     }
     
     public String addOccupancyInspectionFee(){
+        PaymentIntegrator pi = getPaymentIntegrator();
         Fee oif = new Fee();
-        OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
         oif.setOccupancyInspectionFeeID(formOccupancyInspectionFeeID);
         oif.setMuni(getFormMuni());
         oif.setFeeName(formOccupancyInspectionFeeName);
@@ -156,16 +152,12 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
                 .toLocalDateTime());
         oif.setNotes(formOccupancyInspectionFeeNotes);
         try {
-            oifi.insertOccupancyInspectionFee(oif, this);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Successfully added occupancy inspection fee to database!", ""));
-        } catch(IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Unable to add occupancy inspection fee to database, sorry!", "Check server print out..."));
-            return "";
+            pi.insertOccupancyInspectionFee(oif);
+        } catch (IntegrationException ex) {
         }
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Successfully added occupancy inspection fee to database!", ""));
         
         return "occupancyInspectionFeeManage";
         
@@ -173,20 +165,16 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     }
     
     public void deleteSelectedOccupancyInspectionFee(ActionEvent e){
-        OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
+        PaymentIntegrator pi = getPaymentIntegrator();
+        
         if(getSelectedOccupancyInspectionFee() != null){
             try {
-                oifi.deleteOccupancyInspectionFee(getSelectedOccupancyInspectionFee(), this);
-                getFacesContext().addMessage(null,
+                pi.deleteOccupancyInspectionFee(getSelectedOccupancyInspectionFee());
+            } catch (IntegrationException ex) {
+            }
+            getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Occupancy inspection fee deleted forever!", ""));
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to delete occupancy inspection fee--probably because it is used "
-                                    + "somewhere in the database. Sorry.", 
-                            "This category will always be with us."));
-            }
             
         } else {
             getFacesContext().addMessage(null,
@@ -199,14 +187,11 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
      * @return the occupancyInspectionFeeList
      */
     public ArrayList<Fee> getOccupancyInspectionFeeList() {
+        PaymentIntegrator pi = getPaymentIntegrator();
         try {
-            OccupancyInspectionIntegrator oi = getOccupancyInspectionIntegrator();
-            ArrayList<Fee> oil = oi.getOccupancyInspectionFeeList(this);
+            List<Fee> oil = pi.getOccupancyInspectionFeeList();
         } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null, 
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Unable to load OccupancyInspectionFeeList",
-                        "This must be corrected by the system administrator"));
+            System.out.println(ex);
         }
         if(occupancyInspectionFeeList != null){
         return occupancyInspectionFeeList;
