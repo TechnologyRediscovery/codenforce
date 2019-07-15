@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Upload photographs and documents</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="linkBlobView">
+                    
+                    <div class="mainContainer">
+                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                        </h:messages>
+                        
+                        <p:spacer height="5px"/>
+                        <hr />
+                        <p:spacer height="5px"/>
+                                  
+                        
+                        <h:form id="linkBlobForm">
+                            <h2>Link uploaded files to various entities</h2>
+                            <p:dataTable
+                                id="blobTable"
+                                var="blob"
+                                value="#{sessionBean.blobList}"
+                                rowKey="#{blob.blobID}"
+                                tableStyleClass="primeDataTable"
+                                draggableRows="false" tabindex="6">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="File Type"/>
+                                    </f:facet>
+                                    <h:outputText value="#{blob.type.typeID}"/>
+                                    <!-- type icon here -->
+                                </p:column>
+                                <p:column width="70%">
+                                    <f:facet name="header">
+                                        <h:outputText value="File"/>
+                                    </f:facet>
+                                    <p:graphicImage width="50%" value="#{blobCoordinator.image}">
+                                        <f:param name="blobID" value="#{blob.blobID}" />
+                                    </p:graphicImage>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Description"/>
+                                    </f:facet>
+                                    <h:outputText id="desc" value="#{blob.description}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Link to Code Violation"/>
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkCV-dlg').show()" update=":linkBlobForm:linkCV-dlg"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Link to Property"/>
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkProperty-dlg').show()" update=":linkBlobForm:linkProperty-dlg"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Link to Person"/>
+                                    </f:facet>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkPerson-dlg').show()" update=":linkBlobForm:linkPerson-dlg"/>
+                                </p:column>
+                            </p:dataTable>
+                            
+                            <p:dialog id="linkCV-dlg"
+                                      header="Link selected file to Code Violation" 
+                                      widgetVar="linkCV-dlg" 
+                                      responsive="true" 
+                                      width="400"
+                                      modal="false"
+                                      height="600">
+                                <h2>Enter the ID of the Code Violation</h2>
+                                <p:inputNumber value="#{linkBlobBB.codeViolationID}" thousandSeparator="" label="Code Violation ID" decimalPlaces="0"/>
+                                <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.linkBlobToCodeViolation()}" oncomplete="PF('linkCV-dlg').hide()" update=":linkBlobForm:linkCV-dlg"/>
+                            </p:dialog>
+                            
+                            <p:dialog id="linkProperty-dlg"
+                                      header="Link selected file to Property" 
+                                      widgetVar="linkProperty-dlg" 
+                                      responsive="true" 
+                                      width="400"
+                                      modal="false"
+                                      height="600">
+                                <h2>Enter the ID of the Property</h2>
+                                <p:inputNumber value="#{linkBlobBB.propertyID}" thousandSeparator="" label="Property ID" decimalPlaces="0"/>
+                                <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.linkBlobToProperty()}" oncomplete="PF('linkProperty-dlg').hide()" update=":linkBlobForm:linkProperty-dlg"/>
+                            </p:dialog>
+                            
+                            <p:dialog id="linkPerson-dlg"
+                                      header="Link selected file to Person" 
+                                      widgetVar="linkPerson-dlg" 
+                                      responsive="true" 
+                                      width="400"
+                                      modal="false"
+                                      height="600">
+                                <h2>Enter the ID of the Person</h2>
+                                <p:inputNumber value="#{linkBlobBB.personID}" thousandSeparator="" label="Person ID" decimalPlaces="0"/>
+                                <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.linkBlobToPerson()}" oncomplete="PF('linkPerson-dlg').hide()" update=":linkBlobForm:linkPerson-dlg"/>
+                            </p:dialog>
+                            
+                            <p:spacer height="5px"/>
+                            
+                            <p:commandButton  ajax="false" tabindex="12"
+                                              value="Back to Dashboard" id="backToDashButton"
+                                              action="#{linkBlobBB.navToDash}"/>
+                        </h:form>
+                        
+                    </div>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
@@ -272,19 +273,20 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    public void deletePhoto(int photoID) {
+    
+    public void deletePhoto(int blobID){
         // TODO: remove entry from linker table for deleted photos
-        for (Integer pid : this.selectedViolation.getPhotoList()) {
-            if (pid.compareTo(photoID) == 0) {
-                this.selectedViolation.getPhotoList().remove(pid);
+        for(Integer pid : this.selectedViolation.getBlobIDList()){
+            if(pid.compareTo(blobID) == 0){
+                this.selectedViolation.getBlobIDList().remove(pid);
                 break;
             }
         }
-        ImageServices is = getImageServices();
+        BlobCoordinator blobc = getBlobCoordinator();
         try {
-            is.deletePhotograph(photoID);
+            blobc.deleteBlob(blobID);
         } catch (IntegrationException ex) {
-            System.out.println("CaseProfileBB.deletePhotograph | " + ex);
+            System.out.println(ex);
         }
     }
     

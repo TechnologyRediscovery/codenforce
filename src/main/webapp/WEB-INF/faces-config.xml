@@ -694,6 +694,19 @@
             <to-view-id>/restricted/cogstaff/gen/selectBoxListChangeRequest.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>uploadBlob</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/uploadBlob.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>manageBlob</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/manageBlob.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
     </navigation-rule>
     
     <navigation-rule>
@@ -705,7 +718,14 @@
         </navigation-case>
     </navigation-rule>
     
-   
+   <navigation-rule>
+        <from-view-id>/restricted/cogstaff/gen/uploadBlob.xhtml</from-view-id>  
+        <navigation-case>
+            <from-outcome>linkBlob</from-outcome>
+            <to-view-id>/restricted/cogstaff/gen/linkBlob.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
     
    
@@ -1445,21 +1465,10 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <description>Utility application-scoped bean for handling image upload and download	</description>
-        <managed-bean-name>imageServices</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ImageServices</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>photoBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PhotoBB</managed-bean-class>
+        <managed-bean-name>cEEventsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CEEventsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    <managed-bean>
-        <managed-bean-name>eventsCECaseBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventsCECaseBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>propertyAddBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyAddBB</managed-bean-class>
@@ -1484,7 +1493,6 @@
         <managed-bean-name>eventCECaseReportBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.EventCECaseReportBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
-
     </managed-bean>
     <managed-bean>
         <managed-bean-name>personSearchPublicBB</managed-bean-name>
@@ -1510,5 +1518,31 @@
         <managed-bean-name>choiceIntegrator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.integration.ChoiceIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
+        <managed-bean-name>uploadBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Utility application-scoped bean for handling blob upload and download	</description>
+        <managed-bean-name>blobCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.BlobCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Handles storing and retrieving of BLOBs to/from the database	</description>
+        <managed-bean-name>blobIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.integration.BlobIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>linkBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.linkBlobBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>manageBlobBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.manageBlobBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

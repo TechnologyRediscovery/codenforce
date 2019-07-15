@@ -7,49 +7,39 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Describe code enforcement concern</title>
+        <title>Upload photographs and documents</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../../navContainer_public.xhtml">
+        <ui:composition template="./../../navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="requestCEActionFlow1View">
+                <f:view id="uploadBlobView">
                     
                     <div class="mainContainer">
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
                         
-                        <h1>Upload photos of your concern at <h:outputText value="#{sessionBean.ceactionRequestForSubmission.requestProperty.address}"/> in <h:outputText value="#{sessionBean.ceactionRequestForSubmission.muni.muniName}"/></h1>
-                        
-                        <h:form id="requestCEActionFlowFormUploadPhoto" enctype="multipart/form-data">
-                            
-                         <p:commandButton  ajax="false" tabindex="1"
-                                              value="Skip photo upload and continue to contact info" 
-                                              id="ceactionrequestflow-nophotos-cb"
-                                              action="#{cEActionRequestSubmitBB.savePhotos}"/>
-                        
                         <p:spacer height="5px"/>
                         <hr />
-                        <p:spacer height="5px"/>
+                        <p:spacer height="5px"/>       
                         
-                        <h2>Choose a file and upload</h2>
-                        
-                            <p:fileUpload fileUploadListener="#{cEActionRequestSubmitBB.handlePhotoUpload}"
-                            mode="advanced" 
-                            update="requestCEActionFlowFormDescribePhoto:photoTable"
-                            multiple="true"
-                            fileLimit="3" 
-                            sizeLimit="900000000" 
-                            allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
+                        <h:form id="uploadBlobFileUploadForm" enctype="multipart/form-data">
+                            <h2>Choose a file and upload</h2>
+                            <p:fileUpload fileUploadListener="#{uploadBlobBB.handleBlobUpload}"
+                                mode="advanced" 
+                                update=":uploadBlobReviewBlobsForm:blobTable"
+                                multiple="true"
+                                sizeLimit="900000000" 
+                                allowTypes="/(\.|\/)(jpe?g|png|pdf)$/"/>    
                         </h:form>
                         
                         <p:spacer height="5px"/>
                                   
                         
-                        <h:form id="requestCEActionFlowFormDescribePhoto">
-                            <h2>Review and describe uploaded photos</h2>
+                        <h:form id="uploadBlobReviewBlobsForm">
+                            <h2>Review and describe uploaded photos and documents</h2>
                                     <p:dataTable
-                                        id="photoTable"
+                                        id="blobTable"
                                         var="blob"
                                         value="#{sessionBean.blobList}"
                                         rowKey="#{blob.blobID}"
@@ -57,15 +47,16 @@
                                         draggableRows="false" tabindex="6">
                                         <p:column>
                                             <f:facet name="header">
-                                                <h:outputText value="blobID"/>
+                                                <h:outputText value="File Type"/>
                                             </f:facet>
-                                            <h:outputText value="#{blob.blobID}"/>
+                                            <h:outputText value="#{blob.type.typeID}"/>
+                                            <!-- file type dropdown here -->
                                         </p:column>
                                         <p:column width="70%">
                                             <f:facet name="header">
                                                 <h:outputText value="Photo"/>
                                             </f:facet>
-                                            <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                            <p:graphicImage width="50%" value="#{blobCoordinator.image}">
                                                 <f:param name="blobID" value="#{blob.blobID}" />
                                             </p:graphicImage>
                                         </p:column>
@@ -84,8 +75,8 @@
                             <p:spacer height="5px"/>
                             
                             <p:commandButton  ajax="false" tabindex="12"
-                                              value="Save photos and proceed to contact details" id="continueToContactInfoButton"
-                                              action="#{cEActionRequestSubmitBB.savePhotos}"/>
+                                              value="Save file types &amp; descriptions and proceed to file attachment" id="continueToLinkButton"
+                                              action="#{uploadBlobBB.navToLinkBlob}"/>
                         </h:form>
                         
                     </div>

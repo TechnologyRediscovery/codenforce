@@ -21,10 +21,27 @@ import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.Report;
-import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
+import com.tcvcog.tcvce.entities.CodeSet;
+import com.tcvcog.tcvce.entities.CodeSource;
+import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.PublicInfoBundle;
+import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -32,8 +49,8 @@ import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -81,7 +98,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeElement activeCodeElement;
     
     /* *** Code Enf Action Request Session Shelves ***  */
-    
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
@@ -112,6 +128,12 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     /* *** Public Person Search/Edit Session Shelves *** */
     private Person activeAnonPerson;
+    private OccPermitApplicationReason occPermitApplicationReason;
+
+    /* *** Blob Upload Session Shelves *** */
+    private List<Blob> blobList;
+    //linking
+
 
     /**
      * Creates a new instance of getSessionBean()
@@ -622,6 +644,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
+    }
+
+    /**   
      * @return the reportConfigCEEventList
      */
     public ReportConfigCEEventList getReportConfigCEEventList() {
@@ -693,6 +729,20 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setActiveAnonPerson(Person activeAnonPerson) {
         this.activeAnonPerson = activeAnonPerson;
+    }
+
+    /**
+     * @return the occPermitApplicationReason
+     */
+    public OccPermitApplicationReason getOccPermitApplicationReason() {
+        return occPermitApplicationReason;
+    }
+
+    /**
+     * @param occPermitApplicationReason the occPermitApplicationReason to set
+     */
+    public void setOccPermitApplicationReason(OccPermitApplicationReason occPermitApplicationReason) {
+        this.occPermitApplicationReason = occPermitApplicationReason;
     }
     
     

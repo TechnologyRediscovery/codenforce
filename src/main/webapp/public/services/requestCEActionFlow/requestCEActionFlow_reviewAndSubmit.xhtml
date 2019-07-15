@@ -92,24 +92,30 @@
                                             <p:spacer height="5px"/>
                                             <p:dataTable
                                                 id="photoTable"
-                                                var="photoid"
-                                                value="#{cEActionRequestSubmitBB.currentRequest.photoList}"
-                                                rowKey="#{photoid}"
+                                                var="blobID"
+                                                value="#{sessionBean.ceactionRequestForSubmission.blobIDList}"
+                                                rowKey="#{blobID}"
                                                 tableStyleClass="primeDataTable"
                                                 draggableRows="false" tabindex="6">
                                                 <p:column>
                                                     <f:facet name="header">
+                                                        <h:outputText value="blobID"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{blobID}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
                                                         <h:outputText value="Photo"/>
                                                     </f:facet>
-                                                    <p:graphicImage width="100%" value="#{imageServices.image}">
-                                                        <f:param name="photoID" value="#{photoid}"/>
+                                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                        <f:param name="blobID" value="#{blobID}"/>
                                                     </p:graphicImage>
                                                 </p:column>
                                                 <p:column>
                                                     <f:facet name="header">
                                                         <h:outputText value="Description"/>
                                                     </f:facet>
-                                                    <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                                    <h:outputText escape="false" value="#{blobCoordinator.getBlob(blobID).description}"/>
                                                 </p:column>
                                             </p:dataTable>
                                         </f:facet>

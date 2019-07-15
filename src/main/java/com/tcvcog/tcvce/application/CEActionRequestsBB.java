@@ -99,26 +99,57 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     @PostConstruct
     public void initBean() {
-        SearchCoordinator sc = getSearchCoordinator();
-
-        QueryCEAR sessionQuery = getSessionBean().getSessionQueryCEAR();
-
-        selectedRequest = getSessionBean().getSessionCEAR();
-
+//        SearchCoordinator sc = getSearchCoordinator();
+//
+//        QueryCEAR sessionQuery = getSessionBean().getSessionQueryCEAR();
+//
+//        selectedRequest = getSessionBean().getSessionCEAR();
+//
+//        try {
+//            requestList = sc.runQuery(sessionQuery).getResults();
+//            if (selectedRequest == null && requestList.size() > 0) {
+//                selectedRequest = requestList.get(0);
+//                generateCEARReasonDonutModel();
+//            }
+//            selectedQueryCEAR = sessionQuery;
+//            searchParams = sessionQuery.getParmsList().get(0);
+//            queryList = sc.buildQueryCEARList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+//        } catch (IntegrationException | AuthorizationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+//        }
+        
+        
+         CaseCoordinator cc = getCaseCoordinator();
+        SearchCoordinator searchCoord = getSearchCoordinator();
+        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
+                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
+        rpt.setPrintFullCEARQueue(false);
         try {
-            requestList = sc.runQuery(sessionQuery).getResults();
-            if (selectedRequest == null && requestList.size() > 0) {
-                selectedRequest = requestList.get(0);
-                generateCEARReasonDonutModel();
-            }
-            selectedQueryCEAR = sessionQuery;
-            searchParams = sessionQuery.getParmsList().get(0);
-            queryList = sc.buildQueryCEARList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
-        } catch (IntegrationException | AuthorizationException ex) {
+            QueryCEAR query = searchCoord.assembleQueryCEAR(
+                                                QueryCEAREnum.CUSTOM, 
+                                                getSessionBean().getFacesUser(), 
+                                                getSessionBean().getActiveMuni(), 
+                                                null);
+            List<CEActionRequest> singleReqList = new ArrayList<>();
+            selectedRequest.setInsertPageBreakBefore(false);
+            singleReqList.add(selectedRequest);
+            query.addToResults(singleReqList);
+            query.setExecutionTimestamp(LocalDateTime.now());
+            rpt.setBOBQuery(query);
+            rpt.setGenerationTimestamp(LocalDateTime.now());
+            rpt.setTitle("Code enforcement request");
+        } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                             "Unable to build query, sorry!", ""));
+            
         }
+        
+        reportConfig = rpt;
+        
     }
 
     private void generateCEARReasonDonutModel() {
@@ -217,42 +248,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         reportConfig = rpt;
     }
     
-    /**
-     *
-     * @param ev
-     */
-    public void prepareReportSingleCEAR(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator searchCoord = getSearchCoordinator();
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
-                getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
-        rpt.setPrintFullCEARQueue(false);
-        try {
-            QueryCEAR query = searchCoord.assembleQueryCEAR(
-                                                QueryCEAREnum.CUSTOM, 
-                                                getSessionBean().getFacesUser(), 
-                                                getSessionBean().getActiveMuni(), 
-                                                null);
-            List<CEActionRequest> singleReqList = new ArrayList<>();
-            selectedRequest.setInsertPageBreakBefore(false);
-            singleReqList.add(selectedRequest);
-            query.addToResults(singleReqList);
-            query.setExecutionTimestamp(LocalDateTime.now());
-            rpt.setBOBQuery(query);
-            rpt.setGenerationTimestamp(LocalDateTime.now());
-            rpt.setTitle("Code enforcement request");
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                             "Unable to build query, sorry!", ""));
-            
-        }
-        
-        reportConfig = rpt;
-
-    }
-
     public String generateReportSingleCEAR() {
         getSessionBean().setSessionCEAR(selectedRequest);
         getSessionBean().setSessionReport(reportConfig);
@@ -619,20 +614,19 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
 
     }
-
-    public void deletePhoto(int photoID) {
+    
+    public void deletePhoto(int blobID){
         // TODO: remove entry from linker tbale for deleted photos
-        for (Integer pid : this.selectedRequest.getPhotoList()) {
-            if (pid.compareTo(photoID) == 0) {
-                this.selectedRequest.getPhotoList().remove(pid);
+        for(Integer bid : this.selectedRequest.getBlobIDList()){
+            if(bid.compareTo(blobID) == 0){
+                this.selectedRequest.getBlobIDList().remove(bid);
                 break;
             }
         }
-        ImageServices is = getImageServices();
         try {
-            is.deletePhotograph(photoID);
+            getBlobCoordinator().deleteBlob(blobID);
         } catch (IntegrationException ex) {
-            System.out.println("CEActionRequessBB.deletePhotograph | " + ex);
+            System.out.println(ex);
         }
     }
 

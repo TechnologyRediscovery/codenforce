@@ -16,11 +16,16 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobType;
 import java.util.Date;
 import java.io.Serializable;
 import org.primefaces.component.tabview.TabView;
@@ -29,13 +34,14 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -45,8 +51,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.PhaseId;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 /**
  *
  * @author cedba
@@ -95,8 +105,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
     private java.util.Date currentDate;
     
-    private List<Photograph> photoList;
-    private Photograph selectedPhoto;
+    private List<Blob> blobList;
+    //private Photograph selectedPhoto;
 
     /**
      * Creates a new instance of ActionRequestBean
@@ -114,8 +124,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // set date of record to current date
         form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
                 .atZone(ZoneId.systemDefault()).toInstant());
+        
         // init new, empty photo list
-        this.photoList = new ArrayList<>();
+        this.blobList = new ArrayList<>();    
         
         if(facesUser != null && req != null && currentRequest.getRequestProperty() != null){
             try {
@@ -193,6 +204,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         cear = cc.getInititalizedCEActionRequest();
         cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
+        cear.setBlobIDList(new ArrayList<Integer>());
         getSessionBean().setCeactionRequestForSubmission(cear);
         return "chooseProperty";
     }
@@ -208,30 +220,15 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
     
     public String saveConcernDescriptions(){
-        if(getSessionBean().getCeactionRequestForSubmission().getPhotoList() == null){
-            getSessionBean().getCeactionRequestForSubmission().setPhotoList(new ArrayList<Integer>());
-        }
+        getSessionBean().setBlobList(new ArrayList<Blob>());
+        
         return "photoUpload";
     }
     
     public String savePhotos(){
-        ImageServices is = getImageServices();
+        BlobCoordinator blobc = getBlobCoordinator();
+        SessionBean sb = getSessionBean();
         
-        for(Photograph photo : this.photoList){
-            
-            try { 
-                // update db entries with new descriptions
-                is.updatePhotoDescription(photo);
-                
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "INTEGRATION ERROR: Unable save photos, our apologies!", 
-                                "Please call your municipal office and report your concern by phone."));
-                return "";
-            }
-        }
         // before moving onto the person page, get a person's skeleton from the coordinator, put it
         // in the session for use on the next page
         setupPersonEntry();
@@ -260,23 +257,29 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         }
         int newPhotoID = 0;
         
-        ImageServices is = getImageServices();
-        Photograph ph = new Photograph();
-        ph.setPhotoBytes(ev.getFile().getContents());
-        ph.setDescription("no description");
-        ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
-        ph.setTimeStamp(LocalDateTime.now());
-        // store photo on the request (by id)
-        try {
-           newPhotoID = is.storePhotograph(ph);
-           getSessionBean().getCeactionRequestForSubmission().getPhotoList().add(newPhotoID);
-           System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | stored photo ID " + newPhotoID );
-        } catch (IntegrationException ex) {
-            System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | upload failed!\n" + ex);
-            return;
-        }
-        this.photoList.add(ph);
+        // verify blob types here. Post a FacesMessage if file type is not an image
+        String fileType = ev.getFile().getContentType();
+        System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + fileType);
         
+        if(!fileType.contains("jpg") && !fileType.contains("gif") && !fileType.contains("png")){
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Incompatible file type. ",
+                        "Please upload image files only (jpg, gif, or png)."));
+        }
+        
+        BlobCoordinator blobc = getBlobCoordinator();
+        Blob blob = blobc.getNewBlob();  //init new blob
+        blob.setBytes(ev.getFile().getContents());  // set bytes  
+        blob.setType(BlobType.PHOTO);
+        try {
+            blob.setBlobID(blobc.storeBlob(blob));
+        } catch (BlobException | IntegrationException ex) {
+            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+        }
+        getSessionBean().getCeactionRequestForSubmission().getBlobIDList().add((Integer)blob.getBlobID());
+        getSessionBean().getBlobList().add(blob);  // store blob on session bean for testing, take this out later probably
+
     }
     
     
@@ -289,8 +292,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
         CEActionRequest req = currentRequest;
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        ImageServices imageServices = getImageServices();
+        BlobIntegrator blobI = getBlobIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
+        SessionBean sb = getSessionBean();
+        BlobIntegrator blobi = getBlobIntegrator();
         
         int submittedActionRequestID;
         int personID;
@@ -337,14 +342,18 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(req);
             getSessionBean().setSessionCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
+            // insert photos to db and link to request
             
-            // commit photos to db and link to request
-            if(req.getPhotoList() != null && !req.getPhotoList().isEmpty()){
-                for(Integer photoID : req.getPhotoList()){
-                    imageServices.commitPhotograph(photoID);
-                    imageServices.linkPhotoToActionRequest(photoID, submittedActionRequestID);
+            for(Blob blob : sb.getBlobList()){
+                try {
+                    blobi.storeBlob(blob);
+                    sb.getCeactionRequestForSubmission().getBlobIDList().add(blob.getBlobID());
+                    blobI.linkBlobToActionRequest(blob.getBlobID(), sb.getCeactionRequestForSubmission().getRequestID());
+                } catch (BlobException ex) {
+                    System.out.println(ex);
                 }
             }
+                    
             // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -678,31 +687,17 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     /**
-     * @return the photoList
+     * @return the blobList
      */
-    public List<Photograph> getPhotoList() {
-        return photoList;
+    public List<Blob> getBlobList() {
+        return blobList;
     }
 
     /**
-     * @param photoList the photoList to set
+     * @param blobList the blobList to set
      */
-    public void setPhotoList(List<Photograph> photoList) {
-        this.photoList = photoList;
-    }
-
-    /**
-     * @return the selectedPhoto
-     */
-    public Photograph getSelectedPhoto() {
-        return selectedPhoto;
-    }
-
-    /**
-     * @param selectedPhoto the selectedPhoto to set
-     */
-    public void setSelectedPhoto(Photograph selectedPhoto) {
-        this.selectedPhoto = selectedPhoto;
+    public void setBlobListList(List<Blob> blobList) {
+        this.blobList = blobList;
     }
 
     /**

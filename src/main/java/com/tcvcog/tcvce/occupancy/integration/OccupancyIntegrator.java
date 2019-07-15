@@ -156,11 +156,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     public void updateOccPeriod(OccPeriod op){
         
-        
-        
     }
-    
-  
     
     public OccPermit getOccPermit(int permitID) throws IntegrationException{
         OccPermit op = null;

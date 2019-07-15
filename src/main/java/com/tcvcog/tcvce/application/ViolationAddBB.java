@@ -18,15 +18,20 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.Photograph;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
@@ -49,8 +54,13 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     
     private CodeViolation currentViolation;
     private CECase currentCase;
-    private List<Photograph> photoList;
-    private Photograph selectedPhoto;
+    private Date dateOfRecord;
+    private Date stipulatedComplianceDate;
+    private double penalty;
+    private String description;
+    private String notes;
+    private List<Blob> blobList;
+    private Blob selectedBlob;
     
     /**
      * Creates a new instance of ViolationAdd
@@ -65,15 +75,6 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
         currentCase = getSessionBean().getSessionCECase();
     }
     
-    public void updateDescription(Photograph photo){
-        ImageServices is = getImageServices();
-        try {
-            is.updatePhotoDescription(photo);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-    }
-    
     public void handlePhotoUpload(FileUploadEvent ev){
         if(this.currentViolation == null){
             this.currentViolation = getSessionBean().getSessionCodeViolation();
@@ -82,27 +83,28 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
             System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
             return;
         }
-        if(this.currentViolation.getPhotoList() == null){
-            this.currentViolation.setPhotoList(new ArrayList<Integer>());
+        if(this.currentViolation.getBlobIDList() == null){
+            this.currentViolation.setBlobIDList(new ArrayList<Integer>());
         }
-        if(this.photoList == null){
-            this.photoList = new ArrayList<>();
+        if(this.blobList == null){
+            this.blobList = new ArrayList<>();
         }
         
-        ImageServices is = getImageServices();
-        Photograph ph = new Photograph();
-        ph.setPhotoBytes(ev.getFile().getContents());
-        ph.setDescription("no description");
-        ph.setTypeID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("photoTypeId")));
-        ph.setTimeStamp(LocalDateTime.now());
+        BlobIntegrator blobi = getBlobIntegrator();
+        Blob blob = getBlobCoordinator().getNewBlob();
+        blob.setBytes(ev.getFile().getContents());
+        blob.setType(BlobType.PHOTO); // TODO: extract type from context somehow
         
         try {
-            this.currentViolation.getPhotoList().add(is.storePhotograph(ph));
+            this.currentViolation.getBlobIDList().add(blobi.storeBlob(blob));
         } catch (IntegrationException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed!\n" + ex);
             return;
+        } catch (BlobException ex) {
+            System.out.println(ex);
+            return;
         }
-        this.getPhotoList().add(ph);
+        this.getBlobList().add(blob);
     }
     
     public String addViolation(){
@@ -171,6 +173,8 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     }
     
     public String photosConfirm(){
+        /*  TODO: this obviously
+        
         if(this.currentViolation == null){
             this.currentViolation = getSessionBean().getSessionCodeViolation();
         }
@@ -200,6 +204,7 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
                     return "";
             }
         }
+        */
         return "ceHome";
     }
    
@@ -224,29 +229,29 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the photoList
      */
-    public List<Photograph> getPhotoList() {
-        return photoList;
+    public List<Blob> getBlobList() {
+        return this.blobList;
     }
 
     /**
-     * @param photoList the photoList to set
+     * @param blobList
      */
-    public void setPhotoList(List<Photograph> photoList) {
-        this.photoList = photoList;
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
     }
 
     /**
-     * @return the selectedPhoto
+     * @return the selectedBlob
      */
-    public Photograph getSelectedPhoto() {
-        return selectedPhoto;
+    public Blob getSelectedPhoto() {
+        return getSelectedBlob();
     }
 
     /**
-     * @param selectedPhoto the selectedPhoto to set
+     * @param selectedBlob
      */
-    public void setSelectedPhoto(Photograph selectedPhoto) {
-        this.selectedPhoto = selectedPhoto;
+    public void setSelectedPhoto(Blob selectedBlob) {
+        this.setSelectedBlob(selectedBlob);
     }
 
     /**
@@ -261,6 +266,90 @@ public class ViolationAddBB extends BackingBeanUtils implements Serializable {
      */
     public void setCurrentCase(CECase currentCase) {
         this.currentCase = currentCase;
+    }
+
+    /**
+     * @return the penalty
+     */
+    public double getPenalty() {
+        return penalty;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @return the selectedBlob
+     */
+    public Blob getSelectedBlob() {
+        return selectedBlob;
+    }
+
+    /**
+     * @param penalty the penalty to set
+     */
+    public void setPenalty(double penalty) {
+        this.penalty = penalty;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    /**
+     * @param selectedBlob the selectedBlob to set
+     */
+    public void setSelectedBlob(Blob selectedBlob) {
+        this.selectedBlob = selectedBlob;
+    }
+
+    /**
+     * @return the dateOfRecord
+     */
+    public Date getDateOfRecord() {
+        return dateOfRecord;
+    }
+
+    /**
+     * @return the stipulatedComplianceDate
+     */
+    public Date getStipulatedComplianceDate() {
+        return stipulatedComplianceDate;
+    }
+
+    /**
+     * @param dateOfRecord the dateOfRecord to set
+     */
+    public void setDateOfRecord(Date dateOfRecord) {
+        this.dateOfRecord = dateOfRecord;
+    }
+
+    /**
+     * @param stipulatedComplianceDate the stipulatedComplianceDate to set
+     */
+    public void setStipulatedComplianceDate(Date stipulatedComplianceDate) {
+        this.stipulatedComplianceDate = stipulatedComplianceDate;
     }
 
   

@@ -46,6 +46,5 @@ DROP COLUMN newowner_personid;
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (13, 'database/patches/dbpatch_beta13.sql', '05-05-2019', 'ecd', 'occ permit application revisions');
-
+    VALUES (13, 'database/patches/dbpatch_beta13.sql', '05-30-2019', 'ecd', 'final clean ups');
 
