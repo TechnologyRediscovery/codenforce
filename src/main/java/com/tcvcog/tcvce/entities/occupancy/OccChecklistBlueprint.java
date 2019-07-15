@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.Municipality;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +40,9 @@ public class OccChecklistBlueprint {
     private String title;
     private String description;
     private boolean active;
+    private CodeSource governingCodeSource;
     
-    private List<OccSpace> spaceList;
+    private List<OccSpaceType> spaceTypeList;
 
     /**
      * @return the muni
@@ -101,17 +103,17 @@ public class OccChecklistBlueprint {
     }
 
     /**
-     * @return the spaceList
+     * @return the spaceTypeList
      */
-    public List<OccSpace> getSpaceList() {
-        return spaceList;
+    public List<OccSpaceType> getSpaceTypeList() {
+        return spaceTypeList;
     }
 
     /**
-     * @param spaceList the spaceList to set
+     * @param spaceList the spaceTypeList to set
      */
-    public void setSpaceList(ArrayList<OccSpace> spaceList) {
-        this.spaceList = spaceList;
+    public void setSpaceList(List<OccSpaceType> spaceList) {
+        this.spaceTypeList = spaceList;
     }
 
     /**
@@ -126,6 +128,20 @@ public class OccChecklistBlueprint {
      */
     public void setInspectionChecklistID(int inspectionChecklistID) {
         this.inspectionChecklistID = inspectionChecklistID;
+    }
+
+    /**
+     * @return the governingCodeSource
+     */
+    public CodeSource getGoverningCodeSource() {
+        return governingCodeSource;
+    }
+
+    /**
+     * @param governingCodeSource the governingCodeSource to set
+     */
+    public void setGoverningCodeSource(CodeSource governingCodeSource) {
+        this.governingCodeSource = governingCodeSource;
     }
 
   

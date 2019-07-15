@@ -25,6 +25,8 @@ import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
@@ -843,4 +845,152 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         this.paymentTypeMap = paymentTypeMap;
     }
      */
+
+    
+
+    public void updateOccupancyInspectionFee(Fee oif) throws IntegrationException {
+        String query = "UPDATE public.occinspectionfee\n" + "   SET muni_municode=?, feename=?, feeamount=?, effectivedate=?, \n" + "       expirydate=?, notes=? \n" + " WHERE feeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, oif.getMuni().getMuniCode());
+            stmt.setInt(7, oif.getOccupancyInspectionFeeID());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update occupancy inspection fee", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        }
+    }
+
+    public void deleteOccupancyInspectionFee(Fee oif) throws IntegrationException {
+        String query = "DELETE FROM public.occinspectionfee\n" + " WHERE feeid= ?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, oif.getOccupancyInspectionFeeID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete occupancy inspeciton fee--probably because another" + "part of the database has a reference item.", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    public ArrayList<Fee> getOccupancyInspectionFeeList() throws IntegrationException {
+        String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" + "       notes\n" + "  FROM public.occinspectionfee";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Fee> occupancyInspectionFeeList = new ArrayList();
+        try {
+            stmt = con.prepareStatement(query);
+            System.out.println("");
+            rs = stmt.executeQuery();
+            System.out.println("OccupancyInspectionFeeIntegrator.getOccupancyInspectionFeeList | SQL: " + stmt.toString());
+            while (rs.next()) {
+//                occupancyInspectionFeeList.add(generateOccupancyInspectionFee(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Occupancy Inspection Fee List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */
+                }
+            }
+        }
+        return occupancyInspectionFeeList;
+    }
+
+    public void insertOccupancyInspectionFee(Fee occupancyInspectionFee) throws IntegrationException {
+        String query = "INSERT INTO public.occinspectionfee(\n" + "            feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" + "            notes)\n" + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n" + "            ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, occupancyInspectionFee.getMuni().getMuniCode());
+            System.out.println("OccupancyInspectionFeeIntegrator.occupancyInspectionFeeIntegrator | sql: " + stmt.toString());
+            System.out.println("TRYING TO EXECUTE INSERT METHOD");
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert Occupancy Inspection Fee", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+    }
+
+    private Fee generateOccupancyInspectionFee(ResultSet rs) throws IntegrationException {
+        Fee newOif = new Fee();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        try {
+            newOif.setOccupancyInspectionFeeID(rs.getInt("feeid"));
+            newOif.setMuni(mi.getMuni(rs.getInt("muni_municode")));
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Error generation OccInspectionFee from result set", ex);
+        }
+        return newOif;
+    }
 }

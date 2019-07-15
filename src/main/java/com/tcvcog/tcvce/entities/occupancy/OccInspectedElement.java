@@ -26,8 +26,8 @@ import java.time.LocalDateTime;
  * @author Eric C. Darsow
  */
 public class OccInspectedElement implements Serializable{
+    
     private int id;
-    private boolean inspected;
     private CodeElement element;
     private LocalDateTime complianceDate;
     private String notes;
@@ -75,19 +75,6 @@ public class OccInspectedElement implements Serializable{
         this.notes = notes;
     }
 
-    /**
-     * @return the inspected
-     */
-    public boolean isInspected() {
-        return inspected;
-    }
-
-    /**
-     * @param inspected the inspected to set
-     */
-    public void setInspected(boolean inspected) {
-        this.inspected = inspected;
-    }
 
     /**
      * @return the element

@@ -99,7 +99,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
                 .toLocalDateTime());
         //oif.setOccupancyInspectionFeeNotes(formOccupancyInspectionFeeNotes);
         try{
-            oifi.updateOccupancyInspectionFee(oif);
+            oifi.updateOccupancyInspectionFee(oif, this);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Occupancy Inspection Fee updated!", ""));
@@ -128,7 +128,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
         oif.setNotes(newFormOccupancyInspectionFeeNotes);
         
         try{
-            oifi.insertOccupancyInspectionFee(oif);
+            oifi.insertOccupancyInspectionFee(oif, this);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Occupancy Inspection Fee updated!", ""));
@@ -156,7 +156,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
                 .toLocalDateTime());
         oif.setNotes(formOccupancyInspectionFeeNotes);
         try {
-            oifi.insertOccupancyInspectionFee(oif);
+            oifi.insertOccupancyInspectionFee(oif, this);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Successfully added occupancy inspection fee to database!", ""));
@@ -176,7 +176,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
         OccupancyInspectionIntegrator oifi = getOccupancyInspectionIntegrator();
         if(getSelectedOccupancyInspectionFee() != null){
             try {
-                oifi.deleteOccupancyInspectionFee(getSelectedOccupancyInspectionFee());
+                oifi.deleteOccupancyInspectionFee(getSelectedOccupancyInspectionFee(), this);
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Occupancy inspection fee deleted forever!", ""));
@@ -201,7 +201,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     public ArrayList<Fee> getOccupancyInspectionFeeList() {
         try {
             OccupancyInspectionIntegrator oi = getOccupancyInspectionIntegrator();
-            ArrayList<Fee> oil = oi.getOccupancyInspectionFeeList();
+            ArrayList<Fee> oil = oi.getOccupancyInspectionFeeList(this);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

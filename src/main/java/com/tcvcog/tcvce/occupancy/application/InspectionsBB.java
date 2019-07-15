@@ -97,7 +97,7 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
         OccupancyInspectionIntegrator oii = getOccupancyInspectionIntegrator();
 
         try{
-            oii.updateOccupancyInspection(currentInspection);
+            oii.updateOccupancyInspection(currentInspection, this);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Occupancy Inspection Record updated!", ""));
@@ -114,7 +114,7 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
         OccupancyInspectionIntegrator oii =  getOccupancyInspectionIntegrator();
 
         try{
-            oii.insertOccupanyInspection(o);
+            oii.insertOccupanyInspection(o, this);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Succcessfully added occupancy inspection to the database!", ""));

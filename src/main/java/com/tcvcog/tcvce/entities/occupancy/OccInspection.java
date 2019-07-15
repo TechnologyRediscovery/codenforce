@@ -41,14 +41,17 @@ public class OccInspection {
     
     private User passCertifiedBy;
     private LocalDateTime passTS;
+    private LocalDateTime effectiveDate;
     
     private int maxOccupantsAllowed;
     private int numBedrooms;
     private int numBathrooms;
     
-    private Person thirdPartyInspector_personid;
-    private LocalDateTime thirdPartyApprovalTS;
+    private Person thirdPartyInspector;
+    private LocalDateTime thirdPartyInspectorApprovalTS;
     private User thirdPartyApprovalBy;
+    
+    
 
     private String notes; 
     
@@ -218,17 +221,17 @@ public class OccInspection {
     }
 
     /**
-     * @return the thirdPartyInspector_personid
+     * @return the thirdPartyInspector
      */
-    public Person getThirdPartyInspector_personid() {
-        return thirdPartyInspector_personid;
+    public Person getThirdPartyInspector() {
+        return thirdPartyInspector;
     }
 
     /**
-     * @return the thirdPartyApprovalTS
+     * @return the thirdPartyInspectorApprovalTS
      */
-    public LocalDateTime getThirdPartyApprovalTS() {
-        return thirdPartyApprovalTS;
+    public LocalDateTime getThirdPartyInspectorApprovalTS() {
+        return thirdPartyInspectorApprovalTS;
     }
 
     /**
@@ -239,17 +242,17 @@ public class OccInspection {
     }
 
     /**
-     * @param thirdPartyInspector_personid the thirdPartyInspector_personid to set
+     * @param thirdPartyInspector the thirdPartyInspector to set
      */
-    public void setThirdPartyInspector_personid(Person thirdPartyInspector_personid) {
-        this.thirdPartyInspector_personid = thirdPartyInspector_personid;
+    public void setThirdPartyInspector(Person thirdPartyInspector) {
+        this.thirdPartyInspector = thirdPartyInspector;
     }
 
     /**
-     * @param thirdPartyApprovalTS the thirdPartyApprovalTS to set
+     * @param thirdPartyInspectorApprovalTS the thirdPartyInspectorApprovalTS to set
      */
-    public void setThirdPartyApprovalTS(LocalDateTime thirdPartyApprovalTS) {
-        this.thirdPartyApprovalTS = thirdPartyApprovalTS;
+    public void setThirdPartyInspectorApprovalTS(LocalDateTime thirdPartyInspectorApprovalTS) {
+        this.thirdPartyInspectorApprovalTS = thirdPartyInspectorApprovalTS;
     }
 
     /**
@@ -278,6 +281,20 @@ public class OccInspection {
      */
     public void setPassTS(LocalDateTime passTS) {
         this.passTS = passTS;
+    }
+
+    /**
+     * @return the effectiveDate
+     */
+    public LocalDateTime getEffectiveDate() {
+        return effectiveDate;
+    }
+
+    /**
+     * @param effectiveDate the effectiveDate to set
+     */
+    public void setEffectiveDate(LocalDateTime effectiveDate) {
+        this.effectiveDate = effectiveDate;
     }
 
     

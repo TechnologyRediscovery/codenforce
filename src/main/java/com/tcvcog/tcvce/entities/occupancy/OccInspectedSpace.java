@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Subclass of Space: stores inspection-specific data about each space element
@@ -29,29 +30,32 @@ import java.util.ArrayList;
  * 
  * @author Eric C. Darsow, Technology Rediscovery LLC 
  */
-public class OccInspectedSpace extends BackingBeanUtils implements Serializable{
+public class OccInspectedSpace extends OccSpace implements Serializable{
     
-    private int spaceid;
-    private OccSpaceType spaceType;
-    private String name;
-    private ArrayList<OccInspectedElement> inspectedElementList;
+    private List<OccInspectedElement> inspectedElementList;
     private OccLocationDescriptor location;
     
-    public OccInspectedSpace(){
+    public OccInspectedSpace(OccSpace spc){
+        this.spaceid = spc.getSpaceid();
+        this.spaceType = spc.getSpaceType();
+        this.name = spc.getName();
+        this.required = spc.isRequired();
+        this.elementList = spc.getElementList();
+        
         inspectedElementList = new ArrayList<>();
     }
 
     /**
      * @return the inspectedElementList
      */
-    public ArrayList<OccInspectedElement> getInspectedElementList() {
+    public List<OccInspectedElement> getInspectedElementList() {
         return inspectedElementList;
     }
 
     /**
      * @param inspectedElementList the inspectedElementList to set
      */
-    public void setInspectedElementList(ArrayList<OccInspectedElement> inspectedElementList) {
+    public void setInspectedElementList(List<OccInspectedElement> inspectedElementList) {
         this.inspectedElementList = inspectedElementList;
     }
 

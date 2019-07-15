@@ -16,20 +16,23 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.entities.CodeElement;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Eric Darsow echocharliedelta@protonmail.com
  */
-public class OccSpace implements Serializable {
+public class OccSpace extends BackingBeanUtils implements Serializable {
     
-    private int spaceid;
-    private OccSpaceType spaceType;
-    private String name;
-    private ArrayList<CodeElement> elementList;
+    protected int spaceid;
+    protected OccSpaceType spaceType;
+    protected String name;
+    protected boolean required;
+    protected List<CodeElement> elementList;
 
     /**
      * @return the spaceType
@@ -41,7 +44,7 @@ public class OccSpace implements Serializable {
     /**
      * @return the elementList
      */
-    public ArrayList<CodeElement> getElementList() {
+    public List<CodeElement> getElementList() {
         return elementList;
     }
 
@@ -85,6 +88,20 @@ public class OccSpace implements Serializable {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the required
+     */
+    public boolean isRequired() {
+        return required;
+    }
+
+    /**
+     * @param required the required to set
+     */
+    public void setRequired(boolean required) {
+        this.required = required;
     }
     
    
