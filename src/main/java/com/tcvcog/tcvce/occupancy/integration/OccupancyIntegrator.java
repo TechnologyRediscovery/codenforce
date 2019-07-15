@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.MalformedBOBException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -35,6 +36,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.integration.ChoiceIntegrator;
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import java.io.Serializable;
 import java.sql.Array;
 import java.sql.Connection;
@@ -65,7 +68,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    public OccPeriod getOccPeriod(int periodid) throws IntegrationException{
+    public OccPeriod getOccPeriod(int periodid) throws IntegrationException, MalformedBOBException{
         OccPeriod op = null;
         String query =  "SELECT periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n" +
                         "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n" +
@@ -79,35 +82,31 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PreparedStatement stmt = null;
  
         try {
-            
             stmt = con.prepareStatement(query);
             stmt.setInt(1, periodid);
-            
             rs = stmt.executeQuery();
             while(rs.next()){
                 op = generateOccPeriod(rs);
             }
-            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+            throw new IntegrationException("Unable to build occ period", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return op;
-        
-        
     }
     
     
-    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
+    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException, MalformedBOBException{
         ChecklistIntegrator ci = getChecklistIntegrator();
-        OccupancyInspectionIntegrator oii = getOccupancyInspectionIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        EventIntegrator ei = getEventIntegrator();
+        ChoiceIntegrator choiceInt = getChoiceIntegrator();
         
         OccPeriod op = new OccPeriod();
         
@@ -145,17 +144,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setApplicationList(getOccPermitApplicationList(op));
         op.setPersonList(pi.getPersonList(op));
         
-//        op.setEventList(eventList);
-//        op.setEventProposalList(eventProposalList);
+        op.setEventList(ei.getOccEvents(op.getPeriodID()));
+        op.setEventProposalList(choiceInt.getProposalList(op));
 //        op.setInspectionList(inspectionList);;
 //        op.setPermitList(permitList);;
 //        op.setPhotoIDList(photoIDList);
-//        
-        
-        
-        
-        
-        return op;
+
+            return op;
     }
     
     public void updateOccPeriod(OccPeriod op){
@@ -164,11 +159,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         
     }
     
-    public void inactivateOccPeriod(OccPeriod op){
-        
-        
-        
-    }
+  
     
     public OccPermit getOccPermit(int permitID) throws IntegrationException{
         OccPermit op = null;
@@ -198,8 +189,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     private OccPermit generateOccPermit(ResultSet rs) throws SQLException, IntegrationException{
-        OccupancyInspectionIntegrator ii = getOccupancyInspectionIntegrator();
-        CodeIntegrator ci = getCodeIntegrator();
+        
         
         OccPermit op = new OccPermit();
         
@@ -215,11 +205,16 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return op;
     }
     
-    public ArrayList<OccPermit> getOccPermitList(PropertyUnit pu){
+    public List<OccPermit> getOccPermitList(PropertyUnit pu){
         return new ArrayList();
     }
     
-    public ArrayList<OccPermit> getOccPermitList(Property p) throws IntegrationException{
+    public List<OccPermit> getOccPermitList(OccPeriod period){
+        
+        return new ArrayList<>();
+    }
+    
+    public List<OccPermit> getOccPermitList(Property p) throws IntegrationException{
         
         ArrayList<OccPermit> permitList = new ArrayList();
         String query =  " ";
@@ -298,12 +293,14 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     public OccPeriodType getOccPeriodType(int typeid) throws IntegrationException{
         OccPeriodType tpe = null;
-        String query =  "   SELECT typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
-                            "       permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n" +
-                            "       rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
-                            "       requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
-                            "       defaultvalidityperioddays\n" +
-                            "  FROM public.occperiodtype WHERE typeid=?;";
+        String query =  "SELECT typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
+                        "       permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n" +
+                        "       rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
+                        "       requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
+                        "       defaultpermitvalidityperioddays, occchecklist_checklistlistid, \n" +
+                        "       asynchronousinspectionvalidityperiod, defaultinspectionvalidityperiod, \n" +
+                        "       eventruleset_setid\n" +
+                        "  FROM public.occperiodtype WHERE typeid=?;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
