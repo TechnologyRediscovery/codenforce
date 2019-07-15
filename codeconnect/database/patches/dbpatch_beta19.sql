@@ -151,7 +151,83 @@ ALTER TABLE occinspectedchecklistspaceelementphotodoc RENAME TO occinspectedspac
 ALTER TABLE public.occinspectedspaceelement DROP COLUMN occupancyinspection_id;
 ALTER TABLE public.occinspectedspaceelement DROP COLUMN checklistspaceelement_id;
 
+
 ALTER TABLE public.occinspectedspaceelement RENAME inspectedchecklistspaceelementid TO inspectedspaceelementid;
+
+ALTER TABLE public.occinspectedspaceelementphotodoc DROP CONSTRAINT IF EXISTS inspchklstspele_elementid_cv_fk;
+ALTER TABLE public.occinspectedspaceelementphotodoc 
+	ADD CONSTRAINT occinspectedspaceelementphotodoc_photodocid_fk 
+	FOREIGN KEY (photodoc_photodocid)
+	REFERENCES photodoc (photodocid);
+
+ALTER TABLE public.occinspectedspaceelementphotodoc DROP CONSTRAINT IF EXISTS inspchklstspele_elementid_phdoc_fk;
+ALTER TABLE public.occinspectedspaceelementphotodoc 
+	ADD CONSTRAINT occinspectedspaceelementphotodoc_inspectedele_fk 
+	FOREIGN KEY (inspchklstspele_elementid)
+	REFERENCES occinspectedspaceelement (inspectedspaceelementid);
+
+ALTER TABLE occspaceelement ADD COLUMN required BOOLEAN DEFAULT true;
+ALTER TABLE occspace ADD COLUMN description TEXT;
+
+ALTER TABLE occinspectedspaceelement ADD COLUMN overriderequiredflagnotinspected_userid INTEGER 
+	CONSTRAINT occinspectedspaceelement_overridereq_userid_fk 
+	REFERENCES login (userid);
+
+ALTER TABLE muniprofile ADD COLUMN minimumuserrankforinspectionoverrides INTEGER DEFAULT 3;
+
+ALTER TABLE public.occinspectedspaceelementphotodoc RENAME inspchklstspele_elementid  TO inspectedspaceelement_elementid;
+
+ALTER TABLE public.occinspectedspaceelement ADD COLUMN spaceelement_elementid INTEGER NOT NULL
+	CONSTRAINT occinspectedspaceelement_elementid_fk 
+	REFERENCES occspaceelement (spaceelementid);
+
+
+ALTER TABLE public.occinspectedspaceelement RENAME lastinspectedbyts  TO lastinspectedts;
+ALTER TABLE public.occinspectedspaceelement ADD COLUMN required BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE public.propertyunit ADD COLUMN active boolean default true;
+
+ALTER TABLE codeviolationseverityclass RENAME TO intensityclass;
+
+DROP TABLE public.datasource CASCADE;
+
+ALTER TABLE genlog RENAME TO log;
+ALTER TABLE genlogcategory RENAME TO logcategory;
+
+DROP TABLE personsource CASCADE;
+
+ALTER TABLE person ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT person_bobsourceid_fk REFERENCES bobsource (sourceid);
+ALTER TABLE property ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT property_bobsourceid_fk REFERENCES bobsource (sourceid);
+ALTER TABLE property ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT property_bobsourceid_fk REFERENCES bobsource (sourceid);
+
+
+
+
+
+ALTER TABLE property ADD COLUMN unfitdatestart TIMESTAMP WITH TIME ZONE;
+ALTER TABLE property ADD COLUMN unfitdatestop TIMESTAMP WITH TIME ZONE;
+ALTER TABLE property ADD COLUMN unfitby_userid INTEGER 
+	CONSTRAINT property_unfitby_userid_fk 
+	REFERENCES login (userid);
+
+ALTER TABLE property ADD COLUMN abandoneddatestart TIMESTAMP WITH TIME ZONE;
+ALTER TABLE property ADD COLUMN abandoneddatestop TIMESTAMP WITH TIME ZONE;
+ALTER TABLE property ADD COLUMN abandonedby_userid INTEGER CONSTRAINT property_abandoned_userid_fk REFERENCES login (userid);
+
+ALTER TABLE property ADD COLUMN vacantdatestart TIMESTAMP WITH TIME ZONE;
+ALTER TABLE property ADD COLUMN vacantdatestop TIMESTAMP WITH TIME ZONE;
+ALTER TABLE property ADD COLUMN vacantbu_userid INTEGER CONSTRAINT property_vacant_userid_fk REFERENCES login (userid);
+
+ALTER TABLE property ADD COLUMN condition_intensityclassid INTEGER CONSTRAINT property_conditionintensityclass_classid_fk REFERENCES intensityclass (classid);
+ALTER TABLE property ADD COLUMN landbankprospect_intensityclassid INTEGER CONSTRAINT property_landbankprospect_classid_fk REFERENCES intensityclass (classid);
+ALTER TABLE property ADD COLUMN landbankheld BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE property DROP COLUMN vacant;
+ALTER TABLE property ADD COLUMN active BOOLEAN DEFAULT TRUE;
+
+
+ALTER TABLE propertyunit ADD COLUMN condition_intensityclassid INTEGER CONSTRAINT propunit_conditionintensityclass_classid_fk REFERENCES intensityclass (classid);
+
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
     VALUES (19, 'database/patches/dbpatch_beta19.sql', '07-09-2019', 'ecd', 'municipality facelift and others');
