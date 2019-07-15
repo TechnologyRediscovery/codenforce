@@ -1136,7 +1136,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         return ins;
     }
      
-    public void updateOccupancyInspection(OccInspection occInspection) throws IntegrationException {
+    public void updateOccInspection(OccInspection occInspection) throws IntegrationException {
         String query = "UPDATE public.occinspection\n" 
                 + "   SET propertyunitid=?, login_userid=?, firstinspectiondate=?, \n" 
                 + "       firstinspectionpass=?, secondinspectiondate=?, secondinspectionpass=?, \n" 

@@ -30,7 +30,10 @@ public class EventRuleImplementation extends EventRule implements Serializable{
     protected LocalDateTime lastEvaluatedTS;
     protected LocalDateTime passedRuleTS;
     
+
+    
     public EventRuleImplementation(EventRule rule){
+        
         this.ruleid = rule.getRuleid();
         this.title = rule.getTitle();
         this.description = rule.getDescription();
@@ -61,8 +64,6 @@ public class EventRuleImplementation extends EventRule implements Serializable{
 
         this.active = rule.isActive();
         this.notes = rule.getNotes();
-        
-        
         
     }
     

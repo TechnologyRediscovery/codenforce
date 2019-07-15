@@ -56,7 +56,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public CaseIntegrator() {
     }
     
-    public ArrayList getCECasesByProp(Property p) throws IntegrationException, CaseLifecyleException{
+    public ArrayList getCECasesByProp(Property p) 
+            throws IntegrationException, CaseLifecyleException{
         ArrayList<CECase> caseList = new ArrayList();
         String query = "SELECT \n" +
             "  caseid\n" +
@@ -749,7 +750,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public List<CECase> getCECaseHistoryList(User u) throws IntegrationException, CaseLifecyleException{
+    public List<CECase> getCECaseHistoryList(User u) 
+            throws IntegrationException, CaseLifecyleException{
         List<CECase> cList = new ArrayList<>();
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;

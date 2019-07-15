@@ -54,24 +54,26 @@ public class SpaceTypeBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the spaceTypeList
      */
-    public ArrayList<OccSpaceType> getSpaceTypeList() {
+    public List<OccSpaceType> getSpaceTypeList() {
+        ChecklistIntegrator si = getChecklistIntegrator();
         
-        try {
-            ChecklistIntegrator si = getChecklistIntegrator();
-            spaceTypeList = si.getSpaceTypeList();
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Unable to load space type list", 
-                        "This must be corrected by the System Administrator"));
-        }
-         if(spaceTypeList != null){
-            return spaceTypeList;
-            
-        } else {
-            spaceTypeList = new ArrayList();
-            return spaceTypeList;
-        }
+//        try {
+////            spaceTypeList = si.getSpa();
+//        } catch (IntegrationException ex) {
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                        "Unable to load space type list", 
+//                        "This must be corrected by the System Administrator"));
+//        }
+//         if(spaceTypeList != null){
+//            return spaceTypeList;
+//            
+//        } else {
+//            spaceTypeList = new ArrayList();
+//            return spaceTypeList;
+//        }
+
+        return new ArrayList<>();
     }
 
     /**

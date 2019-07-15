@@ -91,7 +91,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
             currentCitation.setDateOfRecord(LocalDateTime.now());
             currentCitation.setUserOwner(getSessionBean().getFacesUser());
             currentCitation.setIsActive(true);
-            currentCitation.setOrigin_courtentity(getSessionBean().getActiveMuni().getDefaultCourtEntity());
+            currentCitation.setOrigin_courtentity(getSessionBean().getActiveMuni().getCourtEntities().get(0));
             List<CodeViolation> l = new ArrayList<>();
             for(CodeViolation v: ceCase.getViolationList()){
                 if(v.getActualComplianceDate() == null){

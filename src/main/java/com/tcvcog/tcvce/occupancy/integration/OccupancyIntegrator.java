@@ -18,13 +18,9 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.MalformedBOBException;
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -67,8 +63,34 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     public OccupancyIntegrator() {
     }
     
+    public List<OccPeriod> getOccPeriodList(PropertyUnit unit) throws IntegrationException{
+        List<OccPeriod> opList = new ArrayList<>();
+        String query =  "SELECT periodid FROM public.occperiod WHERE propertyunit_unitid=?;";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+ 
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, unit.getUnitID());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                opList.add(getOccPeriod(rs.getInt("periodid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build occ period", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return opList;
+    }
     
-    public OccPeriod getOccPeriod(int periodid) throws IntegrationException, MalformedBOBException{
+    
+    public OccPeriod getOccPeriod(int periodid) throws IntegrationException{
         OccPeriod op = null;
         String query =  "SELECT periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n" +
                         "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n" +
@@ -100,7 +122,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException, MalformedBOBException{
+    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
         ChecklistIntegrator ci = getChecklistIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         SystemIntegrator si = getSystemIntegrator();
@@ -149,9 +171,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setInspectionList(ci.getOccInspectionList(op));
 
         op.setPermitList(getOccPermitList(op));
-//        op.setPhotoIDList(photoIDList);
-
-            return op;
+        op.setBlobIDList(getBlobList(op));
+        return op;
     }
     
     public void updateOccPeriod(OccPeriod op){
@@ -233,6 +254,40 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return permitList;
+    }
+    
+    /**
+     * Gets an Integer-coded list of blobs
+     * 
+     * @param period
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> getBlobList(OccPeriod period) throws IntegrationException{
+        List<Integer> blobIDList = new ArrayList<>();
+        String query =  "SELECT photodoc_photodocid, occperiod_periodid\n" +
+                        "  FROM public.occperiodphotodoc WHERE occperiod_periodid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, period.getPeriodID());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                blobIDList.add(rs.getInt("photodoc_photodocid"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build occ permit list", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return blobIDList;
+        
+        
     }
     
     public void updateOccPeriodType(OccPeriodType opt) throws IntegrationException {

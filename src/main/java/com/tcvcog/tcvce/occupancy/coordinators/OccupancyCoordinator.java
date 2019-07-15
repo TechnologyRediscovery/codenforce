@@ -52,7 +52,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
     
     public OccInspectedSpace generateNewlyInspectedSpace(OccSpace space, String locationDescription){
-        OccInspectedSpace is = new OccInspectedSpace();
+        OccInspectedSpace is = new OccInspectedSpace(space);
         OccLocationDescriptor ld = new OccLocationDescriptor();
         ld.setLocationDescription(locationDescription);
         ListIterator<CodeElement> elementIterator = space.getElementList().listIterator();

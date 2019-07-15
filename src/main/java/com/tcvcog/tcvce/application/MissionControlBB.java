@@ -136,7 +136,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         CodeIntegrator ci = getCodeIntegrator();
         getSessionBean().setActiveMuni(selectedMuni);
         try {
-            getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(selectedMuni.getDefaultCodeSetID()));
+            getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(selectedMuni.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 

@@ -11,7 +11,6 @@ import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.EventRule;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
-import com.tcvcog.tcvce.entities.Photograph;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -34,7 +33,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private List<EventRule> eventRuleList;
     private List<OccInspection> inspectionList;
     private List<OccPermit> permitList;
-    private List<Integer> photoIDList;
+    private List<Integer> blobIDList;
     
     private User manager;
     
@@ -119,10 +118,10 @@ public class OccPeriod extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the photoIDList
+     * @return the blobIDList
      */
-    public List<Integer> getPhotoIDList() {
-        return photoIDList;
+    public List<Integer> getBlobIDList() {
+        return blobIDList;
     }
 
     /**
@@ -301,10 +300,10 @@ public class OccPeriod extends EntityUtils implements Serializable{
     }
 
     /**
-     * @param photoIDList the photoIDList to set
+     * @param blobIDList the blobIDList to set
      */
-    public void setPhotoIDList(List<Integer> photoIDList) {
-        this.photoIDList = photoIDList;
+    public void setBlobIDList(List<Integer> blobIDList) {
+        this.blobIDList = blobIDList;
     }
 
     /**

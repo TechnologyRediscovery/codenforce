@@ -547,7 +547,12 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         // not needed after converting property use type to a simple string without a lookup table
 //         String query = "SELECT * from property LEFT OUTER JOIN propertyusetype ON public.propertyusetype.propertyUseTypeID = public.property.propertyusetype_useid "
 //                + " WHERE propertyid = ?;";
-        String query = "SELECT * from property WHERE propertyid = ?;";
+        String query = "SELECT propertyid, municipality_municode, parid, lotandblock, address, \n" +
+                        "       propertyusetype, usegroup, constructiontype, countycode, apartmentno, \n" +
+                        "       notes, addr_city, addr_state, addr_zip, ownercode, propclass, \n" +
+                        "       lastupdated, lastupdatedby, locationdescription, datasource, \n" +
+                        "       vacant\n" +
+                        "  FROM public.property WHERE propertyid=?;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;

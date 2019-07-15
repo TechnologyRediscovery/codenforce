@@ -514,28 +514,6 @@ public class BackingBeanUtils implements Serializable{
     }
 
    
-    
-   
-   
-    /**
-     * @return the occupancyInspectionIntegrator
-     */
-    public OccupancyInspectionIntegrator getOccupancyInspectionIntegrator() {
-        FacesContext context = getFacesContext();
-        ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{occupancyInspectionIntegrator}", OccupancyInspectionIntegrator.class);
-        occupancyInspectionIntegrator = (OccupancyInspectionIntegrator) ve.getValue(context.getELContext());
-        return occupancyInspectionIntegrator;
-    }
-
-    /**
-     * @param occupancyInspectionIntegrator the occupancyInspectionIntegrator to set
-     */
-    public void setOccupancyInspectionIntegrator(OccupancyInspectionIntegrator occupancyInspectionIntegrator) {
-        this.occupancyInspectionIntegrator = occupancyInspectionIntegrator;
-    }
-
-    
    
     /**
      * @return the courtEntityIntegrator
