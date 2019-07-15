@@ -10,7 +10,8 @@
         <title>Add Payment</title>
     </h:head>
     <h:body>
-        <ui:composition template="../../navContainer_restricted.xhtml">
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <!--template="../../navContainer_restricted.xhtml"-->
             <ui:define name="content">
                 <div class="mainContainer">
                     <h:messages globalOnly="true" showDetail="true" showSummary="true"
@@ -80,7 +81,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Payer ID" />
                                         </f:facet>
-                                        <h:outputText value="#{p.paymentPayerID}"/>
+                                        <h:outputText value="#{p.paymentPayer.personID}"/>
                                     </p:column>
                                     
                                     <p:column width="25%">
@@ -154,9 +155,8 @@
                                     <h:outputText value="Payment Type:"/>
                                 </p:outputLabel>
                                 <h:panelGroup>
-                                    <p:selectOneMenu id="paymentTypeMenu" tabindex="5" required="false" value="#{paymentBB.formPaymentPaymentType}">
-                                        <f:converter converterId="paymentTypeConverter"/>
-                                        <f:selectItems id="paymentTypeList" value="#{paymentTypeBB.paymentTypeList}" var="pt" itemValue="#{pt}" itemLabel="#{pt.paymentTypeTitle}"/>
+                                    <p:selectOneMenu id="paymentTypeMenu" tabindex="5" required="false" converter="paymentTypeConverter" value="#{paymentBB.formPaymentPaymentType}">
+                                        <f:selectItems id="paymentTypeList" value="#{paymentBB.paymentTypeList}" var="pt" itemValue="#{pt}" itemLabel="#{pt.paymentTypeTitle}"/>
                                     </p:selectOneMenu>
                                     
                                     <!--<h:message for="muniSelectMenu" showDetail="false" showSummary="true" 
@@ -213,7 +213,7 @@
                                 
                                 <h:outputLabel value="Payer ID:" for="newPaymentPayer"/>
                                 <h:panelGroup>
-                                    <p:inputText id="newPaymentPayer" value="#{paymentBB.formPaymentPayerID}" 
+                                    <p:inputText id="newPaymentPayer" value="#{paymentBB.formPaymentPayer}" 
                                            style="width: 250px;" tabindex="10" required="true" styleClass="inputText"/>
                                     <h:message for="newPaymentPayer" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -229,15 +229,15 @@
                                 
                                 <h:outputLabel value="Check No:" for="newPaymentCheckNo"/>
                                 <h:panelGroup>
-                                    <p:inputText id="newPaymentCheckNo" value="#{paymentBB.formCheckNum}" 
-                                           style="width: 250px;" tabindex="12" required="true" styleClass="inputText"/>
+                                    <p:inputText id="newPaymentCheckNo" value="#{paymentBB.formPaymentCheckNum}" 
+                                           style="width: 250px;" tabindex="12" required="false" styleClass="inputText"/>
                                     <h:message for="newPaymentCheckNo" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
                                 
                                 <h:outputLabel value="Cleared"/>
                                     <h:panelGroup>    
-                                        <p:inputSwitch id="newPaymentCleared" value="#{paymentBB.formCleared}" 
+                                        <p:inputSwitch id="newPaymentCleared" value="#{paymentBB.formPaymentCleared}" 
                                                    tabindex="13" onLabel="Yes" offLabel="No"/>
                                         <h:message for="newPaymentCleared" showDetail="true" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -245,7 +245,7 @@
                                 
                                 <f:facet name="footer">
                                     <h:outputLabel for="paymentNotesEditor" value="Payment Notes:"/>
-                                        <p:editor id="paymentNotesEditor" value="#{paymentBB.formNotes}" 
+                                    <p:editor id="paymentNotesEditor" value="#{paymentBB.formPaymentNotes}" 
                                                     controls="bold italic underline strikethrough font size style color 
                                                     bullets numbering center undo redo rule link removeformat outdent 
                                                     indent link unlink copy cut paste rule alignleft center alignright"
