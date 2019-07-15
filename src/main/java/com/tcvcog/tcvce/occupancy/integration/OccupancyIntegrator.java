@@ -118,7 +118,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
         op.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
         
-        op.setPeriodType(getOccPeriodType(rs.getInt("type_typeid")));
+        op.setType(getOccPeriodType(rs.getInt("type_typeid")));
         op.setPeriodTypeCertifiedBy(ui.getUser("typecertifiedby_userid"));
         op.setPeriodTypeCertifiedTS(rs.getTimestamp("typecertifiedts").toLocalDateTime());
         
@@ -146,8 +146,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         
         op.setEventList(ei.getOccEvents(op.getPeriodID()));
         op.setEventProposalList(choiceInt.getProposalList(op));
-//        op.setInspectionList(inspectionList);;
-//        op.setPermitList(permitList);;
+        op.setInspectionList(ci.getOccInspectionList(op));
+
+        op.setPermitList(getOccPermitList(op));
 //        op.setPhotoIDList(photoIDList);
 
             return op;
@@ -163,9 +164,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     public OccPermit getOccPermit(int permitID) throws IntegrationException{
         OccPermit op = null;
-        String query =  "SELECT permitid, referenceno, occinspec_inspectionid, permittype, dateissued, \n" +
-                        " dateexpires, issuedunder, specialconditions, notes\n" +
-                        " FROM public.occupancypermit WHERE permitid=?;";
+        String query =  "SELECT permitid, occperiod_periodid, referenceno, issuedto_personid, \n" +
+                        "       issuedby_userid, dateissued, permitadditionaltext, notes\n" +
+                        "  FROM public.occpermit WHERE permitid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -189,61 +190,50 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     private OccPermit generateOccPermit(ResultSet rs) throws SQLException, IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        OccPermit permit = new OccPermit();
+        PersonIntegrator pi = getPersonIntegrator();
         
+        permit.setPermitID(rs.getInt("permitid"));
+        permit.setPeriodID(rs.getInt("occperiod_periodid"));
+        permit.setReferenceNo(rs.getString("referenceno"));
         
-        OccPermit op = new OccPermit();
+        if(rs.getTimestamp("dateissued") != null){
+            permit.setDateIssued(rs.getTimestamp("dateissued").toLocalDateTime());
+        }
         
-        op.setPermitID(rs.getInt("permitid"));
-        op.setReferenceNo(rs.getString("referenceno"));
-//        op.setInspection(ii.getOccupancyInspection(rs.getInt("occinspec_inspectionid")));
-        op.setDateIssued(rs.getTimestamp("dateissued").toLocalDateTime());
-        op.setDateExpires(rs.getTimestamp("dateexpires").toLocalDateTime());
-//        op.setIssuingCodeSource(ci.getCodeSource(rs.getInt("issuedunder")));
-        op.setSpecialConditions(rs.getString("specialconditions"));
-        op.setNotes(rs.getString("notes"));
+        permit.setIssuedBy(ui.getUser(rs.getInt("issuedby_userid")));
+        permit.setIssuedTo(pi.getPerson(rs.getInt("issuedto_personid")));
         
-        return op;
+        permit.setPermitAdditionalText(rs.getString("permitadditionaltext"));
+        permit.setNotes(rs.getString("notes"));
+        
+        return permit;
     }
     
-    public List<OccPermit> getOccPermitList(PropertyUnit pu){
-        return new ArrayList();
-    }
-    
-    public List<OccPermit> getOccPermitList(OccPeriod period){
-        
-        return new ArrayList<>();
-    }
-    
-    public List<OccPermit> getOccPermitList(Property p) throws IntegrationException{
-        
-        ArrayList<OccPermit> permitList = new ArrayList();
-        String query =  " ";
-        
+    public List<OccPermit> getOccPermitList(OccPeriod period) throws IntegrationException{
+        List<OccPermit> permitList = new ArrayList<>();
+        String query =  "SELECT permitid FROM public.occpermit WHERE occperiod_periodid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
- 
         try {
-            
             stmt = con.prepareStatement(query);
-//            stmt.setInt(1, permitID);
+            stmt.setInt(1, period.getPeriodID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                //permitList.add(generateOccupancyPermit(rs.getInt("permitid")));
+                permitList.add(getOccPermit(rs.getInt("permitid")));
             }
-            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+            throw new IntegrationException("Unable to build occ permit list", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return new ArrayList();
-        
+        return permitList;
     }
-    
     
     public void updateOccPeriodType(OccPeriodType opt) throws IntegrationException {
         String query = "UPDATE public.occpermittype\n" +
@@ -328,25 +318,25 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
     
     
-    public List<OccPeriodType> getCompleteOccPeriodTypeList(Municipality m) throws IntegrationException{
-        ArrayList<OccPeriodType> occPeriodTypeList = new ArrayList<>();
-        String query = "SELECT typeid\n" +
-                        "  FROM public.occperiodtype WHERE muni_municode = ?;";
+    public List<OccPeriodType> getCompleteOccPeriodTypeList(int profileID) throws IntegrationException{
+        List<OccPeriodType> occPeriodTypeList = new ArrayList<>();
+        String query = "SELECT muniprofile_profileid, occperiodtype_typeid\n" +
+                        "  FROM public.muniprofileoccperiodtype WHERE muniprofile_profileid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
+            stmt.setInt(1, profileID);
             rs = stmt.executeQuery();
-            System.out.println("OccupancyPermitTypeIntegrator.getCompleteOccPeriodTypelist| SQL: " + stmt.toString());
             while(rs.next()){
-                occPeriodTypeList.add(getOccPeriodType(rs.getInt("typeid")));
+                occPeriodTypeList.add(getOccPeriodType(rs.getInt("occperiodtype_typeid")));
             }
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get OccupancyPermitType", ex);
+            throw new IntegrationException("Cannot get OccupancyPermitType list, sorry", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

@@ -303,6 +303,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      */
     public User getUser(int userID) throws IntegrationException{
         
+        if(userID == 0){
+            return null;
+        }
+        
         Connection con = getPostgresCon();
         ResultSet rs = null;
         User newUser = null;

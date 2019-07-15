@@ -22,17 +22,18 @@ import java.util.List;
  *
  * @author sylvia
  */
-public class OccSpaceTypeChecklist extends OccSpaceType {
+public class OccSpaceTypeTemplate extends OccSpaceType {
 
     protected boolean overrideSpaceTypeRequired;
     protected boolean overrideSpaceTypeRequiredValue;
     protected boolean overrideSpaceTypeRequireAllSpaces;
+    protected List<OccSpace> spaceList;
     
-    public OccSpaceTypeChecklist(OccSpaceType type){
+    public OccSpaceTypeTemplate(OccSpaceType type){
         this.spaceTypeID = type.getSpaceTypeID();
         this.spaceTypeTitle = type.getSpaceTypeTitle();
         this.spaceTypeDescription = type.getSpaceTypeDescription();
-        this.spaceList = type.getSpaceList();
+        this.required = type.isRequired();
        
     }
 
@@ -76,6 +77,20 @@ public class OccSpaceTypeChecklist extends OccSpaceType {
      */
     public void setOverrideSpaceTypeRequireAllSpaces(boolean overrideSpaceTypeRequireAllSpaces) {
         this.overrideSpaceTypeRequireAllSpaces = overrideSpaceTypeRequireAllSpaces;
+    }
+
+    /**
+     * @return the spaceList
+     */
+    public List getSpaceList() {
+        return spaceList;
+    }
+
+    /**
+     * @param spaceList the spaceList to set
+     */
+    public void setSpaceList(List<OccSpace> spaceList) {
+        this.spaceList = spaceList;
     }
     
 

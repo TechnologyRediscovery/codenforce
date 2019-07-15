@@ -25,6 +25,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     
     private int periodID;
     private int propertyUnitID;
+    private OccPeriodType type;
     
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
@@ -37,7 +38,6 @@ public class OccPeriod extends EntityUtils implements Serializable{
     
     private User manager;
     
-    private OccPeriodType periodType;
     private User periodTypeCertifiedBy;
     private LocalDateTime periodTypeCertifiedTS;
     
@@ -133,10 +133,10 @@ public class OccPeriod extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the periodType
+     * @return the type
      */
-    public OccPeriodType getPeriodType() {
-        return periodType;
+    public OccPeriodType getType() {
+        return type;
     }
 
     /**
@@ -315,10 +315,10 @@ public class OccPeriod extends EntityUtils implements Serializable{
     }
 
     /**
-     * @param periodType the periodType to set
+     * @param type the type to set
      */
-    public void setPeriodType(OccPeriodType periodType) {
-        this.periodType = periodType;
+    public void setType(OccPeriodType type) {
+        this.type = type;
     }
 
     /**

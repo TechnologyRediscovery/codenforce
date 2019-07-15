@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedElement;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
@@ -56,11 +56,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccLocationDescriptor ld = new OccLocationDescriptor();
         ld.setLocationDescription(locationDescription);
         ListIterator<CodeElement> elementIterator = space.getElementList().listIterator();
-        OccInspectedElement ie;
+        OccInspectedSpaceElement ie;
         
         while(elementIterator.hasNext()){
             CodeElement ce = elementIterator.next();
-            ie = new OccInspectedElement();
+            ie = new OccInspectedSpaceElement();
             ie.setElement(ce);
             is.getInspectedElementList().add(ie);
             // each element in this space gets a reference to the same OccLocationDescriptor object

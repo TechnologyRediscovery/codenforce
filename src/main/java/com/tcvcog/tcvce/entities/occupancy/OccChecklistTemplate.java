@@ -30,7 +30,7 @@ import java.util.List;
  * 
  * @author Eric Darsow
  */
-public class OccChecklistBlueprint {
+public class OccChecklistTemplate {
     
     // note we have a lexicon switch here: in the DB, this object is 
     // derived from an inspectionchecklist row. In Javaland, we make
@@ -42,7 +42,7 @@ public class OccChecklistBlueprint {
     private boolean active;
     private CodeSource governingCodeSource;
     
-    private List<OccSpaceType> spaceTypeList;
+    private List<OccSpaceTypeTemplate> occSpaceTypeTemplateList;
 
     /**
      * @return the muni
@@ -103,17 +103,17 @@ public class OccChecklistBlueprint {
     }
 
     /**
-     * @return the spaceTypeList
+     * @return the occSpaceTypeTemplateList
      */
-    public List<OccSpaceType> getSpaceTypeList() {
-        return spaceTypeList;
+    public List<OccSpaceTypeTemplate> getOccSpaceTypeTemplateList() {
+        return occSpaceTypeTemplateList;
     }
 
     /**
-     * @param spaceList the spaceTypeList to set
+     * @param occSpaceTypeTemplateList the occSpaceTypeTemplateList to set
      */
-    public void setSpaceList(List<OccSpaceType> spaceList) {
-        this.spaceTypeList = spaceList;
+    public void setOccSpaceTypeTemplateList(List<OccSpaceTypeTemplate> occSpaceTypeTemplateList) {
+        this.occSpaceTypeTemplateList = occSpaceTypeTemplateList;
     }
 
     /**

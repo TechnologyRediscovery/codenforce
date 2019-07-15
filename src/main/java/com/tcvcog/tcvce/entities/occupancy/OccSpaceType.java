@@ -27,7 +27,6 @@ public class OccSpaceType {
     protected String spaceTypeTitle;
     protected String spaceTypeDescription;
     protected boolean required;
-    protected List<OccSpace> spaceList;
 
     /**
      * @return the spaceTypeID
@@ -85,19 +84,6 @@ public class OccSpaceType {
         this.required = required;
     }
 
-    /**
-     * @return the spaceList
-     */
-    public List<OccSpace> getSpaceList() {
-        return spaceList;
-    }
-
-    /**
-     * @param spaceList the spaceList to set
-     */
-    public void setSpaceList(List<OccSpace> spaceList) {
-        this.spaceList = spaceList;
-    }
 
     
 }

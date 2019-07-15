@@ -32,30 +32,29 @@ import java.util.List;
  */
 public class OccInspectedSpace extends OccSpace implements Serializable{
     
-    private List<OccInspectedElement> inspectedElementList;
+    private List<OccInspectedSpaceElement> inspectedElementList;
     private OccLocationDescriptor location;
+    private OccSpaceType type;
     
     public OccInspectedSpace(OccSpace spc){
         this.spaceid = spc.getSpaceid();
-        this.spaceType = spc.getSpaceType();
+        this.occSpaceTypeID = spc.getOccSpaceTypeID();
         this.name = spc.getName();
         this.required = spc.isRequired();
         this.elementList = spc.getElementList();
-        
-        inspectedElementList = new ArrayList<>();
     }
 
     /**
      * @return the inspectedElementList
      */
-    public List<OccInspectedElement> getInspectedElementList() {
+    public List<OccInspectedSpaceElement> getInspectedElementList() {
         return inspectedElementList;
     }
 
     /**
      * @param inspectedElementList the inspectedElementList to set
      */
-    public void setInspectedElementList(List<OccInspectedElement> inspectedElementList) {
+    public void setInspectedElementList(List<OccInspectedSpaceElement> inspectedElementList) {
         this.inspectedElementList = inspectedElementList;
     }
 
@@ -84,7 +83,7 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
      * @return the spaceType
      */
     public OccSpaceType getSpaceType() {
-        return spaceType;
+        return type;
     }
 
     /**
@@ -105,7 +104,7 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
      * @param spaceType the spaceType to set
      */
     public void setSpaceType(OccSpaceType spaceType) {
-        this.spaceType = spaceType;
+        this.type = spaceType;
     }
 
     /**
@@ -113,6 +112,20 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the type
+     */
+    public OccSpaceType getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(OccSpaceType type) {
+        this.type = type;
     }
     
 }
