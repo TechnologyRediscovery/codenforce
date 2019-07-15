@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Foundational entity for the system: Property
@@ -27,18 +28,17 @@ public class Property implements Serializable{
     private String address_state;
     private String address_zip;
     
+    private List<PropertyUnit> unitList;
+    
     private String propertyUseType;
-    
-    
     
     private String useGroup;
     private String constructionType;
     private String countyCode;
     private String apartmentno;
     
+    private List<CECase> infoCaseList;
     
-    private boolean multiUnit;
-    private boolean rental;
     private boolean vacant;
     
     private String notes;
@@ -206,34 +206,7 @@ public class Property implements Serializable{
         this.notes = notes;
     }
 
-    /**
-     * @return the multiUnit
-     */
-    public boolean isMultiUnit() {
-        return multiUnit;
-    }
-
-    /**
-     * @param multiUnit the multiUnit to set
-     */
-    public void setMultiUnit(boolean multiUnit) {
-        this.multiUnit = multiUnit;
-    }
-
-    /**
-     * @return the rental
-     */
-    public boolean isRental() {
-        return rental;
-    }
-
-    /**
-     * @param rental the rental to set
-     */
-    public void setRental(boolean rental) {
-        this.rental = rental;
-    }
-
+   
     /**
      * @return the vacant
      */
@@ -302,6 +275,34 @@ public class Property implements Serializable{
      */
     public void setApartmentno(String apartmentno) {
         this.apartmentno = apartmentno;
+    }
+
+    /**
+     * @return the unitList
+     */
+    public List<PropertyUnit> getUnitList() {
+        return unitList;
+    }
+
+    /**
+     * @param unitList the unitList to set
+     */
+    public void setUnitList(List<PropertyUnit> unitList) {
+        this.unitList = unitList;
+    }
+
+    /**
+     * @return the infoCaseList
+     */
+    public List<CECase> getInfoCaseList() {
+        return infoCaseList;
+    }
+
+    /**
+     * @param infoCaseList the infoCaseList to set
+     */
+    public void setInfoCaseList(List<CECase> infoCaseList) {
+        this.infoCaseList = infoCaseList;
     }
   
 }
