@@ -18,23 +18,24 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeSource;
+import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a set of space types and their associated code elements
- * that are inspected in each. When an occupancy inspection is underway, this
- * set of code elements is used to populate an "implemented inspected space element"
- * checklist that contains pass/fail, comments, date of pass/fail, etc.
+ * that are SET TO BE inspected in each. When an occupancy inspection is underway, this
+ * set of code elements is used to populate the list of OccInspectedSpaceElements
+ * insdie the OccInspectedSpace container
  * 
  * @author Eric Darsow
  */
-public class OccChecklistBlueprint {
+public class OccChecklistTemplate extends EntityUtils {
     
     // note we have a lexicon switch here: in the DB, this object is 
     // derived from an inspectionchecklist row. In Javaland, we make
-    // an InspectionBlueprint object that contains data from sevearl tables
+    // a ChecklistTemplate object that contains data from sevearl tables
     private int inspectionChecklistID;
     private Municipality muni;
     private String title;
@@ -42,7 +43,7 @@ public class OccChecklistBlueprint {
     private boolean active;
     private CodeSource governingCodeSource;
     
-    private List<OccSpaceType> spaceTypeList;
+    private List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList;
 
     /**
      * @return the muni
@@ -103,17 +104,17 @@ public class OccChecklistBlueprint {
     }
 
     /**
-     * @return the spaceTypeList
+     * @return the occSpaceTypeTemplateList
      */
-    public List<OccSpaceType> getSpaceTypeList() {
-        return spaceTypeList;
+    public List<OccSpaceTypeInspectionDirective> getOccSpaceTypeTemplateList() {
+        return occSpaceTypeTemplateList;
     }
 
     /**
-     * @param spaceList the spaceTypeList to set
+     * @param occSpaceTypeTemplateList the occSpaceTypeTemplateList to set
      */
-    public void setSpaceList(List<OccSpaceType> spaceList) {
-        this.spaceTypeList = spaceList;
+    public void setOccSpaceTypeTemplateList(List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList) {
+        this.occSpaceTypeTemplateList = occSpaceTypeTemplateList;
     }
 
     /**
@@ -142,6 +143,55 @@ public class OccChecklistBlueprint {
      */
     public void setGoverningCodeSource(CodeSource governingCodeSource) {
         this.governingCodeSource = governingCodeSource;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + this.inspectionChecklistID;
+        hash = 79 * hash + Objects.hashCode(this.muni);
+        hash = 79 * hash + Objects.hashCode(this.title);
+        hash = 79 * hash + Objects.hashCode(this.description);
+        hash = 79 * hash + (this.active ? 1 : 0);
+        hash = 79 * hash + Objects.hashCode(this.governingCodeSource);
+        hash = 79 * hash + Objects.hashCode(this.occSpaceTypeTemplateList);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OccChecklistTemplate other = (OccChecklistTemplate) obj;
+        if (this.inspectionChecklistID != other.inspectionChecklistID) {
+            return false;
+        }
+        if (this.active != other.active) {
+            return false;
+        }
+        if (!Objects.equals(this.title, other.title)) {
+            return false;
+        }
+        if (!Objects.equals(this.description, other.description)) {
+            return false;
+        }
+        if (!Objects.equals(this.muni, other.muni)) {
+            return false;
+        }
+        if (!Objects.equals(this.governingCodeSource, other.governingCodeSource)) {
+            return false;
+        }
+        if (!Objects.equals(this.occSpaceTypeTemplateList, other.occSpaceTypeTemplateList)) {
+            return false;
+        }
+        return true;
     }
 
   

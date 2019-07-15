@@ -18,6 +18,8 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeSource;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.User;
 import java.time.LocalDateTime;
 
 /**
@@ -29,11 +31,11 @@ public class OccPermit {
     private int permitID;
     // used for storing municipality-generated IDs associated with the permit
     private String referenceNo;
-    
+    private int periodID;
+    private User issuedBy;
+    private Person issuedTo;
     private LocalDateTime dateIssued;
-    private LocalDateTime dateExpires;
-    private String issuingCodeSourceName;
-    private String specialConditions;
+    private String permitAdditionalText;
     private String notes;
     
     /**
@@ -59,20 +61,13 @@ public class OccPermit {
         return dateIssued;
     }
 
-    /**
-     * @return the dateExpires
-     */
-    public LocalDateTime getDateExpires() {
-        return dateExpires;
-    }
-
   
 
     /**
-     * @return the specialConditions
+     * @return the permitAdditionalText
      */
-    public String getSpecialConditions() {
-        return specialConditions;
+    public String getPermitAdditionalText() {
+        return permitAdditionalText;
     }
 
     /**
@@ -104,20 +99,13 @@ public class OccPermit {
         this.dateIssued = dateIssued;
     }
 
-    /**
-     * @param dateExpires the dateExpires to set
-     */
-    public void setDateExpires(LocalDateTime dateExpires) {
-        this.dateExpires = dateExpires;
-    }
-
    
 
     /**
-     * @param specialConditions the specialConditions to set
+     * @param permitAdditionalText the permitAdditionalText to set
      */
-    public void setSpecialConditions(String specialConditions) {
-        this.specialConditions = specialConditions;
+    public void setPermitAdditionalText(String permitAdditionalText) {
+        this.permitAdditionalText = permitAdditionalText;
     }
 
     /**
@@ -127,20 +115,47 @@ public class OccPermit {
         this.notes = notes;
     }
 
-   
 
     /**
-     * @return the issuingCodeSourceName
+     * @return the periodID
      */
-    public String getIssuingCodeSourceName() {
-        return issuingCodeSourceName;
+    public int getPeriodID() {
+        return periodID;
     }
 
     /**
-     * @param issuingCodeSourceName the issuingCodeSourceName to set
+     * @param periodID the periodID to set
      */
-    public void setIssuingCodeSourceName(String issuingCodeSourceName) {
-        this.issuingCodeSourceName = issuingCodeSourceName;
+    public void setPeriodID(int periodID) {
+        this.periodID = periodID;
+    }
+
+    /**
+     * @return the issuedBy
+     */
+    public User getIssuedBy() {
+        return issuedBy;
+    }
+
+    /**
+     * @param issuedBy the issuedBy to set
+     */
+    public void setIssuedBy(User issuedBy) {
+        this.issuedBy = issuedBy;
+    }
+
+    /**
+     * @return the issuedTo
+     */
+    public Person getIssuedTo() {
+        return issuedTo;
+    }
+
+    /**
+     * @param issuedTo the issuedTo to set
+     */
+    public void setIssuedTo(Person issuedTo) {
+        this.issuedTo = issuedTo;
     }
     
     

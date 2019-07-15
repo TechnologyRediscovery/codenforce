@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.entities.CodeElement;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,17 +28,11 @@ import java.util.List;
 public class OccSpace extends BackingBeanUtils implements Serializable {
     
     protected int spaceid;
-    protected OccSpaceType spaceType;
+    protected int occSpaceTypeID;
     protected String name;
     protected boolean required;
     protected List<CodeElement> elementList;
 
-    /**
-     * @return the spaceType
-     */
-    public OccSpaceType getSpaceType() {
-        return spaceType;
-    }
 
     /**
      * @return the elementList
@@ -48,17 +41,11 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
         return elementList;
     }
 
-    /**
-     * @param spaceType the spaceType to set
-     */
-    public void setSpaceType(OccSpaceType spaceType) {
-        this.spaceType = spaceType;
-    }
 
     /**
      * @param elementList the elementList to set
      */
-    public void setElementList(ArrayList<CodeElement> elementList) {
+    public void setElementList(List<CodeElement> elementList) {
         this.elementList = elementList;
     }
 
@@ -103,6 +90,22 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
     public void setRequired(boolean required) {
         this.required = required;
     }
+
+    /**
+     * @return the occSpaceTypeID
+     */
+    public int getOccSpaceTypeID() {
+        return occSpaceTypeID;
+    }
+
+    /**
+     * @param occSpaceTypeID the occSpaceTypeID to set
+     */
+    public void setOccSpaceTypeID(int occSpaceTypeID) {
+        this.occSpaceTypeID = occSpaceTypeID;
+    }
+
+   
     
    
 }

@@ -33,7 +33,7 @@ public class OccInspection {
     private User inspector;
     private int occPeriodID;
     
-    private OccChecklistBlueprint blueprint;
+    private OccChecklistTemplate checklistTemplate;
     private List<OccInspectedSpace> inspectedSpaceList;
     
     private int pacc;
@@ -137,17 +137,17 @@ public class OccInspection {
    
 
     /**
-     * @return the blueprint
+     * @return the checklistTemplate
      */
-    public OccChecklistBlueprint getBlueprint() {
-        return blueprint;
+    public OccChecklistTemplate getChecklistTemplate() {
+        return checklistTemplate;
     }
 
     /**
-     * @param blueprint the blueprint to set
+     * @param checklistTemplate the checklistTemplate to set
      */
-    public void setBlueprint(OccChecklistBlueprint blueprint) {
-        this.blueprint = blueprint;
+    public void setChecklistTemplate(OccChecklistTemplate checklistTemplate) {
+        this.checklistTemplate = checklistTemplate;
     }
 
     /**

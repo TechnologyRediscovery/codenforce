@@ -1,10 +1,8 @@
-SELECT occinspectedspaceelement.inspectedspaceelementid
-     FROM occinspectedspaceelement INNER JOIN occinspectedspace ON (occinspectedspaceelement.inspectedspace_inspectedspaceid = occinspectedspace.inspectedspaceid)
-     INNER JOIN occspaceelement ON (occspaceelement.spaceelementid = occinspectedspaceelement.spaceelement_elementid)
-     INNER JOIN occspace ON (occspaceelement.space_id = occspace.spaceid)
-     WHERE occinspectedspace.inspectedspaceid=0;
-
-
- SELECT occinspectedspaceelement.inspectedspaceelementid
-     FROM occinspectedspaceelement INNER JOIN occinspectedspace ON (occinspectedspaceelement.inspectedspace_inspectedspaceid = occinspectedspace.inspectedspaceid)
-     WHERE occinspectedspace.inspectedspaceid=0;
+﻿SELECT inspectedspaceelementid, notes, locationdescription_id, occinspectedspaceelement.lastinspectedby_userid,
+                   lastinspectedbyts, compliancegrantedby_userid, compliancegrantedts,
+                   inspectedspace_inspectedspaceid, overriderequiredflagnotinspected_userid,
+                   spaceelement_elementid
+             FROM occinspectedspaceelement INNER JOIN occinspectedspace ON (inspectedspace_inspectedspaceid = inspectedspaceid)
+             INNER JOIN occspaceelement ON (spaceelementid = spaceelement_elementid)
+             INNER JOIN occspace ON (space_id = spaceid)
+             WHERE inspectedspaceid=0;
