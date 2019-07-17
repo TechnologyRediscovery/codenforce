@@ -14,33 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.occupancy.application;
-
-import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.entities.Intensity;
-import java.io.Serializable;
-import java.util.ArrayList;
-import javax.annotation.PostConstruct;
+package com.tcvcog.tcvce.entities;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class IntensityBB extends BackingBeanUtils implements Serializable {
+public enum IntensityCategory{
+    CodeViolation("Code Violation"),
+    Administrative("Administrative");
     
-    private ArrayList<Intensity> workingIntensityList;
-    private ArrayList<Intensity> existingIntensityList;
+    private final String label;
     
-    
-    public IntensityBB() {
-        
+    private IntensityCategory(String label) {
+
+    this.label = label;
     }
     
-    @PostConstruct
-    public void initBean() {
-        
+    public String getLabel(){
+        return label;
     }
-            
-    
-    
+
 }
