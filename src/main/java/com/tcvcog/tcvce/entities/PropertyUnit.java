@@ -17,9 +17,12 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -29,8 +32,9 @@ public class PropertyUnit {
     
     private int unitID;
     private Property property;
-    
     private String unitNumber;
+    
+    private List<OccPeriod> periodList;
     
     private String notes;
     private String otherKnownAddress;
@@ -38,6 +42,13 @@ public class PropertyUnit {
     private boolean rental;
     
     private boolean inactive;
+    
+    private LocalDateTime rentalintentstartdate;
+    private LocalDateTime rentalintentstopdate;
+    private User rentalintentlastupdatedby;
+    private String rentalnotes;
+    private boolean active;
+    private int condition_intensityclassid;
     
 
     /**
