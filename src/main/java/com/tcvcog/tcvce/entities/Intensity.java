@@ -22,25 +22,25 @@ package com.tcvcog.tcvce.entities;
  */
 public class Intensity {
     
-    private int classid;
+    private int classID;
     private String title;
-    private int muni_municode;
-    private int numericrating;
-    private String schemaname;
+    private Municipality muni;
+    private int numericRating;
+    private IntensityCategory schemaName;
     private boolean active;
-    private int icon_iconid;
+    private Icon icon;
     
     public Intensity() {
         
         
     }
 
-    public int getClassid() {
-        return classid;
+    public int getClassID() {
+        return classID;
     }
 
-    public void setClassid(int classid) {
-        this.classid = classid;
+    public void setClassID(int classID) {
+        this.classID = classID;
     }
 
     public String getTitle() {
@@ -51,28 +51,28 @@ public class Intensity {
         this.title = title;
     }
 
-    public int getMuni_municode() {
-        return muni_municode;
+    public Municipality getMuni() {
+        return muni;
     }
 
-    public void setMuni_municode(int muni_municode) {
-        this.muni_municode = muni_municode;
+    public void setMuni(Municipality muni) {
+        this.muni = muni;
     }
 
-    public int getNumericrating() {
-        return numericrating;
+    public int getNumericRating() {
+        return numericRating;
     }
 
-    public void setNumericrating(int numericrating) {
-        this.numericrating = numericrating;
+    public void setNumericRating(int numericRating) {
+        this.numericRating = numericRating;
     }
 
-    public String getSchemaname() {
-        return schemaname;
+    public IntensityCategory getSchemaName() {
+        return schemaName;
     }
 
-    public void setSchemaname(String schemaname) {
-        this.schemaname = schemaname;
+    public void setSchemaName(IntensityCategory schemaName) {
+        this.schemaName = schemaName;
     }
 
     public boolean isActive() {
@@ -83,14 +83,12 @@ public class Intensity {
         this.active = active;
     }
 
-    public int getIcon_iconid() {
-        return icon_iconid;
+    public Icon getIcon() {
+        return icon;
     }
 
-    public void setIcon_iconid(int icon_iconid) {
-        this.icon_iconid = icon_iconid;
+    public void setIcon(Icon icon) {
+        this.icon = icon;
     }
-    
-    
     
 }

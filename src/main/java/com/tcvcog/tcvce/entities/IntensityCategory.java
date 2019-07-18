@@ -21,8 +21,7 @@ package com.tcvcog.tcvce.entities;
  * @author Nathan Dietz
  */
 public enum IntensityCategory{
-    CodeViolation("Code Violation"),
-    Administrative("Administrative");
+    Administrative("administrative to serious human safety concern hazard, 1-10");
     
     private final String label;
     
