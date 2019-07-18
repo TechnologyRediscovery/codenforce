@@ -48,6 +48,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * Creates a new instance of PropertyIntegrator
      */
     public PropertyIntegrator() {
+        
     }
 
     /**
@@ -99,28 +100,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
 
-        PropertyWithLists p = new PropertyWithLists();
+        PropertyWithLists p = new PropertyWithLists(generateProperty(rs));
 
-        try {
-            p.setPropertyID(rs.getInt("propertyid"));
-            p.setMuni(mi.getMuni(rs.getInt("municipality_muniCode")));
-            p.setMuniCode(rs.getInt("municipality_muniCode"));
-            p.setParID(rs.getString("parid"));
-
-            p.setLotAndBlock(rs.getString("lotandblock"));
-            p.setAddress(rs.getString("address"));
-            p.setPropertyUseType(rs.getString("propertyusetype"));  //use type name
-
-            p.setUseGroup(rs.getString("usegroup"));
-            p.setConstructionType(rs.getString("constructiontype"));
-            p.setCountyCode(rs.getString("countycode"));
-            p.setNotes(rs.getString("notes"));
-
-            //p.setNotes(rs.getString("notes"));
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error generating Property from ResultSet", ex);
-        }
+        // finish me
+       
         return p;
     }
 
@@ -137,7 +120,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-
         ArrayList<Property> propList = new ArrayList<>();
 
         try {
@@ -153,33 +135,14 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         } catch (SQLException ex) {
             System.out.println(ex.toString());
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-
         return propList;
-
     }
 
-    public ArrayList<Property> searchForProperties(String houseNum, String street, int muniID) throws IntegrationException {
+    public List<Property> searchForProperties(String houseNum, String street, int muniID) throws IntegrationException {
         String query = "SELECT propertyid, municipality_municode, parid, lotandblock, address, \n"
                 + "       propertyusetype, usegroup, constructiontype, countycode, apartmentno, \n"
                 + "       notes, addr_city, addr_state, addr_zip, ownercode, propclass, \n"
@@ -190,7 +153,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         ResultSet rs = null;
         PreparedStatement stmt = null;
 
-        ArrayList<Property> propList = new ArrayList<>();
+        List<Property> propList = new ArrayList<>();
 
         try {
             stmt = con.prepareStatement(query);
@@ -206,35 +169,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error searching for properties", ex);
-
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-
         return propList;
-
     }
 
-    public ArrayList<Property> searchForChangedProperties(String houseNum, String street, int muniID) throws IntegrationException {
+    public List<Property> searchForChangedProperties(String houseNum, String street, int muniID) throws IntegrationException {
         String query = "SELECT DISTINCT\n"
                 + "	   propertyid, unit_unitid, municipality_municode, parid, lotandblock, address,\n"
                 + "        propertyusetype, usegroup, constructiontype, countycode, apartmentno,\n"
@@ -252,7 +195,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         ResultSet rs = null;
         PreparedStatement stmt = null;
 
-        ArrayList<Property> propList = new ArrayList<>();
+        List<Property> propList = new ArrayList<>();
 
         try {
             stmt = con.prepareStatement(query);
@@ -268,35 +211,17 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error searching for properties", ex);
-
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return propList;
 
     }
     
-    public ArrayList<Property> searchForChangedPropertiesAll(String houseNum, String street, int muniID) throws IntegrationException {
+    public List<Property> searchForChangedPropertiesAll(String houseNum, String street, int muniID) throws IntegrationException {
         String query = "SELECT DISTINCT\n"
                 + "	   propertyid, unit_unitid, municipality_municode, parid, lotandblock, address,\n"
                 + "        propertyusetype, usegroup, constructiontype, countycode, apartmentno,\n"
@@ -314,7 +239,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         ResultSet rs = null;
         PreparedStatement stmt = null;
 
-        ArrayList<Property> propList = new ArrayList<>();
+        List<Property> propList = new ArrayList<>();
 
         try {
             stmt = con.prepareStatement(query);
@@ -332,26 +257,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             throw new IntegrationException("Error searching for properties", ex);
 
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return propList;
@@ -393,10 +301,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(8, newProp.getCountyCode());
             stmt.setString(9, newProp.getNotes());
 
-            stmt.setBoolean(10, newProp.isRental());  // containsrentalunits=?
-            stmt.setBoolean(11, newProp.isMultiUnit());  // multiunit=?
-            stmt.setBoolean(12, newProp.isVacant());  // vacant=?
-
             stmt.setInt(13, getSessionBean().getFacesUser().getUserID());
             stmt.setTimestamp(14, Timestamp.valueOf(LocalDateTime.now()));
 
@@ -418,20 +322,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("Error inserting property. ", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
 
     }
@@ -455,26 +347,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return pList;
@@ -506,8 +381,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(7, propToUpdate.getCountyCode());
             stmt.setString(8, propToUpdate.getNotes());
 
-            stmt.setBoolean(9, propToUpdate.isRental());  // containsrentalunits=?
-            stmt.setBoolean(10, propToUpdate.isVacant());  // vacant=?
 
             stmt.setInt(11, getSessionBean().getFacesUser().getUserID());
             stmt.setTimestamp(12, Timestamp.valueOf(LocalDateTime.now()));
@@ -522,20 +395,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to build propertyUseTypesMap", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            
         } // close finally
 
         return "propertyProfile";
@@ -569,26 +431,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return p;
@@ -619,26 +464,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return p;
@@ -674,26 +502,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to generate property history list", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return propList;
@@ -722,20 +533,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            
         } // close finally
 
     }
@@ -763,26 +563,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return unitList;
@@ -811,26 +594,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
         return unitList;
@@ -858,26 +624,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             throw new IntegrationException("PropertyIntegrator.getPropertyUnit | Unable to get property unit, ", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         }
 
         return pu;
@@ -909,72 +658,38 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         PropertyUnit skeleton = pi.getPropertyUnit(uc.getUnitID());
         
         if(uc.getUnitNumber() != null) {
-        
-        skeleton.setUnitNumber(uc.getUnitNumber());
-        
+            skeleton.setUnitNumber(uc.getUnitNumber());
         }
         
         if(uc.getOtherKnownAddress() != null) {
-            
             skeleton.setOtherKnownAddress("Updated");
-            
-            //uc.getOtherKnownAddress()
-            
+        } else { 
+            skeleton.setOtherKnownAddress("Updated");
         }
-        else { 
-        
-        skeleton.setOtherKnownAddress("Updated");
-        
-        }
-        
         
         if(uc.getNotes() != null) {
-            
             skeleton.setNotes(uc.getNotes());
-            
         }
         
         if(uc.isBoolChanged()) {
-            
             skeleton.setRental(uc.isRental());
-            
         }
         
         try {
             stmt = con.prepareStatement(query);
-
             stmt.setString(1, skeleton.getUnitNumber());
-
             stmt.setString(2, skeleton.getOtherKnownAddress());
-
             stmt.setString(3, skeleton.getNotes());
-            
             stmt.setBoolean(4, skeleton.isRental());
-
             stmt.setBoolean(5, uc.isRemoved());
-
             stmt.setInt(6, skeleton.getUnitID());
-            
             stmt.executeUpdate();
-
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to update PropertyUnit", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
 
     }
@@ -1012,20 +727,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("PropertyIntegrator.insertPropertyUnitChange | Error inserting property unit change order", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
 
     }
@@ -1056,26 +759,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex);
             throw new IntegrationException("PropertyIntegrator.getPropertyUnitChange | Unable to get property unit, ", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         }
 
         return uc;
@@ -1120,29 +806,17 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt = con.prepareStatement(query);
 
             stmt.setString(1, changeToUpdate.getUnitNumber());
-
             stmt.setInt(2, changeToUpdate.getUnitID());
-
             stmt.setString(3, changeToUpdate.getOtherKnownAddress());
-
             stmt.setString(4, changeToUpdate.getNotes());
-
             stmt.setBoolean(5, changeToUpdate.isRental());
-
             stmt.setBoolean(6, changeToUpdate.isRemoved());
-
             stmt.setBoolean(7, changeToUpdate.isAdded());
-
             stmt.setTimestamp(8, changeToUpdate.getChangedOn());
-
             stmt.setTimestamp(9, changeToUpdate.getApprovedOn());
-
             stmt.setInt(10, changeToUpdate.getApprovedBy().getUserID());
-
             stmt.setString(11, changeToUpdate.getChangedBy());
-
             stmt.setBoolean(12, changeToUpdate.isActive());
-
             stmt.setInt(13, changeToUpdate.getUnitChangeID());
             
             stmt.executeUpdate();
@@ -1151,26 +825,14 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to update PropertyUnitChange", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
 
     }
 
-    public ArrayList<PropertyUnitChange> getPropertyUnitChangeList(Property property) throws IntegrationException {
-        ArrayList<PropertyUnitChange> ucl = new ArrayList<PropertyUnitChange>();
+    public List<PropertyUnitChange> getPropertyUnitChangeList(Property property) throws IntegrationException {
+        List<PropertyUnitChange> ucl = new ArrayList<>();
         String query = "SELECT \n"
                 + "	unitchangeid, unit_unitid, propertyunitchange.property_propertyid, property.address,\n"
                 + "	propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
@@ -1196,33 +858,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("PropertyIntegrator.getPropertyUnitChangeList | Unable to get property unit change, ", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         }
 
         return ucl;
     }
 
-    public ArrayList<PropertyUnitChange> getPropertyUnitChangeListAll(Property property) throws IntegrationException {
-        ArrayList<PropertyUnitChange> ucl = new ArrayList<PropertyUnitChange>();
+    public List<PropertyUnitChange> getPropertyUnitChangeListAll(Property property) throws IntegrationException {
+        List<PropertyUnitChange> ucl = new ArrayList<>();
         String query = "SELECT \n"
                 + "	unitchangeid, unit_unitid, propertyunitchange.property_propertyid, property.address,\n"
                 + "	propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
@@ -1248,26 +893,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             System.out.println(ex.toString());
             throw new IntegrationException("PropertyIntegrator.getPropertyUnitChangeList | Unable to get property unit change, ", ex);
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         }
 
         return ucl;

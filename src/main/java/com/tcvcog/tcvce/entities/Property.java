@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,33 +18,53 @@ import java.util.List;
 
 public class Property implements Serializable{
     
-    private int propertyID;
-    private Municipality muni;
-    private int muniCode;
-    private String parID;
     
-    private String lotAndBlock;
-    private String address;
-    private String address_city;
-    private String address_state;
-    private String address_zip;
+    protected int propertyID;
+    protected Municipality muni;
+    protected int muniCode;
+    protected String parID;
+    protected String lotAndBlock;
+    protected String address;
     
-    private List<PropertyUnit> unitList;
+    protected String propertyUseType;
+    protected String useGroup;
+    protected String constructionType;
+    protected String countyCode;
+    protected String apartmentno;
     
-    private String propertyUseType;
+    protected String notes;
+    protected String address_city;
+    protected String address_state;
+    protected String address_zip;
     
-    private String useGroup;
-    private String constructionType;
-    private String countyCode;
-    private String apartmentno;
+    protected String ownerCode;
+    protected String propclass;
+  
+    protected LocalDateTime lastupdated;
+    protected User lastupdatedby;
+    protected String locationdescription;
     
-    private List<CECase> infoCaseList;
+    protected BOBSource datasource;
+    protected LocalDateTime unfitdatestart;
+    protected LocalDateTime unfitdatestop;
+    protected User unfitby;
     
-    private boolean vacant;
+    protected LocalDateTime abandoneddatestart;
+    protected LocalDateTime abandoneddatestop;
+    protected User abandonedby;
+    protected LocalDateTime vacantdatestart;
     
-    private String notes;
+    protected LocalDateTime vacantdatestop;
+    protected User vacantbu_userid;
+    protected int condition_intensityclassid;
     
-  /**
+    protected int landbankprospect_intensityclassid;
+    protected boolean landbankheld;
+    protected boolean active;
+    protected boolean nonAddressable;
+    
+    
+    /**
      * Creates a new instance of Property
      */
     public Property() {
@@ -208,20 +229,6 @@ public class Property implements Serializable{
 
    
     /**
-     * @return the vacant
-     */
-    public boolean isVacant() {
-        return vacant;
-    }
-
-    /**
-     * @param vacant the vacant to set
-     */
-    public void setVacant(boolean vacant) {
-        this.vacant = vacant;
-    }
-
-    /**
      * @return the address_city
      */
     public String getAddress_city() {
@@ -277,32 +284,288 @@ public class Property implements Serializable{
         this.apartmentno = apartmentno;
     }
 
+    
+
+
     /**
-     * @return the unitList
+     * @return the ownerCode
      */
-    public List<PropertyUnit> getUnitList() {
-        return unitList;
+    public String getOwnerCode() {
+        return ownerCode;
     }
 
     /**
-     * @param unitList the unitList to set
+     * @return the propclass
      */
-    public void setUnitList(List<PropertyUnit> unitList) {
-        this.unitList = unitList;
+    public String getPropclass() {
+        return propclass;
     }
 
     /**
-     * @return the infoCaseList
+     * @return the lastupdated
      */
-    public List<CECase> getInfoCaseList() {
-        return infoCaseList;
+    public LocalDateTime getLastupdated() {
+        return lastupdated;
     }
 
     /**
-     * @param infoCaseList the infoCaseList to set
+     * @return the lastupdatedby
      */
-    public void setInfoCaseList(List<CECase> infoCaseList) {
-        this.infoCaseList = infoCaseList;
+    public User getLastupdatedby() {
+        return lastupdatedby;
     }
+
+    /**
+     * @return the locationdescription
+     */
+    public String getLocationdescription() {
+        return locationdescription;
+    }
+
+    /**
+     * @return the datasource
+     */
+    public BOBSource getDatasource() {
+        return datasource;
+    }
+
+    /**
+     * @return the unfitdatestart
+     */
+    public LocalDateTime getUnfitdatestart() {
+        return unfitdatestart;
+    }
+
+    /**
+     * @return the unfitdatestop
+     */
+    public LocalDateTime getUnfitdatestop() {
+        return unfitdatestop;
+    }
+
+    /**
+     * @return the unfitby
+     */
+    public User getUnfitby() {
+        return unfitby;
+    }
+
+    /**
+     * @return the abandoneddatestart
+     */
+    public LocalDateTime getAbandoneddatestart() {
+        return abandoneddatestart;
+    }
+
+    /**
+     * @return the abandoneddatestop
+     */
+    public LocalDateTime getAbandoneddatestop() {
+        return abandoneddatestop;
+    }
+
+    /**
+     * @return the abandonedby
+     */
+    public User getAbandonedby() {
+        return abandonedby;
+    }
+
+    /**
+     * @return the vacantdatestart
+     */
+    public LocalDateTime getVacantdatestart() {
+        return vacantdatestart;
+    }
+
+    /**
+     * @return the vacantdatestop
+     */
+    public LocalDateTime getVacantdatestop() {
+        return vacantdatestop;
+    }
+
+    /**
+     * @return the vacantbu_userid
+     */
+    public User getVacantbu_userid() {
+        return vacantbu_userid;
+    }
+
+    /**
+     * @return the condition_intensityclassid
+     */
+    public int getCondition_intensityclassid() {
+        return condition_intensityclassid;
+    }
+
+    /**
+     * @return the landbankprospect_intensityclassid
+     */
+    public int getLandbankprospect_intensityclassid() {
+        return landbankprospect_intensityclassid;
+    }
+
+    /**
+     * @return the landbankheld
+     */
+    public boolean isLandbankheld() {
+        return landbankheld;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param ownerCode the ownerCode to set
+     */
+    public void setOwnerCode(String ownerCode) {
+        this.ownerCode = ownerCode;
+    }
+
+    /**
+     * @param propclass the propclass to set
+     */
+    public void setPropclass(String propclass) {
+        this.propclass = propclass;
+    }
+
+    /**
+     * @param lastupdated the lastupdated to set
+     */
+    public void setLastupdated(LocalDateTime lastupdated) {
+        this.lastupdated = lastupdated;
+    }
+
+    /**
+     * @param lastupdatedby the lastupdatedby to set
+     */
+    public void setLastupdatedby(User lastupdatedby) {
+        this.lastupdatedby = lastupdatedby;
+    }
+
+    /**
+     * @param locationdescription the locationdescription to set
+     */
+    public void setLocationdescription(String locationdescription) {
+        this.locationdescription = locationdescription;
+    }
+
+    /**
+     * @param datasource the datasource to set
+     */
+    public void setDatasource(BOBSource datasource) {
+        this.datasource = datasource;
+    }
+
+    /**
+     * @param unfitdatestart the unfitdatestart to set
+     */
+    public void setUnfitdatestart(LocalDateTime unfitdatestart) {
+        this.unfitdatestart = unfitdatestart;
+    }
+
+    /**
+     * @param unfitdatestop the unfitdatestop to set
+     */
+    public void setUnfitdatestop(LocalDateTime unfitdatestop) {
+        this.unfitdatestop = unfitdatestop;
+    }
+
+    /**
+     * @param unfitby the unfitby to set
+     */
+    public void setUnfitby(User unfitby) {
+        this.unfitby = unfitby;
+    }
+
+    /**
+     * @param abandoneddatestart the abandoneddatestart to set
+     */
+    public void setAbandoneddatestart(LocalDateTime abandoneddatestart) {
+        this.abandoneddatestart = abandoneddatestart;
+    }
+
+    /**
+     * @param abandoneddatestop the abandoneddatestop to set
+     */
+    public void setAbandoneddatestop(LocalDateTime abandoneddatestop) {
+        this.abandoneddatestop = abandoneddatestop;
+    }
+
+    /**
+     * @param abandonedby the abandonedby to set
+     */
+    public void setAbandonedby(User abandonedby) {
+        this.abandonedby = abandonedby;
+    }
+
+    /**
+     * @param vacantdatestart the vacantdatestart to set
+     */
+    public void setVacantdatestart(LocalDateTime vacantdatestart) {
+        this.vacantdatestart = vacantdatestart;
+    }
+
+    /**
+     * @param vacantdatestop the vacantdatestop to set
+     */
+    public void setVacantdatestop(LocalDateTime vacantdatestop) {
+        this.vacantdatestop = vacantdatestop;
+    }
+
+    /**
+     * @param vacantbu_userid the vacantbu_userid to set
+     */
+    public void setVacantbu_userid(User vacantbu_userid) {
+        this.vacantbu_userid = vacantbu_userid;
+    }
+
+    /**
+     * @param condition_intensityclassid the condition_intensityclassid to set
+     */
+    public void setCondition_intensityclassid(int condition_intensityclassid) {
+        this.condition_intensityclassid = condition_intensityclassid;
+    }
+
+    /**
+     * @param landbankprospect_intensityclassid the landbankprospect_intensityclassid to set
+     */
+    public void setLandbankprospect_intensityclassid(int landbankprospect_intensityclassid) {
+        this.landbankprospect_intensityclassid = landbankprospect_intensityclassid;
+    }
+
+    /**
+     * @param landbankheld the landbankheld to set
+     */
+    public void setLandbankheld(boolean landbankheld) {
+        this.landbankheld = landbankheld;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    /**
+     * @return the nonAddressable
+     */
+    public boolean isNonAddressable() {
+        return nonAddressable;
+    }
+
+    /**
+     * @param nonAddressable the nonAddressable to set
+     */
+    public void setNonAddressable(boolean nonAddressable) {
+        this.nonAddressable = nonAddressable;
+    }
+
   
 }
