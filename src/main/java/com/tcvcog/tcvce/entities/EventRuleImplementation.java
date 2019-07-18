@@ -30,8 +30,6 @@ public class EventRuleImplementation extends EventRule implements Serializable{
     protected LocalDateTime lastEvaluatedTS;
     protected LocalDateTime passedRuleTS;
     
-
-    
     public EventRuleImplementation(EventRule rule){
         
         this.ruleid = rule.getRuleid();
@@ -48,7 +46,6 @@ public class EventRuleImplementation extends EventRule implements Serializable{
         this.requiredeventcatthresholdglobalorder = rule.isRequiredeventcatthresholdglobalorder();
         this.requiredeventcatupperboundglobalorder = rule.isRequiredeventcatupperboundglobalorder();
 
-
         this.forbiddeneventcatthresholdtypeintorder = rule.isForbiddeneventcatthresholdtypeintorder();
         this.forbiddeneventcatupperboundtypeintorder = rule.isForbiddeneventcatupperboundtypeintorder();
 
@@ -64,9 +61,7 @@ public class EventRuleImplementation extends EventRule implements Serializable{
 
         this.active = rule.isActive();
         this.notes = rule.getNotes();
-        
     }
-    
 
     /**
      * @return the attachedTS

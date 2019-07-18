@@ -257,9 +257,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         ResultSet rs = null;
         PreparedStatement stmt = null;
         List<CodeElement> eleList = new ArrayList<>();
-        
         try {
-
             stmt = con.prepareStatement(query);
             stmt.setInt(1, s.getSpaceid());
             rs = stmt.executeQuery();
@@ -278,7 +276,6 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-
         return s;
     }
     
@@ -288,7 +285,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * @param elementsToAttach a list of CodeElements that should be inspected in this space
      * @throws IntegrationException 
      */
-    public void attachCodeElementsToSpace(OccSpace s, ArrayList<CodeElement> elementsToAttach) throws IntegrationException{
+    public void attachCodeElementsToSpace(OccSpace s, List<CodeElement> elementsToAttach) throws IntegrationException{
         
         String query =  "INSERT INTO public.occspaceelement(\n" +
                         " spaceelementid, space_id, codeelement_id)\n" +
@@ -312,7 +309,6 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("", ex);
-
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -327,12 +323,10 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * @throws IntegrationException 
      */
     public void detachCodeElementFromSpace(OccSpace s, CodeElement elementToDetach) throws IntegrationException{
-        
         String query = "DELETE FROM public.occspaceelement\n" +
                         " WHERE space_id = ? AND spaceelementid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, s.getSpaceid());
@@ -342,7 +336,6 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("", ex);
-
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -359,22 +352,17 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      * @throws IntegrationException 
      */
     public List<OccSpace> getSpaceList() throws IntegrationException{
-        
         String query = "SELECT spaceid FROM public.space;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         ArrayList<OccSpace> spaceAL = new ArrayList();
-
         try {
-
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
-
             while(rs.next()){
                 spaceAL.add(getOccSpace(rs.getInt("spaceid")));
             }
-
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("", ex);
@@ -384,9 +372,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-
         return spaceAL;
-        
     }
     
     /**
@@ -500,7 +486,6 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         
         chkList.setOccSpaceTypeTemplateList(getOccInspecTemplateSpaceTypeList(chkList.getInspectionChecklistID()));
         
-        
         return chkList;
     }
     
@@ -549,7 +534,7 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         List<OccInspectedSpace> inspSpaceList = new ArrayList<>();
         String query = "SELECT inspectedspaceid, occspace_spaceid, occinspection_inspectionid, \n" +
                         "       occlocationdescription_descid, lastinspectedby_userid, lastinspectedts\n" +
-                        "  FROM public.occinspectedspace ;";
+                        "  FROM public.occinspectedspace WHERE occinspection_inspectionid=?;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -787,7 +772,10 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
      */
     public void updateInspectedSpace(OccInspection oi, OccInspectedSpace is) throws IntegrationException{
         
-        String query = "";
+        String query =  "UPDATE public.occinspectedspace\n" +
+                        "   SET occspace_spaceid=?, occinspection_inspectionid=?, \n" +
+                        "       occlocationdescription_descid=?, lastinspectedby_userid=?, lastinspectedts=?\n" +
+                        " WHERE inspectedspaceid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -795,10 +783,11 @@ public class ChecklistIntegrator extends BackingBeanUtils implements Serializabl
         try {
 
             stmt = con.prepareStatement(query);
+            stmt.setInt(1, is.getSpaceid());
             rs = stmt.executeQuery();
-
+            
             while(rs.next()){
-
+                // TODO
             }
 
         } catch (SQLException ex) {
