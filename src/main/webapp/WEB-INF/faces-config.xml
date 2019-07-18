@@ -437,7 +437,7 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>IntensityBB</managed-bean-name>
+        <managed-bean-name>intensityBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.IntensityBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>

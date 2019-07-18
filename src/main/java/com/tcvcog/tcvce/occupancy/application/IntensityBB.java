@@ -18,9 +18,12 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.entities.Intensity;
+import com.tcvcog.tcvce.entities.IntensityCategory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -28,9 +31,11 @@ import javax.annotation.PostConstruct;
  */
 public class IntensityBB extends BackingBeanUtils implements Serializable {
     
-    private ArrayList<Intensity> workingIntensityList;
+    private Intensity workingIntensityClass;
+    private Intensity selectedIntensityClass;
     private ArrayList<Intensity> existingIntensityList;
-    
+    private IntensityCategory selectedCategory;
+    private ArrayList<IntensityCategory> categoryList;
     
     public IntensityBB() {
         
@@ -39,6 +44,62 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
         
+    }
+
+    public void editIntensity(ActionEvent e){
+        if(selectedIntensityClass != null){
+            workingIntensityClass.setClassID(selectedIntensityClass.getClassID());
+            workingIntensityClass.setTitle(selectedIntensityClass.getTitle());
+            workingIntensityClass.setMuni(selectedIntensityClass.getMuni());
+            workingIntensityClass.setNumericRating(selectedIntensityClass.getNumericRating());
+            workingIntensityClass.setSchemaName(selectedIntensityClass.getSchemaName());
+            workingIntensityClass.setActive(selectedIntensityClass.isActive());
+            workingIntensityClass.setIcon(selectedIntensityClass.getIcon());
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Please select an Intensity Class to edit", ""));
+        }
+    }
+    
+    public Intensity getWorkingIntensityClass() {
+        return workingIntensityClass;
+    }
+
+    public void setWorkingIntensityClass(Intensity workingIntensityClass) {
+        this.workingIntensityClass = workingIntensityClass;
+    }
+
+    public ArrayList<Intensity> getExistingIntensityList() {
+        return existingIntensityList;
+    }
+
+    public void setExistingIntensityList(ArrayList<Intensity> existingIntensityList) {
+        this.existingIntensityList = existingIntensityList;
+    }
+
+    public IntensityCategory getSelectedCategory() {
+        return selectedCategory;
+    }
+
+    public void setSelectedCategory(IntensityCategory selectedCategory) {
+        this.selectedCategory = selectedCategory;
+    }
+
+    public ArrayList<IntensityCategory> getCategoryList() {
+        return categoryList;
+    }
+
+    public void setCategoryList(ArrayList<IntensityCategory> categoryList) {
+        this.categoryList = categoryList;
+    }
+
+    public Intensity getSelectedIntensityClass() {
+        return selectedIntensityClass;
+    }
+
+    public void setSelectedIntensityClass(Intensity selectedIntensityClass) {
+        this.selectedIntensityClass = selectedIntensityClass;
     }
             
     
