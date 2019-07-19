@@ -26,7 +26,7 @@ public class Intensity {
     private String title;
     private Municipality muni;
     private int numericRating;
-    private IntensityCategory schemaName;
+    private IntensitySchema schema;
     private boolean active;
     private Icon icon;
     
@@ -67,12 +67,12 @@ public class Intensity {
         this.numericRating = numericRating;
     }
 
-    public IntensityCategory getSchemaName() {
-        return schemaName;
+    public IntensitySchema getSchema() {
+        return schema;
     }
 
-    public void setSchemaName(IntensityCategory schemaName) {
-        this.schemaName = schemaName;
+    public void setSchema(IntensitySchema schema) {
+        this.schema = schema;
     }
 
     public boolean isActive() {
