@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.entities.Intensity;
-import com.tcvcog.tcvce.entities.IntensityCategory;
+import com.tcvcog.tcvce.entities.IntensitySchema;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.annotation.PostConstruct;
@@ -34,8 +34,8 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     private Intensity workingIntensityClass;
     private Intensity selectedIntensityClass;
     private ArrayList<Intensity> existingIntensityList;
-    private IntensityCategory selectedCategory;
-    private ArrayList<IntensityCategory> categoryList;
+    private IntensitySchema selectedCategory;
+    private ArrayList<IntensitySchema> categoryList;
     
     public IntensityBB() {
         
@@ -52,7 +52,7 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
             workingIntensityClass.setTitle(selectedIntensityClass.getTitle());
             workingIntensityClass.setMuni(selectedIntensityClass.getMuni());
             workingIntensityClass.setNumericRating(selectedIntensityClass.getNumericRating());
-            workingIntensityClass.setSchemaName(selectedIntensityClass.getSchemaName());
+            workingIntensityClass.setSchema(selectedIntensityClass.getSchema());
             workingIntensityClass.setActive(selectedIntensityClass.isActive());
             workingIntensityClass.setIcon(selectedIntensityClass.getIcon());
         } else {
@@ -78,19 +78,19 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
         this.existingIntensityList = existingIntensityList;
     }
 
-    public IntensityCategory getSelectedCategory() {
+    public IntensitySchema getSelectedCategory() {
         return selectedCategory;
     }
 
-    public void setSelectedCategory(IntensityCategory selectedCategory) {
+    public void setSelectedCategory(IntensitySchema selectedCategory) {
         this.selectedCategory = selectedCategory;
     }
 
-    public ArrayList<IntensityCategory> getCategoryList() {
+    public ArrayList<IntensitySchema> getCategoryList() {
         return categoryList;
     }
 
-    public void setCategoryList(ArrayList<IntensityCategory> categoryList) {
+    public void setCategoryList(ArrayList<IntensitySchema> categoryList) {
         this.categoryList = categoryList;
     }
 
