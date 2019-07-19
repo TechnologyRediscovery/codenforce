@@ -72,7 +72,6 @@ public class SearchParamsProperty extends SearchParams implements Serializable {
    private int yearBuiltMax;
    
    
-   
     /**
      * @return the filterByLotAndBlock
      */

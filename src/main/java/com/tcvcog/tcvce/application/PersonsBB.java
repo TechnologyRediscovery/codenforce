@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -62,7 +62,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     private List<Property> propertyCandidateList;
     private Property selectedProperty;
     
-    private SearchParamsPersons searchParams;
+    private SearchParamsPerson searchParams;
     
     
     /**
@@ -358,14 +358,14 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the searchParams
      */
-    public SearchParamsPersons getSearchParams() {
+    public SearchParamsPerson getSearchParams() {
         return searchParams;
     }
 
     /**
      * @param searchParams the searchParams to set
      */
-    public void setSearchParams(SearchParamsPersons searchParams) {
+    public void setSearchParams(SearchParamsPerson searchParams) {
         this.searchParams = searchParams;
     }
 

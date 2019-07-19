@@ -11,8 +11,7 @@ package com.tcvcog.tcvce.entities.search;
  */
 public enum QueryPropertyEnum {
     
-    OPENCECASES_OCCPERIODSINPROCESS("Active properties", "Properties with open code enf cases and occupancy period authorization in process", 2, false),
-    CUSTOM("Custom", "Custom", 2, false);
+    OPENCECASES_OCCPERIODSINPROCESS("Active properties", "Properties with open code enf cases and occupancy period authorization in process", 2, false);
     
     private final String title;
     private final String desc;

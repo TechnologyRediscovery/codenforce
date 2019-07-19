@@ -5,29 +5,24 @@
  */
 package com.tcvcog.tcvce.entities.search;
 
-import com.tcvcog.tcvce.entities.RoleType;
-
 /**
  *
  * @author sylvia
  */
 public enum QueryPersonEnum {
     
-    ACTIVE_PERSONS("Active persons", "Persons associated with active code enf and occ cases", false, RoleType.MuniReader),
-    USER_PERSONS("User persons", "Persons whose role is to store a system User's personal data, such as name and phone", false, RoleType.MuniReader),
-    CUSTOM("Custom", "Custom", false, RoleType.MuniReader);
-    
+    ACTIVE_PERSONS("Active persons", "Persons associated with active code enf and occ cases", 2, false);
     
     private final String title;
     private final String desc;
-    private final RoleType requiredRoleMin;
+    private final int userRankMinimum;
     private final boolean log;
     
-    private QueryPersonEnum(String t, String l, boolean lg, RoleType rt){
+    private QueryPersonEnum(String t, String l, int rnkMin, boolean lg){
         this.title = t;
         this.desc = l;
+        this.userRankMinimum = rnkMin;
         this.log = lg;
-        this.requiredRoleMin = rt;
     }
     
     public String getDesc(){
@@ -38,17 +33,16 @@ public enum QueryPersonEnum {
         return title;
     }
 
+    /**
+     * @return the userRankMinimum
+     */
+    public int getUserRankMinimum() {
+        return userRankMinimum;
+    }
     
     
     public boolean logQueryRun(){
         return log;
-    }
-
-    /**
-     * @return the requiredRoleMin
-     */
-    public RoleType getRequiredRoleMin() {
-        return requiredRoleMin;
     }
     
     

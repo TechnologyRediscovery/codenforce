@@ -53,7 +53,6 @@ public class SearchParamsPerson extends SearchParams implements Serializable{
      */
     public String getFirstNameSS() {
         return firstNameSS;
-        
     }
 
     /**

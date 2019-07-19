@@ -9,7 +9,6 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +31,7 @@ public class QueryProperty
     public QueryProperty(QueryPropertyEnum name,
                         Municipality m, 
                         List<SearchParamsProperty> params,
-                        UserAuthorized u){
+                        User u){
         super(m, u);
         query = name;
         searchParamsList = new ArrayList<>();

@@ -32,7 +32,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
@@ -71,7 +71,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     
     private List<CECase> caseList;
     private ArrayList<CECase> filteredCaseList;
-    private SearchParamsCECases searchParams;
+    private SearchParamsCECase searchParams;
     
     private List<QueryCECase> queryList;
     private QueryCECase selectedCECaseQuery;
@@ -472,10 +472,10 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 //                selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
 //            }
 
-            if(triggeringEventForProposal != null && selectedEvent.getEventProposalImplementation() != null){
-                selectedEvent.getEventProposalImplementation().setGeneratingEventID(triggeringEventForProposal.getEventID());
-                
-            }
+//            if(triggeringEventForProposal != null && selectedEvent.getEventProposalImplementation() != null){
+//                selectedEvent.getEventProposalImplementation().setGeneratingEventID(triggeringEventForProposal.getEventID());
+//                
+//            }
             // writing null in here is fine if the event wasn't triggered
 
             // main entry point for handing the new event off to the CaseCoordinator
@@ -494,8 +494,8 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             // (We saved the triggering event when the take action button was clicked, before the event
             // add dialog was displayed and event-specific data is entered by the user
             if (triggeringEventForProposal != null) {
-                triggeringEventForProposal.getEventProposalImplementation().setResponseEvent(selectedEvent);
-                triggeringEventForProposal.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
+//                triggeringEventForProposal.getEventProposalImplementation().setResponseEvent(selectedEvent);
+//                triggeringEventForProposal.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
                 ec.logResponseToActionRequest(triggeringEventForProposal);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -571,11 +571,11 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     public void commitActionRequestRejection(ActionEvent ev) {
         EventCoordinator ec = getEventCoordinator();
-        selectedEvent.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
-        selectedEvent.getEventProposalImplementation().setProposalRejected(true);
+//        selectedEvent.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
+//        selectedEvent.getEventProposalImplementation().setProposalRejected(true);
         
         // rejected Proposals by definition did not result in a new Event
-        selectedEvent.getEventProposalImplementation().setResponseEvent(null);
+//        selectedEvent.getEventProposalImplementation().setResponseEvent(null);
         try {
             ec.logResponseToActionRequest(selectedEvent);
             currentCase.getEventProposalList().remove(rejectedEventListIndex);
@@ -1355,7 +1355,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the searchParams
      */
-    public SearchParamsCECases getSearchParams() {
+    public SearchParamsCECase getSearchParams() {
 
         return searchParams;
     }
@@ -1363,7 +1363,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param searchParams the searchParams to set
      */
-    public void setSearchParams(SearchParamsCECases searchParams) {
+    public void setSearchParams(SearchParamsCECase searchParams) {
         this.searchParams = searchParams;
     }
 

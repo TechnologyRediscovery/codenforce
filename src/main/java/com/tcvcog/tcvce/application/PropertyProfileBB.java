@@ -309,7 +309,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     /**
      * @param propList the propList to set
      */
-    public void setPropList(ArrayList<Property> propList) {
+    public void setPropList(List<Property> propList) {
         this.propList = propList;
     }
 

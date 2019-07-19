@@ -10,7 +10,6 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +32,7 @@ public class QueryPerson
     public QueryPerson(QueryPersonEnum name,
                         Municipality m, 
                         List<SearchParamsPerson> params,
-                        UserAuthorized u){
+                        User u){
         super(m, u);
         query = name;
         searchParamsList = new ArrayList<>();

@@ -374,7 +374,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
-            propList = pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
+            propList = (ArrayList<Property>) pi.searchForProperties(houseNum, streetName, getSessionBean().getCeactionRequestForSubmission().getMuni().getMuniCode());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));
