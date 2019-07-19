@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -43,7 +44,7 @@ import javax.faces.event.ActionEvent;
  */
 public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
-    private ArrayList<Property> changedPropList;
+    private List<Property> changedPropList;
     private Municipality selectedMuni;
 
     private String houseNum;
@@ -51,11 +52,11 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
     private Property selectedProperty;
     private PropertyWithLists propWithLists;
 
-    private ArrayList<PropertyUnit> existingUnitList;
-    private ArrayList<PropertyUnitChange> proposedUnitList;
+    private List<PropertyUnit> existingUnitList;
+    private List<PropertyUnitChange> proposedUnitList;
     private Person existingOwner;
     private Person proposedOwner;
-    private ArrayList<ChangeOrderAction> actionList;
+    private List<ChangeOrderAction> actionList;
 
     @PostConstruct
     public void initBean() {
@@ -184,11 +185,11 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public ArrayList<Property> getChangedPropList() {
+    public List<Property> getChangedPropList() {
         return changedPropList;
     }
 
-    public void setChangedPropList(ArrayList<Property> changedPropList) {
+    public void setChangedPropList(List<Property> changedPropList) {
         this.changedPropList = changedPropList;
     }
 
@@ -232,19 +233,19 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         this.propWithLists = propWithLists;
     }
 
-    public ArrayList<PropertyUnit> getExistingUnitList() {
+    public List<PropertyUnit> getExistingUnitList() {
         return existingUnitList;
     }
 
-    public void setExistingUnitList(ArrayList<PropertyUnit> existingUnitList) {
+    public void setExistingUnitList(List<PropertyUnit> existingUnitList) {
         this.existingUnitList = existingUnitList;
     }
 
-    public ArrayList<PropertyUnitChange> getProposedUnitList() {
+    public List<PropertyUnitChange> getProposedUnitList() {
         return proposedUnitList;
     }
 
-    public void setProposedUnitList(ArrayList<PropertyUnitChange> proposedUnitList) {
+    public void setProposedUnitList(List<PropertyUnitChange> proposedUnitList) {
         this.proposedUnitList = proposedUnitList;
     }
 
@@ -264,7 +265,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         this.proposedOwner = proposedOwner;
     }
 
-    public ArrayList<ChangeOrderAction> getActionList() {
+    public List<ChangeOrderAction> getActionList() {
         return actionList;
     }
 

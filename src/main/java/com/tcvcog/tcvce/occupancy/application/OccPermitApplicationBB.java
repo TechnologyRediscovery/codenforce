@@ -16,7 +16,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChange;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
-import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
@@ -67,12 +67,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     private Person currentOwner;
     private Person newOwner;
     private Person contactPerson;
-    private ArrayList<Person> newOccupants;
+    private List<Person> newOccupants;
 
-    private ArrayList<PersonType> requiredPersons;
-    private ArrayList<PersonType> optAndReqPersons;
+    private List<PersonType> requiredPersons;
+    private List<PersonType> optAndReqPersons;
 
-    private SearchParamsPersons params;
+    private SearchParamsPerson params;
 
     /**
      * Creates a new instance of OccPermitApplicationBB
@@ -200,7 +200,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         return propList;
     }
 
-    public void setPropList(ArrayList<Property> propList) {
+    public void setPropList(List<Property> propList) {
         this.propList = propList;
     }
 
@@ -259,14 +259,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     /**
      * @return the newOccupants
      */
-    public ArrayList<Person> getNewOccupants() {
+    public List<Person> getNewOccupants() {
         return newOccupants;
     }
 
     /**
      * @param newOccupants the newOccupants to set
      */
-    public void setNewOccupants(ArrayList<Person> newOccupants) {
+    public void setNewOccupants(List<Person> newOccupants) {
         this.newOccupants = newOccupants;
     }
 
@@ -423,14 +423,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     /**
      * @return the params
      */
-    public SearchParamsPersons getParams() {
+    public SearchParamsPerson getParams() {
         return params;
     }
 
     /**
      * @param params the params to set
      */
-    public void setParams(SearchParamsPersons params) {
+    public void setParams(SearchParamsPerson params) {
         this.params = params;
     }
 
@@ -464,19 +464,19 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         this.applicationPerson = applicationPerson;
     }
 
-    public ArrayList<PersonType> getRequiredPersons() {
+    public List<PersonType> getRequiredPersons() {
         return requiredPersons;
     }
 
-    public void setRequiredPersons(ArrayList<PersonType> requiredPersons) {
+    public void setRequiredPersons(List<PersonType> requiredPersons) {
         this.requiredPersons = requiredPersons;
     }
 
-    public ArrayList<PersonType> getOptAndReqPersons() {
+    public List<PersonType> getOptAndReqPersons() {
         return optAndReqPersons;
     }
 
-    public void setOptAndReqPersons(ArrayList<PersonType> optAndReqPersons) {
+    public void setOptAndReqPersons(List<PersonType> optAndReqPersons) {
         this.optAndReqPersons = optAndReqPersons;
     }
 
@@ -923,15 +923,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         return "addPerson";
     }
 
-    public ArrayList<String> getPersonRequirementDescription() {
+    public List<String> getPersonRequirementDescription() {
 
-        ArrayList<PersonType> required = requiredPersons;
+        List<PersonType> required = requiredPersons;
 
-        ArrayList<PersonType> optional = getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
+        List<PersonType> optional = getSessionBean().getOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
 
         StringBuilder description = new StringBuilder("It is required that you have these types of people: ");
 
-        ArrayList<String> descList = new ArrayList<String>();
+        List<String> descList = new ArrayList<String>();
 
         for (PersonType type : required) {
 
@@ -973,7 +973,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         applicant = null;
 
-        ArrayList<Integer> countTypes = new ArrayList();
+        List<Integer> countTypes = new ArrayList();
 
         for (int index = 0; index < 17; index++) {
 
@@ -1058,7 +1058,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public void submitUnitChangeList() {
 
-        ArrayList<PropertyUnitChange> changeList = new ArrayList<PropertyUnitChange>();
+        List<PropertyUnitChange> changeList = new ArrayList<>();
 
         PropertyIntegrator pri = getPropertyIntegrator();
 

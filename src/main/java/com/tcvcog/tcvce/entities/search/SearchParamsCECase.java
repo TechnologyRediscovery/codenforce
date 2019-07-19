@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Sylvia Garland
  */
-public class SearchParamsCECases 
+public class SearchParamsCECase 
         extends SearchParams 
         implements Serializable{
     
@@ -46,7 +46,7 @@ public class SearchParamsCECases
     private boolean useCaseManager;
     private User caseManagerUser;
     
-   public SearchParamsCECases(){
+   public SearchParamsCECase(){
        
    }
 

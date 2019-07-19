@@ -22,12 +22,12 @@ public class QueryCECase
         extends Query{
     
     private QueryCECaseEnum queryName;
-    private List<SearchParamsCECases> searchParamsList; 
+    private List<SearchParamsCECase> searchParamsList; 
     private List<CECase> results;
     
     public QueryCECase( QueryCECaseEnum qName, 
                         Municipality muni, 
-                        List<SearchParamsCECases> params,
+                        List<SearchParamsCECase> params,
                         User u) {
         super(muni, u);
         queryName = qName;
@@ -59,14 +59,14 @@ public class QueryCECase
     /**
      * @return the searchParamsList
      */
-    public List<SearchParamsCECases> getSearchParamsList() {
+    public List<SearchParamsCECase> getSearchParamsList() {
         return searchParamsList;
     }
 
     /**
      * @param searchParamsList the searchParamsList to set
      */
-    public void setSearchParamsList(List<SearchParamsCECases> searchParamsList) {
+    public void setSearchParamsList(List<SearchParamsCECase> searchParamsList) {
         this.searchParamsList = searchParamsList;
     }
 
@@ -81,7 +81,7 @@ public class QueryCECase
      *
      * @return
      */
-    public List<SearchParamsCECases> getParamsList() {
+    public List<SearchParamsCECase> getParamsList() {
         return searchParamsList;
     }
 

@@ -946,7 +946,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             if (params.isFilterByStartEndDate()){
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
-                if(params.isUseDateOfRecord()){
+                if(params.isApplyDateSearchToDateOfRecord()){
                     sb.append("dateofrecord "); 
                 } else if(params.isUseRespondedAtDateRange()){
                     sb.append("viewconfirmedat ");
@@ -985,7 +985,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
 
 
-            if (params.isFilterByActive()) {
+            if (params.isActive_filterBy()) {
                 if(notFirstCriteria){sb.append("AND ");} else {notFirstCriteria = true;}
                 if (params.isIsActive()) {
                     sb.append("activeevent = TRUE ");

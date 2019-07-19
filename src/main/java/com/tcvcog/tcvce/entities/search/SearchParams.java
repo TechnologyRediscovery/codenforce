@@ -25,6 +25,7 @@ public class SearchParams extends EntityUtils implements Serializable{
      
     private String searchName;
     private String searchDescription;
+    
     private boolean filterByMuni;
     private Municipality muni; 
     
@@ -43,13 +44,16 @@ public class SearchParams extends EntityUtils implements Serializable{
     private int startDateRelativeDays;
     private int endDateRelativeDays;
     
-    private boolean useDateOfRecord;
+    private boolean applyDateSearchToDateOfRecord;
     private boolean useEntryTimestamp;
     
     private boolean filterByObjectID;
     private int objectID;
     
     private boolean limitResultCountTo100;
+    
+    private boolean active_filterBy;
+    private boolean active;
     
    public SearchParams(){
        
@@ -336,17 +340,17 @@ public class SearchParams extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the useDateOfRecord
+     * @return the applyDateSearchToDateOfRecord
      */
-    public boolean isUseDateOfRecord() {
-        return useDateOfRecord;
+    public boolean isApplyDateSearchToDateOfRecord() {
+        return applyDateSearchToDateOfRecord;
     }
 
     /**
-     * @param useDateOfRecord the useDateOfRecord to set
+     * @param applyDateSearchToDateOfRecord the applyDateSearchToDateOfRecord to set
      */
-    public void setUseDateOfRecord(boolean useDateOfRecord) {
-        this.useDateOfRecord = useDateOfRecord;
+    public void setApplyDateSearchToDateOfRecord(boolean applyDateSearchToDateOfRecord) {
+        this.applyDateSearchToDateOfRecord = applyDateSearchToDateOfRecord;
     }
 
     /**
@@ -392,7 +396,35 @@ public class SearchParams extends EntityUtils implements Serializable{
         this.endDatePretty = endDatePretty;
     }
 
-    
+    /**
+     * @return the active_filterBy
+     */
+    public boolean isActive_filterBy() {
+        return active_filterBy;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active_filterBy the active_filterBy to set
+     */
+    public void setActive_filterBy(boolean active_filterBy) {
+        this.active_filterBy = active_filterBy;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+   
 
    
     

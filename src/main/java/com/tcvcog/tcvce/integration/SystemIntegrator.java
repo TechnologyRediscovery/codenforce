@@ -77,7 +77,6 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    
     public PrintStyle getPrintStyle(int styleID) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -458,7 +457,6 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 while(rs.next()){
                     caseCountMap.put(phaseString, rs.getInt(1));
                 }
-            
             }
             
         } catch (SQLException ex) {

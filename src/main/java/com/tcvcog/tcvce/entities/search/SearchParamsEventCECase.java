@@ -90,7 +90,7 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
     /**
      * @return the filterByActive
      */
-    public boolean isFilterByActive() {
+    public boolean isActive_filterBy() {
         return filterByActive;
     }
 
@@ -176,7 +176,7 @@ public class SearchParamsEventCECase extends SearchParams implements Serializabl
     /**
      * @param filterByActive the filterByActive to set
      */
-    public void setFilterByActive(boolean filterByActive) {
+    public void setActive_filterBy(boolean filterByActive) {
         this.filterByActive = filterByActive;
     }
 

@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
 import java.io.Serializable;
