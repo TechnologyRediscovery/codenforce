@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParamsPersons;
+import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
@@ -272,7 +272,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return the new Person() object generated from the query
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public ArrayList<Person> getPersonList(SearchParamsPersons params) throws IntegrationException {
+    public ArrayList<Person> getPersonList(SearchParamsPerson params) throws IntegrationException {
         Connection con = getPostgresCon();
         ArrayList<Person> personAL = new ArrayList<>();
         ResultSet rs = null;
@@ -1044,7 +1044,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public List<Person> queryPersons(SearchParamsPersons params) throws IntegrationException {
+    
+    public List<Person> searchForPersons(SearchParamsPerson params) throws IntegrationException {
         ArrayList<Person> personList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;

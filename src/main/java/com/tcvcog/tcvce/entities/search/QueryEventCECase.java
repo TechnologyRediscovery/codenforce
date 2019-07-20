@@ -27,7 +27,10 @@ public class QueryEventCECase extends Query {
     private List<SearchParamsEventCECase> eventSearchParamsList;
     private List<EventCECaseCasePropBundle> results;
     
-    public QueryEventCECase(QueryEventCECaseEnum qName, Municipality muni, User u, List<SearchParamsEventCECase> params) {
+    public QueryEventCECase(QueryEventCECaseEnum qName, 
+                            Municipality muni, 
+                            User u, 
+                            List<SearchParamsEventCECase> params) {
         super(muni, u);
         eventSearchParamsList = new ArrayList<>();
         eventSearchParamsList.addAll(params);

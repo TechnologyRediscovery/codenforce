@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -105,10 +105,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws CaseLifecyleException 
      */
      public QueryCECase runQueryCECase(QueryCECase q) throws IntegrationException, CaseLifecyleException{
-        List<SearchParamsCECases> pList = q.getParmsList();
+        List<SearchParamsCECase> pList = q.getParmsList();
         
-        for(SearchParamsCECases sp: pList){
-            q.addToResults(getCECases(sp));
+        for(SearchParamsCECase sp: pList){
+            q.addToResults(searchForCECase(sp));
         }
         q.setExecutionTimestamp(LocalDateTime.now());
         System.out.println("CaseIntegrator.QueryCECases | returning list of size: " + q.getBOBResultList().size());
@@ -125,8 +125,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException
      * @throws CaseLifecyleException 
      */
-    private List<CECase> getCECases(SearchParamsCECases params) throws IntegrationException, CaseLifecyleException{
-        ArrayList<CECase> caseList = new ArrayList();
+    private List<CECase> searchForCECase(SearchParamsCECase params) throws IntegrationException, CaseLifecyleException{
+        List<CECase> caseList = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;

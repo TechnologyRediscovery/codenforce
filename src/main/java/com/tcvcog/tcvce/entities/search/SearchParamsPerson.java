@@ -16,7 +16,7 @@ import java.util.List;
  * 
  * @author Sylvia Garland
  */
-public class SearchParamsPersons extends SearchParams implements Serializable{
+public class SearchParamsPerson extends SearchParams implements Serializable{
     
         private String firstNameSS;
         private boolean filterByFirstName;
@@ -44,7 +44,7 @@ public class SearchParamsPersons extends SearchParams implements Serializable{
         private boolean verifiedSwitch;
         private boolean filterByVerifiedSwitch;       
         
-   public SearchParamsPersons(){
+   public SearchParamsPerson(){
        personTypes = new ArrayList<>();
    }
 

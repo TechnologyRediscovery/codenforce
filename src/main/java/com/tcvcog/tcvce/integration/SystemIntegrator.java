@@ -93,9 +93,10 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             }
         } // close finally
         return styleMap;
-    }
+    }    
+    
+    public PrintStyle getPrintStyle(int styleID) throws IntegrationException{
 
-    public PrintStyle getPrintStyle(int styleID) throws IntegrationException {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PrintStyle style = null;

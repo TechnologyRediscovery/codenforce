@@ -22,9 +22,9 @@ import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.QueryEventCECaseEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECases;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsProperties;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -295,9 +295,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return ci.runQueryCECase(query);
      }
      
-     public QueryCECase assembleQueryCECase(QueryCECaseEnum qName, User u, Municipality m, SearchParamsCECases params){
+     public QueryCECase assembleQueryCECase(QueryCECaseEnum qName, User u, Municipality m, SearchParamsCECase params){
          QueryCECase query;
-         List<SearchParamsCECases> paramsList = new ArrayList<>();
+         List<SearchParamsCECase> paramsList = new ArrayList<>();
          
          if(params != null){
              qName = QueryCECaseEnum.CUSTOM;
@@ -342,8 +342,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECases getDefaultSearchParams_CECase_allOpen(Municipality m){
-        SearchParamsCECases params = new SearchParamsCECases();
+    public SearchParamsCECase getDefaultSearchParams_CECase_allOpen(Municipality m){
+        SearchParamsCECase params = new SearchParamsCECase();
         
         // superclass 
         params.setFilterByMuni(true);
@@ -375,8 +375,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECases getSearchParams_CECase_closedPast30Days (Municipality m){
-        SearchParamsCECases params = new SearchParamsCECases();
+    public SearchParamsCECase getSearchParams_CECase_closedPast30Days (Municipality m){
+        SearchParamsCECase params = new SearchParamsCECase();
         params.setSearchName("CECases");
         
         // superclass 
@@ -407,25 +407,18 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
    
     
-    protected SearchParamsProperties getSearchParamsSkeletonProperties(){
-        SearchParamsProperties propParams = new SearchParamsProperties();
+    protected SearchParamsProperty getSearchParamsSkeletonProperties(){
+        SearchParamsProperty propParams = new SearchParamsProperty();
         // superclass
         propParams.setFilterByStartEndDate(false);
         propParams.setFilterByObjectID(false);
         propParams.setLimitResultCountTo100(true);
         
-        // subclass SearchParamsProperties
+        // subclass SearchParamsProperty
         propParams.setFilterByLotAndBlock(false);
         propParams.setFilterByParcelID(false);
         propParams.setFilterByAddressPart(true);
-        propParams.setFilterByStreetPart(true);
-        propParams.setFilterByCECaseStartEndDate(false);
-        propParams.setFilterByRental(false);
-        propParams.setFilterByVacant(false);
-        propParams.setFilterByUnits(false);
-        propParams.setFilterBySource(false);
-        propParams.setFilterByPropertyUseType(false);
-        propParams.setFilterByPerson(false);
+
         
         return propParams;
     }
@@ -544,7 +537,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByEventOwner(false);
         eventParams.setOwnerUserID(u);
         
-        eventParams.setFilterByActive(true);
+        eventParams.setActive_filterBy(true);
         eventParams.setIsActive(true);
         
         eventParams.setFilterByPerson(false);
@@ -568,7 +561,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByStartEndDate(true);
         eventParams.setUseRelativeDates(true);
         
-        eventParams.setUseDateOfRecord(true);
+        eventParams.setApplyDateSearchToDateOfRecord(true);
         // query from a week ago to now
         eventParams.setStartDateRelativeDays(-30);
         eventParams.setEndDateRelativeDays(0);
@@ -584,7 +577,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setFilterByEventOwner(true);
         eventParams.setOwnerUserID(u);
         
-        eventParams.setFilterByActive(true);
+        eventParams.setActive_filterBy(true);
         eventParams.setIsActive(true);
         
         eventParams.setFilterByPerson(false);
@@ -611,7 +604,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setMuni(m);
         eventParams.setFilterByStartEndDate(true);
         eventParams.setUseRelativeDates(true);
-        eventParams.setUseDateOfRecord(true);
+        eventParams.setApplyDateSearchToDateOfRecord(true);
         // query from a week ago to now
         eventParams.setStartDateRelativeDays(-400);
         eventParams.setEndDateRelativeDays(0);
@@ -627,7 +620,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         eventParams.setFilterByEventOwner(false);
         
-        eventParams.setFilterByActive(true);
+        eventParams.setActive_filterBy(true);
         eventParams.setIsActive(true);
         
         
