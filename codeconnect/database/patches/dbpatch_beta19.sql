@@ -225,8 +225,73 @@ ALTER TABLE property ADD COLUMN landbankheld BOOLEAN DEFAULT FALSE;
 ALTER TABLE property DROP COLUMN vacant;
 ALTER TABLE property ADD COLUMN active BOOLEAN DEFAULT TRUE;
 
+ALTER TABLE property DROP COLUMN datasource;
 
 ALTER TABLE propertyunit ADD COLUMN condition_intensityclassid INTEGER CONSTRAINT propunit_conditionintensityclass_classid_fk REFERENCES intensityclass (classid);
+ALTER TABLE property ADD COLUMN nonaddressable BOOLEAN DEFAULT FALSE;
+
+
+
+
+CREATE SEQUENCE IF NOT EXISTS propertystatusid_seq
+  START WITH 1000
+  INCREMENT BY 1 
+  MINVALUE 1000
+  NO MAXVALUE 
+  CACHE 1;
+
+CREATE TABLE public.propertystatus
+(
+	statusid 						INTEGER NOT NULL DEFAULT nextval('propertystatusid_seq') PRIMARY KEY,
+	title 							text,
+	description 					text,
+	userdeployable					boolean DEFAULT true,
+	minimumuserranktoassign 		integer DEFAULT 2,
+	minimumuserranktoremove 		integer DEFAULT 2,
+	muni_municode 					integer CONSTRAINT propertystatus_municode_fk REFERENCES municipality (municode),
+	active 							boolean DEFAULT TRUE
+
+);
+
+ALTER TABLE property DROP COLUMN status_statusid;
+
+
+ALTER TABLE property ADD COLUMN status_statusid INTEGER CONSTRAINT property_statusid_fk REFERENCES propertystatus (statusid);
+
+ALTER TABLE property DROP COLUMN propertyusetype;
+ALTER TABLE property ADD COLUMN usetype_typeid INTEGER CONSTRAINT property_propertyusetypeid_fk  REFERENCES propertyusetype (propertyusetypeid);
+
+ALTER TABLE propertyusetype ADD COLUMN zoneclass TEXT;
+
+ALTER TABLE property RENAME vacantbu_userid TO vacantby_userid;
+
+ALTER TABLE property DROP COLUMN status_statusid;
+
+CREATE SEQUENCE IF NOT EXISTS propertyotherid_seq
+  START WITH 1000
+  INCREMENT BY 1 
+  MINVALUE 1000
+  NO MAXVALUE 
+  CACHE 1;
+
+CREATE TABLE public.propertyotherid
+(
+	otheridid 				INTEGER NOT NULL DEFAULT nextval('propertyotherid_seq') PRIMARY KEY,
+	property_propid 		INTEGER NOT NULL CONSTRAINT propertyotherid_propid_fk REFERENCES property (propertyid),
+	otheraddress 			text,
+	otheraddressnotes 		text,
+	otheraddresslastupdated TIMESTAMP WITH TIME ZONE,
+	otherlotandblock 		text,
+	otherlotandblocknotes 	text,
+	otherlotandblocklastupdated 	TIMESTAMP WITH TIME ZONE,
+	otherparcelid 			text,
+	otherparcelidnotes 		text,
+	otherparceladdresslastupdated 	TIMESTAMP WITH TIME ZONE
+);
+
+ALTER TABLE propertyunit ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.propertyunit RENAME rentalintentstartdate  TO rentalintentdatestart;
+ALTER TABLE public.propertyunit RENAME rentalintentstopdate  TO rentalintentdatestop;
 
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)

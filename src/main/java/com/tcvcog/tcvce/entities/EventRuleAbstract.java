@@ -15,33 +15,32 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     protected int ruleid;
     protected String title;
     protected String description;
-    protected EventType requiredEventType;
-    protected EventType forbiddenEventType;
-    protected EventCategory requiredEventCategory;
-    protected EventCategory forbiddenEventCategory;
+    protected EventType requiredeventtype;
+    protected EventType forbiddeneventtype;
+    protected EventCategory requiredEventCat;
+    protected EventCategory forbiddenEventCat;
     
-    protected int requiredECThreshold_typeInternalOrder;
-    protected boolean requiredECThreshold_typeInternalOrder_treatAsUpperBound;
+    protected int requiredeventcatthresholdtypeintorder;
+    protected boolean requiredeventcatupperboundtypeintorder;
     
-    protected int requiredECThreshold_globalOrder;
-    protected boolean requiredECThreshold_globalOrder_treatAsUpperBound;
+    protected int requiredeventcatthresholdglobalorder;
+    protected boolean requiredeventcatupperboundglobalorder;
     
-    protected int forbiddenECThreshold_typeInternalOrder;
-    protected boolean forbiddenECThreshold_typeInternalOrder_treatAsUpperBound;
     
-    protected int forbiddenECThreshold_globalOrder;
-    protected boolean forbiddenECThreshold_globalOrder_treatAsUpperBound;
+    protected int forbiddeneventcatthresholdtypeintorder;
+    protected boolean forbiddeneventcatupperboundtypeintorder;
     
-    protected boolean mandatoryRulePassRequiredToCloseEntity;
-    protected boolean inactivateRuleOnEntityClose;
+    protected int forbiddeneventcatthresholdglobalorder;
+    protected boolean forbiddeneventcatupperboundglobalorder;
     
-    protected Directive promptingDirective;
-    protected int formPromptingDirectiveID;
-   
-    protected EventCategory triggeredECOnRulePass;
-    protected EventCategory triggeredECOnRuleFail;
+    protected boolean mandatorypassreqtocloseentity;
+    protected boolean autoremoveonentityclose;
+    protected Proposal promptingProposal;
     
-    protected boolean activeRuleAbstract;
+    protected EventCategory triggeredeventcatonpass;
+    protected EventCategory triggeredeventcatonfail;
+    
+    protected boolean active;
     protected String notes;
 
     /**
@@ -66,117 +65,123 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the requiredEventType
+     * @return the requiredeventtype
      */
-    public EventType getRequiredEventType() {
-        return requiredEventType;
+    public EventType getRequiredeventtype() {
+        return requiredeventtype;
     }
 
     /**
-     * @return the forbiddenEventType
+     * @return the forbiddeneventtype
      */
-    public EventType getForbiddenEventType() {
-        return forbiddenEventType;
+    public EventType getForbiddeneventtype() {
+        return forbiddeneventtype;
     }
 
     /**
-     * @return the requiredEventCategory
+     * @return the requiredEventCat
      */
-    public EventCategory getRequiredEventCategory() {
-        return requiredEventCategory;
+    public EventCategory getRequiredEventCat() {
+        return requiredEventCat;
     }
 
     /**
-     * @return the requiredECThreshold_typeInternalOrder
+     * @return the requiredeventcatthresholdtypeintorder
      */
     public int isRequiredeventcatthresholdtypeintorder() {
-        return getRequiredECThreshold_typeInternalOrder();
+        return requiredeventcatthresholdtypeintorder;
     }
 
     /**
-     * @return the requiredECThreshold_typeInternalOrder_treatAsUpperBound
+     * @return the requiredeventcatupperboundtypeintorder
      */
-    public boolean isRequiredECThreshold_typeInternalOrder_treatAsUpperBound() {
-        return requiredECThreshold_typeInternalOrder_treatAsUpperBound;
+    public boolean isRequiredeventcatupperboundtypeintorder() {
+        return requiredeventcatupperboundtypeintorder;
     }
 
     /**
-     * @return the requiredECThreshold_globalOrder
+     * @return the requiredeventcatthresholdglobalorder
      */
     public int isRequiredeventcatthresholdglobalorder() {
-        return getRequiredECThreshold_globalOrder();
+        return requiredeventcatthresholdglobalorder;
     }
 
     /**
-     * @return the requiredECThreshold_globalOrder_treatAsUpperBound
+     * @return the requiredeventcatupperboundglobalorder
      */
-    public boolean isRequiredECThreshold_globalOrder_treatAsUpperBound() {
-        return requiredECThreshold_globalOrder_treatAsUpperBound;
+    public boolean isRequiredeventcatupperboundglobalorder() {
+        return requiredeventcatupperboundglobalorder;
     }
 
 
     /**
-     * @return the forbiddenECThreshold_typeInternalOrder
+     * @return the forbiddeneventcatthresholdtypeintorder
      */
     public int isForbiddeneventcatthresholdtypeintorder() {
-        return getForbiddenECThreshold_typeInternalOrder();
+        return forbiddeneventcatthresholdtypeintorder;
     }
 
     /**
-     * @return the forbiddenECThreshold_typeInternalOrder_treatAsUpperBound
+     * @return the forbiddeneventcatupperboundtypeintorder
      */
-    public boolean isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound() {
-        return forbiddenECThreshold_typeInternalOrder_treatAsUpperBound;
+    public boolean isForbiddeneventcatupperboundtypeintorder() {
+        return forbiddeneventcatupperboundtypeintorder;
     }
 
     /**
-     * @return the forbiddenECThreshold_globalOrder
+     * @return the forbiddeneventcatthresholdglobalorder
      */
     public int isForbiddeneventcatthresholdglobalorder() {
-        return getForbiddenECThreshold_globalOrder();
+        return forbiddeneventcatthresholdglobalorder;
     }
 
     /**
-     * @return the forbiddenECThreshold_globalOrder_treatAsUpperBound
+     * @return the forbiddeneventcatupperboundglobalorder
      */
-    public boolean isForbiddenECThreshold_globalOrder_treatAsUpperBound() {
-        return forbiddenECThreshold_globalOrder_treatAsUpperBound;
+    public boolean isForbiddeneventcatupperboundglobalorder() {
+        return forbiddeneventcatupperboundglobalorder;
     }
 
     /**
-     * @return the mandatoryRulePassRequiredToCloseEntity
+     * @return the mandatorypassreqtocloseentity
      */
-    public boolean isMandatoryRulePassRequiredToCloseEntity() {
-        return mandatoryRulePassRequiredToCloseEntity;
+    public boolean isMandatorypassreqtocloseentity() {
+        return mandatorypassreqtocloseentity;
     }
 
     /**
-     * @return the inactivateRuleOnEntityClose
+     * @return the autoremoveonentityclose
      */
-    public boolean isInactivateRuleOnEntityClose() {
-        return inactivateRuleOnEntityClose;
-    }
-
-
-    /**
-     * @return the triggeredECOnRulePass
-     */
-    public EventCategory getTriggeredECOnRulePass() {
-        return triggeredECOnRulePass;
+    public boolean isAutoremoveonentityclose() {
+        return autoremoveonentityclose;
     }
 
     /**
-     * @return the triggeredECOnRuleFail
+     * @return the promptingProposal
      */
-    public EventCategory getTriggeredECOnRuleFail() {
-        return triggeredECOnRuleFail;
+    public Proposal getPromptingProposal() {
+        return promptingProposal;
     }
 
     /**
-     * @return the activeRuleAbstract
+     * @return the triggeredeventcatonpass
      */
-    public boolean isActiveRuleAbstract() {
-        return activeRuleAbstract;
+    public EventCategory getTriggeredeventcatonpass() {
+        return triggeredeventcatonpass;
+    }
+
+    /**
+     * @return the triggeredeventcatonfail
+     */
+    public EventCategory getTriggeredeventcatonfail() {
+        return triggeredeventcatonfail;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
     }
 
     /**
@@ -201,116 +206,123 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     }
 
     /**
-     * @param requiredEventType the requiredEventType to set
+     * @param requiredeventtype the requiredeventtype to set
      */
-    public void setRequiredEventType(EventType requiredEventType) {
-        this.requiredEventType = requiredEventType;
+    public void setRequiredeventtype(EventType requiredeventtype) {
+        this.requiredeventtype = requiredeventtype;
     }
 
     /**
-     * @param forbiddenEventType the forbiddenEventType to set
+     * @param forbiddeneventtype the forbiddeneventtype to set
      */
-    public void setForbiddenEventType(EventType forbiddenEventType) {
-        this.forbiddenEventType = forbiddenEventType;
+    public void setForbiddeneventtype(EventType forbiddeneventtype) {
+        this.forbiddeneventtype = forbiddeneventtype;
     }
 
     /**
-     * @param requiredEventCategory the requiredEventCategory to set
+     * @param requiredEventCat the requiredEventCat to set
      */
-    public void setRequiredEventCategory(EventCategory requiredEventCategory) {
-        this.requiredEventCategory = requiredEventCategory;
+    public void setRequiredEventCat(EventCategory requiredEventCat) {
+        this.requiredEventCat = requiredEventCat;
     }
 
     /**
-     * @param requiredECThreshold_typeInternalOrder the requiredECThreshold_typeInternalOrder to set
+     * @param requiredeventcatthresholdtypeintorder the requiredeventcatthresholdtypeintorder to set
      */
-    public void setRequiredECThreshold_typeInternalOrder(int requiredECThreshold_typeInternalOrder) {
-        this.requiredECThreshold_typeInternalOrder = requiredECThreshold_typeInternalOrder;
+    public void setRequiredeventcatthresholdtypeintorder(int requiredeventcatthresholdtypeintorder) {
+        this.requiredeventcatthresholdtypeintorder = requiredeventcatthresholdtypeintorder;
     }
 
     /**
-     * @param requiredECThreshold_typeInternalOrder_treatAsUpperBound the requiredECThreshold_typeInternalOrder_treatAsUpperBound to set
+     * @param requiredeventcatupperboundtypeintorder the requiredeventcatupperboundtypeintorder to set
      */
-    public void setRequiredECThreshold_typeInternalOrder_treatAsUpperBound(boolean requiredECThreshold_typeInternalOrder_treatAsUpperBound) {
-        this.requiredECThreshold_typeInternalOrder_treatAsUpperBound = requiredECThreshold_typeInternalOrder_treatAsUpperBound;
+    public void setRequiredeventcatupperboundtypeintorder(boolean requiredeventcatupperboundtypeintorder) {
+        this.requiredeventcatupperboundtypeintorder = requiredeventcatupperboundtypeintorder;
     }
 
     /**
-     * @param requiredECThreshold_globalOrder the requiredECThreshold_globalOrder to set
+     * @param requiredeventcatthresholdglobalorder the requiredeventcatthresholdglobalorder to set
      */
-    public void setRequiredECThreshold_globalOrder(int requiredECThreshold_globalOrder) {
-        this.requiredECThreshold_globalOrder = requiredECThreshold_globalOrder;
+    public void setRequiredeventcatthresholdglobalorder(int requiredeventcatthresholdglobalorder) {
+        this.requiredeventcatthresholdglobalorder = requiredeventcatthresholdglobalorder;
     }
 
     /**
-     * @param requiredECThreshold_globalOrder_treatAsUpperBound the requiredECThreshold_globalOrder_treatAsUpperBound to set
+     * @param requiredeventcatupperboundglobalorder the requiredeventcatupperboundglobalorder to set
      */
-    public void setRequiredECThreshold_globalOrder_treatAsUpperBound(boolean requiredECThreshold_globalOrder_treatAsUpperBound) {
-        this.requiredECThreshold_globalOrder_treatAsUpperBound = requiredECThreshold_globalOrder_treatAsUpperBound;
+    public void setRequiredeventcatupperboundglobalorder(boolean requiredeventcatupperboundglobalorder) {
+        this.requiredeventcatupperboundglobalorder = requiredeventcatupperboundglobalorder;
     }
 
 
     /**
-     * @param forbiddenECThreshold_typeInternalOrder the forbiddenECThreshold_typeInternalOrder to set
+     * @param forbiddeneventcatthresholdtypeintorder the forbiddeneventcatthresholdtypeintorder to set
      */
-    public void setForbiddenECThreshold_typeInternalOrder(int forbiddenECThreshold_typeInternalOrder) {
-        this.forbiddenECThreshold_typeInternalOrder = forbiddenECThreshold_typeInternalOrder;
+    public void setForbiddeneventcatthresholdtypeintorder(int forbiddeneventcatthresholdtypeintorder) {
+        this.forbiddeneventcatthresholdtypeintorder = forbiddeneventcatthresholdtypeintorder;
     }
 
     /**
-     * @param forbiddenECThreshold_typeInternalOrder_treatAsUpperBound the forbiddenECThreshold_typeInternalOrder_treatAsUpperBound to set
+     * @param forbiddeneventcatupperboundtypeintorder the forbiddeneventcatupperboundtypeintorder to set
      */
-    public void setForbiddenECThreshold_typeInternalOrder_treatAsUpperBound(boolean forbiddenECThreshold_typeInternalOrder_treatAsUpperBound) {
-        this.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound = forbiddenECThreshold_typeInternalOrder_treatAsUpperBound;
+    public void setForbiddeneventcatupperboundtypeintorder(boolean forbiddeneventcatupperboundtypeintorder) {
+        this.forbiddeneventcatupperboundtypeintorder = forbiddeneventcatupperboundtypeintorder;
     }
 
     /**
-     * @param forbiddenECThreshold_globalOrder the forbiddenECThreshold_globalOrder to set
+     * @param forbiddeneventcatthresholdglobalorder the forbiddeneventcatthresholdglobalorder to set
      */
-    public void setForbiddenECThreshold_globalOrder(int forbiddenECThreshold_globalOrder) {
-        this.forbiddenECThreshold_globalOrder = forbiddenECThreshold_globalOrder;
+    public void setForbiddeneventcatthresholdglobalorder(int forbiddeneventcatthresholdglobalorder) {
+        this.forbiddeneventcatthresholdglobalorder = forbiddeneventcatthresholdglobalorder;
     }
 
     /**
-     * @param forbiddenECThreshold_globalOrder_treatAsUpperBound the forbiddenECThreshold_globalOrder_treatAsUpperBound to set
+     * @param forbiddeneventcatupperboundglobalorder the forbiddeneventcatupperboundglobalorder to set
      */
-    public void setForbiddenECThreshold_globalOrder_treatAsUpperBound(boolean forbiddenECThreshold_globalOrder_treatAsUpperBound) {
-        this.forbiddenECThreshold_globalOrder_treatAsUpperBound = forbiddenECThreshold_globalOrder_treatAsUpperBound;
+    public void setForbiddeneventcatupperboundglobalorder(boolean forbiddeneventcatupperboundglobalorder) {
+        this.forbiddeneventcatupperboundglobalorder = forbiddeneventcatupperboundglobalorder;
     }
 
     /**
-     * @param mandatoryRulePassRequiredToCloseEntity the mandatoryRulePassRequiredToCloseEntity to set
+     * @param mandatorypassreqtocloseentity the mandatorypassreqtocloseentity to set
      */
-    public void setMandatoryRulePassRequiredToCloseEntity(boolean mandatoryRulePassRequiredToCloseEntity) {
-        this.mandatoryRulePassRequiredToCloseEntity = mandatoryRulePassRequiredToCloseEntity;
+    public void setMandatorypassreqtocloseentity(boolean mandatorypassreqtocloseentity) {
+        this.mandatorypassreqtocloseentity = mandatorypassreqtocloseentity;
     }
 
     /**
-     * @param inactivateRuleOnEntityClose the inactivateRuleOnEntityClose to set
+     * @param autoremoveonentityclose the autoremoveonentityclose to set
      */
-    public void setInactivateRuleOnEntityClose(boolean inactivateRuleOnEntityClose) {
-        this.inactivateRuleOnEntityClose = inactivateRuleOnEntityClose;
+    public void setAutoremoveonentityclose(boolean autoremoveonentityclose) {
+        this.autoremoveonentityclose = autoremoveonentityclose;
     }
 
     /**
-     * @param triggeredECOnRulePass the triggeredECOnRulePass to set
+     * @param promptingProposal the promptingProposal to set
      */
-    public void setTriggeredECOnRulePass(EventCategory triggeredECOnRulePass) {
-        this.triggeredECOnRulePass = triggeredECOnRulePass;
+    public void setPromptingProposal(Proposal promptingProposal) {
+        this.promptingProposal = promptingProposal;
     }
 
     /**
-     * @param triggeredECOnRuleFail the triggeredECOnRuleFail to set
+     * @param triggeredeventcatonpass the triggeredeventcatonpass to set
      */
-    public void setTriggeredECOnRuleFail(EventCategory triggeredECOnRuleFail) {
-        this.triggeredECOnRuleFail = triggeredECOnRuleFail;
+    public void setTriggeredeventcatonpass(EventCategory triggeredeventcatonpass) {
+        this.triggeredeventcatonpass = triggeredeventcatonpass;
     }
 
     /**
-     * @param activeRuleAbstract the activeRuleAbstract to set
+     * @param triggeredeventcatonfail the triggeredeventcatonfail to set
      */
-    public void setActiveRuleAbstract(boolean activeRuleAbstract) {
-        this.activeRuleAbstract = activeRuleAbstract;
+    public void setTriggeredeventcatonfail(EventCategory triggeredeventcatonfail) {
+        this.triggeredeventcatonfail = triggeredeventcatonfail;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     /**
@@ -328,74 +340,17 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     }
 
     /**
-     * @return the forbiddenEventCategory
+     * @return the forbiddenEventCat
      */
-    public EventCategory getForbiddenEventCategory() {
-        return forbiddenEventCategory;
+    public EventCategory getForbiddenEventCat() {
+        return forbiddenEventCat;
     }
 
     /**
-     * @param forbiddenEventCategory the forbiddenEventCategory to set
+     * @param forbiddenEventCat the forbiddenEventCat to set
      */
-    public void setForbiddenEventCategory(EventCategory forbiddenEventCategory) {
-        this.forbiddenEventCategory = forbiddenEventCategory;
-    }
-
-    /**
-     * @return the requiredECThreshold_typeInternalOrder
-     */
-    public int getRequiredECThreshold_typeInternalOrder() {
-        return requiredECThreshold_typeInternalOrder;
-    }
-
-    /**
-     * @return the requiredECThreshold_globalOrder
-     */
-    public int getRequiredECThreshold_globalOrder() {
-        return requiredECThreshold_globalOrder;
-    }
-
-    /**
-     * @return the forbiddenECThreshold_typeInternalOrder
-     */
-    public int getForbiddenECThreshold_typeInternalOrder() {
-        return forbiddenECThreshold_typeInternalOrder;
-    }
-
-    /**
-     * @return the forbiddenECThreshold_globalOrder
-     */
-    public int getForbiddenECThreshold_globalOrder() {
-        return forbiddenECThreshold_globalOrder;
-    }
-
-
-    /**
-     * @return the promptingDirective
-     */
-    public Directive getPromptingDirective() {
-        return promptingDirective;
-    }
-
-    /**
-     * @return the formPromptingDirectiveID
-     */
-    public int getFormPromptingDirectiveID() {
-        return formPromptingDirectiveID;
-    }
-
-    /**
-     * @param promptingDirective the promptingDirective to set
-     */
-    public void setPromptingDirective(Directive promptingDirective) {
-        this.promptingDirective = promptingDirective;
-    }
-
-    /**
-     * @param formPromptingDirectiveID the formPromptingDirectiveID to set
-     */
-    public void setFormPromptingDirectiveID(int formPromptingDirectiveID) {
-        this.formPromptingDirectiveID = formPromptingDirectiveID;
+    public void setForbiddenEventCat(EventCategory forbiddenEventCat) {
+        this.forbiddenEventCat = forbiddenEventCat;
     }
 
     

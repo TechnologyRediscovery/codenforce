@@ -33,6 +33,8 @@ public class OccInspection {
     private User inspector;
     private int occPeriodID;
     
+    // This template object provides us the raw lists of uninspected
+    // space types, from which we extract a list of Spaces and their CodeElements
     private OccChecklistTemplate checklistTemplate;
     private List<OccInspectedSpace> inspectedSpaceList;
     

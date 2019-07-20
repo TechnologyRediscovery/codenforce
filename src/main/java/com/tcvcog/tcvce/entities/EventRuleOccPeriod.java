@@ -20,23 +20,13 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 
 /**
- * Note on naming: This class is formally part of Occupancy and should be in its
- * Entities package, but since it extends EventRuleImplementation whose members have
- * protected access, they needed to share packages. Its sister Object on the CE side
- * is CECaseEventRule. The naming pattern for subclasses specific to one of our two
- * main branches of
- * 
- *  [BranchName][ObjectFamilyName] 
- * 
- * was inverted when naming this class since there are no
- *  Occ* classes in here. SO the next best group was the Event* family.
+ *
  * @author sylvia
  */
 public class EventRuleOccPeriod extends EventRuleImplementation{
     
-    private int occPeriodEventRuleID;
     private int OccPeriodID;
-    private Event passedRuleEvent;
+    private OccEvent passedRuleEvent;
     
     /**
      *
@@ -58,6 +48,12 @@ public class EventRuleOccPeriod extends EventRuleImplementation{
         return OccPeriodID;
     }
 
+    /**
+     * @return the passedRuleEvent
+     */
+    public OccEvent getPassedRuleEvent() {
+        return passedRuleEvent;
+    }
 
     /**
      * @param OccPeriodID the OccPeriodID to set
@@ -67,30 +63,13 @@ public class EventRuleOccPeriod extends EventRuleImplementation{
     }
 
     /**
-     * @return the passedRuleEvent
-     */
-    public Event getPassedRuleEvent() {
-        return passedRuleEvent;
-    }
-
-    /**
      * @param passedRuleEvent the passedRuleEvent to set
      */
-    public void setPassedRuleEvent(Event passedRuleEvent) {
+    public void setPassedRuleEvent(OccEvent passedRuleEvent) {
         this.passedRuleEvent = passedRuleEvent;
     }
-
-    /**
-     * @return the occPeriodEventRuleID
-     */
-    public int getOccPeriodEventRuleID() {
-        return occPeriodEventRuleID;
-    }
-
-    /**
-     * @param occPeriodEventRuleID the occPeriodEventRuleID to set
-     */
-    public void setOccPeriodEventRuleID(int occPeriodEventRuleID) {
-        this.occPeriodEventRuleID = occPeriodEventRuleID;
-    }
+    
+    
+    
+    
 }

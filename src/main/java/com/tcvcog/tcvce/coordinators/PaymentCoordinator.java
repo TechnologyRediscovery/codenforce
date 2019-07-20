@@ -17,13 +17,9 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
-import com.tcvcog.tcvce.entities.Payment;
-import java.util.List;
-
 /**
- * Implements business logic related to payments.
- * 
- * @author NADGIT and SYLVIA
+ *
+ * @author Eric C. Darsow
  */
 public class PaymentCoordinator {
 
@@ -31,19 +27,6 @@ public class PaymentCoordinator {
      * Creates a new instance of PaymentCoordinator
      */
     public PaymentCoordinator() {
-    }
-    
-    /**
-     * Container for business logic related to an individual Payment instance
-     * @param pmt
-     * @return 
-     */
-    public Payment configurePayment(Payment pmt){
-        
-        return pmt;
-        
-        
-        
     }
     
 }

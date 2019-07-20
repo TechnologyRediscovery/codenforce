@@ -9,7 +9,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.time.ZoneId;
@@ -96,7 +96,7 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
      */
     public void commitOccupancyInspectionUpdates(ActionEvent e){
         OccupancyIntegrator oii = getOccupancyIntegrator();
-        ChecklistIntegrator ci = getChecklistIntegrator();
+        OccInspectionIntegrator ci = getOccInspectionIntegrator();
         
         try{
             ci.updateOccInspection(currentInspection);
@@ -114,7 +114,7 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
     public void addOccupancyInspection(){
         OccInspection o = null;
         OccupancyIntegrator oii =  getOccupancyIntegrator();
-        ChecklistIntegrator ci = getChecklistIntegrator();
+        OccInspectionIntegrator ci = getOccInspectionIntegrator();
         
 
         try{

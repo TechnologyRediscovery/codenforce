@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.*;
  */
 public enum PropertyStatus {
 
+    // TODO: finish me!
     UNKNOWN("Unknown", 0, "occperstatus_unknown"),
     KNOWN_UNAUTHORIZED("Known to be occupied without authorization", 0, "known_unauthorized"),
     

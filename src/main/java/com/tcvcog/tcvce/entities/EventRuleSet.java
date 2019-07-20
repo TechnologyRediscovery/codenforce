@@ -28,7 +28,7 @@ public class EventRuleSet extends EntityUtils implements Serializable {
     private int rulseSetID;
     private String title;
     private String description;
-    private List<EventRule> ruleList;
+    private List<EventRuleAbstract> ruleList;
 
     /**
      * @return the rulseSetID
@@ -54,7 +54,7 @@ public class EventRuleSet extends EntityUtils implements Serializable {
     /**
      * @return the ruleList
      */
-    public List<EventRule> getRuleList() {
+    public List<EventRuleAbstract> getRuleList() {
         return ruleList;
     }
 
@@ -82,7 +82,7 @@ public class EventRuleSet extends EntityUtils implements Serializable {
     /**
      * @param ruleList the ruleList to set
      */
-    public void setRuleList(List<EventRule> ruleList) {
+    public void setRuleList(List<EventRuleAbstract> ruleList) {
         this.ruleList = ruleList;
     }
     

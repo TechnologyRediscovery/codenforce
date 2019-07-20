@@ -45,7 +45,7 @@ import java.util.List;
  * A Choice is given to the user in a Directive and can take one of the
  following forms:
  An EventCategory
- An EventRule
+ An EventRuleAbstract
  A page redirection via JSF navigation subsystem
  * @author sylvia
  */

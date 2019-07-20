@@ -128,9 +128,9 @@
     
     <managed-bean>
         <managed-bean-name>inspectionChecklistIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>occupancyIntegrator</managed-bean-name>
@@ -184,15 +184,15 @@
     
     <managed-bean>
         <managed-bean-name>occupancyCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.OccupancyCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>paymentCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.coordinators.PaymentCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.PaymentCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     <!--session-scoped beans-->
     
     

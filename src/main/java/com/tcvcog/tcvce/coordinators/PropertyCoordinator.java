@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
@@ -68,40 +69,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     public PropertyWithLists getNewPropertyWithLists(){
-        PropertyWithLists propWithLists = new PropertyWithLists();
+        PropertyUnitWithLists propUnitWithLists = new PropertyWithLists();
         return propWithLists;
     }
     
-    /**
-     * Returns PropertyWithLists without default unit. Useful for displaying a list of units for
-     * a multiunit property.
-     * @param prop
-     * @return PropertyWithLists object
-     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
-     */
-    public PropertyWithLists getPropertyUnitsWithoutDefault(Property prop) throws CaseLifecyleException{
-        PropertyIntegrator pi = getPropertyIntegrator();
-        PropertyWithLists propWithLists = pi.getNewPropertyWithLists();
-        
-        try{
-            propWithLists = pi.getPropertyWithLists(prop.getPropertyID());
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        // Removes the default, automatically generated PropertyUnit        
-        List<PropertyUnit> unitList = propWithLists.getUnitList();
-        PropertyUnit defaultUnit = null;
-        for(PropertyUnit unit:unitList){
-            if(unit.getUnitNumber().equals("-1")){
-            defaultUnit = unit;
-            }
-        }
-        unitList.remove(defaultUnit);        
-
-        return propWithLists;
-    }
+    
     /**
      * Returns PropertyWithLists with all units, including default unit.
      * @param prop

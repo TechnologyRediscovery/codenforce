@@ -50,11 +50,10 @@ public class PropertyWithLists extends Property implements Serializable{
         this.lotAndBlock = prop.getLotAndBlock();
         this.address = prop.getAddress();
 
-        this.propertyUseType = prop.getPropertyUseType();
+        this.useTypeString = prop.getUseTypeString();
         this.useGroup = prop.getUseGroup();
         this.constructionType = prop.getConstructionType();
         this.countyCode = prop.getCountyCode();
-        this.apartmentno = prop.getApartmentno();
 
         this.notes = prop.getNotes();
         this.address_city = prop.getAddress_city();
@@ -64,28 +63,32 @@ public class PropertyWithLists extends Property implements Serializable{
         this.ownerCode = prop.getOwnerCode();
         this.propclass = prop.getPropclass();
 
-        this.lastupdated = prop.getLastupdated();
-        this.lastupdatedby = prop.getLastupdatedby();
-        this.locationdescription = prop.getLocationdescription();
+        this.lastUpdatedTS = prop.getLastUpdatedTS();
+        this.lastUpdatedBy = prop.getLastUpdatedBy();
+        this.locationDescriptor = prop.getLocationDescriptor();
 
-        this.datasource = prop.getDatasource();
-        this.unfitdatestart = prop.getUnfitdatestart();
-        this.unfitdatestop = prop.getUnfitdatestop();
-        this.unfitby = prop.getUnfitby();
+        this.bobSource = prop.getBobSource();
+        this.unfitDateStart = prop.getUnfitDateStart();
+        this.unfitDateStop = prop.getUnfitDateStop();
+        this.unfitBy = prop.getUnfitBy();
 
-        this.abandoneddatestart = prop.getAbandoneddatestart();
-        this.abandoneddatestop = prop.getAbandoneddatestop();
-        this.abandonedby = prop.getAbandonedby();
-        this.vacantdatestart = prop.getVacantdatestart();
+        this.abandonedDateStart = prop.getAbandonedDateStart();
+        this.abandonedDateStop = prop.getAbandonedDateStop();
+        this.abandonedBy = prop.getAbandonedBy();
+        this.vacantDateStart = prop.getVacantDateStart();
 
-        this.vacantdatestop = prop.getVacantdatestop();
-        this.vacantbu_userid = prop.getVacantbu_userid();
-        this.condition_intensityclassid = prop.getCondition_intensityclassid();
+        this.vacantDateStop = prop.getVacantDateStop();
+        this.vacantBy = prop.getVacantBy();
+        this.conditionIntensityClassID = prop.getConditionIntensityClassID();
 
-        this.landbankprospect_intensityclassid = prop.getLandbankprospect_intensityclassid();
-        this.landbankheld = prop.isLandbankheld();
+        this.landBankProspectIntensityClassID = prop.getLandBankProspectIntensityClassID();
+        this.LandBankHeld = prop.isLandBankHeld();
         this.active = prop.isActive();
         this.nonAddressable = prop.isNonAddressable();
+        
+        this.useTypeID = prop.getUseTypeID();
+        this.useTypeString = prop.getUseTypeString();
+        
         
     }
     

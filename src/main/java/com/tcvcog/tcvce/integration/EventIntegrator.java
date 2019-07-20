@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
-import com.tcvcog.tcvce.entities.EventRule;
+import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.EventRuleSet;
 import com.tcvcog.tcvce.entities.MuniProfile;
@@ -39,7 +39,7 @@ import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.OccPeriodEventRule;
+import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -135,8 +135,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public EventRule getEventRule(int ruleid) throws IntegrationException{
-        EventRule rule = null;
+    public EventRuleAbstract getEventRule(int ruleid) throws IntegrationException{
+        EventRuleAbstract rule = null;
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -180,8 +180,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws SQLException
      */
-    private EventRule generateEventRule(ResultSet rs) throws SQLException, IntegrationException{
-        EventRule evRule = new EventRule();
+    private EventRuleAbstract generateEventRule(ResultSet rs) throws SQLException, IntegrationException{
+        EventRuleAbstract evRule = new EventRuleAbstract();
         ChoiceIntegrator ci = getChoiceIntegrator();
         
         evRule.setRuleid(rs.getInt("ruleid"));
@@ -217,8 +217,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return evRule;
     }
     
-    public List<EventRule> getEventRuleList(int ruleSetID) throws IntegrationException{
-        List<EventRule> list = new ArrayList<>();
+    public List<EventRuleAbstract> getEventRuleList(int ruleSetID) throws IntegrationException{
+        List<EventRuleAbstract> list = new ArrayList<>();
         String query = "SELECT eventrule_ruleid\n" +
                         "  FROM public.eventruleruleset WHERE ruleset_rulesetid=?;";
         Connection con = getPostgresCon();
@@ -308,12 +308,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return s;
     }
     
-    public List<CECaseEventRule> getEventRuleList(CECase cse) throws IntegrationException{
+    public List<CECaseEventRule> getEventRuleCECaseList(CECase cse) throws IntegrationException{
         EventRuleImplementation ruleImp = null;
         List<CECaseEventRule> ruleList = new ArrayList<>();
         String query =  "   SELECT cecase_caseid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
                         "       lastevaluatedts, passedrulets, passedrule_eventid\n" +
-                        "  FROM public.cecaserule;";
+                        "  FROM public.cecaserule WHERE cecase_caseid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -363,16 +363,16 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
        return ruleImp;
     }
     
-    private OccPeriodEventRule generateOccPeriodEventRule(ResultSet rs, EventRuleImplementation imp) throws SQLException{
-        OccPeriodEventRule evRule = new OccPeriodEventRule(imp);
+    private EventRuleOccPeriod generateOccPeriodEventRule(ResultSet rs, EventRuleImplementation imp) throws SQLException{
+        EventRuleOccPeriod evRule = new EventRuleOccPeriod(imp);
         evRule.setOccPeriodID(rs.getInt("occperiod_periodid"));
         evRule.setPassedRuleEvent(getOccEvent(rs.getInt("passedrule_eventid")));
         return evRule;
     }
     
-    public List<OccPeriodEventRule> getEventRuleList(OccPeriod op) throws IntegrationException{
+    public List<EventRuleOccPeriod> getEventRuleOccPeriodList(OccPeriod op) throws IntegrationException{
         EventRuleImplementation ruleImp;
-        List<OccPeriodEventRule> ruleList = new ArrayList<>();
+        List<EventRuleOccPeriod> ruleList = new ArrayList<>();
         String query = "SELECT occperiod_periodid, eventrule_ruleid, attachedts, attachedby_userid, \n" +
                         "       lastevaluatedts, passedrulets, passedrule_eventid\n" +
                         "  FROM public.occperiodeventrule WHERE occperiod_periodid=?;";
