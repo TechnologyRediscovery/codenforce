@@ -164,14 +164,13 @@ public class PropertyUnitChange {
         
         skeleton.setUnitNumber(unitNumber);
         
-        skeleton.setRental(rental);
         
         skeleton.setNotes(notes);
         
         skeleton.setOtherKnownAddress(otherKnownAddress);
         
         try {
-            skeleton.setProperty(pi.getProperty(propertyID));
+            skeleton.setPropertyID(pi.getProperty(propertyID).getPropertyID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

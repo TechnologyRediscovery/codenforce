@@ -23,14 +23,14 @@ import java.time.LocalDateTime;
  *
  * @author sylvia
  */
-public class EventRuleImplementation extends EventRule implements Serializable{
+public class EventRuleImplementation extends EventRuleAbstract implements Serializable{
     
     protected LocalDateTime attachedTS;
     protected User attachedBy;
     protected LocalDateTime lastEvaluatedTS;
     protected LocalDateTime passedRuleTS;
     
-    public EventRuleImplementation(EventRule rule){
+    public EventRuleImplementation(EventRuleAbstract rule){
         
         this.ruleid = rule.getRuleid();
         this.title = rule.getTitle();

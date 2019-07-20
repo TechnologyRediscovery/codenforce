@@ -43,13 +43,13 @@ import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 
-import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
-import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -146,8 +146,8 @@ public class Initializer implements ServletContextListener{
         
         // occupancy "modules"
         
-        ChecklistIntegrator chklstInt = new ChecklistIntegrator();
-        servletContext.setAttribute("ChecklistIntegrator", chklstInt);
+        OccInspectionIntegrator inspecInt = new OccInspectionIntegrator();
+        servletContext.setAttribute("occInspectionIntegrator", inspecInt);
         
         OccupancyIntegrator occupancyIntegrator = new OccupancyIntegrator();
         servletContext.setAttribute("occupancyIntegrator", occupancyIntegrator);

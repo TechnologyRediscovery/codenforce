@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 
@@ -55,7 +55,7 @@ public class SpaceTypeBB extends BackingBeanUtils implements Serializable {
      * @return the spaceTypeList
      */
     public List<OccSpaceType> getSpaceTypeList() {
-        ChecklistIntegrator si = getChecklistIntegrator();
+        OccInspectionIntegrator si = getOccInspectionIntegrator();
         
 //        try {
 ////            spaceTypeList = si.getSpa();

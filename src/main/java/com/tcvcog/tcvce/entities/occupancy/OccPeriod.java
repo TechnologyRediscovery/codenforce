@@ -8,7 +8,8 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.EventRule;
+import com.tcvcog.tcvce.entities.EventRuleAbstract;
+import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.User;
@@ -30,7 +31,8 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private List<PersonOccPeriod> personList;
     private List<OccEvent> eventList;
     private List<Proposal> eventProposalList;
-    private List<EventRule> eventRuleList;
+    private List<EventRuleOccPeriod> eventRuleOccPeriodList;
+    
     private List<OccInspection> inspectionList;
     private List<OccPermit> permitList;
     private List<Integer> blobIDList;
@@ -439,18 +441,20 @@ public class OccPeriod extends EntityUtils implements Serializable{
         this.defaultValidityPeriodDays = defaultValidityPeriodDays;
     }
 
+    
+
     /**
-     * @return the eventRuleList
+     * @return the eventRuleOccPeriodList
      */
-    public List<EventRule> getEventRuleList() {
-        return eventRuleList;
+    public List<EventRuleOccPeriod> getEventRuleOccPeriodList() {
+        return eventRuleOccPeriodList;
     }
 
     /**
-     * @param eventRuleList the eventRuleList to set
+     * @param eventRuleOccPeriodList the eventRuleOccPeriodList to set
      */
-    public void setEventRuleList(List<EventRule> eventRuleList) {
-        this.eventRuleList = eventRuleList;
+    public void setEventRuleOccPeriodList(List<EventRuleOccPeriod> eventRuleOccPeriodList) {
+        this.eventRuleOccPeriodList = eventRuleOccPeriodList;
     }
      
     

@@ -149,11 +149,11 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
                                 " [Removed on " + change.getChangedOn().toGMTString()
                                 + " by " + change.getChangedBy() + "]"));
 
-                        pi.updatePropertyUnit(change);
+                        pi.implementPropertyUnitChangeOrder(change);
 
                     } else {
 
-                        pi.updatePropertyUnit(change);
+                        pi.implementPropertyUnitChangeOrder(change);
 
                     }
 

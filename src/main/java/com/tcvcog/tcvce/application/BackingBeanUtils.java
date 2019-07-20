@@ -50,7 +50,7 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 
 // occupancy integrators
-import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
@@ -58,7 +58,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 // system integrators
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
-import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.sql.SQLException;
@@ -112,7 +112,7 @@ public class BackingBeanUtils implements Serializable{
     private PersonCoordinator personCoordinator;
     private PropertyCoordinator propertyCoordinator;
     
-    private ChecklistIntegrator checklistIntegrator;
+    private OccInspectionIntegrator occInspectionIntegrator;
     private OccupancyIntegrator occupancyIntegrator;
     private PaymentIntegrator paymentIntegrator;
     private OccupancyCoordinator occupancyCoordinator;
@@ -576,22 +576,22 @@ public class BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the checklistIntegrator
+     * @return the occInspectionIntegrator
      */
-    public ChecklistIntegrator getChecklistIntegrator() {
+    public OccInspectionIntegrator getOccInspectionIntegrator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{checklistIntegrator}", ChecklistIntegrator.class);
-        checklistIntegrator = (ChecklistIntegrator) ve.getValue(context.getELContext());
+                .createValueExpression(context.getELContext(), "#{occInspectionIntegrator}", OccInspectionIntegrator.class);
+        occInspectionIntegrator = (OccInspectionIntegrator) ve.getValue(context.getELContext());
         
-        return checklistIntegrator;
+        return occInspectionIntegrator;
     }
 
     /**
-     * @param checklistIntegrator the checklistIntegrator to set
+     * @param occInspectionIntegrator the occInspectionIntegrator to set
      */
-    public void setChecklistIntegrator(ChecklistIntegrator checklistIntegrator) {
-        this.checklistIntegrator = checklistIntegrator;
+    public void setOccInspectionIntegrator(OccInspectionIntegrator occInspectionIntegrator) {
+        this.occInspectionIntegrator = occInspectionIntegrator;
     }
 
     /**

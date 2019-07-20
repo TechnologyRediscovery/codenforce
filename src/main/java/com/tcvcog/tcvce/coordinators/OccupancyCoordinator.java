@@ -15,7 +15,7 @@ Council of Governments, PA
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.occupancy.coordinators;
+package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -31,7 +31,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
-import com.tcvcog.tcvce.occupancy.integration.ChecklistIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -70,7 +70,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }    
     
     public void saveNewlyInspectedSpace(OccInspection oi, OccInspectedSpace is) throws IntegrationException{
-        ChecklistIntegrator ci = getChecklistIntegrator();
+        OccInspectionIntegrator ci = getOccInspectionIntegrator();
         ci.insertNewlyInspectedSpace(oi, is);
     }
     
