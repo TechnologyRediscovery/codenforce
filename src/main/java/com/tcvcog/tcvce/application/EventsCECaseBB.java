@@ -92,8 +92,6 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         // which would have been placed there by the generateReport method in this bean
         reportConfig = getSessionBean().getReportConfigCEEventList();
         
-        
-        
     }
     
     public void hideEvent(EventCECaseCasePropBundle ev){

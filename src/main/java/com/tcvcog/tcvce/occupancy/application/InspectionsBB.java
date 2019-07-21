@@ -54,7 +54,6 @@ import javax.faces.event.ActionEvent;
  */
 public class InspectionsBB extends BackingBeanUtils implements Serializable {
 
-    private List<OccInspection> inspectionList;
     private OccInspection currentInspection;
     
     /**
@@ -111,43 +110,10 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void addOccupancyInspection(){
-        OccInspection o = null;
-        OccupancyIntegrator oii =  getOccupancyIntegrator();
-        OccInspectionIntegrator ci = getOccInspectionIntegrator();
-        
-
-        try{
-            ci.insertOccupanyInspection(currentInspection);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Succcessfully added occupancy inspection to the database!", ""));
-        }catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                   getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "Unable to add occupancy inspection to the database, my apologies!", "Check again..."));
-            }
-    }
+   
 
 
-    /**
-     * Controls the release of the list of OccupancyInspections stuck in the main 
-     * data table on the left side of inspections.xhtml/';.
-     * 
-     * @return the inspectionList
-     */
-    public List<OccInspection> getInspectionList() {
-        // The SessionBean holds a list of OccupancyInspections
-        // which we will always use when first loading this page.
-        // Before leaving this page, put whatever the current page-based
-        // List has in it back on the SessionBean's shelf
-        List<OccInspection> occList = getSessionBean().getInspectionQueue();
-        if(occList != null){
-            inspectionList = occList;
-        }
-        return inspectionList;
-    }
+  
 
     /**
      * @return the currentInspection
@@ -156,12 +122,7 @@ public class InspectionsBB extends BackingBeanUtils implements Serializable {
         return currentInspection;
     }
 
-    /**
-     * @param inspectionList the inspectionList to set
-     */
-    public void setInspectionList(List<OccInspection> inspectionList) {
-        this.inspectionList = inspectionList;
-    }
+  
 
     /**
      * @param currentInspection the currentInspection to set

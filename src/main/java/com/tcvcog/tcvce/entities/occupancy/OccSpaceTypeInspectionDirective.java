@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
@@ -29,19 +28,6 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
     protected boolean overrideSpaceTypeRequiredValue;
     protected boolean overrideSpaceTypeRequireAllSpaces;
     protected List<OccSpace> spaceList;
-    
-    
-    //xiaohong add
-    protected boolean selected;
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-    
     
     public OccSpaceTypeInspectionDirective(OccSpaceType type){
         this.spaceTypeID = type.getSpaceTypeID();
@@ -96,7 +82,7 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
     /**
      * @return the spaceList
      */
-    public List<OccSpace> getSpaceList() {
+    public List getSpaceList() {
         return spaceList;
     }
 
@@ -105,43 +91,6 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
      */
     public void setSpaceList(List<OccSpace> spaceList) {
         this.spaceList = spaceList;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 97 * hash + (this.overrideSpaceTypeRequired ? 1 : 0);
-        hash = 97 * hash + (this.overrideSpaceTypeRequiredValue ? 1 : 0);
-        hash = 97 * hash + (this.overrideSpaceTypeRequireAllSpaces ? 1 : 0);
-        hash = 97 * hash + Objects.hashCode(this.spaceList);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OccSpaceTypeInspectionDirective other = (OccSpaceTypeInspectionDirective) obj;
-        if (this.overrideSpaceTypeRequired != other.overrideSpaceTypeRequired) {
-            return false;
-        }
-        if (this.overrideSpaceTypeRequiredValue != other.overrideSpaceTypeRequiredValue) {
-            return false;
-        }
-        if (this.overrideSpaceTypeRequireAllSpaces != other.overrideSpaceTypeRequireAllSpaces) {
-            return false;
-        }
-        if (!Objects.equals(this.spaceList, other.spaceList)) {
-            return false;
-        }
-        return true;
     }
     
 

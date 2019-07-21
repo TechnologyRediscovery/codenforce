@@ -388,5 +388,56 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     public HashMap<String, Integer> getMunicipalityStringIDMap() throws IntegrationException{
         return generateCompleteMuniNameIDMap();
     }
+
+    /**
+     * Users are permitted access to a set of municipalities which are all dumped
+     * into a List by this method during the user lookup process.
+     * @param uid
+     * @return A list of Municipalities to which the user should be granted data-related
+     * access within their user type domain
+     * @throws IntegrationException
+     */
+    public List<Municipality> getUserAuthMunis(int uid, UserIntegrator userIntegrator) throws IntegrationException {
+        Connection con = userIntegrator.getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT muni_municode FROM loginmuni WHERE userid = ?;";
+        List<Municipality> muniList = new ArrayList<>();
+        PreparedStatement stmt = null;
+        MunicipalityIntegrator mi = userIntegrator.getMunicipalityIntegrator();
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, uid);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                muniList.add(mi.getMuni(rs.getInt("muni_municode")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("UserIntegrator.getUserAuthMunis | Error getting user-auth-munis", ex);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */
+                }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+        } // close finally
+        return muniList;
+    }
     
 }

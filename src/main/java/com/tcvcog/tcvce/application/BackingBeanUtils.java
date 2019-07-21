@@ -250,7 +250,7 @@ public class BackingBeanUtils implements Serializable{
      * Chops up the current time to get seven random digits
      * @return 
      */
-    public int getControlCodeFromTime(){
+    public int generateControlCodeFromTime(){
          long dateInMs = new Date().getTime();
          
          String numAsString = String.valueOf(dateInMs);

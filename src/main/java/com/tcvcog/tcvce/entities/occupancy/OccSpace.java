@@ -31,6 +31,7 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
     protected int occSpaceTypeID;
     protected String name;
     protected boolean required;
+    protected String description;
     protected List<CodeElement> elementList;
 
 
@@ -103,6 +104,20 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
      */
     public void setOccSpaceTypeID(int occSpaceTypeID) {
         this.occSpaceTypeID = occSpaceTypeID;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
    

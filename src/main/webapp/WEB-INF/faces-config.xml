@@ -1536,13 +1536,8 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <managed-bean-name>choiceCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.ChoiceCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    <managed-bean>
-        <managed-bean-name>choiceIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.integration.ChoiceIntegrator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
+        <managed-bean-name>occPeriodsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

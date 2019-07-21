@@ -12,7 +12,7 @@ import java.io.Serializable;
  * Note the switches are private and final--so they can't be tweaked on the fly
  * by changes in other classes. Watch git changes for those in here!
  *  
- * @author Ellen Baskem
+ * @author Ellen Bascomb
  */
 public class AccessKeyCard implements Serializable{
 
@@ -22,15 +22,13 @@ public class AccessKeyCard implements Serializable{
     private final boolean hasEnfOfficialPermissions;
     private final boolean hasMuniStaffPermissions;
     private final boolean hasMuniReaderPermissions;
-    private final int rank;
 
     public AccessKeyCard(   boolean dev,
                             boolean admin,
                             boolean cogstaff,
                             boolean ceo,
                             boolean munistaff,
-                            boolean munireader,
-                            int r){
+                            boolean munireader){
         
         hasDeveloperPermissions = dev;
         hasSysAdminPermissions = admin;
@@ -38,7 +36,6 @@ public class AccessKeyCard implements Serializable{
         hasEnfOfficialPermissions = ceo;
         hasMuniStaffPermissions = munistaff;
         hasMuniReaderPermissions = munireader;
-        rank = r;
         
     }
 
@@ -84,11 +81,6 @@ public class AccessKeyCard implements Serializable{
     public boolean isHasMuniReaderPermissions() {
         return hasMuniReaderPermissions;
     }
-    
-    public int getRank(){
-        return rank;
-    }
-    
     
     
 }

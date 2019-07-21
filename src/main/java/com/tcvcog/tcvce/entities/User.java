@@ -32,23 +32,15 @@ public class User implements Serializable{
     private int userID;
     private RoleType roleType;
     private String username;
-    private String password;
     
     private Person person;
     private int personID;
-   
+    
+    private UserAccessRecord accessRecord;
     
     private String notes;
-    private LocalDateTime activityStartDate;
-    private java.util.Date activityStartDateUtilDate;
-    private LocalDateTime activityStopDate;
-    private java.util.Date activityStopDateUtilDate;
-    
-    // permissions
-    private boolean systemAccessPermitted;
     private AccessKeyCard keyCard;
     
-    private boolean isEnforcementOfficial;
     private String badgeNumber;
     private String oriNumber;
     
@@ -120,37 +112,6 @@ public class User implements Serializable{
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
-    /**
-     * @return the activityStartDate
-     */
-    public LocalDateTime getActivityStartDate() {
-        return activityStartDate;
-    }
-
-    /**
-     * @param activityStartDate the activityStartDate to set
-     */
-    public void setActivityStartDate(LocalDateTime activityStartDate) {
-        this.activityStartDate = activityStartDate;
-    }
-
-    /**
-     * @return the activityStopDate
-     */
-    public LocalDateTime getActivityStopDate() {
-        return activityStopDate;
-    }
-
-    /**
-     * @param activityStopDate the activityStopDate to set
-     */
-    public void setActivityStopDate(LocalDateTime activityStopDate) {
-        this.activityStopDate = activityStopDate;
-    }
-
-   
-
    
     
     
@@ -168,20 +129,6 @@ public class User implements Serializable{
      */
     public void setKeyCard(AccessKeyCard keyCard) {
         this.keyCard = keyCard;
-    }
-
-    /**
-     * @return the systemAccessPermitted
-     */
-    public boolean isSystemAccessPermitted() {
-        return systemAccessPermitted;
-    }
-
-    /**
-     * @param systemAccessPermitted the systemAccessPermitted to set
-     */
-    public void setSystemAccessPermitted(boolean systemAccessPermitted) {
-        this.systemAccessPermitted = systemAccessPermitted;
     }
 
     /**
@@ -205,19 +152,6 @@ public class User implements Serializable{
         this.person = person;
     }
 
-    /**
-     * @return the isEnforcementOfficial
-     */
-    public boolean isIsEnforcementOfficial() {
-        return isEnforcementOfficial;
-    }
-
-    /**
-     * @param isEnforcementOfficial the isEnforcementOfficial to set
-     */
-    public void setIsEnforcementOfficial(boolean isEnforcementOfficial) {
-        this.isEnforcementOfficial = isEnforcementOfficial;
-    }
 
     /**
      * @return the badgeNumber
@@ -248,51 +182,6 @@ public class User implements Serializable{
     }
 
     /**
-     * @return the activityStopDateUtilDate
-     */
-    public java.util.Date getActivityStopDateUtilDate() {
-        if(getActivityStopDate() != null){
-            activityStopDateUtilDate = java.util.Date.from(getActivityStopDate()
-                    .atZone(ZoneId.systemDefault()).toInstant());
-            
-        }
-        return activityStopDateUtilDate;
-    }
-
-    /**
-     * @param activityStopDateUtilDate the activityStopDateUtilDate to set
-     */
-    public void setActivityStopDateUtilDate(java.util.Date activityStopDateUtilDate) {
-        this.activityStopDateUtilDate = activityStopDateUtilDate;
-        if(activityStopDateUtilDate != null){
-            activityStopDate = activityStopDateUtilDate
-                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
-
-    /**
-     * @return the activityStartDateUtilDate
-     */
-    public java.util.Date getActivityStartDateUtilDate() {
-        if(getActivityStartDate() != null){
-            activityStartDateUtilDate = java.util.Date.from(getActivityStartDate()
-                    .atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return activityStartDateUtilDate;
-    }
-
-    /**
-     * @param activityStartDateUtilDate the activityStartDateUtilDate to set
-     */
-    public void setActivityStartDateUtilDate(java.util.Date activityStartDateUtilDate) {
-        this.activityStartDateUtilDate = activityStartDateUtilDate;
-        if(activityStartDateUtilDate != null){
-            activityStartDate = activityStartDateUtilDate
-                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
-
-    /**
      * @return the personID
      */
     public int getPersonID() {
@@ -309,19 +198,7 @@ public class User implements Serializable{
         this.personID = personID;
     }
 
-    /**
-     * @return the password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * @param password the password to set
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  
 
     @Override
     public int hashCode() {
@@ -329,17 +206,10 @@ public class User implements Serializable{
         hash = 43 * hash + this.userID;
         hash = 43 * hash + Objects.hashCode(this.roleType);
         hash = 43 * hash + Objects.hashCode(this.username);
-        hash = 43 * hash + Objects.hashCode(this.password);
         hash = 43 * hash + Objects.hashCode(this.person);
         hash = 43 * hash + this.personID;
         hash = 43 * hash + Objects.hashCode(this.notes);
-        hash = 43 * hash + Objects.hashCode(this.activityStartDate);
-        hash = 43 * hash + Objects.hashCode(this.activityStartDateUtilDate);
-        hash = 43 * hash + Objects.hashCode(this.activityStopDate);
-        hash = 43 * hash + Objects.hashCode(this.activityStopDateUtilDate);
-        hash = 43 * hash + (this.systemAccessPermitted ? 1 : 0);
         hash = 43 * hash + Objects.hashCode(this.keyCard);
-        hash = 43 * hash + (this.isEnforcementOfficial ? 1 : 0);
         hash = 43 * hash + Objects.hashCode(this.badgeNumber);
         hash = 43 * hash + Objects.hashCode(this.oriNumber);
         return hash;
@@ -362,6 +232,20 @@ public class User implements Serializable{
         }
        
         return true;
+    }
+
+    /**
+     * @return the accessRecord
+     */
+    public UserAccessRecord getAccessRecord() {
+        return accessRecord;
+    }
+
+    /**
+     * @param accessRecord the accessRecord to set
+     */
+    public void setAccessRecord(UserAccessRecord accessRecord) {
+        this.accessRecord = accessRecord;
     }
     
 }

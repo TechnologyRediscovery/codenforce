@@ -142,7 +142,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         
         queryList = sc.buildQueryCECaseList(getSessionBean().getActiveMuni(), getSessionBean().getFacesUser());
-        selectedCECaseQuery = getSessionBean().getSessionQueryCECase();
+        selectedCECaseQuery = getSessionBean().getQueryCECase();
         searchParams = selectedCECaseQuery.getSearchParamsList().get(0);
         if(!selectedCECaseQuery.isExecutedByIntegrator()){
             try {
@@ -355,7 +355,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setSessionReport(reportCECase);
         // force our reportingBB to choose the right bundle
         getSessionBean().setReportConfigCECaseList(null);
-        getSessionBean().setSessionQueryCECase(selectedCECaseQuery);
+        getSessionBean().setQueryCECase(selectedCECaseQuery);
 
         return "reportCECase";
     }
@@ -382,7 +382,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         getSessionBean().setReportConfigCECase(null);
         getSessionBean().setcECaseQueue(caseList);
         getSessionBean().setSessionReport(reportCECaseList);
-        getSessionBean().setSessionQueryCECase(selectedCECaseQuery);
+        getSessionBean().setQueryCECase(selectedCECaseQuery);
         
         return "reportCECaseList";
 

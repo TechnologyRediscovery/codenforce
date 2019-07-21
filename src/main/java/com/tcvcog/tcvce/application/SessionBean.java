@@ -32,6 +32,12 @@ import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,17 +59,19 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private List<CEActionRequest> queueCEAR;
     
     private CEActionRequest sessionCEAR;
-    private QueryCEAR sessionQueryCEAR;
     
     private List<CECase> cECaseQueue;
     private List<EventCECaseCasePropBundle> cEEventWCPIQueue;
     private List<CodeViolation> violationQueue;
     private List<OccInspection> inspectionQueue;
     
-    private QueryCECase sessionQueryCECase;
-   
-    
+    private QueryProperty queryProperty;
+    private QueryPerson queryPerson;
+    private QueryCEAR sessionQueryCEAR;
+    private QueryCECase queryCECase;
     private QueryEventCECase queryEventCECase;
+    private QueryOccPeriod queryOccPeriod;
+    
    
     /* *** System Core Objects Session Shelves ***  */
     private Municipality activeMuni;
@@ -106,6 +114,16 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private OccPermitApplication occPermitApplication;
     private PropertyUnit activePropUnit;
     private PropertyWithLists activePropWithLists;
+    private PropertyWithLists workingPropWithLists;
+    private PersonType activePersonType;
+    
+    private OccPeriod sessionOccPeriod;
+    private List<OccPeriod> sessionOccPeriodList;
+    private OccInspection sessionOccInspection;
+    private OccPermit sessionOccPermit;
+    
+    /* *** Public Person Search/Edit Session Shelves *** */
+    private Person activeAnonPerson;
     private OccPermitApplicationReason occPermitApplicationReason;
 
     /* *** Blob Upload Session Shelves *** */
@@ -654,20 +672,130 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
    
 
     /**
-     * @return the sessionQueryCECase
+     * @return the queryCECase
      */
-    public QueryCECase getSessionQueryCECase() {
-        return sessionQueryCECase;
+    public QueryCECase getQueryCECase() {
+        return queryCECase;
     }
 
     /**
-     * @param sessionQueryCECase the sessionQueryCECase to set
+     * @param queryCECase the queryCECase to set
      */
-    public void setSessionQueryCECase(QueryCECase sessionQueryCECase) {
-        this.sessionQueryCECase = sessionQueryCECase;
+    public void setQueryCECase(QueryCECase queryCECase) {
+        this.queryCECase = queryCECase;
     }
 
-    
+    /**
+     * @return the activePersonType
+     */
+    public PersonType getActivePersonType() {
+        return activePersonType;
+    }
+
+    /**
+     * @param activePersonType the activePersonType to set
+     */
+    public void setActivePersonType(PersonType activePersonType) {
+        this.activePersonType = activePersonType;
+    }
+
+    /**
+     * @return the activeAnonPerson
+     */
+    public Person getActiveAnonPerson() {
+        return activeAnonPerson;
+    }
+
+    /**
+     * @param activeAnonPerson the activeAnonPerson to set
+     */
+    public void setActiveAnonPerson(Person activeAnonPerson) {
+        this.activeAnonPerson = activeAnonPerson;
+    }
+
+    /**
+     * @return the occPermitApplicationReason
+     */
+    public OccPermitApplicationReason getOccPermitApplicationReason() {
+        return occPermitApplicationReason;
+    }
+
+    /**
+     * @param occPermitApplicationReason the occPermitApplicationReason to set
+     */
+    public void setOccPermitApplicationReason(OccPermitApplicationReason occPermitApplicationReason) {
+        this.occPermitApplicationReason = occPermitApplicationReason;
+    }
+
+    /**
+     * @return the sessionOccPeriod
+     */
+    public OccPeriod getSessionOccPeriod() {
+        return sessionOccPeriod;
+    }
+
+    /**
+     * @return the queryOccPeriod
+     */
+    public QueryOccPeriod getQueryOccPeriod() {
+        return queryOccPeriod;
+    }
+
+    /**
+     * @return the sessionOccPeriodList
+     */
+    public List<OccPeriod> getSessionOccPeriodList() {
+        return sessionOccPeriodList;
+    }
+
+    /**
+     * @return the sessionOccInspection
+     */
+    public OccInspection getSessionOccInspection() {
+        return sessionOccInspection;
+    }
+
+    /**
+     * @return the sessionOccPermit
+     */
+    public OccPermit getSessionOccPermit() {
+        return sessionOccPermit;
+    }
+
+    /**
+     * @param sessionOccPeriod the sessionOccPeriod to set
+     */
+    public void setSessionOccPeriod(OccPeriod sessionOccPeriod) {
+        this.sessionOccPeriod = sessionOccPeriod;
+    }
+
+    /**
+     * @param queryOccPeriod the queryOccPeriod to set
+     */
+    public void setQueryOccPeriod(QueryOccPeriod queryOccPeriod) {
+        this.queryOccPeriod = queryOccPeriod;
+    }
+
+    /**
+     * @param sessionOccPeriodList the sessionOccPeriodList to set
+     */
+    public void setSessionOccPeriodList(List<OccPeriod> sessionOccPeriodList) {
+        this.sessionOccPeriodList = sessionOccPeriodList;
+    }
+
+    /**
+     * @param sessionOccInspection the sessionOccInspection to set
+     */
+    public void setSessionOccInspection(OccInspection sessionOccInspection) {
+        this.sessionOccInspection = sessionOccInspection;
+    }
+
+    /**
+     * @param sessionOccPermit the sessionOccPermit to set
+     */
+    public void setSessionOccPermit(OccPermit sessionOccPermit) {
+        this.sessionOccPermit = sessionOccPermit;
+    }
     
     
 }
