@@ -49,9 +49,58 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     }    
     
+    /**
+     * Primary user retrieval method: Note that there aren't as many checks here
+     * since the jboss container is managing the lookup of authenticated users. 
+     * We are pulling the login name from the already authenticated glassfish user 
+     * and just grabbing their profile from the db
+     * 
+     * @param loginName
+     * @return the fully baked cog user
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException occurs if the user
+     * has been retrieved from the database but their access has been toggled off
+     */
+    public User getUser(String loginName) throws IntegrationException, AuthorizationException{
+        System.out.println("UserCoordinator.getUser | given by jboss: " + loginName );
+        User authenticatedUser;
+        UserIntegrator ui = getUserIntegrator();
+        authenticatedUser = ui.getUser(loginName);
+        Municipality m = ui.getUserDefaultMunicipality(authenticatedUser.getUserID());
+        
+        if(configureUserMuniAccess(authenticatedUser, m) != null){
+            // set user permissions with the role type that comes from the DB
+            // which the Integrator sets
+            authenticatedUser.setKeyCard(acquireAccessKeyCard(authenticatedUser.getRoleType()));
+            return authenticatedUser;
+            
+        } else {
+            throw new AuthorizationException("User exists but access to system "
+                    + "has been switched off. If you believe you are receiving "
+                    + "this message in error, please contact system administrator "
+                    + "Eric Darsow at 412.923.9907.");
+        }
+    }
+    
+    private User configureUserMuniAccess(User u, Municipality m){
+        
+        if(u.getAccessRecord().getAccessgranteddatestart().isBefore(LocalDateTime.now())
+                &&
+            u.getAccessRecord().getAccessgranteddatestop().isAfter(LocalDateTime.now())
+                && 
+                
+            )
+        
+        
+        
+        
+        return null;
+    }
+    
+    
     public int insertNewUser(User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        String tempPassword = String.valueOf(getControlCodeFromTime());
+        String tempPassword = String.valueOf(generateControlCodeFromTime());
         u.setPassword(tempPassword);
         int newUserID = ui.insertUser(u);
         return newUserID;
@@ -96,43 +145,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     public User getUserSkeleton(){
         User u = new User();
-        u.setActivityStartDate(LocalDateTime.now());
-        u.setActivityStopDate(LocalDateTime.now().plusYears(1));
         return u;
     }
    
-    /**
-     * Primary user retrieval method: Note that there aren't as many checks here
-     * since the jboss container is managing the lookup of authenticated users. 
-     * We are pulling the login name from the already authenticated glassfish user 
-     * and just grabbing their profile from the db
-     * 
-     * @param loginName
-     * @return the fully baked cog user
-     * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.AuthorizationException occurs if the user
-     * has been retrieved from the database but their access has been toggled off
-     */
-    public User getUser(String loginName) throws IntegrationException, AuthorizationException{
-        System.out.println("UserCoordinator.getUser | given: " + loginName );
-        User authenticatedUser;
-        UserIntegrator ui = getUserIntegrator();
-        authenticatedUser = ui.getUser(loginName);
-        // integrator sets high level system access permissions
-        if(authenticatedUser.isSystemAccessPermitted()){
-            // set user permissions with the role type that comes from the DB
-            // which the Integrator sets
-            authenticatedUser.setKeyCard(acquireAccessKeyCard(authenticatedUser.getRoleType()));
-            return authenticatedUser;
-            
-        } else {
-            
-            throw new AuthorizationException("User exists but access to system "
-                    + "has been switched off. If you believe you are receiving "
-                    + "this message in error, please contact system administrator "
-                    + "Eric Darsow at 412.923.9907.");
-        }
-    }
     
     public Municipality getDefaultyMuni(User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
@@ -147,7 +162,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     public List<Municipality> getUserAuthMuniList(int userID) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        List<Municipality> ml = ui.getUserAuthMunis(userID);
+        List<Municipality> ml = ui.getUserAuthMunis(userID, this);
         return ml;
     }
     
@@ -174,8 +189,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     true,   // cogstaff
                                     true,   // enfOfficial
                                     true,   // muniStaff
-                                    true,
-                                    1);  // muniReader
+                                    true);  // muniReader
                break;
             
             case SysAdmin:
@@ -184,8 +198,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     true,   // cogstaff
                                     true,   // enfOfficial
                                     true,   // muniStaff
-                                    true,
-                                    2           );  // muniReader
+                                    true);  // muniReader
                break;               
                
             case CogStaff:
@@ -194,8 +207,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     true,   // cogstaff
                                     false,   // enfOfficial
                                     true,   // muniStaff
-                                    true,
-                                    3           );  // muniReader
+                                    true);  // muniReader
                break;               
                
             case EnforcementOfficial:
@@ -204,8 +216,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     false,   // cogstaff
                                     true,   // enfOfficial
                                     true,   // muniStaff
-                                    true,
-                                    4           );  // muniReader
+                                    true);  // muniReader
                break;
                
             case MuniStaff:
@@ -214,8 +225,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     false,   // cogstaff
                                     false,   // enfOfficial
                                     true,   // muniStaff
-                                    true,
-                                    5       );  // muniReader
+                                    true);  // muniReader
                break;
                
             case MuniReader:
@@ -224,8 +234,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                                     false,   // cogstaff
                                     false,   // enfOfficial
                                     false,   // muniStaff
-                                    true,
-                                    6       );  // muniReader
+                                    true);  // muniReader
                break;               
                
             default:
@@ -245,7 +254,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public List<Municipality> getUnauthorizedMunis(User u) throws IntegrationException {
         
         UserIntegrator ui = getUserIntegrator();
-        List<Municipality> authMunis = ui.getUserAuthMunis(u.getUserID());        
+        List<Municipality> authMunis = ui.getUserAuthMunis(u.getUserID(), this);        
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         List<Municipality> munis = mi.getMuniList();
         

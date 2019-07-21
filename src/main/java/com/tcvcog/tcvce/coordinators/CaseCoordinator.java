@@ -276,7 +276,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     public CECase getInitializedCECase(Property p, User u){
         CECase newCase = new CECase();
         
-        int casePCC = getControlCodeFromTime();
+        int casePCC = generateControlCodeFromTime();
         // caseID set by postgres sequence
         // timestamp set by postgres
         // no closing date, by design of case flow

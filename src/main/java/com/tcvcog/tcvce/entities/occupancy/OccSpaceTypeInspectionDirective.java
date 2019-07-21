@@ -22,14 +22,14 @@ import java.util.List;
  *
  * @author sylvia
  */
-public class OccSpaceTypeTemplate extends OccSpaceType {
+public class OccSpaceTypeInspectionDirective extends OccSpaceType {
 
     protected boolean overrideSpaceTypeRequired;
     protected boolean overrideSpaceTypeRequiredValue;
     protected boolean overrideSpaceTypeRequireAllSpaces;
     protected List<OccSpace> spaceList;
     
-    public OccSpaceTypeTemplate(OccSpaceType type){
+    public OccSpaceTypeInspectionDirective(OccSpaceType type){
         this.spaceTypeID = type.getSpaceTypeID();
         this.spaceTypeTitle = type.getSpaceTypeTitle();
         this.spaceTypeDescription = type.getSpaceTypeDescription();

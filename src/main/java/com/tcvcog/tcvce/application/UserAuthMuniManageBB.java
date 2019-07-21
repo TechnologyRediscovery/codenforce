@@ -138,7 +138,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
         try {
             unauthorizedMuniList = getUnauthorizedMuniList();
             UserIntegrator ui = getUserIntegrator();
-            authMuniList = ui.getUserAuthMunis(selectedUser.getUserID());
+            authMuniList = ui.getUserAuthMunis(selectedUser.getUserID(), this);
         } catch(IntegrationException ex){
             System.out.println("UserAuthMuniManageBB.onSelectedUserChange | " + ex.toString());
         }
@@ -239,7 +239,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
                             "Removed " + muni.getMuniName() + " from " + selectedUser.getUsername() 
                                     + ".", ""));
         try {
-            authMuniList = ui.getUserAuthMunis(selectedUser.getUserID());
+            authMuniList = ui.getUserAuthMunis(selectedUser.getUserID(), this);
         }
         catch (IntegrationException ex){
              System.out.println("UserAuthMuniManageBB.removeAuthMuni | " + ex);

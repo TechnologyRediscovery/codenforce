@@ -139,7 +139,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         PreparedStatement stmt = null;
 
         String useType = null;
-
         
         try {
             stmt = con.prepareStatement(query);

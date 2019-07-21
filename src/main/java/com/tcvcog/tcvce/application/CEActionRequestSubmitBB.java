@@ -315,7 +315,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             }
         }
         
-        int controlCode = getControlCodeFromTime();
+        int controlCode = generateControlCodeFromTime();
         req.setRequestPublicCC(controlCode);
         
         // all requests now are required to be at a known address

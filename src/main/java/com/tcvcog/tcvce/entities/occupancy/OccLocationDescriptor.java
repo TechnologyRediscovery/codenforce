@@ -24,6 +24,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 public class OccLocationDescriptor {
     private int locationID;
     private String locationDescription;
+    private int buildingFloorNo;
 
     /**
      * @return the locationID
@@ -51,6 +52,22 @@ public class OccLocationDescriptor {
      */
     public void setLocationDescription(String locationDescription) {
         this.locationDescription = locationDescription;
+    }
+
+   
+
+    /**
+     * @return the buildingFloorNo
+     */
+    public int getBuildingFloorNo() {
+        return buildingFloorNo;
+    }
+
+    /**
+     * @param buildingFloorNo the buildingFloorNo to set
+     */
+    public void setBuildingFloorNo(int buildingFloorNo) {
+        this.buildingFloorNo = buildingFloorNo;
     }
     
 }

@@ -41,6 +41,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
 import java.util.ArrayList;
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -56,6 +57,11 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     public SessionInitializer() {
     }
     
+    @PostConstruct
+    public void initBean(){
+        
+    }
+    
     /**
      * Central method for setting up the user's session:
      * 1) First get the user from the system
@@ -67,6 +73,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @return success or failure String used by faces to navigate to the internal page
      * or the error page
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
     public String initiateInternalSession() throws IntegrationException, CaseLifecyleException{
         CodeIntegrator ci = getCodeIntegrator();
@@ -86,7 +93,6 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 System.out.println("SessionInitializer.initiateInternalSession ");
 
                 Municipality muni = uc.getDefaultyMuni(extractedUser);
-                
 //                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                        .getString("arbitraryPlaceholderPersonID"))));
                 getSessionBean().setFacesUser(extractedUser);
@@ -103,8 +109,6 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
                         Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
                          "SessionInitializer.initiateInternalSession | Created internal session", false, false);
-
-                
             }
         
         } catch (IntegrationException ex) {
@@ -120,7 +124,6 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
         }
-          
         return "success";
     }
 
@@ -128,14 +131,11 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @return the username string of an authenticated user from the container
      */
     private String getContainerAuthenticatedUser() {
-        
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
         return request.getRemoteUser();
     }
-
-    
         
     private void populateSessionObjectQueues(User u, Municipality m) throws IntegrationException, CaseLifecyleException{
         SessionBean sessionBean = getSessionBean();
@@ -147,30 +147,24 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         CaseIntegrator caseInt = getCaseIntegrator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         
-        
         sessionBean.setPersonQueue(persCoord.loadPersonHistoryList(u));
         sessionBean.setcECaseQueue(caseCoord.getUserCaseHistoryList(u));
         
         QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
-        sessionBean.setSessionQueryCECase(queryCECase);
+        sessionBean.setQueryCECase(queryCECase);
         
-        Property p = propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("arbitraryPlaceholderPropertyID")));
-        
-        sessionBean.setActiveProp(p);
-
-        sessionBean.setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("arbitraryPlaceholderPersonID"))));
-        
+        sessionBean.setActiveProp(m.getMuniOfficeProperty());
+        sessionBean.setActivePerson(u.getPerson());
         sessionBean.setSessionQueryCEAR(searchCoord.getQueryInitialCEAR(u, m));
         
-        CECase c = caseInt.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("arbitraryPlaceholderCaseID")));
-        sessionBean.setSessionCECase(c);
-        
+//        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+//                .getString("arbitraryPlaceholderCaseID")
+//                
+        sessionBean.setSessionCECase(caseInt.getPropertyInfoCase(m.getMuniOfficeProperty()));
+
 //        sessionBean.setcECaseQueue(new ArrayList<CECase>());
 //        sessionBean.getcECaseQueue().add(c);
-        
+
         sessionBean.setPropertyQueue(propI.getPropertyHistoryList(u));
         sessionBean.getPropertyQueue().add(p);
     }

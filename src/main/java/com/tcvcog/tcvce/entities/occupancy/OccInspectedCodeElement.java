@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
  *
  * @author Eric C. Darsow
  */
-public class OccInspectedSpaceElement implements Serializable{
+public class OccInspectedCodeElement implements Serializable{
     
     private int inspectedElementID;
     private CodeElement element;
@@ -38,10 +38,12 @@ public class OccInspectedSpaceElement implements Serializable{
     private User complianceGrantedBy;
     
     private boolean required;
-    private User overrideRequiredFlag_eleNotInspected;
+    private User overrideRequiredFlag_thisElementNotInspectedBy;
     private String notes;
     
     private OccLocationDescriptor location;
+    
+    private int failureIntensityClassID;
 
     /**
      * @return the inspectedElementID
@@ -164,10 +166,10 @@ public class OccInspectedSpaceElement implements Serializable{
     }
 
     /**
-     * @return the overrideRequiredFlag_eleNotInspected
+     * @return the overrideRequiredFlag_thisElementNotInspectedBy
      */
-    public User getOverrideRequiredFlag_eleNotInspected() {
-        return overrideRequiredFlag_eleNotInspected;
+    public User getOverrideRequiredFlag_thisElementNotInspectedBy() {
+        return overrideRequiredFlag_thisElementNotInspectedBy;
     }
 
     /**
@@ -178,9 +180,23 @@ public class OccInspectedSpaceElement implements Serializable{
     }
 
     /**
-     * @param overrideRequiredFlag_eleNotInspected the overrideRequiredFlag_eleNotInspected to set
+     * @param overrideRequiredFlag_thisElementNotInspectedBy the overrideRequiredFlag_thisElementNotInspectedBy to set
      */
-    public void setOverrideRequiredFlag_eleNotInspected(User overrideRequiredFlag_eleNotInspected) {
-        this.overrideRequiredFlag_eleNotInspected = overrideRequiredFlag_eleNotInspected;
+    public void setOverrideRequiredFlag_thisElementNotInspectedBy(User overrideRequiredFlag_thisElementNotInspectedBy) {
+        this.overrideRequiredFlag_thisElementNotInspectedBy = overrideRequiredFlag_thisElementNotInspectedBy;
+    }
+
+    /**
+     * @return the failureIntensityClassID
+     */
+    public int getFailureIntensityClassID() {
+        return failureIntensityClassID;
+    }
+
+    /**
+     * @param failureIntensityClassID the failureIntensityClassID to set
+     */
+    public void setFailureIntensityClassID(int failureIntensityClassID) {
+        this.failureIntensityClassID = failureIntensityClassID;
     }
 }

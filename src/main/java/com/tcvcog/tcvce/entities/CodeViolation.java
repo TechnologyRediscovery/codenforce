@@ -81,6 +81,11 @@ public class CodeViolation extends EntityUtils implements Serializable{
     
     protected List<Integer> photoList;
     protected List<Fee> feeList;
+    
+    private int severityIntensityClassID;
+    
+    
+    
     /**
      * @return the violationID
      */
@@ -676,6 +681,20 @@ public class CodeViolation extends EntityUtils implements Serializable{
      */
     public void setStatus(ViolationStatus status) {
         this.status = status;
+    }
+
+    /**
+     * @return the severityIntensityClassID
+     */
+    public int getSeverityIntensityClassID() {
+        return severityIntensityClassID;
+    }
+
+    /**
+     * @param severityIntensityClassID the severityIntensityClassID to set
+     */
+    public void setSeverityIntensityClassID(int severityIntensityClassID) {
+        this.severityIntensityClassID = severityIntensityClassID;
     }
 
 }

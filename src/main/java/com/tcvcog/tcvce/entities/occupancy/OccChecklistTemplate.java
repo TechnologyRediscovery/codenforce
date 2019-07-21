@@ -42,7 +42,7 @@ public class OccChecklistTemplate {
     private boolean active;
     private CodeSource governingCodeSource;
     
-    private List<OccSpaceTypeTemplate> occSpaceTypeTemplateList;
+    private List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList;
 
     /**
      * @return the muni
@@ -105,14 +105,14 @@ public class OccChecklistTemplate {
     /**
      * @return the occSpaceTypeTemplateList
      */
-    public List<OccSpaceTypeTemplate> getOccSpaceTypeTemplateList() {
+    public List<OccSpaceTypeInspectionDirective> getOccSpaceTypeTemplateList() {
         return occSpaceTypeTemplateList;
     }
 
     /**
      * @param occSpaceTypeTemplateList the occSpaceTypeTemplateList to set
      */
-    public void setOccSpaceTypeTemplateList(List<OccSpaceTypeTemplate> occSpaceTypeTemplateList) {
+    public void setOccSpaceTypeTemplateList(List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList) {
         this.occSpaceTypeTemplateList = occSpaceTypeTemplateList;
     }
 
