@@ -17,8 +17,10 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Intensity;
 import com.tcvcog.tcvce.entities.IntensitySchema;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.annotation.PostConstruct;
@@ -34,8 +36,8 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     private Intensity workingIntensityClass;
     private Intensity selectedIntensityClass;
     private ArrayList<Intensity> existingIntensityList;
-    private IntensitySchema selectedCategory;
-    private ArrayList<IntensitySchema> categoryList;
+    private IntensitySchema selectedSchema;
+    private ArrayList<IntensitySchema> schemaList;
     
     public IntensityBB() {
         
@@ -62,6 +64,29 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    public void queryIntensityClasses(ActionEvent e){
+        
+        if(selectedSchema != null){
+            
+            SystemIntegrator si = new SystemIntegrator();
+            
+            try{
+            existingIntensityList = (ArrayList<Intensity>) si.getIntensityClassList(selectedSchema);
+        } catch (IntegrationException ex){
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to get Intensity Classes.",
+                    "This must be corrected by the System Administrator"));
+        }
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Please select an Intensity Schema", ""));
+        }
+        
+    }
+    
     public Intensity getWorkingIntensityClass() {
         return workingIntensityClass;
     }
@@ -78,20 +103,40 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
         this.existingIntensityList = existingIntensityList;
     }
 
-    public IntensitySchema getSelectedCategory() {
-        return selectedCategory;
+    public IntensitySchema getSelectedSchema() {
+        return selectedSchema;
     }
 
-    public void setSelectedCategory(IntensitySchema selectedCategory) {
-        this.selectedCategory = selectedCategory;
+    public void setSelectedSchema(IntensitySchema selectedSchema) {
+        this.selectedSchema = selectedSchema;
     }
 
-    public ArrayList<IntensitySchema> getCategoryList() {
-        return categoryList;
+    public ArrayList<IntensitySchema> getSchemaList() {
+        
+        if(schemaList != null) {
+        return schemaList;
+        }
+        else {
+            
+            SystemIntegrator si = new SystemIntegrator();
+            
+            try {
+            schemaList = (ArrayList<IntensitySchema>) si.getIntensitySchemaList();
+            } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
+            getFacesContext().addMessage(null,  
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Unable to load schema list",
+                        "This must be corrected by the system administrator"));
+        }
+            return schemaList;
+            
+        }
+        
     }
 
-    public void setCategoryList(ArrayList<IntensitySchema> categoryList) {
-        this.categoryList = categoryList;
+    public void setSchemaList(ArrayList<IntensitySchema> schemaList) {
+        this.schemaList = schemaList;
     }
 
     public Intensity getSelectedIntensityClass() {
