@@ -67,7 +67,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        caseList = getSessionBean().getcECaseQueue();
+        caseList = getSessionBean().getSessionCECaseList();
         DataCoordinator dc = getDataCoordinator();
         
         try {

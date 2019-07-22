@@ -21,7 +21,7 @@
                             </h:messages>
                         </h:form>
 
-                        <h1>Code Enforcement Action Requests in <h:outputText value="#{sessionBean.activeMuni.muniName}"/></h1>
+                        <h1>Code Enforcement Action Requests in <h:outputText value="#{sessionBean.sessionMuni.muniName}"/></h1>
 
 
                         <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter" styleClass="split-page-panelgrid"
@@ -258,7 +258,7 @@
                                       <p:commandButton    id="prep-multi-cear-cb"
                                                         value="Prepare request list report"
                                                         actionListener="#{cEActionRequestsBB.prepareReportMultiCEAR}"
-                                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
                                                         disabled="false"
                                                         oncomplete="PF('cear-print-dialog-var').show()"
                                                         icon="fa fa-print"
@@ -307,7 +307,7 @@
                                     <p:commandButton    id="open-new-case-cb"
                                                         ajax="false" value="Open new code enf case at this property" 
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
-                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                         action="#{cEActionRequestsBB.path1CreateNewCaseAtProperty}"
                                                         update="ceActionRequestsMessages" icon="fa fa-folder" 
                                                         styleClass="cear-actions-button"/>
@@ -315,7 +315,7 @@
 
                                     <p:commandButton    id="attach-to-case-cb"
                                                         value="Attach to existing code enf case"
-                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{sessionBeasessionUserer.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('attach-to-case-dialog').show()"
                                                         update="attach-to-existing-case-form:cases-on-selected-request-property-DS"
@@ -325,14 +325,14 @@
 
                                     <p:commandButton    id="no-violation-found-cb"
                                                         value="No violation found on site"
-                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{sessionBsessionUserUser.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('no-violation-found-dialog').show()"
                                                         icon="fa fa-circle-o"/>
 
                                     <p:commandButton    id="invalid-request-cb"
                                                         value="Invalid request"
-                                                        rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{sessiosessionUseresUser.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('invalid-dialog').show()"
                                                         icon="fa fa-exclamation-circle"/>
@@ -345,7 +345,7 @@
                                     <p:commandButton    id="print-singleCAR-cb"
                                                         value="Print request"
                                                         actionListener="#{cEActionRequestsBB.prepareReportSingleCEAR}"
-                                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                        rendered="#{sesessionUser.facesUser.keyCard.hasMuniReaderPermissions}"
                                                         disabled="false"
                                                         oncomplete="PF('cear-print-dialog-var').show()"
                                                         icon="fa fa-print"
@@ -360,7 +360,7 @@
                                                           
                                                           value="Attach internal note"
                                                           icon="fa fa-pencil-square-o"
-                                                          rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
+                                                          rendered="#{sessionUseran.facesUser.keyCard.hasMuniReaderPermissions}" />
 
 
 
@@ -421,7 +421,7 @@
                                                                     styleClass="noFill button-size-small"
                                                                     disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                                     icon="fa fa-home"
-                                                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"/>
+                                                                    rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"/>
                                             </h:panelGroup>
 
                                             <h:panelGroup>
@@ -470,7 +470,7 @@
                                                                     styleClass="noFill button-size-small" 
                                                                     icon="fa fa-child"
                                                                     disabled="#{empty cEActionRequestsBB.selectedRequest}"
-                                                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" />
+                                                                    rendered="#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}" />
                                             </h:panelGroup>
 
                                             <h:panelGroup>
@@ -506,7 +506,7 @@
                                                                  value="view photos" 
                                                                  styleClass="noFill button-size-small"
                                                                  update="photo-form:photoTable"
-                                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
+                                                                 rendersessionUsersionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
 
 
                                                 <p:spacer height="5px"/>
@@ -518,7 +518,7 @@
                                                                  icon="fa fa-pencil-square-o"
                                                                  value="new note" 
                                                                  styleClass="noFill button-size-small" 
-                                                                 rendered="#{sessionBean.facesUser.keyCard.hasCOGStaffPermissions}" />
+                                                                 rendered="#{sessionBean.sessionUser.keyCard.hasCOGStaffPermissions}" />
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
                                                     <h:outputText id="selr-notes-internal" escape="false" value="#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
@@ -533,7 +533,7 @@
                                                                  value="new note"
                                                                  icon="fa fa-pencil-square-o"
                                                                  styleClass="noFill button-size-small" 
-                                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
+                                                                 resessionUser{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
                                                     <h:outputText id="selr-notes-muni" escape="false" value="#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
@@ -548,7 +548,7 @@
                                                                  value="new note" 
                                                                  icon="fa fa-pencil-square-o"
                                                                  styleClass="noFill button-size-small" 
-                                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}" />
+                                                                 rendered="#{sessiosessionUseresUser.keyCard.hasMuniStaffPermissions}" />
                                                 <p:spacer height="5px"/>
                                                 <div class="rowExpansion" style="leftalign">
                                                     <h:outputText id="selr-notes-public" escape="false" value="#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
@@ -562,7 +562,7 @@
 
                                     <p:commandButton    id="manually-override-status-cb"
                                                         value="Manually override request status"
-                                                        rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                                        renderedsessionUseronBean.facesUser.keyCard.hasSysAdminPermissions}"
                                                         disabled="#{empty cEActionRequestsBB.selectedRequest}"
                                                         onclick="PF('override-request-status-dialog').show()"
                                                         icon="fa fa-gears"/>
@@ -581,7 +581,7 @@
                         <p:confirmDialog message="Attach request to existing case" 
                                          severity="alert" widgetVar="attach-to-case-dialog"
                                          closable="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+                                         renderedsessionUseronBean.facesUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="attach-to-existing-case-form">
 
@@ -604,7 +604,7 @@
                                                      req-details-form:selr-notes-public
                                                      req-details-form:selr-attachedCase
                                                      "
-                                                     rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                     rendersessionUsersionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                      oncomplete="PF('attach-to-case-dialog').hide()"/>
                                     <p:commandButton ajax="true" 
                                                      value="Cancel" icon="fa fa-stop" 
@@ -618,7 +618,7 @@
                         <p:confirmDialog message="Mark request as invalid" 
                                          severity="alert" widgetVar="invalid-dialog"
                                          closable="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+                                         rendsessionUseressionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="invalid-form">
                                 <h:outputLabel for="invalidMessageITA" value="What makes this an invalid request?"/>
@@ -631,7 +631,7 @@
                                 <p:spacer height="15px "/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.path3AttachInvalidMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('invalid-dialog').hide()"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                 resessionUser{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                  update="req-details-form:selr-notes-public
                                                  msgForm:ceActionRequestsMessages
                                                  req-details-form:selr-status-ot
@@ -647,7 +647,7 @@
                         <p:confirmDialog message="Mark request: No Violation Found" 
                                          severity="alert" widgetVar="no-violation-found-dialog"
                                          closable="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+                                         sessionUser"#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="no-violation-form">
                                 <h:outputLabel for="noViolationMessageITA" value="Describe the results of your request investigation:"/>
@@ -660,7 +660,7 @@
                                 <p:spacer height="15px"/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.path4AttachNoViolationFoundMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('no-violation-found-dialog').hide()"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                               sessionUserd="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                  update="req-details-form:selr-notes-public
                                                  msgForm:ceActionRequestsMessages
                                                  req-details-form:selr-status-ot
@@ -674,7 +674,7 @@
                         <p:confirmDialog message="Override request status" 
                                          severity="alert" widgetVar="override-request-status-dialog"
                                          closable="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+                                     sessionUserred="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="override-request-status-form">
 
@@ -707,7 +707,7 @@
                             <p:confirmDialog message="Manage public access" 
                                              severity="alert" widgetVar="manage-public-access-dialog"
                                              closable="true"
-                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                             rendered="#{sesssessionUseracesUser.keyCard.hasMuniStaffPermissions}">
 
                                 <h:form id="manage-public-access-form">
 
@@ -715,7 +715,7 @@
                                     <p:spacer height="15px"/>
                                     <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.changePACCAccess}"
                                                      value="Save" icon="fa fa-link" oncomplete="PF('manage-public-access-dialog').hide()"
-                                                     rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                             sessionUserendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                      update="req-details-form:selr-notes-public
                                                      msgForm:ceActionRequestsMessages"/>
                                     <p:commandButton ajax="true" 
@@ -729,7 +729,7 @@
                         <p:confirmDialog message="Change property" 
                                          severity="alert" widgetVar="change-property-dialog"
                                          closable="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+                               sessionUser rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
 
                             <h:form id="change-property-form">
 
@@ -816,7 +816,7 @@
 
                                 <p:commandButton value="Assign request to selected property"
                                                  actionListener="#{cEActionRequestsBB.updateRequestProperty}"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                     sessionUser   rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
                                                  update="   msgForm:ceActionRequestsMessages
                                                  req-details-form:selr-prop-address
                                                  req-details-form:selr-prop-muni
@@ -835,7 +835,7 @@
                         <p:dialog       height="650" width="700"
                                         widgetVar="change-person-dialog"
                                         closable="true" 
-                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                        rendered="#{sesessionUser.facesUser.keyCard.hasMuniStaffPermissions}">
 
                             <h3>Search for a different person</h3>
 
@@ -940,7 +940,7 @@
 
                                 <p:commandButton value="Assign request to selected person"
                                                  actionListener="#{cEActionRequestsBB.updateRequestor}"
-                                                 disabled="#{!sessionBean.facesUser.keyCard.hasCOGStaffPermissions}"
+                      sessionUser                  disabled="#{!sessionBean.facesUser.keyCard.hasCOGStaffPermissions}"
                                                  update="   msgForm:ceActionRequestsMessages
                                                  req-details-form:selr-persontype
                                                  req-details-form:selr-pers-fn
@@ -1177,7 +1177,7 @@
                         <p:confirmDialog message="Attach internal message" 
                                          severity="alert" widgetVar="internal-message-dialog"
                                          closable="true" responsive="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasCOGStaffPermissions}">
+                                         rendered="#{sessionBeasessionUserer.keyCard.hasCOGStaffPermissions}">
 
                             <h:form id="internal-message-form">
                                 <h:outputLabel for="internal-message-ita" value="Message text"/>
@@ -1190,7 +1190,7 @@
                                 <p:spacer height="15px"/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachInternalMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('internal-message-dialog').hide()"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasCOGStaffPermissions}"
+                                                 rendered="#{sessionBsessionUserUser.keyCard.hasCOGStaffPermissions}"
                                                  update="req-details-form:selr-notes-internal
                                                  msgForm:ceActionRequestsMessages"/>
                                 <p:commandButton ajax="true" 
@@ -1203,7 +1203,7 @@
                         <p:confirmDialog message="Attach municipality message" 
                                          severity="alert" widgetVar="muni-message-dialog"
                                          closable="true" responsive="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                         renderedsessionUseronBean.facesUser.keyCard.hasMuniStaffPermissions}">
 
                             <h:form id="muni-message-form">
                                 <h:outputLabel for="muni-message-ita" value="Message text"/>
@@ -1215,7 +1215,7 @@
                                 <p:spacer height="15px"/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachMuniMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('muni-message-dialog').hide()"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                 rendersessionUsersionBean.facesUser.keyCard.hasMuniStaffPermissions}"
                                                  update="req-details-form:selr-notes-muni"/>
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
@@ -1227,7 +1227,7 @@
                         <p:confirmDialog message="Attach public message" 
                                          severity="alert" widgetVar="public-message-dialog"
                                          closable="true"
-                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                         rendsessionUseressionBean.facesUser.keyCard.hasMuniStaffPermissions}">
 
                             <h:form id="public-message-form">
                                 <h:outputLabel for="public-message-ita" value="Message text"/>
@@ -1240,7 +1240,7 @@
                                 <p:spacer height="15px"/>
                                 <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachPublicMessage}"
                                                  value="Submit" icon="fa fa-link" oncomplete="PF('public-message-dialog').hide()"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                 resessionUser{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
                                                  update="req-details-form:selr-notes-public"/>
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
@@ -1252,7 +1252,7 @@
                                          severity="alert" widgetVar="photo-dialog"
                                          closable="true"
 
-                                         rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+ sessionUser                               rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
 
                             <h:form id="photo-form">
                                 <p:scrollPanel style="width:1000px; height:400px" mode="native">
@@ -1271,7 +1271,7 @@
                                                              actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
                                                              value="Delete" 
                                                              icon="fa fa-bomb"
-                                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                               sessionUser                     rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
                                                              update=":photo-form:photoTable"/>
                                         </p:column>
                                         <p:column>
@@ -1306,7 +1306,7 @@
                     <p:dialog  id="cear-print-dialog"
                                widgetVar="cear-print-dialog-var"
                                closable="true" responsive="true"
-                               dynamic="true"
+                               dysessionUserue"
                                rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
                         
                         <h:form id="cear-print-form">
@@ -1352,11 +1352,11 @@
 
                                         <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReportSingleCEAR}"
                                                  value="Print code enforcement request" icon="fa fa-print" 
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions and !cEActionRequestsBB.reportConfig.printFullCEARQueue}"
+   sessionUser                                     rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions and !cEActionRequestsBB.reportConfig.printFullCEARQueue}"
                                                  />
                                         <p:commandButton ajax="false" action="#{cEActionRequestsBB.generateReportMultiCEAR}"
                                                  value="Generate report" icon="fa fa-print" 
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions and cEActionRequestsBB.reportConfig.printFullCEARQueue}"
+   sessionUser                                     rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions and cEActionRequestsBB.reportConfig.printFullCEARQueue}"
                                                  />
                             </h:form>
 

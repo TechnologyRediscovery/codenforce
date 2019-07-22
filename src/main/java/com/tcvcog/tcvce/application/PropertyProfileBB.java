@@ -78,11 +78,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            this.currProp = pi.getPropertyWithLists(getSessionBean().getPropertyQueue().get(0).getPropertyID());
+            this.currProp = pi.getPropertyWithLists(getSessionBean().getSessionPropertyList().get(0).getPropertyID());
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
-        propList = getSessionBean().getPropertyQueue();
+        propList = getSessionBean().getSessionPropertyList();
     }
 
     public void searchForProperties(ActionEvent event){
@@ -90,7 +90,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         
         try {
-            setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getActiveMuni().getMuniCode()));
+            setPropList(pi.searchForProperties(getHouseNum(), getStreetName(), getSessionBean().getSessionMuni().getMuniCode()));
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + getPropList().size() + " results", ""));
@@ -114,7 +114,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String openCECase(){
-        getSessionBean().setActiveProp(currProp);
+        getSessionBean().setSessionProperty(currProp);
         return "addNewCase";
     }
     
@@ -126,7 +126,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     
     public String viewPersonProfile(Person p){
-        getSessionBean().getPersonQueue().add(0,p);
+        getSessionBean().getSessionPersonList().add(0,p);
         return "persons";
     }
     
@@ -135,8 +135,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         UserIntegrator ui = getUserIntegrator();
         try {
             currProp = pi.getPropertyWithLists(prop.getPropertyID());
-            ui.logObjectView(getSessionBean().getFacesUser(), prop);
-            getSessionBean().getPropertyQueue().add(prop);
+            ui.logObjectView(getSessionBean().getSessionUser(), prop);
+            getSessionBean().getSessionPropertyList().add(prop);
             
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
@@ -150,7 +150,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             if(currProp == null){
-                currProp = pi.getPropertyWithLists(getSessionBean().getActiveProp().getPropertyID());
+                currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID());
             }
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
@@ -191,7 +191,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     public String updateProperty(){
-        getSessionBean().getPropertyQueue().add(0, currProp);
+        getSessionBean().getSessionPropertyList().add(0, currProp);
         return "propertyUpdate";
         
     }

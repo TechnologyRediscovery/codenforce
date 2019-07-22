@@ -666,7 +666,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
         e.setDateOfRecord(LocalDateTime.now());
-        e.setOwner(getFacesUser());
+        e.setOwner(getSessionUser());
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());

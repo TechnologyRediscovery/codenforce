@@ -83,7 +83,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
-        currentUser = getSessionBean().getFacesUser();
+        currentUser = getSessionBean().getSessionUser();
     }
     
 

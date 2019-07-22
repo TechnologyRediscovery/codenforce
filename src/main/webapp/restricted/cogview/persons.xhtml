@@ -31,7 +31,7 @@
                                                     oncomplete="PF('person-addupdate-dialog-var').show()"
                                                     update="person-addupdate-form"
                                                     value="Create new Person"
-                                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                    rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                     icon="fa fa-plus"
                                                     />
                             </h:form>
@@ -91,7 +91,7 @@
                                 <p:commandButton    id="open-search-options-cb"
                                                     ajax="true" process="@none"
                                                     value="Advanced search options"
-                                                    disabled="!#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                    disabled="!#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}"
                                                     onclick="PF('search-params-dialog').show()"
                                                     icon="fa fa-gears"/>
 
@@ -294,7 +294,7 @@
                                                                  icon="fa fa-send"
                                                                  value="create new note" 
                                                                  styleClass="noFill" 
-                                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
+                                                                 rendered="#{sessionBsessionUserUser.keyCard.hasMuniReaderPermissions}" />
                                                 <p:spacer height="15px"/>
                                                 <div class="rowExpansion">
                                                     <h:outputText escape="false" value="#{personsBB.selectedPerson.notes}"/>
@@ -390,7 +390,7 @@
                                 height="650" width="700"
                                 widgetVar="search-params-dialog"
                                 closable="true" 
-                                rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                                rendered="#{sessiosessionUseresUser.keyCard.hasMuniReaderPermissions}">
 
                         <h:form id="search-params-form">
                             <h3>Advanced Person search options</h3>
@@ -463,7 +463,7 @@
                                              change-person-form:formFirstName-person
                                              change-person-form:formLastName-person"
                                              actionListener="#{personsBB.searchForPersons}"
-                                             rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                             rendered="#{sessionBsessionUserUser.keyCard.hasMuniStaffPermissions}"
                                              update="   change-person-form:personTable
                                              messages-left-form:persons-messages-global"
                                              oncomplete="PF('search-params-dialog').hide()"/>
@@ -474,7 +474,7 @@
                     <p:dialog      height="650" width="1200"
                                    widgetVar="update-person-dialog"
                                    closable="true" 
-                                   rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                   rendered="#{sessiosessionUseresUser.keyCard.hasMuniStaffPermissions}">
 
                     </p:dialog>
 
@@ -482,7 +482,7 @@
                                         message="Attach note to Person" 
                                         severity="alert" widgetVar="person-note-dialog"
                                         closable="true" responsive="true"
-                                        rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                        rendered="#{sesssessionUseracesUser.keyCard.hasMuniStaffPermissions}">
 
                         <h:form id="person-note-form">
                             <h:outputLabel for="note-ita" value="Note text"/>
@@ -500,7 +500,7 @@
 
                             <p:commandButton    ajax="true" actionListener="#{personsBB.attachNoteToPerson}" tabindex="3"
                                                 value="Submit" icon="fa fa-link" oncomplete="PF('person-note-dialog').hide()"
-                                                rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                rendered="#{sesessionUser.facesUser.keyCard.hasMuniStaffPermissions}"
                                                 update="    selected-person-info-form
                                                 messages-left-form:persons-messages-global"/>
                         </h:form>
@@ -510,7 +510,7 @@
                                 height="650" width="900"
                                 widgetVar="person-addupdate-dialog-var"
                                 closable="true" 
-                                rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                                renderedsessionUseronBean.facesUser.keyCard.hasMuniReaderPermissions}">
 
 
                         <h:form id="person-addupdate-form">

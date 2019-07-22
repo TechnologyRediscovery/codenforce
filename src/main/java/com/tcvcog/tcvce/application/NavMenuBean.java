@@ -41,7 +41,7 @@ public class NavMenuBean extends BackingBeanUtils implements Serializable{
     
     public MenuModel getModel(){
         model = new DefaultMenuModel();
-        User user = getFacesUser();
+        User user = getSessionUser();
         
         switch(user.getRoleType()){
             
