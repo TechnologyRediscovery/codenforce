@@ -25,16 +25,16 @@ public class QueryOccPeriod
      * Holds this Query's identity Enum which includes the Query's
      * title and description.
      */
-    private QueryPropertyEnum query;
+    private QueryOccPeriodEnum queryName;
     private List<SearchParamsOccPeriod> searchParamsList; 
     private List<OccPeriod> results;
 
-    public QueryOccPeriod(QueryPropertyEnum name,
+    public QueryOccPeriod(QueryOccPeriodEnum name,
                         Municipality m, 
                         List<SearchParamsOccPeriod> params,
                         User u){
         super(m, u);
-        query = name;
+        queryName = name;
         searchParamsList = new ArrayList<>();
         searchParamsList.addAll(params);
         results = new ArrayList<>();
@@ -42,12 +42,12 @@ public class QueryOccPeriod
 
     @Override
     public String getQueryTitle(){
-        return query.getTitle();
+        return queryName.getTitle();
     }
     
 
    public void addSearchParams(SearchParamsOccPeriod sp){
-       searchParamsList.add(sp);
+        getSearchParamsList().add(sp);
        
    }
     
@@ -65,7 +65,7 @@ public class QueryOccPeriod
     }
 
     public void setParamsList(List l) {
-        searchParamsList = l;
+        setSearchParamsList((List<SearchParamsOccPeriod>) l);
     }
 
     @Override
@@ -80,19 +80,10 @@ public class QueryOccPeriod
 
     @Override
     public List<SearchParamsOccPeriod> getParmsList() {
-        return searchParamsList;
+        return getSearchParamsList();
     }
 
     
-
-    /**
-     * @return the queryName
-     */
-    public QueryPropertyEnum getQueryName() {
-        return query;
-    }
-
-  
 
     @Override
     public void clearResultList() {
@@ -104,8 +95,8 @@ public class QueryOccPeriod
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 23 * hash + Objects.hashCode(this.query);
-        hash = 23 * hash + Objects.hashCode(this.searchParamsList);
+        hash = 23 * hash + Objects.hashCode(this.getQueryName());
+        hash = 23 * hash + Objects.hashCode(this.getSearchParamsList());
         hash = 23 * hash + Objects.hashCode(this.results);
         return hash;
     }
@@ -122,10 +113,37 @@ public class QueryOccPeriod
             return false;
         }
         final QueryOccPeriod other = (QueryOccPeriod) obj;
-        if (this.query != other.query) {
+        if (this.getQueryName() != other.getQueryName()) {
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * @return the searchParamsList
+     */
+    public List<SearchParamsOccPeriod> getSearchParamsList() {
+        return searchParamsList;
+    }
+
+
+    /**
+     * @param searchParamsList the searchParamsList to set
+     */
+    public void setSearchParamsList(List<SearchParamsOccPeriod> searchParamsList) {
+        this.searchParamsList = searchParamsList;
+    }
+
+    public QueryOccPeriodEnum getQueryName(){
+        return queryName;
+    }
+    
+    /**
+     * @param queryName the queryName to set
+     */
+    public void setQueryName(QueryOccPeriodEnum queryName) {
+        this.queryName = queryName;
     }
     
     

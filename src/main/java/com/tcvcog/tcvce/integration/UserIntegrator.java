@@ -163,7 +163,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     private UserAccessRecord generateUserAccessRecord(ResultSet rs) throws SQLException{
         UserAccessRecord rec = new UserAccessRecord();
-        rec.setMuni_municode(rs.getInt(""));
         
         rec.setMuni_municode(rs.getInt("muni_municode"));
         rec.setMuni_municode(rs.getInt("userid"));
@@ -254,7 +253,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         ResultSet rs = null;
         String query = "SELECT muni_municode FROM public.loginmuni "
-                + "WHERE userid=? AND defaultmuni=?;";
+                + "WHERE userid=? AND defaultmuni=? AND recorddeactivatedts IS NULL "
+                + "             AND accessgranteddatestart < now() "
+                + "             AND accessgranteddatestop > now() "
+                + "             ORDER BY recordcreatedts DESC;";
         Municipality m = null;
         PreparedStatement stmt = null;
         
@@ -267,16 +269,16 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             while(rs.next()){
                 m = mi.getMuni(rs.getInt("muni_municode"));
             }
-            if(!rs.first()){
-                stmt = con.prepareStatement(query);
-                stmt.setInt(1, userID);
-                stmt.setBoolean(2, true);
-                rs = stmt.executeQuery();
-                while(rs.next()){
-                    m = mi.getMuni(rs.getInt("muni_municode"));
-                }
-                
-            }
+//            if(!rs.first()){
+//                stmt = con.prepareStatement(query);
+//                stmt.setInt(1, userID);
+//                stmt.setBoolean(2, true);
+//                rs = stmt.executeQuery();
+//                while(rs.next()){
+//                    m = mi.getMuni(rs.getInt("muni_municode"));
+//                }
+//                
+//            }
                 
             
         } catch (SQLException ex) {
@@ -290,6 +292,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return m;
     }
     
+    /**
+     * @deprecated 
+     * @param u
+     * @param m
+     * @return
+     * @throws IntegrationException 
+     */
     public boolean setDefaultMunicipality(User u, Municipality m) throws IntegrationException{
         Connection con = getPostgresCon();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
@@ -716,54 +725,5 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
 
-    /**
-     * Used by the EventCordinator to setup events by attaching default code officers
-     * to events designated for such
-     * @param cecaseid
-     * @return the code officer user associated with the given case
-     * @throws IntegrationException
-     */
-    public User getDefaultCodeOfficer(int cecaseid, CaseIntegrator caseIntegrator) throws IntegrationException {
-        MunicipalityIntegrator mi = caseIntegrator.getMunicipalityIntegrator();
-        User u = null;
-        String query = "SELECT municipality_municode \n" + "FROM cecase INNER JOIN property ON (property_propertyid = propertyid) \n" + "WHERE caseid = ?;";
-        Connection con = caseIntegrator.getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, cecaseid);
-            //System.out.println("CaseIntegrator.| sql: " + stmt.toString());
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                u = mi.getDefaultCodeOfficer(rs.getInt("municipality_municode"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get default code officer", ex);
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */
-                }
-            }
-        } // close finally
-        return u;
-    }
+    
 }

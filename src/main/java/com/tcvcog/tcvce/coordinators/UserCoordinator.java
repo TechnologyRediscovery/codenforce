@@ -67,12 +67,13 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         UserIntegrator ui = getUserIntegrator();
         authenticatedUser = ui.getUser(loginName);
         Municipality m = ui.getUserDefaultMunicipality(authenticatedUser.getUserID());
-        
-        if(configureUserMuniAccess(authenticatedUser, m) != null){
+        User muniConfiguredUser = configureUserMuniAccess(authenticatedUser, m);
+        // as long as we have a User object, the User is allowed at least MuniReader access
+        if(muniConfiguredUser != null){
             // set user permissions with the role type that comes from the DB
             // which the Integrator sets
-            authenticatedUser.setKeyCard(acquireAccessKeyCard(authenticatedUser.getRoleType()));
-            return authenticatedUser;
+            authenticatedUser.setKeyCard(acquireAccessKeyCard(muniConfiguredUser.getRoleType()));
+            return muniConfiguredUser;
             
         } else {
             throw new AuthorizationException("User exists but access to system "
@@ -84,24 +85,48 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     private User configureUserMuniAccess(User u, Municipality m){
         
-        if(u.getAccessRecord().getAccessgranteddatestart().isBefore(LocalDateTime.now())
+        if( m.getMuniCode() == u.getAccessRecord().getMuni_municode()
+                &&
+            u.getAccessRecord().getAccessgranteddatestart().isBefore(LocalDateTime.now())
                 &&
             u.getAccessRecord().getAccessgranteddatestop().isAfter(LocalDateTime.now())
-                && 
-                
-            )
-        
-        
-        
-        
-        return null;
+                &&
+            u.getAccessRecord().getRecorddeactivatedts() != null){
+            
+                // the current user is allowed access to this muni, so now determine RoleType
+                // based on assigned start and stop dates for various roles as specified in the
+                // current UserAccessRecord
+                if(u.getAccessRecord().getSupportstartdate().isBefore(LocalDateTime.now())
+                        &&
+                    u.getAccessRecord().getSupportstopdate().isAfter(LocalDateTime.now())){
+                    u.setRoleType(RoleType.Developer);
+                } else if(u.getAccessRecord().getSysadminstartdate().isBefore(LocalDateTime.now())
+                        &&
+                    u.getAccessRecord().getSysadminstopdate().isAfter(LocalDateTime.now())){
+                    u.setRoleType(RoleType.SysAdmin);
+                    
+                } else if(u.getAccessRecord().getCodeofficerstartdate().isBefore(LocalDateTime.now())
+                        &&
+                    u.getAccessRecord().getCodeofficerstopdate().isAfter(LocalDateTime.now())){
+                    u.setRoleType(RoleType.EnforcementOfficial);
+                } else if(u.getAccessRecord().getStaffstartdate().isBefore(LocalDateTime.now())
+                        &&
+                    u.getAccessRecord().getStaffstopdate().isAfter(LocalDateTime.now())){
+                    u.setRoleType(RoleType.MuniStaff);
+                } else {
+                    u.setRoleType(RoleType.MuniReader);
+                }
+            return u;
+        } else {
+            return null;
+        }
     }
     
     
     public int insertNewUser(User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
         String tempPassword = String.valueOf(generateControlCodeFromTime());
-        u.setPassword(tempPassword);
+//        u.setPassword(tempPassword);
         int newUserID = ui.insertUser(u);
         return newUserID;
         
@@ -151,7 +176,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     public Municipality getDefaultyMuni(User u) throws IntegrationException{
         UserIntegrator ui = getUserIntegrator();
-        return ui.getDefaultMunicipality(u);
+        return ui.getUserDefaultMunicipality(u.getUserID());
     }
     
     public boolean setDefaultMuni(User u, Municipality m) throws IntegrationException{
@@ -161,8 +186,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     public List<Municipality> getUserAuthMuniList(int userID) throws IntegrationException{
-        UserIntegrator ui = getUserIntegrator();
-        List<Municipality> ml = ui.getUserAuthMunis(userID, this);
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        List<Municipality> ml = mi.getUserAuthMunis(userID);
         return ml;
     }
     
@@ -252,10 +277,10 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public List<Municipality> getUnauthorizedMunis(User u) throws IntegrationException {
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         UserIntegrator ui = getUserIntegrator();
-        List<Municipality> authMunis = ui.getUserAuthMunis(u.getUserID(), this);        
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        List<Municipality> authMunis = mi.getUserAuthMunis(u.getUserID());        
         List<Municipality> munis = mi.getMuniList();
         
         if(authMunis != null){

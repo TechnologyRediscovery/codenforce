@@ -533,11 +533,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        
-        
     }
 
-    public QueryProperty queryProperties(QueryProperty query) throws IntegrationException {
+    public QueryProperty runQueryProperties(QueryProperty query) throws IntegrationException {
         List<SearchParamsProperty> pList = query.getParmsList();
 
         for (SearchParamsProperty sp : pList) {
@@ -546,7 +544,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         query.setExecutionTimestamp(LocalDateTime.now());
         query.setExecutedByIntegrator(true);
         return query;
-
     }
 
     public List<Property> searchForProperties(SearchParamsProperty params) throws IntegrationException {
