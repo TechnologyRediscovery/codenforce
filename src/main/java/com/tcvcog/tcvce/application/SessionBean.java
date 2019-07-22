@@ -83,7 +83,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     private QueryProperty queryProperty;
     private QueryPerson queryPerson;
-    private QueryCEAR sessionQueryCEAR;
+    private QueryCEAR queryCEAR;
     private QueryCECase queryCECase;
     private QueryEventCECase queryEventCECase;
     private QueryOccPeriod queryOccPeriod;
@@ -418,7 +418,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setQueueCEAR(List<CEActionRequest> qc) {
         if(qc != null && qc.size() > 0 ){
-            setSessionQueryCEAR(null);
+            setQueryCEAR(null);
     
             this.queueCEAR = qc;
         }
@@ -684,17 +684,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionQueryCEAR
+     * @return the queryCEAR
      */
-    public QueryCEAR getSessionQueryCEAR() {
-        return sessionQueryCEAR;
+    public QueryCEAR getQueryCEAR() {
+        return queryCEAR;
     }
 
     /**
-     * @param sessionQueryCEAR the sessionQueryCEAR to set
+     * @param queryCEAR the queryCEAR to set
      */
-    public void setSessionQueryCEAR(QueryCEAR sessionQueryCEAR) {
-        this.sessionQueryCEAR = sessionQueryCEAR;
+    public void setQueryCEAR(QueryCEAR queryCEAR) {
+        this.queryCEAR = queryCEAR;
     }
 
   
@@ -825,6 +825,48 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setSessionOccPermit(OccPermit sessionOccPermit) {
         this.sessionOccPermit = sessionOccPermit;
+    }
+
+    /**
+     * @return the queryProperty
+     */
+    public QueryProperty getQueryProperty() {
+        return queryProperty;
+    }
+
+    /**
+     * @return the queryPerson
+     */
+    public QueryPerson getQueryPerson() {
+        return queryPerson;
+    }
+
+    /**
+     * @return the queryEventCECase
+     */
+    public QueryEventCECase getQueryEventCECase() {
+        return queryEventCECase;
+    }
+
+    /**
+     * @param queryProperty the queryProperty to set
+     */
+    public void setQueryProperty(QueryProperty queryProperty) {
+        this.queryProperty = queryProperty;
+    }
+
+    /**
+     * @param queryPerson the queryPerson to set
+     */
+    public void setQueryPerson(QueryPerson queryPerson) {
+        this.queryPerson = queryPerson;
+    }
+
+    /**
+     * @param queryEventCECase the queryEventCECase to set
+     */
+    public void setQueryEventCECase(QueryEventCECase queryEventCECase) {
+        this.queryEventCECase = queryEventCECase;
     }
     
     

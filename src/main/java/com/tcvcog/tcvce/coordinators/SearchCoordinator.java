@@ -13,6 +13,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
@@ -21,13 +22,25 @@ import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.entities.search.QueryEventCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
+import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
+import com.tcvcog.tcvce.entities.search.SearchParamsPropertyDateFields;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -480,10 +493,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          query = new QueryEventCECase(qName, m, u, paramsList);
          query.setExecutedByIntegrator(false);
          return query;
-         
-         
      }
-     
     
     /**
      * First gen queries. Replaced by the rest of this class
@@ -623,7 +633,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         eventParams.setActive_filterBy(true);
         eventParams.setIsActive(true);
         
-        
         eventParams.setFilterByPerson(false);
         eventParams.setUseRespondedAtDateRange(false);
         
@@ -632,7 +641,225 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return eventParams;
     }
 
-   
     
+    public QueryOccPeriod assembleQueryOccPeriod(QueryOccPeriodEnum qName, User u, Municipality m, SearchParamsOccPeriod params){
+         QueryOccPeriod  query;
+         List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
+         
+         if(params != null){
+             qName = QueryOccPeriodEnum.CUSTOM;
+         }
+         
+         switch(qName){
+            case AUTHWORKINPROGRESS:
+                paramsList.add(generateParams_occPeriod_wip(m));
+                break;
+            case RENTAL_ALL:
+                break;
+            case RENTAL_REGISTERED:
+                break;
+            case RENTAL_UNREGISTERED:
+                break;
+            
+         }
+         query = new QueryOccPeriod(qName, m, paramsList, u);
+         query.setExecutedByIntegrator(false);
+         return query;
+     }
+    
+    private SearchParamsOccPeriod generateParams_occPeriod_wip(Municipality m){
+        SearchParamsOccPeriod params = new SearchParamsOccPeriod();
+        
+        params.setSearchName("Periods with outstanding inspections");
+        params.setSearchDescription("Inspections have been started by not certified as passed");
+        
+        params.setInspectionPassed_filterBy(true);
+        params.setInspectionPassed_switch_passedInspection(false);
+        
+        return params;
+        
+    }
+    
+    public List<QueryOccPeriod> buildQueryOccPeriodList(User u, Municipality m) throws IntegrationException{
+        QueryOccPeriodEnum[] nameArray = QueryOccPeriodEnum.values();
+        List<QueryOccPeriod> queryList = new ArrayList<>();
+        for(QueryOccPeriodEnum queryTitle: nameArray){
+            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
+            queryList.add(assembleQueryOccPeriod(queryTitle, u, m, null));
+        }
+        return queryList;
+    }
+    
+    /**
+     * Single point of entry for queries on Occupancy Periods
+     * 
+     * @param query an assembled QueryOccPeriod
+     * @return a reference to the same QueryOccPeriod instance passed in with the business
+     * objects returned from the integrator accessible via getResults()
+     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
+     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
+     * @throws IntegrationException fatal error in the integration code
+     */
+    public QueryOccPeriod runQuery(QueryOccPeriod query) throws AuthorizationException, IntegrationException{
+        query.clearResultList();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+//        if(query.getUser().getRoleType().getRank() > query.getQueryName().getUserRankMinimum() ){
+        //TODO: get this to actually work
+        if(query.getUser().getRoleType().getRank() < query.getUserRankAccessMinimum().getRank() ){
+            throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
+        }
+        
+        if(query.getQueryName().logQueryRun()){
+            logRun(query);
+        }
+        return oi.runQueryOccPeriod(query);
+    }
+    
+    
+    public QueryPerson assembleQueryPerson(QueryPersonEnum qName, User u, Municipality m, SearchParamsPerson params){
+         QueryPerson  query;
+         List<SearchParamsPerson> paramsList = new ArrayList<>();
+         
+         if(params != null){
+             qName = QueryPersonEnum.CUSTOM;
+         }
+         
+         switch(qName){
+            case ACTIVE_PERSONS:
+                paramsList.add(generateParams_persons_active(m));
+                break;
+            
+         }
+         query = new QueryPerson(qName, m, paramsList, u);
+         query.setExecutedByIntegrator(false);
+         return query;
+     }
+    
+    private SearchParamsPerson generateParams_persons_active(Municipality m){
+        SearchParamsPerson params = new SearchParamsPerson();
+        
+        params.setSearchName("Public person types");
+        params.setSearchDescription("All persons declared to be public");
+        
+        params.setFilterByPersonTypes(true);
+        List<PersonType> pList = new ArrayList<>();
+        pList.add(PersonType.Public);
+        params.setPersonTypes(pList);
+        
+        return params;
+        
+    }
+    
+    public List<QueryPerson> buildQueryPersonList(User u, Municipality m) throws IntegrationException{
+        QueryPersonEnum[] nameArray = QueryPersonEnum.values();
+        List<QueryPerson> queryList = new ArrayList<>();
+        for(QueryPersonEnum queryTitle: nameArray){
+            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
+            queryList.add(assembleQueryPerson(queryTitle, u, m, null));
+        }
+        return queryList;
+    }
+    
+    /**
+     * Single point of entry for queries on Person objects
+     * 
+     * @param query an assembled QueryOccPeriod
+     * @return a reference to the same QueryOccPeriod instance passed in with the business
+     * objects returned from the integrator accessible via getResults()
+     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
+     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
+     * @throws IntegrationException fatal error in the integration code
+     */
+    public QueryPerson runQuery(QueryPerson query) throws AuthorizationException, IntegrationException{
+        query.clearResultList();
+        PersonIntegrator pi = getPersonIntegrator();
+        if(query.getUser().getRoleType().getRank() < query.getUserRankAccessMinimum().getRank() ){
+            throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
+        }
+        
+        if(query.getQueryName().logQueryRun()){
+            logRun(query);
+        }
+        return pi.runQueryPerson(query);
+    }
+    
+     
+    public QueryProperty assembleQueryProperty(QueryPropertyEnum qName, User u, Municipality m, SearchParamsProperty params){
+         QueryProperty  query;
+         List<SearchParamsProperty> paramsList = new ArrayList<>();
+         
+         if(params != null){
+             qName = QueryPropertyEnum.CUSTOM;
+         }
+         
+         switch(qName){
+            case OPENCECASES_OCCPERIODSINPROCESS:
+                paramsList.add(generateParams_property_active(m));
+                break;
+            case CUSTOM:
+                paramsList.add(params);
+                break;
+            
+         }
+         query = new QueryProperty(qName, m, paramsList, u);
+         query.setExecutedByIntegrator(false);
+         return query;
+     }
+    
+    private SearchParamsProperty generateParams_property_active(Municipality m){
+        SearchParamsProperty params = new SearchParamsProperty();
+        
+        params.setSearchName("Properties updated in the past month");
+        params.setSearchDescription("Applies to properties with any field updated");
+        
+        params.setFilterByMuni(true);
+        params.setMuni(m);
+        
+        params.setFilterByStartEndDate(true);
+        params.setUseRelativeDates(true);
+        params.setDateField(SearchParamsPropertyDateFields.LAST_UPDATED);
+        params.setStartDateRelativeDays(-30);
+        params.setEndDateRelativeDays(0);
+        
+        params.setActive_filterBy(true);
+        params.setActive(true);
+        
+
+        return params;
+        
+    }
+    
+    public List<QueryProperty> buildQueryPropertyList(User u, Municipality m) throws IntegrationException{
+        QueryPropertyEnum[] nameArray = QueryPropertyEnum.values();
+        List<QueryProperty> queryList = new ArrayList<>();
+        for(QueryPropertyEnum queryTitle: nameArray){
+            // THE FACTORY CALL for QueryCEAR objects!!!!!!!!!!!!!!
+            queryList.add(assembleQueryProperty(queryTitle, u, m, null));
+        }
+        return queryList;
+    }
+    
+    /**
+     * Single point of entry for queries on Property objects
+     * 
+     * @param query an assembled QueryOccPeriod
+     * @return a reference to the same QueryOccPeriod instance passed in with the business
+     * objects returned from the integrator accessible via getResults()
+     * @throws AuthorizationException thrown when the quering User's rank is below the Query's 
+     * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
+     * @throws IntegrationException fatal error in the integration code
+     */
+    public QueryProperty runQuery(QueryProperty query) throws AuthorizationException, IntegrationException{
+        query.clearResultList();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        if(query.getUser().getRoleType().getRank() < query.getUserRankAccessMinimum().getRank() ){
+            throw new AuthorizationException("User/owner of query does not meet rank minimum specified by the Query");
+        }
+        
+        if(query.getQueryName().logQueryRun()){
+            logRun(query);
+        }
+        return pi.runQueryProperties(query);
+    }
     
 }

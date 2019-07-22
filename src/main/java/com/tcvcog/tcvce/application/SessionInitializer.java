@@ -29,7 +29,13 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryEventCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -93,19 +99,14 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 System.out.println("SessionInitializer.initiateInternalSession ");
 
                 Municipality muni = uc.getDefaultyMuni(extractedUser);
-//                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-//                        .getString("arbitraryPlaceholderPersonID"))));
                 getSessionBean().setFacesUser(extractedUser);
-//                getSessionBean().setActivePersonList(persInt.getPersonHistory(extractedUser));
                 getSessionBean().setActiveMuni(muni);
                 getSessionBean().setUserAuthMuniList(uc.getUserAuthMuniList(extractedUser.getUserID()));
                 
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
                 getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getCodeSet().getCodeSetID()));
-                
                 populateSessionObjectQueues(extractedUser, muni);
-
                 getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
                         Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
                          "SessionInitializer.initiateInternalSession | Created internal session", false, false);
@@ -147,6 +148,31 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         CaseIntegrator caseInt = getCaseIntegrator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         
+        sessionBean.setQueryProperty(
+                searchCoord.assembleQueryProperty(
+                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, u, m, null));
+        
+        sessionBean.setQueryPerson(
+                searchCoord.assembleQueryPerson(
+                QueryPersonEnum.CUSTOM, u, m, null));
+        
+        sessionBean.setQueryCEAR(
+                searchCoord.assembleQueryCEAR(
+                QueryCEAREnum.ALL_PAST30, u, m, null));
+        
+        sessionBean.setQueryCECase(
+                searchCoord.assembleQueryCECase(
+                QueryCECaseEnum.OPENCASES, u, m, null));
+        
+        sessionBean.setQueryEventCECase(
+                searchCoord.assembleQueryEventCECase(
+                QueryEventCECaseEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, u, m, null));
+        
+        sessionBean.setQueryOccPeriod(
+                searchCoord.assembleQueryOccPeriod(
+                QueryOccPeriodEnum.CUSTOM, u, m, null));
+        
+        
         sessionBean.setPersonQueue(persCoord.loadPersonHistoryList(u));
         sessionBean.setcECaseQueue(caseCoord.getUserCaseHistoryList(u));
         
@@ -155,7 +181,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         
         sessionBean.setActiveProp(m.getMuniOfficeProperty());
         sessionBean.setActivePerson(u.getPerson());
-        sessionBean.setSessionQueryCEAR(searchCoord.getQueryInitialCEAR(u, m));
+        sessionBean.setQueryCEAR(searchCoord.getQueryInitialCEAR(u, m));
         
 //        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                .getString("arbitraryPlaceholderCaseID")

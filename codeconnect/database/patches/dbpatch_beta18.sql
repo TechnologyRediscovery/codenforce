@@ -158,12 +158,9 @@ ALTER TABLE municipality
 
 CREATE TABLE public.municourtentity
 (
-
 	muni_municode 								INTEGER NOT NULL CONSTRAINT municourtentity_municode_fk REFERENCES municipality (municode),
 	courtentity_entityid 						INTEGER NOT NULL CONSTRAINT municourtentity_courtid_fk REFERENCES courtentity (entityid),
 	CONSTRAINT municourtentity_comp_pk 	PRIMARY KEY (muni_municode, courtentity_entityid)
-
-
 );
 
 ALTER TABLE courtentity DROP COLUMN muni_municode CASCADE;
@@ -178,14 +175,7 @@ ALTER TABLE cecase ADD COLUMN personinfocase_personid INTEGER CONSTRAINT cecase_
 
 ALTER TABLE cecase ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT cecase_bobsourceid_fk REFERENCES bobsource (sourceid);
 
-
-
-
-
-
-
 ALTER TABLE public.occpermitapplication ADD COLUMN rentalintent boolean;
-
 
 /* new propertyunitchange table*/
 
@@ -244,10 +234,12 @@ CREATE TABLE public.choicedirectivedirectiveset
 
 ALTER TABLE choicedirectivechoice RENAME COLUMN eventproposal_proposalid TO directive_directiveid;
 
-
 ALTER SEQUENCE choiceproposalsetid_seq RENAME TO choicedirectivesetid_seq;
 
+ALTER TABLE eventcategory RENAME COLUMN proposal_propid TO directive_directiveid;
 
+-- Cleanup on occ
+ALTER TABLE occspace ADD COLUMN required BOOLEAN default false;
 
 INSERT INTO public.dbpatch(
             patchnum, patchfilename, datepublished, patchauthor, notes)

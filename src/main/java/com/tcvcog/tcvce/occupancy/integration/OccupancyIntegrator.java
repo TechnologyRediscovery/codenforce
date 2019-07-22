@@ -100,7 +100,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return opList;
     }
 
-    public QueryOccPeriod queryOccPeriods(QueryOccPeriod query) throws IntegrationException {
+    public QueryOccPeriod runQueryOccPeriod(QueryOccPeriod query) throws IntegrationException {
         List<SearchParamsOccPeriod> pList = query.getParmsList();
         
         for(SearchParamsOccPeriod sp: pList){

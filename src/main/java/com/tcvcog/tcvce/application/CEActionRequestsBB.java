@@ -251,7 +251,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public String generateReportSingleCEAR() {
         getSessionBean().setSessionCEAR(selectedRequest);
         getSessionBean().setSessionReport(reportConfig);
-        getSessionBean().setSessionQueryCEAR(selectedQueryCEAR);
+        getSessionBean().setQueryCEAR(selectedQueryCEAR);
         return "reportCEARList";
 
     }
@@ -265,7 +265,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         reportConfig.getBOBQuery().getBOBResultList().get(0).setInsertPageBreakBefore(false);
         
         getSessionBean().setSessionReport(reportConfig);
-        getSessionBean().setSessionQueryCEAR(selectedQueryCEAR);
+        getSessionBean().setQueryCEAR(selectedQueryCEAR);
         return "reportCEARList";
     }
 

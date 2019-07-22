@@ -222,35 +222,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     
    
     
-    public User getDefaultCodeOfficer(int  muniCode) throws IntegrationException{
-        User u = null;
-        UserIntegrator ui = getUserIntegrator();
-       
-        Connection con = getPostgresCon();
-        
-        String query = "SELECT defaultcodeofficeruser FROM municipality WHERE municode = ?;";
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
- 
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, muniCode);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                u = ui.getUser(rs.getInt("defaultcodeofficeruser"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.getDefaultCodeOfficer", ex);
-
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return u;
-    }
     
     
     
@@ -397,45 +368,32 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
      * access within their user type domain
      * @throws IntegrationException
      */
-    public List<Municipality> getUserAuthMunis(int uid, UserIntegrator userIntegrator) throws IntegrationException {
-        Connection con = userIntegrator.getPostgresCon();
+    public List<Municipality> getUserAuthMunis(int uid) throws IntegrationException {
+        Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT muni_municode FROM loginmuni WHERE userid = ?;";
+        String query = "SELECT DISTINCT muni_municode \n" +
+                        "FROM munilogin\n" +
+                        "WHERE userid = ? \n" +
+                        "AND recorddeactivatedts IS NULL\n" +
+                        "AND accessgranteddatestart < now()\n" +
+                        "AND accessgranteddatestop > now();";
         List<Municipality> muniList = new ArrayList<>();
         PreparedStatement stmt = null;
-        MunicipalityIntegrator mi = userIntegrator.getMunicipalityIntegrator();
+        
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, uid);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                muniList.add(mi.getMuni(rs.getInt("muni_municode")));
+                muniList.add(getMuni(rs.getInt("muni_municode")));
             }
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("UserIntegrator.getUserAuthMunis | Error getting user-auth-munis", ex);
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */
-                }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         return muniList;
     }
