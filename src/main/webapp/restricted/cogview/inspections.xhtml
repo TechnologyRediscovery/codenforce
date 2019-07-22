@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 </h:messages>
                             </h:form>
 
-                            <h1><h:outputText value="Open cases in #{sessionBean.activeMuni.muniName}"/></h1>
+                            <h1><h:outputText value="Open cases in #{sessionBean.sessionMuni.muniName}"/></h1>
                             <h3>List builder:</h3>
                             <h:outputText value="Filer#{caseProfileBB.searchParams.useIsOpen}"/>
                             <h:outputText value="#{caseProfileBB.searchParams.isOpen}"/>
@@ -1035,7 +1035,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                  height="650" width="900"
                                  widgetVar="add-event-dialog-var"
                                  closable="true" 
-                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}">
 
 
                         <h:form id="addNewEventForm">
@@ -1192,7 +1192,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                  height="650" width="900"
                                  widgetVar="edit-case-metadata-var"
                                  closable="true" 
-                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                 rendered="#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}">
 
                         <h:outputText value="You are editing case no. #{caseProfileBB.currentCase.caseID}"/>
                         <p:spacer height="10px"/>

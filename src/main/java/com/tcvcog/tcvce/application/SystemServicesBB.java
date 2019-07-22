@@ -74,7 +74,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     public void logErrorPageLoad(){
         try {
-            getLogIntegrator().makeLogEntry(getFacesUser().getUserID(),
+            getLogIntegrator().makeLogEntry(getSessionUser().getUserID(),
                     getSessionID(), 2, "error page hit", true, false);
         } catch (IntegrationException ex) {
             Logger.getLogger(SystemServicesBB.class.getName()).log(Level.SEVERE, null, ex);
@@ -88,7 +88,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 
         ImprovementSuggestion is = new ImprovementSuggestion();
         
-        is.setSubmitter(getFacesUser());
+        is.setSubmitter(getSessionUser());
         is.setImprovementTypeID(selectedImprovementType);
         is.setSuggestionText(systemImprovementTicketRText);
         // back to the hard-coded since I couldn't get the resource bundle lookup

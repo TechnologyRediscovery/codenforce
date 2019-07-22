@@ -134,7 +134,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     public String switchMuni(){
         CodeIntegrator ci = getCodeIntegrator();
-        getSessionBean().setActiveMuni(selectedMuni);
+        getSessionBean().setSessionMuni(selectedMuni);
         try {
             getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(selectedMuni.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
@@ -195,7 +195,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @return the user
      */
     public User getUser() {
-        user = getFacesUser();
+        user = getSessionUser();
         if(user != null){
             System.out.println("MissionControlBB.getUser | facesUser: " + user.getPerson().getFirstName());
         }
@@ -213,7 +213,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getActiveMuni();
+        currentMuni = getSessionBean().getSessionMuni();
         return currentMuni;
     }
 
@@ -254,7 +254,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         EventIntegrator ei = getEventIntegrator();
         try {
             timelineEventList = 
-                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getActiveMuni(), 
+                    (ArrayList<EventCECaseCasePropBundle>) ei.getUpcomingTimelineEvents(getSessionBean().getSessionMuni(), 
                             LocalDateTime.now(), LocalDateTime.now().plusDays(365));
         } catch (IntegrationException ex) {
             System.out.println(ex);

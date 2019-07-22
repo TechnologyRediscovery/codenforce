@@ -281,7 +281,7 @@
                                                                  value="#{eventsCECaseBB.searchParams.person}"
                                                                  disabled="#{!eventsCECaseBB.searchParams.filterByPerson}">
                                                     <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                                    <f:selectItems value="#{sessionBean.personQueue}"  var="p" itemValue="#{p}" 
+                                                    <f:selectItems value="#{sessionBean.sessionPersonList}"  var="p" itemValue="#{p}" 
                                                                    itemLabel="#{p.firstName} #{p.lastName}"/>
                                                     <f:converter converterId="personConverter"/>
                                                 </p:selectOneMenu>
@@ -538,7 +538,7 @@
                                                                     action="#{eventsCECaseBB.editEventInCaseManager(e)}"
                                                                     disabled="false"
                                                                     icon="fa fa-arrow-circle-right"
-                                                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                                    rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
                                                                     />
                                                                 <p:commandButton       
                                                                     id="eventlist-hide-event-cb" 
@@ -548,7 +548,7 @@
                                                                     styleClass="button-float-right"
                                                                     actionListener="#{eventsCECaseBB.hideEvent(e)}"
                                                                     icon="fa fa-moon-o"
-                                                                    rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    rendered="#{sessionBeasessionUserer.keyCard.hasEnfOfficialPermissions}"
                                                                     update="event-list-tabview:events-datascroller-form:events-datascroller"
                                                                     />
                                                     </div>
@@ -830,7 +830,7 @@
                                     widgetVar="report-event-diaglog-var"
                                     closable="true" responsive="true"
                                     dynamic="true"
-                                    rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                                    rendered="#{sessionBeasessionUserer.keyCard.hasMuniReaderPermissions}">
 
                              <h:form id="ceev-reportconfig-messages-form">
                                 <h:messages id="ceev-messages-in-report-dialog" globalOnly="true" showDetail="false" showSummary="true"
@@ -923,7 +923,7 @@
 
                                 <p:commandButton ajax="false" action="#{eventsCECaseBB.generateEventReport}"
                                                  value="Generate report" icon="fa fa-print" 
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 rendered="#{sessionBsessionUserUser.keyCard.hasMuniReaderPermissions}"
                                                  />
 
                             </h:form>

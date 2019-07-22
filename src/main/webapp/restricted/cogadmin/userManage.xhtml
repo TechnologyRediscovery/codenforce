@@ -27,7 +27,7 @@
                             <p:commandButton ajax="true" value="Add New User" icon="fa fa-plus" 
                                              actionListener="#{userBB.addUser}"
                                              oncomplete="PF('user-addupdate-dialog').show()"
-                                             rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}"
+                                             rendered="#{sessionBean.sessionUser.keyCard.hasSysAdminPermissions}"
                                              update="
                                              user-addupdate-form:useradd-personid-it
                                              user-addupdate-form:roleIM
@@ -235,13 +235,13 @@
                         <p:dialog      height="650" width="800"
                                        widgetVar="user-info-dialog"
                                        closable="true" 
-                                       rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                       rendered="#{sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}">
                         </p:dialog>
 
                         <p:dialog   height="750" width="1000"
                                     widgetVar="user-addupdate-dialog"
                                     closable="true" 
-                                    rendered="#{sessionBean.facesUser.keyCard.hasSysAdminPermissions}">
+                                    rendered="#{sessionBeasessionUserer.keyCard.hasSysAdminPermissions}">
                             <h:form id="user-addupdate-form">
 
                                 <h2>Add/update user</h2>

@@ -75,8 +75,8 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         SearchCoordinator sc = getSearchCoordinator();
         
         
-        queryList = sc.buildQueryEventCECaseList(getSessionBean().getActiveMuni(),getSessionBean().getFacesUser());
-        selectedBOBQuery = sc.getQueryInitialEventCECASE(getSessionBean().getActiveMuni(), getSessionBean().getFacesUser());
+        queryList = sc.buildQueryEventCECaseList(getSessionBean().getSessionMuni(),getSessionBean().getSessionUser());
+        selectedBOBQuery = sc.getQueryInitialEventCECASE(getSessionBean().getSessionMuni(), getSessionBean().getSessionUser());
         if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery((QueryEventCECase) selectedBOBQuery);
@@ -112,7 +112,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         EventCoordinator ec = getEventCoordinator();
         try {
             eventList = ec.queryEvents( searchParams, 
-                                        getSessionBean().getFacesUser(), 
+                                        getSessionBean().getSessionUser(), 
                                         getSessionBean().getUserAuthMuniList());
             if(eventList != null){
                 Collections.sort(eventList);
@@ -174,7 +174,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         CaseBase caseNoLists = ev.getEventCaseBare();
         try {
-            getSessionBean().getcECaseQueue().add(0, ci.generateCECase(caseNoLists));
+            getSessionBean().getSessionCECaseList().add(0, ci.generateCECase(caseNoLists));
         } catch (SQLException ex) {
             System.out.println(ex);
         } catch (IntegrationException ex) {
@@ -205,8 +205,8 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
            
             EventCoordinator ec = getEventCoordinator();
             reportConfig = ec.getDefaultReportConfigCEEventList();
-            reportConfig.setMuni(getSessionBean().getActiveMuni());
-            reportConfig.setCreator(getSessionBean().getFacesUser());
+            reportConfig.setMuni(getSessionBean().getSessionMuni());
+            reportConfig.setCreator(getSessionBean().getSessionUser());
             if(selectedBOBQuery != null){
                  reportConfig.setTitle(selectedBOBQuery.getQueryTitle());
             }
@@ -240,7 +240,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
             
         }
        reportConfig.setBOBQuery(selectedBOBQuery);
-       getSessionBean().setcEEventWCPIQueue(eventList);
+       getSessionBean().setSessionEventWithCasePropList(eventList);
        getSessionBean().setReportConfigCEEventList(reportConfig);
        getSessionBean().setSessionReport(reportConfig);
        return "reportCEEventList";

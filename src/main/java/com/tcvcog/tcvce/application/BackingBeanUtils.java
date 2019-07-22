@@ -669,7 +669,7 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @return the facesUser
      */
-    public User getFacesUser() {
+    public User getSessionUser() {
         ExternalContext ec = getFacesContext().getExternalContext();
         facesUser = (User) ec.getSessionMap().get("facesUser");
         return facesUser;
@@ -678,7 +678,7 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @param facesUser the facesUser to set
      */
-    public void setFacesUser(User facesUser) {
+    public void setSessionUser(User facesUser) {
         this.facesUser = facesUser;
     }
     

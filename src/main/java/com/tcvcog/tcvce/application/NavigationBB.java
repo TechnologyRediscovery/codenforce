@@ -45,7 +45,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     public String gotoPropertyProfile(){
-        if(getSessionBean().getActiveProp() != null){
+        if(getSessionBean().getSessionProperty() != null){
             return "propertyProfile";
         } else {
              getFacesContext().addMessage(null, 
@@ -71,7 +71,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     public String gotoPersonProfile(){
-        if(getSessionBean().getActivePerson()!= null ){
+        if(getSessionBean().getSessionPerson()!= null ){
             return "personProfile";
         } else{
              getFacesContext().addMessage(null, 
@@ -95,7 +95,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveProperty
      */
     public boolean isNoActiveProperty() {
-        Property p = getSessionBean().getActiveProp();
+        Property p = getSessionBean().getSessionProperty();
         noActiveProperty = (p == null);
         return noActiveProperty;
     }
@@ -148,7 +148,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActivePerson
      */
     public boolean isNoActivePerson() {
-        Person p = getSessionBean().getActivePerson();
+        Person p = getSessionBean().getSessionPerson();
         noActivePerson = (p == null);
         return noActivePerson;
     }
@@ -164,7 +164,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
      * @return the noActiveUser
      */
     public boolean isNoActiveUser() {
-        noActiveUser = (getFacesUser() == null); 
+        noActiveUser = (getSessionUser() == null); 
         return noActiveUser;
     }
 

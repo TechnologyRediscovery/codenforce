@@ -99,8 +99,8 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 System.out.println("SessionInitializer.initiateInternalSession ");
 
                 Municipality muni = uc.getDefaultyMuni(extractedUser);
-                getSessionBean().setFacesUser(extractedUser);
-                getSessionBean().setActiveMuni(muni);
+                getSessionBean().setSessionUser(extractedUser);
+                getSessionBean().setSessionMuni(muni);
                 getSessionBean().setUserAuthMuniList(uc.getUserAuthMuniList(extractedUser.getUserID()));
                 
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
@@ -172,15 +172,14 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 searchCoord.assembleQueryOccPeriod(
                 QueryOccPeriodEnum.CUSTOM, u, m, null));
         
-        
-        sessionBean.setPersonQueue(persCoord.loadPersonHistoryList(u));
-        sessionBean.setcECaseQueue(caseCoord.getUserCaseHistoryList(u));
+        sessionBean.setSessionPersonList(persCoord.loadPersonHistoryList(u));
+        sessionBean.setSessionCECaseList(caseCoord.getUserCaseHistoryList(u));
         
         QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         sessionBean.setQueryCECase(queryCECase);
         
-        sessionBean.setActiveProp(m.getMuniOfficeProperty());
-        sessionBean.setActivePerson(u.getPerson());
+        sessionBean.setSessionProperty(m.getMuniOfficeProperty());
+        sessionBean.setSessionPerson(u.getPerson());
         sessionBean.setQueryCEAR(searchCoord.getQueryInitialCEAR(u, m));
         
 //        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
@@ -191,7 +190,5 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        sessionBean.setcECaseQueue(new ArrayList<CECase>());
 //        sessionBean.getcECaseQueue().add(c);
 
-        sessionBean.setPropertyQueue(propI.getPropertyHistoryList(u));
-        sessionBean.getPropertyQueue().add(p);
     }
 }
