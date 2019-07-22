@@ -10,7 +10,8 @@
         <title></title>
     </h:head>
     <h:body>
-        <ui:composition template="../navContainer_restricted.xhtml">
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <!--../navContainer_restricted.xhtml-->
             <ui:define name="content">
                 <div class="mainContainer">
                     <h:messages globalOnly="true" showDetail="false" showSummary="true"
@@ -26,10 +27,10 @@
 
                         <p:spacer height="5px"/>
 
-                        <p:selectOneMenu id="intensityCategoryMenu" value="#{intensityBB.selectedCategory}">
-                            <f:selectItems id="paymentTypeList" value="#{intensityBB.categoryList}" var="ct" itemValue="#{ct}" itemLabel="#{ct.label}"/>
+                        <p:selectOneMenu id="intensityCategoryMenu" value="#{intensityBB.selectedSchema}">
+                            <f:selectItems id="paymentTypeList" value="#{intensityBB.schemaList}" var="ct" itemValue="#{ct}" itemLabel="#{ct.label}"/>
                         </p:selectOneMenu>
-                        <p:commandButton value="Get Intensity Classes" ajax="true" action=""/>
+                        <p:commandButton value="Get Intensity Classes" ajax="true" action="#{intensityBB.queryIntensityClasses()}"/>
 
                         <p:spacer height="10px"/>
                         <hr/>

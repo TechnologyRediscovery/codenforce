@@ -61,7 +61,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
                         "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
                         "       lastupdated_userid, primarystaffcontact_userid\n" +
-                        "  FROM public.municipality WHERE municode=?;";
+                        "  FROM public.municipality"
+                      + "  WHERE municode=?;";
         ResultSet rs = null;
  
         try {

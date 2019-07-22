@@ -20,16 +20,19 @@ package com.tcvcog.tcvce.entities;
  *
  * @author Nathan Dietz
  */
-public enum IntensitySchema{
-    Administrative("administrative to serious human safety concern hazard, 1-10");
+public class IntensitySchema{
     
-    private final String label;
+    private String label;
     
-    private IntensitySchema(String label) {
+    public IntensitySchema(String label) {
 
     this.label = label;
     }
-    
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public String getLabel(){
         return label;
     }

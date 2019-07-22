@@ -736,7 +736,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             intsty.setTitle(rs.getString("title"));
             intsty.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             intsty.setNumericRating(rs.getInt("numericrating"));
-            intsty.setSchema(IntensitySchema.valueOf(rs.getString("schemaName")));
+            intsty.setSchema(new IntensitySchema(rs.getString("schemaName")));
             intsty.setActive(rs.getBoolean("active"));
             intsty.setIcon(getIcon(rs.getInt("icon_iconid")));
         } catch (SQLException ex) {
@@ -909,5 +909,66 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
     }
+    
+    public List<IntensitySchema> getIntensitySchemaList() throws IntegrationException {
 
+        List<IntensitySchema> inList = new ArrayList<>();
+
+        String query = "SELECT DISTINCT schemaname FROM intensityclass;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                inList.add(generateIntensitySchema(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("SystemIntegrator.getIntensitySchemaList | Unable to get Intensity Schema List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return inList;
+
+    }
+
+    public IntensitySchema generateIntensitySchema(ResultSet rs) throws IntegrationException {
+        
+        String schemaName = "";
+
+        try {
+            schemaName = rs.getString("schemaname");
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating IntensitySchema from ResultSet", ex);
+        }
+
+        return new IntensitySchema(schemaName);
+
+    }
+    
 }

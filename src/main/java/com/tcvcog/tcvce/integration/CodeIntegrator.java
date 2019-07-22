@@ -666,7 +666,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         //System.out.println("CodeIntegrator.getCodeElement | fetching code element by ID");
         CodeElement newCodeElement = new CodeElement();
         PreparedStatement stmt = null;
-        Connection con = null;
+        Connection con = getPostgresCon();
         // note that muniCode is not returned in this query since it is specified in the WHERE
         String query = "SELECT elementid, guideentryid, codesource_sourceid, ordchapterno, \n" +
             "ordchaptertitle, ordsecnum, ordsectitle, ordsubsecnum, ordsubsectitle, \n" +
@@ -676,7 +676,6 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
  
         try {
-            con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, elementID);
             rs = stmt.executeQuery();
