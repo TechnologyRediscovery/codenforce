@@ -91,7 +91,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (con != null) { try { con.close(); } catch (SQLException e) { System.out.println("getMuni | " + e.toString());} }
         } // close finally
         
         return rs;
@@ -230,7 +230,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (con != null) { try { con.close(); } catch (SQLException e) { System.out.println("MunicipalityIntegrator.getMuniList | " + e.toString());} }
         } // close finally
         
         return mList;

@@ -290,8 +290,8 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
              throw new IntegrationException("Exception in CodeSetIntegrator", ex);
         } finally{
             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) {System.out.println("getCodeSetById | " + e.toString());} }
         } // close finally
         return cs;
         
@@ -588,7 +588,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (con != null) { try { con.close(); } catch (SQLException e) { System.out.println("getEnforcableCodeElementList | " + e.toString());} }
         } // close finally
         
         return eceList;
@@ -691,7 +691,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (con != null) { try { con.close(); } catch (SQLException e) {System.out.println(e.toString());} }
         } // close finally
         return newCodeElement;
         
