@@ -61,7 +61,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
 
-        Property activeProp = getSessionBean().getActiveProp();
+        Property activeProp = getSessionBean().getSessionProperty();
 
         actionList = new ArrayList<>();
         
@@ -99,7 +99,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         PropertyIntegrator pi = getPropertyIntegrator();
 
         try {
-            setChangedPropList(pi.searchForChangedProperties(getHouseNum(), getStreetName(), getSessionBean().getActiveMuni().getMuniCode()));
+            setChangedPropList(pi.searchForChangedProperties(getHouseNum(), getStreetName(), getSessionBean().getSessionMuni().getMuniCode()));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Your search completed with " + getChangedPropList().size() + " results", ""));
@@ -118,8 +118,8 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
             selectedProperty = pi.getPropertyWithLists(prop.getPropertyID());
             existingUnitList = pi.getPropertyUnitList(selectedProperty);
             proposedUnitList = pi.getPropertyUnitChangeList(selectedProperty);
-            ui.logObjectView(getSessionBean().getFacesUser(), prop);
-            getSessionBean().getPropertyQueue().add(prop);
+            ui.logObjectView(getSessionBean().getSessionUser(), prop);
+            getSessionBean().getSessionPropertyList().add(prop);
 
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
@@ -149,11 +149,11 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
                                 " [Removed on " + change.getChangedOn().toGMTString()
                                 + " by " + change.getChangedBy() + "]"));
 
-                        pi.updatePropertyUnit(change);
+                        pi.implementPropertyUnitChangeOrder(change);
 
                     } else {
 
-                        pi.updatePropertyUnit(change);
+                        pi.implementPropertyUnitChangeOrder(change);
 
                     }
 
@@ -179,7 +179,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
     public String goToChangeDetail() {
 
-        getSessionBean().setActiveProp(selectedProperty);
+        getSessionBean().setSessionProperty(selectedProperty);
 
         return "unitchangedetail";
 

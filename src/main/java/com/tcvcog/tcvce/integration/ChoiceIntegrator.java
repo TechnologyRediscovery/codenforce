@@ -45,7 +45,7 @@ import java.util.List;
  * A Choice is given to the user in a Directive and can take one of the
  following forms:
  An EventCategory
- An EventRule
+ An EventRuleAbstract
  A page redirection via JSF navigation subsystem
  * @author sylvia
  */
@@ -232,15 +232,13 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-
         return proposalList;
-        
     }
     
     
     public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException{
         
-         List<Proposal> proposalList = new ArrayList<>();
+        List<Proposal> proposalList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
         sb.append(  "SELECT proposalid\n" +
@@ -611,6 +609,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             }
             
             stmt.setInt(3, prop.getInitiator().getUserID());
+            
             if(prop.getResponderIntended() != null){
                 stmt.setInt(4, prop.getResponderIntended().getUserID());
             } else {
@@ -659,7 +658,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(17, prop.getOccperiodID());
             stmt.setInt(18, prop.getCecaseID());
             
-            
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -672,9 +670,5 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         
     }
-    
-    
-    
-    
     
 }

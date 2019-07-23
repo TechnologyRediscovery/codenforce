@@ -33,15 +33,17 @@ public class OccInspection {
     private User inspector;
     private int occPeriodID;
     
+    // This template object provides us the raw lists of uninspected
+    // space types, from which we extract a list of Spaces and their CodeElements
     private OccChecklistTemplate checklistTemplate;
     private List<OccInspectedSpace> inspectedSpaceList;
     
     private int pacc;
     private boolean enablePacc;
     
-    private User passCertifiedBy;
-    private LocalDateTime passTS;
-    private LocalDateTime effectiveDate;
+    private User passedInspectionCertifiedBy;
+    private LocalDateTime passedInspectionTS;
+    private LocalDateTime effectiveDateOfRecord;
     
     private int maxOccupantsAllowed;
     private int numBedrooms;
@@ -50,10 +52,18 @@ public class OccInspection {
     private Person thirdPartyInspector;
     private LocalDateTime thirdPartyInspectorApprovalTS;
     private User thirdPartyApprovalBy;
-    
-    
 
     private String notes; 
+    
+    public OccInspection(){
+        inspectedSpaceList = new ArrayList<>();
+    }
+    
+    public void addSpaceToInspectedSpaces(OccInspectedSpace spc){
+        inspectedSpaceList.add(spc);
+        
+    }
+    
     
     /**
      * @return the inspectionID
@@ -165,17 +175,17 @@ public class OccInspection {
     }
 
     /**
-     * @return the passCertifiedBy
+     * @return the passedInspectionCertifiedBy
      */
-    public User getPassCertifiedBy() {
-        return passCertifiedBy;
+    public User getPassedInspectionCertifiedBy() {
+        return passedInspectionCertifiedBy;
     }
 
     /**
-     * @param passCertifiedBy the passCertifiedBy to set
+     * @param passedInspectionCertifiedBy the passedInspectionCertifiedBy to set
      */
-    public void setPassCertifiedBy(User passCertifiedBy) {
-        this.passCertifiedBy = passCertifiedBy;
+    public void setPassedInspectionCertifiedBy(User passedInspectionCertifiedBy) {
+        this.passedInspectionCertifiedBy = passedInspectionCertifiedBy;
     }
 
     /**
@@ -270,31 +280,31 @@ public class OccInspection {
     }
 
     /**
-     * @return the passTS
+     * @return the passedInspectionTS
      */
-    public LocalDateTime getPassTS() {
-        return passTS;
+    public LocalDateTime getPassedInspectionTS() {
+        return passedInspectionTS;
     }
 
     /**
-     * @param passTS the passTS to set
+     * @param passedInspectionTS the passedInspectionTS to set
      */
-    public void setPassTS(LocalDateTime passTS) {
-        this.passTS = passTS;
+    public void setPassedInspectionTS(LocalDateTime passedInspectionTS) {
+        this.passedInspectionTS = passedInspectionTS;
     }
 
     /**
-     * @return the effectiveDate
+     * @return the effectiveDateOfRecord
      */
-    public LocalDateTime getEffectiveDate() {
-        return effectiveDate;
+    public LocalDateTime getEffectiveDateOfRecord() {
+        return effectiveDateOfRecord;
     }
 
     /**
-     * @param effectiveDate the effectiveDate to set
+     * @param effectiveDateOfRecord the effectiveDateOfRecord to set
      */
-    public void setEffectiveDate(LocalDateTime effectiveDate) {
-        this.effectiveDate = effectiveDate;
+    public void setEffectiveDateOfRecord(LocalDateTime effectiveDateOfRecord) {
+        this.effectiveDateOfRecord = effectiveDateOfRecord;
     }
 
     

@@ -30,6 +30,9 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -1147,5 +1150,18 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
        
         return personList;
     }
+    
+    
+    public QueryPerson runQueryPerson(QueryPerson query) throws IntegrationException {
+        List<SearchParamsPerson> pList = query.getParmsList();
+        
+        for(SearchParamsPerson sp: pList){
+            query.addToResults(searchForPersons(sp));
+        }
+        query.setExecutionTimestamp(LocalDateTime.now());
+        query.setExecutedByIntegrator(true);
+        return query;
+    }
+
 
 } // close class

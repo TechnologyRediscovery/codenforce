@@ -69,7 +69,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     public OccupancyIntegrator() {
     }
 
-    public List<OccPeriod> getOccPeriodList(PropertyUnit unit) throws IntegrationException {
+    
+    public List<OccPeriod> getOccPeriodList(PropertyUnit pu) throws IntegrationException {
+        return getOccPeriodList(pu.getUnitID());
+    }
+    
+    public List<OccPeriod> getOccPeriodList(int unitID) throws IntegrationException {
         List<OccPeriod> opList = new ArrayList<>();
         String query = "SELECT periodid FROM public.occperiod WHERE propertyunit_unitid=?;";
 
@@ -79,7 +84,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, unit.getUnitID());
+            stmt.setInt(1, unitID);
             rs = stmt.executeQuery();
             while (rs.next()) {
                 opList.add(getOccPeriod(rs.getInt("periodid")));
@@ -95,7 +100,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return opList;
     }
 
-    public QueryOccPeriod queryOccPeriods(QueryOccPeriod query) throws IntegrationException {
+    public QueryOccPeriod runQueryOccPeriod(QueryOccPeriod query) throws IntegrationException {
         List<SearchParamsOccPeriod> pList = query.getParmsList();
         
         for(SearchParamsOccPeriod sp: pList){
@@ -397,7 +402,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException {
-        ChecklistIntegrator ci = getChecklistIntegrator();
+        OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         UserIntegrator ui = getUserIntegrator();
@@ -442,8 +447,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         op.setEventList(ei.getOccEvents(op.getPeriodID()));
         op.setEventProposalList(choiceInt.getProposalList(op));
-        op.setInspectionList(ci.getOccInspectionList(op));
-
+        op.setInspectionList(inspecInt.getOccInspectionList(op));
+        op.setEventRuleOccPeriodList(ei.getEventRuleOccPeriodList(op));
+        
         op.setPermitList(getOccPermitList(op));
         op.setBlobIDList(getBlobList(op));
         return op;
@@ -1068,7 +1074,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setString(5, application.getInternalNotes());
             stmt.setString(6, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
             stmt.setInt(7, application.getApplicantPerson().getPersonID());
-            stmt.setBoolean(8, application.getApplicationPropertyUnit().isRental());
             stmt.execute();
             ResultSet inserted_application = stmt.getResultSet();
             inserted_application.next();

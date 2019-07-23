@@ -27,11 +27,19 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryEventCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.io.Serializable;
@@ -40,7 +48,9 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -56,6 +66,11 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
     public SessionInitializer() {
     }
     
+    @PostConstruct
+    public void initBean(){
+        
+    }
+    
     /**
      * Central method for setting up the user's session:
      * 1) First get the user from the system
@@ -67,8 +82,9 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @return success or failure String used by faces to navigate to the internal page
      * or the error page
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
      */
-    public String initiateInternalSession() throws IntegrationException, CaseLifecyleException{
+    public String initiateInternalSession() throws IntegrationException, CaseLifecyleException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
         System.out.println("SessionInitializer.initiateInternalSession");
         FacesContext facesContext = getFacesContext();
@@ -76,6 +92,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         PropertyIntegrator pi = getPropertyIntegrator();
         PersonIntegrator persInt = getPersonIntegrator();
         CaseIntegrator caseint = getCaseIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try {
             User extractedUser = uc.getUser(getContainerAuthenticatedUser());
@@ -86,25 +103,19 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                 System.out.println("SessionInitializer.initiateInternalSession ");
 
                 Municipality muni = uc.getDefaultyMuni(extractedUser);
+                MunicipalityComplete muniComplete = mi.getMuniComplete(muni.getMuniCode());
                 
-//                getSessionBean().setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-//                        .getString("arbitraryPlaceholderPersonID"))));
-                getSessionBean().setFacesUser(extractedUser);
-//                getSessionBean().setActivePersonList(persInt.getPersonHistory(extractedUser));
-                getSessionBean().setActiveMuni(muni);
+                getSessionBean().setSessionUser(extractedUser);
+                getSessionBean().setSessionMuni(muniComplete);
                 getSessionBean().setUserAuthMuniList(uc.getUserAuthMuniList(extractedUser.getUserID()));
                 
                 // grab code set ID from the muni object,  ask integrator for the CodeSet object, 
                 //and then and store in sessionBean
-                getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muni.getCodeSet().getCodeSetID()));
-                
-                populateSessionObjectQueues(extractedUser, muni);
-
+                getSessionBean().setActiveCodeSet(muniComplete.getCodeSet());
+                populateSessionObjectQueues(extractedUser, muniComplete);
                 getLogIntegrator().makeLogEntry(extractedUser.getUserID(), getSessionID(), 
                         Integer.parseInt(getResourceBundle(Constants.LOGGING_CATEGORIES).getString("login")), 
                          "SessionInitializer.initiateInternalSession | Created internal session", false, false);
-
-                
             }
         
         } catch (IntegrationException ex) {
@@ -120,7 +131,6 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
         }
-          
         return "success";
     }
 
@@ -128,16 +138,23 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @return the username string of an authenticated user from the container
      */
     private String getContainerAuthenticatedUser() {
-        
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ec.getRequest();
         return request.getRemoteUser();
     }
-
-    
         
-    private void populateSessionObjectQueues(User u, Municipality m) throws IntegrationException, CaseLifecyleException{
+    /**
+     * With an active User and Municipality, we're ready to load up our
+     * Session-persistent shelves with our core business objects,
+     * Queries and some utility lists
+     * 
+     * @param u
+     * @param m
+     * @throws IntegrationException
+     * @throws CaseLifecyleException 
+     */
+    private void populateSessionObjectQueues(User u, MunicipalityComplete m) throws IntegrationException, CaseLifecyleException{
         SessionBean sessionBean = getSessionBean();
         
         PersonCoordinator persCoord = getPersonCoordinator();
@@ -148,30 +165,49 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         SearchCoordinator searchCoord = getSearchCoordinator();
         
         
-        sessionBean.setPersonQueue(persCoord.loadPersonHistoryList(u));
-        sessionBean.setcECaseQueue(caseCoord.getUserCaseHistoryList(u));
+//        sessionBean.setSessionPersonList(persCoord.loadPersonHistoryList(u));
+//        sessionBean.setSessionCECaseList(caseCoord.getUserCaseHistoryList(u));
+//        
+//        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
-        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
-        sessionBean.setSessionQueryCECase(queryCECase);
+        sessionBean.setSessionCECase(caseInt.getPropertyInfoCase(m.getMuniOfficeProperty()));
+        sessionBean.setSessionProperty(m.getMuniOfficeProperty());
+        sessionBean.setSessionPerson(u.getPerson());
         
-        Property p = propI.getProperty(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("arbitraryPlaceholderPropertyID")));
-        
-        sessionBean.setActiveProp(p);
+//        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+//                .getString("arbitraryPlaceholderCaseID")
+//                
 
-        sessionBean.setActivePerson(persInt.getPerson(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("arbitraryPlaceholderPersonID"))));
-        
-        sessionBean.setSessionQueryCEAR(searchCoord.getQueryInitialCEAR(u, m));
-        
-        CECase c = caseInt.getCECase(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("arbitraryPlaceholderCaseID")));
-        sessionBean.setSessionCECase(c);
-        
 //        sessionBean.setcECaseQueue(new ArrayList<CECase>());
 //        sessionBean.getcECaseQueue().add(c);
         
-        sessionBean.setPropertyQueue(propI.getPropertyHistoryList(u));
-        sessionBean.getPropertyQueue().add(p);
+        // Note that these are Query skeletons and have not yet ben run
+        // It's up to the individual beans to check the Query object's
+        // "run by integrator" member and run the query if they choose
+        sessionBean.setQueryProperty(
+                searchCoord.assembleQueryProperty(
+                QueryPropertyEnum.OPENCECASES_OCCPERIODSINPROCESS, u, m, null));
+        
+        sessionBean.setQueryPerson(
+                searchCoord.assembleQueryPerson(
+                QueryPersonEnum.CUSTOM, u, m, null));
+        
+        sessionBean.setQueryCEAR(
+                searchCoord.assembleQueryCEAR(
+                QueryCEAREnum.ALL_PAST30, u, m, null));
+        
+        sessionBean.setQueryCECase(
+                searchCoord.assembleQueryCECase(
+                QueryCECaseEnum.OPENCASES, u, m, null));
+        
+        sessionBean.setQueryEventCECase(
+                searchCoord.assembleQueryEventCECase(
+                QueryEventCECaseEnum.MUNICODEOFFICER_ACTIVITY_PAST30DAYS, u, m, null));
+        
+        sessionBean.setQueryOccPeriod(
+                searchCoord.assembleQueryOccPeriod(
+                QueryOccPeriodEnum.CUSTOM, u, m, null));
+        
+
     }
 }

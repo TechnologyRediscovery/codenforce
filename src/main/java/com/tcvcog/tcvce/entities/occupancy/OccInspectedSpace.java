@@ -18,7 +18,9 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +34,12 @@ import java.util.List;
  */
 public class OccInspectedSpace extends OccSpace implements Serializable{
     
-    private List<OccInspectedSpaceElement> inspectedElementList;
+    private List<OccInspectedCodeElement> inspectedElementList;
     private OccLocationDescriptor location;
     private OccSpaceType type;
+    
+    private User lastInspectedBy;
+    private LocalDateTime lastInspectedTS;
     
     public OccInspectedSpace(OccSpace spc){
         this.spaceid = spc.getSpaceid();
@@ -42,19 +47,26 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
         this.name = spc.getName();
         this.required = spc.isRequired();
         this.elementList = spc.getElementList();
+        
+        inspectedElementList = new ArrayList<>();
+    }
+    
+    public void addElementToInspectedList(OccInspectedCodeElement ele){
+        inspectedElementList.add(ele);
+        
     }
 
     /**
      * @return the inspectedElementList
      */
-    public List<OccInspectedSpaceElement> getInspectedElementList() {
+    public List<OccInspectedCodeElement> getInspectedElementList() {
         return inspectedElementList;
     }
 
     /**
      * @param inspectedElementList the inspectedElementList to set
      */
-    public void setInspectedElementList(List<OccInspectedSpaceElement> inspectedElementList) {
+    public void setInspectedElementList(List<OccInspectedCodeElement> inspectedElementList) {
         this.inspectedElementList = inspectedElementList;
     }
 
@@ -72,13 +84,7 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
         this.location = location;
     }
 
-    /**
-     * @return the spaceid
-     */
-    public int getSpaceid() {
-        return spaceid;
-    }
-
+   
     /**
      * @return the spaceType
      */
@@ -86,19 +92,7 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
         return type;
     }
 
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param spaceid the spaceid to set
-     */
-    public void setSpaceid(int spaceid) {
-        this.spaceid = spaceid;
-    }
+  
 
     /**
      * @param spaceType the spaceType to set
@@ -107,12 +101,7 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
         this.type = spaceType;
     }
 
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+   
 
     /**
      * @return the type
@@ -126,6 +115,34 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
      */
     public void setType(OccSpaceType type) {
         this.type = type;
+    }
+
+    /**
+     * @return the lastInspectedBy
+     */
+    public User getLastInspectedBy() {
+        return lastInspectedBy;
+    }
+
+    /**
+     * @return the lastInspectedTS
+     */
+    public LocalDateTime getLastInspectedTS() {
+        return lastInspectedTS;
+    }
+
+    /**
+     * @param lastInspectedBy the lastInspectedBy to set
+     */
+    public void setLastInspectedBy(User lastInspectedBy) {
+        this.lastInspectedBy = lastInspectedBy;
+    }
+
+    /**
+     * @param lastInspectedTS the lastInspectedTS to set
+     */
+    public void setLastInspectedTS(LocalDateTime lastInspectedTS) {
+        this.lastInspectedTS = lastInspectedTS;
     }
     
 }

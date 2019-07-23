@@ -60,11 +60,11 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
     public String updateMuni(){
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         try {
-            mi.updateMuni(currentMuni);
+            mi.updateMuniComplete(currentMuni);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Successfully updated municipality info!", ""));
-            getSessionBean().setActiveMuni(mi.getMuni(currentMuni.getMuniCode()));
+            getSessionBean().setSessionMuni(mi.getMuni(currentMuni.getMuniCode()));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -84,7 +84,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
      * @return the currentMuni
      */
     public Municipality getCurrentMuni() {
-        currentMuni = getSessionBean().getActiveMuni();
+        currentMuni = getSessionBean().getSessionMuni();
         return currentMuni;
     }
 

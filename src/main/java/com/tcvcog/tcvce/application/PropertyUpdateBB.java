@@ -49,7 +49,7 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            currProp = pi.getPropertyWithLists(getSessionBean().getPropertyQueue().get(0).getPropertyID());
+            currProp = pi.getPropertyWithLists(getSessionBean().getSessionPropertyList().get(0).getPropertyID());
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
@@ -60,7 +60,7 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
         
         try {
             pi.updateProperty(currProp);
-            getSessionBean().getPropertyQueue().add(0, currProp);
+            getSessionBean().getSessionPropertyList().add(0, currProp);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Successfully updated property with ID " + getCurrProp().getPropertyID() 

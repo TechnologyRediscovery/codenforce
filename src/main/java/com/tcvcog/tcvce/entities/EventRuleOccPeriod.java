@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccEvent;
  *
  * @author sylvia
  */
-public class OccPeriodEventRule extends EventRuleImplementation{
+public class EventRuleOccPeriod extends EventRuleImplementation{
     
     private int OccPeriodID;
     private OccEvent passedRuleEvent;
@@ -32,7 +32,7 @@ public class OccPeriodEventRule extends EventRuleImplementation{
      *
      * @param impl
      */
-    public OccPeriodEventRule(EventRuleImplementation impl){
+    public EventRuleOccPeriod(EventRuleImplementation impl){
         super(impl);
         // implementation subclass
         this.attachedTS = impl.getAttachedTS();

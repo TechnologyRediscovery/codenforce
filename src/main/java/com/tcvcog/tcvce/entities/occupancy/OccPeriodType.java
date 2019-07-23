@@ -37,6 +37,7 @@ public class OccPeriodType {
     private boolean permittable;
     private boolean startdaterequired;
     private boolean enddaterequired;
+    private boolean inspectable;
     private boolean passedInspectionRequired;
     
     private boolean rentalcompatible;
@@ -315,6 +316,20 @@ public class OccPeriodType {
      */
     public void setDefaultValidityPeriodDays(int defaultValidityPeriodDays) {
         this.defaultValidityPeriodDays = defaultValidityPeriodDays;
+    }
+
+    /**
+     * @return the inspectable
+     */
+    public boolean isInspectable() {
+        return inspectable;
+    }
+
+    /**
+     * @param inspectable the inspectable to set
+     */
+    public void setInspectable(boolean inspectable) {
+        this.inspectable = inspectable;
     }
     
 }

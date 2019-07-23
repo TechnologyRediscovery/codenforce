@@ -45,12 +45,7 @@ public class UserUpdateBB extends BackingBeanUtils implements Serializable{
     private RoleType formRoleType;
     private RoleType[] roleTypeArray;
     private String formUsername;
-    private String formPassword;
-    private int formMuniCode;
     private String formNotes;
-    private Date formActivityStartDate;
-    private Date formActivityStopDate;
-    private boolean formAccessPermitted;
 
     
     public String commitUpdatesToUser(){
@@ -60,11 +55,7 @@ public class UserUpdateBB extends BackingBeanUtils implements Serializable{
         u.setRoleType(formRoleType);
         u.setUsername(formUsername);
         u.setNotes(formNotes);
-        u.setActivityStartDate(formActivityStartDate.toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        u.setActivityStopDate(formActivityStopDate.toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        u.setSystemAccessPermitted(formAccessPermitted);
+       
         try {
             ui.updateUser(u);
             getFacesContext().addMessage(null,
@@ -115,36 +106,7 @@ public class UserUpdateBB extends BackingBeanUtils implements Serializable{
         return formNotes;
     }
 
-    /**
-     * @return the formActivityStartDate
-     */
-    public Date getFormActivityStartDate() {
-        if(userToUpdate.getActivityStartDate() != null){
-            formActivityStartDate = Date.from(userToUpdate.getActivityStartDate()
-                .atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return formActivityStartDate;
-    }
-
-    /**
-     * @return the formActivityStopDate
-     */
-    public Date getFormActivityStopDate() {
-        if(userToUpdate.getActivityStopDate() != null){
-            formActivityStopDate = Date.from(userToUpdate.getActivityStopDate()
-                    .atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return formActivityStopDate;
-    }
-
-    /**
-     * @return the formAccessPermitted
-     */
-    public boolean isFormAccessPermitted() {
-        formAccessPermitted = userToUpdate.isSystemAccessPermitted();
-        return formAccessPermitted;
-    }
-
+  
    
 
     /**
@@ -171,49 +133,12 @@ public class UserUpdateBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param formPassword the formPassword to set
-     */
-    public void setFormPassword(String formPassword) {
-        
-        this.formPassword = formPassword;
-    }
-
-    /**
-     * @param formMuniCode the formMuniCode to set
-     */
-    public void setFormMuniCode(int formMuniCode) {
-        
-        this.formMuniCode = formMuniCode;
-    }
-
-    
-    /**
      * @param formNotes the formNotes to set
      */
     public void setFormNotes(String formNotes) {
         this.formNotes = formNotes;
     }
 
-    /**
-     * @param formActivityStartDate the formActivityStartDate to set
-     */
-    public void setFormActivityStartDate(Date formActivityStartDate) {
-        this.formActivityStartDate = formActivityStartDate;
-    }
-
-    /**
-     * @param formActivityStopDate the formActivityStopDate to set
-     */
-    public void setFormActivityStopDate(Date formActivityStopDate) {
-        this.formActivityStopDate = formActivityStopDate;
-    }
-
-    /**
-     * @param formAccessPermitted the formAccessPermitted to set
-     */
-    public void setFormAccessPermitted(boolean formAccessPermitted) {
-        this.formAccessPermitted = formAccessPermitted;
-    }
 
     /**
      * @return the roleTypeArray

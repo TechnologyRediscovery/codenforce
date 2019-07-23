@@ -76,20 +76,20 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PersonCoordinator pc = getPersonCoordinator();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
+        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuni());
         // the selected person should be initiated using logic in getSelectedPerson
-        selectedPerson = getSessionBean().getPersonQueue().get(0);
+        selectedPerson = getSessionBean().getSessionPersonList().get(0);
         try {
             muniNameIDMap = mi.getMunicipalityStringIDMap();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        propertyCandidateList = getSessionBean().getPropertyQueue();
+        propertyCandidateList = getSessionBean().getSessionPropertyList();
         loadPersonHistory();
     }
     
     public String viewPersonAssociatedProperty(Property p){
-        getSessionBean().getPropertyQueue().add(0, p);
+        getSessionBean().getSessionPropertyList().add(0, p);
         return "properties";
     }
     
@@ -97,7 +97,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         PersonCoordinator pc = getPersonCoordinator();
 
         try {
-            pc.addNotesToPerson(selectedPerson, getSessionBean().getFacesUser(), notesToAppend);
+            pc.addNotesToPerson(selectedPerson, getSessionBean().getSessionUser(), notesToAppend);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
                     , "Done: Notes added to person ID:" + selectedPerson.getPersonID(),"" ));
         } catch (IntegrationException ex) {
@@ -114,7 +114,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            pc.updatePerson(selectedPerson, getSessionBean().getFacesUser(), updateDescription);
+            pc.updatePerson(selectedPerson, getSessionBean().getSessionUser(), updateDescription);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Person updated! This updated person is now your 'active person'", ""));
@@ -153,7 +153,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     
     public void initiatePersonCreation(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getActiveMuni());
+        selectedPerson = pc.getNewPersonSkeleton(getSessionBean().getSessionMuni());
         System.out.println("PersonsBB.initiatePersonCreation : selected person id: " + selectedPerson.getPersonID());
     }
     
@@ -164,7 +164,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void loadPersonHistory(){
         PersonIntegrator pi = getPersonIntegrator();
         try {
-            personList = pi.getPersonHistory(getSessionBean().getFacesUser());
+            personList = pi.getPersonHistory(getSessionBean().getSessionUser());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "History was loaded!", ""));
@@ -186,11 +186,11 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         
         int newPersonID;
         try {
-            selectedPerson.setCreatorUserID(getSessionBean().getFacesUser().getUserID());
+            selectedPerson.setCreatorUserID(getSessionBean().getSessionUser().getUserID());
             newPersonID = pc.addNewPerson(selectedPerson);
             selectedPerson = pi.getPerson(newPersonID);
-            getSessionBean().setActivePerson(selectedPerson);
-            getSessionBean().getPersonQueue().add(selectedPerson);
+            getSessionBean().setSessionPerson(selectedPerson);
+            getSessionBean().getSessionPersonList().add(selectedPerson);
             
             
 //            ui.logObjectView(getSessionBean().getFacesUser(), selectedPerson);
@@ -212,7 +212,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         System.out.println("PersonBB.searchForPersons");
         // clear past search results on bean and on the session
         personList = null;
-        getSessionBean().setPersonQueue(null);
+        getSessionBean().setSessionPersonList(null);
         // this will trigger database lookup logic inside
         // getPersonList() when we tell the search result table to clear itself
     }
@@ -221,10 +221,10 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
     public void searchForPersonsByNameOnly(ActionEvent event){
         System.out.println("PersonBB.searchForPersonsByNameOnly");
         PersonCoordinator pc = getPersonCoordinator();
-        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getActiveMuni());
+        searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuni());
         // clear past search results on bean and on the session
         personList = null;
-        getSessionBean().setPersonQueue(null);
+        getSessionBean().setSessionPersonList(null);
         // this will trigger database lookup logic inside
         // getPersonList() when we tell the search result table to clear itself
     }
@@ -234,7 +234,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         UserIntegrator ui = getUserIntegrator();
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            ui.logObjectView(getSessionBean().getFacesUser(), p);
+            ui.logObjectView(getSessionBean().getSessionUser(), p);
             propertyPersonList = pi.getProperties(p);
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -275,7 +275,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
 
         System.out.println("PersonBB.getPersonList");
         PersonIntegrator integrator = getPersonIntegrator();
-        List<Person> sessionPersonList = getSessionBean().getPersonQueue();
+        List<Person> sessionPersonList = getSessionBean().getSessionPersonList();
 
         // first check if our view-scoped list is emtpy, if so, we need a list!
         if (personList == null) {
@@ -286,7 +286,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             } else {
                 try {
                     personList = integrator.getPersonList(searchParams); // go to Integrator with searchParams
-                    getSessionBean().setPersonQueue(personList);
+                    getSessionBean().setSessionPersonList(personList);
                     if (personList.isEmpty()) {
                         System.out.println("PersonBB.getPersonList | Emtpy list");
                         getFacesContext().addMessage(null,
@@ -329,7 +329,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
      */
     public Person getSelectedPerson() {
         if(selectedPerson == null){
-            selectedPerson = getSessionBean().getActivePerson();
+            selectedPerson = getSessionBean().getSessionPerson();
         }
         return selectedPerson;
     }

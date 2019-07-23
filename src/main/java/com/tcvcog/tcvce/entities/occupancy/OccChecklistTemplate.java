@@ -24,9 +24,9 @@ import java.util.List;
 
 /**
  * Represents a set of space types and their associated code elements
- * that are inspected in each. When an occupancy inspection is underway, this
- * set of code elements is used to populate an "implemented inspected space element"
- * checklist that contains pass/fail, comments, date of pass/fail, etc.
+ * that are SET TO BE inspected in each. When an occupancy inspection is underway, this
+ * set of code elements is used to populate the list of OccInspectedSpaceElements
+ * insdie the OccInspectedSpace container
  * 
  * @author Eric Darsow
  */
@@ -42,7 +42,7 @@ public class OccChecklistTemplate {
     private boolean active;
     private CodeSource governingCodeSource;
     
-    private List<OccSpaceTypeTemplate> occSpaceTypeTemplateList;
+    private List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList;
 
     /**
      * @return the muni
@@ -105,14 +105,14 @@ public class OccChecklistTemplate {
     /**
      * @return the occSpaceTypeTemplateList
      */
-    public List<OccSpaceTypeTemplate> getOccSpaceTypeTemplateList() {
+    public List<OccSpaceTypeInspectionDirective> getOccSpaceTypeTemplateList() {
         return occSpaceTypeTemplateList;
     }
 
     /**
      * @param occSpaceTypeTemplateList the occSpaceTypeTemplateList to set
      */
-    public void setOccSpaceTypeTemplateList(List<OccSpaceTypeTemplate> occSpaceTypeTemplateList) {
+    public void setOccSpaceTypeTemplateList(List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList) {
         this.occSpaceTypeTemplateList = occSpaceTypeTemplateList;
     }
 

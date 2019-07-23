@@ -36,10 +36,12 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -276,7 +278,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     public CECase getInitializedCECase(Property p, User u){
         CECase newCase = new CECase();
         
-        int casePCC = getControlCodeFromTime();
+        int casePCC = generateControlCodeFromTime();
         // caseID set by postgres sequence
         // timestamp set by postgres
         // no closing date, by design of case flow
@@ -470,7 +472,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     private boolean evalulateCasePhaseChangeRule(CECase cse, CECaseEvent event) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         
-        EventRule rule = new EventRule();
+        EventRuleAbstract rule = new EventRuleAbstract();
         boolean rulePasses = false;
         
                     if( ruleSubcheck_requiredEventType(cse, rule)
@@ -500,7 +502,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
    
     
     
-    private boolean ruleSubcheck_requiredEventType(CECase cse, EventRule rule){
+    private boolean ruleSubcheck_requiredEventType(CECase cse, EventRuleAbstract rule){
         boolean subcheckPasses = true;
         if(rule.getRequiredeventtype()!= null){
             subcheckPasses = false;
@@ -516,7 +518,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
    
     
-    private boolean ruleSubcheck_forbiddenEventType(CECase cse, EventRule rule){
+    private boolean ruleSubcheck_forbiddenEventType(CECase cse, EventRuleAbstract rule){
         boolean subcheckPasses = true;
         Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
@@ -528,7 +530,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private boolean ruleSubcheck_requiredEventCategory(CECase cse, EventRule rule){
+    private boolean ruleSubcheck_requiredEventCategory(CECase cse, EventRuleAbstract rule){
         boolean subcheckPasses = true;
         if(rule.getRequiredEventCat().getCategoryID() != 0){
             subcheckPasses = false;
@@ -543,7 +545,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, EventRule rule){
+    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, EventRuleAbstract rule){
         boolean subcheckPasses = true;
         Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
         while(iter.hasNext()){
@@ -555,7 +557,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
     
-    private void implementPassedCasePhaseChangeRule(CECase cse, EventRule rule) 
+    private void implementPassedCasePhaseChangeRule(CECase cse, EventRuleAbstract rule) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
@@ -666,7 +668,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
         e.setDateOfRecord(LocalDateTime.now());
-        e.setOwner(getFacesUser());
+        e.setOwner(getSessionUser());
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         e.setCaseID(c.getCaseID());
@@ -825,13 +827,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
         
-    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m){
+    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m) throws SQLException{
         SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        
         try {
-            nov.setStyle(si.getPrintStyle(m.getDefaultNOVStyleID()));
+            nov.setStyle(si.getPrintStyle(mi.getMuniComplete(m.getMuniCode()).getDefaultNOVStyleID()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

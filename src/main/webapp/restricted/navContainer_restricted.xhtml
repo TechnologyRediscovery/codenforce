@@ -140,15 +140,15 @@
 
                                 <div class="activeObjectBox">
                                     <h:outputText styleClass="infoBarDataLabel" value="muni: "/>
-                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.activeMuni.muniName} "/> 
+                                    <h:outputText styleClass="infoBarData" value="#{sessionBean.sessionMuni.muniName} "/> 
                                     
                                 </div>
 
                                 <div class="activeObjectBox">
                                     <ui:remove>
                                         <h:outputText styleClass="infoBarDataLabel" value="property: "/>
-                                        <h:outputText styleClass="infoBarData" value="#{sessionBean.activeProp.address} "/> 
-                                        <h:outputText styleClass="infoBarData" value="(#{sessionBean.activeProp.muni.muniName})  "/>
+                                        <h:outputText styleClass="infoBarData" value="#{sessionBean.sessionProperty.address} "/> 
+                                        <h:outputText styleClass="infoBarData" value="(#{sessionsessionPropertyeProp.muni.muniName})  "/>
 
                                         <p:commandButton styleClass="sessionInfoButton" action="#{navigationBB.gotoPropertyProfile}" value="profile" ajax="false" icon="fa fa-home" disabled="#{navigationBB.noActiveProperty}"/>
                                         <p:commandButton styleClass="sessionInfoButton" action="propertySearch" value="change prop" ajax="false" icon="fa fa-search"/>

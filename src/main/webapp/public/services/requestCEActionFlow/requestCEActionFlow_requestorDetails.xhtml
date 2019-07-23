@@ -22,7 +22,7 @@
                         <h1>Code enforcement requestor details</h1>
 
                         <f:subview  id="ceactionreq-facesuser-subview" 
-                                    rendered="#{!(empty sessionBean.facesUser)}">
+                                    rendered="#{!(empty sessionBean.sessionUser)}">
                             <h:form id="ceactionreq-requestor-config-form">
 
                                 <h2>Option 1: Request action as yourself</h2>
@@ -31,7 +31,7 @@
                                 
                                 <p:commandButton ajax="false" tabindex="1"
                                                  id="ceactionrequest-requestasyourself-cb"
-                                                 value="Request as yourself: #{sessionBean.facesUser.person.firstName} #{sessionBean.facesUser.person.lastName} (user ID #{sessionBean.facesUser.userID})" 
+                                                 value="Request as yourself: #{sessionBean.sessionUser.person.firstName} #{sessionBean.sessionUser.person.lastName} (user ID #{sessionBean.sessionUser.userID})" 
                                                  action="#{cEActionRequestSubmitBB.requestActionAsFacesUser}"
                                                  />    
                                 
@@ -83,9 +83,9 @@
                                 <p:selectOneMenu id="recent-person-list-menu" 
                                                  required="false" tabindex="2"
                                                  value="#{cEActionRequestSubmitBB.currentPerson}"
-                                                 disabled="#{sessionBean.propertyQueue.size() == 0}">
+                                                 disabled="#{sessionBean.sessionPropertyList.size() == 0}">
                                     <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                    <f:selectItems value="#{sessionBean.personQueue}"  var="p" itemValue="#{p}" 
+                                    <f:selectItems value="#{sessionBean.sessionPersonList}"  var="p" itemValue="#{p}" 
                                                    itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
                                     <f:converter converterId="personConverter"/>
                                     
@@ -118,7 +118,7 @@
                         <h:form id="requestCEActionFlowFormRequestorDetails">
                             
                               <f:subview  id="ceactionreq-facesuser-subview" 
-                                          rendered="#{(empty sessionBean.facesUser)}">
+                                          rendered="#{(empty sessionBsessionUserUser)}">
                                     <h2>Enter your contact details</h2>
                               </f:subview>
 

@@ -81,17 +81,17 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         }
         
         
-        Citation c = getSessionBean().getActiveCitation();
+        Citation c = getSessionBean().getSessionCitation();
         if(c != null){
             currentCitation = c;
         } else {
-            CECase ceCase = getSessionBean().getcECaseQueue().get(0);
+            CECase ceCase = getSessionBean().getSessionCECaseList().get(0);
             currentCitation = new Citation();
             currentCitation.setCeCaseNoLists(ceCase);
             currentCitation.setDateOfRecord(LocalDateTime.now());
-            currentCitation.setUserOwner(getSessionBean().getFacesUser());
+            currentCitation.setUserOwner(getSessionBean().getSessionUser());
             currentCitation.setIsActive(true);
-            currentCitation.setOrigin_courtentity(getSessionBean().getActiveMuni().getCourtEntities().get(0));
+            currentCitation.setOrigin_courtentity(getSessionBean().getSessionMuni().getCourtEntities().get(0));
             List<CodeViolation> l = new ArrayList<>();
             for(CodeViolation v: ceCase.getViolationList()){
                 if(v.getActualComplianceDate() == null){
@@ -101,9 +101,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
             currentCitation.setViolationList(l);
             removedViolationList = new ArrayList<>();
         }
-        
     }
-    
     
     public void removeViolationFromCitation(CodeViolation v){
         currentCitation.getViolationList().remove(v);
@@ -136,7 +134,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         
         Citation c = currentCitation;
-        c.setUserOwner(getFacesUser());
+        c.setUserOwner(getSessionUser());
         try {
             cc.issueCitation(c);
               

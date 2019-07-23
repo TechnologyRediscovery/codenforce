@@ -11,7 +11,9 @@ package com.tcvcog.tcvce.entities.search;
  */
 public enum QueryPersonEnum {
     
-    ACTIVE_PERSONS("Active persons", "Persons associated with active code enf and occ cases", 2, false);
+    ACTIVE_PERSONS("Active persons", "Persons associated with active code enf and occ cases", 2, false),
+    CUSTOM("Custom", "Custom", 2, false);
+    
     
     private final String title;
     private final String desc;

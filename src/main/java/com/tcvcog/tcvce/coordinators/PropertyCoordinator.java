@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 Turtle Creek Valley
-Council of Governments, PA
+ * Council of Governments, PA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,17 +20,11 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.entities.occupancy.OccPermit;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -61,47 +55,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyUnit propUnit = new PropertyUnit();
         
         propUnit.setUnitNumber(DEFAULTUNITNUMBER);
-        propUnit.setRental(DEFAULTRENTAL);
+//        propUnit.setRental(DEFAULTRENTAL);
 //        propUnit.setPropertyUnitPersonList(new ArrayList<Person>());
-
         return propUnit;
     }
     
-    public PropertyWithLists getNewPropertyWithLists(){
-        PropertyWithLists propWithLists = new PropertyWithLists();
-        return propWithLists;
-    }
-    
-    /**
-     * Returns PropertyWithLists without default unit. Useful for displaying a list of units for
-     * a multiunit property.
-     * @param prop
-     * @return PropertyWithLists object
-     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
-     */
-    public PropertyWithLists getPropertyUnitsWithoutDefault(Property prop) throws CaseLifecyleException{
-        PropertyIntegrator pi = getPropertyIntegrator();
-        PropertyWithLists propWithLists = pi.getNewPropertyWithLists();
-        
-        try{
-            propWithLists = pi.getPropertyWithLists(prop.getPropertyID());
-            
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        // Removes the default, automatically generated PropertyUnit        
-        List<PropertyUnit> unitList = propWithLists.getUnitList();
-        PropertyUnit defaultUnit = null;
-        for(PropertyUnit unit:unitList){
-            if(unit.getUnitNumber().equals("-1")){
-            defaultUnit = unit;
-            }
-        }
-        unitList.remove(defaultUnit);        
-
-        return propWithLists;
-    }
     /**
      * Returns PropertyWithLists with all units, including default unit.
      * @param prop
@@ -110,16 +68,12 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyWithLists getPropertyUnits(Property prop) throws CaseLifecyleException{
         PropertyIntegrator pi = getPropertyIntegrator();
-        PropertyWithLists propWithLists = pi.getNewPropertyWithLists();
-        
+        PropertyWithLists propWithLists = null;
         try{
             propWithLists = pi.getPropertyWithLists(prop.getPropertyID());
-            
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }     
-
         return propWithLists;
     }   
-    
 }

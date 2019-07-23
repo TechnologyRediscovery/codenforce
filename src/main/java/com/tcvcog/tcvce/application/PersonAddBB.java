@@ -88,7 +88,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         if (formMuni != null){
             p.setMuniCode(formMuni.getMuniCode());
         } else {
-            p.setMuniCode(getSessionBean().getActiveMuni().getMuniCode());
+            p.setMuniCode(getSessionBean().getSessionMuni().getMuniCode());
         }
         
         
@@ -124,7 +124,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         try {
             if(formConnectToActiveProperty){
                 
-                Property property = getSessionBean().getActiveProp();
+                Property property = getSessionBean().getSessionProperty();
                 personInt.insertPersonAndConnectToProperty(p, property);
             
                 getFacesContext().addMessage(null,
@@ -474,7 +474,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
      */
     public Property getActiveProp() {
         
-        activeProp = getSessionBean().getActiveProp();
+        activeProp = getSessionBean().getSessionProperty();
         return activeProp;
     }
 

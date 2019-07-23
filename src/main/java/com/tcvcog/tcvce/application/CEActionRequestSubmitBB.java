@@ -118,7 +118,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void initBean(){
         CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
         PropertyIntegrator pi = getPropertyIntegrator();
-        User facesUser = getSessionBean().getFacesUser();
+        User facesUser = getSessionBean().getSessionUser();
         currentRequest = req;
         
         // set date of record to current date
@@ -135,19 +135,19 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 System.out.println(ex);
             }
         } else if (facesUser != null && req != null ) {
-            personCandidateList = getSessionBean().getPersonQueue();
+            personCandidateList = getSessionBean().getSessionPersonList();
         }
         disabledPersonFormFields = false;
         actionRequestorAssignmentMethod = 1;
         if(facesUser != null){
-            selectedMuni = getSessionBean().getActiveMuni();
+            selectedMuni = getSessionBean().getSessionMuni();
         }
     }
     
   
     
     public String requestActionAsFacesUser(){
-        currentRequest.setRequestor(getSessionBean().getFacesUser().getPerson());
+        currentRequest.setRequestor(getSessionBean().getSessionUser().getPerson());
         getSessionBean().setCeactionRequestForSubmission(currentRequest);
         return "reviewAndSubmit";
     }
@@ -315,7 +315,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             }
         }
         
-        int controlCode = getControlCodeFromTime();
+        int controlCode = generateControlCodeFromTime();
         req.setRequestPublicCC(controlCode);
         
         // all requests now are required to be at a known address

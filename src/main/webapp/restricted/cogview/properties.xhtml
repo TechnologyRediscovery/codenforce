@@ -33,9 +33,9 @@
                             <h:form id="propertySearchForm">
 
                                 <p:commandButton id="propertyAddButton"
-                                                 value="Add new property in #{sessionBean.activeMuni.muniName}" icon="fa fa-plus"
+                                                 value="Add new property in #{sessionBean.sessionMuni.muniName}" icon="fa fa-plus"
                                                  action="#{propertyProfileBB.addProperty()}"
-                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"
+                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"
                                                  
                                                  />
                                 <p:spacer height="10px"/>
@@ -72,7 +72,7 @@
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
                                         <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuniCode}">
-                                            <f:selectItems value="#{sessionBean.facesUser.authMunis}"/>
+                                            <f:selectItems value="#{sessionBeasessionUserer.authMunis}"/>
                                         </p:selectOneMenu>
                                         <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -82,7 +82,7 @@
                                     
                                     <h:panelGroup>
                                         <p:commandButton
-                                            value="Search in #{sessionBean.activeMuni.muniName}" tabindex="3" ajax="false"
+                                            value="Search in #{sessionBeansessionMunii.muniName}" tabindex="3" ajax="false"
                                             icon="fa fa-search"  actionListener="#{propertyProfileBB.searchForProperties}" />
                                     </h:panelGroup>
                                 
@@ -166,7 +166,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Use Type"/>
                                         </f:facet>
-                                        <h:outputText value="#{prop.propertyUseType}" />
+                                        <h:outputText value="#{prop.useTypeString}" />
                                     </p:column>
 
                                     <p:column width="5%">
@@ -241,7 +241,7 @@
                                             <h:outputText styleClass="uiLabel" value="Use Type:" />
                                         </h:outputLabel>
                                         <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-usetype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.propertyUseType}"/>
+                                        <h:outputText id="prop-info-usetype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.pruseTypeString/>
                                     </h:panelGroup>
 
 

@@ -24,7 +24,7 @@
 
                         <h1>Code enforcement event explorer</h1>
 
-                        <p>All future timeline events in <h:outputText value="#{sessionBean.activeMuni.muniName} and events requiring your personal view confirmation."/></p>
+                        <p>All future timeline events in <h:outputText value="#{sessionBean.sessionMuni.muniName} and events requiring your personal view confirmation."/></p>
 
                         <h:form id="ceev-form-search">
 
@@ -250,7 +250,7 @@
                                                                  value="#{cEEventsBB.searchParams.person}"
                                                                  disabled="#{!cEEventsBB.searchParams.filterByPerson}">
                                                     <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                                    <f:selectItems value="#{sessionBean.personQueue}"  var="p" itemValue="#{p}" 
+                                                    <f:selectItems value="#{sessionBean.sessionPersonList}"  var="p" itemValue="#{p}" 
                                                                    itemLabel="#{p.firstName} #{p.lastName}"/>
                                                     <f:converter converterId="personConverter"/>
                                                 </p:selectOneMenu>
@@ -471,7 +471,7 @@
                                                  actionListener="#{cEEventsBB.loadEventsRequiringAction(ev)}"
                                                  disabled="false"
                                                  icon="fa fa-tasks"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
                                                  update="
                                                     ceev-form-search
                                                     events-datascroller-form:events-datascroller
@@ -486,7 +486,7 @@
                                                  actionListener="#{cEEventsBB.loadOfficerActivityPastWeek}"
                                                  disabled="false"
                                                  icon="fa fa-wheelchair-alt"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 rendered="#{sessionBeasessionUserer.keyCard.hasMuniReaderPermissions}"
                                                  update="
                                                     ceev-form-search
                                                     events-datascroller-form:events-datascroller
@@ -501,7 +501,7 @@
                                                  styleClass="noFill"
                                                  disabled="false"
                                                  icon="fa fa-check-square"
-                                                 rendered="#{sessionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                 rendered="#{sessionBsessionUserUser.keyCard.hasMuniReaderPermissions}"
                                                  update="
                                                     ceev-form-search
                                                     events-datascroller-form:events-datascroller

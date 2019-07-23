@@ -26,7 +26,7 @@ public class CECase extends CaseBase implements Cloneable{
     
     
     private List<Proposal> proposalList;
-    private List<EventRule> eventRuleList;
+    private List<EventRuleAbstract> eventRuleList;
     private List<CECaseEvent> eventProposalList;
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
@@ -307,14 +307,14 @@ public class CECase extends CaseBase implements Cloneable{
     /**
      * @return the eventRuleList
      */
-    public List<EventRule> getEventRuleList() {
+    public List<EventRuleAbstract> getEventRuleList() {
         return eventRuleList;
     }
 
     /**
      * @param eventRuleList the eventRuleList to set
      */
-    public void setEventRuleList(List<EventRule> eventRuleList) {
+    public void setEventRuleList(List<EventRuleAbstract> eventRuleList) {
         this.eventRuleList = eventRuleList;
     }
 

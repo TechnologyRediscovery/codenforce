@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
@@ -72,7 +72,7 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
         PersonCoordinator pc = getPersonCoordinator();
         person = pc.anonymizePersonData(person);
         clonePerson = person;
-        clonePerson.setPersonType(getSessionBean().getActivePersonType());
+//        clonePerson.setPersonType(getSessionBean().getActivePersonType());
     }
     
     public String addCloneToApplicantPersons(Person clone) throws IntegrationException{

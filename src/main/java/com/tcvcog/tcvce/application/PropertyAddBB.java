@@ -31,15 +31,15 @@ public class PropertyAddBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         SessionBean sb = getSessionBean();
         this.prop = new PropertyWithLists();
-        this.prop.setMuni(sb.getActiveMuni());
-        this.prop.setMuniCode(sb.getActiveMuni().getMuniCode());
+        this.prop.setMuni(sb.getSessionMuni());
+        this.prop.setMuniCode(sb.getSessionMuni().getMuniCode());
     }
     
     public String insertProp(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             getProp().setPropertyID(pi.insertProperty(getProp()));
-            getSessionBean().setActivePropWithLists(getProp());
+//            getSessionBean().setActivePropWithLists(getProp());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Successfully inserted property with ID " + getProp().getPropertyID() 

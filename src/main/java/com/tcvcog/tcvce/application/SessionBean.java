@@ -49,46 +49,69 @@ import com.tcvcog.tcvce.entities.search.QueryEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryProperty;
 import java.io.Serializable;
 import java.util.List;
 
 /**
- *
- *       //@ManagedBean(name="sessionBean")
- *       //@SessionScoped
+ * Stores member vars of pretty much all our custom types
+ * for persistence across an entire session (i.e. across page changes)
+ * Many backing beans will grab this SessionBean in their initBean() method
+ * and check for the presence of a session object. If not null, the method injects
+ * those objects into its own members. If null, beans will decide if they need an object
+ * and where to get it.
+ * 
+ * When many beans facilitate navigation to other pages, they will put their working
+ * object on one of these session shelves for others to work with and to maintain
+ * user state across page changes.
+ * 
  * @author Eric C. Darsow
  */
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
-    // primary security authoriziation container 
-    // TODO - remove and get the keycard directly from the User stored in the session
-
-    private List<Property> propertyQueue;
-    private List<Person> personQueue;
-    
-    private List<CEActionRequest> queueCEAR;
-    
-    private CEActionRequest sessionCEAR;
-    private QueryCEAR sessionQueryCEAR;
-    
-    private List<CECase> cECaseQueue;
-    private List<EventCECaseCasePropBundle> cEEventWCPIQueue;
-    private List<CodeViolation> violationQueue;
-    private List<OccInspection> inspectionQueue;
-    
-    private QueryCECase sessionQueryCECase;
-   
-    
-    private QueryEventCECase queryEventCECase;
-   
-    /* *** System Core Objects Session Shelves ***  */
-    private Municipality activeMuni;
     private List<Municipality> userAuthMuniList;
-    private User facesUser;
-    private Property activeProp;
-    private Person activePerson;
-    private PropertyWithLists activePropWithList;
+
+    // BOB individual object session shelves - NOT NULL
+    private MunicipalityComplete sessionMuni;
+    private CECase sessionCECase;
+    private User sessionUser;
+    private Property sessionProperty;
+    private Person sessionPerson;
+    private OccPeriod sessionOccPeriod;
+    
+    // BOB individual object session shelves - NOT ALWAYS POPULATED
+    private CEActionRequest sessionCEAR;
+    private PropertyUnit sessionPropertyUnit;
+    private OccInspection sessionOccInspection;
+    private OccPermit sessionOccPermit;
+    
+    // CECase-specific objects
+    private NoticeOfViolation sessionNotice;
+    private Citation sessionCitation;
+    private CodeViolation sessionCodeViolation;
+    
+    // BOB Lists
+    private List<Property> sessionPropertyList;
+    private List<Person> sessionPersonList;
+    private List<CEActionRequest> sessionCEARList;
+    private List<CECase> sessionCECaseList;
+    private List<EventCECaseCasePropBundle> sessionEventWithCasePropList;
+    private List<CodeViolation> sessionViolationList;
+    private List<OccPeriod> sessionOccPeriodList;
+    private List<Blob> blobList;
+    
+    // BOB queries
+    private QueryProperty queryProperty;
+    private QueryPerson queryPerson;
+    private QueryCEAR queryCEAR;
+    private QueryCECase queryCECase;
+    private QueryEventCECase queryEventCECase;
+    private QueryOccPeriod queryOccPeriod;
     
     /* *** Municipal Code Session Shelves ***  */
     private CodeSource activeCodeSource;
@@ -97,16 +120,18 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private EnforcableCodeElement selectedEnfCodeElement;
     private CodeElement activeCodeElement;
     
+    /* *** Occupancy Permit Application Session Shelves *** */
+    private OccPermitApplication occPermitApplication;
+    private PropertyWithLists activePropWithLists;
+    private PropertyWithLists workingPropWithLists;
+    private PropertyUnit activePropUnit;
+    private PersonType activePersonType;
+    
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
     private User utilityUserToUpdate;
     private CEActionRequest ceactionRequestForSubmission;
-    private CECase sessionCECase;
     
-     /* *** Code Enforcement Case Session Shelves ***  */
-    private NoticeOfViolation activeNotice;
-    private Citation activeCitation;
-    private CodeViolation sessionCodeViolation;
     
     /* *** Public Data Session Shelves ***  */
     private List<PublicInfoBundle> infoBundleList;
@@ -119,19 +144,11 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigCECaseList reportConfigCECaseList;
     private ReportConfigCEEventList reportConfigCEEventList;
     
-    /* *** Occupancy Permit Application Session Shelves *** */
-    private OccPermitApplication occPermitApplication;
-    private PropertyUnit activePropUnit;
-    private PropertyWithLists activePropWithLists;
-    private PropertyWithLists workingPropWithLists;
-    private PersonType activePersonType;
-    
     /* *** Public Person Search/Edit Session Shelves *** */
     private Person activeAnonPerson;
     private OccPermitApplicationReason occPermitApplicationReason;
 
     /* *** Blob Upload Session Shelves *** */
-    private List<Blob> blobList;
     //linking
 
 
@@ -143,10 +160,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activeProp
+     * @return the sessionProperty
      */
-    public Property getActiveProp() {
-        return activeProp;
+    public Property getSessionProperty() {
+        return sessionProperty;
     }
 
     /**
@@ -166,18 +183,18 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activePerson
+     * @return the sessionPerson
      */
-    public Person getActivePerson() {
-        return activePerson;
+    public Person getSessionPerson() {
+        return sessionPerson;
     }
 
    
     /**
-     * @return the activeNotice
+     * @return the sessionNotice
      */
-    public NoticeOfViolation getActiveNotice() {
-        return activeNotice;
+    public NoticeOfViolation getSessionNotice() {
+        return sessionNotice;
     }
 
     
@@ -190,10 +207,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activeCitation
+     * @return the sessionCitation
      */
-    public Citation getActiveCitation() {
-        return activeCitation;
+    public Citation getSessionCitation() {
+        return sessionCitation;
     }
 
     /**
@@ -211,10 +228,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the violationQueue
+     * @return the sessionViolationList
      */
-    public List<CodeViolation> getViolationQueue() {
-        return violationQueue;
+    public List<CodeViolation> getSessionViolationList() {
+        return sessionViolationList;
     }
 
     /**
@@ -225,10 +242,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param activeProp the activeProp to set
+     * @param sessionProperty the sessionProperty to set
      */
-    public void setActiveProp(Property activeProp) {
-        this.activeProp = activeProp;
+    public void setSessionProperty(Property sessionProperty) {
+        this.sessionProperty = sessionProperty;
     }
 
     /**
@@ -241,18 +258,18 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
 
 
     /**
-     * @param activePerson the activePerson to set
+     * @param sessionPerson the sessionPerson to set
      */
-    public void setActivePerson(Person activePerson) {
-        this.activePerson = activePerson;
+    public void setSessionPerson(Person sessionPerson) {
+        this.sessionPerson = sessionPerson;
     }
 
    
     /**
-     * @param activeNotice the activeNotice to set
+     * @param sessionNotice the sessionNotice to set
      */
-    public void setActiveNotice(NoticeOfViolation activeNotice) {
-        this.activeNotice = activeNotice;
+    public void setSessionNotice(NoticeOfViolation sessionNotice) {
+        this.sessionNotice = sessionNotice;
     }
 
  
@@ -265,10 +282,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param activeCitation the activeCitation to set
+     * @param sessionCitation the sessionCitation to set
      */
-    public void setActiveCitation(Citation activeCitation) {
-        this.activeCitation = activeCitation;
+    public void setSessionCitation(Citation sessionCitation) {
+        this.sessionCitation = sessionCitation;
     }
 
     /**
@@ -286,10 +303,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param violationQueue the violationQueue to set
+     * @param sessionViolationList the sessionViolationList to set
      */
-    public void setViolationQueue(List<CodeViolation> violationQueue) {
-        this.violationQueue = violationQueue;
+    public void setSessionViolationList(List<CodeViolation> sessionViolationList) {
+        this.sessionViolationList = sessionViolationList;
     }
 
     /**
@@ -328,18 +345,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activeMuni
+     * @return the sessionMuni
      */
-    public Municipality getActiveMuni() {
-        return activeMuni;
+    public MunicipalityComplete getSessionMuni() {
+        return sessionMuni;
     }
 
     /**
-     * @param activeMuni the activeMuni to set
+     * @param sessionMuni the sessionMuni to set
      */
-    public void setActiveMuni(Municipality activeMuni) {
-        System.out.println("MissionControlBB.setActiveMuni | set: " + activeMuni.getMuniName());
-        this.activeMuni = activeMuni;
+    public void setSessionMuni(MunicipalityComplete sessionMuni) {
+        this.sessionMuni = sessionMuni;
     }
 
     /**
@@ -387,37 +403,37 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the queueCEAR
+     * @return the sessionCEARList
      */
-    public List<CEActionRequest> getQueueCEAR() {
+    public List<CEActionRequest> getSessionCEARList() {
         
-        return queueCEAR;
+        return sessionCEARList;
     }
 
     /**
-     * @return the cECaseQueue
+     * @return the sessionCECaseList
      */
-    public List<CECase> getcECaseQueue() {
-        return cECaseQueue;
+    public List<CECase> getSessionCECaseList() {
+        return sessionCECaseList;
     }
 
     /**
      * @param qc
      */
-    public void setQueueCEAR(List<CEActionRequest> qc) {
+    public void setSessionCEARList(List<CEActionRequest> qc) {
         if(qc != null && qc.size() > 0 ){
-            setSessionQueryCEAR(null);
+            setQueryCEAR(null);
     
-            this.queueCEAR = qc;
+            this.sessionCEARList = qc;
         }
     }
     
 
     /**
-     * @param cECaseQueue the cECaseQueue to set
+     * @param sessionCECaseList the sessionCECaseList to set
      */
-    public void setcECaseQueue(List<CECase> cECaseQueue) {
-        this.cECaseQueue = cECaseQueue;
+    public void setSessionCECaseList(List<CECase> sessionCECaseList) {
+        this.sessionCECaseList = sessionCECaseList;
     }
 
     /**
@@ -463,33 +479,33 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the facesUser
+     * @return the sessionUser
      */
     @Override
-    public User getFacesUser() {
-        return facesUser;
+    public User getSessionUser() {
+        return sessionUser;
     }
 
     /**
-     * @param facesUser the facesUser to set
+     * @param sessionUser the sessionUser to set
      */
     @Override
-    public void setFacesUser(User facesUser) {
-        this.facesUser = facesUser;
+    public void setSessionUser(User sessionUser) {
+        this.sessionUser = sessionUser;
     }
 
     /**
-     * @return the personQueue
+     * @return the sessionPersonList
      */
-    public List<Person> getPersonQueue() {
-        return personQueue;
+    public List<Person> getSessionPersonList() {
+        return sessionPersonList;
     }
 
     /**
-     * @param personQueue the personQueue to set
+     * @param sessionPersonList the sessionPersonList to set
      */
-    public void setPersonQueue(List<Person> personQueue) {
-        this.personQueue = personQueue;
+    public void setSessionPersonList(List<Person> sessionPersonList) {
+        this.sessionPersonList = sessionPersonList;
     }
 
    
@@ -507,19 +523,6 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.personForCEActionRequestSubmission = personForCEActionRequestSubmission;
     }
 
-    /**
-     * @return the activePropWithList
-     */
-    public PropertyWithLists getActivePropWithList() {
-        return activePropWithList;
-    }
-
-    /**
-     * @param activePropWithList the activePropWithList to set
-     */
-    public void setActivePropWithList(PropertyWithLists activePropWithList) {
-        this.activePropWithList = activePropWithList;
-    }
     
     public OccPermitApplication getOccPermitApplication() {
         return occPermitApplication;
@@ -529,77 +532,44 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         this.occPermitApplication = occPermitApplication;
     }
 
-    public PropertyUnit getActivePropUnit() {
-        return activePropUnit;
+    public PropertyUnit getSessionPropertyUnit() {
+        return sessionPropertyUnit;
     }
 
-    public void setActivePropUnit(PropertyUnit activePropUnit) {
-        this.activePropUnit = activePropUnit;
+    public void setSessionPropertyUnit(PropertyUnit sessionPropertyUnit) {
+        this.sessionPropertyUnit = sessionPropertyUnit;
     }
 
-    /**
-     * @return the activePropWithLists
-     */
-    public PropertyWithLists getActivePropWithLists() {
-        return activePropWithLists;
-    }
-
-    /**
-     * @param activePropWithLists the activePropWithLists to set
-     */
-    public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
-        this.activePropWithLists = activePropWithLists;
-    }
-    
-    public PropertyWithLists getWorkingPropWithLists() {
-        return workingPropWithLists;
-    }
-
-    public void setWorkingPropWithLists(PropertyWithLists workingPropWithLists) {
-        this.workingPropWithLists = workingPropWithLists;
-    }
+  
     
     /*
-     * @return the cEEventWCPIQueue
+     * @return the sessionEventWithCasePropList
      */
-    public List<EventCECaseCasePropBundle> getcEEventWCPIQueue() {
-        return cEEventWCPIQueue;
+    public List<EventCECaseCasePropBundle> getSessionEventWithCasePropList() {
+        return sessionEventWithCasePropList;
     }
 
     /**
-     * @param cEEventWCPIQueue the cEEventWCPIQueue to set
+     * @param sessionEventWithCasePropList the sessionEventWithCasePropList to set
      */
-    public void setcEEventWCPIQueue(List<EventCECaseCasePropBundle> cEEventWCPIQueue) {
-        this.cEEventWCPIQueue = cEEventWCPIQueue;
+    public void setSessionEventWithCasePropList(List<EventCECaseCasePropBundle> sessionEventWithCasePropList) {
+        this.sessionEventWithCasePropList = sessionEventWithCasePropList;
     }
 
     /**
-     * @return the propertyQueue
+     * @return the sessionPropertyList
      */
-    public List<Property> getPropertyQueue() {
-        return propertyQueue;
+    public List<Property> getSessionPropertyList() {
+        return sessionPropertyList;
     }
 
     /**
-     * @param propertyQueue the propertyQueue to set
+     * @param sessionPropertyList the sessionPropertyList to set
      */
-    public void setPropertyQueue(List<Property> propertyQueue) {
-        this.propertyQueue = propertyQueue;
+    public void setSessionPropertyList(List<Property> sessionPropertyList) {
+        this.sessionPropertyList = sessionPropertyList;
     }
 
-    /**
-     * @return the inspectionQueue
-     */
-    public List<OccInspection> getInspectionQueue() {
-        return inspectionQueue;
-    }
-
-    /**
-     * @param inspectionQueue the inspectionQueue to set
-     */
-    public void setInspectionQueue(List<OccInspection> inspectionQueue) {
-        this.inspectionQueue = inspectionQueue;
-    }
 
     /**
      * @return the reportConfigCECase
@@ -672,17 +642,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the sessionQueryCEAR
+     * @return the queryCEAR
      */
-    public QueryCEAR getSessionQueryCEAR() {
-        return sessionQueryCEAR;
+    public QueryCEAR getQueryCEAR() {
+        return queryCEAR;
     }
 
     /**
-     * @param sessionQueryCEAR the sessionQueryCEAR to set
+     * @param queryCEAR the queryCEAR to set
      */
-    public void setSessionQueryCEAR(QueryCEAR sessionQueryCEAR) {
-        this.sessionQueryCEAR = sessionQueryCEAR;
+    public void setQueryCEAR(QueryCEAR queryCEAR) {
+        this.queryCEAR = queryCEAR;
     }
 
   
@@ -690,31 +660,17 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
    
 
     /**
-     * @return the sessionQueryCECase
+     * @return the queryCECase
      */
-    public QueryCECase getSessionQueryCECase() {
-        return sessionQueryCECase;
+    public QueryCECase getQueryCECase() {
+        return queryCECase;
     }
 
     /**
-     * @param sessionQueryCECase the sessionQueryCECase to set
+     * @param queryCECase the queryCECase to set
      */
-    public void setSessionQueryCECase(QueryCECase sessionQueryCECase) {
-        this.sessionQueryCECase = sessionQueryCECase;
-    }
-
-    /**
-     * @return the activePersonType
-     */
-    public PersonType getActivePersonType() {
-        return activePersonType;
-    }
-
-    /**
-     * @param activePersonType the activePersonType to set
-     */
-    public void setActivePersonType(PersonType activePersonType) {
-        this.activePersonType = activePersonType;
+    public void setQueryCECase(QueryCECase queryCECase) {
+        this.queryCECase = queryCECase;
     }
 
     /**
@@ -743,6 +699,174 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setOccPermitApplicationReason(OccPermitApplicationReason occPermitApplicationReason) {
         this.occPermitApplicationReason = occPermitApplicationReason;
+    }
+
+    /**
+     * @return the sessionOccPeriod
+     */
+    public OccPeriod getSessionOccPeriod() {
+        return sessionOccPeriod;
+    }
+
+    /**
+     * @return the queryOccPeriod
+     */
+    public QueryOccPeriod getQueryOccPeriod() {
+        return queryOccPeriod;
+    }
+
+    /**
+     * @return the sessionOccPeriodList
+     */
+    public List<OccPeriod> getSessionOccPeriodList() {
+        return sessionOccPeriodList;
+    }
+
+    /**
+     * @return the sessionOccInspection
+     */
+    public OccInspection getSessionOccInspection() {
+        return sessionOccInspection;
+    }
+
+    /**
+     * @return the sessionOccPermit
+     */
+    public OccPermit getSessionOccPermit() {
+        return sessionOccPermit;
+    }
+
+    /**
+     * @param sessionOccPeriod the sessionOccPeriod to set
+     */
+    public void setSessionOccPeriod(OccPeriod sessionOccPeriod) {
+        this.sessionOccPeriod = sessionOccPeriod;
+    }
+
+    /**
+     * @param queryOccPeriod the queryOccPeriod to set
+     */
+    public void setQueryOccPeriod(QueryOccPeriod queryOccPeriod) {
+        this.queryOccPeriod = queryOccPeriod;
+    }
+
+    /**
+     * @param sessionOccPeriodList the sessionOccPeriodList to set
+     */
+    public void setSessionOccPeriodList(List<OccPeriod> sessionOccPeriodList) {
+        this.sessionOccPeriodList = sessionOccPeriodList;
+    }
+
+    /**
+     * @param sessionOccInspection the sessionOccInspection to set
+     */
+    public void setSessionOccInspection(OccInspection sessionOccInspection) {
+        this.sessionOccInspection = sessionOccInspection;
+    }
+
+    /**
+     * @param sessionOccPermit the sessionOccPermit to set
+     */
+    public void setSessionOccPermit(OccPermit sessionOccPermit) {
+        this.sessionOccPermit = sessionOccPermit;
+    }
+
+    /**
+     * @return the queryProperty
+     */
+    public QueryProperty getQueryProperty() {
+        return queryProperty;
+    }
+
+    /**
+     * @return the queryPerson
+     */
+    public QueryPerson getQueryPerson() {
+        return queryPerson;
+    }
+
+    /**
+     * @return the queryEventCECase
+     */
+    public QueryEventCECase getQueryEventCECase() {
+        return queryEventCECase;
+    }
+
+    /**
+     * @param queryProperty the queryProperty to set
+     */
+    public void setQueryProperty(QueryProperty queryProperty) {
+        this.queryProperty = queryProperty;
+    }
+
+    /**
+     * @param queryPerson the queryPerson to set
+     */
+    public void setQueryPerson(QueryPerson queryPerson) {
+        this.queryPerson = queryPerson;
+    }
+
+    /**
+     * @param queryEventCECase the queryEventCECase to set
+     */
+    public void setQueryEventCECase(QueryEventCECase queryEventCECase) {
+        this.queryEventCECase = queryEventCECase;
+    }
+
+    /**
+     * @return the activePropWithLists
+     */
+    public PropertyWithLists getActivePropWithLists() {
+        return activePropWithLists;
+    }
+
+    /**
+     * @return the workingPropWithLists
+     */
+    public PropertyWithLists getWorkingPropWithLists() {
+        return workingPropWithLists;
+    }
+
+    /**
+     * @param activePropWithLists the activePropWithLists to set
+     */
+    public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
+        this.activePropWithLists = activePropWithLists;
+    }
+
+    /**
+     * @param workingPropWithLists the workingPropWithLists to set
+     */
+    public void setWorkingPropWithLists(PropertyWithLists workingPropWithLists) {
+        this.workingPropWithLists = workingPropWithLists;
+    }
+
+    /**
+     * @return the activePropUnit
+     */
+    public PropertyUnit getActivePropUnit() {
+        return activePropUnit;
+    }
+
+    /**
+     * @param activePropUnit the activePropUnit to set
+     */
+    public void setActivePropUnit(PropertyUnit activePropUnit) {
+        this.activePropUnit = activePropUnit;
+    }
+
+    /**
+     * @return the activePersonType
+     */
+    public PersonType getActivePersonType() {
+        return activePersonType;
+    }
+
+    /**
+     * @param activePersonType the activePersonType to set
+     */
+    public void setActivePersonType(PersonType activePersonType) {
+        this.activePersonType = activePersonType;
     }
     
     
