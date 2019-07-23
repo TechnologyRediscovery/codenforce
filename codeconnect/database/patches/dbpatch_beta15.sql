@@ -143,7 +143,6 @@ CREATE TABLE public.eventproposalchoice
 );
 
 
-
 CREATE SEQUENCE IF NOT EXISTS occevent_eventid_seq
   START WITH 1000
   INCREMENT BY 1 
