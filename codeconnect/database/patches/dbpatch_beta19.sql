@@ -333,6 +333,7 @@ ALTER TABLE login DROP COLUMN orinumber;
 ALTER TABLE munilogin ADD COLUMN badgenumber text;
 ALTER TABLE munilogin ADD COLUMN orinumber text;
 
+-- REALEASED DON'T ADD TO ME!
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
     VALUES (19, 'database/patches/dbpatch_beta19.sql', '07-09-2019', 'ecd', 'municipality facelift and others');

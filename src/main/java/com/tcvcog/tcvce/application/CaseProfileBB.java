@@ -779,7 +779,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             return "violationEdit";
     }
  
-    public String createNewNotice() {
+    public String createNewNotice() throws SQLException {
         NoticeOfViolation nov;
         CaseCoordinator cc = getCaseCoordinator();
             if (!currentCase.getViolationListUnresolved().isEmpty()) {

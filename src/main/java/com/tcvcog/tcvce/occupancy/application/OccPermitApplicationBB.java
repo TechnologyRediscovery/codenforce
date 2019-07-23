@@ -492,7 +492,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                             "Please select a municipality.", ""));
             return "";
         }
-        getSessionBean().setSessionMuni(selectedMuni);
+//        getSessionBean().setSessionMuni(selectedMuni);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
         getSessionBean().setOccPermitApplication(occpermitapp);

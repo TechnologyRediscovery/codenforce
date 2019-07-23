@@ -36,9 +36,12 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
+import com.tcvcog.tcvce.entities.MunicipalityComplete;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
  
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import javax.annotation.PostConstruct;
 
@@ -132,11 +135,13 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
     
-    public String switchMuni(){
+    public String switchMuni() throws IntegrationException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
-        getSessionBean().setSessionMuni(selectedMuni);
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityComplete muniComp = mi.getMuniComplete(selectedMuni.getMuniCode());
+        getSessionBean().setSessionMuni(muniComp);
         try {
-            getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(selectedMuni.getCodeSet().getCodeSetID()));
+            getSessionBean().setActiveCodeSet(ci.getCodeSetBySetID(muniComp.getCodeSet().getCodeSetID()));
         } catch (IntegrationException ex) {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
