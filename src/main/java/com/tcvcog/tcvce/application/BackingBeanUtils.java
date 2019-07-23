@@ -133,8 +133,6 @@ public class BackingBeanUtils implements Serializable{
     private DataSource dataSource;
     private Connection connx;
     
-    
-    
     /**
      * Creates a new instance of BackingBeanUtils
      */
@@ -146,8 +144,6 @@ public class BackingBeanUtils implements Serializable{
         // it should be made by the MBCF
         //System.out.println("Constructing BackingBean Utils");
         //userCoordinator = new UserCoordinator();
-        
-       
         
     }
     
@@ -185,7 +181,6 @@ public class BackingBeanUtils implements Serializable{
         }
         return isInList;
     }
-    
     
     
     public void setUserCoordinator(UserCoordinator userCoordinator){

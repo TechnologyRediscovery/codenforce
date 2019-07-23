@@ -51,16 +51,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
   
     
     public Municipality getMuni(int muniCode) throws IntegrationException, SQLException{
-        return generateMuni(getMuniResultSet(muniCode));
-        
-    }
-    
-    public MunicipalityComplete getMuniComplete(int muniCode) throws IntegrationException, SQLException{
-        return generateMuniComplete(getMuniResultSet(muniCode));
-    }
-    
-    private ResultSet getMuniResultSet(int muniCode) throws IntegrationException{
-        PreparedStatement stmt = null;
+          PreparedStatement stmt = null;
+        Municipality muni = null;
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
         String query =  "    SELECT municode, muniname, address_street, address_city, address_state, \n" +
@@ -79,10 +71,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setInt(1, muniCode);
             //System.out.println("MunicipalityIntegrator.getMuni | query: " + stmt.toString());
             rs = stmt.executeQuery();
-//            while(rs.next()){
-//                System.out.println("MuniIntegrator.getMuni| inside while having at least one row");
-//                muni = generateMuniComplete(rs);
-//            }
+            while(rs.next()){
+                System.out.println("MuniIntegrator.getMuni| inside while having at least one row");
+                muni = generateMuni(rs);
+            }
             
         } catch (SQLException ex) {
             System.out.println("MunicipalityIntegrator.getMuni | " + ex.toString());
@@ -93,7 +85,46 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return rs;
+        return muni;
+        
+    }
+    
+    public MunicipalityComplete getMuniComplete(int muniCode) throws IntegrationException{
+        PreparedStatement stmt = null;
+        MunicipalityComplete muniComplete = null;
+        Connection con = null;
+        // note that muniCode is not returned in this query since it is specified in the WHERE
+        String query =  "    SELECT municode, muniname, address_street, address_city, address_state, \n" +
+                        "       address_zip, phone, fax, email, population, activeinprogram, \n" +
+                        "       defaultcodeset, occpermitissuingsource_sourceid, novprintstyle_styleid, \n" +
+                        "       profile_profileid, enablecodeenformcent, enableoccupancy, enablepublicceactionreqsub, \n" +
+                        "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
+                        "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
+                        "       lastupdated_userid, primarystaffcontact_userid\n" +
+                        "  FROM public.municipality WHERE municode=?;";
+        ResultSet rs = null;
+ 
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, muniCode);
+            //System.out.println("MunicipalityIntegrator.getMuni | query: " + stmt.toString());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                System.out.println("MuniIntegrator.getMuni| inside while having at least one row");
+                muniComplete = generateMuniComplete(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println("MunicipalityIntegrator.getMuni | " + ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuni", ex);
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return muniComplete;
     }
     
     
@@ -102,6 +133,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
         muni.setMuniCode(rs.getInt("municode"));
         muni.setMuniName(rs.getString("muniname"));
+        
         
         return muni;
     }
