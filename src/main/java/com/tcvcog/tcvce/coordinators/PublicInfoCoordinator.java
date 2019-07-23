@@ -185,7 +185,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowDetailsPageButton(false);
         } else {
             pib.setPaccStatusMessage("A public information bundle was found but public "
-                    + "access was switched off by a code officer. Please contact your municipal office at " + req.getMuni().getPhone());
+                    + "access was switched off by a code officer. Please contact your municipal office. ");
             
         }
         

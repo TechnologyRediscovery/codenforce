@@ -110,11 +110,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             inspec.setChecklistTemplate(templ);
             inspec.setInspector(user);
             inspec.setPacc(generateControlCodeFromTime());
-            if(muni.isEnablePublicOccInspectionTODOs()){
-                inspec.setEnablePacc(true);
-            } else {
-                inspec.setEnablePacc(false);
-            }
+//            if(muni.isEnablePublicOccInspectionTODOs()){
+//                inspec.setEnablePacc(true);
+//            } else {
+//                inspec.setEnablePacc(false);
+//            }
             inspec = oii.insertOccInspection(in);
         } else {
             throw new InspectionException("Occ period either inactive or uninspectable");

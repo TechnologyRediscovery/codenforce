@@ -101,9 +101,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
             currentCitation.setViolationList(l);
             removedViolationList = new ArrayList<>();
         }
-        
     }
-    
     
     public void removeViolationFromCitation(CodeViolation v){
         currentCitation.getViolationList().remove(v);

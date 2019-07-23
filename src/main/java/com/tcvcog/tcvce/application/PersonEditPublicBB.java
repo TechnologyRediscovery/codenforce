@@ -72,7 +72,7 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
         PersonCoordinator pc = getPersonCoordinator();
         person = pc.anonymizePersonData(person);
         clonePerson = person;
-        clonePerson.setPersonType(getSessionBean().getActivePersonType());
+//        clonePerson.setPersonType(getSessionBean().getActivePersonType());
     }
     
     public String addCloneToApplicantPersons(Person clone) throws IntegrationException{

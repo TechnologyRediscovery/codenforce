@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -49,8 +50,16 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     
   
     
-    public Municipality getMuni(int muniCode) throws IntegrationException{
-        Municipality muni = null;
+    public Municipality getMuni(int muniCode) throws IntegrationException, SQLException{
+        return generateMuni(getMuniResultSet(muniCode));
+        
+    }
+    
+    public MunicipalityComplete getMuniComplete(int muniCode) throws IntegrationException, SQLException{
+        return generateMuniComplete(getMuniResultSet(muniCode));
+    }
+    
+    private ResultSet getMuniResultSet(int muniCode) throws IntegrationException{
         PreparedStatement stmt = null;
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
@@ -71,10 +80,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setInt(1, muniCode);
             //System.out.println("MunicipalityIntegrator.getMuni | query: " + stmt.toString());
             rs = stmt.executeQuery();
-            while(rs.next()){
-                System.out.println("MuniIntegrator.getMuni| inside while having at least one row");
-                muni = generateMuni(rs);
-            }
+//            while(rs.next()){
+//                System.out.println("MuniIntegrator.getMuni| inside while having at least one row");
+//                muni = generateMuniComplete(rs);
+//            }
             
         } catch (SQLException ex) {
             System.out.println("MunicipalityIntegrator.getMuni | " + ex.toString());
@@ -85,21 +94,28 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return muni;
-        
+        return rs;
     }
     
-    public Municipality generateMuni(ResultSet rs) throws SQLException, IntegrationException{
+    
+    private Municipality generateMuni(ResultSet rs) throws SQLException{
+        Municipality muni = new Municipality();
+        
+        muni.setMuniCode(rs.getInt("municode"));
+        muni.setMuniName(rs.getString("muniname"));
+        
+        return muni;
+    }
+    
+    private MunicipalityComplete generateMuniComplete(ResultSet rs) throws SQLException, IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         UserIntegrator ui = getUserIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        Municipality muni = new Municipality();
+        MunicipalityComplete muni = new MunicipalityComplete(generateMuni(rs));
         
-        muni.setMuniCode(rs.getInt("municode"));
-        muni.setMuniName(rs.getString("muniname"));
         muni.setAddress_street(rs.getString("address_street"));
         muni.setAddress_city(rs.getString("address_city"));
         muni.setAddress_state(rs.getString("address_state"));
@@ -125,7 +141,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setEnablePublicOccInspectionTODOs(rs.getBoolean("enablepublicoccinspectodo"));
 
         muni.setMuniManager(ui.getUser(rs.getInt("munimanager_userid")));
-        muni.setMuniOfficeProperty(pi.getProperty(rs.getInt("office_propertyid")));
+        muni.setMuniOfficePropertyId(rs.getInt("office_propertyid"));
         muni.setNotes(rs.getString("notes"));
         muni.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
         
@@ -221,13 +237,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
+    
    
     
-    
-    
-    
-    //TODO: finish me
-    public void updateMuni(Municipality muni) throws IntegrationException{
+    public void updateMuniComplete(MunicipalityComplete muni) throws IntegrationException{
         
         Connection con = null;
         String query =  "UPDATE public.municipality\n" +
@@ -270,7 +283,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt.setBoolean(18, muni.isEnablePublicOccInspectionTODOs());
             stmt.setInt(19, muni.getMuniManager().getUserID());
             
-            stmt.setInt(20, muni.getMuniOfficeProperty().getPropertyID());
+            stmt.setInt(20, muni.getMuniOfficePropertyId());
             stmt.setString(21, muni.getNotes());
             // lastupdatedts=now()
             stmt.setInt(22, muni.getLastUpdaetdBy().getUserID());

@@ -43,24 +43,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- *       //@ManagedBean(name="sessionBean")
- *       //@SessionScoped
+ * Stores member vars of pretty much all our custom types
+ * for persistence across an entire session (i.e. across page changes)
+ * Many backing beans will grab this SessionBean in their initBean() method
+ * and check for the presence of a session object. If not null, the method injects
+ * those objects into its own members. If null, beans will decide if they need an object
+ * and where to get it.
+ * 
+ * When many beans facilitate navigation to other pages, they will put their working
+ * object on one of these session shelves for others to work with and to maintain
+ * user state across page changes.
+ * 
  * @author Eric C. Darsow
  */
 public class SessionBean extends BackingBeanUtils implements Serializable{
     
-    private CEActionRequest sessionCEAR;
-
-    // BOB individual object session shelves
-    private CECase sessionCECase;
-    private Municipality sessionMuni;
     private List<Municipality> userAuthMuniList;
+
+    // BOB individual object session shelves - NOT NULL
+    private MunicipalityComplete sessionMuni;
+    private CECase sessionCECase;
     private User sessionUser;
     private Property sessionProperty;
-    private PropertyUnit sessionPropertyUnit;
     private Person sessionPerson;
     private OccPeriod sessionOccPeriod;
+    
+    // BOB individual object session shelves - NOT ALWAYS POPULATED
+    private CEActionRequest sessionCEAR;
+    private PropertyUnit sessionPropertyUnit;
     private OccInspection sessionOccInspection;
     private OccPermit sessionOccPermit;
     
@@ -96,6 +106,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication occPermitApplication;
+    private PropertyWithLists activePropWithLists;
+    private PropertyWithLists workingPropWithLists;
+    private PropertyUnit activePropUnit;
+    private PersonType activePersonType;
     
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
@@ -317,15 +331,14 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the sessionMuni
      */
-    public Municipality getSessionMuni() {
+    public MunicipalityComplete getSessionMuni() {
         return sessionMuni;
     }
 
     /**
      * @param sessionMuni the sessionMuni to set
      */
-    public void setSessionMuni(Municipality sessionMuni) {
-        System.out.println("MissionControlBB.setActiveMuni | set: " + sessionMuni.getMuniName());
+    public void setSessionMuni(MunicipalityComplete sessionMuni) {
         this.sessionMuni = sessionMuni;
     }
 
@@ -768,6 +781,62 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setQueryEventCECase(QueryEventCECase queryEventCECase) {
         this.queryEventCECase = queryEventCECase;
+    }
+
+    /**
+     * @return the activePropWithLists
+     */
+    public PropertyWithLists getActivePropWithLists() {
+        return activePropWithLists;
+    }
+
+    /**
+     * @return the workingPropWithLists
+     */
+    public PropertyWithLists getWorkingPropWithLists() {
+        return workingPropWithLists;
+    }
+
+    /**
+     * @param activePropWithLists the activePropWithLists to set
+     */
+    public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
+        this.activePropWithLists = activePropWithLists;
+    }
+
+    /**
+     * @param workingPropWithLists the workingPropWithLists to set
+     */
+    public void setWorkingPropWithLists(PropertyWithLists workingPropWithLists) {
+        this.workingPropWithLists = workingPropWithLists;
+    }
+
+    /**
+     * @return the activePropUnit
+     */
+    public PropertyUnit getActivePropUnit() {
+        return activePropUnit;
+    }
+
+    /**
+     * @param activePropUnit the activePropUnit to set
+     */
+    public void setActivePropUnit(PropertyUnit activePropUnit) {
+        this.activePropUnit = activePropUnit;
+    }
+
+    /**
+     * @return the activePersonType
+     */
+    public PersonType getActivePersonType() {
+        return activePersonType;
+    }
+
+    /**
+     * @param activePersonType the activePersonType to set
+     */
+    public void setActivePersonType(PersonType activePersonType) {
+        this.activePersonType = activePersonType;
     }
     
     

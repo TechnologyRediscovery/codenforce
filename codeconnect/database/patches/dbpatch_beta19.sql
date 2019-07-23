@@ -321,6 +321,18 @@ CREATE SEQUENCE IF NOT EXISTS munilogin_recordid_seq
   CACHE 1;
 
 ALTER TABLE munilogin ADD COLUMN muniloginrecordid INTEGER DEFAULT nextval('munilogin_recordid_seq') PRIMARY KEY;
+ALTER TABLE munilogin ADD COLUMN recordcreatedts TIMESTAMP WITH TIME ZONE DEFAULT now();
+ALTER TABLE munilogin RENAME activitystartdate TO accessgranteddatestart;
+ALTER TABLE munilogin RENAME activitystopdate TO accessgranteddatestop;
+
+ALTER TABLE login DROP COLUMN userrole;
+
+ALTER TABLE login DROP COLUMN badgenumber;
+ALTER TABLE login DROP COLUMN orinumber;
+
+ALTER TABLE munilogin ADD COLUMN badgenumber text;
+ALTER TABLE munilogin ADD COLUMN orinumber text;
+
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
     VALUES (19, 'database/patches/dbpatch_beta19.sql', '07-09-2019', 'ecd', 'municipality facelift and others');

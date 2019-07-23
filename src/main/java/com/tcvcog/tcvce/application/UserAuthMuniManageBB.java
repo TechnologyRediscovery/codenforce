@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -131,14 +132,13 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
      * for the selected user.
      */
     public void onSelectedUserChange() {
-        System.out.println("UserAuthMuniManageBB.onSelectedUserChange |" + selectedUser.getUserID());
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         clearAuthMuniList();
         clearUnauthorizedMuniList();
 
         try {
             unauthorizedMuniList = getUnauthorizedMuniList();
-            UserIntegrator ui = getUserIntegrator();
-            authMuniList = ui.getUserAuthMunis(selectedUser.getUserID(), this);
+            authMuniList = mi.getUserAuthMunis(selectedUser.getUserID());
         } catch(IntegrationException ex){
             System.out.println("UserAuthMuniManageBB.onSelectedUserChange | " + ex.toString());
         }
@@ -228,6 +228,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
      */
     public String removeAuthMuni(Municipality muni){
         UserIntegrator ui = getUserIntegrator();        
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         try {
             ui.deleteUserAuthMuni(selectedUser, muni);
         }
@@ -239,7 +240,7 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
                             "Removed " + muni.getMuniName() + " from " + selectedUser.getUsername() 
                                     + ".", ""));
         try {
-            authMuniList = ui.getUserAuthMunis(selectedUser.getUserID(), this);
+            authMuniList = mi.getUserAuthMunis(selectedUser.getUserID());
         }
         catch (IntegrationException ex){
              System.out.println("UserAuthMuniManageBB.removeAuthMuni | " + ex);
