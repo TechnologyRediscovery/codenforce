@@ -555,7 +555,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return caseList;
     }
     
-    public CECase getPropertyInfoCase(Property prop){
+    public CECase getPropertyInfoCase(int propID){
         // TODO: finish me!
         return new CECase();
     }

@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -19,7 +20,6 @@ import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.occupancy.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -486,14 +486,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      *
      * @return "chooseProperty" - Navigates to property selection page
      */
-    public String setActiveMuni() {
+    public String setSessionMuni() {
         if (selectedMuni == null) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a municipality.", ""));
             return "";
         }
-        getSessionBean().setActiveMuni(selectedMuni);
+        getSessionBean().setSessionMuni(selectedMuni);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
         getSessionBean().setOccPermitApplication(occpermitapp);
@@ -505,7 +505,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public void searchForPropertiesSingleMuni() {
         PropertyIntegrator pi = getPropertyIntegrator();
-        Municipality activeMuni = getSessionBean().getActiveMuni();
+        Municipality activeMuni = getSessionBean().getSessionMuni();
 
         try {
             propList = pi.searchForProperties(houseNum, streetName, activeMuni.getMuniCode());
@@ -566,7 +566,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PropertyCoordinator pc = getPropertyCoordinator();
         unitToAdd = pc.getNewPropertyUnit();
         unitToAdd.setUnitNumber("");
-        unitToAdd.setRental(false);
+//        unitToAdd.setRental(false);
         unitToAdd.setNotes("");
 
         if (workingPropUnits == null) {
@@ -700,7 +700,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "";
 
         } else {
-            unit.setProperty(getSessionBean().getActivePropWithLists());
+            unit.setPropertyID(getSessionBean().getActivePropWithLists().getPropertyID());
             getSessionBean().setActivePropUnit(unit);
             getSessionBean().getOccPermitApplication().setApplicationPropertyUnit(unit);
 
@@ -883,7 +883,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public String editPersonInfo(Person person) {
         person.setPersonType(getSessionBean().getActivePersonType());
-        List<Person> attachedPersons = getSessionBean().getOccPermitApplication().getAttachedPersons();
+        attachedPersons = getSessionBean().getOccPermitApplication().getAttachedPersons();
 
         if (attachedPersons == null) {
             attachedPersons = new ArrayList();
@@ -1081,7 +1081,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             boolean added = true;
 
-            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getProperty().getPropertyID());
+            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
             
             if (changedby.getPersonID() != 0)
             {
@@ -1134,11 +1134,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                     }
 
-                    if (workingUnit.isRental() != activeUnit.isRental()) {
-
-                        skeleton.setRental(workingUnit.isRental());
-
-                    }
+//                    if (workingUnit.isRental() != activeUnit.isRental()) {
+//
+//                        skeleton.setRental(workingUnit.isRental());
+//
+//                    }
 
                 }
 
@@ -1152,7 +1152,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                 skeleton.setNotes(workingUnit.getNotes());
 
-                skeleton.setRental(workingUnit.isRental());
+//                skeleton.setRental(workingUnit.isRental());
 
             }
 
@@ -1169,7 +1169,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             PropertyUnitChange skeleton = new PropertyUnitChange();
 
-            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getProperty().getPropertyID());
+            skeleton.setPropertyID(getSessionBean().getOccPermitApplication().getApplicationPropertyUnit().getPropertyID());
             
             if (changedby.getPersonID() != 0)
             {
@@ -1217,7 +1217,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                 skeleton.setNotes(activeUnit.getNotes());
 
-                skeleton.setRental(activeUnit.isRental());
+//                skeleton.setRental(activeUnit.isRental());
 
                 skeleton.setRemoved(removed);
 

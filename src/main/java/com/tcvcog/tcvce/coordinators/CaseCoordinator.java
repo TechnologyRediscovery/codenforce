@@ -36,10 +36,12 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CitationIntegrator;
 import com.tcvcog.tcvce.integration.ViolationIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -825,13 +827,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     }
     
         
-    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m){
+    public NoticeOfViolation novGetNewNOVSkeleton(CECase cse, Municipality m) throws SQLException{
         SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        
         try {
-            nov.setStyle(si.getPrintStyle(m.getDefaultNOVStyleID()));
+            nov.setStyle(si.getPrintStyle(mi.getMuniComplete(m.getMuniCode()).getDefaultNOVStyleID()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

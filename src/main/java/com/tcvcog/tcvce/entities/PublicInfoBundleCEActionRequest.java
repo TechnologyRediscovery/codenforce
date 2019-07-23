@@ -57,16 +57,16 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle implements
         sb.append("</span>");
         sb.append(getMuni().getMuniName());
         sb.append("<br />");
-        sb.append(getMuni().getAddress_street());
-        sb.append("<br />");
-        sb.append(getMuni().getAddress_city());
-        sb.append(" ");
-        sb.append(getMuni().getAddress_state());
-        sb.append(" ");
-        sb.append(getMuni().getAddress_zip());
-        sb.append("<br />");
-        sb.append(getMuni().getPhone());
-        sb.append("<br />");
+//        sb.append(getMuni().getAddress_street());
+//        sb.append("<br />");
+//        sb.append(getMuni().getAddress_city());
+//        sb.append(" ");
+//        sb.append(getMuni().getAddress_state());
+//        sb.append(" ");
+//        sb.append(getMuni().getAddress_zip());
+//        sb.append("<br />");
+//        sb.append(getMuni().getPhone());
+//        sb.append("<br />");
         
         sb.append("<span class=\"bold\">");
         sb.append("Action Request Status: ");

@@ -39,7 +39,7 @@ public class PropertyAddBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             getProp().setPropertyID(pi.insertProperty(getProp()));
-            getSessionBean().setActivePropWithLists(getProp());
+//            getSessionBean().setActivePropWithLists(getProp());
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Successfully inserted property with ID " + getProp().getPropertyID() 
