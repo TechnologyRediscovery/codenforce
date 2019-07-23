@@ -59,21 +59,21 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
     
     public String updateMuni(){
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            mi.updateMuniComplete(currentMuni);
+//        try {
+//            mi.updateMuniComplete(currentMuni);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Successfully updated municipality info!", ""));
-            getSessionBean().setSessionMuni(mi.getMuni(currentMuni.getMuniCode()));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                "Unable to update municipality info due to a system error", 
-                        "This could be because the code set"
-                        + "ID or the code source ID you entered is not an "
-                        + "actual database record ID. Check in the "
-                        + "\"municipal code\" section to verify ID numbers"));
-        }
+//            getSessionBean().setSessionMuni(mi.getMuni(currentMuni.getMuniCode()));
+//        } catch (IntegrationException ex) {
+//            getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                "Unable to update municipality info due to a system error", 
+//                        "This could be because the code set"
+//                        + "ID or the code source ID you entered is not an "
+//                        + "actual database record ID. Check in the "
+//                        + "\"municipal code\" section to verify ID numbers"));
+//        }
         
         return "";
         
