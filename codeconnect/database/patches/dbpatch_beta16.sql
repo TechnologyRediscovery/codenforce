@@ -83,6 +83,14 @@ CREATE TABLE public.moneycecasefeeassigned
 );
 
 
+-- added manually by nathan on his system
+ALTER TABLE moneycecasefeeassigned DROP COLUMN codesetelement_elementid;
+-- added manually by nathan on his system
+ALTER TABLE moneycecasefeeassigned ADD COLUMN cecase_caseid INTEGER NOT NULL CONSTRAINT moneycecasefeeassigned_caseid_fk REFERENCES cecase (caseid);
+-- added manually by nathan on his system
+ALTER TABLE moneyfeeassigned ADD COLUMN fee_feeid INTEGER NOT NULL CONSTRAINT moneyassignedfee_feeid_fk REFERENCES moneyfee (feeid);
+
+
 CREATE SEQUENCE IF NOT EXISTS moneyoccperiodfeeassignedid_seq
   START WITH 1000
   INCREMENT BY 1 
