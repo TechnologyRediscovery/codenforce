@@ -26,6 +26,15 @@ public class UserWithAccessData extends User{
     private AccessKeyCard keyCard;
     
     public UserWithAccessData(User u){
+        this.userID = u.getUserID();
+        this.roleType = u.getRoleType();
+        this.username = u.getUsername();
+        this.person = u.getPerson();
+        this.personID = u.getPersonID();
+        this.notes = u.getNotes();
+        this.badgeNumber = u.getBadgeNumber();
+        this.oriNumber = u.getOriNumber();
+        
         
     }
 

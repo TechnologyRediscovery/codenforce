@@ -1167,6 +1167,8 @@
         </navigation-case>
         
         
+        
+        
         <navigation-case>
             <from-view-id> /public/services/personSearchPublic.xhtml </from-view-id>
             <from-outcome> managePeople </from-outcome>

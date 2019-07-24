@@ -32,7 +32,7 @@ import java.io.Serializable;
  */
 public class PropertyCoordinator extends BackingBeanUtils implements Serializable {
 
-    private final String DEFAULTUNITNUMBER = "0";
+    private final String DEFAULTUNITNUMBER = "-1";
     private final boolean DEFAULTRENTAL = false;
     
     /**
