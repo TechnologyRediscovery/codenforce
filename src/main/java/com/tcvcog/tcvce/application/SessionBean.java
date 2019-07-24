@@ -121,7 +121,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private CodeElement activeCodeElement;
     
     /* *** Occupancy Permit Application Session Shelves *** */
-    private OccPermitApplication occPermitApplication;
+    private OccPermitApplication sessionOccPermitApplication;
     private PropertyWithLists activePropWithLists;
     private PropertyWithLists workingPropWithLists;
     private PropertyUnit activePropUnit;
@@ -524,12 +524,12 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     
-    public OccPermitApplication getOccPermitApplication() {
-        return occPermitApplication;
+    public OccPermitApplication getSessionOccPermitApplication() {
+        return sessionOccPermitApplication;
     }
 
-    public void setOccPermitApplication(OccPermitApplication occPermitApplication) {
-        this.occPermitApplication = occPermitApplication;
+    public void setSessionOccPermitApplication(OccPermitApplication sessionOccPermitApplication) {
+        this.sessionOccPermitApplication = sessionOccPermitApplication;
     }
 
     public PropertyUnit getSessionPropertyUnit() {
