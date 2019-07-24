@@ -129,8 +129,10 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
                     "Please contact system administrator Eric Darsow at 412.923.9907"));
             return "failure";
         } catch (AuthorizationException ex) {
+            System.out.println("SessionInitializer.intitiateInternalSession | Auth exception");
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
+            return "failure";
         }
         return "success";
     }

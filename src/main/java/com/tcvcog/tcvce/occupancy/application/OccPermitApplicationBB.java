@@ -95,6 +95,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        
+        if(getSessionBean().getSessionUser() != null){
+            selectedMuni = getSessionBean().getSessionMuni();
+        }
 
         propWithLists = getSessionBean().getActivePropWithLists();
 
@@ -151,7 +155,30 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
+    } // end postConstruct
+    
+    
+    public String beginInternalOccApp(PropertyUnit pu) throws IntegrationException, CaseLifecyleException{
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
+        getSessionBean().setSessionOccPermitApplication(occpermitapp);
+        
+        getSessionBean().setActivePropWithLists(pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID()));
+
+        if (propWithLists.getUnitList().size() == 1) {
+            List<PropertyUnit> propertyUnitList = propWithLists.getUnitList();
+            getSessionBean().setActivePropUnit(propertyUnitList.get(0));
+            getSessionBean().getSessionOccPermitApplication().setApplicationPropertyUnit(pu);
+        }
+        
+        
+        
+        return "beginInternalOccUpp";
+        
     }
+    
 
     /**
      * Set the user-selected municipality. The property search will be done
@@ -305,8 +332,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             }
             
             try {
-            ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-            
+                ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
                 ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep");
             } catch (IOException ex) {
             }

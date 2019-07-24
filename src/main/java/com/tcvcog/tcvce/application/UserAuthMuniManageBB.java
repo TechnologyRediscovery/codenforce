@@ -171,9 +171,12 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
     }
     
     /**
+     * TODO finish me occbeta
+     *  
      * Updates the loginmuni data table with the list of selected municipalities corresponding to 
      * the selected user. Also clears all selections and lists of municipalities, so that the user
      * can make another selection to edit user-municipality mappings.
+     * 
      * @return An empty String, which refreshes the page.
      */
     public String updateAuthMunis() {

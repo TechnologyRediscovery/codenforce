@@ -29,17 +29,17 @@ import java.util.Objects;
  */
 public class User implements Serializable{
 
-    private int userID;
-    private RoleType roleType;
-    private String username;
+    protected int userID;
+    protected RoleType roleType;
+    protected String username;
     
-    private Person person;
-    private int personID;
+    protected Person person;
+    protected int personID;
 
-    private String notes;
+    protected String notes;
     
-    private String badgeNumber;
-    private String oriNumber;
+    protected String badgeNumber;
+    protected String oriNumber;
     
     
     /**
