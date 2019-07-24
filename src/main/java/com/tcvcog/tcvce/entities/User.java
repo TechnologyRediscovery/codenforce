@@ -226,5 +226,9 @@ public class User implements Serializable{
     /**
      * @param accessRecord the accessRecord to set
      */
+<<<<<<< HEAD
       
+=======
+    
+>>>>>>> cf646aa... occbeta cleanup WIP; just sorted out getSessionUser() mess
 }
