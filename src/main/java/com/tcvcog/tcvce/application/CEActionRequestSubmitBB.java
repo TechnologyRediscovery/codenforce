@@ -228,7 +228,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
     public String saveConcernDescriptions(){
         getSessionBean().setBlobList(new ArrayList<Blob>());
-        
         return "photoUpload";
     }
     
@@ -256,11 +255,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
         Person skel = pc.getNewPersonSkeleton(m);
-//        try {
-//            skel.setCreatorUserID(uc.getRobotUser().getUserID());
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//        }
+        try {
+            skel.setCreatorUserID(uc.getRobotUser().getUserID());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
 //        skel.setSourceID(Integer.parseInt(
 //                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
 //                .getString("actionRequestPublicUserPersonSourceID")));
@@ -305,6 +304,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * This action method is called when the request code enforcement
      * action request is submitted online (submit button in submitCERequest
      * @return the page ID for navigation
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public String submitActionRequest() throws IntegrationException {
         currentRequest = getSessionBean().getCeactionRequestForSubmission();
