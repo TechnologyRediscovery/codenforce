@@ -529,7 +529,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public void selectNewRequestPerson(Person p) {
         selectedPersonForAttachment = p;
-
     }
 
     public void updateRequestor(ActionEvent ev) {
@@ -550,7 +549,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                      "Unable to change requestor person",
                      getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
-
     }
 
     public void changePACCAccess() {

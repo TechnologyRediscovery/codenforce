@@ -88,7 +88,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
 
         ImprovementSuggestion is = new ImprovementSuggestion();
         
-        is.setSubmitter(getSessionUser());
+        is.setSubmitter(getSessionBean().getSessionUser());
         is.setImprovementTypeID(selectedImprovementType);
         is.setSuggestionText(systemImprovementTicketRText);
         // back to the hard-coded since I couldn't get the resource bundle lookup

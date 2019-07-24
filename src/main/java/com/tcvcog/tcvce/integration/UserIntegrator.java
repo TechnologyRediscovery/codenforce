@@ -66,7 +66,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         User newUser = null;
         // broken query
-        String query =  "   SELECT userid, username notes, personlink \n" +
+        String query =  "   SELECT userid, username, notes, personlink \n" +
                         "   FROM public.login WHERE userid = ?;";
         
         PreparedStatement stmt = null;
@@ -141,9 +141,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setUserID(rs.getInt("userid"));
             user.setUsername(rs.getString("username"));
             user.setNotes(rs.getString("notes"));
-            
             user.setPerson(pi.getPerson(rs.getInt("personlink")));
-            
         } catch (SQLException ex) {
             throw new IntegrationException("Cannot create user", ex);
         }
@@ -152,8 +150,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     private UserWithAccessData generateUserWithAccessData(ResultSet rs, Municipality muni) throws IntegrationException{
-            UserCoordinator uc = getUserCoordinator();
-            MunicipalityIntegrator mi = getMunicipalityIntegrator();
             UserWithAccessData user = new UserWithAccessData(generateUser(rs));
             user.setAccessRecord(getUserAccessRecord(user, muni));
             return user;

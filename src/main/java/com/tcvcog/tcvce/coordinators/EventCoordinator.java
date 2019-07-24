@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -189,7 +190,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param muniList
      * @return 
      */
-    public boolean determineCanUserEvaluateProposal(CECaseEvent ev, User u, List<Municipality> muniList){
+    public boolean determineCanUserEvaluateProposal(CECaseEvent ev, UserWithAccessData u, List<Municipality> muniList){
         boolean canEvaluateProposal = false;
         Directive evProp = ev.getCategory().getDirective();
         
@@ -212,7 +213,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return canEvaluateProposal;
     }
     
-    public void deleteEvent(CECaseEvent ev, User u) throws AuthorizationException{
+    public void deleteEvent(CECaseEvent ev, UserWithAccessData u) throws AuthorizationException{
         EventIntegrator ei = getEventIntegrator();
         try {
             if(u.getKeyCard().isHasSysAdminPermissions()){
