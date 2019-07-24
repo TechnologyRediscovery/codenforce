@@ -35,14 +35,14 @@ import java.util.Map;
  *
  * @author Eric C. Darsow
  */
-public class SessionSystemCoordinator extends BackingBeanUtils implements Serializable{
+public class SystemCoordinator extends BackingBeanUtils implements Serializable{
 
     private Map<Integer, String> muniCodeNameMap;
     
     /**
      * Creates a new instance of LoggingCoordinator
      */
-    public SessionSystemCoordinator() {
+    public SystemCoordinator() {
     }
     
     

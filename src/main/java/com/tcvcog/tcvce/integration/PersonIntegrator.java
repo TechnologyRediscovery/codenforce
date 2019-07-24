@@ -17,12 +17,13 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -79,45 +80,16 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             
-            String s = "SELECT \n" +
-                    "  person.personid, \n" +
-                    "  person.persontype AS persontype, \n" +
-                    "  person.muni_municode, \n" +
-                    "  person.fname, \n" +
-                    "  person.lname, \n" +
-                    "  person.jobtitle, \n" +
-                    "  person.phonecell, \n" +
-                    "  person.phonework, \n" +
-                    "  person.phonehome, \n" +
-                    "  person.email, \n" +
-                    "  person.address_street, \n" +
-                    "  person.address_city, \n" +
-                    "  person.address_state, \n" +
-                    "  person.address_zip, \n" +
-                    "  person.notes, \n" +
-                    "  person.lastupdated, \n" +
-                    "  person.expirydate, \n" +
-                    "  person.isactive, \n" +
-                    "  person.isunder18, \n" +
-                    "  person.humanverifiedby, \n" +
-                    "  person.compositelname, \n" +
-                    "  person.creator, \n" +
-                    "  person.businessentity, \n" +
-                    "  person.mailing_address_street, \n" +
-                    "  person.mailing_address_city, \n" +
-                    "  person.mailing_address_zip, \n" +
-                    "  person.mailing_address_state, \n" +
-                    "  person.useseparatemailingaddr, \n" +
-                    "  person.expirynotes, \n" +
-                    "  person.creationtimestamp, \n" +
-                    "  person.canexpire, \n" +
-                    "  person.userlink, \n" +
-                    "  personsource.sourceid, \n" +
-                    "  personsource.title\n" +
-                    "FROM \n" +
-                    "  public.person LEFT OUTER JOIN public.personsource ON person.sourceid = personsource.sourceid \n" +
-                    "WHERE \n" +
-                    "  personid = ?;";
+            String s = "SELECT personid, persontype, muni_municode, fname, lname, jobtitle, \n" +
+                        "       phonecell, phonehome, phonework, email, address_street, address_city, \n" +
+                        "       address_state, address_zip, notes, lastupdated, expirydate, isactive, \n" +
+                        "       isunder18, humanverifiedby, compositelname, sourceid, creator, \n" +
+                        "       businessentity, mailing_address_street, mailing_address_city, \n" +
+                        "       mailing_address_zip, mailing_address_state, useseparatemailingaddr, \n" +
+                        "       expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline, \n" +
+                        "       ghostof, ghostby, ghosttimestamp, cloneof, clonedby, clonetimestamp, \n" +
+                        "       referenceperson\n" +
+                        "  FROM public.person WHERE personid=?;";
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, personId);
@@ -157,49 +129,47 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     private Person generatePersonFromResultSet(ResultSet rs) throws IntegrationException {
         // Instantiates the new person object
         Person newPerson = new Person();
-        SessionSystemCoordinator ssc = getSessionSystemCoordinator();
+        SystemCoordinator ssc = getSystemCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        
         
         try {
             newPerson.setPersonID(rs.getInt("personid"));
             newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
             newPerson.setMuniCode(rs.getInt("muni_municode"));
-            newPerson.setMuniName(ssc.getMuniCodeNameMap().get(rs.getInt("muni_municode")));
-
+            newPerson.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             newPerson.setFirstName(rs.getString("fName"));
             newPerson.setLastName(rs.getString("lName"));
             newPerson.setJobTitle(rs.getString("jobtitle"));
+            
             newPerson.setPhoneCell(rs.getString("phoneCell"));
             newPerson.setPhoneHome(rs.getString("phoneHome"));
             newPerson.setPhoneWork(rs.getString("phoneWork"));
-            
             newPerson.setEmail(rs.getString("email"));
             newPerson.setAddressStreet(rs.getString("address_street"));
             newPerson.setAddressCity(rs.getString("address_city"));
 
             newPerson.setAddressState(rs.getString("address_state"));
             newPerson.setAddressZip(rs.getString("address_zip"));
-            
             newPerson.setNotes(rs.getString("notes"));
-            newPerson.setLastUpdated(rs.getTimestamp("lastupdated").toLocalDateTime());
-            java.sql.Timestamp s = rs.getTimestamp("expirydate");
-            if (s != null) {
-                newPerson.setExpiryDate(s.toLocalDateTime());
 
-            } else {
-                newPerson.setExpiryDate(null);
+            if(rs.getTimestamp("lastupdated") != null){
+                newPerson.setLastUpdated(rs.getTimestamp("lastupdated").toLocalDateTime());
+            }
+            
+            if (rs.getTimestamp("expirydate") != null) {
+                newPerson.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
             }
             newPerson.setActive(rs.getBoolean("isactive"));
 
             newPerson.setUnder18(rs.getBoolean("isunder18"));
             newPerson.setVerifiedByUserID(rs.getInt("humanverifiedby"));
             newPerson.setCompositeLastName(rs.getBoolean("compositelname"));
-
-            newPerson.setSourceID(rs.getInt("sourceid"));
-            newPerson.setSourceTitle(rs.getString("title"));
-            
+            newPerson.setSource(si.getBOBSource(rs.getInt("sourceid")));
             newPerson.setCreatorUserID(rs.getInt("creator"));
+            
             newPerson.setBusinessEntity(rs.getBoolean("businessentity"));
-
             newPerson.setMailingAddressStreet(rs.getString("mailing_address_street"));
             newPerson.setMailingAddressCity(rs.getString("mailing_address_city"));
             newPerson.setMailingAddressZip(rs.getString("mailing_address_zip"));
@@ -214,6 +184,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             }
             newPerson.setCanExpire(rs.getBoolean("canexpire"));
             newPerson.setLinkedUserID(rs.getInt("userlink"));
+            newPerson.setMailingAddressThirdLine(rs.getString("mailing_address_thirdline"));
+            
+            // HAVE NOT IMPLEMENTED GHOSTS AND CLONES YET!
+            
             
 
         } catch (SQLException ex) {
@@ -455,7 +429,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     " sourceid, creator, businessentity, " +
                     " mailing_address_street, mailing_address_city, " +
                     " mailing_address_zip, mailing_address_state, useseparatemailingaddr, " +
-                    " expirynotes, creationtimestamp, canexpire, userlink) " +
+                    " expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline) " +
                     " VALUES (DEFAULT, CAST (? AS persontype), ?, " //1-2
                     + "?, ?, ?, " + //3-5, through jobtitle
                     " ?, ?, ?, "
@@ -466,7 +440,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     + "?, ?, ?, " 
                     + "?, ?, " // through 25, mailing_address_city
                     + "?, ?, ?, "
-                    + "?, ?, ?, NULL);"; // through 32
+                    + "?, ?, ?, NULL, ?);"; // through 32
 
         PreparedStatement stmt = null;
         try {
@@ -531,8 +505,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(29, personToStore.getExpiryNotes());
             stmt.setTimestamp(30, java.sql.Timestamp.valueOf(LocalDateTime.now()));
             stmt.setBoolean(31, personToStore.isCanExpire());
+            
 //            stmt.setInt(32, personToStore.getLinkedUserID());
 
+            stmt.setString(32, personToStore.getMailingAddressThirdLine());
+            
             stmt.execute();
 
             // now get the most recent Unique ID added to this person to pass 
@@ -708,7 +685,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 "       sourceid=?, businessentity=?, \n" +
                 "       mailing_address_street=?, mailing_address_city=?, mailing_address_zip=?, \n" +
                 "       mailing_address_state=?, useseparatemailingaddr=?, expirynotes=?,  \n" +
-                "       canexpire=? \n" +
+                "       canexpire=?, mailing_address_thirdline=?  \n" +
                 " WHERE personid=?;";
 
         PreparedStatement stmt = null;
@@ -744,10 +721,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(16, personToUpdate.isUnder18());          
             stmt.setBoolean(17, personToUpdate.isCompositeLastName());
             
-            if(personToUpdate.getSourceID() == 0){
-                stmt.setNull(18, java.sql.Types.NULL);
+           
+             if(personToUpdate.getSource() != null){
+                stmt.setInt(18, personToUpdate.getSource().getSourceid());
             } else {
-                stmt.setInt(18, personToUpdate.getSourceID());
+                stmt.setNull(18, java.sql.Types.NULL);
             }
             stmt.setBoolean(19, personToUpdate.isBusinessEntity());
             
@@ -760,7 +738,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(25, personToUpdate.getExpiryNotes());
             
             stmt.setBoolean(26, personToUpdate.isCanExpire());
-            stmt.setInt(27, personToUpdate.getPersonID());
+            stmt.setString(27, personToUpdate.getMailingAddressThirdLine());
+            stmt.setInt(28, personToUpdate.getPersonID());
 
             stmt.execute();
             System.out.println("PersonIntegrator.updatePerson : Excecuted update");

@@ -89,15 +89,18 @@
 
                                             </p:column>
 
-                                            <p:column>
+                                <ui:remove>
+                                                
+                                                <p:column>
 
-                                                <f:facet name="header">
-                                                    <h:outputText value="Type" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.propertyUseType}"/>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Type" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{prop.propertyUseType}"/>
 
-                                            </p:column>
+                                                </p:column>
 
+                                </ui:remove>
                                         </p:dataTable>
 
                                         <p:spacer height="10px"/>

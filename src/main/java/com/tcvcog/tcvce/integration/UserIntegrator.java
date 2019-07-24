@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -26,6 +27,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAccessRecord;
+import com.tcvcog.tcvce.entities.UserWithAccessData;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -64,8 +66,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         User newUser = null;
         // broken query
-        String query =  "   SELECT userid, username, password, notes, "
-                        + "     personlink \n" +
+        String query =  "   SELECT userid, username notes, personlink \n" +
                         "   FROM public.login WHERE userid = ?;";
         
         PreparedStatement stmt = null;
@@ -75,7 +76,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, userID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                newUser = generateUser(rs, getUserDefaultMunicipality(rs.getInt("userid")));
+                newUser = generateUser(rs);
             }
             
         } catch (SQLException ex) {
@@ -90,6 +91,42 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return newUser;
     }
     
+    public UserWithAccessData getUserWithAccessData(int userID, Municipality m) throws IntegrationException{
+        if(userID == 0){
+            return null;
+        }
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        UserWithAccessData newUser = null;
+        // broken query
+        String query =  "   SELECT userid, username, notes, personlink \n" +
+                        "   FROM public.login WHERE userid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, userID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                newUser = generateUserWithAccessData(rs, m);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error getting user", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return newUser;
+        
+        
+    }
+    
      /**
      * Note that the client method is responsible for moving the cursor on the 
      * result set object before passing it into this method     * 
@@ -97,9 +134,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    private User generateUser(ResultSet rs, Municipality muni) throws IntegrationException{
+    private User generateUser(ResultSet rs) throws IntegrationException{
         User user = new User();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         try {
             user.setUserID(rs.getInt("userid"));
@@ -108,13 +144,19 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             
             user.setPerson(pi.getPerson(rs.getInt("personlink")));
             
-            user.setAccessRecord(getUserAccessRecord(user, muni));
-            
         } catch (SQLException ex) {
             throw new IntegrationException("Cannot create user", ex);
         }
         
         return user;
+    }
+    
+    private UserWithAccessData generateUserWithAccessData(ResultSet rs, Municipality muni) throws IntegrationException{
+            UserCoordinator uc = getUserCoordinator();
+            MunicipalityIntegrator mi = getMunicipalityIntegrator();
+            UserWithAccessData user = new UserWithAccessData(generateUser(rs));
+            user.setAccessRecord(getUserAccessRecord(user, muni));
+            return user;
     }
     
     
@@ -406,12 +448,12 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return the Fully-baked user object ready to be passed to and fro
      * @throws IntegrationException 
      */   
-    public User getUser(String userName) throws IntegrationException{
+    public int getUserID(String userName) throws IntegrationException{
         
         System.out.println("UserIntegrator.getUser");
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        User newUser = null;
+        int userID = 0;
         String query = "SELECT userid FROM login WHERE username = ?;";
         
         PreparedStatement stmt = null;
@@ -422,7 +464,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, userName);
             rs = stmt.executeQuery();
             while(rs.next()){
-                newUser = getUser(rs.getInt("userid"));
+                userID = rs.getInt("userid");
             }
             
         } catch (SQLException ex) {
@@ -434,7 +476,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return newUser;
+        return userID;
     }
     
     

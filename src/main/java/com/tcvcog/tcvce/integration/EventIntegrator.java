@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -815,7 +815,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     private CECaseEvent generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException {
         CECaseEvent ev = new CECaseEvent();
         UserIntegrator ui = getUserIntegrator();
-        SessionSystemCoordinator ssc = getSessionSystemCoordinator();
+        SystemCoordinator ssc = getSystemCoordinator();
         
         ev.setPropertyID(rs.getInt("property_propertyid"));
         ev.setMuniCode(rs.getInt("municipality_municode"));

@@ -475,7 +475,10 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      
       
       public BOBSource getBOBSource(int sourceID) throws IntegrationException{
-        BOBSource bs = null;
+          if(sourceID == 0){
+              return null;
+          }
+          BOBSource bs = null;
           
           String query =    "   SELECT sourceid, title, description, creator, muni_municode, userattributable, \n" +
                             "           active, notes\n" +

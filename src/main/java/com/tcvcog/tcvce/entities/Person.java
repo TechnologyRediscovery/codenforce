@@ -35,11 +35,28 @@ public class Person extends EntityUtils implements Serializable{
     protected int personID;
     
     protected PersonType personType;
+    /**
+     * Used this to avoid cycles in Municipality creation
+     * but now with a super and subclass of muni, we don't need them
+     * @deprecated 
+     */
     protected int muniCode;
+    /**
+     * Used this to avoid cycles in Municipality creation
+     * but now with a super and subclass of muni, we don't need them
+     * @deprecated 
+     */
     protected String muniName;
     
+    private Municipality muni;
+    
     protected int sourceID;
-    protected String sourceTitle;
+    
+    protected BOBSource source;
+    
+    /**
+     * We don't use a User object here due to cycling
+     */
     protected int creatorUserID;
     protected LocalDateTime creationTimeStamp;
     
@@ -380,13 +397,6 @@ public class Person extends EntityUtils implements Serializable{
         return sourceID;
     }
 
-    /**
-     * @return the sourceTitle
-     */
-    public String getSourceTitle() {
-        return sourceTitle;
-    }
-
    
     /**
      * @return the businessEntity
@@ -448,14 +458,6 @@ public class Person extends EntityUtils implements Serializable{
         this.sourceID = sourceID;
     }
 
-    /**
-     * @param sourceTitle the sourceTitle to set
-     */
-    public void setSourceTitle(String sourceTitle) {
-        this.sourceTitle = sourceTitle;
-    }
-
-   
 
     /**
      * @param businessEntity the businessEntity to set
@@ -530,7 +532,6 @@ public class Person extends EntityUtils implements Serializable{
         hash = 79 * hash + this.personID;
         hash = 79 * hash + Objects.hashCode(this.personType);
         hash = 79 * hash + this.sourceID;
-        hash = 79 * hash + Objects.hashCode(this.sourceTitle);
         hash = 79 * hash + Objects.hashCode(this.firstName);
         hash = 79 * hash + Objects.hashCode(this.lastName);
         hash = 79 * hash + (this.compositeLastName ? 1 : 0);
@@ -914,6 +915,34 @@ public class Person extends EntityUtils implements Serializable{
      */
     public void setMergedList(ArrayList<Integer> mergedList) {
         this.mergedList = mergedList;
+    }
+
+    /**
+     * @return the muni
+     */
+    public Municipality getMuni() {
+        return muni;
+    }
+
+    /**
+     * @param muni the muni to set
+     */
+    public void setMuni(Municipality muni) {
+        this.muni = muni;
+    }
+
+    /**
+     * @return the source
+     */
+    public BOBSource getSource() {
+        return source;
+    }
+
+    /**
+     * @param source the source to set
+     */
+    public void setSource(BOBSource source) {
+        this.source = source;
     }
     
 

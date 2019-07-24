@@ -718,7 +718,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
         
         if(rs.getString("createdby") != null){
-            v.setCreatedBy(ui.getUser(rs.getString("createdby")));
+            v.setCreatedBy(ui.getUserID(rs.getString("createdby")));
         }
         
         v.setCeCaseID(rs.getInt("cecase_caseid"));
@@ -744,7 +744,7 @@ public class ViolationIntegrator extends BackingBeanUtils implements Serializabl
         v.setLeagacyImport(rs.getBoolean("legacyimport"));
         if(rs.getTimestamp("compliancetimestamp") != null){
             v.setComplianceTimeStamp(rs.getTimestamp("compliancetimestamp").toLocalDateTime());
-            v.setComplianceUser(ui.getUser("complianceUser"));
+            v.setComplianceUser(ui.getUserID("complianceUser"));
             
         }
         
