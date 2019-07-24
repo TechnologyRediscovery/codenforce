@@ -63,7 +63,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     // BOB individual object session shelves - NOT NULL
     private MunicipalityComplete sessionMuni;
     private CECase sessionCECase;
-    private User sessionUser;
+    private UserWithAccessData sessionUser;
     private Property sessionProperty;
     private Person sessionPerson;
     private OccPeriod sessionOccPeriod;
@@ -465,16 +465,16 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     /**
      * @return the sessionUser
      */
-    @Override
-    public User getSessionUser() {
+    
+    public UserWithAccessData getSessionUser() {
         return sessionUser;
     }
 
     /**
      * @param sessionUser the sessionUser to set
      */
-    @Override
-    public void setSessionUser(User sessionUser) {
+    
+    public void setSessionUser(UserWithAccessData sessionUser) {
         this.sessionUser = sessionUser;
     }
 

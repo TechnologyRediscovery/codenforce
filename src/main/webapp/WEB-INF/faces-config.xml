@@ -146,8 +146,8 @@
     
     
     <managed-bean>
-        <managed-bean-name>sessionSystemCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.SessionSystemCoordinator</managed-bean-class>
+        <managed-bean-name>systemCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.SystemCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
    
@@ -155,6 +155,12 @@
     <managed-bean>
         <managed-bean-name>codeCoordinator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.CodeCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>userCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.UserCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     

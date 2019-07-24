@@ -134,7 +134,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         
         Citation c = currentCitation;
-        c.setUserOwner(getSessionUser());
+        c.setUserOwner(getSessionBean().getSessionUser());
         try {
             cc.issueCitation(c);
               

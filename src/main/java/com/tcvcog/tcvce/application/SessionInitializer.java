@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
@@ -95,7 +96,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try {
-            User extractedUser = uc.getUser(getContainerAuthenticatedUser());
+            UserWithAccessData extractedUser = uc.getUserWithAccessData(getContainerAuthenticatedUser());
             if(extractedUser != null){
                 
                 ExternalContext ec = facesContext.getExternalContext();

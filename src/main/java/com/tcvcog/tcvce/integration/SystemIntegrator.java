@@ -664,14 +664,18 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return caseCountMap;
 
     }
-
-    public BOBSource getBOBSource(int sourceID) throws IntegrationException {
-        BOBSource bs = null;
-
-        String query = "   SELECT sourceid, title, description, creator, muni_municode, userattributable, \n"
-                + "           active, notes\n"
-                + "           FROM public.bobsource WHERE sourceid = ?;";
-
+     
+      
+      public BOBSource getBOBSource(int sourceID) throws IntegrationException{
+          if(sourceID == 0){
+              return null;
+          }
+          BOBSource bs = null;
+          
+          String query =    "   SELECT sourceid, title, description, creator, muni_municode, userattributable, \n" +
+                            "           active, notes\n" +
+                            "           FROM public.bobsource WHERE sourceid = ?;";
+        
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;

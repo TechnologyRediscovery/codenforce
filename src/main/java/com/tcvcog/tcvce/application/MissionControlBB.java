@@ -200,7 +200,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @return the user
      */
     public User getUser() {
-        user = getSessionUser();
+        user = getSessionBean().getSessionUser();
         if(user != null){
             System.out.println("MissionControlBB.getUser | facesUser: " + user.getPerson().getFirstName());
         }

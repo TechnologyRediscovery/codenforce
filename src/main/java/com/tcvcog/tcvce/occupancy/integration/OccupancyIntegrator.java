@@ -420,7 +420,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
 
         op.setType(getOccPeriodType(rs.getInt("type_typeid")));
-        op.setPeriodTypeCertifiedBy(ui.getUser("typecertifiedby_userid"));
+        op.setPeriodTypeCertifiedBy(ui.getUser(rs.getInt("typecertifiedby_userid")));
         op.setPeriodTypeCertifiedTS(rs.getTimestamp("typecertifiedts").toLocalDateTime());
 
         op.setStartDate(rs.getTimestamp("startdate").toLocalDateTime());

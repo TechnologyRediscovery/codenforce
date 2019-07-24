@@ -74,7 +74,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     public void logErrorPageLoad(){
         try {
-            getLogIntegrator().makeLogEntry(getSessionUser().getUserID(),
+            getLogIntegrator().makeLogEntry(getSessionBean().getSessionUser().getUserID(),
                     getSessionID(), 2, "error page hit", true, false);
         } catch (IntegrationException ex) {
             Logger.getLogger(SystemServicesBB.class.getName()).log(Level.SEVERE, null, ex);

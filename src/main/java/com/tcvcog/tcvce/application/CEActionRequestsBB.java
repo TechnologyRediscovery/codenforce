@@ -306,7 +306,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             }
 
             MessageBuilderParams mbp = new MessageBuilderParams();
-            mbp.user = getSessionUser();
+            mbp.user = getSessionBean().getSessionUser();
             mbp.existingContent = selectedRequest.getPublicExternalNotes();
             mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseHeader");
             mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("attachedToCaseExplanation");
@@ -343,7 +343,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         selectedCaseForAttachment = c;
         try {
-            ceari.connectActionRequestToCECase(selectedRequest.getRequestID(), selectedCaseForAttachment.getCaseID(), getSessionUser().getUserID());
+            ceari.connectActionRequestToCECase(selectedRequest.getRequestID(), selectedCaseForAttachment.getCaseID(), getSessionBean().getSessionUser().getUserID());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Successfully connected action request ID " + selectedRequest.getRequestID()
                     + " to code enforcement case ID " + selectedCaseForAttachment.getCaseID(), ""));
@@ -367,7 +367,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             // build message to document change
             MessageBuilderParams mcc = new MessageBuilderParams();
-            mcc.user = getSessionUser();
+            mcc.user = getSessionBean().getSessionUser();
             mcc.existingContent = selectedRequest.getPublicExternalNotes();
             mcc.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestHeader");
             mcc.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("invalidActionRequestExplanation");
@@ -401,7 +401,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             // build message to document change
             MessageBuilderParams mbp = new MessageBuilderParams();
-            mbp.user = getSessionUser();
+            mbp.user = getSessionBean().getSessionUser();
             mbp.existingContent = selectedRequest.getPublicExternalNotes();
             mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundHeader");
             mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("noViolationFoundExplanation");
@@ -506,7 +506,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
 
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionUser();
+        mbp.user = getSessionBean().getSessionUser();
         mbp.existingContent = selectedRequest.getPublicExternalNotes();
         mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedHeader");
         mbp.explanation = getResourceBundle(Constants.MESSAGE_TEXT).getString("propertyChangedExplanation");
@@ -574,7 +574,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionUser();
+        mbp.user = getSessionBean().getSessionUser();
         mbp.existingContent = selectedRequest.getCogInternalNotes();
         mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("internalNote");
         mbp.explanation = "";
@@ -599,7 +599,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionUser();
+        mbp.user = getSessionBean().getSessionUser();
         mbp.existingContent = selectedRequest.getMuniNotes();
         mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("muniNote");
         mbp.explanation = "";
@@ -623,7 +623,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.user = getSessionUser();
+        mbp.user = getSessionBean().getSessionUser();
         mbp.existingContent = selectedRequest.getPublicExternalNotes();
         mbp.header = getResourceBundle(Constants.MESSAGE_TEXT).getString("externalNote");
         mbp.explanation = "";

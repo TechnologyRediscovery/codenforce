@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -115,7 +115,7 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
     private Map<String, Integer> getCaseCountMap(){
         Map<String, Integer> caseCountMap = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        SessionSystemCoordinator ssc = getSessionSystemCoordinator();
+        SystemCoordinator ssc = getSystemCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         try {
              caseCountMap = si.getCaseCountsByPhase(getSessionBean().getSessionMuni().getMuniCode());

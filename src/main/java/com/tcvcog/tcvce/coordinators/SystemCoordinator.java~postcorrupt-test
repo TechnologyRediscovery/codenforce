@@ -18,13 +18,19 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -35,17 +41,50 @@ import java.util.Map;
  *
  * @author Eric C. Darsow
  */
-public class SessionSystemCoordinator extends BackingBeanUtils implements Serializable{
+public class SystemCoordinator extends BackingBeanUtils implements Serializable{
 
     private Map<Integer, String> muniCodeNameMap;
+    private final String SEPARATOR_LINE_TOP =       ">>>>>>>>>>>> NOTE >>>>>>>>>>>>";
+    private final String SEPARATOR_LINE_BOTTOM =    "<<<<<<<<<< END NOTE <<<<<<<<<<";
+    private final String INTERNAL_SEPARATOR =       "------------------------------";
+    private final String HTML_BREAK = "<br>";
+    private final String SPACE = " ";
     
+            
     /**
      * Creates a new instance of LoggingCoordinator
      */
-    public SessionSystemCoordinator() {
+    public SystemCoordinator() {
     }
     
     
+    public String formatAndAppendNote(User u, String noteToAppend, String existingText){
+        StringBuilder sb = new StringBuilder(existingText);
+        sb.append(HTML_BREAK);
+        sb.append(SEPARATOR_LINE_TOP);
+        sb.append(HTML_BREAK);
+
+        sb.append(noteToAppend);
+        
+        sb.append(INTERNAL_SEPARATOR);
+        sb.append("creator:");
+        sb.append(SPACE);
+        sb.append(u.getPerson().getFirstName());
+        sb.append(SPACE);
+        sb.append(u.getPerson().getLastName());
+        sb.append(SPACE);
+        sb.append("(user: ");
+        sb.append(u.getUsername());
+        sb.append(", id: ");
+        sb.append(u.getUserID());
+        sb.append(")");
+        sb.append(HTML_BREAK);
+        sb.append("timestamp: ");
+        sb.append(getPrettyDate(LocalDateTime.now()));
+        sb.append(SEPARATOR_LINE_BOTTOM);
+        
+        return sb.toString();
+    }
     
     
 
@@ -68,6 +107,19 @@ public class SessionSystemCoordinator extends BackingBeanUtils implements Serial
     }
     
     
+      public List<Municipality> getPermittedMunicipalityList(UserAuthorized user) throws IntegrationException{
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        List<Municipality> muniList = new ArrayList<>();
+        if(user.getKeyCard().getAuthRole() == RoleType.Developer){
+            muniList.addAll(mi.getMuniList());
+        } else {
+            muniList.add(user.getGoverningAuthPeriod().getMuni());
+        }
+        
+        return muniList;
+    }
+    
+  
 
     /**
      * @param muniCodeNameMap the muniCodeNameMap to set

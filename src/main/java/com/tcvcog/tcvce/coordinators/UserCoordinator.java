@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.RoleType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -37,8 +38,6 @@ import java.util.List;
  *
  * @author cedba
  */
-@ApplicationScoped
-@Named("userCoordinator")
 public class UserCoordinator extends BackingBeanUtils implements Serializable {
     final int MIN_PSSWD_LENGTH = 8;
     
@@ -61,29 +60,23 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.AuthorizationException occurs if the user
      * has been retrieved from the database but their access has been toggled off
      */
-    public User getUser(String loginName) throws IntegrationException, AuthorizationException{
+    public UserWithAccessData getUserWithAccessData(String loginName) throws IntegrationException, AuthorizationException{
         System.out.println("UserCoordinator.getUser | given by jboss: " + loginName );
-        User authenticatedUser;
+        UserWithAccessData authenticatedUser = null;
         UserIntegrator ui = getUserIntegrator();
-        authenticatedUser = ui.getUser(loginName);
-        Municipality m = ui.getUserDefaultMunicipality(authenticatedUser.getUserID());
-        User muniConfiguredUser = configureUserMuniAccess(authenticatedUser, m);
-        // as long as we have a User object, the User is allowed at least MuniReader access
-        if(muniConfiguredUser != null){
-            // set user permissions with the role type that comes from the DB
-            // which the Integrator sets
-            authenticatedUser.setKeyCard(acquireAccessKeyCard(muniConfiguredUser.getRoleType()));
-            return muniConfiguredUser;
-            
-        } else {
-            throw new AuthorizationException("User exists but access to system "
-                    + "has been switched off. If you believe you are receiving "
-                    + "this message in error, please contact system administrator "
-                    + "Eric Darsow at 412.923.9907.");
-        }
+        // convert the login name given to us by the JBoss container into a local ID num
+        int authUserID = ui.getUserID(loginName);
+        // use this id number to figure out which muni to grant initial auth to
+        Municipality m = ui.getUserDefaultMunicipality(authUserID);
+        // retrieve the access record from the DB for use in computing access permissions
+        authenticatedUser = ui.getUserWithAccessData(authUserID, m);
+        // now configure the user's permissions for this specific muni
+        configureUserMuniAccess(authenticatedUser, m);
+        // send back our lovely fancy UserWithAccessData
+        return authenticatedUser;
     }
     
-    private User configureUserMuniAccess(User u, Municipality m){
+    private User configureUserMuniAccess(UserWithAccessData u, Municipality m) throws AuthorizationException{
         
         if( m.getMuniCode() == u.getAccessRecord().getMuni_municode()
                 &&
@@ -116,9 +109,15 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                 } else {
                     u.setRoleType(RoleType.MuniReader);
                 }
+                
+                u.setKeyCard(getAccessKeyCard(u.getRoleType()));
+                
             return u;
         } else {
-            return null;
+            throw new AuthorizationException("User exists but access to system "
+                    + "has been switched off. If you believe you are receiving "
+                    + "this message in error, please contact system administrator "
+                    + "Eric Darsow at 412.923.9907.");
         }
     }
     
@@ -204,7 +203,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param rt
      * @return a User object whose access controls switches are configured
      */
-    private AccessKeyCard acquireAccessKeyCard(RoleType rt){
+    private AccessKeyCard getAccessKeyCard(RoleType rt){
         AccessKeyCard card = null;
         
         switch(rt){

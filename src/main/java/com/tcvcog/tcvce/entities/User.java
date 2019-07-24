@@ -35,11 +35,8 @@ public class User implements Serializable{
     
     private Person person;
     private int personID;
-    
-    private UserAccessRecord accessRecord;
-    
+
     private String notes;
-    private AccessKeyCard keyCard;
     
     private String badgeNumber;
     private String oriNumber;
@@ -112,24 +109,15 @@ public class User implements Serializable{
     public void setNotes(String notes) {
         this.notes = notes;
     }
-   
-    
-    
     // no setters for access permissions private variables!!
-
     /**
      * @return the keyCard
      */
-    public AccessKeyCard getKeyCard() {
-        return keyCard;
-    }
-
     /**
      * @param keyCard the keyCard to set
-     */
-    public void setKeyCard(AccessKeyCard keyCard) {
-        this.keyCard = keyCard;
-    }
+     */   
+    
+    
 
     /**
      * @param roleType the roleType to set
@@ -209,7 +197,6 @@ public class User implements Serializable{
         hash = 43 * hash + Objects.hashCode(this.person);
         hash = 43 * hash + this.personID;
         hash = 43 * hash + Objects.hashCode(this.notes);
-        hash = 43 * hash + Objects.hashCode(this.keyCard);
         hash = 43 * hash + Objects.hashCode(this.badgeNumber);
         hash = 43 * hash + Objects.hashCode(this.oriNumber);
         return hash;
@@ -233,19 +220,11 @@ public class User implements Serializable{
        
         return true;
     }
-
     /**
      * @return the accessRecord
      */
-    public UserAccessRecord getAccessRecord() {
-        return accessRecord;
-    }
-
     /**
      * @param accessRecord the accessRecord to set
      */
-    public void setAccessRecord(UserAccessRecord accessRecord) {
-        this.accessRecord = accessRecord;
-    }
     
 }

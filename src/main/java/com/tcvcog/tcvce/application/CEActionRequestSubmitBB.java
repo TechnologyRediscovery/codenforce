@@ -38,6 +38,7 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
@@ -125,9 +126,14 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // init new, empty photo list
         this.blobList = new ArrayList<>();    
         
-        if(facesUser != null && req != null && currentRequest.getRequestProperty() != null){
+        if(facesUser != null 
+                && 
+            req != null 
+                && 
+            currentRequest.getRequestProperty() != null){
             try {
-                personCandidateList = pi.getPropertyWithLists(currentRequest.getRequestProperty().getPropertyID()).getPersonList();
+                personCandidateList = pi.getPropertyWithLists(
+                        currentRequest.getRequestProperty().getPropertyID()).getPersonList();
             } catch (IntegrationException | CaseLifecyleException ex) {
                 System.out.println(ex);
             }
@@ -168,6 +174,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     
     public int insertActionRequestorNewPerson(Person p){
         PersonIntegrator personIntegrator = getPersonIntegrator();
+        p.setSourceID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestPublicUserPersonSourceID")));
         
         int insertedPersonID = 0;
         
@@ -233,7 +240,16 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         
     }
     
-    public String savePhotos(){
+    public String skipPhotoUpload(){
+        BlobCoordinator blobc = getBlobCoordinator();
+        SessionBean sb = getSessionBean();
+        
+        // before moving onto the person page, get a person's skeleton from the coordinator, put it
+        // in the session for use on the next page
+        setupPersonEntry();
+        return "requestorDetails";
+    }
+    public String savePhotosAndContinue(){
         BlobCoordinator blobc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
         
@@ -248,12 +264,14 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
         Person skel = pc.getNewPersonSkeleton(m);
-        try {
-            skel.setCreatorUserID(uc.getRobotUser().getUserID());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        skel.setSourceID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestPublicUserPersonSourceID")));
+//        try {
+//            skel.setCreatorUserID(uc.getRobotUser().getUserID());
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//        }
+//        skel.setSourceID(Integer.parseInt(
+//                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+//                .getString("actionRequestPublicUserPersonSourceID")));
         currentRequest.setRequestor(skel);
         getSessionBean().setCeactionRequestForSubmission(currentRequest);
     }
@@ -295,14 +313,15 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * action request is submitted online (submit button in submitCERequest
      * @return the page ID for navigation
      */
-    public String submitActionRequest() {
+    public String submitActionRequest() throws IntegrationException {
+        currentRequest = getSessionBean().getCeactionRequestForSubmission();
         
-        CEActionRequest req = currentRequest;
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         BlobIntegrator blobI = getBlobIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         SessionBean sb = getSessionBean();
         BlobIntegrator blobi = getBlobIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
         
         int submittedActionRequestID;
         int personID;
@@ -313,20 +332,34 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
         
-        try {
-            System.out.println("CEActionRequstsSubmitBB.submitActionRequest | inserting personID " + personID);
-            req.setActionRequestorPerson(pi.getPerson(personID));
-            System.out.println("CEActionRequstsSubmitBB.submitActionRequest | person injected into request ");
-        } catch (IntegrationException ex) {
-            System.out.println("CEActionRequestSubmitBB.submitActionRequest | Person insert error");
-            System.out.println(ex);
+        if(currentRequest.getRequestor().getPersonID() == 0){
+            if(getSessionBean().getSessionUser() != null){
+                currentRequest.getRequestor().setSource(
+                        si.getBOBSource(Integer.parseInt(
+                        getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("actionRequestNewPersonByInternalUserPersonSourceID"))));
+            } else {
+                currentRequest.getRequestor().setSource(
+                        si.getBOBSource(Integer.parseInt(
+                        getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("actionRequestPublicUserPersonSourceID"))));
+            }
+             personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
+            try {
+                currentRequest.setRequestor(pi.getPerson(personID));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+        } else {
+            
+            // do nothing, since we already have the person in the system
         }
         
         int controlCode = generateControlCodeFromTime();
-        req.setRequestPublicCC(controlCode);
+        currentRequest.setRequestPublicCC(controlCode);
         
         // all requests now are required to be at a known address
-        req.setIsAtKnownAddress(true);
+        currentRequest.setIsAtKnownAddress(true);
         
 //        if (form_atSpecificAddress){
 //            req.setRequestProperty(selectedProperty);
@@ -347,7 +380,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         try { 
             // send the request into the DB
-            submittedActionRequestID = ceari.submitCEActionRequest(req);
+            submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
             getSessionBean().setSessionCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
             
             // insert photos to db and link to request
