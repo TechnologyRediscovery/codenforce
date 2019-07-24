@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
-import com.tcvcog.tcvce.coordinators.SessionSystemCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
@@ -123,7 +123,7 @@ public class BackingBeanUtils implements Serializable{
     
     // system 
     private SystemIntegrator systemIntegrator;
-    private SessionSystemCoordinator ssCoordinator;
+    private SystemCoordinator systemCoordinator;
     private LogIntegrator logIntegrator;
     
     private SearchCoordinator searchCoordinator;
@@ -132,8 +132,6 @@ public class BackingBeanUtils implements Serializable{
     
     private DataSource dataSource;
     private Connection connx;
-    
-    
     
     /**
      * Creates a new instance of BackingBeanUtils
@@ -146,8 +144,6 @@ public class BackingBeanUtils implements Serializable{
         // it should be made by the MBCF
         //System.out.println("Constructing BackingBean Utils");
         //userCoordinator = new UserCoordinator();
-        
-       
         
     }
     
@@ -185,7 +181,6 @@ public class BackingBeanUtils implements Serializable{
         }
         return isInList;
     }
-    
     
     
     public void setUserCoordinator(UserCoordinator userCoordinator){
@@ -669,7 +664,7 @@ public class BackingBeanUtils implements Serializable{
     /**
      * @return the facesUser
      */
-    public User getSessionUser() {
+    public User getJBOSSUser() {
         ExternalContext ec = getFacesContext().getExternalContext();
         facesUser = (User) ec.getSessionMap().get("facesUser");
         return facesUser;
@@ -790,17 +785,17 @@ public class BackingBeanUtils implements Serializable{
         this.occupancyCoordinator = occupancyCoordiator;
     }
 /**
-     * @return the ssCoordinator
+     * @return the systemCoordinator
      */
-    public SessionSystemCoordinator getSessionSystemCoordinator() {
+    public SystemCoordinator getSystemCoordinator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{sessionSystemCoordinator}", SessionSystemCoordinator.class);
-        ssCoordinator = (SessionSystemCoordinator) ve.getValue(context.getELContext());
-        return ssCoordinator;
+                .createValueExpression(context.getELContext(), "#{systemCoordinator}", SystemCoordinator.class);
+        systemCoordinator = (SystemCoordinator) ve.getValue(context.getELContext());
+        return systemCoordinator;
     }
 /**
-     * @return the ssCoordinator
+     * @return the systemCoordinator
      */
     public DataCoordinator getDataCoordinator() {
         FacesContext context = getFacesContext();
@@ -811,10 +806,10 @@ public class BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param ssCoordinator the ssCoordinator to set
+     * @param systemCoordinator the systemCoordinator to set
      */
-    public void setSsCoordinator(SessionSystemCoordinator ssCoordinator) {
-        this.ssCoordinator = ssCoordinator;
+    public void setSystemCoordinator(SystemCoordinator systemCoordinator) {
+        this.systemCoordinator = systemCoordinator;
     }
 
     

@@ -212,7 +212,6 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setString(15, actionRequest.getPublicExternalNotes());
             stmt.setInt(16, Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("actionRequestInitialStatusCode")));
 
-            System.out.println("CEActionRequestIntegrator.submitCEActionRequest | sql: " + stmt.toString());
             stmt.execute();
             
             // grab the ID of the most recently inserted CEaction request to send

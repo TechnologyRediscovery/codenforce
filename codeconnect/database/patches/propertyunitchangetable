@@ -1,7 +1,5 @@
 ﻿/*changes to occupancypermitapplication table*/
 
-ALTER TABLE public.occupancypermitapplication ADD COLUMN person_personid integer;
-COMMENT ON COLUMN public.occupancypermitapplication.person_personid IS 'This is the Applicant''s ID #';
 
 ALTER TABLE public.occupancypermitapplication ADD COLUMN rental boolean;
 
@@ -23,7 +21,7 @@ CREATE TABLE public.propertyunitchange
   approvedby integer,
   changedby text,
   property_propertyid integer,
-  inactive timestamp with time zone,
+  active boolean,
   CONSTRAINT unitchangeid_pk PRIMARY KEY (unitchangeid)
 )
 WITH (

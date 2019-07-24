@@ -27,7 +27,10 @@
                             <p:outputLabel for="muniSelectMenu" value="Choose your municipality:"/>
                             <p:spacer height="5px"/>
                             
-                            <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{cEActionRequestSubmitBB.selectedMuni}">
+                            <p:selectOneMenu id="muniSelectMenu" 
+                                             tabindex="1" 
+                                             required="true"
+                                             value="#{cEActionRequestSubmitBB.selectedMuni}">
                                 <f:converter converterId="muniConverter"/>
                                 <f:selectItem itemLabel="select a municipality..." noSelectionOption="true" itemDisabled="true"/>
                                 <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />

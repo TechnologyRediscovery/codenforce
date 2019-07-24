@@ -20,16 +20,6 @@ ALTER TABLE moneycecasefeeassigned ADD
 	REFERENCES moneycodesetelementfee (fee_feeid, codesetelement_elementid);
 
 
-ALTER TABLE moneycecasefeeassigned ADD COLUMN
-	assignedby_userid 				INTEGER CONSTRAINT moneycodesetelementfee_assignedby_fk REFERENCES login (userid),
-  	assignedbyts 					TIMESTAMP WITH TIME ZONE,
-  	waivedby_userid		 			INTEGER CONSTRAINT moneycodesetelementfee_wavedbyuserid_fk REFERENCES login (userid),
-  	lastmodifiedts 					TIMESTAMP WITH TIME ZONE,
-  	reduceby 						MONEY,
-  	reduceby_userid					INTEGER CONSTRAINT moneycodesetelementfee_reducedbyuserid_fk REFERENCES login (userid),
-  	notes 							text;
-
-
 ALTER TABLE moneyoccperiodfeeassigned 
 
 	ADD COLUMN assignedby_userid 				INTEGER CONSTRAINT moneycodesetelementfee_assignedby_fk REFERENCES login (userid),

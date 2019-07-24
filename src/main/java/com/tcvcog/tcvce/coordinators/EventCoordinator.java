@@ -372,7 +372,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(updateViolationDescr);
         //even descr set by violation coordinator
-        event.setOwner(getSessionUser());
+        event.setOwner(getSessionBean().getSessionUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
         event.setActive(true);
@@ -481,7 +481,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setDateOfRecord(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setOwner(getSessionUser());
+        event.setOwner(getSessionBean().getSessionUser());
         event.setActive(true);
         
         cc.attachNewEventToCECase(currentCase, event, null);
@@ -533,7 +533,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setDateOfRecord(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setOwner(getSessionUser());
+        event.setOwner(getSessionBean().getSessionUser());
         event.setActive(true);
         
         cc.attachNewEventToCECase(currentCase, event, null);

@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
@@ -95,7 +96,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         try {
-            User extractedUser = uc.getUser(getContainerAuthenticatedUser());
+            UserWithAccessData extractedUser = uc.getUserWithAccessData(getContainerAuthenticatedUser());
             if(extractedUser != null){
                 
                 ExternalContext ec = facesContext.getExternalContext();
@@ -170,8 +171,8 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        
 //        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
-        sessionBean.setSessionCECase(caseInt.getPropertyInfoCase(m.getMuniOfficeProperty()));
-        sessionBean.setSessionProperty(m.getMuniOfficeProperty());
+        sessionBean.setSessionCECase(caseInt.getPropertyInfoCase(m.getMuniOfficePropertyId()));
+        sessionBean.setSessionProperty(propI.getProperty(m.getMuniOfficePropertyId()));
         sessionBean.setSessionPerson(u.getPerson());
         
 //        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
