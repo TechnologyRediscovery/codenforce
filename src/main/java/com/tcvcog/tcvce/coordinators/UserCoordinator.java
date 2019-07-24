@@ -76,43 +76,47 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         return authenticatedUser;
     }
     
-    private User configureUserMuniAccess(UserWithAccessData u, Municipality m) throws AuthorizationException{
+    private User configureUserMuniAccess(UserWithAccessData userWAccess, Municipality m) throws AuthorizationException{
         
-        if( m.getMuniCode() == u.getAccessRecord().getMuni_municode()
+        if(userWAccess == null || m == null){
+            throw new AuthorizationException("UserCoordinator.configureUserMuniAccess | Incoming user or muni is null");
+        }
+        
+        if( m.getMuniCode() == userWAccess.getAccessRecord().getMuni_municode()
                 &&
-            u.getAccessRecord().getAccessgranteddatestart().isBefore(LocalDateTime.now())
+            userWAccess.getAccessRecord().getAccessgranteddatestart().isBefore(LocalDateTime.now())
                 &&
-            u.getAccessRecord().getAccessgranteddatestop().isAfter(LocalDateTime.now())
+            userWAccess.getAccessRecord().getAccessgranteddatestop().isAfter(LocalDateTime.now())
                 &&
-            u.getAccessRecord().getRecorddeactivatedts() != null){
+            userWAccess.getAccessRecord().getRecorddeactivatedts() != null){
             
                 // the current user is allowed access to this muni, so now determine RoleType
                 // based on assigned start and stop dates for various roles as specified in the
                 // current UserAccessRecord
-                if(u.getAccessRecord().getSupportstartdate().isBefore(LocalDateTime.now())
+                if(userWAccess.getAccessRecord().getSupportstartdate().isBefore(LocalDateTime.now())
                         &&
-                    u.getAccessRecord().getSupportstopdate().isAfter(LocalDateTime.now())){
-                    u.setRoleType(RoleType.Developer);
-                } else if(u.getAccessRecord().getSysadminstartdate().isBefore(LocalDateTime.now())
+                    userWAccess.getAccessRecord().getSupportstopdate().isAfter(LocalDateTime.now())){
+                    userWAccess.setRoleType(RoleType.Developer);
+                } else if(userWAccess.getAccessRecord().getSysadminstartdate().isBefore(LocalDateTime.now())
                         &&
-                    u.getAccessRecord().getSysadminstopdate().isAfter(LocalDateTime.now())){
-                    u.setRoleType(RoleType.SysAdmin);
+                    userWAccess.getAccessRecord().getSysadminstopdate().isAfter(LocalDateTime.now())){
+                    userWAccess.setRoleType(RoleType.SysAdmin);
                     
-                } else if(u.getAccessRecord().getCodeofficerstartdate().isBefore(LocalDateTime.now())
+                } else if(userWAccess.getAccessRecord().getCodeofficerstartdate().isBefore(LocalDateTime.now())
                         &&
-                    u.getAccessRecord().getCodeofficerstopdate().isAfter(LocalDateTime.now())){
-                    u.setRoleType(RoleType.EnforcementOfficial);
-                } else if(u.getAccessRecord().getStaffstartdate().isBefore(LocalDateTime.now())
+                    userWAccess.getAccessRecord().getCodeofficerstopdate().isAfter(LocalDateTime.now())){
+                    userWAccess.setRoleType(RoleType.EnforcementOfficial);
+                } else if(userWAccess.getAccessRecord().getStaffstartdate().isBefore(LocalDateTime.now())
                         &&
-                    u.getAccessRecord().getStaffstopdate().isAfter(LocalDateTime.now())){
-                    u.setRoleType(RoleType.MuniStaff);
+                    userWAccess.getAccessRecord().getStaffstopdate().isAfter(LocalDateTime.now())){
+                    userWAccess.setRoleType(RoleType.MuniStaff);
                 } else {
-                    u.setRoleType(RoleType.MuniReader);
+                    userWAccess.setRoleType(RoleType.MuniReader);
                 }
                 
-                u.setKeyCard(getAccessKeyCard(u.getRoleType()));
+                userWAccess.setKeyCard(getAccessKeyCard(userWAccess.getRoleType()));
                 
-            return u;
+            return userWAccess;
         } else {
             throw new AuthorizationException("User exists but access to system "
                     + "has been switched off. If you believe you are receiving "
@@ -173,12 +177,12 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
    
     
-    public Municipality getDefaultyMuni(User u) throws IntegrationException{
+    public Municipality getDefaultyMuni(User u) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
         return ui.getUserDefaultMunicipality(u.getUserID());
     }
     
-    public boolean setDefaultMuni(User u, Municipality m) throws IntegrationException{
+    public boolean setDefaultMuni(User u, Municipality m) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
         return ui.setDefaultMunicipality(u, m);
         

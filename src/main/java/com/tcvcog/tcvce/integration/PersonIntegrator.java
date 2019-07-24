@@ -167,6 +167,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             newPerson.setVerifiedByUserID(rs.getInt("humanverifiedby"));
             newPerson.setCompositeLastName(rs.getBoolean("compositelname"));
             newPerson.setSource(si.getBOBSource(rs.getInt("sourceid")));
+            
+            // avoiding cycles here by not storing the object
             newPerson.setCreatorUserID(rs.getInt("creator"));
             
             newPerson.setBusinessEntity(rs.getBoolean("businessentity"));

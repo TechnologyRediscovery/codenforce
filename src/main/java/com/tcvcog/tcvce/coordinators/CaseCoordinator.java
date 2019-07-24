@@ -817,7 +817,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     
    
     
-    public void novResetMailing(NoticeOfViolation nov, User user) throws IntegrationException, PermissionsException{
+    public void novResetMailing(NoticeOfViolation nov, UserWithAccessData user) throws IntegrationException, PermissionsException{
         ViolationIntegrator cvi = getCodeViolationIntegrator();
         if(user.getKeyCard().isHasSysAdminPermissions()){
             cvi.novResetMailingFieldsToNull(nov);
@@ -1042,7 +1042,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     */
    public boolean determineCEActionRequestRoutingActionEnabledStatus(
                                                         CEActionRequest req,
-                                                        User u ){
+                                                        UserWithAccessData u ){
        if(req != null && u.getKeyCard() != null){
             if((
                     req.getRequestStatus().getStatusID() == 

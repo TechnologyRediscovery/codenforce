@@ -176,7 +176,7 @@ public class PersonAddBB extends BackingBeanUtils implements Serializable {
         
         temp.setEmail(formEmail);
         
-        getSessionBean().getOccPermitApplication().getAttachedPersons().add(temp);
+        getSessionBean().getSessionOccPermitApplication().getAttachedPersons().add(temp);
         
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();

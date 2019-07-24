@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -66,7 +67,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         User newUser = null;
         // broken query
-        String query =  "   SELECT userid, username notes, personlink \n" +
+        String query =  "   SELECT userid, username, notes, personlink \n" +
                         "   FROM public.login WHERE userid = ?;";
         
         PreparedStatement stmt = null;
@@ -91,9 +92,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         return newUser;
     }
     
-    public UserWithAccessData getUserWithAccessData(int userID, Municipality m) throws IntegrationException{
+    public UserWithAccessData getUserWithAccessData(int userID, Municipality m) throws IntegrationException, AuthorizationException{
         if(userID == 0){
-            return null;
+            throw new AuthorizationException("UserIntegrator.getUserWithAccessData | incoming userID = 0");
         }
         
         Connection con = getPostgresCon();
@@ -141,9 +142,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setUserID(rs.getInt("userid"));
             user.setUsername(rs.getString("username"));
             user.setNotes(rs.getString("notes"));
-            
             user.setPerson(pi.getPerson(rs.getInt("personlink")));
-            
         } catch (SQLException ex) {
             throw new IntegrationException("Cannot create user", ex);
         }
@@ -152,8 +151,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     private UserWithAccessData generateUserWithAccessData(ResultSet rs, Municipality muni) throws IntegrationException{
-            UserCoordinator uc = getUserCoordinator();
-            MunicipalityIntegrator mi = getMunicipalityIntegrator();
             UserWithAccessData user = new UserWithAccessData(generateUser(rs));
             user.setAccessRecord(getUserAccessRecord(user, muni));
             return user;
@@ -209,18 +206,44 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         rec.setMuni_municode(rs.getInt("muni_municode"));
         rec.setMuni_municode(rs.getInt("userid"));
         rec.setDefaultmuni(rs.getBoolean("defaultmuni"));
-        rec.setAccessgranteddatestart(rs.getTimestamp("accessgranteddatestart").toLocalDateTime());
-        rec.setAccessgranteddatestop(rs.getTimestamp("accessgranteddatestop").toLocalDateTime());
         
-        rec.setCodeofficerstartdate(rs.getTimestamp("codeofficerstartdate").toLocalDateTime());
-        rec.setCodeofficerstopdate(rs.getTimestamp("codeofficerstopdate").toLocalDateTime());
-        rec.setStaffstartdate(rs.getTimestamp("staffstartdate").toLocalDateTime());
-        rec.setStaffstopdate(rs.getTimestamp("staffstopdate").toLocalDateTime());
         
-        rec.setSysadminstartdate(rs.getTimestamp("sysadminstartdate").toLocalDateTime());
-        rec.setSysadminstopdate(rs.getTimestamp("sysadminstopdate").toLocalDateTime());
-        rec.setSupportstartdate(rs.getTimestamp("supportstartdate").toLocalDateTime());
-        rec.setSupportstopdate(rs.getTimestamp("supportstopdate").toLocalDateTime());
+        if(rs.getTimestamp("accessgranteddatestart") != null){
+            rec.setAccessgranteddatestart(rs.getTimestamp("accessgranteddatestart").toLocalDateTime());
+        }
+        if(rs.getTimestamp("accessgranteddatestop") != null){
+            rec.setAccessgranteddatestop(rs.getTimestamp("accessgranteddatestop").toLocalDateTime());
+        }
+        
+        if(rs.getTimestamp("codeofficerstartdate") != null){
+            rec.setCodeofficerstartdate(rs.getTimestamp("codeofficerstartdate").toLocalDateTime());
+        }
+        if(rs.getTimestamp("codeofficerstopdate") != null){
+            rec.setCodeofficerstopdate(rs.getTimestamp("codeofficerstopdate").toLocalDateTime());
+            
+        }
+        if(rs.getTimestamp("staffstartdate") != null){
+            rec.setStaffstartdate(rs.getTimestamp("staffstartdate").toLocalDateTime());
+        }
+        if(rs.getTimestamp("staffstopdate") != null){
+            rec.setStaffstopdate(rs.getTimestamp("staffstopdate").toLocalDateTime());
+            
+        }
+        
+        if(rs.getTimestamp("sysadminstartdate") != null){
+            rec.setSysadminstartdate(rs.getTimestamp("sysadminstartdate").toLocalDateTime());
+        }
+        if(rs.getTimestamp("sysadminstopdate") != null){
+            rec.setSysadminstopdate(rs.getTimestamp("sysadminstopdate").toLocalDateTime());
+        }
+            
+        if(rs.getTimestamp("supportstartdate") != null){
+            rec.setSupportstartdate(rs.getTimestamp("supportstartdate").toLocalDateTime());
+        }
+        
+        if(rs.getTimestamp("supportsenddate") != null){
+            rec.setSupportstopdate(rs.getTimestamp("supportstopdate").toLocalDateTime());
+        }
         
         rec.setMuni_municode(rs.getInt("codeofficerassignmentorder"));
         rec.setMuni_municode(rs.getInt("staffassignmentorder"));
@@ -233,7 +256,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         rec.setMuni_municode(rs.getInt("bypasssysadminassignmentorder"));
         rec.setMuni_municode(rs.getInt("bypasssupportassignmentorder"));
         
-        rec.setRecordcreatedts(rs.getTimestamp("recorddeactivatedts").toLocalDateTime());
+        if(rs.getTimestamp("recorddeactivatedts") != null){
+            rec.setRecordcreatedts(rs.getTimestamp("recorddeactivatedts").toLocalDateTime());
+        }
         rec.setRole(RoleType.valueOf("role"));
         rec.setMuniloginrecordid(rs.getInt("muniloginrecordid"));
         rec.setRecordcreatedts(rs.getTimestamp("recordcreatedts").toLocalDateTime());
@@ -290,11 +315,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public Municipality getUserDefaultMunicipality(int userID) throws IntegrationException{
+    public Municipality getUserDefaultMunicipality(int userID) throws IntegrationException, AuthorizationException{
         Connection con = getPostgresCon();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         ResultSet rs = null;
-        String query = "SELECT muni_municode FROM public.loginmuni "
+        String query = "SELECT muni_municode FROM public.munilogin "
                 + "WHERE userid=? AND defaultmuni=? AND recorddeactivatedts IS NULL "
                 + "             AND accessgranteddatestart < now() "
                 + "             AND accessgranteddatestop > now() "
@@ -331,6 +356,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
+        if(m == null){
+            throw new AuthorizationException("Could not load a default muni");
+        }
         return m;
     }
     
@@ -341,16 +369,21 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public boolean setDefaultMunicipality(User u, Municipality m) throws IntegrationException{
+    public boolean setDefaultMunicipality(User u, Municipality m) throws IntegrationException, AuthorizationException{
         Connection con = getPostgresCon();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         ResultSet rs = null;
         boolean defaultSet = false;
-        String query = "UPDATE loginmuni SET defaultmuni = TRUE "
+        String queryTurnOffDefaults = "UPDATE munilogin SET defaultmuni = FALSE "
+                + "WHERE USERID = ?;";
+        String query = "UPDATE munilogin SET defaultmuni = TRUE "
                 + "WHERE USERID = ? AND MUNI_MUNICODE = ?;";
         PreparedStatement stmt = null;
         
         try {
+            stmt = con.prepareStatement(queryTurnOffDefaults);
+            stmt.setInt(1, u.getUserID());
+            stmt.executeUpdate();
+            
             stmt = con.prepareStatement(query);
             stmt.setInt(1, u.getUserID());
             stmt.setInt(2, m.getMuniCode());
