@@ -66,6 +66,8 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     
     public void queryIntensityClasses(ActionEvent e){
         
+        System.out.println("Intensity Classes Queried!");
+        
         if(selectedSchema != null){
             
             SystemIntegrator si = new SystemIntegrator();

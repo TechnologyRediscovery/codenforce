@@ -23,29 +23,30 @@
                         <h1>Intensity Profile</h1>
                         <p>Edit, create, and remove Intensity Classes.</p>
                         <p:spacer height="10px"/>
-                        <p>Choose an Intensity category:</p>
+                        <p>Choose an Intensity Schema:</p>
 
                         <p:spacer height="5px"/>
 
-                        <p:selectOneMenu id="intensityCategoryMenu" value="#{intensityBB.selectedSchema}">
-                            <f:selectItems id="paymentTypeList" value="#{intensityBB.schemaList}" var="ct" itemValue="#{ct}" itemLabel="#{ct.label}"/>
-                        </p:selectOneMenu>
-                        <p:commandButton value="Get Intensity Classes" ajax="true" action="#{intensityBB.queryIntensityClasses()}"/>
-
-                        <p:spacer height="10px"/>
-                        <hr/>
-                        <p:spacer height="10px"/>
-
-
-                        <h2>Intensity Classes for the selected category</h2>
-
                         <h:form id="classesViewForm">
+
+                            <p:selectOneMenu id="intensitySchemaMenu" value="#{intensityBB.selectedSchema}">
+                                <f:selectItems id="paymentTypeList" value="#{intensityBB.schemaList}" var="ct" itemValue="#{ct}" itemLabel="#{ct.label}"/>
+                            </p:selectOneMenu>
+                            <p:commandButton id="queryClassesButton" value="Get Intensity Classes" ajax="true" action="#{intensityBB.queryIntensityClasses()}" update="classTable"/>
+
+                            <p:spacer height="10px"/>
+                            <hr/>
+                            <p:spacer height="10px"/>
+
+
+                            <h2>Intensity Classes for the selected Schema</h2>
+
+
                             <p:spacer height="10px"/>
                             <p:dataTable
                                 id="classTable"
                                 var="c"
                                 rowKey="#{c.classID}"
-                                rowExpandMode="multiple"
                                 value="#{intensityBB.existingIntensityList}"
                                 tableStyleClass="primeDataTable"
                                 selection="#{intensityBB.selectedIntensityClass}">
@@ -123,7 +124,7 @@
                                          cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
                                          footerClass="gridFooter">
 
-                                <h:outputLabel value="Class ID:" for="classID"/>
+                                <h:outputLabel value="Class ID:" for="ClassID"/>
                                 <h:panelGroup>
                                     <p:inputText id="classID" value="#{intensityBB.workingIntensityClass.classID}"
                                                  style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
@@ -136,13 +137,13 @@
                                         <h:outputText value="Class Title:"/>
                                     </p:outputLabel>
                                     <h:panelGroup>
-                                        <p:inputText id="classID" value="#{intensityBB.workingIntensityClass.title}"
+                                        <p:inputText id="classTitle" value="#{intensityBB.workingIntensityClass.title}"
                                                      style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
                                     </h:panelGroup>
                                 </ui:remove>
 
                                 <h:outputLabel value="Municipality:" for="classMuni"/>
-                                <h:panelGroup>
+                                <h:panelGroup id="classMuni">
 
                                     <p:selectOneMenu
                                         id="muniSM" tabindex="6"
@@ -163,7 +164,7 @@
                                 <h:outputLabel value="Numeric Rating" for="classRating"/>
                                 <h:panelGroup>
 
-                                    <p:inputText id="classID" value="#{intensityBB.workingIntensityClass.numericRating}"
+                                    <p:inputText id="classRating" value="#{intensityBB.workingIntensityClass.numericRating}"
                                                  style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
 
 
@@ -174,7 +175,7 @@
 
                                 <h:outputLabel value="Active?" for="classActive"/>
                                 <h:panelGroup>
-                                    <p:inputSwitch id="newPaymentCleared" value="#{intensityBB.workingIntensityClass.active}"
+                                    <p:inputSwitch id="classActive" value="#{intensityBB.workingIntensityClass.active}"
                                                    tabindex="13" onLabel="Yes" offLabel="No"/>
                                     <h:message for="classActive" showDetail="false" showSummary="true"
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
