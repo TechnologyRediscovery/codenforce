@@ -29,10 +29,13 @@
 
                         <h:form id="classesViewForm">
 
-                            <p:selectOneMenu id="intensitySchemaMenu" value="#{intensityBB.selectedSchema}">
+                            <p:selectOneMenu id="intensitySchemaMenu" value="#{intensityBB.selectedSchema}" converter="intensitySchemaConverter">
                                 <f:selectItems id="paymentTypeList" value="#{intensityBB.schemaList}" var="ct" itemValue="#{ct}" itemLabel="#{ct.label}"/>
                             </p:selectOneMenu>
-                            <p:commandButton id="queryClassesButton" value="Get Intensity Classes" ajax="true" action="#{intensityBB.queryIntensityClasses()}" update="classTable"/>
+                            <p:commandButton id="queryClassesButton"
+                                             value="Get Intensity Classes" ajax="true" 
+                                             action="#{intensityBB.queryIntensityClasses()}" 
+                                             update="classTable"/>
 
                             <p:spacer height="10px"/>
                             <hr/>
@@ -49,6 +52,7 @@
                                 rowKey="#{c.classID}"
                                 value="#{intensityBB.existingIntensityList}"
                                 tableStyleClass="primeDataTable"
+                                selectionMode="single"
                                 selection="#{intensityBB.selectedIntensityClass}">
 
 
@@ -94,6 +98,7 @@
 
 
                             </p:dataTable>
+                            <p:spacer height="10"/>
 
                             <p:commandButton ajax="false"
                                              actionListener="#{intensityBB.editIntensity}"
@@ -126,8 +131,8 @@
 
                                 <h:outputLabel value="Class ID:" for="ClassID"/>
                                 <h:panelGroup>
-                                    <p:inputText id="classID" value="#{intensityBB.workingIntensityClass.classID}"
-                                                 style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
+                                    <p:inputText id="classID" value="#{intensityBB.workingIntensityClass.classID}" disabled="#{intensityBB.editing}"
+                                                 style="width: 250px;" tabindex="4" required="true" styleClass="inputText" maxlength="100"/>
                                     <h:message for="classID" showDetail="false" showSummary="true"
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -165,7 +170,7 @@
                                 <h:panelGroup>
 
                                     <p:inputText id="classRating" value="#{intensityBB.workingIntensityClass.numericRating}"
-                                                 style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
+                                                 style="width: 250px;" tabindex="4" required="true" styleClass="inputText" maxlength="100"/>
 
 
                                     <h:message for="classRating" showDetail="true" showSummary="true"
@@ -181,12 +186,15 @@
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
 
-
-
-                                <p:spacer height="15"/>
+                                <p:spacer height="10"/>
 
                             </h:panelGrid>
 
+                            <p:commandButton ajax="false" rendered="#{intensityBB.editing}"
+                                             actionListener="#{intensityBB.commitEdits()}"
+                                             value="Commit Updates" tabindex="2"/>
+
+                            <p:spacer height="15"/>
 
                         </h:form>
 

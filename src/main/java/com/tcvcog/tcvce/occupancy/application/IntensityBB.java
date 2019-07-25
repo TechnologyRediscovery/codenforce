@@ -39,12 +39,21 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     private IntensitySchema selectedSchema;
     private ArrayList<IntensitySchema> schemaList;
     
+    private boolean editing;
+    
     public IntensityBB() {
         
     }
     
     @PostConstruct
     public void initBean() {
+        
+        if (workingIntensityClass == null) {
+            
+            workingIntensityClass = new Intensity();
+
+            
+        }
         
     }
 
@@ -57,6 +66,8 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
             workingIntensityClass.setSchema(selectedIntensityClass.getSchema());
             workingIntensityClass.setActive(selectedIntensityClass.isActive());
             workingIntensityClass.setIcon(selectedIntensityClass.getIcon());
+            
+            editing = true;
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -64,7 +75,29 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-    public void queryIntensityClasses(ActionEvent e){
+    public void commitEdits() {
+        
+        SystemIntegrator si = new SystemIntegrator();
+        
+        try{
+            si.updateIntensityClass(workingIntensityClass);
+            
+            workingIntensityClass = new Intensity();
+            
+            queryIntensityClasses();
+            
+            editing = false;
+        } catch (IntegrationException ex){
+            System.out.println(ex.toString());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to update Intensity Classes.",
+                    "This must be corrected by the System Administrator"));
+        }
+        
+    }
+    
+    public void queryIntensityClasses(){
         
         System.out.println("Intensity Classes Queried!");
         
@@ -148,7 +181,16 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     public void setSelectedIntensityClass(Intensity selectedIntensityClass) {
         this.selectedIntensityClass = selectedIntensityClass;
     }
+
+    public boolean isEditing() {
+        return editing;
+    }
+
+    public void setEditing(boolean editing) {
+        this.editing = editing;
+    }
             
+    
     
     
 }
