@@ -802,7 +802,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
     public void updateIntensityClass(Intensity intsty) throws IntegrationException {
 
         String query = "UPDATE public.intensityclass\n"
-                + "SET classid=?, title=?, muni_municode=?, numericrating=?,\n"
+                + "SET title=?, muni_municode=?, numericrating=?,\n"
                 + "schemaname=?, active=?, icon_iconid=?\n"
                 + "WHERE classid=?;";
 
@@ -811,13 +811,13 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, intsty.getClassID());
-            stmt.setString(2, intsty.getTitle());
-            stmt.setInt(3, intsty.getMuni().getMuniCode());
-            stmt.setInt(4, intsty.getNumericRating());
-            stmt.setString(5, intsty.getSchema().getLabel());
-            stmt.setBoolean(6, intsty.isActive());
-            stmt.setInt(7, intsty.getIcon().getIconid());
+            stmt.setString(1, intsty.getTitle());
+            stmt.setInt(2, intsty.getMuni().getMuniCode());
+            stmt.setInt(3, intsty.getNumericRating());
+            stmt.setString(4, intsty.getSchema().getLabel());
+            stmt.setBoolean(5, intsty.isActive());
+            stmt.setInt(6, intsty.getIcon().getIconid());
+            stmt.setInt(7, intsty.getClassID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
