@@ -1164,7 +1164,7 @@
                                 <p:commandButton ajax="false" icon="fa fa-paper-plane"
                                                  action="#{caseProfileBB.createNewNotice}"
                                                  value="Create new notice of violation letter"
-                                                 rendersessionUsersionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                  disabled="false"
                                                  />
                                 <p:spacer height="5px"/>
@@ -1256,7 +1256,7 @@
                                                              value="Nuke notice" styleClass="noFill"
                                                              icon="fa fa-bomb" 
                                                              disabled="#{!(empty notice.lockedAndqueuedTS)}"
-                                                             rendsessionUseressionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                             rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                              update="notices-messages-form:notices-messages-global
                                                              notices-ds"/>
                                         </h:panelGroup>
@@ -1398,7 +1398,7 @@
                                                          action="#{caseProfileBB.updateCitation(citation)}"
                                                          value="edit"
                                                          icon="fa fa-edit"
-                                                       sessionUserd="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                         rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"/>
                                     </p:column>
 
                                     <p:rowExpansion>
@@ -1615,7 +1615,7 @@
                                  height="650" width="900"
                                  widgetVar="add-event-dialog-var"
                                  closable="true" 
-                             sessionUserred="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}">
 
 
                         <h:form id="addNewEventForm">
@@ -1875,7 +1875,7 @@
                                                  value="Create new event" icon="fa fa-plus"
                                                  oncomplete="PF('add-event-dialog-var').hide()"
                                                  disabled="#{!(caseProfileBB.selectedEvent.eventID == 0)}"
-                                           sessionUserdered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                  update="
                                                  case-details-form
                                                  event-dt-form:caseEventTable
@@ -1886,7 +1886,7 @@
                                 <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitEventEdits}"
                                                  value="Edit event" icon="fa fa-edit"
                                                  disabled="#{caseProfileBB.selectedEvent.eventID == 0}"
-                                         sessionUserendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                  oncomplete="PF('add-event-dialog-var').hide()"
                                                  update="
                                                  case-details-form
@@ -1917,7 +1917,7 @@
                                  height="650" width="900"
                                  widgetVar="edit-case-metadata-var"
                                  closable="true" 
-                     sessionUser   rendered="#{sessionBean.facesUser.keyCard.hasMuniStaffPermissions}">
+                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}">
 
                         <h:outputText value="You are editing case no. #{caseProfileBB.currentCase.caseID}"/>
                         <p:spacer height="10px"/>
@@ -2013,7 +2013,7 @@
                             <p:commandButton value="Abort override" onclick="PF('phase-override').hide()" type="button" icon="fa fa-stop"/>
 
                             <p:commandButton ajax="true" 
-                                     sessionUserendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                             rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                              actionListener="#{caseProfileBB.overrideCasePhase}" 
                                              icon="fa fa-bullhorn"
                                              value="Override phase" 
@@ -2087,7 +2087,7 @@
                     <p:confirmDialog message="Reject action request" 
                                      severity="alert" widgetVar="reject-requested-action-diaglog-var"
                                      closable="true" responsive="true"
-                       sessionUser     rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}">
+                                     rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}">
 
                         <h:form id="muni-message-form">
                             <h:outputLabel for="rejection-reason" value="Reason for rejecting request:"/>
@@ -2100,7 +2100,7 @@
 
                             <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitActionRequestRejection}"
                                              value="Submit" icon="fa fa-thumbs-down" oncomplete="PF('reject-requested-action-diaglog-var').hide()"
-                             sessionUser       rendered="#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                             rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                              update="event-dt-form:caseEventTable
                                              case-profile-messages-form:case-profile-messages-global    
                                              events-datascroller-form
@@ -2215,7 +2215,7 @@
 
                             <p:commandButton ajax="true" action="#{caseProfileBB.generateReportCECase}"
                                              value="Generate" icon="fa fa-print" 
-                                             renderedsessionUseronBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                             rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
                                              />
 
                         </h:form>
@@ -2225,7 +2225,7 @@
                     <p:confirmDialog message="Create case list report" 
                                      severity="alert" widgetVar="report-caselist-profile-diaglog-var"
                                      closable="true" responsive="true"
-                                     rendersessionUsersionBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                                     rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}">
 
                         <h:form id="report-caselist-profile-form">
 
@@ -2288,7 +2288,7 @@
 
                             <p:commandButton ajax="true" action="#{caseProfileBB.generateReportCECaseList}"
                                              value="Generate" icon="fa fa-print" 
-                                             rendsessionUseressionBean.facesUser.keyCard.hasMuniReaderPermissions}"
+                                             rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
                                              />
 
                         </h:form>

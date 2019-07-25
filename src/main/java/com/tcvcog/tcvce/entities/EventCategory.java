@@ -45,6 +45,7 @@ public class EventCategory implements Serializable {
     
     private int relativeOrderWithinType;
     private int relativeOrderGlobal;
+    
     private String hostEventDescriptionSuggestedText;
     
     /**

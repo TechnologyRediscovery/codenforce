@@ -71,7 +71,7 @@
                                             <h:outputText value="Municipality"/>
                                         </p:outputLabel>
                                         <p:spacer height="5px"/>
-                                        <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuniCode}">
+                                        <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuni}">
                                             <f:selectItems value="#{sessionBeasessionUserer.authMunis}"/>
                                         </p:selectOneMenu>
                                         <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 

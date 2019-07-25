@@ -620,7 +620,79 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             
          } // close switch
     } // close method
+
+    private boolean evalulateEventRule(CECase cse, CECaseEvent event) throws IntegrationException, CaseLifecyleException, ViolationException {
+        EventRuleAbstract rule = new EventRuleAbstract();
+        boolean rulePasses = false;
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if (ruleSubcheck_requiredEventType(cse, rule) 
+                && 
+            ruleSubcheck_forbiddenEventType(cse, rule) 
+                && 
+            ruleSubcheck_requiredEventCategory(cse, rule) 
+                && 
+            ruleSubcheck_forbiddenEventCategory(cse, rule)) {
+                rulePasses = true;
+                cc.implementPassedCasePhaseChangeRule(cse, rule);
+        }
+        return rulePasses;
+    }
     
+    private boolean ruleSubcheck_requiredEventCategory(CECase cse, EventRuleAbstract rule) {
+        boolean subcheckPasses = true;
+        if (rule.getRequiredEventCat().getCategoryID() != 0) {
+            subcheckPasses = false;
+            Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
+            while (iter.hasNext()) {
+                CECaseEvent ev = iter.next();
+                if (ev.getCategory().getCategoryID() == rule.getRequiredEventCat().getCategoryID()) {
+                    subcheckPasses = true;
+                }
+            }
+        }
+        return subcheckPasses;
+    }
+
+    private boolean ruleSubcheck_forbiddenEventType(CECase cse, EventRuleAbstract rule) {
+        boolean subcheckPasses = true;
+        Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
+        while (iter.hasNext()) {
+            CECaseEvent ev = iter.next();
+            if (ev.getCategory().getEventType() == rule.getRequiredeventtype()) {
+                subcheckPasses = false;
+            }
+        }
+        return subcheckPasses;
+    }
+
+    private boolean ruleSubcheck_requiredEventType(CECase cse, EventRuleAbstract rule) {
+        boolean subcheckPasses = true;
+        if (rule.getRequiredeventtype() != null) {
+            subcheckPasses = false;
+            Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
+            while (iter.hasNext()) {
+                CECaseEvent ev = iter.next();
+                if (ev.getCategory().getEventType() == rule.getRequiredeventtype()) {
+                    subcheckPasses = true;
+                }
+            }
+        }
+        return subcheckPasses;
+    }
+
+    private boolean ruleSubcheck_forbiddenEventCategory(CECase cse, EventRuleAbstract rule) {
+        boolean subcheckPasses = true;
+        Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
+        while (iter.hasNext()) {
+            CECaseEvent ev = iter.next();
+            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCat().getCategoryID()) {
+                subcheckPasses = false;
+            }
+        }
+        return subcheckPasses;
+    }
+
    
     
     

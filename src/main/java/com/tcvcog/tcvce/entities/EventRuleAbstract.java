@@ -26,7 +26,6 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     protected int requiredeventcatthresholdglobalorder;
     protected boolean requiredeventcatupperboundglobalorder;
     
-    
     protected int forbiddeneventcatthresholdtypeintorder;
     protected boolean forbiddeneventcatupperboundtypeintorder;
     
@@ -35,6 +34,7 @@ public class EventRuleAbstract extends EntityUtils implements Serializable {
     
     protected boolean mandatorypassreqtocloseentity;
     protected boolean autoremoveonentityclose;
+    
     protected Proposal promptingProposal;
     
     protected EventCategory triggeredeventcatonpass;

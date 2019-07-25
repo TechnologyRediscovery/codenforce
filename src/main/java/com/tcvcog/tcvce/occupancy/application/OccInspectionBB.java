@@ -52,14 +52,14 @@ import javax.faces.event.ActionEvent;
  * 
  * @author mced ghost
  */
-public class InspectionsBB extends BackingBeanUtils implements Serializable {
+public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 
     private OccInspection currentInspection;
     
     /**
      * Creates a new instance of InspectionsBB
      */
-    public InspectionsBB() {
+    public OccInspectionBB() {
     }
     
     /**
