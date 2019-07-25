@@ -78,7 +78,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            this.currProp = pi.getPropertyWithLists(getSessionBean().getSessionPropertyList().get(0).getPropertyID());
+            this.currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID());
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }

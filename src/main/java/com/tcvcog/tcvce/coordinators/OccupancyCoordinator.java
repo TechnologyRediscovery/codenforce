@@ -80,6 +80,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * Supervises the creation of a new Occupancy Inspection object in the database.
      * The designed flow would be the backing bean calls getOccInspectionSkeleton() and 
      * sets member variables on there and then passes it into this method.
+     * 
      * @param in A skeleton of an OccInspection without an ID number
      * @param period the OccPeriod to which the OccInspection should be linked
      * @param templ The template from which the Inspection will draw its SpaceTypes
