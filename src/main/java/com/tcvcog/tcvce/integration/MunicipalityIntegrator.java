@@ -58,7 +58,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query =  "    SELECT municode, muniname, address_street, address_city, address_state, \n" +
                         "       address_zip, phone, fax, email, population, activeinprogram, \n" +
                         "       defaultcodeset, occpermitissuingsource_sourceid, novprintstyle_styleid, \n" +
-                        "       profile_profileid, enablecodeenformcent, enableoccupancy, enablepublicceactionreqsub, \n" +
+                        "       profile_profileid, enablecodeenforcement, enableoccupancy, enablepublicceactionreqsub, \n" +
                         "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
                         "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
                         "       lastupdated_userid, primarystaffcontact_userid\n" +
@@ -97,7 +97,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query =  "    SELECT municode, muniname, address_street, address_city, address_state, \n" +
                         "       address_zip, phone, fax, email, population, activeinprogram, \n" +
                         "       defaultcodeset, occpermitissuingsource_sourceid, novprintstyle_styleid, \n" +
-                        "       profile_profileid, enablecodeenformcent, enableoccupancy, enablepublicceactionreqsub, \n" +
+                        "       profile_profileid, enablecodeenforcement, enableoccupancy, enablepublicceactionreqsub, \n" +
                         "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
                         "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
                         "       lastupdated_userid, primarystaffcontact_userid\n" +
@@ -174,7 +174,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         muni.setMuniManager(ui.getUser(rs.getInt("munimanager_userid")));
         muni.setMuniOfficePropertyId(rs.getInt("office_propertyid"));
         muni.setNotes(rs.getString("notes"));
-        muni.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+        
+        if(rs.getTimestamp("lastupdatedts") != null){
+            muni.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+        }
         
         muni.setLastUpdaetdBy(ui.getUser(rs.getInt("lastupdated_userid")));
         muni.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
@@ -278,7 +281,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "   SET muniname=?, address_street=?, address_city=?, address_state=?, \n" +
                         "       address_zip=?, phone=?, fax=?, email=?, population=?, activeinprogram=?, \n" +
                         "       defaultcodeset=?, occpermitissuingsource_sourceid=?, novprintstyle_styleid=?, \n" +
-                        "       profile_profileid=?, enablecodeenformcent=?, enableoccupancy=?, \n" +
+                        "       profile_profileid=?, enablecodeenforcement=?, enableoccupancy=?, \n" +
                         "       enablepublicceactionreqsub=?, enablepublicceactionreqinfo=?, \n" +
                         "       enablepublicoccpermitapp=?, enablepublicoccinspectodo=?, munimanager_userid=?, \n" +
                         "       office_propertyid=?, notes=?, lastupdatedts=now(), lastupdated_userid=?, \n" +

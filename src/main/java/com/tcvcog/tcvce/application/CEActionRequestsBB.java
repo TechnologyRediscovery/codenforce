@@ -99,29 +99,28 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     @PostConstruct
     public void initBean() {
-//        SearchCoordinator sc = getSearchCoordinator();
-//
-//        QueryCEAR sessionQuery = getSessionBean().getSessionQueryCEAR();
-//
-//        selectedRequest = getSessionBean().getSessionCEAR();
-//
-//        try {
-//            requestList = sc.runQuery(sessionQuery).getResults();
-//            if (selectedRequest == null && requestList.size() > 0) {
-//                selectedRequest = requestList.get(0);
-//                generateCEARReasonDonutModel();
-//            }
-//            selectedQueryCEAR = sessionQuery;
-//            searchParams = sessionQuery.getParmsList().get(0);
-//            queryList = sc.buildQueryCEARList(getSessionBean().getFacesUser(), getSessionBean().getActiveMuni());
-//        } catch (IntegrationException | AuthorizationException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-//        }
+        SearchCoordinator sc = getSearchCoordinator();
+
+        QueryCEAR sessionQuery = getSessionBean().getQueryCEAR();
+
+        selectedRequest = getSessionBean().getSessionCEAR();
+
+        try {
+            requestList = sc.runQuery(sessionQuery).getResults();
+            if (selectedRequest == null && requestList.size() > 0) {
+                selectedRequest = requestList.get(0);
+                generateCEARReasonDonutModel();
+            }
+            selectedQueryCEAR = sessionQuery;
+            searchParams = sessionQuery.getParmsList().get(0);
+            queryList = sc.buildQueryCEARList(getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
+        } catch (IntegrationException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
         
-        
-         CaseCoordinator cc = getCaseCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
         ReportCEARList rpt = cc.getInitializedReportConficCEARs(
                 getSessionBean().getSessionUser(), getSessionBean().getSessionMuni());
@@ -145,11 +144,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                              "Unable to build query, sorry!", ""));
-            
         }
-        
         reportConfig = rpt;
-        
     }
 
     private void generateCEARReasonDonutModel() {
@@ -168,8 +164,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             
             requestReasonDonut = donut;
         } 
-        
-
     }
 
     public void executeQuery(ActionEvent ev) {
@@ -205,7 +199,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                                                     searchParams);
             requestList =searchCoord.runQuery(selectedQueryCEAR).getResults();
             
-            
             generateCEARReasonDonutModel();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -221,8 +214,6 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         }
     }
 
-    
-    
     public void prepareReportMultiCEAR(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();

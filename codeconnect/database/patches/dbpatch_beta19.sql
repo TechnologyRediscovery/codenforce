@@ -35,10 +35,7 @@ ALTER TABLE muniprofile ADD COLUMN minimumuserranktodeclarerentalintent INTEGER 
 ALTER TABLE propertyunit DROP COLUMN rentalintent;
 ALTER TABLE propertyunit ADD COLUMN rentalnotes TEXT;
 
-ALTER TABLE occinspeection ADD COLUMN effectivedate TIMESTAMP WITH TIME ZONE;
-
-
-
+ALTER TABLE occinspection ADD COLUMN effectivedate TIMESTAMP WITH TIME ZONE;
 
 
 CREATE TABLE public.muniprofileeventruleset
@@ -198,10 +195,6 @@ DROP TABLE personsource CASCADE;
 
 ALTER TABLE person ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT person_bobsourceid_fk REFERENCES bobsource (sourceid);
 ALTER TABLE property ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT property_bobsourceid_fk REFERENCES bobsource (sourceid);
-ALTER TABLE property ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT property_bobsourceid_fk REFERENCES bobsource (sourceid);
-
-
-
 
 
 ALTER TABLE property ADD COLUMN unfitdatestart TIMESTAMP WITH TIME ZONE;

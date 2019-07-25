@@ -142,7 +142,7 @@ CREATE TABLE public.muniprofile
   	occcommercialruleset 			INTEGER NOT NULL CONSTRAINT muniprofile_occcommercialrulesetid_fk REFERENCES eventruleset (rulesetid)
 );
 
-ALTER TABLE municipality ADD CONSTRAINT muni_profileid_fk FOREIGN KEY (profile_profileid) REFERENCES muniprofile (profileid);
+ALTER TABLE municipality ADD 
 
 ALTER TABLE municipality 
 
@@ -153,7 +153,8 @@ ALTER TABLE municipality
   	ADD COLUMN enablepublicoccpermitapp			boolean DEFAULT false,
   	ADD COLUMN enablepublicoccinspectodo		boolean DEFAULT true,
   	ADD COLUMN munimanager_userid 				INTEGER CONSTRAINT muni_manageruserid_fk REFERENCES login (userid),
-  	ADD COLUMN office_propertyid 				INTEGER CONSTRAINT muni_munipropid_fk 	 REFERENCES property (propertyid);
+  	ADD COLUMN office_propertyid 				INTEGER CONSTRAINT muni_munipropid_fk 	 REFERENCES property (propertyid)
+    ADD COLUMN profile_profileid      INTEGER CONSTRAINT muni_profileid_fk REFERENCES muniprofile (profileid);
 
 
 CREATE TABLE public.municourtentity

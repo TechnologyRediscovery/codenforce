@@ -29,14 +29,19 @@ public class CourtEntity implements Serializable {
     private String courtEntityOfficialNum;
     private String jurisdictionLevel;
     private String courtEntityName;
+    
     private String addressStreet;
     private String addressCity;
     private String addressZip;
     private String addressState;
     private String addressCounty;
+    
     private String phone;
     private String url;
     private String notes;
+    
+    private String judgeName;
+    private int relativeOrder;
 
     @Override
     public int hashCode() {
@@ -243,6 +248,34 @@ public class CourtEntity implements Serializable {
      */
     public void setAddressCity(String addressCity) {
         this.addressCity = addressCity;
+    }
+
+    /**
+     * @return the judgeName
+     */
+    public String getJudgeName() {
+        return judgeName;
+    }
+
+    /**
+     * @return the relativeOrder
+     */
+    public int getRelativeOrder() {
+        return relativeOrder;
+    }
+
+    /**
+     * @param judgeName the judgeName to set
+     */
+    public void setJudgeName(String judgeName) {
+        this.judgeName = judgeName;
+    }
+
+    /**
+     * @param relativeOrder the relativeOrder to set
+     */
+    public void setRelativeOrder(int relativeOrder) {
+        this.relativeOrder = relativeOrder;
     }
     
     
