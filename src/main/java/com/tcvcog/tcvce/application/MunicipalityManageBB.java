@@ -27,7 +27,6 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
 
     private Municipality currentMuni;
     
-    private List<User> codeOfficerUserList;
     private Map<String, Integer> styleMap;
     
     
@@ -42,11 +41,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
     public void initBean(){
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
-        try {
-            codeOfficerUserList = ui.getActiveCodeOfficerList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+       
         
         try {
             styleMap = si.getPrintStyleMap();
@@ -95,19 +90,6 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
         this.currentMuni = currentMuni;
     }
 
-    /**
-     * @return the codeOfficerUserList
-     */
-    public List<User> getCodeOfficerUserList() {
-        return codeOfficerUserList;
-    }
-
-    /**
-     * @param codeOfficerUserList the codeOfficerUserList to set
-     */
-    public void setCodeOfficerUserList(List<User> codeOfficerUserList) {
-        this.codeOfficerUserList = codeOfficerUserList;
-    }
 
     /**
      * @return the styleMap

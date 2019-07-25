@@ -204,7 +204,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         UserAccessRecord rec = new UserAccessRecord();
         
         rec.setMuni_municode(rs.getInt("muni_municode"));
-        rec.setMuni_municode(rs.getInt("userid"));
+        rec.setUserid(rs.getInt("userid"));
         rec.setDefaultmuni(rs.getBoolean("defaultmuni"));
         
         
@@ -241,25 +241,25 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             rec.setSupportstartdate(rs.getTimestamp("supportstartdate").toLocalDateTime());
         }
         
-        if(rs.getTimestamp("supportsenddate") != null){
+        if(rs.getTimestamp("supportstopdate") != null){
             rec.setSupportstopdate(rs.getTimestamp("supportstopdate").toLocalDateTime());
         }
         
-        rec.setMuni_municode(rs.getInt("codeofficerassignmentorder"));
-        rec.setMuni_municode(rs.getInt("staffassignmentorder"));
-        rec.setMuni_municode(rs.getInt("sysadminassignmentorder"));
+        rec.setCodeofficerassignmentorder(rs.getInt("codeofficerassignmentorder"));
+        rec.setStaffassignmentorder(rs.getInt("staffassignmentorder"));
+        rec.setSysadminassignmentorder(rs.getInt("sysadminassignmentorder"));
         
-        rec.setMuni_municode(rs.getInt("supportassignmentorder"));
-        rec.setMuni_municode(rs.getInt("bypasscodeofficerassignmentorder"));
+        rec.setSupportassignmentorder(rs.getInt("supportassignmentorder"));
+        rec.setBypasscodeofficerassignmentorder(rs.getInt("bypasscodeofficerassignmentorder"));
         
-        rec.setMuni_municode(rs.getInt("bypassstaffassignmentorder"));
-        rec.setMuni_municode(rs.getInt("bypasssysadminassignmentorder"));
-        rec.setMuni_municode(rs.getInt("bypasssupportassignmentorder"));
+        rec.setBypassstaffassignmentorder(rs.getInt("bypassstaffassignmentorder"));
+        rec.setBypasssysadminassignmentorder(rs.getInt("bypasssysadminassignmentorder"));
+        rec.setBypasssupportassignmentorder(rs.getInt("bypasssupportassignmentorder"));
         
         if(rs.getTimestamp("recorddeactivatedts") != null){
             rec.setRecordcreatedts(rs.getTimestamp("recorddeactivatedts").toLocalDateTime());
         }
-        rec.setRole(RoleType.valueOf("role"));
+//        rec.setRole(RoleType.valueOf("role"));
         rec.setMuniloginrecordid(rs.getInt("muniloginrecordid"));
         rec.setRecordcreatedts(rs.getTimestamp("recordcreatedts").toLocalDateTime());
         rec.setOrinumber(rs.getString("orinumber"));
@@ -586,7 +586,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         ArrayList<User> userList = new ArrayList();
         
-        String query =  "SELECT userid FROM login WHERE accesspermitted = TRUE;";
+       String query =  "SELECT userid "
+                + "FROM munilogin "
+                + "WHERE recorddeactivatedts IS NULL "
+                + "AND accessgranteddatestart < now() "
+                + "AND accessgranteddatestop > now();";
         
         PreparedStatement stmt = null;
         
@@ -611,23 +615,31 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-     /**
-     * For attaching event requests to default code officers by muni
+    /**
+     * For use by system administrators to manage user data
+     * @param muniCode
      * @return
      * @throws IntegrationException 
      */
-    public List<User> getActiveCodeOfficerList() throws IntegrationException{
+    public List getCompleteActiveUserList(int muniCode) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        List<User> userList = new ArrayList<>();
+        ArrayList<User> userList = new ArrayList();
         
-        String query =  "SELECT userid FROM login WHERE enforcementofficial=TRUE AND accesspermitted=TRUE;";
+       String query =  "SELECT userid "
+                + "FROM munilogin "
+                + "WHERE muni_municode=? "
+                + "AND recorddeactivatedts IS NULL "
+                + "AND accessgranteddatestart < now() "
+                + "AND accessgranteddatestop > now();";
         
         PreparedStatement stmt = null;
         
         try {
             
             stmt = con.prepareStatement(query);
+            stmt.setInt(1, muniCode);
+            
             rs = stmt.executeQuery();
             while(rs.next()){
                 userList.add(getUser(rs.getInt("userid")));
@@ -646,8 +658,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-       /**
+     
+    /**
      * For attaching event requests to default code officers by muni
+     * @param muniCode
      * @return
      * @throws IntegrationException 
      */
@@ -656,14 +670,24 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         List<User> userList = new ArrayList<>();
         
-        String query =  "SELECT userid FROM login WHERE enforcementofficial=TRUE AND accesspermitted=TRUE;";
+        String query =  "SELECT userid "
+                + "FROM munilogin "
+                + "WHERE muni_municode=? "
+                + "AND recorddeactivatedts IS NULL "
+                + "AND accessgranteddatestart < now() "
+                + "AND accessgranteddatestop > now() "
+                + "AND codeofficerstartdate < now() "
+                + "AND codeofficerstopdate > now();";
         
         PreparedStatement stmt = null;
         
         try {
             
             stmt = con.prepareStatement(query);
+            stmt.setInt(1, muniCode);
+            
             rs = stmt.executeQuery();
+            
             while(rs.next()){
                 userList.add(getUser(rs.getInt("userid")));
             }

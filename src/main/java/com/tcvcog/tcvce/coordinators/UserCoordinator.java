@@ -88,7 +88,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                 &&
             userWAccess.getAccessRecord().getAccessgranteddatestop().isAfter(LocalDateTime.now())
                 &&
-            userWAccess.getAccessRecord().getRecorddeactivatedts() != null){
+            userWAccess.getAccessRecord().getRecorddeactivatedts() == null){
             
                 // the current user is allowed access to this muni, so now determine RoleType
                 // based on assigned start and stop dates for various roles as specified in the
@@ -113,9 +113,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                 } else {
                     userWAccess.setRoleType(RoleType.MuniReader);
                 }
-                
                 userWAccess.setKeyCard(getAccessKeyCard(userWAccess.getRoleType()));
-                
             return userWAccess;
         } else {
             throw new AuthorizationException("User exists but access to system "
