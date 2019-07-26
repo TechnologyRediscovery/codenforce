@@ -1006,16 +1006,10 @@
             <to-view-id>/restricted/cogstaff/ce/courtEntityManage.xhtml</to-view-id>
             <redirect />
         </navigation-case>
-    <!--
+    
         <navigation-case>
             <from-outcome>intensityManage</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    -->
-        <navigation-case>
-            <from-outcome>intensityManage</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/intensityManage.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     
