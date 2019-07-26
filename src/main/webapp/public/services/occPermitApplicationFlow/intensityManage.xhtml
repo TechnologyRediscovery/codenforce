@@ -29,7 +29,11 @@
 
                         <h:form id="classesViewForm">
 
-                            <p:selectOneMenu id="intensitySchemaMenu" value="#{intensityBB.selectedSchema}" converter="intensitySchemaConverter">
+                            <p:selectOneMenu id="intensitySchemaMenu" value="#{intensityBB.selectedSchema}" 
+                                             converter="intensitySchemaConverter" required="true">
+                                <p:ajax event="change" update="@this"/>
+                                <f:selectItem itemLabel="Select a schema..." itemDisabled="true"/>
+                                
                                 <f:selectItems id="paymentTypeList" value="#{intensityBB.schemaList}" var="ct" itemValue="#{ct}" itemLabel="#{ct.label}"/>
                             </p:selectOneMenu>
                             <p:commandButton id="queryClassesButton"
@@ -182,7 +186,7 @@
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
 
-                                <ui:remove>
+                                
                                     <p:outputLabel for="classTitle">
                                         <h:outputText value="Class Title:"/>
                                     </p:outputLabel>
@@ -190,7 +194,7 @@
                                         <p:inputText id="classTitle" value="#{intensityBB.workingIntensityClass.title}"
                                                      style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
                                     </h:panelGroup>
-                                </ui:remove>
+                                
 
                                 <h:outputLabel value="Municipality:" for="classMuni"/>
                                 <h:panelGroup id="classMuni">
@@ -223,6 +227,25 @@
 
                                 </h:panelGroup>
 
+                                <h:outputLabel value="Icon:" for="classIcon"/>
+                                <h:panelGroup id="classIcon">
+
+                                    <p:selectOneMenu
+                                        id="iconSM" tabindex="6"
+                                        value="#{intensityBB.workingIntensityClass.icon}">
+
+                                        <f:selectItem itemLabel="select an icon..." itemDisabled="true"/>
+
+                                        <f:converter converterId="iconConverter"/>
+                                        <f:selectItems id="uconNameList" value="#{intensityBB.iconList}" var="i" itemValue="#{i}" itemLabel="#{i.name}" />
+
+                                    </p:selectOneMenu>
+
+                                    <h:message for="classIcon" showDetail="true" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+                                
                                 <h:outputLabel value="Active?" for="classActive"/>
                                 <h:panelGroup>
                                     <p:inputSwitch id="classActive" value="#{intensityBB.workingIntensityClass.active}"
