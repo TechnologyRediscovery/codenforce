@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.Intensity;
 import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -39,6 +40,7 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     private IntensitySchema selectedSchema;
     private IntensitySchema workingSchema;
     private ArrayList<IntensitySchema> schemaList;
+    private ArrayList<Icon> iconList;
 
     private boolean editing;
 
@@ -55,6 +57,13 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
 
             workingSchema = new IntensitySchema();
 
+        }
+
+        SystemIntegrator si = getSystemIntegrator();
+        try {
+            iconList = (ArrayList<Icon>) si.getIconList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
         }
 
     }
@@ -113,19 +122,29 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
 
         SystemIntegrator si = new SystemIntegrator();
 
-        try {
-            si.insertIntensityClass(workingIntensityClass);
+        if (selectedSchema != null) {
 
-            workingIntensityClass = new Intensity();
+            workingIntensityClass.setSchema(selectedSchema);
 
-            queryIntensityClasses();
+            try {
+                si.insertIntensityClass(workingIntensityClass);
 
-        } catch (IntegrationException ex) {
-            System.out.println(ex.toString());
+                workingIntensityClass = new Intensity();
+
+                queryIntensityClasses();
+
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to insert Intensity Class.",
+                                "This must be corrected by the System Administrator"));
+            }
+        } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to insert Intensity Class.",
-                            "This must be corrected by the System Administrator"));
+                            "Please select a schema before creating a class.",
+                            ""));
         }
 
     }
@@ -164,19 +183,19 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
             schemaList.add(workingSchema);
 
             workingSchema = new IntensitySchema();
-            
+
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Schema added to list!",
                             ""));
-            
+
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please enter in a label for your new schema.",
                             ""));
         }
-        
+
         System.out.println("IntensityBB.addIntensitySchema | Completed method ");
     }
 
@@ -253,6 +272,14 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
 
     public void setEditing(boolean editing) {
         this.editing = editing;
+    }
+
+    public ArrayList<Icon> getIconList() {
+        return iconList;
+    }
+
+    public void setIconList(ArrayList<Icon> iconList) {
+        this.iconList = iconList;
     }
 
 }
