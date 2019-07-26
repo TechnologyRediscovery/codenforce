@@ -32,33 +32,35 @@ import javax.faces.event.ActionEvent;
  * @author Nathan Dietz
  */
 public class IntensityBB extends BackingBeanUtils implements Serializable {
-    
+
     private Intensity workingIntensityClass;
     private Intensity selectedIntensityClass;
     private ArrayList<Intensity> existingIntensityList;
     private IntensitySchema selectedSchema;
+    private IntensitySchema workingSchema;
     private ArrayList<IntensitySchema> schemaList;
-    
+
     private boolean editing;
-    
+
     public IntensityBB() {
-        
+
     }
-    
+
     @PostConstruct
     public void initBean() {
-        
+
         if (workingIntensityClass == null) {
-            
+
             workingIntensityClass = new Intensity();
 
-            
+            workingSchema = new IntensitySchema();
+
         }
-        
+
     }
 
-    public void editIntensity(ActionEvent e){
-        if(selectedIntensityClass != null){
+    public void editIntensity(ActionEvent e) {
+        if (selectedIntensityClass != null) {
             workingIntensityClass.setClassID(selectedIntensityClass.getClassID());
             workingIntensityClass.setTitle(selectedIntensityClass.getTitle());
             workingIntensityClass.setMuni(selectedIntensityClass.getMuni());
@@ -66,62 +68,118 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
             workingIntensityClass.setSchema(selectedIntensityClass.getSchema());
             workingIntensityClass.setActive(selectedIntensityClass.isActive());
             workingIntensityClass.setIcon(selectedIntensityClass.getIcon());
-            
+
             editing = true;
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Please select an Intensity Class to edit", ""));
+                            "Please select an Intensity Class to edit", ""));
         }
     }
-    
+
     public void commitEdits() {
-        
+
         SystemIntegrator si = new SystemIntegrator();
-        
-        try{
+
+        try {
             si.updateIntensityClass(workingIntensityClass);
-            
+
             workingIntensityClass = new Intensity();
-            
+
             queryIntensityClasses();
-            
+
             editing = false;
-        } catch (IntegrationException ex){
+        } catch (IntegrationException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Unable to update Intensity Classes.",
-                    "This must be corrected by the System Administrator"));
+                            "Unable to update Intensity Classes.",
+                            "This must be corrected by the System Administrator"));
         }
-        
+
     }
-    
-    public void queryIntensityClasses(){
-        
-        System.out.println("Intensity Classes Queried!");
-        
-        if(selectedSchema != null){
-            
-            SystemIntegrator si = new SystemIntegrator();
-            
-            try{
-            existingIntensityList = (ArrayList<Intensity>) si.getIntensityClassList(selectedSchema);
-        } catch (IntegrationException ex){
-            System.out.println(ex);
+
+    public void cancelEdits() {
+
+        workingIntensityClass = new Intensity();
+
+        queryIntensityClasses();
+
+        editing = false;
+
+    }
+
+    public void createIntensityClass() {
+
+        SystemIntegrator si = new SystemIntegrator();
+
+        try {
+            si.insertIntensityClass(workingIntensityClass);
+
+            workingIntensityClass = new Intensity();
+
+            queryIntensityClasses();
+
+        } catch (IntegrationException ex) {
+            System.out.println(ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Unable to get Intensity Classes.",
-                    "This must be corrected by the System Administrator"));
+                            "Unable to insert Intensity Class.",
+                            "This must be corrected by the System Administrator"));
         }
+
+    }
+
+    public void queryIntensityClasses() {
+
+        System.out.println("Intensity Classes Queried!");
+
+        if (selectedSchema != null) {
+
+            SystemIntegrator si = new SystemIntegrator();
+
+            try {
+                existingIntensityList = (ArrayList<Intensity>) si.getIntensityClassList(selectedSchema);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to get Intensity Classes.",
+                                "This must be corrected by the System Administrator"));
+            }
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Please select an Intensity Schema", ""));
+                            "Please select an Intensity Schema", ""));
+        }
+
+    }
+
+    public void addIntensitySchema() {
+
+        if (workingSchema.getLabel() != null
+                && !workingSchema.getLabel().isEmpty()
+                && workingSchema.getLabel().matches(".*\\w.*")) {
+
+            schemaList.add(workingSchema);
+
+            workingSchema = new IntensitySchema();
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Schema added to list!",
+                            ""));
+            
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please enter in a label for your new schema.",
+                            ""));
         }
         
+        System.out.println("IntensityBB.addIntensitySchema | Completed method ");
     }
-    
+
     public Intensity getWorkingIntensityClass() {
         return workingIntensityClass;
     }
@@ -147,27 +205,26 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     }
 
     public ArrayList<IntensitySchema> getSchemaList() {
-        
-        if(schemaList != null) {
-        return schemaList;
-        }
-        else {
-            
-            SystemIntegrator si = new SystemIntegrator();
-            
-            try {
-            schemaList = (ArrayList<IntensitySchema>) si.getIntensitySchemaList();
-            } catch (IntegrationException ex) {
-            System.out.println(ex.toString());
-            getFacesContext().addMessage(null,  
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Unable to load schema list",
-                        "This must be corrected by the system administrator"));
-        }
+
+        if (schemaList != null) {
             return schemaList;
-            
+        } else {
+
+            SystemIntegrator si = new SystemIntegrator();
+
+            try {
+                schemaList = (ArrayList<IntensitySchema>) si.getIntensitySchemaList();
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to load schema list",
+                                "This must be corrected by the system administrator"));
+            }
+            return schemaList;
+
         }
-        
+
     }
 
     public void setSchemaList(ArrayList<IntensitySchema> schemaList) {
@@ -182,6 +239,14 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
         this.selectedIntensityClass = selectedIntensityClass;
     }
 
+    public IntensitySchema getWorkingSchema() {
+        return workingSchema;
+    }
+
+    public void setWorkingSchema(IntensitySchema workingSchema) {
+        this.workingSchema = workingSchema;
+    }
+
     public boolean isEditing() {
         return editing;
     }
@@ -189,8 +254,5 @@ public class IntensityBB extends BackingBeanUtils implements Serializable {
     public void setEditing(boolean editing) {
         this.editing = editing;
     }
-            
-    
-    
-    
+
 }

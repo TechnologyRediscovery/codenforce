@@ -14,7 +14,7 @@
             <!--../navContainer_restricted.xhtml-->
             <ui:define name="content">
                 <div class="mainContainer">
-                    <h:messages globalOnly="true" showDetail="false" showSummary="true"
+                    <h:messages  id="messages" globalOnly="true" showDetail="false" showSummary="true"
                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                     </h:messages>
 
@@ -33,11 +33,39 @@
                                 <f:selectItems id="paymentTypeList" value="#{intensityBB.schemaList}" var="ct" itemValue="#{ct}" itemLabel="#{ct.label}"/>
                             </p:selectOneMenu>
                             <p:commandButton id="queryClassesButton"
-                                             value="Get Intensity Classes" ajax="true" 
-                                             action="#{intensityBB.queryIntensityClasses()}" 
+                                             value="Get Intensity Classes" ajax="true"
+                                             action="#{intensityBB.queryIntensityClasses()}"
                                              update="classTable"/>
 
                             <p:spacer height="10px"/>
+
+
+                            <h3>Create new Schema:</h3>
+                            <p:outputLabel>If you would like to use a Schema that doesn't exist for the
+                                class you are creating/editing, type its name in the box below
+                                and click "Add Schema". The schema should then appear in the list above.
+
+                                <p><em>Note: Schemas must be attached to a class in order to be saved in the database.
+                                        If you create a schema but do not add your Class to the database or commit your updates
+                                        your schema will not will be saved.</em></p>
+                            </p:outputLabel>
+
+                            <h:panelGrid columns="2" border="0"
+                                         columnClasses="gridTd, gridTd,"
+                                         footerClass="gridFooter">
+                                <p:inputText id="workingSchemaLabel" value="#{intensityBB.workingSchema.label}"
+                                             style="width: 500px;" required="false" styleClass="inputText" maxlength="100"/>
+
+                                <p:commandButton id="addSchemaButton"
+                                                 value="Add Schema to List" ajax="true"
+                                                 action="#{intensityBB.addIntensitySchema()}"
+                                                 update="intensitySchemaMenu messages workingSchemaLabel"/>
+                            </h:panelGrid>
+
+
+
+                            <p:spacer height="10px"/>
+
                             <hr/>
                             <p:spacer height="10px"/>
 
@@ -110,6 +138,8 @@
                             </ui:remove>
                         </h:form>
 
+
+
                         <p:spacer height="10px"/>
                         <hr/>
                         <p:spacer height="10px"/>
@@ -117,9 +147,24 @@
                         <h:form id="classEditForm">
 
                             <h2>Form</h2>
-                            <p> Please fill out the form values below to create or edit an existing Intensity Class.</p>
+
+                            <p:outputLabel rendered="#{!intensityBB.editing}">
+                                You are currently creating an Intensity class. Please fill out the form below to specify the details
+                                of the class. The drop down box above is used to choose the Intensity Schema.
+
+                                <p>If you would like to edit an existing class, please select its schema,
+                                    click the button labeled "Get Intensity Classes", select the class, and finally click
+                                    "Update Selected Intensity Class".</p>
+                            </p:outputLabel>
 
 
+                            <p:outputLabel rendered="#{intensityBB.editing}">
+                                You are currently editing an Intensity class. Please fill out the form below to specify the details
+                                of the class. The drop down box above is used to choose the Intensity Schema.
+
+                                <p>If you would like to apply your edits, you can click the button below that says "Commit Updates".
+                                    If you would like to cancel your updates instead, please click the button labeled "Cancel Updates".</p>
+                            </p:outputLabel>
 
                             <p:spacer height="10px"/>
                             <hr/>
@@ -131,7 +176,7 @@
 
                                 <h:outputLabel value="Class ID:" for="ClassID"/>
                                 <h:panelGroup>
-                                    <p:inputText id="classID" value="#{intensityBB.workingIntensityClass.classID}" disabled="#{intensityBB.editing}"
+                                    <p:inputText id="classID" value="#{intensityBB.workingIntensityClass.classID}" disabled="true"
                                                  style="width: 250px;" tabindex="4" required="true" styleClass="inputText" maxlength="100"/>
                                     <h:message for="classID" showDetail="false" showSummary="true"
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -193,6 +238,15 @@
                             <p:commandButton ajax="false" rendered="#{intensityBB.editing}"
                                              actionListener="#{intensityBB.commitEdits()}"
                                              value="Commit Updates" tabindex="2"/>
+
+                            <p:commandButton ajax="false" rendered="#{intensityBB.editing}"
+                                             actionListener="#{intensityBB.cancelEdits()}"
+                                             value="Cancel Updates" tabindex="2"/>
+
+
+                            <p:commandButton ajax="false" rendered="#{!intensityBB.editing}"
+                                             actionListener="#{intensityBB.createIntensityClass()}"
+                                             value="Add Intensity Class" tabindex="2"/>
 
                             <p:spacer height="15"/>
 
