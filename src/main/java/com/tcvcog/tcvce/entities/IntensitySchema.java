@@ -26,7 +26,9 @@ public class IntensitySchema{
     
     private String label;
     
-    
+    public IntensitySchema() {
+        
+    }
     
     public IntensitySchema(String label) {
 
