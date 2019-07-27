@@ -64,34 +64,24 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         Property activeProp = getSessionBean().getSessionProperty();
 
         actionList = new ArrayList<>();
-        
         actionList.add(ChangeOrderAction.DoNothing);
-
         actionList.add(ChangeOrderAction.Accept);
-
         actionList.add(ChangeOrderAction.Reject);
-        
         
         if (activeProp != null) {
 
             PropertyIntegrator pi = getPropertyIntegrator();
 
             try {
-
                 existingUnitList = pi.getPropertyUnitList(activeProp);
-
                 proposedUnitList = pi.getPropertyUnitChangeList(activeProp);
-
             } catch (IntegrationException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Unable to get unit lists! ", ""));
-
             }
-
         }
-
     }
 
     public void searchForChangedProperties(ActionEvent event) {

@@ -1,6 +1,7 @@
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -10,19 +11,24 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIInput;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
 
@@ -51,6 +57,7 @@ Council of Governments, PA
 public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     private PropertyWithLists currProp;
+    private PropertyUnit currPropUnit;
     private List<Person> filteredPersonList;
     
     private String parid;
@@ -106,6 +113,141 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     public String goToChanges() {
         
         return "unitchanges";
+    }
+    
+      
+    public void beginPropertyUnitChanges(ActionEvent ev){
+        
+    }
+    
+     /**
+     * Adds a blank unit to propUnitsToAdd list. This newly-created unit can
+     * then be selected and edited by the user.
+     */
+    public void addUnitToNewPropUnits() {
+        PropertyUnit unitToAdd;
+        PropertyCoordinator pc = getPropertyCoordinator();
+        unitToAdd = pc.getNewPropertyUnit();
+        unitToAdd.setUnitNumber("");
+//        unitToAdd.setRental(false);
+        unitToAdd.setNotes("");
+        currProp.getUnitList().add(unitToAdd);
+        
+//        clearAddUnitFormValues();
+    }
+    
+    public void removePropertyUnitFromEditTable(PropertyUnit pu){
+        currProp.getUnitList().remove(pu);
+        getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Zap!", ""));
+        
+    }
+    
+    public void deactivatePropertyUnit(PropertyUnit pu){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        pu.setActive(false);
+        try {
+            pi.updatePropertyUnit(pu);
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Unit deactivated with ID " + pu.getUnitID(), ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Could not deactivate unit with ID " + pu.getUnitID(), ""));
+        }
+        
+    }
+    
+       /**
+     * Finalizes the unit list the user has created so that it can be compared
+     * to the existing one in the database.
+     *
+     * @param ev
+     */
+    public void finalizeUnitList(ActionEvent ev) {
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        boolean missingUnitNum = false;
+        boolean duplicateUnitNum = false;
+        int duplicateNums = 0;
+        //The above boolean is a flag to see if there is more than 1 of  Unit Number. The int to the left stores how many of a given number the loop below finds.
+
+        for (PropertyUnit firstUnit : currProp.getUnitList()) {
+            duplicateNums = 0;
+
+            firstUnit.setUnitNumber(firstUnit.getUnitNumber().replaceAll("(?i)unit", ""));
+
+            if (firstUnit.getUnitNumber().compareTo("") == 0) {
+                missingUnitNum = true;
+                break; //break for performance reasons. Can be removed if breaks are not welcome here.
+            }
+
+            for (PropertyUnit secondUnit : currProp.getUnitList()) {
+                if (firstUnit.getUnitNumber().compareTo(secondUnit.getUnitNumber()) == 0) {
+                    duplicateNums++;
+                }
+            }
+
+            if (duplicateNums > 1) {
+                duplicateUnitNum = true;
+                break; //break for performance reasons. Can be removed if breaks are not welcome here.
+            }
+        }
+
+        if (currProp.getUnitList().isEmpty()) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please add at least one unit.", ""));
+            
+        } else if (missingUnitNum) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "All units must have a Unit Number", ""));
+
+        } else if (duplicateUnitNum) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Some Units have the same Number", ""));
+
+        } else {
+            Iterator<PropertyUnit> iter = currProp.getUnitList().iterator();
+            while(iter.hasNext()){
+                PropertyUnit pu = iter.next();
+                if(pu.getUnitID() == 0){
+                    try {
+                        pu.setPropertyID(currProp.getPropertyID());
+                        pi.insertPropertyUnit(pu);
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                        "Success! Inserted property unit: " + pu.getUnitNumber(), ""));
+                    } catch (IntegrationException ex) {
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                        "Could not insert unit with number: " + pu.getUnitNumber(), ""));
+                        
+                    }
+                } else {
+                    try {
+                        pu.setPropertyID(currProp.getPropertyID());
+                        pi.updatePropertyUnit(pu);
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                        "Success! Updated property unit: " + pu.getUnitNumber(), ""));
+                    } catch (IntegrationException ex) {
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                        "Could not update unit with number: " + pu.getUnitNumber(), ""));
+                        
+                    }
+                    
+                }
+            }
+        }
+        
+        
+
     }
     
     public String addProperty(){
@@ -359,6 +501,20 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setSelectedMuni(Municipality selectedMuni) {
         this.selectedMuni = selectedMuni;
+    }
+
+    /**
+     * @return the currPropUnit
+     */
+    public PropertyUnit getCurrPropUnit() {
+        return currPropUnit;
+    }
+
+    /**
+     * @param currPropUnit the currPropUnit to set
+     */
+    public void setCurrPropUnit(PropertyUnit currPropUnit) {
+        this.currPropUnit = currPropUnit;
     }
 
    
