@@ -315,7 +315,7 @@
 
                                     <p:commandButton    id="attach-to-case-cb"
                                                         value="Attach to existing code enf case"
-                                                        rendered="#{sessionBeasessionUserer.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('attach-to-case-dialog').show()"
                                                         update="attach-to-existing-case-form:cases-on-selected-request-property-DS"
@@ -325,14 +325,14 @@
 
                                     <p:commandButton    id="no-violation-found-cb"
                                                         value="No violation found on site"
-                                                        rendered="#{sessionBsessionUserUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('no-violation-found-dialog').show()"
                                                         icon="fa fa-circle-o"/>
 
                                     <p:commandButton    id="invalid-request-cb"
                                                         value="Invalid request"
-                                                        rendered="#{sessiosessionUseresUser.keyCard.hasEnfOfficialPermissions}"
+                                                        rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                         disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
                                                         onclick="PF('invalid-dialog').show()"
                                                         icon="fa fa-exclamation-circle"/>
@@ -345,7 +345,7 @@
                                     <p:commandButton    id="print-singleCAR-cb"
                                                         value="Print request"
                                                         actionListener="#{cEActionRequestsBB.prepareReportSingleCEAR}"
-                                                        rendered="#{sesessionUser.facesUser.keyCard.hasMuniReaderPermissions}"
+                                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
                                                         disabled="false"
                                                         oncomplete="PF('cear-print-dialog-var').show()"
                                                         icon="fa fa-print"
@@ -360,7 +360,8 @@
                                                           
                                                           value="Attach internal note"
                                                           icon="fa fa-pencil-square-o"
-                                                          rendered="#{sessionUseran.facesUser.keyCard.hasMuniReaderPermissions}" />
+                                                          rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
+                                                          />
 
 
 
@@ -506,7 +507,8 @@
                                                                  value="view photos" 
                                                                  styleClass="noFill button-size-small"
                                                                  update="photo-form:photoTable"
-                                                                 rendered="#{sessionUsersionBean.facesUser.keyCard.hasMuniReaderPermissions}" />
+                                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                 />
 
 
                                                 <p:spacer height="5px"/>
@@ -835,7 +837,8 @@
                         <p:dialog       height="650" width="700"
                                         widgetVar="change-person-dialog"
                                         closable="true" 
-                                        rendered="#{sesessionUser.facesUser.keyCard.hasMuniStaffPermissions}">
+                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                        >
 
                             <h3>Search for a different person</h3>
 

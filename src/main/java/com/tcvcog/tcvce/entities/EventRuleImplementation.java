@@ -35,29 +35,29 @@ public class EventRuleImplementation extends EventRuleAbstract implements Serial
         this.ruleid = rule.getRuleid();
         this.title = rule.getTitle();
         this.description = rule.getDescription();
-        this.requiredeventtype = rule.getRequiredeventtype();
-        this.forbiddeneventtype = rule.getForbiddeneventtype();
-        this.requiredEventCat = rule.getRequiredEventCat();
-        this.forbiddenEventCat = rule.getForbiddenEventCat();
+        this.requiredEventType = rule.getRequiredEventType();
+        this.forbiddenEventType = rule.getForbiddenEventType();
+        this.requiredEventCategory = rule.getRequiredEventCategory();
+        this.forbiddenEventCategory = rule.getForbiddenEventCategory();
 
-        this.requiredeventcatthresholdtypeintorder = rule.isRequiredeventcatthresholdtypeintorder();
-        this.requiredeventcatupperboundtypeintorder = rule.isRequiredeventcatupperboundtypeintorder();
+        this.requiredECThreshold_typeInternalOrder = rule.isRequiredeventcatthresholdtypeintorder();
+        this.requiredECThreshold_typeInternalOrder_treatAsUpperBound = rule.isRequiredECThreshold_typeInternalOrder_treatAsUpperBound();
 
-        this.requiredeventcatthresholdglobalorder = rule.isRequiredeventcatthresholdglobalorder();
-        this.requiredeventcatupperboundglobalorder = rule.isRequiredeventcatupperboundglobalorder();
+        this.requiredECThreshold_globalOrder = rule.isRequiredeventcatthresholdglobalorder();
+        this.requiredECThreshold_globalOrder_treatAsUpperBound = rule.isRequiredECThreshold_globalOrder_treatAsUpperBound();
 
-        this.forbiddeneventcatthresholdtypeintorder = rule.isForbiddeneventcatthresholdtypeintorder();
-        this.forbiddeneventcatupperboundtypeintorder = rule.isForbiddeneventcatupperboundtypeintorder();
+        this.forbiddenECThreshold_typeInternalOrder = rule.isForbiddeneventcatthresholdtypeintorder();
+        this.forbiddenECThreshold_typeInternalOrder_treatAsUpperBound = rule.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound();
 
-        this.forbiddeneventcatthresholdglobalorder = rule.isForbiddeneventcatthresholdglobalorder();
-        this.forbiddeneventcatupperboundglobalorder = rule.isForbiddeneventcatupperboundglobalorder();
+        this.forbiddenECThreshold_globalOrder = rule.isForbiddeneventcatthresholdglobalorder();
+        this.forbiddenECThreshold_globalOrder_treatAsUpperBound = rule.isForbiddenECThreshold_globalOrder_treatAsUpperBound();
 
-        this.mandatorypassreqtocloseentity = rule.isMandatorypassreqtocloseentity();
-        this.autoremoveonentityclose = rule.isAutoremoveonentityclose();
+        this.mandatoryRulePassRequiredToCloseEntity = rule.isMandatoryRulePassRequiredToCloseEntity();
+        this.inactivateRuleOnEntityClose = rule.isInactivateRuleOnEntityClose();
         this.promptingProposal = rule.getPromptingProposal();
 
-        this.triggeredeventcatonpass = rule.getTriggeredeventcatonpass();
-        this.triggeredeventcatonfail = rule.getTriggeredeventcatonfail();
+        this.triggeredECOnRulePass = rule.getTriggeredECOnRulePass();
+        this.triggeredECOnRuleFail = rule.getTriggeredECOnRuleFail();
 
         this.active = rule.isActive();
         this.notes = rule.getNotes();

@@ -432,9 +432,15 @@
                                                         value="view property profile" />
 
                                     <p>
-                                        <a href="#action-requests">next actions <h:outputText value=" (#{caseProfileBB.currentCase.eventProposalList.size()})" /> </a> | 
+                                        <a href="#action-requests">proposals <h:outputText value=" (#{caseProfileBB.currentCase.proposalList.size()})" /> </a> | 
                                         <a href="#add-event">new event</a> | 
+                                        
+                                        <ui:remove>
+                                            
                                         <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.visibleEventList.size()})" /></a> | 
+                                        </ui:remove>
+                                        
+                                        
                                         <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
                                         <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
                                         <a href="#citations">citations <h:outputText value=" (#{caseProfileBB.currentCase.citationList.size()})" /></a> | 
@@ -445,7 +451,7 @@
                                     <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                                  columnClasses="gridTd, gridTd">
                                         <h:panelGroup>
-                                            <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.caseOpenClosed}" />
+                                            <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
                                             <div class="status-display-container">
                                                 <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
                                                     <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{caseProfileBB.currentCase.casePhaseIcon.materialIcon}"/></i>
@@ -547,7 +553,7 @@
                                 <p:commandButton ajax="false" action="#{caseProfileBB.addViolation}"
                                                  value="Add new code violation"
                                                  icon="fa fa-plus"
-                                                 rendered="#{sessionBsessionUserUser.keyCard.hasEnfOfficialPermissions}"
+                                                 rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                  disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
                                 <p:spacer height="15px"/>
 
@@ -612,10 +618,10 @@
                                         <f:facet name="header">
                                             <h:outputText value="Photos" />
                                         </f:facet>
-                                        <p:commandButton value="View #{empty v.photoList ? '0' : v.photoList.size()} photo(s)" icon="fa fa-search"
+                                        <p:commandButton value="View #{empty v.blobIDList ? '0' : v.blobIDList.size()} photo docs (s)" icon="fa fa-search"
                                                          onclick="PF('photo-dialog').show()"
                                                          actionListener="#{caseProfileBB.setSelectedViolation(v)}"
-                                                         disabled="#{empty v.photoList}"
+                                                         disabled="#{empty v.blobIDList}"
                                                          update=":photo-form"/>
                                     </p:column>
                                     <p:column width="10%">
@@ -693,7 +699,7 @@
                                         <p:commandButton    id="violation-remove-cb" 
                                                             ajax="true" action="#{caseProfileBB.removeViolation(v)}"
                                                             icon="fa fa-stop"
-                                                            rendered="#{sessiosessionUseresUser.keyCard.hasEnfOfficialPermissions}"
+                                                            rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                             disabled="#{!(empty v.actualComplianceDate)}"
                                                             value="Delete violation"  
                                                             update="violation-table
@@ -707,9 +713,11 @@
 
                             <h2 id="action-requests">Requested actions:</h2>
 
+                                
 
                             <h:form id="events-datascroller-form">
 
+                            <ui:remove>
                                     <p:dataScroller
                                         id="events-datascroller"
                                         var="e"
@@ -778,7 +786,7 @@
                                                                        disabled="#{e.responseComplete}"
                                                                        icon="fa fa-play-circle-o"
                                                                        oncomplete="PF('add-event-dialog-var').show()"
-                                                                       rendered="#{sesssessionUseracesUser.keyCard.hasEnfOfficialPermissions}"
+                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                        update="addNewEventForm
                                                                        events-datascroller-form
                                                                        "
@@ -791,7 +799,7 @@
                                                                        styleClass="noFill"
                                                                        disabled="#{e.responseComplete}"
                                                                        icon="fa fa-hand-stop-o"
-                                                                       rendered="#{sesessionUser.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                        update="events-datascroller-form
                                                                        case-profile-messages-form:case-profile-messages-global"
                                                                        />
@@ -801,7 +809,7 @@
                                                                        value="edit event" 
                                                                        styleClass="noFill"
                                                                        icon="fa fa-edit"
-                                                                       rendered="#{sessionUseran.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                        oncomplete="PF('add-event-dialog-var').show()"
                                                                        update="addNewEventForm"
                                                                        />
@@ -810,6 +818,7 @@
                                         </div>
 
                                     </p:dataScroller>
+                            </ui:remove>
 
                             </h:form>
 
@@ -871,7 +880,7 @@
                                                             actionListener="#{caseProfileBB.initiateUserChosenEventCreation}" 
                                                             oncomplete="PF('add-event-dialog-var').show()"
                                                             disabled="#{empty caseProfileBB.selectedEventCategory}"
-                                                            rendered="sessionUserBean.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                            rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                             value="Create new event "  
                                                             icon="fa fa-edit"
                                                             update="addNewEventForm"/>
@@ -981,7 +990,7 @@
                                         <p:commandButton icon="fa fa-moon-o"
                                                          ajax="true"
                                                          disabled="#{e.hidden}"
-                                                         rendered="sessionUserBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                         rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                          actionListener="#{caseProfileBB.hideEvent(e)}" 
                                                          update="caseEventTable
                                                          event-messages-form"
@@ -990,7 +999,7 @@
                                                          ajax="true"
                                                          disabled="#{!e.hidden}"
                                                          actionListener="#{caseProfileBB.unHideEvent(e)}" 
-                                                         renderedsessionUseronBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                         rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                          update="caseEventTable
                                                          event-messages-form"
                                                          />
@@ -1336,7 +1345,7 @@
                                 <p:commandButton ajax="false" action="#{caseProfileBB.createNewCitation}"
                                                  value="Create new citation"
                                                  icon="fa fa-warning"
-                                                 sessionUser"#{sessionBean.facesUser.keyCard.hasEnfOfficialPermissions}"
+                                                rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                  disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
                                 <p:spacer height="5px" />
 
@@ -1765,6 +1774,10 @@
 
 
                                 <h:panelGroup>
+        
+                    <ui:remove>
+                                        
+                                    
                                     <h:outputLabel for="request-action-cb">
                                         <h:outputText value="Requested event category"/>
                                     </h:outputLabel>
@@ -1811,8 +1824,7 @@
 
                                     <h:message for="event-responder-intended" />
 
-
-
+                 </ui:remove>
                                 </h:panelGroup>
 
                                 <f:facet name="footer">
@@ -2036,15 +2048,14 @@
                     <p:confirmDialog message="Photos attached to violation #{caseProfileBB.selectedViolation.violationID}" 
                                      severity="alert" widgetVar="photo-dialog"
                                      closable="true"
-
-                                     rendered="#{sesessionUser.facesUser.keyCard.hasMuniReaderPermissions}">
+                                     rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}">
 
                         <h:form id="photo-form">
                             <p:scrollPanel style="width:1000px; height:400px" mode="native">
                                 <p:dataTable
                                     id="photoTable"
                                     var="photoid"
-                                    value="#{caseProfileBB.selectedViolation.photoList}"
+                                    value="#{caseProfileBB.selectedViolation.blobIDList}"
                                     rowKey="#{photoid}"
                                     tableStyleClass="primeDataTable"
                                     draggableRows="false" tabindex="6">
@@ -2056,7 +2067,7 @@
                                                          actionListener="#{caseProfileBB.deletePhoto(photoid)}"
                                                          value="Delete" 
                                                          icon="fa fa-bomb"
-                                                         rendered="#{sesssessionUseracesUser.keyCard.hasSysAdminPermissions}"
+                                                         rendered="#{sessionBean.sessionUser.keyCard.hasSysAdminPermissions}"
                                                          update=":photo-form:photoTable"/>
                                     </p:column>
                                     <p:column>
@@ -2115,7 +2126,8 @@
                     <p:confirmDialog message="Create case profile report" 
                                      severity="alert" widgetVar="report-case-profile-diaglog-var"
                                      closable="true" responsive="true"
-                                     rendered="sessionUserBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                                     rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                     >
 
                         <h:form id="report-case-profile-form">
 

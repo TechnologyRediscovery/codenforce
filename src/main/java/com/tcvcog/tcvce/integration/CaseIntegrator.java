@@ -421,6 +421,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
      */
     public CECase getCECase(int ceCaseID) throws IntegrationException, CaseLifecyleException{
+        if(ceCaseID == 0){
+            throw new IntegrationException("Cannot get a case with ID 0");
+        } else {
+            System.out.println("CaseIntegrator.getCECase | getting case with id: " + ceCaseID);
+        }
         CaseCoordinator cc = getCaseCoordinator();
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
@@ -455,7 +460,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
         
         // send the case to the coordinator for the setting of casephase and such before returning
-        return cc.configureCECase(cse);
+        if(cse != null){
+            return cc.configureCECase(cse);
+        }
+        else return cse;
     }
     
     public CECase generateCECase(CaseBase caseBare) throws SQLException, IntegrationException{
@@ -482,6 +490,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         SystemIntegrator si = getSystemIntegrator();
         
         int ceCaseID = rs.getInt("caseid");
+        if(ceCaseID == 0){
+            throw new IntegrationException("cannot generate case with ID 0");
+        }
         
         CaseBase c = new CaseBase();
 

@@ -117,7 +117,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void initBean(){
         CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
         PropertyIntegrator pi = getPropertyIntegrator();
-        User facesUser = getSessionBean().getSessionUser();
+        User usr = getSessionBean().getSessionUser();
         currentRequest = req;
         
         // set date of record to current date
@@ -126,7 +126,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // init new, empty photo list
         this.blobList = new ArrayList<>();    
         
-        if(facesUser != null 
+        if(usr != null 
                 && 
             req != null 
                 && 
@@ -137,12 +137,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             } catch (IntegrationException | CaseLifecyleException ex) {
                 System.out.println(ex);
             }
-        } else if (facesUser != null && req != null ) {
+        } else if (usr != null && req != null ) {
             personCandidateList = getSessionBean().getSessionPersonList();
         }
         disabledPersonFormFields = false;
         actionRequestorAssignmentMethod = 1;
-        if(facesUser != null){
+        if(usr != null){
             selectedMuni = getSessionBean().getSessionMuni();
         }
     }

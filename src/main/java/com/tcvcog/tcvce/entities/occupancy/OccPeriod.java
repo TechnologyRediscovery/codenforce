@@ -30,7 +30,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
     private List<OccEvent> eventList;
-    private List<Proposal> eventProposalList;
+    private List<Proposal> proposalList;
     private List<EventRuleOccPeriod> eventRuleOccPeriodList;
     
     private List<OccInspection> inspectionList;
@@ -99,10 +99,10 @@ public class OccPeriod extends EntityUtils implements Serializable{
     }
 
     /**
-     * @return the eventProposalList
+     * @return the proposalList
      */
-    public List<Proposal> getEventProposalList() {
-        return eventProposalList;
+    public List<Proposal> getProposalList() {
+        return proposalList;
     }
 
     /**
@@ -281,10 +281,10 @@ public class OccPeriod extends EntityUtils implements Serializable{
     }
 
     /**
-     * @param eventProposalList the eventProposalList to set
+     * @param proposalList the proposalList to set
      */
-    public void setEventProposalList(List<Proposal> eventProposalList) {
-        this.eventProposalList = eventProposalList;
+    public void setProposalList(List<Proposal> proposalList) {
+        this.proposalList = proposalList;
     }
 
     /**

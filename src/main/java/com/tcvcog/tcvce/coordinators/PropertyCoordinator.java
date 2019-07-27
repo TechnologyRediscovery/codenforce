@@ -20,11 +20,18 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitChange;
+import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  *
@@ -34,6 +41,29 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     private final String DEFAULTUNITNUMBER = "-1";
     private final boolean DEFAULTRENTAL = false;
+    
+    public PropertyWithLists configurePropertyWithLists(PropertyWithLists propWL) throws IntegrationException, CaseLifecyleException{
+        
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        if(propWL.getCeCaseList() == null){propWL.setCeCaseList(new ArrayList<CECase>());}
+        if(propWL.getUnitWithListsList() == null){propWL.setUnitWithListsList(new ArrayList<PropertyUnitWithLists>());}
+        if(propWL.getPersonList()== null){propWL.setPersonList(new ArrayList<Person>());}
+        if(propWL.getInfoCaseList()== null){propWL.setInfoCaseList(new ArrayList<CECase>());}
+        if(propWL.getChangeList()== null){propWL.setChangeList(new ArrayList<PropertyUnitChange>());}
+        if(propWL.getBlobList()== null){propWL.setBlobList(new ArrayList<Integer>());}
+
+        // add a unit number -1 to any PropertyWithoutAnyUnits
+
+        
+        return propWL;
+    }
+    
+    public Property configureProperty(Property p){
+        if(p.getUnitList() == null){p.setUnitList(new ArrayList<PropertyUnit>());}
+        
+        return p;
+    }
     
     /**
      * Creates a new instance of PropertyUnitCoordinator
@@ -54,7 +84,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     public PropertyUnit getNewPropertyUnit(){
         PropertyUnit propUnit = new PropertyUnit();
         
-        propUnit.setUnitNumber(DEFAULTUNITNUMBER);
+        propUnit.setUnitNumber(Constants.DEFAULT_UNIT_NUMBER);
 //        propUnit.setRental(DEFAULTRENTAL);
 //        propUnit.setPropertyUnitPersonList(new ArrayList<Person>());
         return propUnit;

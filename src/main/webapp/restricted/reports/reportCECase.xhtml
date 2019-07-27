@@ -28,8 +28,6 @@
                         </h2>
 
                         <p>
-                            <a href="#action-requests">next actions <h:outputText value=" (#{caseProfileBB.currentCase.eventProposalList.size()})" /> </a> | 
-                            <a href="#add-event">new event</a> | 
                             <a href="#event-history">event history <h:outputText value=" (#{caseProfileBB.currentCase.visibleEventList.size()})" /></a> | 
                             <a href="#violations">violations <h:outputText value=" (#{caseProfileBB.currentCase.violationList.size()})" /></a> | 
                             <a href="#notices">notices <h:outputText value=" (#{caseProfileBB.currentCase.noticeList.size()})" /></a> | 
@@ -41,7 +39,7 @@
                         <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                      columnClasses="gridTd, gridTd">
                             <h:panelGroup>
-                                <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.caseOpenClosed}" />
+                                <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
                                 <div class="status-display-container">
                                     <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
                                         <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{caseProfileBB.currentCase.casePhaseIcon.materialIcon}"/></i>
@@ -168,7 +166,7 @@
                     <p:dataScroller
                         id="events-datascroller"
                         var="e"
-                        value="#{caseProfileBB.currentCase.visibleEventList}"
+                        value="#{caseProfileBB.reportCECase.eventListForReport}"
                         widgetVar="ceevent-ds-var">
 
                         <div class="outlinedBox event-ds-box">
@@ -432,7 +430,7 @@
 
                     <p:dataScroller
                         id="notices-ds"
-                        value="#{caseProfileBB.currentCase.noticeList}"
+                        value="#{caseProfileBB.reportCECase.noticeListForReport}"
                         var="notice"
                         rendered="true">
 

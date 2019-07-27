@@ -31,7 +31,7 @@ public class PropertyWithLists extends Property implements Serializable{
     // cases store code enforcement data
     private List<CECase> ceCaseList;
     // property units store occupancy data
-    private List<PropertyUnit> unitList;
+    private List<PropertyUnitWithLists> unitWithListsList;
     // both are connected to Person objects all over the place
     private List<Person> personList;
     private List<CECase> infoCaseList;
@@ -88,6 +88,7 @@ public class PropertyWithLists extends Property implements Serializable{
         
         this.useTypeID = prop.getUseTypeID();
         this.useTypeString = prop.getUseTypeString();
+        this.unitList = prop.getUnitList();
         
         
     }
@@ -100,12 +101,6 @@ public class PropertyWithLists extends Property implements Serializable{
         return ceCaseList;
     }
 
-    /**
-     * @return the unitList
-     */
-    public List<PropertyUnit> getUnitList() {
-        return unitList;
-    }
 
     /**
      * @return the personList
@@ -121,12 +116,6 @@ public class PropertyWithLists extends Property implements Serializable{
         this.ceCaseList = ceCaseList;
     }
 
-    /**
-     * @param unitList the unitList to set
-     */
-    public void setUnitList(List<PropertyUnit> unitList) {
-        this.unitList = unitList;
-    }
 
     /**
      * @param personList the personList to set
@@ -175,6 +164,20 @@ public class PropertyWithLists extends Property implements Serializable{
      */
     public void setBlobList(List<Integer> blobList) {
         this.blobList = blobList;
+    }
+
+    /**
+     * @return the unitWithListsList
+     */
+    public List<PropertyUnitWithLists> getUnitWithListsList() {
+        return unitWithListsList;
+    }
+
+    /**
+     * @param unitWithListsList the unitWithListsList to set
+     */
+    public void setUnitWithListsList(List<PropertyUnitWithLists> unitWithListsList) {
+        this.unitWithListsList = unitWithListsList;
     }
     
 }

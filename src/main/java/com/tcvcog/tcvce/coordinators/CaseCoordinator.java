@@ -53,6 +53,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -70,6 +71,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         
         
     
+    }
+    
+    @PostConstruct
+    public void initBean(){
+        
     }
     
     /**
@@ -97,9 +103,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             cse.setViolationList(new ArrayList<CodeViolation>());
         }
         
-        cse.setEventProposalList(new ArrayList<CECaseEvent>());
-        cse.setVisibleEventList(new ArrayList<CECaseEvent>());
+        if(cse.getCompleteEventList() == null){
+            cse.setCompleteEventList(new ArrayList<CECaseEvent>());
+        }
         
+        if(cse.getProposalList() == null){
+            cse.setProposalList(new ArrayList<Proposal>());
+        }
+        
+        if(cse.getEventRuleList() == null){
+            cse.setEventRuleList(new ArrayList<EventRuleAbstract>());
+        }
         
         if(cse.getCitationList() == null){
             cse.setCitationList(new ArrayList<Citation>());
@@ -112,14 +126,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         if(cse.getCeActionRequestList() == null){
             cse.setCeActionRequestList(new ArrayList<CEActionRequest>());
         }
-        cse.setActiveEventList(new ArrayList<CECaseEvent>());
         
         configureCECaseStageAndPhase(cse);
         
         Collections.sort(cse.getNoticeList());
         Collections.reverse(cse.getNoticeList());
         
-        Collections.sort(cse.getEventProposalList());
         Collections.sort(cse.getVisibleEventList());
         Collections.reverse(cse.getVisibleEventList()); 
         
@@ -146,6 +158,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
      */
      public CECase configureCECaseStageAndPhase(CECase cse) throws CaseLifecyleException, IntegrationException {
         
+         if(cse.getCaseID() == 0){
+             throw new CaseLifecyleException("cannot configure case with ID 0");
+             
+         }
+         
         // First determine case stage, then dig around as needed in the case
         // data to determine the appropriate phase
         
@@ -162,7 +179,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 
             if(cse.getViolationList().isEmpty()){
                 // Open case, no violations yet: only one mapping
-                cse.setCaseStage(CaseStage.Investigation);
                 cse.setCasePhase(CasePhase.PrelimInvestigationPending);
                 
               // we have at least one violation attached  
@@ -170,7 +186,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                 
                 // If we don't have a mailed notice, then we're in Notice Delivery phase
                 if(!determineIfNoticeHasBeenMailed(cse)){
-                    cse.setCaseStage(CaseStage.Investigation);
                     cse.setCasePhase(CasePhase.NoticeDelivery);
                   
                 // notice has been sent so we're in CaseStage.Enforcement or beyond
@@ -178,23 +193,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                     switch(maxVStage){
                         case 0:  // all violations resolved
                             cse.setCasePhase(CasePhase.Closed);
-                            cse.setCaseStage(CaseStage.Closed);
                             break;
                         case 1: // all violations within compliance window
-                            cse.setCaseStage(CaseStage.Enforcement);
                             cse.setCasePhase(CasePhase.InitialComplianceTimeframe);
                             break;
                         case 2: // one or more EXPIRED compliance timeframes
-                            cse.setCaseStage(CaseStage.Enforcement);
                             cse.setCasePhase(CasePhase.SecondaryPostHearingComplianceTimeframe);
                             break;
                         case 3: // at least 1 violation used in a citation that's attached to case
-                            cse.setCaseStage(CaseStage.Citation);
                             determineAndSetPhase_stageCITATION(cse);
                             break;
                         default: // unintentional dumping ground 
                             cse.setCasePhase(CasePhase.InactiveHolding);
-                            cse.setCaseStage(CaseStage.Unknown);
                     }
                     
                 }
@@ -202,13 +212,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             }
         } else { // we have a closed case
             
-            cse.setCaseStage(CaseStage.Closed);
-            // there is only one possible phase mapping
             cse.setCasePhase(CasePhase.Closed);
         }
         //now set the icon based on what phase we just assigned the case to
         cse.setCasePhaseIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString(cse.getCaseStage().getIconPropertyLookup()))));
+                .getString(cse.getCasePhase().getCaseStage().getIconPropertyLookup()))));
         return cse;
     }
      
@@ -219,6 +227,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
       */
     public CECase determineAndSetPhase_stageCITATION(CECase cse){
         Iterator<CECaseEvent> iter = cse.getActiveEventList().iterator();
+        cse.setCasePhase(CasePhase.HearingPreparation);
         while(iter.hasNext()){
             CECaseEvent ev = iter.next();
             if(ev.getCategory().getEventType() == EventType.Citation){
@@ -469,7 +478,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         return insertedEventID;
     } // close method
     
-    protected void implementPassedCasePhaseChangeRule(CECase cse, EventRuleAbstract rule) 
+    
+    protected void processCaseOnEventRulePass(CECase cse, EventRuleAbstract rule) 
             throws IntegrationException, CaseLifecyleException, ViolationException{
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
@@ -482,7 +492,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
 //            newEvent = ec.getInitializedEvent(cse, ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryID()));
 //            
 //            attachNewEventToCECase(cse, newEvent, null);
-//            System.out.println("CaseCoordinator.implementPassedCasePhaseChangeRule "  + newEvent.getCategory().getEventCategoryTitle());
+//            System.out.println("CaseCoordinator.processCaseOnEventRulePass "  + newEvent.getCategory().getEventCategoryTitle());
 //        }
 //        
     }
@@ -1013,6 +1023,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
     * @param rptCse
     * @return
     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException 
     */
    public ReportConfigCECase transformCECaseForReport(ReportConfigCECase rptCse) throws IntegrationException, CaseLifecyleException{
        CaseIntegrator ci = getCaseIntegrator();
@@ -1036,7 +1047,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
                     && !rptCse.isIncludeOfficerOnlyEvents()) continue;
             evList.add(ev);
        }
-       c.setVisibleEventList(evList);
+       rptCse.setEventListForReport(evList);
+       
        List<NoticeOfViolation> noticeList = new ArrayList<>();
        Iterator<NoticeOfViolation> iterNotice = c.getNoticeList().iterator();
        while(iterNotice.hasNext()){
@@ -1047,7 +1059,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
            if(!rptCse.isIncludeAllNotices() && nov.getReturnedTS() != null  ) continue;
            noticeList.add(nov);
        }
-       c.setNoticeList(noticeList);
+       rptCse.setNoticeListForReport(noticeList);
        return rptCse;
    }
    

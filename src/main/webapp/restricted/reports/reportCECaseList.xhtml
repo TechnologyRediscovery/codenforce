@@ -75,8 +75,6 @@
                             </h2>
 
                             <p>
-                                <a href="#action-requests">next actions <h:outputText value=" (#{cse.eventProposalList.size()})" /> </a> | 
-                                <a href="#add-event">new event</a> | 
                                 <a href="#event-history">event history <h:outputText value=" (#{cse.visibleEventList.size()})" /></a> | 
                                 <a href="#violations">violations <h:outputText value=" (#{cse.violationList.size()})" /></a> | 
                                 <a href="#notices">notices <h:outputText value=" (#{cse.noticeList.size()})" /></a> | 
@@ -88,7 +86,7 @@
                             <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                          columnClasses="gridTd, gridTd">
                                 <h:panelGroup>
-                                    <h:outputLabel styleClass="bold" value="Case Status: #{cse.caseOpenClosed}" />
+                                    <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
                                     <div class="status-display-container">
                                         <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
                                             <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{cse.casePhaseIcon.materialIcon}"/></i>

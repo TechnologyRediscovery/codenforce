@@ -500,7 +500,7 @@
 
                             <p:commandButton    ajax="true" actionListener="#{personsBB.attachNoteToPerson}" tabindex="3"
                                                 value="Submit" icon="fa fa-link" oncomplete="PF('person-note-dialog').hide()"
-                                                rendered="#{sesessionUser.facesUser.keyCard.hasMuniStaffPermissions}"
+                                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                 update="    selected-person-info-form
                                                 messages-left-form:persons-messages-global"/>
                         </h:form>
@@ -510,7 +510,8 @@
                                 height="650" width="900"
                                 widgetVar="person-addupdate-dialog-var"
                                 closable="true" 
-                                renderedsessionUseronBean.facesUser.keyCard.hasMuniReaderPermissions}">
+                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
+                                >
 
 
                         <h:form id="person-addupdate-form">

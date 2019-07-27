@@ -362,7 +362,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
     public CitationStatus getCitationStatus(int statusID) throws IntegrationException{
             
         String query =  "SELECT statusid, statusname, description, icon_iconid, editsforbidden, \n" +
-                        "       phasechangerule_ruleid "
+                        "       eventrule_ruleid "
                         + "FROM citationStatus WHERE statusid=?";
         Connection con = getPostgresCon();
         ResultSet rs = null;

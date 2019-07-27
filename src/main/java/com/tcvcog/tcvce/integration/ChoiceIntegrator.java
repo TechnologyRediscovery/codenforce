@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.sun.org.apache.xalan.internal.xsltc.compiler.Constants;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseEvent;
@@ -167,11 +168,13 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     
     public Proposal getProposal(int propID) throws IntegrationException{
         Proposal prop = null;
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        
         StringBuilder sb = new StringBuilder();
         sb.append(  "SELECT proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
                     "       initiator_userid, responderintended_userid, activateson, expireson, \n" +
                     "       responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" +
-                    "       active, notes, relativeorder, hidden, generatingevent_occeventid, \n" +
+                    "       active, notes, relativeorder, generatingevent_occeventid, \n" +
                     "       responseevent_occeventid, occperiod_periodid, cecase_caseid\n" +
                     "  FROM public.choiceproposal WHERE proposalid=?;");
         Connection con = getPostgresCon();
@@ -179,14 +182,12 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
 
         try {
-
             stmt = con.prepareStatement(sb.toString());
             stmt.setInt(1, propID);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
                 prop = generateProposal(rs);
-                
             }
 
         } catch (SQLException ex) {
@@ -235,7 +236,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         return proposalList;
     }
     
-    
     public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException{
         
         List<Proposal> proposalList = new ArrayList<>();
@@ -247,20 +247,17 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-
         try {
-
             stmt = con.prepareStatement(sb.toString());
             stmt.setInt(1, occPer.getPeriodID());
             rs = stmt.executeQuery();
-
             while (rs.next()) {
                 proposalList.add(getProposal(rs.getInt("proposalid")));
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive event proposal response", ex);
+            throw new IntegrationException("Cannot retrive proposal list", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -316,7 +313,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         prop.setActive(rs.getBoolean("active"));
         prop.setNotes(rs.getString("notes"));
         prop.setOrder(rs.getInt("relativeorder"));
-        prop.setHidden(rs.getBoolean("hidden"));
         
         prop.setCecaseID(rs.getInt("cecase_caseid"));
         prop.setOccperiodID(rs.getInt("occperiod_periodid"));
@@ -330,7 +326,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                             "       initiator_userid=?, responderintended_userid=?, activateson=?, \n" +
                             "       expireson=?, responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" +
                             "       responseevent_cecaseeventid=?, active=?, notes=?, relativeorder=?, \n" +
-                            "       hidden=?, generatingevent_occeventid=?, responseevent_occeventid=?, \n" +
+                            "       generatingevent_occeventid=?, responseevent_occeventid=?, \n" +
                             "       occperiod_periodid=?, cecase_caseid=?\n" +
                             " WHERE proposalid=?;";
 
@@ -344,12 +340,12 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             if(ev != null){
                 if(ev instanceof CECaseEvent){
                     stmt.setInt(2, prop.getGeneratingEvent().getEventID());
-                    stmt.setNull(15, java.sql.Types.NULL);
+                    stmt.setNull(14, java.sql.Types.NULL);
                 } else if (ev instanceof OccEvent){
-                    stmt.setInt(15, prop.getGeneratingEvent().getEventID());
+                    stmt.setInt(14, prop.getGeneratingEvent().getEventID());
                     stmt.setNull(2, java.sql.Types.NULL);
                 } else {
-                    stmt.setNull(15, java.sql.Types.NULL);
+                    stmt.setNull(14, java.sql.Types.NULL);
                     stmt.setNull(2, java.sql.Types.NULL);
                 }
             }
@@ -386,28 +382,29 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             if(ev != null){
                 if(ev instanceof CECaseEvent){
                     stmt.setInt(10, prop.getResponseEvent().getEventID());
-                    stmt.setNull(16, java.sql.Types.NULL);
+                    stmt.setNull(15, java.sql.Types.NULL);
                 } else if (ev instanceof OccEvent){
-                    stmt.setInt(16, prop.getResponseEvent().getEventID());
+                    stmt.setInt(15, prop.getResponseEvent().getEventID());
                     stmt.setNull(10, java.sql.Types.NULL);
                 } else {
                     stmt.setNull(10, java.sql.Types.NULL);
-                    stmt.setNull(16, java.sql.Types.NULL);
+                    stmt.setNull(15, java.sql.Types.NULL);
                 }
             }
             stmt.setBoolean(11, prop.isActive());
             stmt.setString(12, prop.getNotes());
             stmt.setInt(13, prop.getOrder());
             
-            stmt.setBoolean(14, prop.isHidden());
-            stmt.setInt(17, prop.getOccperiodID());
-            stmt.setInt(18, prop.getCecaseID());
+//            stmt.setBoolean(14, prop.isHidden());
+            
+            stmt.setInt(16, prop.getOccperiodID());
+            stmt.setInt(17, prop.getCecaseID());
             
             
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot udpate event proposal implementation, sorry", ex);
+            throw new IntegrationException("Cannot udpate proposal implementation, sorry", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -447,7 +444,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive EventProposal", ex);
+            throw new IntegrationException("Cannot retrive Directive", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -456,8 +453,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
         return proposal;
-        
-        
     }
     
     /**
@@ -579,7 +574,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                 "            proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
                 "            initiator_userid, responderintended_userid, activateson, expireson, \n" +
                 "            responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" +
-                "            active, notes, relativeorder, hidden, generatingevent_occeventid, \n" +
+                "            active, notes, relativeorder, generatingevent_occeventid, \n" +
                 "            responseevent_occeventid, occperiod_periodid, cecase_caseid)\n" +
                 "    VALUES (DEFAULT, ?, ?, \n" +
                 "            ?, ?, ?, ?, \n" +
@@ -598,12 +593,12 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             if(ev != null){
                 if(ev instanceof CECaseEvent){
                     stmt.setInt(2, prop.getGeneratingEvent().getEventID());
-                    stmt.setNull(15, java.sql.Types.NULL);
+                    stmt.setNull(14, java.sql.Types.NULL);
                 } else if (ev instanceof OccEvent){
-                    stmt.setInt(15, prop.getGeneratingEvent().getEventID());
+                    stmt.setInt(14, prop.getGeneratingEvent().getEventID());
                     stmt.setNull(2, java.sql.Types.NULL);
                 } else {
-                    stmt.setNull(15, java.sql.Types.NULL);
+                    stmt.setNull(14, java.sql.Types.NULL);
                     stmt.setNull(2, java.sql.Types.NULL);
                 }
             }
@@ -641,22 +636,22 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             if(ev != null){
                 if(ev instanceof CECaseEvent){
                     stmt.setInt(10, prop.getResponseEvent().getEventID());
-                    stmt.setNull(16, java.sql.Types.NULL);
+                    stmt.setNull(15, java.sql.Types.NULL);
                 } else if (ev instanceof OccEvent){
-                    stmt.setInt(16, prop.getResponseEvent().getEventID());
+                    stmt.setInt(15, prop.getResponseEvent().getEventID());
                     stmt.setNull(10, java.sql.Types.NULL);
                 } else {
                     stmt.setNull(10, java.sql.Types.NULL);
-                    stmt.setNull(16, java.sql.Types.NULL);
+                    stmt.setNull(15, java.sql.Types.NULL);
                 }
             }
             stmt.setBoolean(11, prop.isActive());
             stmt.setString(12, prop.getNotes());
             stmt.setInt(13, prop.getOrder());
             
-            stmt.setBoolean(14, prop.isHidden());
-            stmt.setInt(17, prop.getOccperiodID());
-            stmt.setInt(18, prop.getCecaseID());
+//            stmt.setBoolean(14, prop.isHidden());
+            stmt.setInt(16, prop.getOccperiodID());
+            stmt.setInt(17, prop.getCecaseID());
             
             stmt.execute();
 
@@ -668,7 +663,5 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        
     }
-    
 }

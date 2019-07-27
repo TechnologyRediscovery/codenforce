@@ -19,6 +19,10 @@ public interface Proposable {
     public int getMinimumRequiredUserRankToView();
     public int getMinimumRequiredUserRankToChoose();
     public Icon getIcon();
+    public boolean isHidden();
+    public void setHidden(boolean h);
+    public boolean isCanChoose();
+    public void setCanChoose(boolean ch);
     
     
 }

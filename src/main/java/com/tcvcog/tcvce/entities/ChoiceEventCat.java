@@ -50,4 +50,5 @@ public class ChoiceEventCat
     public void setAddCategoryFuncSwitch(boolean addCategoryFuncSwitch) {
         this.addCategoryFuncSwitch = addCategoryFuncSwitch;
     }
+
 }

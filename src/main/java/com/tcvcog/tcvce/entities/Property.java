@@ -24,6 +24,8 @@ public class Property implements Serializable{
     
     private PropertyStatus status;
     
+    protected List<PropertyUnit> unitList;
+    
     protected Municipality muni;
     protected int muniCode;
     protected String parID;
@@ -65,6 +67,7 @@ public class Property implements Serializable{
     protected boolean active;
     protected boolean nonAddressable;
     
+    // until we have an object
     protected int  useTypeID;
     protected String useTypeString;
     
@@ -587,6 +590,20 @@ public class Property implements Serializable{
      */
     public void setUseTypeID(int useTypeID) {
         this.useTypeID = useTypeID;
+    }
+
+    /**
+     * @return the unitList
+     */
+    public List<PropertyUnit> getUnitList() {
+        return unitList;
+    }
+
+    /**
+     * @param unitList the unitList to set
+     */
+    public void setUnitList(List<PropertyUnit> unitList) {
+        this.unitList = unitList;
     }
 
   

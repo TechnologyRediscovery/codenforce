@@ -78,7 +78,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, catID);
-            //System.out.println("EventInteegrator.getEventCategory| sql: " + stmt.toString());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -136,6 +135,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public EventRuleAbstract getEventRule(int ruleid) throws IntegrationException{
+        if(ruleid == 0){
+            return null;
+        }
+        
         EventRuleAbstract rule = null;
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -187,30 +190,30 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         evRule.setRuleid(rs.getInt("ruleid"));
         evRule.setTitle(rs.getString("title"));
         evRule.setDescription(rs.getString("description"));
-        evRule.setRequiredeventtype(EventType.valueOf(rs.getString("requiredeventrype")));
-        evRule.setForbiddeneventtype(EventType.valueOf(rs.getString("forbiddeneventtype")));
+        evRule.setRequiredEventType(EventType.valueOf(rs.getString("requiredeventrype")));
+        evRule.setForbiddenEventType(EventType.valueOf(rs.getString("forbiddeneventtype")));
         
-        evRule.setRequiredEventCat(getEventCategory(rs.getInt("requiredeventcat_catid")));
-        evRule.setRequiredeventcatthresholdtypeintorder(rs.getInt("requiredeventcatthresholdtypeintorder"));
+        evRule.setRequiredEventCategory(getEventCategory(rs.getInt("requiredeventcat_catid")));
+        evRule.setRequiredECThreshold_typeInternalOrder(rs.getInt("requiredeventcatthresholdtypeintorder"));
         
-        evRule.setRequiredeventcatupperboundtypeintorder(rs.getBoolean("requiredeventcatupperboundtypeintorder"));
-        evRule.setRequiredeventcatthresholdglobalorder(rs.getInt("requiredeventcatthresholdglobalorder"));
+        evRule.setRequiredECThreshold_typeInternalOrder_treatAsUpperBound(rs.getBoolean("requiredeventcatupperboundtypeintorder"));
+        evRule.setRequiredECThreshold_globalOrder(rs.getInt("requiredeventcatthresholdglobalorder"));
         
-        evRule.setRequiredeventcatupperboundglobalorder(rs.getBoolean("requiredeventcatupperboundglobalorder"));
-        evRule.setForbiddenEventCat(getEventCategory(rs.getInt("forbiddeneventcat_catid")));
+        evRule.setRequiredECThreshold_globalOrder_treatAsUpperBound(rs.getBoolean("requiredeventcatupperboundglobalorder"));
+        evRule.setForbiddenEventCategory(getEventCategory(rs.getInt("forbiddeneventcat_catid")));
         
-        evRule.setForbiddeneventcatthresholdtypeintorder(rs.getInt("forbiddeneventcatthresholdtypeintorder"));
-        evRule.setForbiddeneventcatupperboundtypeintorder(rs.getBoolean("forbiddeneventcatupperboundtypeintorder"));
+        evRule.setForbiddenECThreshold_typeInternalOrder(rs.getInt("forbiddeneventcatthresholdtypeintorder"));
+        evRule.setForbiddenECThreshold_typeInternalOrder_treatAsUpperBound(rs.getBoolean("forbiddeneventcatupperboundtypeintorder"));
         
-        evRule.setForbiddeneventcatthresholdglobalorder(rs.getInt("forbiddeneventcatthresholdglobalorder"));
-        evRule.setForbiddeneventcatupperboundglobalorder(rs.getBoolean("forbiddeneventcatupperboundglobalorder"));
+        evRule.setForbiddenECThreshold_globalOrder(rs.getInt("forbiddeneventcatthresholdglobalorder"));
+        evRule.setForbiddenECThreshold_globalOrder_treatAsUpperBound(rs.getBoolean("forbiddeneventcatupperboundglobalorder"));
         
-        evRule.setMandatorypassreqtocloseentity(rs.getBoolean("mandatorypassreqtocloseentity"));
-        evRule.setAutoremoveonentityclose(rs.getBoolean("autoremoveonentityclose"));
+        evRule.setMandatoryRulePassRequiredToCloseEntity(rs.getBoolean("mandatorypassreqtocloseentity"));
+        evRule.setInactivateRuleOnEntityClose(rs.getBoolean("autoremoveonentityclose"));
         evRule.setPromptingProposal(ci.getProposal(rs.getInt("promptingproposal_proposalid")));
         
-        evRule.setTriggeredeventcatonpass(getEventCategory(rs.getInt("triggeredeventcatonpass")));
-        evRule.setTriggeredeventcatonfail(getEventCategory(rs.getInt("triggeredeventcatonfail")));
+        evRule.setTriggeredECOnRulePass(getEventCategory(rs.getInt("triggeredeventcatonpass")));
+        evRule.setTriggeredECOnRuleFail(getEventCategory(rs.getInt("triggeredeventcatonfail")));
         evRule.setActive(rs.getBoolean("active"));
         evRule.setNotes(rs.getString("notes"));
         
@@ -427,6 +430,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return categoryList;
     }
     
+    /**
+     * Existed when we had event categories as the only way of requesting things
+     * 
+     * @deprecated 
+     * @return
+     * @throws IntegrationException 
+     */
     public List<EventCategory> getRequestableEventCategories() 
             throws IntegrationException {
         String query = "SELECT categoryid FROM public.eventcategory WHERE requestable = TRUE;";
@@ -473,7 +483,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setString(1, et.toString());
             rs = stmt.executeQuery();
-            System.out.println("EventIntegrator.getEventCategoryList | SQL: " + stmt.toString());
             while (rs.next()) {
                 categoryList.add(getEventCategory(rs.getInt("categoryid")));
             }
@@ -719,7 +728,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, eventIdToInactivate);
 
             stmt.executeUpdate();
-            System.out.println("EventIntegrator.inactivateEvent | inactivating event ID: " + eventIdToInactivate);
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -767,7 +775,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(11, event.getEventID());
             
             stmt.executeUpdate();
-            System.out.println("EventIntegrator.updateEvent: executed event updated on ID " + event.getEventID());
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -1046,7 +1053,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(++paramCounter, params.getObjectID());
             }
 
-            System.out.println("EventIntegrator.getEvents | Param counter before execution: " + paramCounter);
             rs = stmt.executeQuery();
 
             int counter = 0;
@@ -1118,9 +1124,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setTimestamp(1, java.sql.Timestamp.valueOf(start));
             stmt.setTimestamp(2, java.sql.Timestamp.valueOf(end));
             stmt.setInt(3, m.getMuniCode());
-            System.out.println("EventIntegrator.getUpcomingTimelineEvents | stmt: " + stmt.toString());
             rs = stmt.executeQuery();
-            System.out.println("EventIntegrator.getUpcomingTimelineEvents | rs size: " + rs.getFetchSize());
 
             while (rs.next()) {
                 CECaseEvent ev = new CECaseEvent();
@@ -1186,8 +1190,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ec.getEventID());
-
-            System.out.println("EventIntegrator.clearing response to action request");
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
@@ -1220,7 +1222,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
             stmt = con.prepareStatement(query);
             stmt.setInt(1, eventID);
-            System.out.println("EventInteegrator.getEventByEventID| sql: " + stmt.toString());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -1269,7 +1270,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, caseID);
-            System.out.println("EventIntegrator.getEventsByCaseID| sql: " + stmt.toString());
             rs = stmt.executeQuery();
 
             while (rs.next()) {

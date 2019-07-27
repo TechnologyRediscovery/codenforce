@@ -102,10 +102,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+  
     public String goToChanges() {
         
         return "unitchanges";
-        
     }
     
     public String addProperty(){
@@ -136,7 +136,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         try {
             currProp = pi.getPropertyWithLists(prop.getPropertyID());
             ui.logObjectView(getSessionBean().getSessionUser(), prop);
-            getSessionBean().getSessionPropertyList().add(prop);
+            getSessionBean().setSessionProperty(prop);
             
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);

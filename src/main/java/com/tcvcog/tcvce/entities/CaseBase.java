@@ -34,8 +34,6 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
     protected User caseManager;
     protected String caseName;
     protected CasePhase casePhase;
-    protected CaseStage caseStage;
-    private String caseOpenClosed;
     
     protected Icon casePhaseIcon;
     
@@ -290,19 +288,7 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
         this.allowForwardLinkedPublicAccess = allowForwardLinkedPublicAccess;
     }
 
-    /**
-     * @return the caseStage
-     */
-    public CaseStage getCaseStage() {
-              return caseStage;
-    }
-
-    /**
-     * @param caseStage the caseStage to set
-     */
-    public void setCaseStage(CaseStage caseStage) {
-        this.caseStage = caseStage;
-    }
+   
 
     /**
      * @return the casePhaseIcon
@@ -330,7 +316,6 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
         hash = 53 * hash + Objects.hashCode(this.caseManager);
         hash = 53 * hash + Objects.hashCode(this.caseName);
         hash = 53 * hash + Objects.hashCode(this.casePhase);
-        hash = 53 * hash + Objects.hashCode(this.caseStage);
         hash = 53 * hash + Objects.hashCode(this.casePhaseIcon);
         hash = 53 * hash + Objects.hashCode(this.originationDate);
         hash = 53 * hash + Objects.hashCode(this.originiationDatePretty);
@@ -359,21 +344,7 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
         return true;
     }
 
-    /**
-     * @return the caseOpenClosed
-     * @throws com.tcvcog.tcvce.domain.CaseLifecyleException
-     */
-    public String getCaseOpenClosed() throws CaseLifecyleException {
-        String stat = null;
-        if(getCaseStage() != CaseStage.Closed){
-            stat = "Open";
-        } else {
-            stat = "Closed";
-        }
-        
-        caseOpenClosed = stat;
-        return caseOpenClosed;
-    }
+  
 
     /**
      * @return the closingDateUtilDate

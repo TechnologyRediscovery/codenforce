@@ -191,10 +191,6 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
             selectedPerson = pi.getPerson(newPersonID);
             getSessionBean().setSessionPerson(selectedPerson);
             getSessionBean().getSessionPersonList().add(selectedPerson);
-            
-            
-//            ui.logObjectView(getSessionBean().getFacesUser(), selectedPerson);
-            
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Person created with ID " + newPersonID + "! This person is now your active one and has been added to your history.'", ""));

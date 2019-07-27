@@ -25,6 +25,24 @@ import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
+import com.tcvcog.tcvce.entities.CodeSet;
+import com.tcvcog.tcvce.entities.CodeSource;
+import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PublicInfoBundle;
+import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -106,10 +124,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     
     /* *** Occupancy Permit Application Session Shelves *** */
     private OccPermitApplication sessionOccPermitApplication;
-    private PropertyWithLists activePropWithLists;
-    private PropertyWithLists workingPropWithLists;
-    private PropertyUnit activePropUnit;
-    private PersonType activePersonType;
+    private Property occPermitAppActiveProp;
+    private Property occPermitAppWorkingProp;
+    private PropertyUnit occPermitAppActivePropUnit;
+    private PersonType occPermitAppActivePersonType;
     
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
@@ -784,59 +802,59 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the activePropWithLists
+     * @return the occPermitAppActiveProp
      */
-    public PropertyWithLists getActivePropWithLists() {
-        return activePropWithLists;
+    public Property getOccPermitAppActiveProp() {
+        return occPermitAppActiveProp;
     }
 
     /**
-     * @return the workingPropWithLists
+     * @return the occPermitAppWorkingProp
      */
-    public PropertyWithLists getWorkingPropWithLists() {
-        return workingPropWithLists;
+    public Property getOccPermitAppWorkingProp() {
+        return occPermitAppWorkingProp;
     }
 
     /**
-     * @param activePropWithLists the activePropWithLists to set
+     * @param activeProp the occPermitAppActiveProp to set
      */
-    public void setActivePropWithLists(PropertyWithLists activePropWithLists) {
-        this.activePropWithLists = activePropWithLists;
+    public void setOccPermitAppActiveProp(Property activeProp) {
+        this.occPermitAppActiveProp = activeProp;
     }
 
     /**
-     * @param workingPropWithLists the workingPropWithLists to set
+     * @param workingProp the occPermitAppWorkingProp to set
      */
-    public void setWorkingPropWithLists(PropertyWithLists workingPropWithLists) {
-        this.workingPropWithLists = workingPropWithLists;
+    public void setOccPermitAppWorkingProp(Property workingProp) {
+        this.occPermitAppWorkingProp = workingProp;
     }
 
     /**
-     * @return the activePropUnit
+     * @return the occPermitAppActivePropUnit
      */
-    public PropertyUnit getActivePropUnit() {
-        return activePropUnit;
+    public PropertyUnit getOccPermitAppActivePropUnit() {
+        return occPermitAppActivePropUnit;
     }
 
     /**
-     * @param activePropUnit the activePropUnit to set
+     * @param occPermitAppActivePropUnit the occPermitAppActivePropUnit to set
      */
-    public void setActivePropUnit(PropertyUnit activePropUnit) {
-        this.activePropUnit = activePropUnit;
+    public void setOccPermitAppActivePropUnit(PropertyUnit occPermitAppActivePropUnit) {
+        this.occPermitAppActivePropUnit = occPermitAppActivePropUnit;
     }
 
     /**
-     * @return the activePersonType
+     * @return the occPermitAppActivePersonType
      */
-    public PersonType getActivePersonType() {
-        return activePersonType;
+    public PersonType getOccPermitAppActivePersonType() {
+        return occPermitAppActivePersonType;
     }
 
     /**
-     * @param activePersonType the activePersonType to set
+     * @param occPermitAppActivePersonType the occPermitAppActivePersonType to set
      */
-    public void setActivePersonType(PersonType activePersonType) {
-        this.activePersonType = activePersonType;
+    public void setOccPermitAppActivePersonType(PersonType occPermitAppActivePersonType) {
+        this.occPermitAppActivePersonType = occPermitAppActivePersonType;
     }
     
     
