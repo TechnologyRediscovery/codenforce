@@ -422,17 +422,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "addReason";
         }
     }
-    
-    public void beginPropertyUnitChanges(ActionEvent ev){
-        
-    }
-    
-    public void commitPropertyUnitChanges(ActionEvent ev){
-        
-    
-        
-        
-    }
+  
     
     
 

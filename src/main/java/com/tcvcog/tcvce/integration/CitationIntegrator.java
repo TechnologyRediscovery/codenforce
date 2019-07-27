@@ -75,7 +75,6 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             stmt1.setBoolean(6, citation.isIsActive());
             stmt1.setString(7, citation.getNotes());
             
-            System.out.println("CitationIntegrator.insertCitation| citation insert sql: " + stmt1.toString());
             stmt1.execute();
             
             rs = stmtCID.executeQuery();
@@ -83,13 +82,13 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             while(rs.next()){
                  lastCID= rs.getInt(1);
             }
-            System.out.println("CitationIntegrator.insertCitation | last citation ID: " + lastCID);
+            
             ListIterator<CodeViolation> li = citation.getViolationList().listIterator();
             
             while(li.hasNext()){
                 stmt2.setInt(1, lastCID);
                 stmt2.setInt(2, (int) li.next().getViolationID());
-                System.out.println("CitationIntegreator.insertCitation | citationViolation insert SQL: " + stmt2.toString());
+                
                 stmt2.execute();
             }
             
@@ -145,7 +144,6 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, id);
-            System.out.println("Code.getEventCategory| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -182,7 +180,6 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, prop.getPropertyID());
-            System.out.println("CitationIntegrator.getCitationsByProperty| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -216,7 +213,6 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getCaseID());
-            System.out.println("CitationIntegrator.getCitationsByCase| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -312,8 +308,6 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(7, citation.getNotes());
             stmt.setInt(8, citation.getCitationID());
             
-            
-            System.out.println("CitationIntegrator.updateCitation | sql: " + stmt.toString());
             stmt.execute();
             
             getFacesContext().addMessage(null,
@@ -341,7 +335,6 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, citation.getCitationID());
-            System.out.println("CitationIntegrator.updateCitation | sql: " + stmt.toString());
             stmt.execute();
             
             getFacesContext().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -372,7 +365,6 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, statusID);
-            System.out.println("CitationIntegrator.getCitationStatus| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -402,7 +394,7 @@ public class CitationIntegrator extends BackingBeanUtils implements Serializable
         
         try {
             stmt = con.prepareStatement(query);
-            System.out.println("CitationIntegrator.getFullCitationStatusList | sql: " + stmt.toString());
+            
             rs = stmt.executeQuery();
             
             while(rs.next()){

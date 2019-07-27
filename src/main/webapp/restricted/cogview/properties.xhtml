@@ -191,6 +191,14 @@
 
 
                         <div class="object-column">
+                            
+                            <h:form id="form-propertyobject-messages">
+                                
+                                <h:messages id="messages-properties-object"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            </h:form>
 
                             <p:spacer height="6px;"/>
 
@@ -592,7 +600,7 @@
                                     
                                      <p:commandButton       id="button-editunits"
                                                             ajax="true" 
-                                                            actionListener="#{occPermitApplicationBB.beginPropertyUnitChanges}"
+                                                            actionListener="#{propertyProfileBB.beginPropertyUnitChanges}"
                                                             oncomplete="PF('dialog-widvar-unitedit').show()"
                                                             rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                             value="Edit unit list"  
@@ -612,7 +620,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Unit Number" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.unitNumber}" />
+                                        <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
                                     </p:column>
 
                                     <p:column>
@@ -657,14 +665,27 @@
                         <h2>Edit property units</h2>
                         
                         <h:form id="form-unitedit">
+                                 <h:messages id="messages-properties-editunit"
+                                            globalOnly="true" showDetail="true" showSummary="true"
+                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                </h:messages>
+                            
+                            <p:commandButton ajax="true"                                                   
+                                                 actionListener="#{propertyProfileBB.addUnitToNewPropUnits}" 
+                                                 update="table-unitedit"
+                                                 icon="fa fa-plus"
+                                                 tabindex="1"
+                                                 value="Add unit"/>
+                                
+                                
+                            <p:spacer height="5px" />
                               <p:dataTable
                                     id="table-unitedit"
                                     widgetVar="datatable"
                                     rowIndexVar="rowIndex"
                                     var="unit"
-                                    value="#{occPermitApplicationBB.workingPropUnits}"
-                                    selectionMode="single" tabindex="1"
-                                    selection="#{occPermitApplicationBB.selectedUnit}"
+                                    value="#{propertyProfileBB.currProp.unitList}"
+                                    tabindex="2"
                                     rowKey="#{unit.unitID}"
                                     editable="true">                                         
 
@@ -728,9 +749,21 @@
                                         <f:facet name="header">
                                             <h:outputText value="Remove?" />
                                         </f:facet>
-                                        <p:commandButton ajax="true" value="Remove" 
-                                                         action="#{occPermitApplicationBB.removeSelectedUnit(unit)}"
-                                                         update="#{p:component('table-unitedit')}"/>                                      
+                                        <p:commandButton    id="button-editunits-removeunit"
+                                                            ajax="true" 
+                                                            value="Remove" 
+                                                            disabled="#{!(unit.unitID==0)}"
+                                                            action="#{propertyProfileBB.removePropertyUnitFromEditTable(unit)}"
+                                                            update="#{p:component('table-unitedit')}
+                                                            form-unitedit:messages-properties-editunit"/>                                      
+                                        
+                                        <p:commandButton    id="button-editunits-deactivateunit" 
+                                                            ajax="true" 
+                                                             value="Deactivate" 
+                                                             disabled="#{unit.unitID==0}"
+                                                             action="#{propertyProfileBB.deactivatePropertyUnit(unit)}"
+                                                             update="#{p:component('table-unitedit')}
+                                                             form-unitedit:messages-properties-editunit"/>                                      
                                     </p:column>
 
                                 </p:dataTable>
@@ -774,36 +807,27 @@
 
                                 <p:spacer height="5px"/>
                                 
-                                <p:commandButton ajax="true"                                                   
-                                                 actionListener="#{occPermitApplicationBB.addUnitToNewPropUnits}" 
-                                                 update="table-unitedit"
-                                                 value="Add unit"/>
-                                
                                 
                                 <p:spacer height="5px"/>
                                 
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('dialog-widvar-unitedit').hide()"/>
+                                             onclick="PF('dialog-widvar-unitedit').hide()"
+                                             tabindex="4"/>
                             
                             
                              <p:commandButton ajax="true"
-                                                 actionListener="#{occPermitApplicationBB.commitPropertyUnitChanges}"
-                                                 update="property-lists-form:propertyUnitsTable"
-                                                 value="Save unit list" />
-                                
-                                
-                        
-                          
-
+                                              actionListener="#{propertyProfileBB.finalizeUnitList}"
+                                              oncomplete="PF('dialog-widvar-unitedit').hide()"
+                                              icon="fa fa-thumbs-o-up"
+                                                 update="
+                                                    form-unitedit:messages-properties-editunit
+                                                    property-lists-form:propertyUnitsTable
+                                                    form-propertyobject-messages:messages-properties-object"
+                                                 value="Save unit list" 
+                                                 tabindex="3"/>
                         </h:form>
-
-
-
-
                     </p:dialog>
-
-                    
                 </f:view>
             </ui:define>
         </ui:composition>

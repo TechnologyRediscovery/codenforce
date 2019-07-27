@@ -147,10 +147,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             p.setUnitList(getPropertyUnitList(p));
             
             if(p.getUnitList() != null && p.getUnitList().isEmpty()){
+                System.out.println("PropertyIntegrator.generateProperty | inserting new unit");
                 PropertyUnit pu = pc.getNewPropertyUnit();
                 pu.setPropertyID(p.getPropertyID());
                 insertPropertyUnit(pu);
-                p.setUnitList(getPropertyUnitList(p));
             }
             
         } catch (SQLException ex) {
@@ -918,7 +918,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
      public PropertyUnit getPropertyUnitByPropertyUnitID(int propUnitID) throws IntegrationException {
-        PropertyUnit pu = new PropertyUnit();
+        PropertyUnit pu = null;
         String query =  "SELECT unitid, unitnumber, property_propertyid, otherknownaddress, notes, \n" +
                         "       rentalintentdatestart, rentalintentdatestop, rentalintentlastupdatedby_userid, \n" +
                         "       rentalnotes, active, condition_intensityclassid, lastupdatedts\n" +
@@ -1070,6 +1070,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
+            
+            stmt.setInt(11, pu.getUnitID());
 
             stmt.executeUpdate();
 

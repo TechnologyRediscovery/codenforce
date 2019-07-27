@@ -1242,7 +1242,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     public OccEvent getOccEvent(int eventID){
-        
+        // TODO: finish me
         return new OccEvent();
         
         
@@ -1250,6 +1250,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     public List<OccEvent> getOccEvents(int occPeriodID){
+        // TODO: write my guts
         
         return new ArrayList<>();
         
