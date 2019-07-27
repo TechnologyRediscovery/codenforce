@@ -69,7 +69,7 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
             stageCountMap.put(cs, 0);
         }
         for (CECase c : caseList) {
-            CaseStage stg = c.getCaseStage();
+            CaseStage stg = c.getCasePhase().getCaseStage();
             stageCountMap.put(stg, stageCountMap.get(stg) + 1);
         }
         return stageCountMap;

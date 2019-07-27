@@ -157,7 +157,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
      * @throws IntegrationException
      * @throws CaseLifecyleException 
      */
-    private void populateSessionObjectQueues(User u, MunicipalityComplete m) throws IntegrationException, CaseLifecyleException{
+    private void populateSessionObjectQueues(UserWithAccessData u, MunicipalityComplete m) throws IntegrationException, CaseLifecyleException{
         SessionBean sessionBean = getSessionBean();
         
         PersonCoordinator persCoord = getPersonCoordinator();
@@ -173,7 +173,7 @@ public class SessionInitializer extends BackingBeanUtils implements Serializable
 //        
 //        QueryCECase queryCECase = searchCoord.runQuery(searchCoord.getQueryInitialCECASE(m, u));
         
-        sessionBean.setSessionCECase(caseInt.getPropertyInfoCase(m.getMuniOfficePropertyId()));
+        sessionBean.setSessionCECase(caseInt.getCECase(u.getAccessRecord().getDefaultCECaseID()));
         sessionBean.setSessionProperty(propI.getProperty(m.getMuniOfficePropertyId()));
         sessionBean.setSessionPerson(u.getPerson());
         

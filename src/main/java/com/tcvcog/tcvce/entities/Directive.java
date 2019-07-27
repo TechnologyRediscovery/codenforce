@@ -39,6 +39,13 @@ public class Directive extends EntityUtils {
     
     private boolean active;
     
+    /**
+     * Remember, for Directive and Proposal stuff, the hidden property
+     * only lives in JavaLand as it's determined programatically based
+     * on current User viewing and the Date/Time
+     */
+    private boolean hidden;
+    
     private Icon icon;
     
     private int relativeorder;
@@ -401,6 +408,20 @@ public class Directive extends EntityUtils {
      */
     public void setRelativeorder(int relativeorder) {
         this.relativeorder = relativeorder;
+    }
+
+    /**
+     * @return the hidden
+     */
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    /**
+     * @param hidden the hidden to set
+     */
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
     
     

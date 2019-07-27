@@ -82,8 +82,12 @@
                                     
                                     <h:panelGroup>
                                         <p:commandButton
-                                            value="Search in #{sessionBeansessionMunii.muniName}" tabindex="3" ajax="false"
-                                            icon="fa fa-search"  actionListener="#{propertyProfileBB.searchForProperties}" />
+                                            value="Search in #{sessionBean.sessionMuni.muniName}" 
+                                            tabindex="3" 
+                                            ajax="true"
+                                            icon="fa fa-search"  
+                                            actionListener="#{propertyProfileBB.searchForProperties}" 
+                                            update="propSearchTable"/>
                                     </h:panelGroup>
                                 
                             <ui:remove>
@@ -197,8 +201,8 @@
                                     <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address} 
                                                   (#{propertyProfileBB.currProp.muni.muniName})"/>
                                     
-                                     <h:outputText id="header-propid-ot" value=" Prop ID: #{caseProfileBB.currentCase.property.propertyID}"/>  
-                                        <h:outputText id="header-lob-ot" value="| Lot-block: #{caseProfileBB.currentCase.property.lotAndBlock}"/>  
+                                     <h:outputText id="header-propid-ot" value=" Prop ID: #{propertyProfileBB.currProp.propertyID}"/>  
+                                        <h:outputText id="header-lob-ot" value="| Lot-block: #{propertyProfileBB.currProp.lotAndBlock}"/>  
                                 </h1>
 
                                 <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
@@ -241,7 +245,7 @@
                                             <h:outputText styleClass="uiLabel" value="Use Type:" />
                                         </h:outputLabel>
                                         <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-usetype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.pruseTypeString}"/>
+                                        <h:outputText id="prop-info-usetype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.useTypeString}"/>
                                     </h:panelGroup>
 
 
@@ -276,7 +280,6 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <p:spacer width="5px"/>
-                                        <p:selectBooleanCheckbox id="prop-info-rental-cb" value="#{propertyProfileBB.currProp.rental}" tabindex="14" disabled="true"/>
                                     </h:panelGroup>
                                     
                                     <h:panelGroup>
@@ -286,7 +289,6 @@
                                     </h:panelGroup>
                                     <h:panelGroup> 
                                         <p:spacer width="5px"/>
-                                        <p:selectBooleanCheckbox id="prop-info-vacant-cb" value="#{propertyProfileBB.currProp.vacant}" tabindex="14" disabled="true"/>
                                     </h:panelGroup>
                                     
                                     <h:panelGroup>
@@ -300,7 +302,7 @@
                                 
                                 <p:commandButton ajax="false" value="Update Selected Property Info" 
                                                  action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
-                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasCOGStaffPermissions)}"/>
+                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"/>
                             </h:form>
 
                             <p:spacer height="10px"/>
@@ -314,7 +316,7 @@
                                 <p:commandButton ajax="false"  icon="fa fa-plus"
                                                  value="Open a new code enforcement case" 
                                                  action="#{propertyProfileBB.openCECase}"
-                                                 disabled="#{!(sessionBean.facesUser.keyCard.hasEnfOfficialPermissions)}"/>
+                                                 disabled="#{!(sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions)}"/>
                                 <p:spacer height="10px"/>
                                 <p:dataTable
                                     id="prop-cases-datatable"
@@ -587,6 +589,17 @@
 
                                     <h2>Dwelling units</h2>
                                     <p>List of the dwelling units registered to this property.</p> 
+                                    
+                                     <p:commandButton       id="button-editunits"
+                                                            ajax="true" 
+                                                            actionListener="#{occPermitApplicationBB.beginPropertyUnitChanges}"
+                                                            oncomplete="PF('dialog-widvar-unitedit').show()"
+                                                            rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                            value="Edit unit list"  
+                                                            icon="fa fa-edit"
+                                                            update="form-unitedit"/>
+                                     
+                                     <p:spacer height="5px" />
 
                                     <p:dataTable
                                     id="propertyUnitsTable"
@@ -606,7 +619,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Rental?" />
                                         </f:facet>
-                                        <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                        <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
                                     </p:column>
 
                                     <p:column>
@@ -636,6 +649,161 @@
 
                         </div>
                     </div>
+                    
+                       <p:dialog    id="dialog-unitedit"
+                                 height="650" width="900"
+                                 widgetVar="dialog-widvar-unitedit"
+                                 closable="true" >
+                        <h2>Edit property units</h2>
+                        
+                        <h:form id="form-unitedit">
+                              <p:dataTable
+                                    id="table-unitedit"
+                                    widgetVar="datatable"
+                                    rowIndexVar="rowIndex"
+                                    var="unit"
+                                    value="#{occPermitApplicationBB.workingPropUnits}"
+                                    selectionMode="single" tabindex="1"
+                                    selection="#{occPermitApplicationBB.selectedUnit}"
+                                    rowKey="#{unit.unitID}"
+                                    editable="true">                                         
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Number" />
+                                        </f:facet>
+                                        <p:cellEditor>
+                                            <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
+                                            <f:facet name="input">
+                                                <p:inputText value="#{unit.unitNumber}"
+                                                             onkeydown="PF('datatable').onKeyDown(event)"
+                                                             onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                            </f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rental?" />
+                                        </f:facet>
+                                        
+                    <ui:remove>
+                                            
+                                        <p:cellEditor>
+                                            <f:facet name="output">
+                                                <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
+                                            </f:facet>
+                                            <f:facet name="input"> 
+                                                <h:selectBooleanCheckbox value="#{unit.rental}"/> 
+                                            </f:facet>
+                                        </p:cellEditor>
+                                        
+                        </ui:remove>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Unit Description" />
+                                        </f:facet>
+                                        <p:cellEditor>
+                                            <f:facet name="output">
+                                                <h:outputText value="#{unit.notes}" />
+                                            </f:facet>
+                                            <f:facet name="input">
+                                                <p:inputText value="#{unit.notes}" 
+                                                             onkeydown="PF('datatable').onKeyDown(event)"
+                                                             onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                            </f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+
+                                    <p:column style="width:40px">
+                                        <f:facet name="header">
+                                            <h:outputText value="Edit?" />
+                                        </f:facet>
+                                        <p:rowEditor/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Remove?" />
+                                        </f:facet>
+                                        <p:commandButton ajax="true" value="Remove" 
+                                                         action="#{occPermitApplicationBB.removeSelectedUnit(unit)}"
+                                                         update="#{p:component('table-unitedit')}"/>                                      
+                                    </p:column>
+
+                                </p:dataTable>
+
+                                
+                                <script type="text/javascript">
+
+                                    $(function () {
+                                        $.extend(PF("datatable"), {
+                                            onKeyDown: function (e) {
+                                                var key = e.which,
+                                                        keyCode = $.ui.keyCode;
+
+                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                    e.preventDefault();
+                                                }
+                                            },
+
+                                            onKeyUp: function (e, rowIndex) {
+                                                var key = e.which,
+                                                        keyCode = $.ui.keyCode;
+                                                //.ui-row-editor-check .ui-icon-check .ui-c
+                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                    this.tbody
+                                                            .find('.ui-row-editor .ui-icon-check')
+                                                            .eq(rowIndex)
+                                                            .click();
+                                                }
+
+                                                if (key === keyCode.ESCAPE) {
+                                                    this.tbody
+                                                            .find('.ui-row-editor .ui-icon-close')
+                                                            .eq(rowIndex)
+                                                            .click();
+                                                }
+                                            }
+                                        });
+                                    });
+
+                                </script>
+
+                                <p:spacer height="5px"/>
+                                
+                                <p:commandButton ajax="true"                                                   
+                                                 actionListener="#{occPermitApplicationBB.addUnitToNewPropUnits}" 
+                                                 update="table-unitedit"
+                                                 value="Add unit"/>
+                                
+                                
+                                <p:spacer height="5px"/>
+                                
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('dialog-widvar-unitedit').hide()"/>
+                            
+                            
+                             <p:commandButton ajax="true"
+                                                 actionListener="#{occPermitApplicationBB.commitPropertyUnitChanges}"
+                                                 update="property-lists-form:propertyUnitsTable"
+                                                 value="Save unit list" />
+                                
+                                
+                        
+                          
+
+                        </h:form>
+
+
+
+
+                    </p:dialog>
+
+                    
                 </f:view>
             </ui:define>
         </ui:composition>

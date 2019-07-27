@@ -38,6 +38,9 @@ public class Constants implements Serializable {
     public final static String USER_COORDINATOR_SCOPE = "applicationScope.";
     public final static String USER_COORDINATOR_KEY = "userCoordinator";
     
+    // blasted unit numbers often have letters in them!
+    public final static String DEFAULT_UNIT_NUMBER = "-1";
+    
     
     public final static String SERVER_NAME = "localhost:5432";
     public final static String DB_NAME = "cogdb";

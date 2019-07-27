@@ -17,14 +17,17 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
  * @author sylvia
  */
-public abstract class Choice implements Proposable, Serializable {
+public abstract class Choice implements Proposable, Serializable, Comparable<Choice> {
 
+    protected boolean hidden;
     protected boolean active;
+    protected boolean canChoose;
     protected int choiceID;
     protected String description;
     private Icon icon;
@@ -148,5 +151,79 @@ public abstract class Choice implements Proposable, Serializable {
     public void setIcon(Icon icon) {
         this.icon = icon;
     }
+
+    /**
+     * @return the hidden
+     */
+    @Override
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    /**
+     * @param hidden the hidden to set
+     */
+    @Override
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    @Override
+    public void setCanChoose(boolean ch){
+        this.canChoose = ch;
+    }
+
+    @Override
+    public  boolean isCanChoose(){
+        return canChoose;
+        
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.hidden ? 1 : 0);
+        hash = 97 * hash + (this.active ? 1 : 0);
+        hash = 97 * hash + (this.canChoose ? 1 : 0);
+        hash = 97 * hash + this.choiceID;
+        hash = 97 * hash + Objects.hashCode(this.description);
+        hash = 97 * hash + Objects.hashCode(this.icon);
+        hash = 97 * hash + this.minimumRequiredUserRankToChoose;
+        hash = 97 * hash + this.minimumRequiredUserRankToView;
+        hash = 97 * hash + this.relativeOrder;
+        hash = 97 * hash + Objects.hashCode(this.title);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Choice other = (Choice) obj;
+        if (this.choiceID != other.choiceID) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int compareTo(Choice o){
+        if(this.relativeOrder > o.getRelativeOrder()){
+            return 1;
+        } else if (this.relativeOrder < o.getRelativeOrder()){
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+    
+    
     
 }

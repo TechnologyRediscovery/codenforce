@@ -32,6 +32,7 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Directive;
+import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -634,19 +635,19 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 && 
             ruleSubcheck_forbiddenEventCategory(cse, rule)) {
                 rulePasses = true;
-                cc.implementPassedCasePhaseChangeRule(cse, rule);
+                cc.processCaseOnEventRulePass(cse, rule);
         }
         return rulePasses;
     }
     
     private boolean ruleSubcheck_requiredEventCategory(CECase cse, EventRuleAbstract rule) {
         boolean subcheckPasses = true;
-        if (rule.getRequiredEventCat().getCategoryID() != 0) {
+        if (rule.getRequiredEventCategory().getCategoryID() != 0) {
             subcheckPasses = false;
             Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
             while (iter.hasNext()) {
                 CECaseEvent ev = iter.next();
-                if (ev.getCategory().getCategoryID() == rule.getRequiredEventCat().getCategoryID()) {
+                if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
                     subcheckPasses = true;
                 }
             }
@@ -659,7 +660,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
         while (iter.hasNext()) {
             CECaseEvent ev = iter.next();
-            if (ev.getCategory().getEventType() == rule.getRequiredeventtype()) {
+            if (ev.getCategory().getEventType() == rule.getRequiredEventType()) {
                 subcheckPasses = false;
             }
         }
@@ -668,12 +669,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 
     private boolean ruleSubcheck_requiredEventType(CECase cse, EventRuleAbstract rule) {
         boolean subcheckPasses = true;
-        if (rule.getRequiredeventtype() != null) {
+        if (rule.getRequiredEventType() != null) {
             subcheckPasses = false;
             Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
             while (iter.hasNext()) {
                 CECaseEvent ev = iter.next();
-                if (ev.getCategory().getEventType() == rule.getRequiredeventtype()) {
+                if (ev.getCategory().getEventType() == rule.getRequiredEventType()) {
                     subcheckPasses = true;
                 }
             }
@@ -686,14 +687,142 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         Iterator<CECaseEvent> iter = cse.getVisibleEventList().iterator();
         while (iter.hasNext()) {
             CECaseEvent ev = iter.next();
-            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCat().getCategoryID()) {
+            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
                 subcheckPasses = false;
             }
         }
         return subcheckPasses;
     }
 
-   
+    public boolean evalulateEventRule(List<Event> eventList, EventRuleAbstract rule) throws IntegrationException, CaseLifecyleException, ViolationException {
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(eventList == null || rule == null){
+            throw new CaseLifecyleException("EventCoordinator.evaluateEventRule | Null event list or rule");
+        }
+        
+        if (rule.getRequiredEventType() != null){
+            if(!ruleSubcheck_requiredEventType(eventList, rule)){
+                return false;
+            }
+        } 
+        if (rule.getForbiddenEventType() != null){
+            if(!ruleSubcheck_forbiddenEventType(eventList, rule)){
+                return false;
+            }
+        } 
+        if (rule.getRequiredEventCategory() != null){
+            if(!ruleSubcheck_requiredEventCategory(eventList, rule)){
+                return false;
+            }
+        } 
+        if (rule.getForbiddenEventCategory() != null){
+            if(!ruleSubcheck_forbiddenEventCategory(eventList, rule)){
+                return false;
+            }
+        } 
+        return true;
+    }
     
+    private boolean ruleSubcheck_requiredEventCategory(List<Event> eventList, EventRuleAbstract rule) {
+        
+        Iterator<Event> iter = eventList.iterator();
+        while (iter.hasNext()) {
+            Event ev = iter.next();
+            // simplest case: check for matching categories
+            if (ev.getCategory().getCategoryID() == rule.getRequiredEventCategory().getCategoryID()) {
+                return true;
+            }
+            // if we didn't match, perhaps we need to treat the requried category as a threshold
+            // to be applied to an event category's type internal relative order
+            if(rule.getRequiredECThreshold_typeInternalOrder() != 0){
+                if(rule.isRequiredECThreshold_typeInternalOrder_treatAsUpperBound()){
+                    if(ev.getCategory().getRelativeOrderWithinType() <= rule.getRequiredECThreshold_typeInternalOrder()){
+                        return true;
+                    }
+                } else { // treat threshold as a lower bound
+                    if(ev.getCategory().getRelativeOrderWithinType() >= rule.getRequiredECThreshold_typeInternalOrder()){
+                        return true;
+                    }
+                }
+            }
+            // if we didn't pass the rule with type internal ordering as a thresold, check global
+            // ordering thresolds
+            if(rule.getRequiredECThreshold_globalOrder() != 0){
+                if(rule.isRequiredECThreshold_globalOrder_treatAsUpperBound()){
+                    if(ev.getCategory().getRelativeOrderGlobal()<= rule.getRequiredECThreshold_globalOrder()){
+                        return true;
+                    }
+                } else { // treat threshold as a lower bound
+                    if(ev.getCategory().getRelativeOrderGlobal() >= rule.getRequiredECThreshold_globalOrder()){
+                        return true;
+                    }
+                }
+            }
+        }
+        // list did not contain an Event whose category was required or required in a specified range
+        return false;
+    }
+    
+    private boolean ruleSubcheck_forbiddenEventCategory(List<Event> eventList, EventRuleAbstract rule) {
+       Iterator<Event> iter = eventList.iterator();
+        while (iter.hasNext()) {
+            Event ev = iter.next();
+            // simplest case: check for matching categories
+            if (ev.getCategory().getCategoryID() == rule.getForbiddenEventCategory().getCategoryID()) {
+                return false;
+            }
+            // if we didn't match, perhaps we need to treat the requried category as a threshold
+            // to be applied to an event category's type internal relative order
+            if(rule.getForbiddenECThreshold_typeInternalOrder() != 0){
+                if(rule.isForbiddenECThreshold_typeInternalOrder_treatAsUpperBound()){
+                    if(ev.getCategory().getRelativeOrderWithinType() <= rule.getForbiddenECThreshold_typeInternalOrder()){
+                        return false;
+                    }
+                } else { // treat threshold as a lower bound
+                    if(ev.getCategory().getRelativeOrderWithinType() >= rule.getForbiddenECThreshold_typeInternalOrder()){
+                        return false;
+                    }
+                }
+            }
+            // if we didn't pass the rule with type internal ordering as a thresold, check global
+            // ordering thresolds
+            if(rule.getForbiddenECThreshold_globalOrder() != 0){
+                if(rule.isForbiddenECThreshold_globalOrder_treatAsUpperBound()){
+                    if(ev.getCategory().getRelativeOrderGlobal()<= rule.getForbiddenECThreshold_globalOrder()){
+                        return false;
+                    }
+                } else { // treat threshold as a lower bound
+                    if(ev.getCategory().getRelativeOrderGlobal() >= rule.getForbiddenECThreshold_globalOrder()){
+                        return false;
+                    }
+                }
+            }
+        }
+        // list did not contain an Event whose category was required or required in a specified range
+        return true;
+    }
+
+    private boolean ruleSubcheck_requiredEventType(List<Event> eventList, EventRuleAbstract rule) {
+        Iterator<Event> iter = eventList.iterator();
+        while (iter.hasNext()) {
+            EventType evType = iter.next().getCategory().getEventType();
+            if (evType == rule.getRequiredEventType()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean ruleSubcheck_forbiddenEventType(List<Event> eventList, EventRuleAbstract rule) {
+        Iterator<Event> iter = eventList.iterator();
+        while (iter.hasNext()) {
+            EventType evType = iter.next().getCategory().getEventType();
+            if (evType == rule.getForbiddenEventType()) {
+                return false;
+            }
+        }
+        return true;
+    }
     
 } // close class

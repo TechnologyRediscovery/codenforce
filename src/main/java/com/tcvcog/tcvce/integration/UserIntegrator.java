@@ -168,7 +168,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                         "       codeofficerassignmentorder, staffassignmentorder, sysadminassignmentorder, \n" +
                         "       supportassignmentorder, bypasscodeofficerassignmentorder, bypassstaffassignmentorder, \n" +
                         "       bypasssysadminassignmentorder, bypasssupportassignmentorder, \n" +
-                        "       recorddeactivatedts, userrole, muniloginrecordid, recordcreatedts,  badgenumber, orinumber \n" +
+                        "       recorddeactivatedts, userrole, muniloginrecordid, recordcreatedts,  badgenumber, orinumber, defaultcecase_caseid \n" +
                         "   FROM public.munilogin "
                 + "         WHERE userid=? "
                 + "             AND muni_municode=? "
@@ -264,6 +264,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         rec.setRecordcreatedts(rs.getTimestamp("recordcreatedts").toLocalDateTime());
         rec.setOrinumber(rs.getString("orinumber"));
         rec.setBadgenumber(rs.getString("badgenumber"));
+        
+        rec.setDefaultCECaseID(rs.getInt("defaultcecase_caseid"));
         
         return rec;
     }

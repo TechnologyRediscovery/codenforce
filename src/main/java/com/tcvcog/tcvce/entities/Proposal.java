@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  *
@@ -14,13 +15,13 @@ import java.time.LocalDateTime;
  * 
  * @author sylvia
  */
-public class Proposal extends EntityUtils implements Serializable {
+public class Proposal extends EntityUtils implements Serializable, Comparable<Proposal> {
     
     private int proposalID ;
     private Directive directive;
     
     private int generatingEventID;
-    private boolean currentUserCanEvaluateProposal;
+    private boolean readOnlyCurrentUser;
     
     private User initiator;
     private User responderIntended;
@@ -249,17 +250,17 @@ public class Proposal extends EntityUtils implements Serializable {
 
 
     /**
-     * @return the currentUserCanEvaluateProposal
+     * @return the readOnlyCurrentUser
      */
-    public boolean isCurrentUserCanEvaluateProposal() {
-        return currentUserCanEvaluateProposal;
+    public boolean isReadOnlyCurrentUser() {
+        return readOnlyCurrentUser;
     }
 
     /**
-     * @param currentUserCanEvaluateProposal the currentUserCanEvaluateProposal to set
+     * @param readOnlyCurrentUser the readOnlyCurrentUser to set
      */
-    public void setCurrentUserCanEvaluateProposal(boolean currentUserCanEvaluateProposal) {
-        this.currentUserCanEvaluateProposal = currentUserCanEvaluateProposal;
+    public void setReadOnlyCurrentUser(boolean readOnlyCurrentUser) {
+        this.readOnlyCurrentUser = readOnlyCurrentUser;
     }
 
     /**
@@ -373,5 +374,69 @@ public class Proposal extends EntityUtils implements Serializable {
     public void setOccperiodID(int occperiodID) {
         this.occperiodID = occperiodID;
     }
+
+
+    @Override
+    public int compareTo(Proposal p) {
+        if(this.order < p.getOrder()){
+            return -1;
+            
+        } else if (this.order > p.getOrder()){
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + this.proposalID;
+        hash = 47 * hash + Objects.hashCode(this.directive);
+        hash = 47 * hash + this.generatingEventID;
+        hash = 47 * hash + (this.readOnlyCurrentUser ? 1 : 0);
+        hash = 47 * hash + Objects.hashCode(this.initiator);
+        hash = 47 * hash + Objects.hashCode(this.responderIntended);
+        hash = 47 * hash + Objects.hashCode(this.responderActual);
+        hash = 47 * hash + Objects.hashCode(this.activatesOn);
+        hash = 47 * hash + Objects.hashCode(this.activatesOnPretty);
+        hash = 47 * hash + Objects.hashCode(this.expiresOn);
+        hash = 47 * hash + Objects.hashCode(this.expiresOnPretty);
+        hash = 47 * hash + Objects.hashCode(this.responseTimestamp);
+        hash = 47 * hash + Objects.hashCode(this.responseTimePrettyDate);
+        hash = 47 * hash + (this.active ? 1 : 0);
+        hash = 47 * hash + (this.hidden ? 1 : 0);
+        hash = 47 * hash + Objects.hashCode(this.generatingEvent);
+        hash = 47 * hash + Objects.hashCode(this.responseEvent);
+        hash = 47 * hash + Objects.hashCode(this.notes);
+        hash = 47 * hash + (this.proposalRejected ? 1 : 0);
+        hash = 47 * hash + this.order;
+        hash = 47 * hash + this.cecaseID;
+        hash = 47 * hash + this.occperiodID;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Proposal other = (Proposal) obj;
+        if (this.proposalID != other.proposalID) {
+            return false;
+        }
+        if (!Objects.equals(this.directive, other.directive)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
     
 }

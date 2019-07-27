@@ -69,10 +69,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, muniCode);
-            //System.out.println("MunicipalityIntegrator.getMuni | query: " + stmt.toString());
             rs = stmt.executeQuery();
             while(rs.next()){
-                System.out.println("MuniIntegrator.getMuni| inside while having at least one row");
                 muni = generateMuni(rs);
             }
             
@@ -108,10 +106,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, muniCode);
-            //System.out.println("MunicipalityIntegrator.getMuni | query: " + stmt.toString());
             rs = stmt.executeQuery();
             while(rs.next()){
-                System.out.println("MuniIntegrator.getMuni| inside while having at least one row");
                 muniComplete = generateMuniComplete(rs);
             }
             
@@ -202,7 +198,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, profileID);
-            //System.out.println("MunicipalityIntegrator.getMuni | query: " + stmt.toString());
             rs = stmt.executeQuery();
             while(rs.next()){
                 mp = generateMuniProfile(rs);
@@ -247,14 +242,12 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         String query = "SELECT municode FROM municipality;";
         ResultSet rs = null;
         Statement stmt = null;
-        System.out.println("MunicipalityIntegrator.getMuniList | about to get pgcon");
         Connection con = getPostgresCon();
  
         try {
             stmt = con.createStatement();
             rs = stmt.executeQuery(query);
             while(rs.next()){
-                System.out.println("MunicipalityIntegrator.getMuniList | added muni to list");
                 mList.add(getMuni(rs.getInt("municode")));
             }
         } catch (SQLException ex) {
@@ -356,7 +349,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             
             while(rs.next()){
                 muniMap.put(rs.getInt("muniCode"),rs.getString("muniName"));
-                System.out.println("MunicipalityIntegrator.getMunicipalityMap | got: " + muniMap.get(rs.getInt("muniCode")));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());

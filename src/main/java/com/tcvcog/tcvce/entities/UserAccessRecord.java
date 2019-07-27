@@ -28,31 +28,44 @@ public class UserAccessRecord extends EntityUtils implements Serializable {
   private int muni_municode;
   private int userid;
   private boolean defaultmuni;
+  
+  private RoleType role;
+  
   private LocalDateTime accessgranteddatestart;
   private LocalDateTime accessgranteddatestop;
+  
   private LocalDateTime codeofficerstartdate;
   private LocalDateTime codeofficerstopdate;
+  
   private LocalDateTime staffstartdate;
   private LocalDateTime staffstopdate;
+  
   private LocalDateTime sysadminstartdate;
   private LocalDateTime sysadminstopdate;
+  
   private LocalDateTime supportstartdate;
   private LocalDateTime supportstopdate;
+  
   private int codeofficerassignmentorder;
   private int staffassignmentorder;
   private int sysadminassignmentorder;
   private int supportassignmentorder;
+  
   private int bypasscodeofficerassignmentorder;
   private int bypassstaffassignmentorder;
   private int bypasssysadminassignmentorder;
   private int bypasssupportassignmentorder;
+  
   private LocalDateTime recorddeactivatedts;
-  private RoleType role;
+  
   private int muniloginrecordid;
+  
   private LocalDateTime recordcreatedts;
+  
   private String orinumber;
   private String badgenumber;
 
+  private int defaultCECaseID;
     /**
      * @return the muni_municode
      */
@@ -429,6 +442,20 @@ public class UserAccessRecord extends EntityUtils implements Serializable {
      */
     public void setBadgenumber(String badgenumber) {
         this.badgenumber = badgenumber;
+    }
+
+    /**
+     * @return the defaultCECaseID
+     */
+    public int getDefaultCECaseID() {
+        return defaultCECaseID;
+    }
+
+    /**
+     * @param defaultCECaseID the defaultCECaseID to set
+     */
+    public void setDefaultCECaseID(int defaultCECaseID) {
+        this.defaultCECaseID = defaultCECaseID;
     }
     
 }

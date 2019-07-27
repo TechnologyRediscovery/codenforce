@@ -18,22 +18,17 @@ public class CECase extends CaseBase implements Cloneable{
     
     private List<CodeViolation> violationList;
     
-    private List<CECaseEvent> visibleEventList;
-    private List<CECaseEvent> activeEventList;
     private boolean showHiddenEvents;
     private boolean showInactiveEvents;
     private List<CECaseEvent> completeEventList;
     
-    
     private List<Proposal> proposalList;
     private List<EventRuleAbstract> eventRuleList;
-    private List<CECaseEvent> eventProposalList;
     private List<Citation> citationList;
     private List<NoticeOfViolation> noticeList;
     private List<CEActionRequest> ceActionRequestList;
     
     public CECase(){
-        
     }
 
     /**
@@ -44,23 +39,23 @@ public class CECase extends CaseBase implements Cloneable{
      * ** CONSTRUCTORS ARE NOT INHERITED!
      * ** but member variables and methods sure are!
      * 
-     * @param cnl 
+     * @param cse 
      */
-    public CECase(CaseBase cnl){
-        this.caseID = cnl.caseID;
-        this.publicControlCode = cnl.publicControlCode;
-        this.paccEnabled = cnl.paccEnabled;
-        this.allowForwardLinkedPublicAccess = cnl.allowForwardLinkedPublicAccess;
-        this.property = cnl.property;
-        this.propertyUnit = cnl.propertyUnit;
-        this.caseManager = cnl.caseManager;
-        this.caseName = cnl.caseName;
-        this.casePhase = cnl.casePhase;
-        this.casePhaseIcon = cnl.casePhaseIcon;
-        this.originationDate = cnl.originationDate;
-        this.closingDate = cnl.closingDate;
-        this.creationTimestamp = cnl.creationTimestamp;
-        this.notes = cnl.notes;
+    public CECase(CaseBase cse){
+        this.caseID = cse.caseID;
+        this.publicControlCode = cse.publicControlCode;
+        this.paccEnabled = cse.paccEnabled;
+        this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
+        this.property = cse.property;
+        this.propertyUnit = cse.propertyUnit;
+        this.caseManager = cse.caseManager;
+        this.caseName = cse.caseName;
+        this.casePhase = cse.casePhase;
+        this.casePhaseIcon = cse.casePhaseIcon;
+        this.originationDate = cse.originationDate;
+        this.closingDate = cse.closingDate;
+        this.creationTimestamp = cse.creationTimestamp;
+        this.notes = cse.notes;
     }
     
     /**
@@ -95,7 +90,7 @@ public class CECase extends CaseBase implements Cloneable{
      * @return the visibleEventList
      */
     public List<CECaseEvent> getVisibleEventList() {
-        visibleEventList.clear();
+        List<CECaseEvent> visEventList = new ArrayList<>();
         for (CECaseEvent ev : completeEventList) {
             if (!ev.isActive() && !showInactiveEvents) {
                 continue;
@@ -103,17 +98,11 @@ public class CECase extends CaseBase implements Cloneable{
             if (ev.isHidden() && !showHiddenEvents) {
                 continue;
             }
-            visibleEventList.add(ev);
+            visEventList.add(ev);
         } // close for   
-        return visibleEventList;
+        return visEventList;
     }
 
-    /**
-     * @param visibleEventList the visibleEventList to set
-     */
-    public void setVisibleEventList(List<CECaseEvent> visibleEventList) {
-        this.visibleEventList = visibleEventList;
-    }
 
     /**
      * @return the citationList
@@ -157,37 +146,7 @@ public class CECase extends CaseBase implements Cloneable{
         this.ceActionRequestList = ceActionRequestList;
     }
 
-    /**
-     * @return the eventProposalList
-     */
-    public List<CECaseEvent> getEventProposalList() {
-
-        eventProposalList = new ArrayList<>();
-        if(completeEventList !=  null && completeEventList.size() >= 1){
-            for(CECaseEvent ev: completeEventList){
-                if(
-//                        ev.getEventProposalImplementation()!= null 
-//                        && 
-//                    ev.getEventProposalImplementation().getResponseTimestamp() != null
-//                        &&
-                    ev.isActive()
-                        &&
-                    !ev.isHidden()){
-                    // event is a case action request so add it!
-                    eventProposalList.add(ev);
-                }
-            }
-        }
-        
-        return eventProposalList;
-    }
-
-    /**
-     * @param eventProposalList the eventProposalList to set
-     */
-    public void setEventProposalList(List<CECaseEvent> eventProposalList) {
-        this.eventProposalList = eventProposalList;
-    }
+    
 
     /**
      * @return the violationListUnresolved
@@ -271,24 +230,17 @@ public class CECase extends CaseBase implements Cloneable{
      * @return the activeEventList
      */
     public List<CECaseEvent> getActiveEventList() {
-        if(completeEventList != null){
+        List<CECaseEvent> actEvList = new ArrayList<>();
             Iterator<CECaseEvent> iter = completeEventList.iterator();
                 while(iter.hasNext()){
                     CECaseEvent ev = iter.next();
                     if(ev.isActive()){
-                        activeEventList.add(ev);
+                        actEvList.add(ev);
                     }
                 }
-            }
-        return activeEventList;
+        return actEvList;
     }
 
-    /**
-     * @param activeEventList the activeEventList to set
-     */
-    public void setActiveEventList(List<CECaseEvent> activeEventList) {
-        this.activeEventList = activeEventList;
-    }
 
     /**
      * @return the proposalList
