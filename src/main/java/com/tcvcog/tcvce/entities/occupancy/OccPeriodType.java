@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonType;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -330,6 +331,50 @@ public class OccPeriodType {
      */
     public void setInspectable(boolean inspectable) {
         this.inspectable = inspectable;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + this.typeid;
+        hash = 23 * hash + Objects.hashCode(this.muni);
+        hash = 23 * hash + Objects.hashCode(this.title);
+        hash = 23 * hash + Objects.hashCode(this.authorizeduses);
+        hash = 23 * hash + Objects.hashCode(this.description);
+        hash = 23 * hash + (this.userassignable ? 1 : 0);
+        hash = 23 * hash + (this.permittable ? 1 : 0);
+        hash = 23 * hash + (this.startdaterequired ? 1 : 0);
+        hash = 23 * hash + (this.enddaterequired ? 1 : 0);
+        hash = 23 * hash + (this.inspectable ? 1 : 0);
+        hash = 23 * hash + (this.passedInspectionRequired ? 1 : 0);
+        hash = 23 * hash + (this.rentalcompatible ? 1 : 0);
+        hash = 23 * hash + (this.active ? 1 : 0);
+        hash = 23 * hash + (this.allowthirdpartyinspection ? 1 : 0);
+        hash = 23 * hash + Objects.hashCode(this.optionalpersontypeList);
+        hash = 23 * hash + Objects.hashCode(this.requiredPersontypeList);
+        hash = 23 * hash + (this.commercial ? 1 : 0);
+        hash = 23 * hash + (this.requirepersontypeentrycheck ? 1 : 0);
+        hash = 23 * hash + this.defaultValidityPeriodDays;
+        hash = 23 * hash + Objects.hashCode(this.feeList);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OccPeriodType other = (OccPeriodType) obj;
+        if (this.typeid != other.typeid) {
+            return false;
+        }
+        return true;
     }
     
 }

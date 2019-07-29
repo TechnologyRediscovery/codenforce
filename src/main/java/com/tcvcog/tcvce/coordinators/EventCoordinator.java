@@ -560,7 +560,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public CECaseEvent getActionEventForCaseAdvancement(CECase c) throws IntegrationException, CaseLifecyleException{
         CasePhase cp = c.getCasePhase();
         EventIntegrator ei = getEventIntegrator();
-        CECaseEvent e = new CECaseEvent();
+        CECaseEvent e = new CECaseEvent(new Event());
         
         switch(cp){
             case PrelimInvestigationPending:
