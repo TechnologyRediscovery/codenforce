@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -234,6 +235,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
         mp.setEventRuleSetCE(ei.getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPeriodTypeList(oi.getOccPeriodTypeList(rs.getInt("profileid")));
+        if(mp.getOccPeriodTypeList() == null){
+            mp.setOccPeriodTypeList(new ArrayList<OccPeriodType>());
+        }
+        
         return mp;
         
     }
@@ -264,8 +269,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return mList;
         
     }
-    
-    
    
     
     public void updateMuniComplete(MunicipalityComplete muni) throws IntegrationException{

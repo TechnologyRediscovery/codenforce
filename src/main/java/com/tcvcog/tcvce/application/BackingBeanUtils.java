@@ -484,8 +484,12 @@ public class BackingBeanUtils implements Serializable{
     
     public String getPrettyDate(LocalDateTime d){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-        String formattedDateTime = d.format(formatter); 
-        return formattedDateTime;
+        if(d != null){
+            String formattedDateTime = d.format(formatter); 
+            return formattedDateTime;
+        } else {
+            return "";
+        }
     }
 
     /**

@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -36,7 +37,10 @@ import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -72,8 +76,35 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return new OccInspection();
     }
     
-    public OccPeriod getOccPeriodSkeleton(){
-        return new OccPeriod();
+    public OccPeriod initializeNewOccPeriod(Property p, PropertyUnit pu, User u, MunicipalityComplete muni) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        OccPeriod op = new OccPeriod();
+        
+        op.setPropertyUnitID(pu.getUnitID());
+        op.setType(muni.getProfile().getOccPeriodTypeList().get(0));
+        op.setManager(u);
+        op.setCreatedBy(u);
+        op.setCreatedTS(LocalDateTime.now());
+        
+        op.setStartDate(LocalDateTime.now());
+        op.setStartDateCertifiedBy(u);
+        op.setStartDateCertifiedTS(LocalDateTime.now());
+        
+        op.setEndDate(op.getStartDate().plusDays(op.getType().getDefaultValidityPeriodDays()));
+        op.setEndDateCertifiedBy(u);
+        op.setEndDateCertifiedTS(LocalDateTime.now());
+        
+        op.setSource(si.getBOBSource(Integer.parseInt(
+                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("occPeriodNewInternalBOBSourceID"))));
+        
+        return op;
+    }
+    
+    public int insertNewOccPeriod(OccPeriod op, User u) throws IntegrationException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        return oi.insertOccPeriod(op);
+        
     }
     
     /**

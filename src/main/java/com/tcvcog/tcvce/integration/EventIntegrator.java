@@ -2,7 +2,7 @@
  * Copyright (C) 2017 Turtle Creek Valley
 Council of Governments, PA
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.CECaseEventRule;
 import com.tcvcog.tcvce.entities.CasePhase;
+import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
@@ -103,7 +104,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ChoiceIntegrator choiceInt = getChoiceIntegrator();
         
         ec.setCategoryID(rs.getInt("categoryid"));
-        ec.setEventType(EventType.valueOf(rs.getString("categoryType")));
+        if(!(rs.getString("categoryType") == null) && !(rs.getString("categoryType").equals(""))){
+            ec.setEventType(EventType.valueOf(rs.getString("categoryType")));
+        }
         ec.setEventCategoryTitle(rs.getString("title"));
         ec.setEventCategoryDesc(rs.getString("description"));
         ec.setUserdeployable(rs.getBoolean("userdeployable"));
@@ -190,8 +193,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         evRule.setRuleid(rs.getInt("ruleid"));
         evRule.setTitle(rs.getString("title"));
         evRule.setDescription(rs.getString("description"));
-        evRule.setRequiredEventType(EventType.valueOf(rs.getString("requiredeventrype")));
-        evRule.setForbiddenEventType(EventType.valueOf(rs.getString("forbiddeneventtype")));
+        
+        if(!(rs.getString("requiredeventtype") == null) && !(rs.getString("requiredeventtype").equals(""))){
+            evRule.setRequiredEventType(EventType.valueOf(rs.getString("requiredeventtype")));
+        }
+        if(!(rs.getString("forbiddeneventtype") == null) && !(rs.getString("forbiddeneventtype").equals(""))){
+            evRule.setForbiddenEventType(EventType.valueOf(rs.getString("forbiddeneventtype")));
+        }
         
         evRule.setRequiredEventCategory(getEventCategory(rs.getInt("requiredeventcat_catid")));
         evRule.setRequiredECThreshold_typeInternalOrder(rs.getInt("requiredeventcatthresholdtypeintorder"));
@@ -210,10 +218,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
         evRule.setMandatoryRulePassRequiredToCloseEntity(rs.getBoolean("mandatorypassreqtocloseentity"));
         evRule.setInactivateRuleOnEntityClose(rs.getBoolean("autoremoveonentityclose"));
-        evRule.setPromptingProposal(ci.getProposal(rs.getInt("promptingproposal_proposalid")));
-        
-        evRule.setTriggeredECOnRulePass(getEventCategory(rs.getInt("triggeredeventcatonpass")));
-        evRule.setTriggeredECOnRuleFail(getEventCategory(rs.getInt("triggeredeventcatonfail")));
+        if(rs.getInt("promptingproposal_proposalid") != 0){
+            evRule.setPromptingProposal(ci.getProposal(rs.getInt("promptingproposal_proposalid")));
+        }
+        if(rs.getInt("triggeredeventcatonpass") != 0){
+            evRule.setTriggeredECOnRulePass(getEventCategory(rs.getInt("triggeredeventcatonpass")));
+        }
+        if(rs.getInt("triggeredeventcatonfail") != 0){
+            evRule.setTriggeredECOnRuleFail(getEventCategory(rs.getInt("triggeredeventcatonfail")));
+        }
         evRule.setActive(rs.getBoolean("active"));
         evRule.setNotes(rs.getString("notes"));
         
@@ -811,6 +824,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
    
     /**
      * Legacy note: [Zanda was trippin when he wrote this!]
+     * ....And when he revised it for occbeta! 
      *
      * @param rs
      * @param premadeEvent used by event creatino pathways that involve instantiation 
@@ -819,8 +833,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException
      */
-    private CECaseEvent generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException {
-        CECaseEvent ev = new CECaseEvent();
+    private Event generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException {
+        Event ev = new Event();
         UserIntegrator ui = getUserIntegrator();
         SystemCoordinator ssc = getSystemCoordinator();
         
@@ -830,7 +844,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         ev.setEventID(rs.getInt("eventid"));
         ev.setCategory(getEventCategory(rs.getInt("ceeventCategory_catID")));
-        ev.setCaseID(rs.getInt("cecase_caseid"));
+//        ev.setCaseID(rs.getInt("cecase_caseid"));
         
         if (rs.getTimestamp("dateofrecord") != null) {
             LocalDateTime dt = rs.getTimestamp("dateofrecord").toInstant()
@@ -1204,6 +1218,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
   
+    
 
     public CECaseEvent getEventCECase(int eventID) throws IntegrationException {
         CECaseEvent ev = null;

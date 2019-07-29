@@ -107,19 +107,6 @@ h4{
     color: #00b5ec;
 }
 
-.report-title{
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #cde162;
-    
-}
-
-.report-title-sub{
-    font-size: 1.1em;
-    color: #00b5ec;
-    font-style: italic;
-    
-}
 
 
 .darkFont{
@@ -407,6 +394,21 @@ div.headerLink a:before, a:visited{
 
 
 /* ----------- Printing and reports-------- */
+
+
+.report-title{
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cde162;
+    
+}
+
+.report-title-sub{
+    font-size: 1.1em;
+    color: #00b5ec;
+    font-style: italic;
+    
+}
 
 .printing-page-break-before{
     page-break-before: always;
@@ -792,6 +794,19 @@ i.status-display-icon-i{
 }
 
 
+span.ui-label{
+    display: block;
+    clear: left;
+    margin-bottom: 10px;
+    font-weight: bold;
+    
+}
+
+span.ui-label-inline{
+    font-weight: bold;
+}
+
+
 /***************** CLOSE TEXT AND SPANS ***********************/
 
 
@@ -801,6 +816,15 @@ i.status-display-icon-i{
     white-space: normal;
     overflow-wrap: normal;
     text-align: left;
+}
+
+
+.datum{
+    display: block;
+    padding: 5px;
+    border: #abb solid thin;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .wrapText{
@@ -1046,6 +1070,7 @@ tr.reinspect{
     background-color: rgba(12,12,12,0);
     z-index: 100;
     opacity: 1;
+    vertical-align: top''
 }
 
 .panelGridData{
@@ -1245,14 +1270,6 @@ a.outputLink{
 
 select.selectOneListbox{   
     margin-bottom: 10px;
-}
-
-span.uiLabel{
-    display: block;
-    clear: left;
-    margin-bottom: 10px;
-    font-weight: bold;
-    
 }
 
 input.selectBooleanCheckbox{

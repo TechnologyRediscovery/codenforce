@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
@@ -372,6 +373,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     public OccPeriod getOccPeriod(int periodid) throws IntegrationException {
         OccPeriod op = null;
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         String query = "SELECT periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n"
                 + "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n"
                 + "       startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n"
@@ -398,7 +400,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return op;
+        return oc.configureOccPeriod(op);
     }
 
     private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException {
@@ -641,7 +643,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     public List<OccPeriodType> getOccPeriodTypeList(int muniProfileID) throws IntegrationException {
-        List<OccPeriodType> typeList = null;
+        List<OccPeriodType> typeList = new ArrayList<>();
         String query = "SELECT occperiodtype_typeid\n"
                 + "  FROM public.muniprofileoccperiodtype WHERE muniprofile_profileid=?;";
 
@@ -990,6 +992,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
 
         try {
+            opt.setTypeid(rs.getInt("typeid"));
             opt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             opt.setTitle(rs.getString("title"));
             opt.setAuthorizeduses(rs.getString("authorizeduses"));
@@ -1008,7 +1011,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
             opt.setCommercial(rs.getBoolean("commercial"));
             opt.setRequirepersontypeentrycheck(rs.getBoolean("requirepersontypeentrycheck"));
-            opt.setDefaultValidityPeriodDays(rs.getInt("defaultvalidityperioddays"));
+            opt.setDefaultValidityPeriodDays(rs.getInt("defaultpermitvalidityperioddays"));
 
             // wire up when nathan is done
             // opt.setFeeList(fee);

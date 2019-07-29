@@ -1,6 +1,7 @@
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -12,16 +13,21 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -58,6 +64,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     private PropertyWithLists currProp;
     private PropertyUnit currPropUnit;
+    private PropertyUnitWithLists currPropUnitWithLists;
+    private OccPeriod currOccPeriod;
+    
     private List<Person> filteredPersonList;
     
     private String parid;
@@ -72,8 +81,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     private UIInput addressInput;
     
     private Municipality selectedMuni;
-
-
+    
+    private List<OccPeriodType> occPeriodTypeList;
     
     /**
      * Creates a new instance of PropertyProfileBB
@@ -84,12 +93,16 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        
         try {
             this.currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID());
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
         propList = getSessionBean().getSessionPropertyList();
+        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
+        
     }
 
     public void searchForProperties(ActionEvent event){
@@ -219,6 +232,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                     try {
                         pu.setPropertyID(currProp.getPropertyID());
                         pi.insertPropertyUnit(pu);
+                        refreshCurrPropWithLists();
+                        
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Success! Inserted property unit: " + pu.getUnitNumber(), ""));
@@ -226,12 +241,12 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         "Could not insert unit with number: " + pu.getUnitNumber(), ""));
-                        
                     }
                 } else {
                     try {
                         pu.setPropertyID(currProp.getPropertyID());
                         pi.updatePropertyUnit(pu);
+                        refreshCurrPropWithLists();
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Success! Updated property unit: " + pu.getUnitNumber(), ""));
@@ -239,15 +254,22 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                         getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         "Could not update unit with number: " + pu.getUnitNumber(), ""));
-                        
                     }
-                    
                 }
             }
         }
+    }
+    
+    private void refreshCurrPropWithLists(){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            currProp = pi.getPropertyWithLists(currProp.getPropertyID());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        }
         
-        
-
     }
     
     public String addProperty(){
@@ -265,7 +287,63 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return "ceCases";
     }
     
+    public void manageOccPeriod(OccPeriod op){
+        currOccPeriod = op;
+    }
     
+    public void beginConstructingNewOccPeriod(PropertyUnit pu){
+        currPropUnit = pu;
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        System.out.println("PropertyProfileBB.beginConstructingNewOccPeriod | received propunit " + pu.getUnitID());
+        try {
+            currOccPeriod = oc.initializeNewOccPeriod(  currProp, 
+                                                        pu, 
+                                                        getSessionBean().getSessionUser(), 
+                                                        getSessionBean().getSessionMuni());
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+    }
+    
+    
+    public void certifyDataFieldOccPeriod(ActionEvent ev){
+        String fieldToCertify = null;
+        FacesContext fc = getFacesContext();
+        Map<String, String> params = fc.getExternalContext().getRequestParameterMap();
+        fieldToCertify = params.get("certify-fieldid");
+        System.out.println("PropertyProfileBB.certifyDateField | param value: " + fieldToCertify);
+        switch(fieldToCertify){
+            case "enddate":
+                break;
+            case "startdate":
+                break;
+            case "periodtype":
+                break;
+            case "authorization":
+                break;
+        }
+        
+    }
+    
+    
+    public void commitNewOccPeriod(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            int newID = 0;
+            newID = oc.insertNewOccPeriod(currOccPeriod, getSessionBean().getSessionUser());
+            refreshCurrPropWithLists();
+            getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                        "Success! New occ period ID: " + newID, ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                        "Could not commit new occ period: " , ""));
+        }
+    }
     
     public String viewPersonProfile(Person p){
         getSessionBean().getSessionPersonList().add(0,p);
@@ -279,7 +357,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             currProp = pi.getPropertyWithLists(prop.getPropertyID());
             ui.logObjectView(getSessionBean().getSessionUser(), prop);
             getSessionBean().setSessionProperty(prop);
-            
         } catch (IntegrationException | CaseLifecyleException ex) {
             System.out.println(ex);
         }
@@ -301,7 +378,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     *delete blob if the blob is a photo
+     * delete blob if the blob is a photo
      * @param blobID
      */
     public void deletePhoto(int blobID){
@@ -515,6 +592,48 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      */
     public void setCurrPropUnit(PropertyUnit currPropUnit) {
         this.currPropUnit = currPropUnit;
+    }
+
+    /**
+     * @return the currPropUnitWithLists
+     */
+    public PropertyUnitWithLists getCurrPropUnitWithLists() {
+        return currPropUnitWithLists;
+    }
+
+    /**
+     * @param currPropUnitWithLists the currPropUnitWithLists to set
+     */
+    public void setCurrPropUnitWithLists(PropertyUnitWithLists currPropUnitWithLists) {
+        this.currPropUnitWithLists = currPropUnitWithLists;
+    }
+
+    /**
+     * @return the occPeriodTypeList
+     */
+    public List<OccPeriodType> getOccPeriodTypeList() {
+        return occPeriodTypeList;
+    }
+
+    /**
+     * @param occPeriodTypeList the occPeriodTypeList to set
+     */
+    public void setOccPeriodTypeList(List<OccPeriodType> occPeriodTypeList) {
+        this.occPeriodTypeList = occPeriodTypeList;
+    }
+
+    /**
+     * @return the currOccPeriod
+     */
+    public OccPeriod getCurrOccPeriod() {
+        return currOccPeriod;
+    }
+
+    /**
+     * @param currOccPeriod the currOccPeriod to set
+     */
+    public void setCurrOccPeriod(OccPeriod currOccPeriod) {
+        this.currOccPeriod = currOccPeriod;
     }
 
    

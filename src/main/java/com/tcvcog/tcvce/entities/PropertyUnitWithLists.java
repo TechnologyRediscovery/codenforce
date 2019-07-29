@@ -43,6 +43,7 @@ public class PropertyUnitWithLists extends PropertyUnit{
         this.active = prop.isActive();
         this.conditionIntensityClassID = prop.getConditionIntensityClassID();
         this.lastUpdatedTS = prop.getLastUpdatedTS();
+        
     }
 
     /**
