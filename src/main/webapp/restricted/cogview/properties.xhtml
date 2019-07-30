@@ -333,58 +333,79 @@
 
                                         <p:spacer height="5px" />
 
-                                        <p:dataTable
-                                            id="table-addoccperiod-existingperiods"
-                                            widgetVar="var-table-addoccperiod-existingperiods"
-                                            rowIndexVar="rowIndex"
+                                        <p:dataScroller
+                                            id="scroller-periodlist"
+                                            widgetVar="var-scroller-periodlist"
+                                            rowIndexVar="#{period.periodID}"
                                             var="period"
-                                            value="#{propUnit.periodList}"
-                                            tabindex="2"
-                                            rowKey="#{period.periodID}"
-                                            editable="true">                                         
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Start Date" />
-                                                </f:facet>
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.startDate)}" />
-                                            </p:column>
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="End Date" />
-                                                </f:facet>
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.endDate)}" />
-                                            </p:column>
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Type" />
-                                                </f:facet>
-                                                <h:outputText value="#{period.type.title}" />
-                                            </p:column>
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Authorization" />
-                                                </f:facet>
+                                            value="#{unit.periodList}"
+                                            >                                         
+                                            
+                                            
+                                            <div style="datum">
+                                                
+                                                
+                                                <h:outputText value="Start Date: " 
+                                                              styleClass="ui-label-inline" />
+                                                
+                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.startDate)}" 
+                                                              styleClass="data-text"/>
+                                            </div>
+                                                
+                                            <div style="datum">
+                                                <h:outputText value="End Date: " 
+                                                              styleClass="ui-label-inline" />
+                                                
+                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.endDate)}" 
+                                                              styleClass="data-text"/>
+                                            </div>
+                                            <div style="datum">
+                                                <h:outputText value="Type: " 
+                                                              styleClass="ui-label-inline" />
+                                                <h:outputText value="#{period.type.title}" 
+                                                              styleClass="data-text"/>
+                                            </div>
+                                            <div style="datum">
+                                                <h:outputText value="Authorization" 
+                                                              styleClass="ui-label-inline" />
                                                 <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : propertyProfileBB.getPrettyDate(period.authorizedTS)}" />
-                                            </p:column>
-
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Manage" />
-                                                </f:facet>
+                                            </div>
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
                                                                        ajax="true" 
                                                                        actionListener="#{propertyProfileBB.manageOccPeriod(period)}"
                                                                        oncomplete="PF('dialog-widvar-occperiod-addupdate').show()"
                                                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                                        value="edit period"  
-                                                                       icon="fa fa-plus"
+                                                                       icon="fa fa-edit"
                                                                        update="form-occperiod-addupdate"/>
-                                            </p:column>
-                                        </p:dataTable>
+                                                <p:dataScroller
+                                                    id="scroller-inspectionlist"
+                                                    widgetVar="var-scroller-inspectionlist"
+                                                    var="inspection"
+                                                    value="#{period.inspectionList}"
+                                                    rowIndexVar="#{inspection.inspectionID}">
+                                                    
+                                                    <div class="datum">
+                                                        <h:outputText styleClass="ui-label-inline" value="Inspection ID: " />
+                                                        <h:outputText styleClass="data-text" value="#{inspection.inspectionID}" />
+                                                    </div>
+                                                    <div class="datum">
+                                                        <h:outputText styleClass="ui-label-inline" value="Inspector: " />
+                                                        <h:outputText styleClass="data-text" value="#{inspection.inspector.person.firstName} #{inspection.inspector.person.lastName}" />
+                                                    </div>
+                                                    
+                                                    <p:commandButton       id="button-inspectionscroller-manageinspection"
+                                                                           ajax="false" 
+                                                                           action="#{propertyProfileBB.manageInspection(inspection)}"
+                                                                           rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                           value="manage inspection"  
+                                                                           icon="fa fa-list-alt"
+                                                                           />
+                                                
+                                                
+                                                </p:dataScroller>
+                                                
+                                        </p:dataScroller>
                                     </div>
                                 </p:dataScroller>
                             </h:form>

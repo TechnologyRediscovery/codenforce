@@ -830,7 +830,7 @@ public class BackingBeanUtils implements Serializable{
         ChoiceIntegrator ci;
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{ChoiceIntegrator}", ChoiceIntegrator.class);
+                .createValueExpression(context.getELContext(), "#{choiceIntegrator}", ChoiceIntegrator.class);
         ci = (ChoiceIntegrator) ve.getValue(context.getELContext());
         return ci;
     }

@@ -42,7 +42,7 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
     private LocalDateTime lastInspectedTS;
     
     public OccInspectedSpace(OccSpace spc){
-        this.spaceid = spc.getSpaceid();
+        this.spaceID = spc.getSpaceID();
         this.occSpaceTypeID = spc.getOccSpaceTypeID();
         this.name = spc.getName();
         this.required = spc.isRequired();

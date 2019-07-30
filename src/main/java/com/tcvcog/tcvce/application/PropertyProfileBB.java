@@ -15,6 +15,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -343,6 +344,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         "Could not commit new occ period: " , ""));
         }
+    }
+    
+    public String manageInspection(OccInspection inspec){
+        getSessionBean().setSessionOccInspection(inspec);
+        return "inspection";
     }
     
     public String viewPersonProfile(Person p){
