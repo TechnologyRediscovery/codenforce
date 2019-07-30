@@ -15,6 +15,9 @@ import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -60,6 +63,22 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      * Creates a new instance of InspectionsBB
      */
     public OccInspectionBB() {
+    }
+    
+    
+    @PostConstruct
+    public void initBean(){
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        if(currentInspection == null){
+            if(getSessionBean().getSessionOccInspection() != null){
+                currentInspection = getSessionBean().getSessionOccInspection();
+                try {
+                    currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                }
+            }
+        }
     }
     
     /**

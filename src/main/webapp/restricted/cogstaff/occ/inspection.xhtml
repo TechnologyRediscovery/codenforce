@@ -23,28 +23,130 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Inspection</title>
+        <title>Occupancy Inspection</title>
     </h:head>
     <h:body>
         <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="CEActionRequestsView">
+                <f:view id="view-inspections">
                     <div class="mainContainer">
                         
-                        <h:form id="msgForm">
+                        <h:form id="form-inspection-messages-global">
 
-                            <h:messages id="ceActionRequestsMessages" globalOnly="true" showDetail="true" showSummary="true"
+                            <h:messages id="messages-inspection-global" globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
                         </h:form>
 
+                        
+                        
                         <h1>Occupancy Inspection ID:<h:outputText value="#{sessionBean.sessionOccInspection.inspectionID}"/></h1>
                         
+                        <h2>Inspection template</h2>
                         
+                        <h3>Space types in this checklist</h3>
+                        <p:dataScroller
+                            id="scroller-template-spacetypelist"
+                            widgetVar="var-scroller-inspectiontemplate-spacetypelist"
+                            var="spaceType"
+                            value="#{occInspectionBB.currentInspection.checklistTemplate.occSpaceTypeTemplateList}"
+                            rowIndexVar="#{spaceType.spaceTypeID}">
+
+                            <h2><h:outputText styleClass="data-text" value="#{spaceType.spaceTypeTitle}" /></h2>
+                            <div class="datum">
+                                <h:outputText styleClass="ui-label-inline" value="Type: " />
+                                <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeTitle}" />
+
+                                <p:spacer height="5px" />
+
+                                <h:outputText styleClass="ui-label-inline" value="Description: " />
+                                <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeDescription}" />
+                            </div>
+
+                            <div class="datum">
+                                <h:outputText styleClass="ui-label-inline" value="Type ID:" />
+                                <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeID}" />
+                            </div>
+
+                            <div class="outlinedBox">
+
+                                <h4>Spaces in this type</h4>
+
+                                <p:dataScroller
+                                    id="scroller-template-spacetypelist-spacelist"
+                                    widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist"
+                                    var="space"
+                                    value="#{spaceType.spaceList}"
+                                    rowIndexVar="#{space.spaceID}">
+
+                                    <div class="outlinedBox">
+
+
+                                        <div class="datum">
+                                            <h:outputText styleClass="ui-label-inline" value="Space name: " />
+                                            <h:outputText styleClass="data-text" value="#{space.name}" />
+
+                                            <p:spacer height="5px" />
+
+                                            <h:outputText styleClass="ui-label-inline" value="Description: " />
+                                            <h:outputText styleClass="data-text" value="#{space.description}" />
+                                        </div>
+
+                                        <div class="datum">
+                                            <h:outputText styleClass="ui-label-inline" value="Space ID:" />
+                                            <h:outputText styleClass="data-text" value="#{space.spaceID}" />
+                                        </div>
+                                        <p:dataScroller
+                                            id="scroller-template-spacetypelist-spacelist-elementlist"
+                                            widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist-elementlist"
+                                            var="codeElement"
+                                            value="#{space.elementList}"
+                                            rowIndexVar="#{codeElement.elementID}">
+
+                                            <div class="outlinedBox">
+
+                                                <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                                <p:spacer height="5px" />
+                                                <h:outputLabel value="#{codeElement.source.sourceName} 
+                                                               (#{codeElement.source.sourceYear}), " />
+                                                <h:outputText  value="Ch. #{codeElement.ordchapterNo}:" />
+                                                <h:outputText  value="#{codeElement.ordchapterTitle}" />
+                                                <p:spacer height="2px" />
+
+                                                <h:outputText  value="&#167;#{codeElement.ordSecNum}:" />
+                                                <h:outputText  value="#{codeElement.ordSecTitle}; " />
+                                                <h:outputText  value="&#167;&#167;#{codeElement.ordSubSecNum} " />
+                                                <h:outputText  value="#{codeElement.ordSubSecTitle}" />
+
+                                                <p:spacer height="2px" />
+
+                                                <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTD" 
+                                                                rendered="true">
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+                                                        <div class="ord-text">
+                                                            <h:outputText value="#{codeElement.ordTechnicalText}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                </h:panelGrid>
+
+                                            </div>
+
+
+
+                                        </p:dataScroller>
+
+
+
+
+                                    </div>
+                                </p:dataScroller>
+
+                            </div> 
+                        </p:dataScroller>
                     </div>
                 </f:view>
-              
-                
             </ui:define>
         </ui:composition>
     </h:body>

@@ -202,9 +202,38 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return space;
     }
     
+    public OccSpaceType getOccSpaceType(int spaceTypeID) throws IntegrationException{
+        
+        OccSpaceType spaceType = null;
+        String query =  "SELECT spacetypeid, spacetitle, description, required\n" +
+                        "  FROM public.occspacetype WHERE spacetypeid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, spaceTypeID);
+            rs = stmt.executeQuery();
+
+            while(rs.next()){
+                spaceType = generateOccSpaceType(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Could not create sapce", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return spaceType;
+    }
+    
     private OccSpace generateOccSpace(ResultSet rs) throws SQLException, IntegrationException{
         OccSpace space = new OccSpace();
-        space.setSpaceid(rs.getInt("spaceid"));
+        space.setSpaceID(rs.getInt("spaceid"));
         space.setName(rs.getString("name"));
         space.setOccSpaceTypeID(rs.getInt("spacetype_id"));
         space.setDescription(rs.getString("description"));
@@ -231,7 +260,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         List<CodeElement> eleList = new ArrayList<>();
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, spc.getSpaceid());
+            stmt.setInt(1, spc.getSpaceID());
             rs = stmt.executeQuery();
             while(rs.next()){
                 eleList.add(ci.getCodeElement(rs.getInt("codeelement_id")));
@@ -272,7 +301,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             while(li.hasNext()){
                 ce = (CodeElement) li.next();
                 stmt = con.prepareStatement(sql);
-                stmt.setInt(1, spc.getSpaceid());
+                stmt.setInt(1, spc.getSpaceID());
                 stmt.setInt(2, ce.getElementID());
                 stmt.execute();
             }
@@ -300,7 +329,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, spc.getSpaceid());
+            stmt.setInt(1, spc.getSpaceID());
             stmt.setInt(2, elementToDetach.getElementID());
             System.out.println("ChecklistIntegrator.dettachCodeElementsFromSpace | stmt: " + stmt.toString());
             stmt.executeQuery();
@@ -332,13 +361,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                         " WHERE spaceelementid = ?;";
 
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, s.getSpaceid());
+            stmt.setInt(1, s.getSpaceID());
             stmt.executeQuery();
             
             // now remove the space itself
             query = "DELETE FROM public.space WHERE spaceid = ?";
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, s.getSpaceid());
+            stmt.setInt(1, s.getSpaceID());
             stmt.executeQuery();
             
         } catch (SQLException ex) {
@@ -686,7 +715,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         try {
 
             stmt = con.prepareStatement(sql);
-            stmt.setInt(1, spc.getSpaceid());
+            stmt.setInt(1, spc.getSpaceID());
             stmt.setInt(2, spc.getLocation().getLocationID());
             stmt.setInt(3, spc.getLastInspectedBy().getUserID());
             
@@ -710,7 +739,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        spc.setSpaceid(insertedInspSpaceID);
+        spc.setSpaceID(insertedInspSpaceID);
         
         return spc;
         
@@ -875,7 +904,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             // returning the ID of an existing InspectedSpace is unnecessary since the caller would
             // already have it, but the insert returns the fresh one and both this method and
             // the insert come from the same delegator method 
-        return inspSpace.getSpaceid();
+        return inspSpace.getSpaceID();
     }
     
     
@@ -898,7 +927,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, inspSpace.getSpaceid());
+            stmt.setInt(1, inspSpace.getSpaceID());
             stmt.setInt(2, inspection.getInspectionID());
             stmt.setInt(3, inspSpace.getLocation().getLocationID());
             
@@ -921,7 +950,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, is.getSpaceid());
+            stmt.setInt(1, is.getSpaceID());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -948,7 +977,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("", ex);
+            throw new IntegrationException("Could not get space type", ex);
 
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -960,9 +989,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     
     private List<OccSpaceTypeInspectionDirective> getOccInspecTemplateSpaceTypeList(int checklistID) throws IntegrationException{
 
-        String query = "    SELECT checklistspacetypeid, checklist_id, spaceelement_id, required, \n" +
-                        "       spacetype_typeid, overridespctyprequired, overridespctypeequiredvalue, \n" +
-                        "       overridespctypeequiredallspacesreq\n" +
+        String query = "    SELECT checklistspacetypeid, checklist_id, required, \n" +
+                        "       spacetype_typeid, overridespacetyperequired, overridespacetyperequiredvalue, \n" +
+                        "       overridespacetyperequireallspaces\n" +
                         "  FROM public.occchecklistspacetype WHERE checklist_id=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -994,7 +1023,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         
         // Now use the SpaceType to make a SpaceTypeTemplate that contains
         // variables for configuring SpacTypes when they are actually inspected
-        OccSpaceTypeInspectionDirective temp = new OccSpaceTypeInspectionDirective(generateOccSpaceType(rs));
+        OccSpaceTypeInspectionDirective temp = new OccSpaceTypeInspectionDirective(getOccSpaceType(rs.getInt("spacetype_typeid")));
         temp.setOverrideSpaceTypeRequired(rs.getBoolean("overridespacetyperequired"));
         temp.setOverrideSpaceTypeRequiredValue(rs.getBoolean("overridespacetyperequiredvalue"));
         temp.setOverrideSpaceTypeRequireAllSpaces(rs.getBoolean("overridespacetyperequireallspaces"));
@@ -1045,7 +1074,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     
     public void insertSpaceType(OccSpaceType spaceType) throws IntegrationException{
         String query = "INSERT INTO public.occspacetype(\n" +
-                "         spacetypeid, spacetitle, description, required) \n" +
+                "         spacetype_id, spacetitle, description, required) \n" +
                 "    VALUES (DEFAULT, ?, ?, ?)";
         
         Connection con = getPostgresCon();
@@ -1126,7 +1155,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt = con.prepareStatement(query);
             stmt.setInt(1, op.getPeriodID());
             rs = stmt.executeQuery();
-            System.out.println("SpaceTypeIntegrator.getSpaceTypeList| SQL: " + stmt.toString());
 
             while(rs.next()){
                 inspecList.add(getOccInspection(rs.getInt("inspectionid")));
@@ -1156,7 +1184,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                         "       thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n" +
                         "       numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n" +
                         "       effectivedate\n" +
-                        "  FROM public.occinspection;";
+                        "  FROM public.occinspection WHERE inspectionid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1166,7 +1194,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt = con.prepareStatement(query);
             stmt.setInt(1, inspectionID);
             rs = stmt.executeQuery();
-            System.out.println("SpaceTypeIntegrator.getSpaceTypeList| SQL: " + stmt.toString());
 
             while(rs.next()){
                 inspection = generateOccInspection(rs);

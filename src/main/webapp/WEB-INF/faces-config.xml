@@ -1120,6 +1120,16 @@
     <navigation-rule>
         
         <navigation-case>
+            <from-view-id>/restricted/*</from-view-id>
+            <from-outcome>inspection</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/inspection.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    
+    <navigation-rule>
+        
+        <navigation-case>
             <from-view-id>/public/services/occpermitApplicationFlow/occPermitChooseMuni.xhtml</from-view-id>
             <from-outcome>chooseProperty</from-outcome>
             <to-view-id>/public/services/occPermitApplicationFlow/occPermitChoosePropertyUnit.xhtml#currentStep</to-view-id>
@@ -1221,8 +1231,8 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>checklists</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/checklsits.xhtml</to-view-id>
+            <from-outcome>checklist</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/checklsit.xhtml</to-view-id>
         </navigation-case>
         
         <navigation-case>
