@@ -445,6 +445,12 @@
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>intensityBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.IntensityBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
  
     <!--request-scoped beans-->
     
@@ -998,6 +1004,12 @@
         <navigation-case>
             <from-outcome>litigationManage</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/courtEntityManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    
+        <navigation-case>
+            <from-outcome>intensityManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     

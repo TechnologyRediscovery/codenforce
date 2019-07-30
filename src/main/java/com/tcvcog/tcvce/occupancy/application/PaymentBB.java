@@ -68,7 +68,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
             paymentList = paymentIntegrator.getPaymentList();
         } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null, 
+            getFacesContext().addMessage(null,  
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Unable to load payment list",
                         "This must be corrected by the system administrator"));

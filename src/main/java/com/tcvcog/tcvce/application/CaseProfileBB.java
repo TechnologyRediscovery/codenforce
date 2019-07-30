@@ -43,7 +43,6 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -70,16 +69,16 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private DonutChartModel violationDonut;
     
     private List<CECase> caseList;
-    private ArrayList<CECase> filteredCaseList;
+    private List<CECase> filteredCaseList;
     private SearchParamsCECase searchParams;
     
     private List<QueryCECase> queryList;
     private QueryCECase selectedCECaseQuery;
     private Query selectedBOBQuery;
     
-    private ArrayList<CECase> filteredCaseHistoryList;
-    private ArrayList<CECaseEvent> recentEventList;
-    private ArrayList<Person> muniPeopleList;
+    private List<CECase> filteredCaseHistoryList;
+    private List<CECaseEvent> recentEventList;
+    private List<Person> muniPeopleList;
 
     private CECaseEvent eventForTriggeringCasePhaseAdvancement;
     private CECaseEvent triggeringEventForProposal;
@@ -100,7 +99,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private String phaseDiagramImageFilename;
 
     // add currentEvent form fields
-    private ArrayList<EventCategory> eventCategoryList;
+    private List<EventCategory> eventCategoryList;
 
     private EventCategory selectedEventCategory;
     private EventType selectedEventType;
@@ -1054,7 +1053,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param svs
      */
-    public void setSelectedViolations(ArrayList<CodeViolation> svs) {
+    public void setSelectedViolations(List<CodeViolation> svs) {
         selectedViolations = svs;
     }
 
@@ -1077,7 +1076,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param cl
      */
-    public void setCitationList(ArrayList<Citation> cl) {
+    public void setCitationList(List<Citation> cl) {
         citationList = cl;
     }
 
@@ -1180,7 +1179,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param fel
      */
-    public void setFilteredEventList(ArrayList<CECaseEvent> fel) {
+    public void setFilteredEventList(List<CECaseEvent> fel) {
         filteredEventList = fel;
     }
 
@@ -1238,28 +1237,28 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredCaseList
      */
-    public ArrayList<CECase> getFilteredCaseList() {
+    public List<CECase> getFilteredCaseList() {
         return filteredCaseList;
     }
 
     /**
      * @return the filteredCaseHistoryList
      */
-    public ArrayList<CECase> getFilteredCaseHistoryList() {
+    public List<CECase> getFilteredCaseHistoryList() {
         return filteredCaseHistoryList;
     }
 
     /**
      * @return the recentEventList
      */
-    public ArrayList<CECaseEvent> getRecentEventList() {
+    public List<CECaseEvent> getRecentEventList() {
         return recentEventList;
     }
 
     /**
      * @return the muniPeopleList
      */
-    public ArrayList<Person> getMuniPeopleList() {
+    public List<Person> getMuniPeopleList() {
         return muniPeopleList;
     }
 
@@ -1274,58 +1273,39 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param caseList the caseList to set
      */
-    public void setCaseList(ArrayList<CECase> caseList) {
+    public void setCaseList(List<CECase> caseList) {
         this.caseList = caseList;
     }
 
     /**
      * @param filteredCaseList the filteredCaseList to set
      */
-    public void setFilteredCaseList(ArrayList<CECase> filteredCaseList) {
+    public void setFilteredCaseList(List<CECase> filteredCaseList) {
         this.filteredCaseList = filteredCaseList;
     }
 
     /**
      * @param filteredCaseHistoryList the filteredCaseHistoryList to set
      */
-    public void setFilteredCaseHistoryList(ArrayList<CECase> filteredCaseHistoryList) {
+    public void setFilteredCaseHistoryList(List<CECase> filteredCaseHistoryList) {
         this.filteredCaseHistoryList = filteredCaseHistoryList;
     }
 
     /**
      * @param recentEventList the recentEventList to set
      */
-    public void setRecentEventList(ArrayList<CECaseEvent> recentEventList) {
+    public void setRecentEventList(List<CECaseEvent> recentEventList) {
         this.recentEventList = recentEventList;
     }
 
     /**
      * @param muniPeopleList the muniPeopleList to set
      */
-    public void setMuniPeopleList(ArrayList<Person> muniPeopleList) {
+    public void setMuniPeopleList(List<Person> muniPeopleList) {
         this.muniPeopleList = muniPeopleList;
     }
 
-    /**
-     * @param filteredEventList the filteredEventList to set
-     */
-    public void setFilteredEventList(List<CECaseEvent> filteredEventList) {
-        this.filteredEventList = filteredEventList;
-    }
-
-    /**
-     * @param selectedViolations the selectedViolations to set
-     */
-    public void setSelectedViolations(List<CodeViolation> selectedViolations) {
-        this.selectedViolations = selectedViolations;
-    }
-
-    /**
-     * @param citationList the citationList to set
-     */
-    public void setCitationList(List<Citation> citationList) {
-        this.citationList = citationList;
-    }
+   
 
     /**
      * @param imageFilenameMap the imageFilenameMap to set
@@ -1374,7 +1354,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the eventCategoryList
      */
-    public ArrayList<EventCategory> getEventCategoryList() {
+    public List<EventCategory> getEventCategoryList() {
         EventIntegrator ei = getEventIntegrator();
 
         if (selectedEventType != null) {
@@ -1422,7 +1402,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param eventCategoryList the eventCategoryList to set
      */
-    public void setEventCategoryList(ArrayList<EventCategory> eventCategoryList) {
+    public void setEventCategoryList(List<EventCategory> eventCategoryList) {
         this.eventCategoryList = eventCategoryList;
     }
 
@@ -1485,7 +1465,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     /**
      * @param availableActionToRequest the availableActionsToRequest to set
      */
-    public void setAvailableActionToRequest(ArrayList<EventCategory> availableActionToRequest) {
+    public void setAvailableActionToRequest(List<EventCategory> availableActionToRequest) {
         this.availableActionsToRequest = availableActionToRequest;
     }
 
