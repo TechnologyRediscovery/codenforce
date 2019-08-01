@@ -165,7 +165,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return Containing a List of InspectedCodeElement objects ready to be evaluated
      * @throws IntegrationException 
      */
-    public OccInspection inspectionAction_commenceSpaceInspection(  OccInspection inspection, 
+    public OccInspectedSpace inspectionAction_commenceSpaceInspection(  OccInspection inspection, 
                                                                     User u, 
                                                                     OccSpace spc, 
                                                                     OccLocationDescriptor loc) 
@@ -173,6 +173,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
         OccInspectedSpace inspSpace = new OccInspectedSpace(spc);
         inspSpace.setLocation(loc);
+        inspSpace.setLastInspectedBy(u);
+        inspSpace.setLastInspectedTS(LocalDateTime.now());
         ListIterator<CodeElement> elementIterator = spc.getElementList().listIterator();
         OccInspectedCodeElement inspEle;
         
@@ -184,11 +186,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             inspEle.setLastInspectedBy(u);
             inspSpace.addElementToInspectedList(inspEle);
             // each element in this space gets a reference to the same OccLocationDescriptor object
-            inspSpace.setLocation(loc);
+            if(loc == null){
+                inspSpace.setLocation(inspecInt.getLocationDescriptor(Integer.parseInt(
+                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("locationdescriptor_implyfromspacename"))));
+            } else {
+                inspSpace.setLocation(loc);
+            }
         }
-        inspecInt.recordCommencementOfSpaceInspection(inspSpace);
-        inspection = inspecInt.getOccInspection(inspection.getInspectionID());
-        return inspection;
+        inspecInt.recordCommencementOfSpaceInspection(inspSpace, inspection);
+        
+        return inspSpace;
     }    
     
     
