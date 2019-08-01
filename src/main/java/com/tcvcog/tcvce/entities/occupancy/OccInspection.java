@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.entities.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -305,6 +306,95 @@ public class OccInspection {
      */
     public void setEffectiveDateOfRecord(LocalDateTime effectiveDateOfRecord) {
         this.effectiveDateOfRecord = effectiveDateOfRecord;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + this.inspectionID;
+        hash = 53 * hash + Objects.hashCode(this.inspector);
+        hash = 53 * hash + this.occPeriodID;
+        hash = 53 * hash + Objects.hashCode(this.checklistTemplate);
+        hash = 53 * hash + Objects.hashCode(this.inspectedSpaceList);
+        hash = 53 * hash + this.pacc;
+        hash = 53 * hash + (this.enablePacc ? 1 : 0);
+        hash = 53 * hash + Objects.hashCode(this.passedInspectionCertifiedBy);
+        hash = 53 * hash + Objects.hashCode(this.passedInspectionTS);
+        hash = 53 * hash + Objects.hashCode(this.effectiveDateOfRecord);
+        hash = 53 * hash + this.maxOccupantsAllowed;
+        hash = 53 * hash + this.numBedrooms;
+        hash = 53 * hash + this.numBathrooms;
+        hash = 53 * hash + Objects.hashCode(this.thirdPartyInspector);
+        hash = 53 * hash + Objects.hashCode(this.thirdPartyInspectorApprovalTS);
+        hash = 53 * hash + Objects.hashCode(this.thirdPartyApprovalBy);
+        hash = 53 * hash + Objects.hashCode(this.notes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OccInspection other = (OccInspection) obj;
+        if (this.inspectionID != other.inspectionID) {
+            return false;
+        }
+        if (this.occPeriodID != other.occPeriodID) {
+            return false;
+        }
+        if (this.pacc != other.pacc) {
+            return false;
+        }
+        if (this.enablePacc != other.enablePacc) {
+            return false;
+        }
+        if (this.maxOccupantsAllowed != other.maxOccupantsAllowed) {
+            return false;
+        }
+        if (this.numBedrooms != other.numBedrooms) {
+            return false;
+        }
+        if (this.numBathrooms != other.numBathrooms) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.inspector, other.inspector)) {
+            return false;
+        }
+        if (!Objects.equals(this.checklistTemplate, other.checklistTemplate)) {
+            return false;
+        }
+        if (!Objects.equals(this.inspectedSpaceList, other.inspectedSpaceList)) {
+            return false;
+        }
+        if (!Objects.equals(this.passedInspectionCertifiedBy, other.passedInspectionCertifiedBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.passedInspectionTS, other.passedInspectionTS)) {
+            return false;
+        }
+        if (!Objects.equals(this.effectiveDateOfRecord, other.effectiveDateOfRecord)) {
+            return false;
+        }
+        if (!Objects.equals(this.thirdPartyInspector, other.thirdPartyInspector)) {
+            return false;
+        }
+        if (!Objects.equals(this.thirdPartyInspectorApprovalTS, other.thirdPartyInspectorApprovalTS)) {
+            return false;
+        }
+        if (!Objects.equals(this.thirdPartyApprovalBy, other.thirdPartyApprovalBy)) {
+            return false;
+        }
+        return true;
     }
 
     

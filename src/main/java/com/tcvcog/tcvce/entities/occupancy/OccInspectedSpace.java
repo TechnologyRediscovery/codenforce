@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Subclass of Space: stores inspection-specific data about each space element
@@ -143,6 +144,47 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
      */
     public void setLastInspectedTS(LocalDateTime lastInspectedTS) {
         this.lastInspectedTS = lastInspectedTS;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.inspectedElementList);
+        hash = 53 * hash + Objects.hashCode(this.location);
+        hash = 53 * hash + Objects.hashCode(this.type);
+        hash = 53 * hash + Objects.hashCode(this.lastInspectedBy);
+        hash = 53 * hash + Objects.hashCode(this.lastInspectedTS);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OccInspectedSpace other = (OccInspectedSpace) obj;
+        if (!Objects.equals(this.inspectedElementList, other.inspectedElementList)) {
+            return false;
+        }
+        if (!Objects.equals(this.location, other.location)) {
+            return false;
+        }
+        if (!Objects.equals(this.type, other.type)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastInspectedBy, other.lastInspectedBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastInspectedTS, other.lastInspectedTS)) {
+            return false;
+        }
+        return true;
     }
     
 }

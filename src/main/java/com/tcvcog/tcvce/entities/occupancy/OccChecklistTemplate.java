@@ -34,7 +34,7 @@ public class OccChecklistTemplate {
     
     // note we have a lexicon switch here: in the DB, this object is 
     // derived from an inspectionchecklist row. In Javaland, we make
-    // an InspectionBlueprint object that contains data from sevearl tables
+    // a ChecklistTemplate object that contains data from sevearl tables
     private int inspectionChecklistID;
     private Municipality muni;
     private String title;

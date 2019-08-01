@@ -59,5 +59,7 @@ public class Constants implements Serializable {
     
     public final static String STYLE_CLASS_INACTIVE_CASE_PHASE = "stage-inactive";
     
+     
+    
     
 }
