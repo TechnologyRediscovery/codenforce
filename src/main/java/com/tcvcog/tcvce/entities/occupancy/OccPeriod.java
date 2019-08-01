@@ -15,6 +15,7 @@ import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private int periodID;
     private int propertyUnitID;
     private OccPeriodType type;
+    private OccPeriodStatus status;
     
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
@@ -38,7 +40,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private List<Integer> blobIDList;
     
     private User manager;
-    
+     
     private User periodTypeCertifiedBy;
     private LocalDateTime periodTypeCertifiedTS;
     
@@ -47,14 +49,14 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private LocalDateTime createdTS;
     
     private LocalDateTime startDate;
+    private java.util.Date startDateUtilDate;
     private LocalDateTime startDateCertifiedTS;
     private User startDateCertifiedBy;
-     
+    
     private LocalDateTime endDate;
+    private java.util.Date endDateUtilDate;
     private LocalDateTime endDateCertifiedTS;
     private User endDateCertifiedBy;
-    
-    private int defaultValidityPeriodDays;
     
     private LocalDateTime authorizedTS;
     private User authorizedBy;
@@ -427,21 +429,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
         this.notes = notes;
     }
 
-    /**
-     * @return the defaultValidityPeriodDays
-     */
-    public int getDefaultValidityPeriodDays() {
-        return defaultValidityPeriodDays;
-    }
-
-    /**
-     * @param defaultValidityPeriodDays the defaultValidityPeriodDays to set
-     */
-    public void setDefaultValidityPeriodDays(int defaultValidityPeriodDays) {
-        this.defaultValidityPeriodDays = defaultValidityPeriodDays;
-    }
-
-    
+   
 
     /**
      * @return the eventRuleOccPeriodList
@@ -455,6 +443,63 @@ public class OccPeriod extends EntityUtils implements Serializable{
      */
     public void setEventRuleOccPeriodList(List<EventRuleOccPeriod> eventRuleOccPeriodList) {
         this.eventRuleOccPeriodList = eventRuleOccPeriodList;
+    }
+
+    /**
+     * @return the startDateUtilDate
+     */
+    public java.util.Date getStartDateUtilDate() {
+         if(startDate != null){
+            startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+        }
+         return startDateUtilDate;
+    }
+
+    /**
+     * @return the endDateUtilDate
+     */
+    public java.util.Date getEndDateUtilDate() {
+        if(endDate != null){
+            endDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return endDateUtilDate;
+    }
+
+    /**
+     * @param startDateUtilDate the startDateUtilDate to set
+     */
+    public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
+        this.startDateUtilDate = startDateUtilDate;
+        if(startDateUtilDate != null){
+            startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        
+        this.startDateUtilDate = startDateUtilDate;
+    }
+
+    /**
+     * @param endDateUtilDate the endDateUtilDate to set
+     */
+    public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
+        this.endDateUtilDate = endDateUtilDate;
+        if(endDateUtilDate != null){
+            endDate = endDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        this.endDateUtilDate = endDateUtilDate;
+    }
+
+    /**
+     * @return the status
+     */
+    public OccPeriodStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(OccPeriodStatus status) {
+        this.status = status;
     }
      
     

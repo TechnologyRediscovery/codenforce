@@ -484,8 +484,12 @@ public class BackingBeanUtils implements Serializable{
     
     public String getPrettyDate(LocalDateTime d){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-        String formattedDateTime = d.format(formatter); 
-        return formattedDateTime;
+        if(d != null){
+            String formattedDateTime = d.format(formatter); 
+            return formattedDateTime;
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -826,7 +830,7 @@ public class BackingBeanUtils implements Serializable{
         ChoiceIntegrator ci;
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{ChoiceIntegrator}", ChoiceIntegrator.class);
+                .createValueExpression(context.getELContext(), "#{choiceIntegrator}", ChoiceIntegrator.class);
         ci = (ChoiceIntegrator) ve.getValue(context.getELContext());
         return ci;
     }

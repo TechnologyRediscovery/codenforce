@@ -33,7 +33,8 @@ public enum EventType {
     Notice("Notice"),
     Custom("Custom"),
     Compliance("Compliance"),
-    Citation("Citation");
+    Citation("Citation"),
+    Occupancy("Occupancy");
 
     private final String label;
 

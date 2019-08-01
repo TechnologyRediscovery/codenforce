@@ -20,12 +20,12 @@ package com.tcvcog.tcvce.entities;
  *
  * @author sylvia
  */
-public class CECaseEventRule extends EventRuleImplementation{
+public class EventRuleCECase extends EventRuleImplementation{
     
     private int ceCaseID;
     private CECaseEvent passedRuleEvent;
     
-    public CECaseEventRule(EventRuleImplementation imp){
+    public EventRuleCECase(EventRuleImplementation imp){
         super(imp);
         // implementation subclass
         this.attachedTS = imp.getAttachedTS();

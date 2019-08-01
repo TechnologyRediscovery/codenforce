@@ -6,15 +6,22 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccSpace;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -55,12 +62,56 @@ import javax.faces.event.ActionEvent;
 public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 
     private OccInspection currentInspection;
+    private OccSpaceTypeInspectionDirective selectedOccSpaceType;
+    private List<OccSpace> browseSpaceList;
     
     /**
      * Creates a new instance of InspectionsBB
      */
     public OccInspectionBB() {
+        browseSpaceList = new ArrayList<>();
     }
+    
+    
+    
+    
+    @PostConstruct
+    public void initBean(){
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        if(currentInspection == null){
+            if(getSessionBean().getSessionOccInspection() != null){
+                currentInspection = getSessionBean().getSessionOccInspection();
+                try {
+                    currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
+                } catch (IntegrationException ex) {
+                    System.out.println(ex);
+                }
+            }
+        }
+    }
+    
+    public void addSpaceToChecklist(OccSpace space) {
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            currentInspection.getInspectedSpaceList().add(
+                    oc.inspectionAction_commenceSpaceInspection(currentInspection,
+                            getSessionBean().getSessionUser(),
+                            space,
+                            null));
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Space added to checklist!", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Unable to add space to checklist", ""));
+        }
+        
+    }
+    
     
     /**
      * Called when the user clicks a command button inside the row of the
@@ -129,6 +180,37 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setCurrentInspection(OccInspection currentInspection) {
         this.currentInspection = currentInspection;
+    }
+
+    /**
+     * @return the selectedOccSpaceType
+     */
+    public OccSpaceTypeInspectionDirective getSelectedOccSpaceType() {
+        return selectedOccSpaceType;
+    }
+
+    /**
+     * @param selectedOccSpaceType the selectedOccSpaceType to set
+     */
+    public void setSelectedOccSpaceType(OccSpaceTypeInspectionDirective selectedOccSpaceType) {
+        this.selectedOccSpaceType = selectedOccSpaceType;
+    }
+
+    /**
+     * @return the browseSpaceList
+     */
+    public List<OccSpace> getBrowseSpaceList() {
+        if(selectedOccSpaceType != null){
+            browseSpaceList = selectedOccSpaceType.getSpaceList();
+        }
+        return browseSpaceList;
+    }
+
+    /**
+     * @param browseSpaceList the browseSpaceList to set
+     */
+    public void setBrowseSpaceList(List<OccSpace> browseSpaceList) {
+        this.browseSpaceList = browseSpaceList;
     }
     
     

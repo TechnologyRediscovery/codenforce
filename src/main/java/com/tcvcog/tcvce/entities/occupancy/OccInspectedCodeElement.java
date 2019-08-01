@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  *
@@ -199,4 +200,72 @@ public class OccInspectedCodeElement implements Serializable{
     public void setFailureIntensityClassID(int failureIntensityClassID) {
         this.failureIntensityClassID = failureIntensityClassID;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.inspectedElementID;
+        hash = 97 * hash + Objects.hashCode(this.element);
+        hash = 97 * hash + Objects.hashCode(this.lastInspectedTS);
+        hash = 97 * hash + Objects.hashCode(this.lastInspectedBy);
+        hash = 97 * hash + Objects.hashCode(this.complianceGrantedTS);
+        hash = 97 * hash + Objects.hashCode(this.complianceGrantedBy);
+        hash = 97 * hash + (this.required ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.overrideRequiredFlag_thisElementNotInspectedBy);
+        hash = 97 * hash + Objects.hashCode(this.notes);
+        hash = 97 * hash + Objects.hashCode(this.location);
+        hash = 97 * hash + this.failureIntensityClassID;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OccInspectedCodeElement other = (OccInspectedCodeElement) obj;
+        if (this.inspectedElementID != other.inspectedElementID) {
+            return false;
+        }
+        if (this.required != other.required) {
+            return false;
+        }
+        if (this.failureIntensityClassID != other.failureIntensityClassID) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.element, other.element)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastInspectedTS, other.lastInspectedTS)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastInspectedBy, other.lastInspectedBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.complianceGrantedTS, other.complianceGrantedTS)) {
+            return false;
+        }
+        if (!Objects.equals(this.complianceGrantedBy, other.complianceGrantedBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.overrideRequiredFlag_thisElementNotInspectedBy, other.overrideRequiredFlag_thisElementNotInspectedBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.location, other.location)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+    
 }

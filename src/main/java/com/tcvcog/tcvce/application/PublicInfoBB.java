@@ -150,5 +150,10 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
     }
     
     
+    public String goToIntensityManage(){
+        
+        return "intensityManage";
+    }
+    
     
 }

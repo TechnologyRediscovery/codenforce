@@ -875,7 +875,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             PropertyWithLists p = new PropertyWithLists(getProperty(propertyID));
    
             p.setCeCaseList(ci.getCECasesByProp(p));
-            p.setUnitWithListsList(getPropertyUnitWithListsList(getPropertyUnitList(p)));
+            p.setUnitWithListsList(getPropertyUnitWithListsList(p.getUnitList()));
             p.setPersonList(pi.getPersonList(p));
         return pc.configurePropertyWithLists(p);
     }

@@ -445,6 +445,12 @@
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>intensityBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.IntensityBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
  
     <!--request-scoped beans-->
     
@@ -1001,6 +1007,12 @@
             <redirect />
         </navigation-case>
     
+        <navigation-case>
+            <from-outcome>intensityManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    
     </navigation-rule>
     
     <navigation-rule>
@@ -1108,6 +1120,16 @@
     <navigation-rule>
         
         <navigation-case>
+            <from-view-id>/restricted/*</from-view-id>
+            <from-outcome>inspection</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/inspection.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    
+    
+    <navigation-rule>
+        
+        <navigation-case>
             <from-view-id>/public/services/occpermitApplicationFlow/occPermitChooseMuni.xhtml</from-view-id>
             <from-outcome>chooseProperty</from-outcome>
             <to-view-id>/public/services/occPermitApplicationFlow/occPermitChoosePropertyUnit.xhtml#currentStep</to-view-id>
@@ -1209,8 +1231,8 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>checklists</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/checklsits.xhtml</to-view-id>
+            <from-outcome>checklist</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/checklsit.xhtml</to-view-id>
         </navigation-case>
         
         <navigation-case>

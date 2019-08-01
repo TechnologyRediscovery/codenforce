@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -100,6 +101,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
                         "       lastupdated_userid, primarystaffcontact_userid\n" +
                         "  FROM public.municipality WHERE municode=?;";
+
         ResultSet rs = null;
  
         try {
@@ -117,7 +119,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (con != null) { try { con.close(); } catch (SQLException e) { System.out.println("getMuni | " + e.toString());} }
         } // close finally
         
         return muniComplete;
@@ -233,6 +235,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
         mp.setEventRuleSetCE(ei.getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPeriodTypeList(oi.getOccPeriodTypeList(rs.getInt("profileid")));
+        if(mp.getOccPeriodTypeList() == null){
+            mp.setOccPeriodTypeList(new ArrayList<OccPeriodType>());
+        }
+        
         return mp;
         
     }
@@ -257,14 +263,12 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (con != null) { try { con.close(); } catch (SQLException e) { System.out.println("MunicipalityIntegrator.getMuniList | " + e.toString());} }
         } // close finally
         
         return mList;
         
     }
-    
-    
    
     
     public void updateMuniComplete(MunicipalityComplete muni) throws IntegrationException{

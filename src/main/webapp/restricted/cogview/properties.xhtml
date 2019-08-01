@@ -12,7 +12,7 @@
     <h:body>
         <ui:composition template="../navContainer_restricted.xhtml">
             <ui:define name="content">
-                
+
                 <f:view id="properties-view">
                     <div class="two-column-page-flex-container">
                         <div class="list-column">
@@ -24,22 +24,22 @@
                             </h:form>
 
                             <p:commandButton id="goToUnitChangesButton"
-                                                 value="Go to unit changes"
-                                                 action="#{propertyProfileBB.goToChanges()}"
-                                                 />
-                            
+                                             value="Go to unit changes"
+                                             action="#{propertyProfileBB.goToChanges()}"
+                                             />
+
                             <h1 class="property-blue">Properties</h1>
-                            
+
                             <h:form id="propertySearchForm">
 
                                 <p:commandButton id="propertyAddButton"
                                                  value="Add new property in #{sessionBean.sessionMuni.muniName}" icon="fa fa-plus"
                                                  action="#{propertyProfileBB.addProperty()}"
                                                  disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"
-                                                 
+
                                                  />
                                 <p:spacer height="10px"/>
-                                
+
                                 <p:panelGrid columns="2" >
 
                                     <h:panelGroup>
@@ -63,23 +63,23 @@
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
 
-                                    
-                            <ui:remove>
-                                        
-                                    <h:panelGroup>
-                                        <p:outputLabel for="propSearchSelectMuni">
-                                            <h:outputText value="Municipality"/>
-                                        </p:outputLabel>
-                                        <p:spacer height="5px"/>
-                                        <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuni}">
-                                            <f:selectItems value="#{sessionBeasessionUserer.authMunis}"/>
-                                        </p:selectOneMenu>
-                                        <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
 
-                            </ui:remove>
-                                    
+                                    <ui:remove>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="propSearchSelectMuni">
+                                                <h:outputText value="Municipality"/>
+                                            </p:outputLabel>
+                                            <p:spacer height="5px"/>
+                                            <p:selectOneMenu id="propSearchSelectMuni" widgetVar="muniSelectMenu" tabindex="5" required="false" value="#{propertyProfileBB.selectedMuni}">
+                                                <f:selectItems value="#{sessionBeasessionUserer.authMunis}"/>
+                                            </p:selectOneMenu>
+                                            <h:message for="propSearchSelectMuni" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                    </ui:remove>
+
                                     <h:panelGroup>
                                         <p:commandButton
                                             value="Search in #{sessionBean.sessionMuni.muniName}" 
@@ -89,24 +89,24 @@
                                             actionListener="#{propertyProfileBB.searchForProperties}" 
                                             update="propSearchTable"/>
                                     </h:panelGroup>
-                                
-                            <ui:remove>
+
+                                    <ui:remove>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="searchAllCB">
+                                                <h:outputText value="Search all municipalities"/>
+                                            </p:outputLabel>
+                                            <p:spacer height="5px"/>
+                                            <p:selectBooleanCheckbox id="searchAllCB" value="#{propertyProfileBB.allMunis}" tabindex="7"
+                                                                     widgetVar="allMuniCB" onchange="PF('muniSelectMenu').disable()"/>
+                                        </h:panelGroup>
+                                    </ui:remove>
 
                                     <h:panelGroup>
-                                        <p:outputLabel for="searchAllCB">
-                                            <h:outputText value="Search all municipalities"/>
-                                        </p:outputLabel>
-                                        <p:spacer height="5px"/>
-                                        <p:selectBooleanCheckbox id="searchAllCB" value="#{propertyProfileBB.allMunis}" tabindex="7"
-                                                                 widgetVar="allMuniCB" onchange="PF('muniSelectMenu').disable()"/>
-                                    </h:panelGroup>
-                            </ui:remove>
 
-                                    <h:panelGroup>
-                                        
                                         <p:commandButton  value="search tips" onclick="PF('helpdlg').show()" tabindex="4" styleClass="noFill" icon="fa fa-question-circle"/>
                                     </h:panelGroup>
-                                    
+
                                 </p:panelGrid>
 
                                 <p:dialog header="Search Tips" 
@@ -129,7 +129,7 @@
                                     <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
 
                                 </p:dialog>
-                                
+
                                 <p:spacer height="5px"/>
                                 <p:spacer height="5px"/>
 
@@ -183,6 +183,7 @@
                                                          update="
                                                          property-info-form
                                                          property-lists-form
+                                                         form-propunits
                                                          "/>
                                     </p:column>
                                 </p:dataTable>
@@ -191,9 +192,9 @@
 
 
                         <div class="object-column">
-                            
+
                             <h:form id="form-propertyobject-messages">
-                                
+
                                 <h:messages id="messages-properties-object"
                                             globalOnly="true" showDetail="true" showSummary="true"
                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
@@ -206,57 +207,43 @@
 
 
                                 <h1 class="property-blue">
-                                    <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address} 
-                                                  (#{propertyProfileBB.currProp.muni.muniName})"/>
-                                    
-                                     <h:outputText id="header-propid-ot" value=" Prop ID: #{propertyProfileBB.currProp.propertyID}"/>  
-                                        <h:outputText id="header-lob-ot" value="| Lot-block: #{propertyProfileBB.currProp.lotAndBlock}"/>  
+                                    <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address}" />
+                                    <h:outputText value=" | " />
+                                    <h:outputText value="#{propertyProfileBB.currProp.muni.muniName}" />
+                                    <h:outputText value=" | " />
+                                    <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currProp.lotAndBlock}"/>  
+                                    <h:outputText value=" | " />
+                                    <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currProp.propertyID}"/>  
                                 </h1>
 
                                 <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                              columnClasses="gridTd, gridTd">
 
                                     <h:panelGroup>
-                                        <h:outputLabel for="prop-info-addr-ot" >
-                                            <h:outputText styleClass="uiLabel" value="Address:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-addr-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.address}"/>
+                                        <div class="datum">
+                                        
+                                            
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address}" />
+                                            <p:spacer height="0px" />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_city}" />
+                                            <h:outputText value=", " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_state}" />
+                                            <h:outputText value=" " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.address_zip}" />
+                                            
+                                        </div>
+                                        
+                                        <div class="datum">
+                                            <h:outputText styleClass="ui-label-inline" value="Lot and block: " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.lotAndBlock}" />
+                                            <p:spacer height="0px" />
+                                            <h:outputText styleClass="ui-label-inline" value="Parcel ID: " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.currProp.parID}" />
+                                        </div>
+                                        
                                     </h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-muni-ot" >
-                                            <h:outputText styleClass="uiLabel" value="Municipality:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-muni-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.muni.muniName}"/>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-parcelid-ot" >
-                                            <h:outputText styleClass="uiLabel" value="Parcel ID:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-parcelid-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.parID}"/>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-lotandblock-ot" >
-                                            <h:outputText styleClass="uiLabel" value="Lot and Block:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-lotandblock-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.lotAndBlock}"/>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-usetype-ot" >
-                                            <h:outputText styleClass="uiLabel" value="Use Type:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
-                                        <h:outputText id="prop-info-usetype-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.useTypeString}"/>
-                                    </h:panelGroup>
-
-
+                                  
                                     <h:panelGroup>
                                         <h:outputLabel for="prop-info-usegroup-ot" >
                                             <h:outputText styleClass="uiLabel" value="Use Group:" />
@@ -281,42 +268,153 @@
                                         <h:outputText id="prop-info-countycode-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.countyCode}"/>
                                     </h:panelGroup>
 
+                                  
                                     <h:panelGroup>
-                                        <h:outputLabel for="prop-info-rental-cb" >
-                                            <h:outputText styleClass="uiLabel" value="Rental?" />
-                                        </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:spacer width="5px"/>
-                                    </h:panelGroup>
-                                    
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-vacant-cb" >
-                                            <h:outputText styleClass="uiLabel" value="Vacant?" />
-                                        </h:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup> 
-                                        <p:spacer width="5px"/>
-                                    </h:panelGroup>
-                                    
-                                    <h:panelGroup>
-                                        <h:outputLabel for="prop-info-notes-ot" >
                                             <h:outputText styleClass="uiLabel" value="Notes:" />
-                                        </h:outputLabel>
-                                        <p:spacer width="5px"/>
                                         <h:outputText id="prop-info-notes-ot" styleClass="dataText" value="#{propertyProfileBB.currProp.notes}"/>
                                     </h:panelGroup>
                                 </h:panelGrid>
-                                
+
                                 <p:commandButton ajax="false" value="Update Selected Property Info" 
                                                  action="#{propertyProfileBB.updateProperty}" icon="fa fa-edit"
                                                  disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"/>
                             </h:form>
 
+                            <h:form id="form-propunits">
+
+                                <h2>Property units and occupancy periods</h2>
+
+
+                                <p:commandButton       id="button-editunits"
+                                                       ajax="true" 
+                                                       actionListener="#{propertyProfileBB.beginPropertyUnitChanges}"
+                                                       oncomplete="PF('dialog-widvar-unitedit').show()"
+                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                       value="Edit unit list"  
+                                                       icon="fa fa-edit"
+                                                       update="form-unitedit"/>
+
+                                <p:spacer height="5px" />
+
+                                <p:dataScroller
+                                    id="datascroller-propunits"
+                                    var="unit"
+                                    rowIndexVar="#{unit.unitID}"
+                                    value="#{propertyProfileBB.currProp.unitWithListsList}"
+                                    widgetVar="events-requiredactions-ds"
+                                    >
+
+                                    <div class="outlinedBox event-ds-box"> 
+                                        <h3>
+                                            <h:outputText value="Unit Number: " />
+                                            <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
+                                        </h3>
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Rental intent:" />
+                                        <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Unit Description:" />
+                                        <h:outputText value="#{unit.notes}" />
+
+                                        <h4>Occupancy periods</h4>
+
+                                        <p:commandButton       id="button-addoccunit"
+                                                               ajax="true" 
+                                                               actionListener="#{propertyProfileBB.beginConstructingNewOccPeriod(unit)}"
+                                                               oncomplete="PF('dialog-widvar-occperiod-addupdate').show()"
+                                                               rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                               value="Add new occupancy period"  
+                                                               icon="fa fa-plus"
+                                                               update="form-occperiod-addupdate"/>
+
+                                        <p:spacer height="5px" />
+
+                                        <p:dataScroller
+                                            id="scroller-periodlist"
+                                            widgetVar="var-scroller-periodlist"
+                                            rowIndexVar="#{period.periodID}"
+                                            var="period"
+                                            value="#{unit.periodList}"
+                                            >                                         
+                                            
+                                            
+                                            <div style="datum">
+                                                
+                                                
+                                                <h:outputText value="Start Date: " 
+                                                              styleClass="ui-label-inline" />
+                                                
+                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.startDate)}" 
+                                                              styleClass="data-text"/>
+                                            </div>
+                                                
+                                            <div style="datum">
+                                                <h:outputText value="End Date: " 
+                                                              styleClass="ui-label-inline" />
+                                                
+                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(period.endDate)}" 
+                                                              styleClass="data-text"/>
+                                            </div>
+                                            <div style="datum">
+                                                <h:outputText value="Type: " 
+                                                              styleClass="ui-label-inline" />
+                                                <h:outputText value="#{period.type.title}" 
+                                                              styleClass="data-text"/>
+                                            </div>
+                                            <div style="datum">
+                                                <h:outputText value="Authorization" 
+                                                              styleClass="ui-label-inline" />
+                                                <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : propertyProfileBB.getPrettyDate(period.authorizedTS)}" />
+                                            </div>
+                                                <p:commandButton       id="button-occperiodtable-editperiod"
+                                                                       ajax="true" 
+                                                                       actionListener="#{propertyProfileBB.manageOccPeriod(period)}"
+                                                                       oncomplete="PF('dialog-widvar-occperiod-addupdate').show()"
+                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                       value="edit period"  
+                                                                       icon="fa fa-edit"
+                                                                       update="form-occperiod-addupdate"/>
+                                                <p:dataScroller
+                                                    id="scroller-inspectionlist"
+                                                    widgetVar="var-scroller-inspectionlist"
+                                                    var="inspection"
+                                                    value="#{period.inspectionList}"
+                                                    rowIndexVar="#{inspection.inspectionID}">
+                                                    
+                                                    <div class="datum">
+                                                        <h:outputText styleClass="ui-label-inline" value="Inspection ID: " />
+                                                        <h:outputText styleClass="data-text" value="#{inspection.inspectionID}" />
+                                                    </div>
+                                                    <div class="datum">
+                                                        <h:outputText styleClass="ui-label-inline" value="Inspector: " />
+                                                        <h:outputText styleClass="data-text" value="#{inspection.inspector.person.firstName} #{inspection.inspector.person.lastName}" />
+                                                    </div>
+                                                    
+                                                    <p:commandButton       id="button-inspectionscroller-manageinspection"
+                                                                           ajax="false" 
+                                                                           action="#{propertyProfileBB.manageInspection(inspection)}"
+                                                                           rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                           value="manage inspection"  
+                                                                           icon="fa fa-list-alt"
+                                                                           />
+                                                
+                                                
+                                                </p:dataScroller>
+                                                
+                                        </p:dataScroller>
+                                    </div>
+                                </p:dataScroller>
+                            </h:form>
+
+
                             <p:spacer height="10px"/>
                             <hr/>
                             <p:spacer height="10px"/>
-                            
+
                             <h2 class="property-blue">Code enforcement cases</h2>
 
                             <h:form id="property-lists-form">
@@ -359,7 +457,7 @@
                                             <h:outputText value="Phase" />
                                         </f:facet>
                                         <div class="wrapText">
-                                            
+
                                             <h:outputText value="#{c.casePhase}"/>
                                         </div>
                                     </p:column>
@@ -384,332 +482,289 @@
                                                          ajax="false"/>
                                     </p:column>
 
-                                    
-                                </p:dataTable>
-
-
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
-
-
-                                    <h2 class="property-blue">Property Persons</h2>
-                                    
-                                 
-                                    <p:dataTable
-                                        id="prop-persons-datatable"
-                                        var="person"
-                                        value="#{propertyProfileBB.currProp.personList}"
-                                        rowKey="#{person.personID}"
-                                        tableStyleClass="primeDataTable"
-                                        rowExpandMode="single"
-                                        expandedRow="false"
-                                        filteredValue="#{propertyProfileBB.filteredPersonList}"
-                                        >
-
-                                        <p:column width="3%">
-                                            <f:facet name="header">
-                                                <h:outputText value="Exp"/>
-                                            </f:facet>
-                                            <p:rowToggler/>
-                                        </p:column>
-                                        <p:column width="8%">
-                                            <f:facet name="header">
-                                                <h:outputText value="ID" />
-                                            </f:facet>
-                                            <h:outputText value="#{person.personID}"/>
-                                        </p:column>
-
-
-                                        <p:column width="10%" sortBy="#{person.personType.label}"
-                                                  filterBy="#{person.personType.label}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Person Type" />
-                                            </f:facet>
-                                            <h:outputText value="#{person.personType.label}"/>
-                                        </p:column>
-
-                                        <p:column width="10%" sortBy="#{person.muniName}"
-                                                  filterBy="#{person.muniName}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Municipality" />
-                                            </f:facet>
-                                            <h:outputText value="#{person.muniName}"/>
-                                        </p:column>
-
-                                        <p:column width="10%" sortBy="#{person.firstName}"
-                                                  filterBy="#{person.firstName}">
-                                            <f:facet name="header">
-                                                <h:outputText value="First" />
-                                            </f:facet>
-                                            <h:outputText value="#{person.firstName}"/>
-                                        </p:column>
-
-                                        <p:column width="15%" filterBy="#{person.lastName}"
-                                                  sortBy="#{person.lastName}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Last" />
-                                            </f:facet>
-                                            <h:outputText value="#{person.lastName}"/>
-                                        </p:column>
-                                       
-                                        <p:column width="8%" exportable="false">
-                                            <f:facet name="header">
-                                                <h:outputText value="Edit" />
-                                            </f:facet>
-                                            <p:commandButton icon="fa fa-clipboard"
-                                                             action="#{propertyProfileBB.viewPersonProfile(p)}" 
-                                                             ajax="false" disabled="false"/>
-                                        </p:column>
-                                        <p:rowExpansion>
-                                            <div class="outlinedBox">
-                                                <h2>Full person listing for <h:outputText value="#{person.firstName} #{person.lastName}"/> </h2>
-                                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="First Name"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.firstName}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Last Name"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.lastName}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Muni"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.muniName}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Type"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.personType.label}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Job Title"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.jobTitle}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Email"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.email}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Address"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{person.addressStreet}"/>
-                                                            <p:spacer height="5px"/>
-                                                            <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Under 19"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.under18}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Active?"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.active}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Last Updated"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.lastUpdated}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Expires"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.expiryDate.toString}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Phone home"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.phoneHome}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Phone work"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.phoneWork}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Phone cell"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.phoneCell}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <f:facet name="footer">
-                                                        <h:outputLabel styleClass="bold" value="Person notes"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{person.notes}"/>
-                                                        </div>
-                                                    </f:facet>
-                                                </h:panelGrid>
-                                            </div>
-                                        </p:rowExpansion>
-                                    </p:dataTable>
-
-
-                                    <h2>Dwelling units</h2>
-                                    <p>List of the dwelling units registered to this property.</p> 
-                                    
-                                     <p:commandButton       id="button-editunits"
-                                                            ajax="true" 
-                                                            actionListener="#{propertyProfileBB.beginPropertyUnitChanges}"
-                                                            oncomplete="PF('dialog-widvar-unitedit').show()"
-                                                            rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                            value="Edit unit list"  
-                                                            icon="fa fa-edit"
-                                                            update="form-unitedit"/>
-                                     
-                                     <p:spacer height="5px" />
-
-                                    <p:dataTable
-                                    id="propertyUnitsTable"
-                                    var="unit"
-                                    value="#{propertyProfileBB.currProp.unitList}"
-                                    rowKey="#{unit.unitID}"
-                                    >                                         
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Number" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Rental?" />
-                                        </f:facet>
-                                        <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Description" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.notes}" />
-                                    </p:column>
 
                                 </p:dataTable>
 
 
-                                    <hr/>
+                                <p:spacer height="10px"/>
+                                <hr/>
+                                <p:spacer height="10px"/>
 
 
-                                    <h2>Existing Occupancy Inspection Cases</h2>
-                                    <p>A really cool blank data table--More useful functionality coming soon!</p>
+                                <h2 class="property-blue">Property Persons</h2>
 
-                                    <!--Insert occupancy inspection cases here-->
 
-                                    <p:commandButton ajax="fakse" value="View " action="personProfile" disabled="true"/>
+                                <p:dataTable
+                                    id="prop-persons-datatable"
+                                    var="person"
+                                    value="#{propertyProfileBB.currProp.personList}"
+                                    rowKey="#{person.personID}"
+                                    tableStyleClass="primeDataTable"
+                                    rowExpandMode="single"
+                                    expandedRow="false"
+                                    filteredValue="#{propertyProfileBB.filteredPersonList}"
+                                    >
 
-                                    <p:spacer height="10px"/>
-                                    <hr/>
-                                    <p:spacer height="10px"/>
+                                    <p:column width="3%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Exp"/>
+                                        </f:facet>
+                                        <p:rowToggler/>
+                                    </p:column>
+                                    <p:column width="8%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.personID}"/>
+                                    </p:column>
+
+
+                                    <p:column width="10%" sortBy="#{person.personType.label}"
+                                              filterBy="#{person.personType.label}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Person Type" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.personType.label}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" sortBy="#{person.muniName}"
+                                              filterBy="#{person.muniName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Municipality" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.muniName}"/>
+                                    </p:column>
+
+                                    <p:column width="10%" sortBy="#{person.firstName}"
+                                              filterBy="#{person.firstName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="First" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.firstName}"/>
+                                    </p:column>
+
+                                    <p:column width="15%" filterBy="#{person.lastName}"
+                                              sortBy="#{person.lastName}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Last" />
+                                        </f:facet>
+                                        <h:outputText value="#{person.lastName}"/>
+                                    </p:column>
+
+                                    <p:column width="8%" exportable="false">
+                                        <f:facet name="header">
+                                            <h:outputText value="Edit" />
+                                        </f:facet>
+                                        <p:commandButton icon="fa fa-clipboard"
+                                                         action="#{propertyProfileBB.viewPersonProfile(p)}" 
+                                                         ajax="false" disabled="false"/>
+                                    </p:column>
+                                    <p:rowExpansion>
+                                        <div class="outlinedBox">
+                                            <h2>Full person listing for <h:outputText value="#{person.firstName} #{person.lastName}"/> </h2>
+                                            <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                         columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="First Name"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.firstName}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Last Name"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.lastName}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Muni"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.muniName}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Type"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.personType.label}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Job Title"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.jobTitle}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Email"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.email}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Address"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{person.addressStreet}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Under 19"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.under18}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Active?"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.active}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Last Updated"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.lastUpdated}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Expires"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.expiryDate.toString}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone home"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.phoneHome}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone work"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.phoneWork}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Phone cell"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{person.phoneCell}"/>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <f:facet name="footer">
+                                                    <h:outputLabel styleClass="ui-label-inline" value="Person notes"/>
+                                                    <p:spacer height="15px"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText escape="false" value="#{person.notes}"/>
+                                                    </div>
+                                                </f:facet>
+                                            </h:panelGrid>
+                                        </div>
+                                    </p:rowExpansion>
+                                </p:dataTable>
+
+
+
+
+                                <hr/>
+
+
+                                <h2>Existing Occupancy Inspection Cases</h2>
+                                <p>A really cool blank data table--More useful functionality coming soon!</p>
+
+                                <!--Insert occupancy inspection cases here-->
+
+                                <p:commandButton ajax="false" value="View " action="personProfile" disabled="true"/>
+
+                                <p:spacer height="10px"/>
+                                <hr/>
+                                <p:spacer height="10px"/>
                             </h:form>
 
                         </div>
                     </div>
-                    
-                       <p:dialog    id="dialog-unitedit"
+
+                    <p:dialog    id="dialog-unitedit"
                                  height="650" width="900"
                                  widgetVar="dialog-widvar-unitedit"
                                  closable="true" >
                         <h2>Edit property units</h2>
-                        
+
                         <h:form id="form-unitedit">
-                                 <h:messages id="messages-properties-editunit"
-                                            globalOnly="true" showDetail="true" showSummary="true"
-                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                </h:messages>
-                            
+                            <h:messages id="messages-properties-editunit"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
                             <p:commandButton ajax="true"                                                   
-                                                 actionListener="#{propertyProfileBB.addUnitToNewPropUnits}" 
-                                                 update="table-unitedit"
-                                                 icon="fa fa-plus"
-                                                 tabindex="1"
-                                                 value="Add unit"/>
-                                
-                                
+                                             actionListener="#{propertyProfileBB.addUnitToNewPropUnits}" 
+                                             update="table-unitedit"
+                                             icon="fa fa-plus"
+                                             tabindex="1"
+                                             value="Add unit"/>
+
+
                             <p:spacer height="5px" />
-                              <p:dataTable
-                                    id="table-unitedit"
-                                    widgetVar="datatable"
-                                    rowIndexVar="rowIndex"
-                                    var="unit"
-                                    value="#{propertyProfileBB.currProp.unitList}"
-                                    tabindex="2"
-                                    rowKey="#{unit.unitID}"
-                                    editable="true">                                         
+                            <p:dataTable
+                                id="table-unitedit"
+                                widgetVar="datatable"
+                                rowIndexVar="rowIndex"
+                                var="unit"
+                                value="#{propertyProfileBB.currProp.unitList}"
+                                tabindex="2"
+                                rowKey="#{unit.unitID}"
+                                editable="true">                                         
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Number" />
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Unit Number" />
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{unit.unitNumber}"
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                         </f:facet>
-                                        <p:cellEditor>
-                                            <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
-                                            <f:facet name="input">
-                                                <p:inputText value="#{unit.unitNumber}"
-                                                             onkeydown="PF('datatable').onKeyDown(event)"
-                                                             onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                            </f:facet>
-                                        </p:cellEditor>
-                                    </p:column>
+                                    </p:cellEditor>
+                                </p:column>
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Rental?" />
-                                        </f:facet>
-                                        
-                    <ui:remove>
-                                            
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Rental?" />
+                                    </f:facet>
+
+                                    <ui:remove>
+
                                         <p:cellEditor>
                                             <f:facet name="output">
                                                 <h:outputText value="#{unit.rental ? 'Yes' : 'No'}" />
@@ -718,114 +773,322 @@
                                                 <h:selectBooleanCheckbox value="#{unit.rental}"/> 
                                             </f:facet>
                                         </p:cellEditor>
-                                        
-                        </ui:remove>
-                                    </p:column>
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Description" />
+                                    </ui:remove>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Unit Description" />
+                                    </f:facet>
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{unit.notes}" />
                                         </f:facet>
-                                        <p:cellEditor>
-                                            <f:facet name="output">
-                                                <h:outputText value="#{unit.notes}" />
-                                            </f:facet>
-                                            <f:facet name="input">
-                                                <p:inputText value="#{unit.notes}" 
-                                                             onkeydown="PF('datatable').onKeyDown(event)"
-                                                             onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                            </f:facet>
-                                        </p:cellEditor>
-                                    </p:column>
-
-                                    <p:column style="width:40px">
-                                        <f:facet name="header">
-                                            <h:outputText value="Edit?" />
+                                        <f:facet name="input">
+                                            <p:inputText value="#{unit.notes}" 
+                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
                                         </f:facet>
-                                        <p:rowEditor/>
-                                    </p:column>
+                                    </p:cellEditor>
+                                </p:column>
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Remove?" />
-                                        </f:facet>
-                                        <p:commandButton    id="button-editunits-removeunit"
-                                                            ajax="true" 
-                                                            value="Remove" 
-                                                            disabled="#{!(unit.unitID==0)}"
-                                                            action="#{propertyProfileBB.removePropertyUnitFromEditTable(unit)}"
-                                                            update="#{p:component('table-unitedit')}
-                                                            form-unitedit:messages-properties-editunit"/>                                      
-                                        
-                                        <p:commandButton    id="button-editunits-deactivateunit" 
-                                                            ajax="true" 
-                                                             value="Deactivate" 
-                                                             disabled="#{unit.unitID==0}"
-                                                             action="#{propertyProfileBB.deactivatePropertyUnit(unit)}"
-                                                             update="#{p:component('table-unitedit')}
-                                                             form-unitedit:messages-properties-editunit"/>                                      
-                                    </p:column>
+                                <p:column style="width:40px">
+                                    <f:facet name="header">
+                                        <h:outputText value="Edit?" />
+                                    </f:facet>
+                                    <p:rowEditor/>
+                                </p:column>
 
-                                </p:dataTable>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Remove?" />
+                                    </f:facet>
+                                    <p:commandButton    id="button-editunits-removeunit"
+                                                        ajax="true" 
+                                                        value="Remove" 
+                                                        disabled="#{!(unit.unitID==0)}"
+                                                        action="#{propertyProfileBB.removePropertyUnitFromEditTable(unit)}"
+                                                        update="#{p:component('table-unitedit')}
+                                                        form-unitedit:messages-properties-editunit"/>                                      
 
-                                
-                                <script type="text/javascript">
+                                    <p:commandButton    id="button-editunits-deactivateunit" 
+                                                        ajax="true" 
+                                                        value="Deactivate" 
+                                                        disabled="#{unit.unitID==0}"
+                                                        action="#{propertyProfileBB.deactivatePropertyUnit(unit)}"
+                                                        update="#{p:component('table-unitedit')}
+                                                        form-unitedit:messages-properties-editunit"/>                                      
+                                </p:column>
 
-                                    $(function () {
-                                        $.extend(PF("datatable"), {
-                                            onKeyDown: function (e) {
-                                                var key = e.which,
-                                                        keyCode = $.ui.keyCode;
+                            </p:dataTable>
 
-                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                                                    e.preventDefault();
-                                                }
-                                            },
 
-                                            onKeyUp: function (e, rowIndex) {
-                                                var key = e.which,
-                                                        keyCode = $.ui.keyCode;
-                                                //.ui-row-editor-check .ui-icon-check .ui-c
-                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                                                    this.tbody
-                                                            .find('.ui-row-editor .ui-icon-check')
-                                                            .eq(rowIndex)
-                                                            .click();
-                                                }
+                            <script type="text/javascript">
 
-                                                if (key === keyCode.ESCAPE) {
-                                                    this.tbody
-                                                            .find('.ui-row-editor .ui-icon-close')
-                                                            .eq(rowIndex)
-                                                            .click();
-                                                }
+                                $(function () {
+                                    $.extend(PF("datatable"), {
+                                        onKeyDown: function (e) {
+                                            var key = e.which,
+                                                    keyCode = $.ui.keyCode;
+
+                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                e.preventDefault();
                                             }
-                                        });
+                                        },
+
+                                        onKeyUp: function (e, rowIndex) {
+                                            var key = e.which,
+                                                    keyCode = $.ui.keyCode;
+                                            //.ui-row-editor-check .ui-icon-check .ui-c
+                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                this.tbody
+                                                        .find('.ui-row-editor .ui-icon-check')
+                                                        .eq(rowIndex)
+                                                        .click();
+                                            }
+
+                                            if (key === keyCode.ESCAPE) {
+                                                this.tbody
+                                                        .find('.ui-row-editor .ui-icon-close')
+                                                        .eq(rowIndex)
+                                                        .click();
+                                            }
+                                        }
                                     });
+                                });
 
-                                </script>
+                            </script>
 
-                                <p:spacer height="5px"/>
-                                
-                                
-                                <p:spacer height="5px"/>
-                                
+                            <p:spacer height="5px"/>
+
+
+                            <p:spacer height="5px"/>
+
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('dialog-widvar-unitedit').hide()"
                                              tabindex="4"/>
-                            
-                            
-                             <p:commandButton ajax="true"
-                                              actionListener="#{propertyProfileBB.finalizeUnitList}"
-                                              oncomplete="PF('dialog-widvar-unitedit').hide()"
-                                              icon="fa fa-thumbs-o-up"
-                                                 update="
-                                                    form-unitedit:messages-properties-editunit
-                                                    property-lists-form:propertyUnitsTable
+
+
+                            <p:commandButton ajax="true"
+                                             actionListener="#{propertyProfileBB.finalizeUnitList}"
+                                             oncomplete="PF('dialog-widvar-unitedit').hide()"
+                                             icon="fa fa-thumbs-o-up"
+                                             update="
+                                             form-unitedit:messages-properties-editunit
+                                             form-propunits:datascroller-propunits
+                                             form-propertyobject-messages:messages-properties-object"
+                                             value="Save unit list" 
+                                             tabindex="3"/>
+                        </h:form>
+                    </p:dialog>
+
+                    <p:dialog    id="dialog-occperiod-addupdate"
+                                 height="650" width="900"
+                                 header="Occupancy Period"
+                                 widgetVar="dialog-widvar-occperiod-addupdate"
+                                 closable="true" >
+                        
+                         <h:panelGrid columns="1" columnClasses="gridTd">
+                             <h:panelGroup id="pg-occperiod-add-h2" rendered="#{propertyProfileBB.currOccPeriod.periodID != 0}">
+                                    <h2>
+                                        <h:outputText value="Create new occupancy period for unit no. #{propertyProfileBB.currPropUnit.unitNumber}"  /> 
+                                    </h2>
+                                </h:panelGroup>
+                                <h:panelGroup id="pg-occperiod-update-h2" rendered="#{propertyProfileBB.currOccPeriod.periodID == 0}">
+                                    <h2>
+                                        <h:outputText value="Update occupancy period id #{propertyProfileBB.currOccPeriod.periodID}"  /> 
+                                    </h2>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        
+                        <h:form id="form-occperiod-addupdate">
+                            <h:messages id="messages-occperiod-addupdate"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <h:panelGrid    columns="2" rendered="true"
+                                            columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                            footerClass="no-border">
+
+                                <h:panelGroup>
+                                    <div class="datum">
+                                    <h:outputLabel styleClass="ui-label-inline" for="som-occperiodtype" value="Period type:"/>
+                                    <p:spacer height="5px"/>
+                                      <p:selectOneMenu
+                                        id="som-occperiodtype" tabindex="1"
+                                        value="#{propertyProfileBB.currOccPeriod.type}">
+                                            <f:converter converterId="occPeriodTypeConverter"/>
+                                            <f:selectItems id="si-typelist" 
+                                                           value="#{propertyProfileBB.occPeriodTypeList}" 
+                                                           var ="opt" 
+                                                           itemValue="#{opt}" 
+                                                           itemLabel="#{opt.title}" />
+                                    </p:selectOneMenu>
+                                        <h:outputText styleClass="ui-label-inline" value="Certified date: " />
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currOccPeriod.periodTypeCertifiedTS)}" />
+
+                                        <p:spacer height="0px" />
+                                        
+                                        <h:outputText styleClass="ui-label-inline" value="Certified by: " />
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.periodTypeCertifiedBy.person.firstName} 
+                                                      #{propertyProfileBB.currOccPeriod.periodTypeCertifiedBy.person.lastName}" />
+                                    </div>
+                                    
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
+                                    <div class="datum">
+                                        <h:outputText styleClass="ui-label-inline" value="Occ Period creator: "/>
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.createdBy.person.firstName} 
+                                                      #{propertyProfileBB.currOccPeriod.createdBy.person.lastName}"/>
+                                        
+                                        <p:spacer height="0px" />
+                                        
+                                        <h:outputText styleClass="ui-label-inline" value="Creation date: " />
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currOccPeriod.createdTS)}" />
+                                        
+                                        <p:spacer height="0px" />
+                                        
+                                        <h:outputText styleClass="ui-label-inline" value="Object source: "/>
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.source.title}"/>
+                                    </div>
+                                </h:panelGroup>  
+                                
+                                <h:panelGroup>
+                                    <div class="datum">
+                                        <h3>Start date:</h3>
+                                        <p:calendar value="#{propertyProfileBB.currOccPeriod.startDateUtilDate}" 
+                                                    mode="popup"  id="cal-occperiod-startdate"
+                                                    showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true" tabindex="2" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" showTodayButton="true" disabled="#{!(empty propertyProfileBB.currOccPeriod.startDateCertifiedTS)}"
+                                                    required="#{propertyProfileBB.currOccPeriod.type.startdaterequired}"/>
+                                        <h:message for="cal-occperiod-startdate" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                        
+                            <ui:remove>
+
+                                        <h:outputText styleClass="ui-label-inline" value="Certified date: " />
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currOccPeriod.startDateCertifiedTS)}" />
+                            </ui:remove>
+
+                                        <p:spacer height="0px" />
+                                        
+                                        <h:outputText styleClass="ui-label-inline" value="Certified by: " />
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.startDateCertifiedBy.person.firstName} 
+                                                      #{propertyProfileBB.currOccPeriod.startDateCertifiedBy.person.lastName}" />
+                                    </div>
+                                    
+                                    
+                                    
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
+                                    <div class="datum">
+                                        <h3>End date:</h3>
+                                        <p:calendar value="#{propertyProfileBB.currOccPeriod.endDateUtilDate}" 
+                                                    mode="popup"  id="cal-occperiod-enddate"
+                                                    showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true" tabindex="2" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" showTodayButton="true" disabled="#{!(empty propertyProfileBB.currOccPeriod.endDateCertifiedTS)}"
+                                                    required="#{propertyProfileBB.currOccPeriod.type.enddaterequired}"/>
+                                        <h:message for="cal-occperiod-enddate" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                        <ui:remove>
+                                            
+                                        <h:outputText styleClass="ui-label-inline" value="Certified date: " />
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currOccPeriod.endDateCertifiedTS)}" />
+                        </ui:remove>
+
+                                        <p:spacer height="0px" />
+                                        
+                                        <h:outputText styleClass="ui-label-inline" value="Certified by: " />
+                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.endDateCertifiedBy.person.firstName} 
+                                                      #{propertyProfileBB.currOccPeriod.endDateCertifiedBy.person.lastName}" />
+                                        <p:commandButton id="button-occperiodaddupdate-certenddate"
+                                                         actionListener="#{propertyProfileBB.certifyDataFieldOccPeriod}"
+                                                         ajax="true"
+                                                         value="Certify and lock start date"
+                                                         icon="fa fa-lock"
+                                                         disabled="#{(empty propertyProfileBB.currOccPeriod.endDateCertifiedTS)}"
+                                                         styleClass="button-size-small buttonOwnLine" 
+                                                         >
+                                            <f:param name="certify-fieldid" value="enddate" /> 
+                                        </p:commandButton>
+                                    
+                                    
+                                    </div>
+                                    
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
+                                        <h:outputText styleClass="ui-label" value="Permits: " />
+                                        <p:dataScroller value="#{propertyProfileBB.currOccPeriod.permitList}"
+                                                        var="permit" rowIndexVar="#{permit.periodID}">
+                                            
+                                            <h:outputText styleClass="ui-label-inline" value="Permit ID: " />
+                                            <h:outputText styleClass="data-text" value="#{permit.permitID}" />
+                                            
+                                            <p:spacer height="0px" />
+                                            <h:outputText styleClass="ui-label-inline" value="Creation date: " />
+                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(permit.dateIssued)}" />
+                                            
+                                            <p:spacer height="0px" />
+                                            
+                                            <h:outputText styleClass="ui-label-inline" value="Issued by: " />
+                                            <h:outputText styleClass="data-text" value="#{permit.issuedBy.person.firstName} #{permit.issuedBy.person.lastName}" />
+                                            
+                                            <p:commandButton    id="button-occperiodaddupdate-printpermit"
+                                                                value="print" />
+                                            <p:spacer height="3px" />
+                                        </p:dataScroller>
+                                        <p:commandButton    id="button-occperiodaddupdate-newpermit"
+                                                            value="new permit" />
+                                    
+                                </h:panelGroup>
+                                
+                                
+                                <h:panelGroup>
+                                        <h:outputText styleClass="ui-label" value="Connected persons: " />
+                                        <p:dataScroller value="#{propertyProfileBB.currOccPeriod.personList}"
+                                                        var="pers" rowIndexVar="#{pers.personID}">
+                                            <h:outputText value="#{pers.firstName} #{pers.lastName} (#{pers.personType.label})" />
+                                            <p:commandButton    id="button-occperiodaddupdate-viewperson"
+                                                                value="view" />
+                                            <p:commandButton    id="button-occperiodaddupdate-removeperson"
+                                                                value="remove" />
+                                            <p:spacer height="3px" />
+                                        </p:dataScroller>
+                                    
+                                </h:panelGroup>
+                                
+
+                            </h:panelGrid>
+
+                            <p:spacer height="5px" />
+
+                            <p:spacer height="5px"/>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('dialog-widvar-occperiod-addupdate').hide()"
+                                             tabindex="4"/>
+
+
+                            <p:commandButton ajax="true"
+                                             value="Commit new occupancy period" 
+                                             actionListener="#{propertyProfileBB.commitNewOccPeriod}"
+                                             oncomplete="PF('dialog-widvar-occperiod-addupdate').hide()"
+                                             icon="fa fa-thumbs-o-up"
+                                             update="
+                                                    form-propunits:datascroller-propunits
                                                     form-propertyobject-messages:messages-properties-object"
-                                                 value="Save unit list" 
-                                                 tabindex="3"/>
+                                             tabindex="3"/>
                         </h:form>
                     </p:dialog>
                 </f:view>

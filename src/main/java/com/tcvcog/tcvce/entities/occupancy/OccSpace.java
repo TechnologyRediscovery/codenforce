@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class OccSpace extends BackingBeanUtils implements Serializable {
     
-    protected int spaceid;
+    protected int spaceID;
     protected int occSpaceTypeID;
     protected String name;
     protected boolean required;
@@ -51,17 +51,17 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the spaceid
+     * @return the spaceID
      */
-    public int getSpaceid() {
-        return spaceid;
+    public int getSpaceID() {
+        return spaceID;
     }
 
     /**
-     * @param spaceid the spaceid to set
+     * @param spaceID the spaceID to set
      */
-    public void setSpaceid(int spaceid) {
-        this.spaceid = spaceid;
+    public void setSpaceID(int spaceID) {
+        this.spaceID = spaceID;
     }
 
     /**

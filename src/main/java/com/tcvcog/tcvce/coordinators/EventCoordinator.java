@@ -254,13 +254,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ){
             throw new CaseLifecyleException("This event cannot be attached to a closed case");
         }
-        
+        Event e = new Event();
         // the moment of event instantiaion!!!!
-        CECaseEvent event = new CECaseEvent();
-        event.setCategory(ec);
-        event.setDateOfRecord(LocalDateTime.now());
-        event.setActive(true);
-        event.setHidden(false);
+        e.setCategory(ec);
+        e.setDateOfRecord(LocalDateTime.now());
+        e.setActive(true);
+        e.setHidden(false);
+        CECaseEvent event = new CECaseEvent(e);
         event.setCaseID(c.getCaseID());
         return event;
     }
@@ -272,8 +272,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param caseID to which the event should be attached
      * @return an instantiated CECaseEvent object ready to be configured
      */
-    public CECaseEvent getInitializedEvent(int caseID){
-        CECaseEvent event = new CECaseEvent();
+    public CECaseEvent getInitializedCECaseEvent(int caseID){
+        CECaseEvent event = new CECaseEvent(new Event());
         event.setCaseID(caseID);
         return event;
         
@@ -299,7 +299,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Factory method for creating event categories when only the categoryID
      * is available. This is handy since the insertEvent method on the integrator
-     * really only needs the categoryID for storing in the database
+     * only needs the categoryID for storing in the database
      * @param catID the categoryID of the EventCategory you want
      * @return an instantiated EventCategory object
      * @throws com.tcvcog.tcvce.domain.IntegrationException
@@ -325,7 +325,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCategory ec = getInitiatlizedEventCategory(publicMessageEventCategory);
         
         // setup all the event properties
-        CECaseEvent event = getInitializedEvent(caseID);
+        CECaseEvent event = getInitializedCECaseEvent(caseID);
         event.setCategory(ec);
         event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
@@ -392,7 +392,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public CECaseEvent generateViolationComplianceEvent(CodeViolation violation) throws IntegrationException{
-        CECaseEvent e = new CECaseEvent();
+        Event e = new Event();
         EventIntegrator ei = getEventIntegrator();
           e.setCategory(ei.getEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("complianceEvent"))));
@@ -417,7 +417,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             sb.append(")");
             sb.append("<br /><br />");
         e.setNotes(sb.toString());
-        return e;
+        CECaseEvent cev = new CECaseEvent(e);
+        return cev;
     }
     
     
@@ -439,7 +440,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     
     
-    public List getEventList(CECase currentCase) throws IntegrationException{
+    public List<CECaseEvent> getEventList(CECase currentCase) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         List<CECaseEvent> ll = ei.getEventsByCaseID(currentCase.getCaseID());
         return ll;
@@ -560,7 +561,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public CECaseEvent getActionEventForCaseAdvancement(CECase c) throws IntegrationException, CaseLifecyleException{
         CasePhase cp = c.getCasePhase();
         EventIntegrator ei = getEventIntegrator();
-        CECaseEvent e = new CECaseEvent();
+        CECaseEvent e = new CECaseEvent(new Event());
         
         switch(cp){
             case PrelimInvestigationPending:

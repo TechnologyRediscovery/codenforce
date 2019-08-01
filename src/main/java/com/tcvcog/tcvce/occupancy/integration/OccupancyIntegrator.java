@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
@@ -372,6 +373,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     public OccPeriod getOccPeriod(int periodid) throws IntegrationException {
         OccPeriod op = null;
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         String query = "SELECT periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n"
                 + "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n"
                 + "       startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n"
@@ -398,7 +400,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return op;
+        return oc.configureOccPeriod(op);
     }
 
     private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException {
@@ -417,23 +419,38 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         op.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
         op.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
-        op.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+        if(rs.getTimestamp("createdts") != null){
+            op.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+        }
 
         op.setType(getOccPeriodType(rs.getInt("type_typeid")));
         op.setPeriodTypeCertifiedBy(ui.getUser(rs.getInt("typecertifiedby_userid")));
-        op.setPeriodTypeCertifiedTS(rs.getTimestamp("typecertifiedts").toLocalDateTime());
+        if(rs.getTimestamp("typecertifiedts") != null){
+            op.setPeriodTypeCertifiedTS(rs.getTimestamp("typecertifiedts").toLocalDateTime());
+        }
 
-        op.setStartDate(rs.getTimestamp("startdate").toLocalDateTime());
+        if(rs.getTimestamp("startdate") != null){
+            op.setStartDate(rs.getTimestamp("startdate").toLocalDateTime());
+        }
+            
         op.setStartDateCertifiedBy(ui.getUser(rs.getInt("startdatecertifiedby_userid")));
-        op.setStartDateCertifiedTS(rs.getTimestamp("startdatecertifiedts").toLocalDateTime());
+        if(rs.getTimestamp("startdatecertifiedts") != null){
+            op.setStartDateCertifiedTS(rs.getTimestamp("startdatecertifiedts").toLocalDateTime());
+        }
 
-        op.setEndDate(rs.getTimestamp("enddate").toLocalDateTime());
+        if(rs.getTimestamp("enddate") != null){
+            op.setEndDate(rs.getTimestamp("enddate").toLocalDateTime());
+        }
         op.setEndDateCertifiedBy(ui.getUser(rs.getInt("enddatecertifiedby_userid")));
-        op.setEndDateCertifiedTS(rs.getTimestamp("enddatecterifiedts").toLocalDateTime());
+        if(rs.getTimestamp("enddatecterifiedts") != null){
+            op.setEndDateCertifiedTS(rs.getTimestamp("enddatecterifiedts").toLocalDateTime());
+        }
 
         op.setManager(ui.getUser(rs.getInt("manager_userid")));
 
-        op.setAuthorizedTS(rs.getTimestamp("authorizationts").toLocalDateTime());
+        if(rs.getTimestamp("authorizationts") != null){
+            op.setAuthorizedTS(rs.getTimestamp("authorizationts").toLocalDateTime());
+        }
         op.setAuthorizedBy(ui.getUser(rs.getInt("authorizedby_userid")));
 
         op.setOverrideTypeConfig(rs.getBoolean("overrideperiodtypeconfig"));
@@ -641,7 +658,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     public List<OccPeriodType> getOccPeriodTypeList(int muniProfileID) throws IntegrationException {
-        List<OccPeriodType> typeList = null;
+        List<OccPeriodType> typeList = new ArrayList<>();
         String query = "SELECT occperiodtype_typeid\n"
                 + "  FROM public.muniprofileoccperiodtype WHERE muniprofile_profileid=?;";
 
@@ -990,6 +1007,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
 
         try {
+            opt.setTypeid(rs.getInt("typeid"));
             opt.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             opt.setTitle(rs.getString("title"));
             opt.setAuthorizeduses(rs.getString("authorizeduses"));
@@ -1008,7 +1026,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
             opt.setCommercial(rs.getBoolean("commercial"));
             opt.setRequirepersontypeentrycheck(rs.getBoolean("requirepersontypeentrycheck"));
-            opt.setDefaultValidityPeriodDays(rs.getInt("defaultvalidityperioddays"));
+            opt.setDefaultValidityPeriodDays(rs.getInt("defaultpermitvalidityperioddays"));
 
             // wire up when nathan is done
             // opt.setFeeList(fee);

@@ -489,7 +489,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         ci.changeCECasePhase(cse);
         ec.generateAndInsertPhaseChangeEvent(cse, oldCP, rule);
 //        if(rule.getTriggeredEventCategoryID() != 0){
-//            newEvent = ec.getInitializedEvent(cse, ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryID()));
+//            newEvent = ec.getInitializedCECaseEvent(cse, ec.getInitiatlizedEventCategory(rule.getTriggeredEventCategoryID()));
 //            
 //            attachNewEventToCECase(cse, newEvent, null);
 //            System.out.println("CaseCoordinator.processCaseOnEventRulePass "  + newEvent.getCategory().getEventCategoryTitle());
