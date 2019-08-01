@@ -435,10 +435,10 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>occupancyInspectionFeeBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccupancyInspectionFeeBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>feeManagementBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.FeeManagementBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>paymentBB</managed-bean-name>
@@ -1222,10 +1222,16 @@
             <from-outcome>paymentTypeManage</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/paymentTypeManage.xhtml</to-view-id>
         </navigation-case>
-
+<!--
         <navigation-case>
             <from-outcome>feeManage</from-outcome>
-            <to-view-id>/restricted/cogstaff/occ/occInspectionFeeManage.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/occ/feeManage.xhtml</to-view-id>
+        </navigation-case>
+-->        
+        
+        <navigation-case>
+            <from-outcome>feeManage</from-outcome>
+            <to-view-id>/public/feeManage.xhtml</to-view-id>
         </navigation-case>
         
         <navigation-case>

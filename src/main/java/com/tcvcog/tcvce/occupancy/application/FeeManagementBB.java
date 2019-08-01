@@ -39,7 +39,7 @@ import javax.faces.event.ActionEvent;
  */
 
 @ViewScoped
-public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serializable {
+public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     
     private ArrayList<Fee> occupancyInspectionFeeList;
     private Fee selectedOccupancyInspectionFee;
@@ -64,7 +64,7 @@ public class OccupancyInspectionFeeBB extends BackingBeanUtils implements Serial
     /**
      * Creates a new instance of NewJSFManagedBean
      */
-    public OccupancyInspectionFeeBB() {
+    public FeeManagementBB() {
     }
     
     public void editOccupancyInspectionFee(ActionEvent e){
