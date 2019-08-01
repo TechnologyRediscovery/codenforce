@@ -10,8 +10,7 @@
         <title>Add Payment</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../../navContainer_public.xhtml">
-            <!--template="../../navContainer_restricted.xhtml"-->
+        <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <div class="mainContainer">
                     <h:messages globalOnly="true" showDetail="true" showSummary="true"
@@ -124,7 +123,7 @@
                                         <p:outputLabel for="occInsFeeName">
                                            <h:outputText value="Name:"/>
                                         </p:outputLabel>
-                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                        <p:inputText id="occInsFeeName" value="{feeManagementBB.formOccupancyInspectionFeeName}" 
                                                  style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
                                         <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />

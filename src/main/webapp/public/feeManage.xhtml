@@ -10,7 +10,9 @@
         <title>Add Occupancy Inspection Fee</title>
     </h:head>
     <h:body>
-        <ui:composition template="../../navContainer_restricted.xhtml">
+        <ui:composition template="./navContainer_public.xhtml">
+                    <!--template="../../navContainer_restricted.xhtml"-->
+
             <ui:define name="content">
                 <div class="mainContainer">
                     <h:messages globalOnly="true" showDetail="true" showSummary="true"
@@ -26,9 +28,9 @@
                                     id="occInsFees"
                                     var="o"
                                     selectionMode="single"
-                                    selection="#{occupancyInspectionFeeBB.selectedOccupancyInspectionFee}"
+                                    selection="#{feeManagementBB.selectedOccupancyInspectionFee}"
                                     rowKey="#{o.occupancyInspectionFeeID}"
-                                    value="#{occupancyInspectionFeeBB.occupancyInspectionFeeList}"
+                                    value="#{feeManagementBB.occupancyInspectionFeeList}"
                                     tableStyleClass="primeDataTable"
                                     tabindex="1">
                                     <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
@@ -51,37 +53,37 @@
                                         <f:facet name="header">
                                             <h:outputText value="Name" />
                                         </f:facet>
-                                        <h:outputText value="#{o.occupancyInspectionFeeName}"/>
+                                        <h:outputText value="#{o.feeName}"/>
                                     </p:column>
                                     
                                     <p:column width="25%">
                                         <f:facet name="header">
                                             <h:outputText value="Amount" />
                                         </f:facet>
-                                        <h:outputText value="#{o.occupancyInspectionFeeAmount}"/>
+                                        <h:outputText value="#{o.feeAmount}"/>
                                     </p:column>
                                     
                                     <p:column width="25%">
                                         <f:facet name="header">
                                             <h:outputText value="Effective Date" />
                                         </f:facet>
-                                        <h:outputText value="#{o.occupancyInspectionFeeEffDate}"/>
+                                        <h:outputText value="#{o.effectiveDate}"/>
                                     </p:column>
                                     
                                     <p:column width="25%">
                                         <f:facet name="header">
                                             <h:outputText value="Expire Date" />
                                         </f:facet>
-                                        <h:outputText value="#{o.occupancyInspectionFeeExpDate}"/>
+                                        <h:outputText value="#{o.expiryDate}"/>
                                     </p:column>
      
                                 </p:dataTable>
                             <p:spacer height="10px"/>
                             <p:commandButton ajax="false" 
-                                             actionListener="#{occupancyInspectionFeeBB.editOccupancyInspectionFee}"
+                                             actionListener="#{feeManagementBB.editOccupancyInspectionFee}"
                                              value="Update Selected Occupancy Permit Type" tabindex="2"/>
                             <p:commandButton ajax="false" 
-                                             actionListener="#{occupancyInspectionFeeBB.deleteSelectedOccupancyInspectionFee}"
+                                             actionListener="#{feeManagementBB.deleteSelectedOccupancyInspectionFee}"
                                             value="Nuke Selected Category Forever" tabindex="3"/>
                             
                          </h:form>    
@@ -94,7 +96,7 @@
                                         <p:outputLabel for="occInsFeeName">
                                            <h:outputText value="Name:"/>
                                         </p:outputLabel>
-                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                        <p:inputText id="occInsFeeName" value="{feeManagementBB.formOccupancyInspectionFeeName}" 
                                                  style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
                                         <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -115,7 +117,7 @@
 
                                 <h:outputLabel value="Fee name:" for="newOccInsFeeName"/>
                                 <h:panelGroup>
-                                    <p:inputText id="newOccInsFeeName" value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
+                                    <p:inputText id="newOccInsFeeName" value="#{feeManagementBB.formOccupancyInspectionFeeName}" 
                                                  style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
                                     <h:message for="newOccInsFeeName" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -125,9 +127,9 @@
                                     <h:outputText value="Municipality:"/>
                                 </p:outputLabel>
                                 <h:panelGroup>
-                                    <p:selectOneMenu id="muniSelectMenu" tabindex="5" required="false" value="#{occupancyInspectionFeeBB.formMuni}">
+                                    <p:selectOneMenu id="muniSelectMenu" tabindex="5" required="false" value="#{feeManagementBB.formMuni}">
                                         <f:converter converterId="muniConverter"/>
-                                        <f:selectItems id="muniNameList" value="#{sessionBean.activeMuni}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+                                        <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
                                     </p:selectOneMenu>
                                     
                                     <!--<h:message for="muniSelectMenu" showDetail="false" showSummary="true" 
@@ -136,7 +138,7 @@
 
                                 <h:outputLabel value="Amount:" for="newOccInspectionFeeAmount"/>
                                 <h:panelGroup>
-                                    <p:inputText id="newOccInspectionFeeAmount" value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeAmount}" 
+                                    <p:inputText id="newOccInspectionFeeAmount" value="#{feeManagementBB.formOccupancyInspectionFeeAmount}" 
                                            style="width: 250px;" tabindex="6" required="true" styleClass="inputText"/>
                                     <h:message for="newOccInspectionFeeAmount" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -145,7 +147,7 @@
                                 <h:outputLabel value="Effective Date:" for="newOccInsFeeEffDate"/>
                                 <h:panelGroup>
                                     <p:calendar 
-                                        value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeEffDate}" 
+                                        value="#{feeManagementBB.formOccupancyInspectionFeeEffDate}" 
                                             styleClass="occInsFeeDateCal"
                                             mode="popup" tabindex="7"
                                             id="newOccInsFeeEffDate"
@@ -161,7 +163,7 @@
 
                                 <h:outputLabel value="Notes:" for="newOccInsFeeNotes"/>
                                 <h:panelGroup>
-                                    <p:inputText id="newOccInsFeeNotes" value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeNotes}" 
+                                    <p:inputText id="newOccInsFeeNotes" value="#{feeManagementBB.formOccupancyInspectionFeeNotes}" 
                                            style="width: 250px;" tabindex="8" required="true" styleClass="inputText"/>
                                     <h:message for="newOccInsFeeNotes" showDetail="false" showSummary="true" 
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -170,7 +172,7 @@
                                 <h:outputLabel value="Expiry Date:" for="newOccInsFeeExpDate"/>
                                 <h:panelGroup>
                                     <p:calendar 
-                                        value="#{occupancyInspectionFeeBB.formOccupancyInspectionFeeExpDate}" 
+                                        value="#{feeManagementBB.formOccupancyInspectionFeeExpDate}" 
                                             styleClass="occInsFeeDateCal"
                                             mode="popup" tabindex="9"
                                             id="newOccInsFeeExpDate"
@@ -194,9 +196,9 @@
                                 
                             </h:panelGrid>
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" value="Add Occupancy Inspection Fee" action="#{occupancyInspectionFeeBB.addOccupancyInspectionFee}" />
+                            <p:commandButton ajax="false" value="Add Occupancy Inspection Fee" action="#{feeManagementBB.addOccupancyInspectionFee}" />
                             <p:commandButton ajax="false" 
-                                                         actionListener="#{occupancyInspectionFeeBB.commitOccupancyInspectionFeeUpdates}"
+                                                         actionListener="#{feeManagementBB.commitOccupancyInspectionFeeUpdates}"
                                                   value="Commit Updates" tabindex="10"/>
                         </h:form>
                     </f:view>
