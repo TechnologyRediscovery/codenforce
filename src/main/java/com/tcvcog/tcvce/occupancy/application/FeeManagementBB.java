@@ -189,7 +189,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public ArrayList<Fee> getOccupancyInspectionFeeList() {
         PaymentIntegrator pi = getPaymentIntegrator();
         try {
-            List<Fee> oil = pi.getOccupancyInspectionFeeList();
+            occupancyInspectionFeeList = pi.getOccupancyInspectionFeeList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
