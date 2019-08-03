@@ -69,7 +69,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      * Creates a new instance of InspectionsBB
      */
     public OccInspectionBB() {
-        browseSpaceList = new ArrayList<>();
     }
     
     
@@ -77,6 +76,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
+        browseSpaceList = new ArrayList<>();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         if(currentInspection == null){
             if(getSessionBean().getSessionOccInspection() != null){
@@ -90,16 +90,33 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    private void reloadCurrentInspection(){
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        try {
+            currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Unable to reload inspection", ""));
+            
+        }
+        
+    }
+    
     public void addSpaceToChecklist(OccSpace space) {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            currentInspection.getInspectedSpaceList().add(
-                    oc.inspectionAction_commenceSpaceInspection(currentInspection,
+            oc.inspectionAction_commenceSpaceInspection(currentInspection,
                             getSessionBean().getSessionUser(),
                             space,
-                            null));
+                            null);
+            
+        System.out.println("OccInspectionBB.addSpaceToChecklist | space name: " + space.getName());
+        reloadCurrentInspection();
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Space added to checklist!", ""));

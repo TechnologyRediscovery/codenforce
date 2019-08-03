@@ -26,29 +26,29 @@ import java.time.LocalDateTime;
  */
 public class CodeElement implements Serializable {
     
-    private int elementID;
+    protected int elementID;
     
-    private CodeElementGuideEntry guideEntry;
-    private int guideEntryID;
-    private CodeSource source;
+    protected CodeElementGuideEntry guideEntry;
+    protected int guideEntryID;
+    protected CodeSource source;
     
-    private int ordchapterNo;
+    protected int ordchapterNo;
     
-    private String ordchapterTitle;
-    private String ordSecNum;
-    private String ordSecTitle;
+    protected String ordchapterTitle;
+    protected String ordSecNum;
+    protected String ordSecTitle;
     
-    private String ordSubSecNum;
-    private String ordSubSecTitle;
-    private String ordTechnicalText;
+    protected String ordSubSecNum;
+    protected String ordSubSecTitle;
+    protected String ordTechnicalText;
     
-    private String ordHumanFriendlyText;
-    private boolean isActive;
+    protected String ordHumanFriendlyText;
+    protected boolean isActive;
     
-    private String resourceURL;
-    private LocalDateTime dateCreated;
+    protected String resourceURL;
+    protected LocalDateTime dateCreated;
     
-    private String headerString;
+    protected String headerString;
 
     
     /**

@@ -18,10 +18,12 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,39 +37,46 @@ import java.util.Objects;
  */
 public class OccInspectedSpace extends OccSpace implements Serializable{
     
-    private List<OccInspectedCodeElement> inspectedElementList;
+    private int inspectedSpaceID;
+    private List<OccInspectedSpaceElement> inspectedElementList;
     private OccLocationDescriptor location;
     private OccSpaceType type;
     
     private User lastInspectedBy;
     private LocalDateTime lastInspectedTS;
     
+    
     public OccInspectedSpace(OccSpace spc){
         this.spaceID = spc.getSpaceID();
         this.occSpaceTypeID = spc.getOccSpaceTypeID();
         this.name = spc.getName();
         this.required = spc.isRequired();
-        this.elementList = spc.getElementList();
         
-        inspectedElementList = new ArrayList<>();
     }
     
-    public void addElementToInspectedList(OccInspectedCodeElement ele){
-        inspectedElementList.add(ele);
-        
+    public List<CodeElement> getInspectedCodeElementsWithoutShell(){
+        List<CodeElement> eleList = new ArrayList<>();
+        if(inspectedElementList != null){
+            Iterator<OccInspectedSpaceElement> iter = inspectedElementList.iterator();
+            while(iter.hasNext()){
+                eleList.add(iter.next());
+            }
+        }
+        return eleList;
     }
+    
 
     /**
      * @return the inspectedElementList
      */
-    public List<OccInspectedCodeElement> getInspectedElementList() {
+    public List<OccInspectedSpaceElement> getInspectedElementList() {
         return inspectedElementList;
     }
 
     /**
      * @param inspectedElementList the inspectedElementList to set
      */
-    public void setInspectedElementList(List<OccInspectedCodeElement> inspectedElementList) {
+    public void setInspectedElementList(List<OccInspectedSpaceElement> inspectedElementList) {
         this.inspectedElementList = inspectedElementList;
     }
 
@@ -186,5 +195,21 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
         }
         return true;
     }
+
+    /**
+     * @return the inspectedSpaceID
+     */
+    public int getInspectedSpaceID() {
+        return inspectedSpaceID;
+    }
+
+    /**
+     * @param inspectedSpaceID the inspectedSpaceID to set
+     */
+    public void setInspectedSpaceID(int inspectedSpaceID) {
+        this.inspectedSpaceID = inspectedSpaceID;
+    }
+
+   
     
 }
