@@ -90,6 +90,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    public void browseSpaceType(){
+        if(selectedOccSpaceType != null){
+            browseSpaceList = selectedOccSpaceType.getSpaceList();
+            System.out.println("OccInspectionBB.browseSpaceType");
+        }
+        
+    }
+    
     private void reloadCurrentInspection(){
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         try {
@@ -217,9 +225,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      * @return the browseSpaceList
      */
     public List<OccSpace> getBrowseSpaceList() {
-        if(selectedOccSpaceType != null){
-            browseSpaceList = selectedOccSpaceType.getSpaceList();
-        }
+        
         return browseSpaceList;
     }
 
