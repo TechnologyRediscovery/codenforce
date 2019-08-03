@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedCodeElement;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -165,26 +166,31 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @return Containing a List of InspectedCodeElement objects ready to be evaluated
      * @throws IntegrationException 
      */
-    public OccInspectedSpace inspectionAction_commenceSpaceInspection(  OccInspection inspection, 
+    public OccInspection inspectionAction_commenceSpaceInspection(  OccInspection inspection, 
                                                                     User u, 
                                                                     OccSpace spc, 
                                                                     OccLocationDescriptor loc) 
                                                                 throws IntegrationException{
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
+        
+        // Feed the given OccSpace to the constructor of the InspectedSpace
         OccInspectedSpace inspSpace = new OccInspectedSpace(spc);
+        // then configure the OccInspectedSpace for first insertion
         inspSpace.setLocation(loc);
         inspSpace.setLastInspectedBy(u);
         inspSpace.setLastInspectedTS(LocalDateTime.now());
-        ListIterator<CodeElement> elementIterator = spc.getElementList().listIterator();
-        OccInspectedCodeElement inspEle;
+        // We are inspecting all the code elements associated with this space in the checklist template
+        ListIterator<OccSpaceElement> elementIterator = spc.getSpaceElementList().listIterator();
+        OccInspectedSpaceElement inspEle; // Holds our new objects as we add them to the list
+        List<OccInspectedSpaceElement> inElementList = new ArrayList<>();
         
         // wrap each CodeElement in this space in a InspectedCodeElement blanket to keep it warm
         while(elementIterator.hasNext()){
-            CodeElement ele = elementIterator.next();
-            inspEle = new OccInspectedCodeElement();
-            inspEle.setElement(ele);
+            OccSpaceElement ele = elementIterator.next();
+            // Create an OccInspectedElement by by passing in a CodeElement using the special constructor
+            inspEle = new OccInspectedSpaceElement(ele, ele.getSpaceElementID());
             inspEle.setLastInspectedBy(u);
-            inspSpace.addElementToInspectedList(inspEle);
+            inElementList.add(inspEle);
             // each element in this space gets a reference to the same OccLocationDescriptor object
             if(loc == null){
                 inspSpace.setLocation(inspecInt.getLocationDescriptor(Integer.parseInt(
@@ -194,9 +200,21 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 inspSpace.setLocation(loc);
             }
         }
-        inspecInt.recordCommencementOfSpaceInspection(inspSpace, inspection);
         
-        return inspSpace;
+        // Critical moment of injecting an new (i.e. ID-less) InspectedElement into its OccInspectedSpace
+        inspSpace.setInspectedElementList(inElementList);
+        
+        // With a fully built inspected space, we can record our start of inspection in the DB
+        inspSpace = inspecInt.recordCommencementOfSpaceInspection(inspSpace, inspection);
+        System.out.println("OccucpancyCoordinator.inpectionAction_commenceSpaceInspection | commenced inspecting of space");
+        
+        // now use our convenience method to record Inspection of the space's individual elements
+        inspecInt.recordInspectionOfSpaceElements(inspSpace, inspection);
+        
+        inspSpace = inspecInt.getInspectedSpace(inspSpace.getSpaceID());
+        System.out.println("OccucpancyCoordinator.inpectionAction_commenceSpaceInspection | retrievedInspectedSpaceid="+inspSpace);
+        
+        return inspection;
     }    
     
     
@@ -206,11 +224,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oii.getOccInspection(inspection.getInspectionID());
         return inspection;
     }
-    
-    
-    
-    
-    
     
     public OccPermitApplication getNewOccPermitApplication(){
         OccPermitApplication occpermitapp = new OccPermitApplication();        

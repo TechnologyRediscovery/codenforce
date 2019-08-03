@@ -1123,6 +1123,7 @@
             <from-view-id>/restricted/*</from-view-id>
             <from-outcome>inspection</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/inspection.xhtml</to-view-id>
+            <redirect />
         </navigation-case>
     </navigation-rule>
     
@@ -1218,6 +1219,7 @@
         <navigation-case>
             <from-outcome>occInspections</from-outcome>
             <to-view-id>/restricted/cogview/inspections.xhtml</to-view-id>
+            
         </navigation-case>
         
         <navigation-case>

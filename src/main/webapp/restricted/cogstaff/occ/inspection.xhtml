@@ -88,7 +88,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                                value="inspect this space"  
                                                                                icon="fa fa-open"
-                                                                               update="form-inspection-messages-inspecteditems"/>
+                                                                               update="form-inspection-inspecteditems
+                                                                               form-inspection-inspecteditems-messages"/>
 
 
 
@@ -98,7 +99,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         id="scroller-template-spacetypelist-spacelist-elementlist"
                                                         widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist-elementlist"
                                                         var="codeElement"
-                                                        value="#{space.elementList}"
+                                                        value="#{space.spaceElementList}"
                                                         rowIndexVar="#{codeElement.elementID}">
 
                                                         <div class="outlinedBox">
@@ -180,7 +181,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 id="scroller-template-spacetypelist-spacelist-elementlist"
                                                                 widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist-elementlist"
                                                                 var="codeElement"
-                                                                value="#{space.elementList}"
+                                                                value="#{space.spaceElementList}"
                                                                 rowIndexVar="#{codeElement.elementID}">
 
                                                                 <div class="outlinedBox">
@@ -223,11 +224,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <div id="inspection-inspectedelementscol" class="object-column">
                                 <h2>Inspected items</h2>
 
-                                <h:form id="form-inspection-messages-inspecteditems">
+                                <h:form id="form-inspection-inspecteditems-messages">
+                                    
 
                                     <h:messages id="messages-inspection-inspecteditems" globalOnly="true" showDetail="true" showSummary="true"
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                     </h:messages>
+                                </h:form>
+                                <h:form id="form-inspection-inspecteditems">
 
                                     <p:dataScroller
                                         id="scroller-inspectedspacelist"
@@ -243,7 +247,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 widgetVar="var-scroller-inspectedspacelist-elementlist"
                                                 var="inelement"
                                                 value="#{inspace.inspectedElementList}"
-                                                rowIndexVar="#{inelement.inspectedElementID}">
+                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
                                                 <div class="datum">
                                                     <h:outputText styleClass="ui-label-inline" value="Code element: " />
                                                     <h:outputText styleClass="data-text"   value="&#167;#{inelement.ordSecNum}:" />
@@ -271,15 +275,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText styleClass="ui-label-inline" value="Notes: " />
                                                     <h:outputText  styleClass="data-text" value="#{inelement.notes}" />
                                                 </div>
-
-
                                             </p:dataScroller>
                                         </div>
-
                                     </p:dataScroller>
-
                                 </h:form>
-
                             </div>
                         </div>
                     </div>
