@@ -58,8 +58,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 title="tab-active-lookup">
 
                                             <p:selectOneListbox id="listbox-occspacetype" required="true" value="#{occInspectionBB.selectedOccSpaceType}" tabindex="1">
-                                                <p:ajax update="scroller-template-spacetypelist-spacelist" 
-                                                        immediate="true"/> 
+                                                <p:ajax update="scroller-template-spacetypelist-spacelist"
+                                                        listener="#{occInspectionBB.browseSpaceType}"
+                                                        immediate="false"/> 
                                                 <f:converter converterId="occSpaceTypeConverter" />
                                                 <f:selectItems value="#{occInspectionBB.currentInspection.checklistTemplate.occSpaceTypeTemplateList}" 
                                                                var="st" itemLabel="#{st.spaceTypeTitle}" />
@@ -89,7 +90,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                value="inspect this space"  
                                                                                icon="fa fa-open"
                                                                                update="form-inspection-inspecteditems
-                                                                               form-inspection-inspecteditems-messages"/>
+                                                                               form-inspection-inspecteditems-messages
+                                                                               form-inspection-template"/>
 
 
 

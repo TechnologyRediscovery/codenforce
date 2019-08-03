@@ -873,12 +873,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 //            CodeElement templateElement = elementListIter.next();
 //            if(!inspSpace.getInspectedElementList().isEmpty()){
                 while(inspectedElementListIterator.hasNext()){
-                    OccInspectedSpaceElement oii = inspectedElementListIterator.next();
-                    if(oii.getInspectedSpaceElementID() != 0){
-                        updateInspectedSpaceElements(inspection, inspSpace);
+                    OccInspectedSpaceElement oie = inspectedElementListIterator.next();
+                    if(oie.getInspectedSpaceElementID() != 0){
+                        updateInspectedSpaceElement(oie, inspSpace);
                     } else { 
                         spaceInserts++; 
-                        insertInspectedSpaceElements(inspection, inspSpace);
+                        insertInspectedSpaceElement(oie, inspSpace);
                     }
                 }
 //            }
