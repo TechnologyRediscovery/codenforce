@@ -25,7 +25,7 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author Eric C. Darsow
  */
-public enum ViolationStatus {
+public enum ViolationStatusEnum {
 
     RESOLVED(                               "Resolved", 
                                             "",
@@ -53,7 +53,7 @@ public enum ViolationStatus {
     private final String iconPropertyName;
     private final int phaseOrder;
     
-    private ViolationStatus(String label, String lt, String icn, int ord){
+    private ViolationStatusEnum(String label, String lt, String icn, int ord){
         this.label = label;
         this.leadText = lt;
         this.iconPropertyName = icn;

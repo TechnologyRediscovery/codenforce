@@ -193,6 +193,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void removeSpaceFromChecklist(OccInspectedSpace spc){
          OccupancyCoordinator oc = getOccupancyCoordinator();
          oc.removeSpaceFromChecklist(spc, getSessionBean().getSessionUser(), currentInspection);
+         reloadCurrentInspection();
      }
      
      public void recordComplianceWithElement(OccInspectedSpaceElement inSpcEl){
@@ -201,6 +202,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             oc.recordComplianceWithInspectedElement(    inSpcEl,
                                                         getSessionBean().getSessionUser(),
                                                         currentInspection);
+            reloadCurrentInspection();
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Compliance recorded for Space Element: " + inSpcEl.getInspectedSpaceElementID(), ""));
@@ -218,6 +220,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             oc.removeComplianceWithInspectedElement(    inSpcEl,
                                                         getSessionBean().getSessionUser(),
                                                         currentInspection);
+            reloadCurrentInspection();
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Compliance removed for Space Element: " + inSpcEl.getInspectedSpaceElementID(), ""));

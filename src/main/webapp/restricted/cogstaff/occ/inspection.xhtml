@@ -324,16 +324,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <div class="datum">
                                                         <h:panelGrid    id="panelgrid-inspectedspace" 
-                                                                    columns="1" 
-                                                                    columnClasses="gridTD, gridTD" 
+                                                                    columns="3" 
+                                                                    columnClasses="gridTD, gridTD,gridTD" 
                                                                     rendered="true">
                                                             <h:panelGroup>
 
-                                                                <h:outputText styleClass="ui-label-inline" value="Code element: " />
-                                                                <h:outputText styleClass="data-text"   value="&#167;#{inelement.ordSecNum}:" />
+                                                                <h:outputLabel styleClass="bold" value="#{inElement.status.statusEnum.label}" />
+                                                                <div class="status-display-container">
+                                                                    <div class="status-display-icon-container #{inElement.status.icon.styleClass}">
+                                                                        <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{inElement.status.icon.materialIcon}"/></i>
+                                                                    </div>
+                                                                </div>
+                                                            </h:panelGroup>      
+                                                            
+                                                            <h:panelGroup>
+
                                                                 <h:outputText  styleClass="data-text" value="#{inelement.ordSecTitle}; " />
-                                                                <h:outputText  styleClass="data-text" value="&#167;&#167;#{inelement.ordSubSecNum} " />
                                                                 <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecTitle}" />
+                                                                <h:outputText  styleClass="data-text" value="&#167;#{inelement.ordSubSecNum} " />
 
                                                                 <p:spacer height="5px" />
 

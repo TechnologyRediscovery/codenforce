@@ -14,7 +14,7 @@ import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.ViolationStatus;
+import com.tcvcog.tcvce.entities.ViolationStatusEnum;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -75,15 +75,15 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
         return stageCountMap;
     }
     
-    public Map<ViolationStatus, Integer> getViolationCountsByStatus(CECase cse){
-        Map<ViolationStatus, Integer> statusCountMap = new LinkedHashMap<>();
-        List<ViolationStatus> statusList = Arrays.asList(ViolationStatus.values());
-        for (ViolationStatus vs : statusList) {
+    public Map<ViolationStatusEnum, Integer> getViolationCountsByStatus(CECase cse){
+        Map<ViolationStatusEnum, Integer> statusCountMap = new LinkedHashMap<>();
+        List<ViolationStatusEnum> statusList = Arrays.asList(ViolationStatusEnum.values());
+        for (ViolationStatusEnum vs : statusList) {
             statusCountMap.put(vs, 0);
         }
         
         for (CodeViolation cv : cse.getViolationList()) {
-            ViolationStatus status = cv.getStatus();
+            ViolationStatusEnum status = cv.getStatus();
             statusCountMap.put(status, statusCountMap.get(status) + 1);
         }
         return statusCountMap;
@@ -92,11 +92,11 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
     
     
     public DonutChartModel generateModelViolationDonut(CECase cse){
-        Map<ViolationStatus, Integer> statusCountMap = getViolationCountsByStatus(cse);
+        Map<ViolationStatusEnum, Integer> statusCountMap = getViolationCountsByStatus(cse);
         Map<String, Number> chartMap = new LinkedHashMap<>();
         
-        List<ViolationStatus> statusList = Arrays.asList(ViolationStatus.values());
-        for (ViolationStatus vs : statusList) {
+        List<ViolationStatusEnum> statusList = Arrays.asList(ViolationStatusEnum.values());
+        for (ViolationStatusEnum vs : statusList) {
             chartMap.put(vs.getLabel(), statusCountMap.get(vs));
         }
         

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -44,6 +45,8 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
     
     private User lastInspectedBy;
     private LocalDateTime lastInspectedTS;
+    
+    private InspectableStatus status;
     
     
     public OccInspectedSpace(OccSpace spc){
@@ -208,6 +211,22 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
      */
     public void setInspectedSpaceID(int inspectedSpaceID) {
         this.inspectedSpaceID = inspectedSpaceID;
+    }
+
+    
+
+    /**
+     * @return the status
+     */
+    public InspectableStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(InspectableStatus status) {
+        this.status = status;
     }
 
    
