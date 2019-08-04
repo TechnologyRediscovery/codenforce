@@ -18,6 +18,7 @@
 package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.User;
@@ -1019,11 +1020,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 // TODO: failure severity classes
                 stmt.setNull(6, java.sql.Types.NULL);
                 
+                stmt.setInt(7, inspElement.getElementID());
+                
+                
                 stmt.executeUpdate();
-            
+                System.out.println("OccInspectionIntegrator.updatedInspectedCodeElement | completed updated on ineleid: " + inspElement.getInspectedSpaceElementID());
             } catch (SQLException ex) {
                 System.out.println(ex.toString());
-                throw new IntegrationException("Unable to update inspected space in the database, sorry!", ex);
+                throw new IntegrationException("Unable to update inspected space element in the database, sorry!", ex);
 
             } finally{
                  if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -1041,11 +1045,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * @throws IntegrationException thrown for standard SQL errors and this method being 
  given an OccInspectedSpace object whose constituent members lack ID numbers for the updates.
      */
-    public void updateInspectedSpaceLinks(OccInspection inspection, OccInspectedSpace inspSpace) throws IntegrationException{
+    public void updateInspectedSpace(OccInspection inspection, OccInspectedSpace inspSpace) throws IntegrationException{
         
         String query =  "UPDATE public.occinspectedspace\n" +
                         "   SET occspace_spaceid=?, occinspection_inspectionid=?, \n" +
-                        "       occlocationdescription_descid=?, \n" +
+                        "       occlocationdescription_descid=? " +
                         " WHERE inspectedspaceid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1060,7 +1064,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Could not update inspected space link metadata", ex);
+            throw new IntegrationException("Could not update inspected space metadata", ex);
 
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -1301,7 +1305,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     }
     
      public OccInspection getOccInspection(int inspectionID) throws IntegrationException {
-        
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+         
          OccInspection inspection = null;
          
          String query = " SELECT inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n" +
@@ -1334,7 +1339,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return inspection;
+        return oc.configureOccInspection(inspection);
     }
 
        private OccInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException {

@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityComplete;
 import com.tcvcog.tcvce.entities.Person;
@@ -28,6 +29,8 @@ import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.InspectableStatus;
+import com.tcvcog.tcvce.entities.occupancy.InspectionStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
@@ -48,6 +51,9 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.midi.SysexMessage;
 
 /**
  *
@@ -68,10 +74,106 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
     
     public OccInspection configureOccInspection(OccInspection inspection){
-        
+        for(OccInspectedSpace inSpace: inspection.getInspectedSpaceList()){
+            configureOccInspectedSpace(inSpace);
+        }
         
         return inspection;
     }
+    
+    public OccInspectedSpace configureOccInspectedSpace(OccInspectedSpace inSpace){
+        SystemIntegrator si = getSystemIntegrator();
+        boolean atLeastOneElementInspected = false;
+        boolean allElementsPass = true;
+        
+        for(OccInspectedSpaceElement inSpaceEle: inSpace.getInspectedElementList()){
+            configureOccInspectedSpaceElement(inSpaceEle);
+            if(inSpaceEle.getStatus().getStatusEnum() == InspectionStatusEnum.FAIL){
+                allElementsPass = false;
+            } else if (inSpaceEle.getLastInspectedTS() != null){
+                atLeastOneElementInspected = true;
+            }
+        }
+        
+        int iconID = 0;
+        try {
+            if(!atLeastOneElementInspected){
+                
+                inSpace.setStatus(new InspectableStatus(InspectionStatusEnum.NOTINSPECTED));
+                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString(InspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()));
+                inSpace.getStatus().setIcon(si.getIcon(iconID));
+                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | NOTINSPEC inspectedSpaceID: " + inSpace.getInspectedSpaceID());
+                
+            } else if(atLeastOneElementInspected && !allElementsPass) {
+                
+                inSpace.setStatus(new InspectableStatus(InspectionStatusEnum.FAIL));
+                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString(InspectionStatusEnum.FAIL.getIconPropertyLookup()));
+                inSpace.getStatus().setIcon(si.getIcon(iconID));
+                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | FAIL inspectedSpaceID: " + inSpace.getInspectedSpaceID());
+                
+            } else {
+                
+                inSpace.setStatus(new InspectableStatus(InspectionStatusEnum.PASS));
+                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString(InspectionStatusEnum.PASS.getIconPropertyLookup()));
+                inSpace.getStatus().setIcon(si.getIcon(iconID));
+                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | PASS inspectedSpaceID: " + inSpace.getInspectedSpaceID());
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        
+        return inSpace;
+        
+    }
+    
+        public OccInspectedSpaceElement configureOccInspectedSpaceElement(OccInspectedSpaceElement inSpaceEle) {
+        SystemIntegrator si = getSystemIntegrator();
+
+        int iconID = 0;
+
+        try {
+            if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() == null) {
+
+                inSpaceEle.setStatus(new InspectableStatus(InspectionStatusEnum.FAIL));
+                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString(InspectionStatusEnum.FAIL.getIconPropertyLookup()));
+                inSpaceEle.getStatus().setIcon(si.getIcon(iconID));
+                
+                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | FAIL inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
+
+            } else if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() != null){
+
+                inSpaceEle.setStatus(new InspectableStatus(InspectionStatusEnum.PASS));
+                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString(InspectionStatusEnum.PASS.getIconPropertyLookup()));
+                inSpaceEle.getStatus().setIcon(si.getIcon(iconID));
+                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | PASS inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
+
+            } else {
+
+                inSpaceEle.setStatus(new InspectableStatus(InspectionStatusEnum.NOTINSPECTED));
+                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString(InspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()));
+                inSpaceEle.getStatus().setIcon(si.getIcon(iconID));
+                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | NOT INSPECTED inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
+
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return inSpaceEle;
+    }
+
+
+    
+    
+    
+    
+    
     
     public OccInspection getOccInspectionSkeleton(){
         return new OccInspection();

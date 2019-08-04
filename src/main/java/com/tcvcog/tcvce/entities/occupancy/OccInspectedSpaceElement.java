@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -54,6 +55,8 @@ public class OccInspectedSpaceElement
     
     private int failureIntensityClassID;
     
+    
+    private InspectableStatus status;
    
     
     /**
@@ -319,6 +322,22 @@ public class OccInspectedSpaceElement
      */
     public void setBlobList(List<Blob> blobList) {
         this.blobList = blobList;
+    }
+
+   
+
+    /**
+     * @return the status
+     */
+    public InspectableStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(InspectableStatus status) {
+        this.status = status;
     }
 
    

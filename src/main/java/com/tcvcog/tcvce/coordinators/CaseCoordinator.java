@@ -1153,26 +1153,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
             // violation still within compliance timeframe
             if(cv.getDaysUntilStipulatedComplianceDate() >= 0){
                 
-                cv.setStatus(ViolationStatus.UNRESOLVED_WITHINCOMPTIMEFRAME);
+                cv.setStatus(ViolationStatusEnum.UNRESOLVED_WITHINCOMPTIMEFRAME);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString(cv.getStatus().getIconPropertyName()))));
                 
             // violation has NOT been cited, but is past compliance timeframe end date
             } else if(cv.getCitationIDList().isEmpty()) {
                 
-                cv.setStatus(ViolationStatus.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME);
+                cv.setStatus(ViolationStatusEnum.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString(cv.getStatus().getIconPropertyName()))));
                 
             // violation has been cited on at least one citation
             } else {
-                cv.setStatus(ViolationStatus.UNRESOLVED_CITED);
+                cv.setStatus(ViolationStatusEnum.UNRESOLVED_CITED);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString(cv.getStatus().getIconPropertyName()))));
             }
             // we have a resolved violation
         } else {
-                cv.setStatus(ViolationStatus.RESOLVED);
+                cv.setStatus(ViolationStatusEnum.RESOLVED);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString(cv.getStatus().getIconPropertyName()))));
         }

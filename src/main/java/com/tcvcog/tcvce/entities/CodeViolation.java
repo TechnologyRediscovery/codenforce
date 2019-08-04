@@ -35,7 +35,7 @@ public class CodeViolation extends EntityUtils implements Serializable{
     protected EnforcableCodeElement violatedEnfElement;
     protected int ceCaseID;
        
-    protected ViolationStatus status;
+    protected ViolationStatusEnum status;
     protected Icon icon;
     protected String ageLeadText;
     
@@ -673,14 +673,14 @@ public class CodeViolation extends EntityUtils implements Serializable{
     /**
      * @return the status
      */
-    public ViolationStatus getStatus() {
+    public ViolationStatusEnum getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(ViolationStatus status) {
+    public void setStatus(ViolationStatusEnum status) {
         this.status = status;
     }
 
