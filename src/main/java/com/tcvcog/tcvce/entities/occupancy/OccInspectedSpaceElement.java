@@ -17,10 +17,12 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -45,6 +47,8 @@ public class OccInspectedSpaceElement
     private boolean required;
     private User overrideRequiredFlag_thisElementNotInspectedBy;
     private String notes;
+    
+    private List<Blob> blobList;
     
     private OccLocationDescriptor location;
     
@@ -301,6 +305,20 @@ public class OccInspectedSpaceElement
      */
     public void setInspectedSpaceID(int inspectedSpaceID) {
         this.inspectedSpaceID = inspectedSpaceID;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
     }
 
    

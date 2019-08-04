@@ -8,11 +8,20 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
+import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -62,8 +71,22 @@ import javax.faces.event.ActionEvent;
 public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 
     private OccInspection currentInspection;
+    private OccPeriod currentOccPeriod;
+    private PropertyUnitWithProp currentPropertyUnit;
+    private Property currentProperty;
+    
+    private OccInspectedSpace currentInSpc;
+    private OccInspectedSpaceElement currentInSpcEl;
+    
     private OccSpaceTypeInspectionDirective selectedOccSpaceType;
     private List<OccSpace> browseSpaceList;
+    private List<User> inspectorPossibilityList;
+    private User selectedInspector;
+    
+    private String formNoteText;
+    private List<OccLocationDescriptor> locationList;
+    
+    
     
     /**
      * Creates a new instance of InspectionsBB
@@ -71,11 +94,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public OccInspectionBB() {
     }
     
-    
-    
-    
     @PostConstruct
     public void initBean(){
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
         browseSpaceList = new ArrayList<>();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         if(currentInspection == null){
@@ -88,6 +111,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 }
             }
         }
+        try {
+            currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID());
+            currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+        } catch (IntegrationException ex) {
+            Logger.getLogger(OccInspectionBB.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void browseSpaceType(){
@@ -97,6 +126,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
         
     }
+    
+    
     
     private void reloadCurrentInspection(){
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -137,23 +168,84 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
-    
+     
     /**
      * Called when the user clicks a command button inside the row of the
  OccInspection table to manage it
-     * @param ins 
+     * @param ev
      */
-    public void manageInspection(OccInspection ins){
-        setCurrentInspection(ins);
+    public void beginInspectionMetadataEdit(ActionEvent ev){
+        
         
     }
+    
+    
+    
+    
      /**
       * Edits the currentInspection 
       * @param e 
       */
-     public void editOccupancyInspection(ActionEvent e){
+     public void editOccupancyInspectionMetadata(ActionEvent e){
          
     }
+     
+     public void removeSpaceFromChecklist(OccInspectedSpace spc){
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+         oc.removeSpaceFromChecklist(spc, getSessionBean().getSessionUser(), currentInspection);
+     }
+     
+     public void recordComplianceWithElement(OccInspectedSpaceElement inSpcEl){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.recordComplianceWithInspectedElement(    inSpcEl,
+                                                        getSessionBean().getSessionUser(),
+                                                        currentInspection);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Compliance recorded for Space Element: " + inSpcEl.getInspectedSpaceElementID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                ex.getMessage() + inSpcEl.getInspectedSpaceElementID(), ""));
+        }
+     }
+     
+     public void removeComlianceWithElement(OccInspectedSpaceElement inSpcEl){
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.removeComplianceWithInspectedElement(    inSpcEl,
+                                                        getSessionBean().getSessionUser(),
+                                                        currentInspection);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Compliance removed for Space Element: " + inSpcEl.getInspectedSpaceElementID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                ex.getMessage() + inSpcEl.getInspectedSpaceElementID(), ""));
+        }
+     }
+     
+     public void editLocation(OccInspectedSpace inSpace){
+         
+         
+         
+     }
+     
+     
+     
+     
+     
+     
+     
+     public void addNoteToInspectedElement(OccInspectedSpaceElement spcEl){
+         
+         
+     }
+     
     
      /**
       * We can only delete one that was JUST made - OK if this doesn't get implemented
@@ -234,6 +326,132 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setBrowseSpaceList(List<OccSpace> browseSpaceList) {
         this.browseSpaceList = browseSpaceList;
+    }
+
+    /**
+     * @return the formNoteText
+     */
+    public String getFormNoteText() {
+        return formNoteText;
+    }
+
+    /**
+     * @param formNoteText the formNoteText to set
+     */
+    public void setFormNoteText(String formNoteText) {
+        this.formNoteText = formNoteText;
+    }
+
+    /**
+     * @return the locationList
+     */
+    public List<OccLocationDescriptor> getLocationList() {
+        return locationList;
+    }
+
+    /**
+     * @param locationList the locationList to set
+     */
+    public void setLocationList(List<OccLocationDescriptor> locationList) {
+        this.locationList = locationList;
+    }
+
+    /**
+     * @return the currentInSpcEl
+     */
+    public OccInspectedSpaceElement getCurrentInSpcEl() {
+        return currentInSpcEl;
+    }
+
+    /**
+     * @param currentInSpcEl the currentInSpcEl to set
+     */
+    public void setCurrentInSpcEl(OccInspectedSpaceElement currentInSpcEl) {
+        this.currentInSpcEl = currentInSpcEl;
+    }
+
+    /**
+     * @return the currentInSpc
+     */
+    public OccInspectedSpace getCurrentInSpc() {
+        return currentInSpc;
+    }
+
+    /**
+     * @param currentInSpc the currentInSpc to set
+     */
+    public void setCurrentInSpc(OccInspectedSpace currentInSpc) {
+        this.currentInSpc = currentInSpc;
+    }
+
+    /**
+     * @return the inspectorPossibilityList
+     */
+    public List<User> getInspectorPossibilityList() {
+        return inspectorPossibilityList;
+    }
+
+    /**
+     * @param inspectorPossibilityList the inspectorPossibilityList to set
+     */
+    public void setInspectorPossibilityList(List<User> inspectorPossibilityList) {
+        this.inspectorPossibilityList = inspectorPossibilityList;
+    }
+
+    /**
+     * @return the selectedInspector
+     */
+    public User getSelectedInspector() {
+        return selectedInspector;
+    }
+
+    /**
+     * @param selectedInspector the selectedInspector to set
+     */
+    public void setSelectedInspector(User selectedInspector) {
+        this.selectedInspector = selectedInspector;
+    }
+
+    /**
+     * @return the currentOccPeriod
+     */
+    public OccPeriod getCurrentOccPeriod() {
+        return currentOccPeriod;
+    }
+
+    /**
+     * @return the currentPropertyUnit
+     */
+    public PropertyUnitWithProp getCurrentPropertyUnit() {
+        return currentPropertyUnit;
+    }
+
+    /**
+     * @return the currentProperty
+     */
+    public Property getCurrentProperty() {
+        return currentProperty;
+    }
+
+    /**
+     * @param currentOccPeriod the currentOccPeriod to set
+     */
+    public void setCurrentOccPeriod(OccPeriod currentOccPeriod) {
+        this.currentOccPeriod = currentOccPeriod;
+    }
+
+    /**
+     * @param currentPropertyUnit the currentPropertyUnit to set
+     */
+    public void setCurrentPropertyUnit(PropertyUnitWithProp currentPropertyUnit) {
+        this.currentPropertyUnit = currentPropertyUnit;
+    }
+
+    /**
+     * @param currentProperty the currentProperty to set
+     */
+    public void setCurrentProperty(Property currentProperty) {
+        this.currentProperty = currentProperty;
     }
     
     
