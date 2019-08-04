@@ -1141,11 +1141,19 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return puwl;
     }
     
-    public PropertyUnitWithProp getPropertyUnitWithProp(int unitID, int propertyID) throws IntegrationException{
+    /**
+     * Handy utility method for grabbing a PropertyUnit with its own embedded Property
+     * for use in Inspection stuff and reports.
+     * 
+     * @param unitID
+     * @return
+     * @throws IntegrationException 
+     */
+    public PropertyUnitWithProp getPropertyUnitWithProp(int unitID) throws IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         
         PropertyUnitWithProp puwp = new PropertyUnitWithProp(getPropertyUnitByPropertyUnitID(unitID));
-        puwp.setProperty(pi.getProperty(propertyID));
+        puwp.setProperty(pi.getProperty(puwp.getPropertyID()));
         
         return puwp;
     }

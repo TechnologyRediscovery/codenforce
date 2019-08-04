@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +46,7 @@ public class OccInspection {
     private User passedInspectionCertifiedBy;
     private LocalDateTime passedInspectionTS;
     private LocalDateTime effectiveDateOfRecord;
+    protected java.util.Date effectiveDateOfRecordUtilDate;
     
     private int maxOccupantsAllowed;
     private int numBedrooms;
@@ -395,6 +397,27 @@ public class OccInspection {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the effectiveDateOfRecordUtilDate
+     */
+    public java.util.Date getEffectiveDateOfRecordUtilDate() {
+        if(effectiveDateOfRecord != null){
+            effectiveDateOfRecordUtilDate = java.util.Date.from(effectiveDateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        
+        return effectiveDateOfRecordUtilDate;
+    }
+
+    /**
+     * @param effectiveDateOfRecordUtilDate the effectiveDateOfRecordUtilDate to set
+     */
+    public void setEffectiveDateOfRecordUtilDate(java.util.Date effectiveDateOfRecordUtilDate) {
+        this.effectiveDateOfRecordUtilDate = effectiveDateOfRecordUtilDate;
+        if(effectiveDateOfRecordUtilDate != null){
+            effectiveDateOfRecord = effectiveDateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
     }
 
     

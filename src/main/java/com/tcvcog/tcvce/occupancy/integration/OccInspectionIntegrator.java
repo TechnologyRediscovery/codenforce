@@ -674,7 +674,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         inspectedEle.setLastInspectedBy(ui.getUser(rs.getInt("lastinspectedby_userid")));
 
         if(rs.getTimestamp("lastinspectedts") != null){
-            inspectedEle.setComplianceGrantedTS(rs.getTimestamp("lastinspectedts").toLocalDateTime());
+            inspectedEle.setLastInspectedTS(rs.getTimestamp("lastinspectedts").toLocalDateTime());
         }
         inspectedEle.setComplianceGrantedBy(ui.getUser(rs.getInt("compliancegrantedby_userid")));
         if(rs.getTimestamp("compliancegrantedts") != null){
@@ -867,35 +867,19 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      */
     public int recordInspectionOfSpaceElements(OccInspectedSpace inspSpace, OccInspection inspection) throws IntegrationException{
         int spaceInserts = 0;
-//        Iterator<OccSpaceElement> elementListIter = inspSpace.getSpaceElementList().iterator();
         Iterator<OccInspectedSpaceElement> inspectedElementListIterator = inspSpace.getInspectedElementList().iterator();
-//        while (elementListIter.hasNext()) {
-//            CodeElement templateElement = elementListIter.next();
-//            if(!inspSpace.getInspectedElementList().isEmpty()){
                 while(inspectedElementListIterator.hasNext()){
                     OccInspectedSpaceElement oie = inspectedElementListIterator.next();
                     if(oie.getInspectedSpaceElementID() != 0){
-                        updateInspectedSpaceElement(oie, inspSpace);
+                        updateInspectedSpaceElement(oie);
                     } else { 
                         spaceInserts++; 
                         insertInspectedSpaceElement(oie, inspSpace);
                     }
                 }
-//            }
-//         }
         return spaceInserts;
     }
     
-    private void insertInspectedSpaceElements(OccInspection inspection, OccInspectedSpace inspSpace) throws IntegrationException {
-        ListIterator<OccInspectedSpaceElement> iceIter = inspSpace.getInspectedElementList().listIterator();
-        OccInspectedSpaceElement inspElement;
-            while (iceIter.hasNext()) {
-                inspElement = iceIter.next();
-                insertInspectedSpaceElement(inspElement, inspSpace);
-            }
-    }
-    
-   
     
     private void insertInspectedSpaceElement(OccInspectedSpaceElement inspElement, OccInspectedSpace inSpace) throws IntegrationException{
         
@@ -962,7 +946,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 stmt.setNull(7, java.sql.Types.NULL);
             }
             
-            // DOESN"T HAVE IT
             stmt.setInt(8, inspElement.getSpaceElementID());
 
             stmt.setBoolean(9, inspElement.isRequired());
@@ -995,20 +978,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         
     }
     
-    private void updateInspectedSpaceElements(OccInspection inspection, OccInspectedSpace inspSpace) throws IntegrationException{
-        ListIterator<OccInspectedSpaceElement> iceIter = inspSpace.getInspectedElementList().listIterator();
-        OccInspectedSpaceElement inspElement;
-        int totalUpdates = 0;
-            while (iceIter.hasNext()) {
-                inspElement = iceIter.next();
-                updateInspectedSpaceElement(inspElement, inspSpace);
-            }
-    }
-    
-    
-    private void updateInspectedSpaceElement(OccInspectedSpaceElement inspElement, OccInspectedSpace inspSpace) throws IntegrationException{
+    public void updateInspectedSpaceElement(OccInspectedSpaceElement inspElement) throws IntegrationException{
         String sql =        "UPDATE public.occinspectedspaceelement\n" +
-                            "   SET notes=?, lastinspectedby_userid=?, lastinspectedts=now(), compliancegrantedby_userid=?, \n" +
+                            "   SET notes=?, lastinspectedby_userid=?, lastinspectedts=?, compliancegrantedby_userid=?, \n" +
                             "       compliancegrantedts=?, failureseverity_intensityclassid=? \n" +
                             " WHERE inspectedspaceelementid=?;";
         
@@ -1027,28 +999,31 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                     stmt.setNull(2, java.sql.Types.NULL);
                 }
                 
-                if(inspElement.getComplianceGrantedBy() != null){
-                    stmt.setInt(3, inspElement.getLastInspectedBy().getUserID());
+                if(inspElement.getLastInspectedTS()!= null){
+                    stmt.setTimestamp(3, java.sql.Timestamp.valueOf(inspElement.getLastInspectedTS()));
                 } else {
                     stmt.setNull(3, java.sql.Types.NULL);
                 }
+                if(inspElement.getComplianceGrantedBy() != null){
+                    stmt.setInt(4, inspElement.getLastInspectedBy().getUserID());
+                } else {
+                    stmt.setNull(5, java.sql.Types.NULL);
+                }
                 
                 if(inspElement.getComplianceGrantedTS() != null){
-                    stmt.setTimestamp(4, java.sql.Timestamp.valueOf(inspElement.getComplianceGrantedTS()));
+                    stmt.setTimestamp(5, java.sql.Timestamp.valueOf(inspElement.getComplianceGrantedTS()));
                 } else {
-                    stmt.setNull(4, java.sql.Types.NULL);
+                    stmt.setNull(5, java.sql.Types.NULL);
                 }
                 
                 // TODO: failure severity classes
-                stmt.setNull(5, java.sql.Types.NULL);
-                
-                stmt.setInt(6, inspSpace.getSpaceID());
+                stmt.setNull(6, java.sql.Types.NULL);
                 
                 stmt.executeUpdate();
             
             } catch (SQLException ex) {
                 System.out.println(ex.toString());
-                throw new IntegrationException("Unable to update inspected space in the DB, sorry!", ex);
+                throw new IntegrationException("Unable to update inspected space in the database, sorry!", ex);
 
             } finally{
                  if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

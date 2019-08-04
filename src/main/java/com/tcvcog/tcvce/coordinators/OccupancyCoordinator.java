@@ -253,4 +253,43 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         pr.setRequirementSatisfied(isRequirementSatisfied);
     }
+    
+    public void removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi){
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        
+        
+        
+    }
+    
+    public void recordComplianceWithInspectedElement(   OccInspectedSpaceElement oise, 
+                                                        User u, 
+                                                        OccInspection oi) throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        
+        oise.setComplianceGrantedBy(u);
+        oise.setComplianceGrantedTS(LocalDateTime.now());
+        oise.setLastInspectedTS(LocalDateTime.now());
+        oise.setLastInspectedBy(u);
+        
+        oii.updateInspectedSpaceElement(oise);
+        
+        
+    }
+    
+    public void removeComplianceWithInspectedElement(   OccInspectedSpaceElement oise, 
+                                                        User u, 
+                                                        OccInspection oi) throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        
+        oise.setComplianceGrantedBy(null);
+        oise.setComplianceGrantedTS(null);
+        oise.setLastInspectedTS(LocalDateTime.now());
+        oise.setLastInspectedBy(u);
+        
+        oii.updateInspectedSpaceElement(oise);
+        
+        
+    }
+    
+    
 }
