@@ -69,11 +69,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     
     public void editOccupancyInspectionFee(ActionEvent e){
         if(getSelectedOccupancyInspectionFee() != null){
-            setFormOccupancyInspectionFeeID(selectedOccupancyInspectionFee.getOccupancyInspectionFeeID());
-            setFormMuni(selectedOccupancyInspectionFee.getMuni());
-            setFormOccupancyInspectionFeeName(selectedOccupancyInspectionFee.getFeeName());
-            setFormOccupancyInspectionFeeAmount(selectedOccupancyInspectionFee.getFeeAmount());
-            //setFormOccupancyInspectionFeeNotes(selectedOccupancyInspectionFee.getOccupancyInspectionFeeNotes());
+            formOccupancyInspectionFeeID = selectedOccupancyInspectionFee.getOccupancyInspectionFeeID();
+            formMuni = selectedOccupancyInspectionFee.getMuni();
+            formOccupancyInspectionFeeName = selectedOccupancyInspectionFee.getFeeName();
+            formOccupancyInspectionFeeAmount = selectedOccupancyInspectionFee.getFeeAmount();
+            //formOccupancyInspectionFeeNotes = selectedOccupancyInspectionFee.getOccupancyInspectionFeeNotes();
             /*
             Have to figure out what to do w/ setting dates...
             setFormOccupancyInspectionFeeEffDate(formOccupancyInspectionFeeEffDate.toInstant()
