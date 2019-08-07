@@ -818,10 +818,10 @@ public class BackingBeanUtils implements Serializable{
 
     
     public ChoiceCoordinator getChoiceCoordinator(){
-        ChoiceCoordinator cc;;
+        ChoiceCoordinator cc;
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{ChoiceCoordinator}", ChoiceCoordinator.class);
+                .createValueExpression(context.getELContext(), "#{choiceCoordinator}", ChoiceCoordinator.class);
         cc = (ChoiceCoordinator) ve.getValue(context.getELContext());
         return cc;
     }

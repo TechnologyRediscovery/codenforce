@@ -23,18 +23,17 @@ import com.tcvcog.tcvce.entities.*;
  *
  * @author Eric C. Darsow
  */
-public enum OccPeriodStatus {
+public enum OccInspectionStatusEnum {
 
-    UNKNOWN("Unknown", 0, "occperstatus_unknown"),
-    KNOWN_UNAUTHORIZED("Known to be occupied without authorization", 0, "known_unauthorized"),
-    
-    AUTHORIZED("Pending review by code officer", 1, "occperstatus_unknown");
+    NOTINSPECTED("Not inspected", 0, "inspectionStatusIcon_notinspected"),
+    PASS("Passed", 1, "inspectionStatusIcon_pass"),
+    FAIL("Failed", 2, "inspectionStatusIcon_fail");
     
     private final String label;
     private final int phaseOrder;
     private final String iconPropertyLookup;
     
-    private OccPeriodStatus(String label, int ord, String iconLkup){
+    private OccInspectionStatusEnum(String label, int ord, String iconLkup){
         this.label = label;
         this.phaseOrder = ord;
         this.iconPropertyLookup = iconLkup;

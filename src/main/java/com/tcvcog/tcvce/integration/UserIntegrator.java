@@ -48,6 +48,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * Creates a new instance of UserIntegrator
      */
     public UserIntegrator() {
+        
     }
     
    

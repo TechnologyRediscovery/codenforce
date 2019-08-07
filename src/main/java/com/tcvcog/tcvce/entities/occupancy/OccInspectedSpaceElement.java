@@ -17,20 +17,27 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
  *
  * @author Eric C. Darsow
  */
-public class OccInspectedCodeElement implements Serializable{
+public class OccInspectedSpaceElement 
+        extends OccSpaceElement 
+        implements Serializable, Comparable<OccInspectedSpaceElement>{
     
-    private int inspectedElementID;
-    private CodeElement element;
+    private int inspectedSpaceElementID;
+    
+      // here lies the remains of composition replaced by inheritance! 2-AUG-19 on occbeta
+//    private OccSpaceElement spaceElement;
     
     private LocalDateTime lastInspectedTS;
     private User lastInspectedBy;
@@ -42,15 +49,47 @@ public class OccInspectedCodeElement implements Serializable{
     private User overrideRequiredFlag_thisElementNotInspectedBy;
     private String notes;
     
+    private List<Blob> blobList;
+    
     private OccLocationDescriptor location;
     
     private int failureIntensityClassID;
+    
+    
+    private OccInspectableStatus status;
+   
+    
+    /**
+     * For advanced checklist object management in the UI
+     * since the occinspectedspaceelement records know about entries in the
+     * inspectedspace table 
+     */
+    private int inspectedSpaceID;
 
     /**
-     * @return the inspectedElementID
+     * Constructor used when injecting these objects into the DB
+     * @param ele 
      */
-    public int getInspectedElementID() {
-        return inspectedElementID;
+    public OccInspectedSpaceElement(CodeElement ele) {
+        super(ele);
+    }
+    
+    /**
+     *
+     * @param ele
+     * @param spElID
+     */
+    public OccInspectedSpaceElement(CodeElement ele, int spElID){
+        super(ele);
+        this.spaceElementID = spElID;
+        
+    }
+
+    /**
+     * @return the inspectedSpaceElementID
+     */
+    public int getInspectedSpaceElementID() {
+        return inspectedSpaceElementID;
     }
 
     /**
@@ -68,10 +107,10 @@ public class OccInspectedCodeElement implements Serializable{
     }
 
     /**
-     * @param inspectedElementID the inspectedElementID to set
+     * @param inspectedSpaceElementID the inspectedSpaceElementID to set
      */
-    public void setInspectedElementID(int inspectedElementID) {
-        this.inspectedElementID = inspectedElementID;
+    public void setInspectedSpaceElementID(int inspectedSpaceElementID) {
+        this.inspectedSpaceElementID = inspectedSpaceElementID;
     }
 
     /**
@@ -88,20 +127,6 @@ public class OccInspectedCodeElement implements Serializable{
         this.notes = notes;
     }
 
-
-    /**
-     * @return the element
-     */
-    public CodeElement getElement() {
-        return element;
-    }
-
-    /**
-     * @param element the element to set
-     */
-    public void setElement(CodeElement element) {
-        this.element = element;
-    }
 
     /**
      * @return the lastInspectedTS
@@ -204,8 +229,7 @@ public class OccInspectedCodeElement implements Serializable{
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 97 * hash + this.inspectedElementID;
-        hash = 97 * hash + Objects.hashCode(this.element);
+        hash = 97 * hash + this.inspectedSpaceElementID;
         hash = 97 * hash + Objects.hashCode(this.lastInspectedTS);
         hash = 97 * hash + Objects.hashCode(this.lastInspectedBy);
         hash = 97 * hash + Objects.hashCode(this.complianceGrantedTS);
@@ -229,8 +253,15 @@ public class OccInspectedCodeElement implements Serializable{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final OccInspectedCodeElement other = (OccInspectedCodeElement) obj;
-        if (this.inspectedElementID != other.inspectedElementID) {
+        if (obj instanceof CodeElement){
+            if(this.elementID == ((CodeElement) obj).getElementID()){
+                return true;
+            } else {
+                return false;
+            }
+        }
+        final OccInspectedSpaceElement other = (OccInspectedSpaceElement) obj;
+        if (this.inspectedSpaceElementID != other.inspectedSpaceElementID) {
             return false;
         }
         if (this.required != other.required) {
@@ -240,9 +271,6 @@ public class OccInspectedCodeElement implements Serializable{
             return false;
         }
         if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.element, other.element)) {
             return false;
         }
         if (!Objects.equals(this.lastInspectedTS, other.lastInspectedTS)) {
@@ -265,7 +293,65 @@ public class OccInspectedCodeElement implements Serializable{
         }
         return true;
     }
-    
+
+   
+
+    /**
+     * @return the inspectedSpaceID
+     */
+    public int getInspectedSpaceID() {
+        return inspectedSpaceID;
+    }
+
+    /**
+     * @param inspectedSpaceID the inspectedSpaceID to set
+     */
+    public void setInspectedSpaceID(int inspectedSpaceID) {
+        this.inspectedSpaceID = inspectedSpaceID;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
+    }
+
+   
+
+    /**
+     * @return the status
+     */
+    public OccInspectableStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(OccInspectableStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public int compareTo(OccInspectedSpaceElement o) {
+        if(inspectedSpaceElementID > o.getInspectedSpaceElementID()){
+            return 1;
+        } else if(inspectedSpaceElementID == o.getInspectedSpaceElementID()){
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+   
     
     
 }

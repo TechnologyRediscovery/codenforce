@@ -32,23 +32,11 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
     protected String name;
     protected boolean required;
     protected String description;
-    protected List<CodeElement> elementList;
+    
+    protected List<OccSpaceElement> spaceElementList;
 
 
-    /**
-     * @return the elementList
-     */
-    public List<CodeElement> getElementList() {
-        return elementList;
-    }
-
-
-    /**
-     * @param elementList the elementList to set
-     */
-    public void setElementList(List<CodeElement> elementList) {
-        this.elementList = elementList;
-    }
+   
 
     /**
      * @return the spaceID
@@ -118,6 +106,20 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * @return the spaceElementList
+     */
+    public List<OccSpaceElement> getSpaceElementList() {
+        return spaceElementList;
+    }
+
+    /**
+     * @param spaceElementList the spaceElementList to set
+     */
+    public void setSpaceElementList(List<OccSpaceElement> spaceElementList) {
+        this.spaceElementList = spaceElementList;
     }
 
    

@@ -19,9 +19,11 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;    
@@ -1021,6 +1023,32 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
         refreshCurrentCase();
     }
+    
+    
+    public void makeChoice(Choice choice, Proposal p){
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        try {
+            if(p instanceof ProposalCECase){
+                currentCase = cc.processProposalEvaluation( p, 
+                                                            choice, 
+                                                            currentCase, 
+                                                            getSessionBean().getSessionUser());
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
+            }
+            
+        } catch (EventException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            ex.getMessage(), ""));
+        }
+    }    
+    
+    
+    
+    
+    
+    
 
     /**
      * @param currentCase the currentCase to set

@@ -37,6 +37,9 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.tcvcog.tcvce.entities.MunicipalityComplete;
+import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.entities.ProposalCECase;
+import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
  
 import java.io.File;
@@ -59,14 +62,16 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     private User user;
     private Municipality currentMuni;
-    private ArrayList<Municipality> muniList;
     private Municipality selectedMuni;
     
     private DashboardModel mainDash;
     
-    private ArrayList<EventCECaseCasePropBundle> timelineEventList;
-    private ArrayList<EventCECaseCasePropBundle> filteredEventWithCasePropList;
+    private List<EventCECaseCasePropBundle> timelineEventList;
+    private List<EventCECaseCasePropBundle> filteredEventWithCasePropList;
     private int timelineEventViewDateRange;
+    
+    private List<ProposalCECase> ceProposalList;
+    private List<ProposalOccPeriod> occProposalList;
     
  
     
@@ -89,15 +94,21 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         DashboardColumn column1 = new DefaultDashboardColumn();
         DashboardColumn column2 = new DefaultDashboardColumn();
         DashboardColumn column3 = new DefaultDashboardColumn();
-        column1.addWidget("cears");
-        column1.addWidget("cecases");
-        column2.addWidget("occ");
-        column2.addWidget("cetodo");
-        column3.addWidget("occtodo");
-        column3.addWidget("admintodo");
-        getMainDash().addColumn(column1);
-        getMainDash().addColumn(column2);
-        getMainDash().addColumn(column3);
+        column1.addWidget("dashpanel-ce-cears");
+        column1.addWidget("dashpanel-ce-cecases");
+        column1.addWidget("dashpanel-ce-todo");
+        
+        column2.addWidget("dashpanel-occ-periods");
+        column2.addWidget("dashpanel-occ-inspections");
+        column2.addWidget("dashpanel-persons");
+        column2.addWidget("dashpanel-properties");
+        
+        column3.addWidget("dashpanel-sys-events");
+        column3.addWidget("dashpanel-sys-switchmuni");
+
+        mainDash.addColumn(column1);
+        mainDash.addColumn(column2);
+        mainDash.addColumn(column3);
         
     }
     
@@ -164,36 +175,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         
         return "startInitiationProcess";
     }
-    
-    public String logout(){
-        FacesContext context = getFacesContext();
-        HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
-        
-        if (session != null) {
-
-//            session.removeAttribute("dBConnection");
-//            session.removeAttribute("codeCoordinator");
-//            session.removeAttribute("codeIntegrator");
-//            session.removeAttribute("municipalitygrator");
-//            session.removeAttribute("personIntegrator");
-//            session.removeAttribute("propertyIntegrator");
-//            session.removeAttribute("cEActionRequestIntegrator");
-//            session.removeAttribute("userIntegrator");
-            session.invalidate();
-
-            FacesContext facesContext = getFacesContext();
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Logout Successful", ""));
-            System.out.println("MissionControlBB.logout | Session invalidated");
-
-        } else {
-            FacesContext facesContext = getFacesContext();
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                "ERROR: Unable to invalidate session.", "Your system administrator has been notified."));
-        }
-        return "logoutSequenceComplete";
-    }
-
+   
     
 
     /**
@@ -231,12 +213,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
 
     
 
-    /**
-     * @param muniList the muniList to set
-     */
-    public void setMuniList(ArrayList<Municipality> muniList) {
-        this.muniList = muniList;
-    }
+    
 
     /**
      * @return the selectedMuni
@@ -255,7 +232,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the timelineEventList
      */
-    public ArrayList<EventCECaseCasePropBundle> getTimelineEventList() {
+    public List<EventCECaseCasePropBundle> getTimelineEventList() {
         EventIntegrator ei = getEventIntegrator();
         try {
             timelineEventList = 
@@ -314,6 +291,35 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      */
     public void setMainDash(DashboardModel mainDash) {
         this.mainDash = mainDash;
+    }
+
+
+    /**
+     * @return the occProposalList
+     */
+    public List<ProposalOccPeriod> getOccProposalList() {
+        return occProposalList;
+    }
+
+    /**
+     * @param occProposalList the occProposalList to set
+     */
+    public void setOccProposalList(List<ProposalOccPeriod> occProposalList) {
+        this.occProposalList = occProposalList;
+    }
+
+    /**
+     * @return the ceProposalList
+     */
+    public List<ProposalCECase> getCeProposalList() {
+        return ceProposalList;
+    }
+
+    /**
+     * @param ceProposalList the ceProposalList to set
+     */
+    public void setCeProposalList(List<ProposalCECase> ceProposalList) {
+        this.ceProposalList = ceProposalList;
     }
 
    

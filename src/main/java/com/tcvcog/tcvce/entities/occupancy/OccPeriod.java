@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private int periodID;
     private int propertyUnitID;
     private OccPeriodType type;
-    private OccPeriodStatus status;
+    private OccPeriodStatusEnum status;
     
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
@@ -491,14 +492,14 @@ public class OccPeriod extends EntityUtils implements Serializable{
     /**
      * @return the status
      */
-    public OccPeriodStatus getStatus() {
+    public OccPeriodStatusEnum getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(OccPeriodStatus status) {
+    public void setStatus(OccPeriodStatusEnum status) {
         this.status = status;
     }
      

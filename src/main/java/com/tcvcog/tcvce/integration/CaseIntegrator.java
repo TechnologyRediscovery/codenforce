@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CaseBase;
+import com.tcvcog.tcvce.entities.CECaseBase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.EventType;
@@ -376,7 +376,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public CaseBase getCECaseBare(int ceCaseID) throws IntegrationException, CaseLifecyleException{
+    public CECaseBase getCECaseBare(int ceCaseID) throws IntegrationException, CaseLifecyleException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
             "            login_userid, casename, casephase, originationdate, closingdate, \n" +
             "            creationtimestamp, notes, paccenabled, allowuplinkaccess \n" +
@@ -385,7 +385,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
         Connection con = null;
-        CaseBase c = null;
+        CECaseBase c = null;
         
         try {
             
@@ -445,7 +445,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                CaseBase baseCase = generateCECaseNoLists(rs);
+                CECaseBase baseCase = generateCECaseNoLists(rs);
                 cse = generateCECase(baseCase);
             }
             
@@ -466,7 +466,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         else return cse;
     }
     
-    public CECase generateCECase(CaseBase caseBare) throws SQLException, IntegrationException{
+    public CECase generateCECase(CECaseBase caseBare) throws SQLException, IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         CitationIntegrator ci = getCitationIntegrator();
         ViolationIntegrator cvi = getCodeViolationIntegrator();
@@ -484,7 +484,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
-     public CaseBase generateCECaseNoLists(ResultSet rs) throws SQLException, IntegrationException{
+     public CECaseBase generateCECaseNoLists(ResultSet rs) throws SQLException, IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
@@ -494,7 +494,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             throw new IntegrationException("cannot generate case with ID 0");
         }
         
-        CaseBase c = new CaseBase();
+        CECaseBase c = new CECaseBase();
 
         c.setCaseID(ceCaseID);
         c.setPublicControlCode(rs.getInt("cecasepubliccc"));

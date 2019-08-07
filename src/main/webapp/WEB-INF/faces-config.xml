@@ -1123,6 +1123,7 @@
             <from-view-id>/restricted/*</from-view-id>
             <from-outcome>inspection</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/inspection.xhtml</to-view-id>
+            <redirect />
         </navigation-case>
     </navigation-rule>
     
@@ -1218,6 +1219,7 @@
         <navigation-case>
             <from-outcome>occInspections</from-outcome>
             <to-view-id>/restricted/cogview/inspections.xhtml</to-view-id>
+            
         </navigation-case>
         
         <navigation-case>
@@ -1599,6 +1601,12 @@
     <managed-bean>
         <managed-bean-name>occPeriodsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Handles client-side actions related to choice display and selection</description>
+        <managed-bean-name>choiceBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ChoiceBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

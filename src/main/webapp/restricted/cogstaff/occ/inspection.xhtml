@@ -37,126 +37,423 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                             <div class="list-column">
 
-                                <h2>Inspection template</h2>
 
-                                <h:form id="form-inspection-messages-global">
+                                <h:form id="form-messages-global">
 
-                                    <h:messages id="messages-inspection-global" globalOnly="true" showDetail="true" showSummary="true"
+                                    <h:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true"
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                     </h:messages>
                                 </h:form>
 
 
 
-                                <h1>Occupancy Inspection ID:<h:outputText value="#{sessionBean.sessionOccInspection.inspectionID}"/></h1>
-                                <h:form id="form-inspection-template">
+                                <h:form id="insp-form-insp">
+                                    
 
+                                    <h1>
+                                        <h:outputText styleClass="ui-label-inline" value="Inspection at "  />
+                                        <h:outputText styleClass="data-text" value="#{occInspectionBB.currentPropertyUnit.property.address} (#{occInspectionBB.currentPropertyUnit.property.muni.muniName})"  />
+                                    </h1>
+                                    <h:outputText value="Unit No: "  
+                                                  rendered="#{!occInspectionBB.currentPropertyUnit.unitNumber != '-1'}"
+                                                  styleClass="ui-label-inline" />
+                                    <h:outputText value="#{occInspectionBB.currentPropertyUnit.unitNumber}"  
+                                                  rendered="#{!occInspectionBB.currentPropertyUnit.unitNumber != '-1'}"
+                                                  styleClass="data-text"/>
+                                    
+                                    <p:spacer height="3px" />
+                                    <h:outputText styleClass="ui-label-inline" value="Occupancy Period: "  />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(occInspectionBB.currentOccPeriod.startDate)}" />
+                                    <h:outputText styleClass="ui-label-inline" value=" to "  />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(occInspectionBB.currentOccPeriod.endDate)}" />
+                                    
+                                    <h:outputText styleClass="ui-label-inline" value="Inspector: " />
+                                     <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.inspector.person.firstName} 
+                                                    #{occInspectionBB.currentInspection.inspector.person.lastName}
+                                                    (User ID:#{occInspectionBB.currentInspection.inspector.userID})" />
+                                    
+                                    <p:spacer height="3px" />
+                                    <h:outputText styleClass="ui-label-inline" value="Notes:" />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.notes}" escape="false" />
 
+                                    <p:spacer height="3px" />
+                                    
+                                    <p:commandButton   id="insp-insp-button-configinsp"
+                                                           ajax="true" 
+                                                           actionListener="#{occInspectionBB.beginInspectionMetadataEdit}"
+                                                           rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                           onclick="PF('var-dialog-inspectionmetadata').show()"
+                                                           value="configure inspection"  
+                                                           icon="fa fa-gears"
+                                                           update="form-dialog-inspectionmetadata"/>
+                                </h:form>
+                                
+                                <h:form id="insp-form-proposals">
+                                    <h2>Occupancy tasks</h2>
+                                    
+                                    <p:dataScroller id="insp-proposals-proposalscroller"
+                                                    var="proposal"
+                                                    widgetVar="insp-proposals-proposalscroller-var"
+                                                    value="#{occInspectionBB.currentOccPeriod.proposalList}"
+                                                    rowIndexVar="#{proposal.proposalID}">
+                                        
+                                        <h2 class="insp-proposal-prophead">
+                                            <h:outputText value="#{proposal.directive.title}" />
+                                        </h2>
 
-                                    <p:tabView id="tabview-inspection-templateviews">
-                                        <p:tab  id="tab-activelookup"
-                                                title="tab-active-lookup">
+                                        <h:outputText value="#{proposal.directive.description}" />
 
-                                            <p:selectOneListbox id="listbox-occspacetype" required="true" value="#{occInspectionBB.selectedOccSpaceType}" tabindex="1">
-                                                <p:ajax update="scroller-template-spacetypelist-spacelist" 
-                                                        immediate="true"/> 
-                                                <f:converter converterId="occSpaceTypeConverter" />
-                                                <f:selectItems value="#{occInspectionBB.currentInspection.checklistTemplate.occSpaceTypeTemplateList}" 
-                                                               var="st" itemLabel="#{st.spaceTypeTitle}" />
-                                            </p:selectOneListbox>
-
-                                            <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                            <p:dataScroller
-                                                id="scroller-template-spacetypelist-spacelist"
-                                                widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist"
-                                                var="space"
-                                                value="#{occInspectionBB.browseSpaceList}"
-                                                rowIndexVar="#{space.spaceID}">
-
-                                                <div class="outlinedBox">
-
-
-                                                    <div class="datum">
-                                                        <h:outputText styleClass="ui-label-inline" value="Space name: " />
-                                                        <h:outputText styleClass="data-text" value="#{space.name}" />
-
-                                                        <p:commandButton       id="button-occperiodtable-editperiod"
-                                                                               ajax="true" 
-                                                                               actionListener="#{occInspectionBB.addSpaceToChecklist(space)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               value="inspect this space"  
-                                                                               icon="fa fa-open"
-                                                                               update="form-inspection-messages-inspecteditems"/>
-
-
-
-                                                    </div>
-
-                                                    <p:dataScroller
-                                                        id="scroller-template-spacetypelist-spacelist-elementlist"
-                                                        widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist-elementlist"
-                                                        var="codeElement"
-                                                        value="#{space.elementList}"
-                                                        rowIndexVar="#{codeElement.elementID}">
-
-                                                        <div class="outlinedBox">
-
-                                                            <h:outputLabel styleClass="bold" value="Ordindance: "  />
-                                                            <p:spacer height="5px" />
-                                                            <h:outputText  value="&#167;#{codeElement.ordSecNum}:" />
-                                                            <h:outputText  value="#{codeElement.ordSecTitle}; " />
-                                                            <h:outputText  value="&#167;&#167;#{codeElement.ordSubSecNum} " />
-                                                            <h:outputText  value="#{codeElement.ordSubSecTitle}" />
-                                                            <p:spacer height="2px" />
-
-                                                        </div>
-                                                    </p:dataScroller>
-                                                </div>
-                                            </p:dataScroller>
-
-
-                                        </p:tab>
-
-
-                                        <p:tab  id="tab-fulllisting"
-                                                title="tab-full-template">
-
-                                            <h3>Space types in this checklist</h3>
-
-                                            <p:dataScroller
-                                                id="scroller-template-spacetypelist"
-                                                widgetVar="var-scroller-inspectiontemplate-spacetypelist"
-                                                var="spaceType"
-                                                value="#{occInspectionBB.currentInspection.checklistTemplate.occSpaceTypeTemplateList}"
-                                                rowIndexVar="#{spaceType.spaceTypeID}">
-
-                                                <h2><h:outputText styleClass="data-text" value="#{spaceType.spaceTypeTitle}" /></h2>
-                                                <div class="datum">
-                                                    <h:outputText styleClass="ui-label-inline" value="Type: " />
-                                                    <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeTitle}" />
+                                        <p:panel id="insp-proposal-panel-details"
+                                                 toggleable="true"
+                                                 collapsed="true"
+                                                 header="proposal advanced details">
+                                            <h:panelGrid    id="violation-ord-fulltext-pg" 
+                                                            columns="2" 
+                                                            columnClasses="gridTD, gridTD" 
+                                                            rendered="true">
+                                                <h:panelGroup>
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Proposal ID: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.proposalID}" />
 
                                                     <p:spacer height="5px" />
 
-                                                    <h:outputText styleClass="ui-label-inline" value="Description: " />
-                                                    <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeDescription}" />
-                                                </div>
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Directive ID:"  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.directiveID}" />
 
-                                                <div class="datum">
-                                                    <h:outputText styleClass="ui-label-inline" value="Type ID:" />
-                                                    <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeID}" />
-                                                </div>
+                                                    <p:spacer height="5px" />
 
-                                                <div class="outlinedBox">
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Generating event ID: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.generatingEventID}" />
 
-                                                    <h4>Spaces in this type</h4>
+                                                </h:panelGroup>
+                                                
+                                                <h:panelGroup>
+                                                        
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Initiator: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.initiator.person.lastName}" />
+                                                    <h:outputText value=" (ID: " styleClass="data-text" />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.initiator.userID}" />
+                                                    <h:outputText value=")" styleClass="data-text" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Responder intended: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.responderIntended.person.lastName}" />
+                                                    <h:outputText value=" (ID: " styleClass="data-text" />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.responderIntended.userID}" />
+                                                    <h:outputText value=")" styleClass="data-text" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Responder actual: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.responderActual.person.lastName}" />
+                                                    <h:outputText value=" (ID: " styleClass="data-text" />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.responderActual.userID}" />
+                                                    <h:outputText value=")" styleClass="data-text" />
+
+                                                    
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Activates on: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{occInspectionBB.getPrettyDate(proposal.activatesOn)}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Expires on: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{occInspectionBB.getPrettyDate(proposal.expiresOn)}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Response timestamp: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{occInspectionBB.getPrettyDate(proposal.responseTimestamp)}" />
+                                                </h:panelGroup>
+                                                
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Active : "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.active}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Hidden: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.hidden}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Rejected: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.proposalRejected}" />
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Order: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.order}" />
+                                                </h:panelGroup>
+                                                
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Generating event ID: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty proposal.generatingEvent) ? proposal.generatingEvent.eventID : 'no event'}" />
+
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Response event ID: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{!(empty proposal.responseEvent) ? proposal.responseEvent.eventID : 'no event'}" />
+                                                </h:panelGroup>
+                                                
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="Notes: "  />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  escape="false"
+                                                                  value="#{proposal.notes}" />
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+
+                                                    <h:outputText   styleClass="ui-label-inline" 
+                                                                    value="directPropToDefaultMuniCEO: " />
+                                                    <h:outputText   styleClass="data-text" 
+                                                                    value="#{proposal.directive.directPropToDefaultMuniCEO}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="directPropToDefaultMuniStaffer: " />
+                                                    
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.directPropToDefaultMuniStaffer}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="directPropToDeveloper: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.directPropToDeveloper}" />
+                                                    
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="executeChoiceIfLoneWolf: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.executeChoiceIfLoneWolf}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="inactivateGeneratingEventOnEvaluation: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.inactivateGeneratingEventOnEvaluation}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="maintainRelativeDateWindow: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.maintainRelativeDateWindow}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="instantiateMultipleOnBOB: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.instantiateMultipleOnBOB}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="applyToClosedBOBs: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.applyToClosedBOBs}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="autoInactiveOnBOBClose: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.autoInactiveOnBOBClose}" />
+
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="autoInactiveOnGenEventInactivation: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.autoInactiveOnGenEventInactivation}" />
+
+
+                                                    
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    
+                                                    
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="minimumRequiredUserRankToView: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.minimumRequiredUserRankToView}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="minimumRequiredUserRankToEvaluate: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.minimumRequiredUserRankToEvaluate}" />
+                                                    
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="active: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.active}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="hidden: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.hidden}" />
+                                                    
+                                                    <p:spacer height="5px" />
+
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="relativeorder: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.relativeorder}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="directPropToMuniSysAdmin: " />
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="#{proposal.directive.directPropToMuniSysAdmin}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="requiredEvaluationForBOBClose: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.requiredEvaluationForBOBClose}" />
+                                                    
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="forceHidePrecedingProps: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.forceHidePrecedingProps}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="forceHideTrailingProps: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.forceHideTrailingProps}" />
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                  value="refuseToBeHidden: " />
+                                                    <h:outputText styleClass="data-text" 
+                                                                  value="#{proposal.directive.refuseToBeHidden}" />
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:dataScroller id="insp-proposals-choicescroller"
+                                                        var="choice"
+                                                        widgetVar="insp-proposals-choicescroller-var"
+                                                        value="#{proposal.directive.choiceList}"
+                                                        rowIndexVar="#{choice.choiceID}">
+                                            
+                                            
+                                               
+                                            <h2 class="insp-proposal-choicehead">
+                                                <h:outputText value="#{choice.title}" />
+                                            </h2>
+                                                <h:outputText value="#{choice.description}" />
+                                                <p:spacer height="5px"/>
+                                                <p:commandButton    id="insp-proposal-choice-button-choose"
+                                                                    ajax="true" 
+                                                                    actionListener="#{occInspectionBB.makeChoice(choice, proposal)}"
+                                                                    disabled="#{canChoose}"
+                                                                    value="choose"  
+                                                                    icon="#{choice.icon.fontAwesome}"
+                                                                    update="insp-form-proposals"/>
+                                                
+                                                <p:panel id="insp-proposal-choice-panel-details"
+                                                         toggleable="true"
+                                                         collapsed="true"
+                                                         header="choice details">
+                                                    
+                                                             
+                                                </p:panel>
+                                        </p:dataScroller>
+                                        
+                                    
+                                    
+                                    </p:dataScroller>
+                                    
+                                    
+                                    
+                                </h:form>
+                                
+
+                                    <f:subview id="insp-subview-inspectionbuilder"
+                                               rendered="#{empty occInspectionBB.currentInspection.passedInspectionTS}">
+                                        <h:form id="form-template">
+                                        
+                                            <h2>Inspection builder</h2>
+
+                                            <p:tabView id="tabview-templateviews">
+                                                <p:tab  id="tab-activelookup"
+                                                        title="responsive picker">
+
+                                                    <p:selectOneListbox id="listbox-occspacetype" required="true" value="#{occInspectionBB.selectedOccSpaceType}" tabindex="1">
+                                                        <p:ajax update="scroller-template-spacetypelist-spacelist"
+                                                                listener="#{occInspectionBB.browseSpaceType}"
+                                                                immediate="false"/> 
+                                                        <f:converter converterId="occSpaceTypeConverter" />
+                                                        <f:selectItems value="#{occInspectionBB.currentInspection.checklistTemplate.occSpaceTypeTemplateList}" 
+                                                                       var="st" itemLabel="#{st.spaceTypeTitle}" />
+                                                    </p:selectOneListbox>
+
+                                                    <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
 
                                                     <p:dataScroller
                                                         id="scroller-template-spacetypelist-spacelist"
                                                         widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist"
                                                         var="space"
-                                                        value="#{spaceType.spaceList}"
+                                                        value="#{occInspectionBB.browseSpaceList}"
                                                         rowIndexVar="#{space.spaceID}">
 
                                                         <div class="outlinedBox">
@@ -166,68 +463,161 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 <h:outputText styleClass="ui-label-inline" value="Space name: " />
                                                                 <h:outputText styleClass="data-text" value="#{space.name}" />
 
-                                                                <p:spacer height="5px" />
+                                                                <p:commandButton       id="button-inspectspace"
+                                                                                       ajax="true" 
+                                                                                       actionListener="#{occInspectionBB.addSpaceToChecklist(space)}"
+                                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                       value="inspect this space"  
+                                                                                       icon="fa fa-open"
+                                                                                       update="form-inspecteditems
+                                                                                       form-inspecteditems-messages
+                                                                                       insp-form-insp"/>
 
-                                                                <h:outputText styleClass="ui-label-inline" value="Description: " />
-                                                                <h:outputText styleClass="data-text" value="#{space.description}" />
+
+
                                                             </div>
 
-                                                            <div class="datum">
-                                                                <h:outputText styleClass="ui-label-inline" value="Space ID:" />
-                                                                <h:outputText styleClass="data-text" value="#{space.spaceID}" />
-                                                            </div>
                                                             <p:dataScroller
                                                                 id="scroller-template-spacetypelist-spacelist-elementlist"
                                                                 widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist-elementlist"
                                                                 var="codeElement"
-                                                                value="#{space.elementList}"
+                                                                value="#{space.spaceElementList}"
                                                                 rowIndexVar="#{codeElement.elementID}">
 
                                                                 <div class="outlinedBox">
 
                                                                     <h:outputLabel styleClass="bold" value="Ordindance: "  />
                                                                     <p:spacer height="5px" />
-                                                                    <h:outputLabel value="#{codeElement.source.sourceName} 
-                                                                                   (#{codeElement.source.sourceYear}), " />
-                                                                    <h:outputText  value="Ch. #{codeElement.ordchapterNo}:" />
-                                                                    <h:outputText  value="#{codeElement.ordchapterTitle}" />
-                                                                    <p:spacer height="2px" />
-
                                                                     <h:outputText  value="&#167;#{codeElement.ordSecNum}:" />
                                                                     <h:outputText  value="#{codeElement.ordSecTitle}; " />
                                                                     <h:outputText  value="&#167;&#167;#{codeElement.ordSubSecNum} " />
                                                                     <h:outputText  value="#{codeElement.ordSubSecTitle}" />
-
                                                                     <p:spacer height="2px" />
 
-                                                                    <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTD" 
-                                                                                    rendered="true">
-                                                                        <h:panelGroup>
-                                                                            <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
-                                                                            <div class="ord-text">
-                                                                                <h:outputText value="#{codeElement.ordTechnicalText}"/>
-                                                                            </div>
-                                                                        </h:panelGroup>
-
-                                                                    </h:panelGrid>
                                                                 </div>
                                                             </p:dataScroller>
                                                         </div>
                                                     </p:dataScroller>
-                                                </div> 
-                                            </p:dataScroller>
-                                        </p:tab>
-                                    </p:tabView>
-                                </h:form>
+
+
+                                                </p:tab>
+
+
+                                                <p:tab  id="tab-fulllisting"
+                                                        title="static list">
+
+                                                    <h3>Space types in this checklist</h3>
+
+                                                    <p:dataScroller
+                                                        id="scroller-template-spacetypelist"
+                                                        widgetVar="var-scroller-inspectiontemplate-spacetypelist"
+                                                        var="spaceType"
+                                                        value="#{occInspectionBB.currentInspection.checklistTemplate.occSpaceTypeTemplateList}"
+                                                        rowIndexVar="#{spaceType.spaceTypeID}">
+
+                                                        <h2><h:outputText styleClass="data-text" value="#{spaceType.spaceTypeTitle}" /></h2>
+                                                        <div class="datum">
+                                                            <h:outputText styleClass="ui-label-inline" value="Type: " />
+                                                            <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeTitle}" />
+
+                                                            <p:spacer height="5px" />
+
+                                                            <h:outputText styleClass="ui-label-inline" value="Description: " />
+                                                            <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeDescription}" />
+                                                        </div>
+
+                                                        <div class="datum">
+                                                            <h:outputText styleClass="ui-label-inline" value="Type ID:" />
+                                                            <h:outputText styleClass="data-text" value="#{spaceType.spaceTypeID}" />
+                                                        </div>
+
+                                                        <div class="outlinedBox">
+
+                                                            <h4>Spaces in this type</h4>
+
+                                                            <p:dataScroller
+                                                                id="scroller-template-spacetypelist-spacelist"
+                                                                widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist"
+                                                                var="space"
+                                                                value="#{spaceType.spaceList}"
+                                                                rowIndexVar="#{space.spaceID}">
+
+                                                                <div class="outlinedBox">
+
+
+                                                                    <div class="datum">
+                                                                        <h:outputText styleClass="ui-label-inline" value="Space name: " />
+                                                                        <h:outputText styleClass="data-text" value="#{space.name}" />
+
+                                                                        <p:spacer height="5px" />
+
+                                                                        <h:outputText styleClass="ui-label-inline" value="Description: " />
+                                                                        <h:outputText styleClass="data-text" value="#{space.description}" />
+                                                                    </div>
+
+                                                                    <div class="datum">
+                                                                        <h:outputText styleClass="ui-label-inline" value="Space ID:" />
+                                                                        <h:outputText styleClass="data-text" value="#{space.spaceID}" />
+                                                                    </div>
+                                                                    <p:dataScroller
+                                                                        id="scroller-template-spacetypelist-spacelist-elementlist"
+                                                                        widgetVar="var-scroller-inspectiontemplate-spacetypelist-spacelist-elementlist"
+                                                                        var="codeElement"
+                                                                        value="#{space.spaceElementList}"
+                                                                        rowIndexVar="#{codeElement.elementID}">
+
+                                                                        <div class="outlinedBox">
+
+                                                                            <h:outputLabel styleClass="bold" value="Ordindance: "  />
+                                                                            <p:spacer height="5px" />
+                                                                            <h:outputLabel value="#{codeElement.source.sourceName} 
+                                                                                           (#{codeElement.source.sourceYear}), " />
+                                                                            <h:outputText  value="Ch. #{codeElement.ordchapterNo}:" />
+                                                                            <h:outputText  value="#{codeElement.ordchapterTitle}" />
+                                                                            <p:spacer height="2px" />
+
+                                                                            <h:outputText  value="&#167;#{codeElement.ordSecNum}:" />
+                                                                            <h:outputText  value="#{codeElement.ordSecTitle}; " />
+                                                                            <h:outputText  value="&#167;&#167;#{codeElement.ordSubSecNum} " />
+                                                                            <h:outputText  value="#{codeElement.ordSubSecTitle}" />
+
+                                                                            <p:spacer height="2px" />
+
+                                                                            <h:panelGrid    id="violation-ord-fulltext-pg" 
+                                                                                            columns="1" 
+                                                                                            columnClasses="gridTD" 
+                                                                                            rendered="true">
+                                                                                <h:panelGroup>
+                                                                                    <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
+                                                                                    <div class="ord-text">
+                                                                                        <h:outputText value="#{codeElement.ordTechnicalText}"/>
+                                                                                    </div>
+                                                                                </h:panelGroup>
+
+                                                                            </h:panelGrid>
+                                                                        </div>
+                                                                    </p:dataScroller>
+                                                                </div>
+                                                            </p:dataScroller>
+                                                        </div> 
+                                                    </p:dataScroller>
+                                                </p:tab>
+                                            </p:tabView>
+                                    </h:form>
+                                </f:subview>
                             </div>
+                                
                             <div id="inspection-inspectedelementscol" class="object-column">
                                 <h2>Inspected items</h2>
 
-                                <h:form id="form-inspection-messages-inspecteditems">
+                                <h:form id="form-inspecteditems-messages">
 
-                                    <h:messages id="messages-inspection-inspecteditems" globalOnly="true" showDetail="true" showSummary="true"
+
+                                    <h:messages id="messages-inspecteditems" globalOnly="true" showDetail="true" showSummary="true"
                                                 warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                     </h:messages>
+                                </h:form>
+                                <h:form id="form-inspecteditems">
 
                                     <p:dataScroller
                                         id="scroller-inspectedspacelist"
@@ -236,53 +626,420 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         value="#{occInspectionBB.currentInspection.inspectedSpaceList}"
                                         rowIndexVar="#{inspace.spaceID}">
 
-                                        <div class="outlinedBox">
-                                            <h3>Location :<h:outputText styleClass="data-text" value="#{inspace.name}" /></h3>
+                                        <div class="insp-inspace-header">
+                                            <h:outputText styleClass="data-text" value="#{inspace.name}" />
+                                        </div>
+                                        
+                                         <p:commandButton   id="insp-inspectedspace-button-inspacesettings"
+                                                            ajax="true" 
+                                                            value="configure inspected space"
+                                                            disabled="true"
+                                                            onclick="PF('search-params-dialog').show()"
+                                                            icon="fa fa-gears"/>
+                                         
+                                        <p:commandButton   id="insp-inspectedspace-button-editlocation"
+                                                           ajax="true" 
+                                                           actionListener="#{occInspectionBB.editLocation(inspace)}"
+                                                           rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                           onclick="PF('var-dialog-editlocation').show()"
+                                                           value="edit location"  
+                                                           disabled="true"
+                                                           icon="fa fa-map-pin"
+                                                           update="form-inspecteditems
+                                                           form-inspecteditems-messages
+                                                           "/>
+                                        <p:commandButton   id="insp-inspectedspace-button-removespace"
+                                                           ajax="true" 
+                                                           actionListener="#{occInspectionBB.removeSpaceFromChecklist(inspace)}"
+                                                           rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                           value="remove space"  
+                                                           icon="fa fa-times"
+                                                           update="form-inspecteditems
+                                                           form-inspecteditems-messages
+                                                           "/>
+
                                             <p:dataScroller
                                                 id="scroller-inspectedspacelist-elementlist"
                                                 widgetVar="var-scroller-inspectedspacelist-elementlist"
                                                 var="inelement"
                                                 value="#{inspace.inspectedElementList}"
-                                                rowIndexVar="#{inelement.inspectedElementID}">
-                                                <div class="datum">
-                                                    <h:outputText styleClass="ui-label-inline" value="Code element: " />
-                                                    <h:outputText styleClass="data-text"   value="&#167;#{inelement.ordSecNum}:" />
+                                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
+
+                                                        
+                                                <div class="insp-inelement-header">
+                                                    
                                                     <h:outputText  styleClass="data-text" value="#{inelement.ordSecTitle}; " />
-                                                    <h:outputText  styleClass="data-text" value="&#167;&#167;#{inelement.ordSubSecNum} " />
                                                     <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecTitle}" />
-
-                                                    <p:spacer height="5px" />
-
-                                                    <h:outputText styleClass="ui-label-inline" value="Last inspected by: " />
-                                                    <h:outputText  styleClass="data-text" value="#{inelement.lastInspectedBy.person.firstName} #{inelement.lastInspectedBy.person.firstName}" />
-                                                    <h:outputText styleClass="ui-label-inline" value=" on " />
-                                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(inelement.lastInspectedTS)}" />
+                                                    <h:outputText  styleClass="data-text" value=" &#167;" />
+                                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecNum}" />
                                                 </div>
+                                                        
+                                                        <h:panelGrid    id="insp-inspectedspace-panelgrid-inspelement" 
+                                                                        columns="3" 
+                                                                        cellpadding="10" footerClass="gridFooter"
+                                                                        columnClasses="gridTD, gridTD, gridTD" 
+                                                                        rendered="true">
+                                                            <h:panelGroup>
 
-                                                <div class="datum">
+                                                                <div class="status-display-container">
+                                                                    <div class="status-display-icon-container">
+                                                                        <i class="material-icons status-display-icon-i #{inelement.status.icon.styleClass}">
+                                                                            <h:outputText id="status-display-icon-ot" value="#{inelement.status.icon.materialIcon}"/>
+                                                                        </i>
+                                                                    </div>
+                                                                </div>
+                                                                    <p:spacer height="5px" />
+                                                                    <h:outputLabel styleClass="#{inelement.status.icon.styleClass}" 
+                                                                                   value="#{inelement.status.statusEnum.label}" />
+                                                            </h:panelGroup>      
+                                                            
+                                                            <h:panelGroup>
 
-                                                    <h:outputText styleClass="ui-label-inline" value="Compliance granted by: " />
-                                                    <h:outputText  styleClass="data-text" value="#{inelement.complianceGrantedBy.person.firstName} #{inelement.complianceGrantedBy.person.firstName}" />
-                                                    <h:outputText styleClass="ui-label-inline" value=" on " />
-                                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(inelement.complianceGrantedTS)}" />
+                                                                <f:subview      id="insp-inspectedspace-subview-compliancedata"
+                                                                                rendered="#{!(empty inelement.complianceGrantedTS)}">
 
-                                                    <p:spacer height="5px" />
+                                                                    <h:outputText styleClass="ui-label-inline #{inelement.status.icon.styleClass}" value="Compliance granted by: " />
+                                                                    <h:outputText  styleClass="data-text #{inelement.status.icon.styleClass}" value="#{inelement.complianceGrantedBy.person.firstName} #{inelement.complianceGrantedBy.person.lastName}" />
+                                                                    <h:outputText styleClass="ui-label-inline #{inelement.status.icon.styleClass}" value=" on " />
+                                                                    <h:outputText  styleClass="data-text #{inelement.status.icon.styleClass}" value="#{occInspectionBB.getPrettyDate(inelement.complianceGrantedTS)}" />
+                                                                    <p:spacer height="5px" />
 
-                                                    <h:outputText styleClass="ui-label-inline" value="Notes: " />
-                                                    <h:outputText  styleClass="data-text" value="#{inelement.notes}" />
-                                                </div>
+                                                                </f:subview>
+
+                                                                <h:outputText styleClass="ui-label-inline" value="Last inspected by: " />
+                                                                <h:outputText  styleClass="data-text" value="#{inelement.lastInspectedBy.person.firstName} #{inelement.lastInspectedBy.person.lastName}" />
+                                                                <h:outputText styleClass="ui-label-inline" value=" on " />
+                                                                <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(inelement.lastInspectedTS)}" />
+
+                                                                <p:spacer height="5px" />
+                                                                
+                                                                <h:outputText styleClass="ui-label-inline" value="Notes: " />
+                                                                <h:outputText  styleClass="data-text" value="#{inelement.notes}" />
+                                                                <p:spacer height="5px" />
+                                                                
+                                                                <p:commandButton   id="insp-checklist-scroller-inEle-button-notes"
+                                                                                   ajax="true" 
+                                                                                   actionListener="#{occInspectionBB.addNoteToInspectedElement(inelement)}"
+                                                                                   rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                   value="add note"  
+                                                                                   icon="fa fa-edit"
+                                                                                   update="form-inspecteditems
+                                                                                   form-inspecteditems-messages
+                                                                                   "/>
+                                                                
+                                                                <p:commandButton   id="insp-checklist-scroller-inEle-button-blobs"
+                                                                                   ajax="true" 
+                                                                                   disabled="true"
+                                                                                   actionListener="#{occInspectionBB.addNoteToInspectedElement(inelement)}"
+                                                                                   rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                   value="images"  
+                                                                                   icon="fa fa-photo"
+                                                                                   update="insp-dialog-blobs-form"/>
+                                                                
+                                                            </h:panelGroup>
+                                                            <h:panelGroup>
+                                                                
+                                                                <f:subview id="insp-checklist-inelescroller-subview-compliance"
+                                                                            rendered="#{empty inelement.complianceGrantedTS}">
+                                                                    
+                                                                    <p:commandButton   id="insp-checklist-inelescroller-button-compliance"
+                                                                                    ajax="true" 
+                                                                                    actionListener="#{occInspectionBB.recordComplianceWithElement(inelement)}"
+                                                                                    rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                    disabled="#{!(empty inelement.complianceGrantedTS)}"
+                                                                                    value="grant compliance"  
+                                                                                    icon="fa fa-check-square-o"
+                                                                                    update="form-inspecteditems
+                                                                                    form-inspecteditems-messages
+                                                                                    "/>
+                                                                </f:subview>
+                                                                
+                                                                <p:spacer height="5px" />
+                                                                <f:subview id="insp-checklist-subview-reinspect"
+                                                                           rendered="#{empty inelement.complianceGrantedTS}">
+                                                                               
+                                                                
+                                                                    <p:commandButton   id="insp-checklist-scroller-inEle-button-reinspectionwithoutcompliance"
+                                                                                   ajax="true" 
+                                                                                   actionListener="#{occInspectionBB.inspectElementWithoutCompliance(inelement)}"
+                                                                                   rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                   disabled="#{!(empty inelement.complianceGrantedTS or empty inelement.complianceGrantedTS)}"
+                                                                                   value="inspect; do NOT grant compliance"  
+                                                                                   icon="fa fa-eye"
+                                                                                   update="form-inspecteditems
+                                                                                   form-inspecteditems-messages
+                                                                                   "/>
+                                                                
+                                                                </f:subview>
+                                                                
+                                                                <p:spacer height="5px" />
+                                                                <f:subview id="insp-checklist-subview-withdrawcompliance"
+                                                                           rendered="#{!(empty inelement.complianceGrantedTS)}">
+                                                                
+                                                                    <p:commandButton   id="insp-checklist-scroller-inEle-button-removecompliance"
+                                                                                       ajax="true" 
+                                                                                       actionListener="#{occInspectionBB.removeComlianceWithElement(inelement)}"
+                                                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                       disabled="#{(empty inelement.complianceGrantedTS)}"
+                                                                                       value="withdraw compliance"  
+                                                                                       icon="fa fa-minus-square-o"
+                                                                                       update="form-inspecteditems
+                                                                                       form-inspecteditems-messages
+                                                                                       "/>
 
 
+                                                                </f:subview>
+                                                                <p:spacer height="5px" />
+                                                                <f:subview id="insp-checklist-subview-clearinspection"
+                                                                           rendered="#{!(empty inelement.lastInspectedTS)}">
+                                                                               
+                                                                
+                                                                    <p:commandButton   id="insp-checklist-scroller-inEle-button-clearinspection"
+                                                                                   ajax="true" 
+                                                                                   actionListener="#{occInspectionBB.clearInspectionOfElement(inelement)}"
+                                                                                   rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                   disabled="#{!(!(empty inelement.lastInspectedTS) or !(empty inelement.complianceGrantedTS))}"
+                                                                                   value="clear inspection"  
+                                                                                   icon="fa fa-eraser"
+                                                                                   update="form-inspecteditems
+                                                                                   form-inspecteditems-messages
+                                                                                   "/>
+                                                                
+                                                                </f:subview>
+
+                                                                <p:spacer height="5px" />
+                                                                
+                                                                <p:fieldset legend="Inspection tips" 
+                                                                            toggleable="true" 
+                                                                            toggleSpeed="500"
+                                                                            collapsed="true">
+                                                                    
+                                                                    
+                                                                     <h:outputText value="Code guide inspection tips:" escape="false" />
+                                                                     <h:outputText value="#{inelement.guideEntry.inspectionGuidelines}" escape="false" />
+
+                                                                </p:fieldset>
+                                                            </h:panelGroup>
+                                                            
+                                                                
+                                                                
+                                                    </h:panelGrid>
+                                                <hr />  
                                             </p:dataScroller>
-                                        </div>
-
                                     </p:dataScroller>
-
                                 </h:form>
-
                             </div>
                         </div>
                     </div>
+                    
+                  
+                    
+                  
+                    
+                    <p:dialog   id="dialog-inspectionmetadata"
+                                height="650" width="900"
+                                widgetVar="var-dialog-inspectionmetadata"
+                                closable="true" 
+                                rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                >
+
+                        <h:form id="form-dialog-inspectionmetadata">
+
+                            <h:messages id="messages-dialog-inspectionmetadata"
+                                        globalOnly="true" showDetail="true" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            
+                            <h:panelGrid columns="2"
+                                         columnClasses="gridTd, gridTd">
+                                
+                                <h:panelGroup>
+                                     <h:outputText styleClass="ui-label-inline" value="Inspection ID: " />
+                                     <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.inspectionID}" />
+                                     
+                                     <p:spacer height="3px" />
+                                </h:panelGroup>
+                                     
+                                <h:panelGroup>
+                                     <h:outputText styleClass="ui-label-inline" value="Inspector: " />
+                                     <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.inspector.person.firstName} 
+                                                    #{occInspectionBB.currentInspection.inspector.person.lastName}
+                                                    (ID:#{occInspectionBB.currentInspection.inspector.userID})" />
+                                     
+                                     <p:spacer height="5px" />
+                                     
+                                    <p:selectOneMenu id="cecases-criteria-user" required="false" 
+                                                     value="#{occInspectionBB.selectedInspector}">
+                                        <f:selectItem itemLabel="select an inspector..." noSelectionOption="true" />
+                                        <f:selectItems value="#{userBB.userList}"  var="u" itemValue="#{u}" 
+                                                       itemLabel="#{u.person.firstName} #{u.person.lastName} (ID:#{u.username})"/>
+                                        <f:converter converterId="userConverter"/>
+                                    </p:selectOneMenu>
+                                     
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                     <h:outputText styleClass="ui-label-inline" value="Checklist template: " />
+                                     <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.checklistTemplate.title}" />
+                                     <h:outputText  styleClass="data-text" value=" " />
+                                     <h:outputText  styleClass="data-text" value="(ID:#{occInspectionBB.currentInspection.checklistTemplate.inspectionChecklistID})" />
+                                     <p:spacer height="0px" />
+                                     <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.checklistTemplate.description}" />
+                                     <p:spacer height="0px" />
+                                     <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.checklistTemplate.governingCodeSource.sourceName}" />
+                                     <h:outputText  styleClass="data-text" value="(#{occInspectionBB.currentInspection.checklistTemplate.governingCodeSource.sourceYear})" />
+                                    
+                                     <p:spacer height="5px" />
+                                     
+                                    <p:inputText    id="insp-metadata-input-checklisttemplateid" 
+                                                    value="#{occInspectionBB.currentInspection.checklistTemplate.inspectionChecklistID}" 
+                                                    required="true"/>
+                                    
+                                    <h:message for="cecases-search-relative-dates-start-it" showDetail="false" showSummary="true" 
+                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                     <h:outputText styleClass="ui-label-inline" value="Inspection date of record:" />
+                                     <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(currentInspection.effectiveDateOfRecord)}" />
+                                    
+                                    <p:calendar     id="cal-dialog-inspectionmetadata-inspeffectivedate" 
+                                                    value="#{occInspectionBB.currentInspection.effectiveDateOfRecordUtilDate}" 
+                                                    mode="popup" 
+                                                    showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true" tabindex="16" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                    showButtonPanel="true" showTodayButton="true"
+                                                    required="false"/>
+                                    
+                                    <h:message for="cal-dialog-inspectionmetadata-inspeffectivedate" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputText styleClass="ui-label-inline" value="Public access control code: " />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.pacc}" />
+                                    <p:spacer height="0px" />
+                                    <h:outputText styleClass="ui-label-inline" value="Public access enabled: " />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.enablePacc}" />
+                                    
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                     <h:outputText styleClass="ui-label" value="Max occupants: " />
+                                     <p:inputText    id="insp-metadata-input-maxocc" 
+                                                     value="#{occInspectionBB.currentInspection.maxOccupantsAllowed}" 
+                                                    required="false">
+                                         <p:clientValidator />
+                                     </p:inputText>
+                                     <h:outputText styleClass="ui-label" value="Number bedrooms: " />
+                                     <p:inputText    id="insp-metadata-input-bedrooms" 
+                                                     value="#{occInspectionBB.currentInspection.numBedrooms}" 
+                                                    required="false">
+                                         <p:clientValidator />
+                                     </p:inputText>
+                                    
+                                     <h:outputText styleClass="ui-label" value="Number bathrooms: " />
+                                     <p:inputText    id="insp-metadata-input-bathrooms" 
+                                                     value="#{occInspectionBB.currentInspection.numBathrooms}" 
+                                                    required="false">
+                                         <p:clientValidator />
+                                     </p:inputText>
+                                    
+                                    
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputText styleClass="ui-label-inline" value="Third party inspector: " />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.thirdPartyInspector.firstName} 
+                                                   #{occInspectionBB.currentInspection.thirdPartyInspector.lastName}" />
+                                    <h:outputText styleClass="ui-label-inline" value="Third party approval timestamp: " />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(occInspectionBB.currentInspection.thirdPartyInspectorApprovalTS)}" />
+                                    
+                                    <h:outputText styleClass="ui-label-inline" value="Third party inspection certified by:" />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.thirdPartyApprovalBy.person.firstName} 
+                                                   #{occInspectionBB.currentInspection.thirdPartyApprovalBy.person.lastName}" />
+                                    
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputText styleClass="ui-label-inline" value="Notes:" />
+                                    <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.notes}" escape="false" />
+                                    
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+
+                            <p:spacer height="5px"/>
+
+
+
+                            <p:commandButton    id="cancel-cb"
+                                                ajax="true"  tabindex="27"
+                                                value="Cancel" 
+                                                icon="fa fa-stop" 
+                                                immediate="true"
+                                                onclick="PF('var-dialog-inspectionmetadata').hide()"
+                                                />
+
+                            <p:commandButton id="button-updatemetadata" ajax="true"
+                                             value="update metadata" action="#{occInspectionBB.editOccupancyInspectionMetadata}"
+                                             icon="fa fa-thumbs-o-up" tabindex="28"
+                                             oncomplete="PF('var-dialog-inspectionmetadata').hide()"
+                                             update="insp-form-insp"
+                                             />
+
+                        </h:form>
+                    </p:dialog>
+                    
+                    
+                    
+                    <p:dialog   id="insp-dialog-blobs"
+                                header="Photos and docs attached to checklist element ID: #{occInspectionBB.currentInSpcEl.inspectedSpaceElementID}" 
+                                widgetVar="insp-dialog-blobs-var"
+                                closable="true"
+                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}">
+
+                        <h:form id="insp-dialog-blobs-form">
+                            <p:scrollPanel style="width:1000px; height:400px" mode="native">
+                                <p:dataTable
+                                    id="photoTable"
+                                    var="photoid"
+                                    value="#{occInspectionBB.currentInSpcEl.blobList}"
+                                    rowKey="#{photoid}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6">
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Manage"/>
+                                        </f:facet>
+                                        <p:commandButton ajax="true" 
+                                                         actionListener="#{caseProfileBB.deletePhoto(photoid)}"
+                                                         value="Delete" 
+                                                         icon="fa fa-bomb"
+                                                         rendered="#{sessionBean.sessionUser.keyCard.hasSysAdminPermissions}"
+                                                         update=":photo-form:photoTable"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Photo"/>
+                                        </f:facet>
+                                        <p:graphicImage width="100%" value="#{imageServices.image}">
+                                            <f:param name="photoID" value="#{photoid}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Description"/>
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:scrollPanel>
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" 
+                                             icon="fa fa-stop"
+                                             value="close" 
+                                             onclick="PF('insp-dialog-blobs-var').hide()"/>
+                        </h:form>
+                    </p:dialog>
+                    
                 </f:view>
             </ui:define>
         </ui:composition>

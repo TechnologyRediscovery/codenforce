@@ -10,7 +10,7 @@
         
         <h:outputStylesheet name="css/dashboards.css"/>
         
-        <title>Code Enforcement Dashboard</title>
+    <title>CodeNForce Dashboard</title>
     </h:head>
     <h:body>
         <ui:composition template="navContainer_restricted.xhtml">
@@ -22,20 +22,19 @@
                         </h:messages>
                         
                         <h:form id="missionControlForm">
-                            <h1><h:outputText value="#{sessionBean.sessionMuni.muniName}"/> Dashboard</h1>
+                            <h1><h:outputText value="codeNforce Dashboard: #{sessionBean.sessionMuni.muniName}"/> </h1>
                         
                             <p:dashboard model="#{missionControlBB.mainDash}">
                             
-                                <p:panel id="cears"
+                                <p:panel id="dashpanel-ce-cears"
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="I have a header"
-                                         footer="I have a footer"
+                                         header="Requests for code enforcement"
+                                         footer="x requests processed past 30 days"
                                          toggleableHeader="true"
                                          menuTitle="I have a title in the bar"
                                          >
-                                    <h3>Code enforcement requests</h3>
                                     <p:panelGrid columns="2" layout="tabular"
                                         columnClasses="gridTd-bignum, gridTd-bignum">
                                         <h:panelGroup >
@@ -53,87 +52,168 @@
                                     </p:panelGrid>
                                 </p:panel>
                                 
-                                <p:panel id="cecases"
+                                <p:panel id="dashpanel-ce-cecases"
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="I have a header"
-                                         footer="I have a footer"
+                                         header="Active Code enforcement cases"
+                                         footer=""
                                          toggleableHeader="true"
-                                         menuTitle="I have a title in the bar">
-                                    <h3>Code enforcement cases</h3>
-                                    <p:panelGrid columns="2" layout="tabular"
-                                    columnClasses="gridTd-bignum, gridTd-bignum">
-                                    <h:panelGroup >
-                                        <div class="dashboard-bignum">
-                                            <h:outputText styleClass="bignum" value="-"/>
-                                        </div>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <div class="dashboard-rightof-bignum">
-                                            <h:outputText styleClass="bignum-header" value="Open code enforcement"/>
-                                            <br />
-                                            <h:outputText styleClass="bignum-header" value="cases"/>
-                                            <p:spacer height="5px"/>
-                                            <p:commandButton styleClass="nofill" value="View cases" action="ceCases" ajax="false"/>
-                                        </div>
-                                    </h:panelGroup>
-                                </p:panelGrid>
+                                         menuTitle="">
+                                    <p:panelGrid    columns="2" 
+                                                    layout="tabular"
+                                                    columnClasses="gridTd-bignum, gridTd-bignum">
+                                        <h:panelGroup >
+                                            <div class="dashboard-bignum">
+                                                <h:outputText styleClass="bignum" value="-"/>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <div class="dashboard-rightof-bignum">
+                                                <h:outputText styleClass="bignum-header" value="Open code enforcement"/>
+                                                <br />
+                                                <h:outputText styleClass="bignum-header" value="cases"/>
+                                                <p:spacer height="5px"/>
+                                                <p:commandButton styleClass="nofill" value="View cases" action="ceCases" ajax="false"/>
+                                            </div>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
                                 </p:panel>
                                 
-                                <p:panel id="switchmuni"
+                                <p:panel id="dashpanel-ce-todo"
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="I have a header"
-                                         footer="I have a footer"
+                                         header="Code enforcement tasks"
+                                         footer=""
                                          toggleableHeader="true"
-                                         menuTitle="I have a title in the bar">
-                                    <h3></h3>
-                                    <h3>Switch municipality</h3>
-
-                                    <p:selectOneMenu id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
-                                        <f:converter converterId="muniConverter"/>
-                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                        <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                    </p:selectOneMenu>
-                                    <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    <p:commandButton value="switch" styleClass="button" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
+                                         menuTitle="">
+                                    
+                                    <p:dataScroller id="dash-datascroller-cetodo"
+                                                    value="#{missionControlBB.ceProposalList}">
+                                    
+                                        
+                                    
+                                    </p:dataScroller>
+                                    
                                 </p:panel>
                                 
-                                <p:panel id="cetodo"
+                                <p:panel id="dashpanel-properties"
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="I have a header"
-                                         footer="I have a footer"
+                                         header="Active Properties"
+                                         footer="3947 total properties"
                                          toggleableHeader="true"
-                                         menuTitle="I have a title in the bar">
-                                    <h3>Code enforcement proposed actions</h3>
+                                         menuTitle="">
+                                    <div class="datum">
+                                        <h:outputText value="Active property: " />
+                                        <h:outputText value="#{sessionBean.sessionProperty.address}" />
+                                        <h:outputText value=" (" />
+                                        <h:outputText value="#{sessionBean.sessionProperty.muni.muniName}" />
+                                        <h:outputText value=")" />
+                                        <p:commandButton  value="view property" 
+                                                          action="properties"
+                                                          styleClass="noFill" 
+                                                          icon="fa fa-home"/>
+                                    </div>
+                                    <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-persons"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Active Persons"
+                                         footer="3947 total properties"
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    <div class="datum">
+                                        <h:outputText value="Active Person " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.firstName}" />
+                                        <h:outputText value=" " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.lastName}" />
+                                        <h:outputText value=" (ID: " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.personID}" />
+                                        <h:outputText value=" )" />
+                                        <p:commandButton  value="view property" 
+                                                          action="persons"
+                                                          styleClass="noFill" 
+                                                          icon="fa fa-home"/>
+                                    </div>
+                                    
                                      <p:commandButton  value="help on this page" onclick="PF('helpdlg').show()" styleClass="noFill" icon="fa fa-question-circle"/>
                                 </p:panel>
                                 
-                                <p:panel id="occtodo"
+                                
+                                
+                                
+                                <p:panel id="dashpanel-occ-periods"
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="I have a header"
-                                         footer="I have a footer"
+                                         header="Active occ periods"
+                                         footer=""
                                          toggleableHeader="true"
-                                         menuTitle="I have a title in the bar">
-                                    <h3>Occupancy proposed actions</h3>
+                                         menuTitle="">
+                                    
+                                    
+                                    
                                 </p:panel>
                                 
-                                <p:panel id="reporting"
+                                <p:panel id="dashpanel-occ-inspections"
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="I have a header"
-                                         footer="I have a footer"
+                                         header="Scheduled occ inspections"
+                                         footer=""
                                          toggleableHeader="true"
-                                         menuTitle="I have a title in the bar">
-                                    <h3>System admin proposed actions</h3>
+                                         menuTitle="">
+                                    
+                                    <div class="datum">
+                                        <h:outputText value="Active Inspection " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.firstName}" />
+                                        <h:outputText value=" " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.lastName}" />
+                                        <h:outputText value=" (ID: " />
+                                        <h:outputText value="#{sessionBean.sessionPerson.personID}" />
+                                        <h:outputText value=" )" />
+                                        <p:commandButton  value="view property" 
+                                                          action="inspection"
+                                                          styleClass="noFill" 
+                                                          icon="fa fa-home"/>
+                                    </div>
+                                    
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-sys-events"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Recent events"
+                                         footer="x events muniwide in past 24 hours"
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    
+                                </p:panel>
+                                
+                                <p:panel id="dashpanel-sys-switchmuni"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Switch session municipality"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+
+                                    <p:selectOneListbox id="muniSelectMenu" tabindex="1" value="#{missionControlBB.selectedMuni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="muniNameList" value="#{sessionBean.userAuthMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    </p:selectOneListbox>
+                                    <h:message for="muniSelectMenu" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    <p:commandButton value="switch to this muni" styleClass="button" action="#{missionControlBB.switchMuni}" icon="fa fa-long-arrow-right" />
                                 </p:panel>
                                 
                             </p:dashboard>
