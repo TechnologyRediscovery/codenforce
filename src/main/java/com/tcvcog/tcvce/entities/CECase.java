@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Sylvia Baskem
  */
-public class CECase extends CaseBase implements Cloneable{
+public class CECase extends CECaseBase implements Cloneable{
     
     private List<CodeViolation> violationList;
     
@@ -41,7 +41,7 @@ public class CECase extends CaseBase implements Cloneable{
      * 
      * @param cse 
      */
-    public CECase(CaseBase cse){
+    public CECase(CECaseBase cse){
         this.caseID = cse.caseID;
         this.publicControlCode = cse.publicControlCode;
         this.paccEnabled = cse.paccEnabled;

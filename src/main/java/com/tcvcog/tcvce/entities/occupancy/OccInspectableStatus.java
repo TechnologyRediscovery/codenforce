@@ -23,7 +23,6 @@ import com.tcvcog.tcvce.entities.Status;
  * @author sylvia
  */
 public class OccInspectableStatus extends Status{
-    
     private final OccInspectionStatusEnum statusEnum;
 
     public OccInspectableStatus(OccInspectionStatusEnum enumVal){

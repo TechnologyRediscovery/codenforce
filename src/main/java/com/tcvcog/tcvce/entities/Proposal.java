@@ -10,44 +10,37 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- *
+ * Abstract because you can't propose to add an item in a set of things to nothin'
  * Mapped to database table choiceproposal
  * 
  * @author sylvia
  */
 public class Proposal extends EntityUtils implements Serializable, Comparable<Proposal> {
     
-    private int proposalID ;
-    private Directive directive;
+    protected int proposalID ;
+    protected Directive directive;
     
-    private int generatingEventID;
-    private boolean readOnlyCurrentUser;
+    protected int generatingEventID;
+    protected boolean readOnlyCurrentUser;
     
-    private User initiator;
-    private User responderIntended;
-    private User responderActual;
+    protected User initiator;
+    protected User responderIntended;
+    protected User responderActual;
     
-    private LocalDateTime activatesOn;
-    private String activatesOnPretty;
+    protected LocalDateTime activatesOn;
+    protected LocalDateTime expiresOn;
+    protected LocalDateTime responseTimestamp;
     
-    private LocalDateTime expiresOn;
-    private String expiresOnPretty;
+    protected boolean active;
+    protected boolean hidden;
     
-    private LocalDateTime responseTimestamp;
-    private String responseTimePrettyDate;
-    
-    private boolean active;
-    private boolean hidden;
-    
-    private Event generatingEvent;
-    private Event responseEvent;
+    protected Event generatingEvent;
+    protected Event responseEvent;
 
-    private String notes;
-    private boolean proposalRejected;
+    protected String notes;
+    protected boolean proposalRejected;
     
-    private int order;
-    private int cecaseID;
-    private int occperiodID;
+    protected int order;
 
     /**
      * @param responderIntended the responderIntended to set
@@ -71,15 +64,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         return responderActual;
     }
 
-    /**
-     * @param event
-     * @return the responseTimePrettyDate
-     */
-    public String getResponseTimePrettyDate(Event event) {
-        String pretty = event.getPrettyDate(responseTimestamp);
-        responseTimePrettyDate = pretty;
-        return getResponseTimePrettyDate();
-    }
+   
 
     /**
      * @param proposalRejected the proposalRejected to set
@@ -95,14 +80,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.notes = notes;
     }
 
-    /**
-     * @param responseTimePrettyDate the responseTimePrettyDate to set
-     */
-    public void setResponseTimePrettyDate(String responseTimePrettyDate) {
-        this.responseTimePrettyDate = responseTimePrettyDate;
-    }
-
-
+   
     /**
      * @return the proposalRejected
      */
@@ -160,12 +138,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.proposalID = proposalID;
     }
 
-    /**
-     * @return the responseTimePrettyDate
-     */
-    public String getResponseTimePrettyDate() {
-        return responseTimePrettyDate;
-    }
+    
 
     /**
      * @param responderActual the responderActual to set
@@ -183,12 +156,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         return activatesOn;
     }
 
-    /**
-     * @return the activatesOnPretty
-     */
-    public String getActivatesOnPretty() {
-        return activatesOnPretty;
-    }
+    
 
     /**
      * @return the expiresOn
@@ -197,13 +165,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         return expiresOn;
     }
 
-    /**
-     * @return the expiresOnPretty
-     */
-    public String getExpiresOnPretty() {
-        return expiresOnPretty;
-    }
-
+    
 
     /**
      * @param activatesOn the activatesOn to set
@@ -212,12 +174,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.activatesOn = activatesOn;
     }
 
-    /**
-     * @param activatesOnPretty the activatesOnPretty to set
-     */
-    public void setActivatesOnPretty(String activatesOnPretty) {
-        this.activatesOnPretty = activatesOnPretty;
-    }
+    
 
     /**
      * @param expiresOn the expiresOn to set
@@ -226,12 +183,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.expiresOn = expiresOn;
     }
 
-    /**
-     * @param expiresOnPretty the expiresOnPretty to set
-     */
-    public void setExpiresOnPretty(String expiresOnPretty) {
-        this.expiresOnPretty = expiresOnPretty;
-    }
+    
 
 
     /**
@@ -347,33 +299,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         this.order = order;
     }
 
-    /**
-     * @return the cecaseID
-     */
-    public int getCecaseID() {
-        return cecaseID;
-    }
-
-    /**
-     * @return the occperiodID
-     */
-    public int getOccperiodID() {
-        return occperiodID;
-    }
-
-    /**
-     * @param cecaseID the cecaseID to set
-     */
-    public void setCecaseID(int cecaseID) {
-        this.cecaseID = cecaseID;
-    }
-
-    /**
-     * @param occperiodID the occperiodID to set
-     */
-    public void setOccperiodID(int occperiodID) {
-        this.occperiodID = occperiodID;
-    }
+   
 
 
     @Override
@@ -399,11 +325,8 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         hash = 47 * hash + Objects.hashCode(this.responderIntended);
         hash = 47 * hash + Objects.hashCode(this.responderActual);
         hash = 47 * hash + Objects.hashCode(this.activatesOn);
-        hash = 47 * hash + Objects.hashCode(this.activatesOnPretty);
         hash = 47 * hash + Objects.hashCode(this.expiresOn);
-        hash = 47 * hash + Objects.hashCode(this.expiresOnPretty);
         hash = 47 * hash + Objects.hashCode(this.responseTimestamp);
-        hash = 47 * hash + Objects.hashCode(this.responseTimePrettyDate);
         hash = 47 * hash + (this.active ? 1 : 0);
         hash = 47 * hash + (this.hidden ? 1 : 0);
         hash = 47 * hash + Objects.hashCode(this.generatingEvent);
@@ -411,8 +334,6 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         hash = 47 * hash + Objects.hashCode(this.notes);
         hash = 47 * hash + (this.proposalRejected ? 1 : 0);
         hash = 47 * hash + this.order;
-        hash = 47 * hash + this.cecaseID;
-        hash = 47 * hash + this.occperiodID;
         return hash;
     }
 
@@ -436,6 +357,7 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
         }
         return true;
     }
+
     
     
     

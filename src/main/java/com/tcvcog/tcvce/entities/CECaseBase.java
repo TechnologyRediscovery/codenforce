@@ -5,13 +5,11 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Objects;
-import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 
 /**
  *
@@ -19,9 +17,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
  */
 public class CECaseBase 
         extends EntityUtils 
-        implements Serializable, 
-                    Openable,
-                    Cloneable{
+        implements Serializable, Cloneable {
     
     protected int caseID;
     protected int publicControlCode;
@@ -74,14 +70,6 @@ public class CECaseBase
         
     }
 
-    
-      @Override
-    public boolean isOpen() {
-        return this.casePhase.isCaseOpen();
-    }
-
-  
-    
     public long getCaseAge() {
         return getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
@@ -415,7 +403,5 @@ public class CECaseBase
     public void setSource(BOBSource source) {
         this.source = source;
     }
-
-  
 
 }

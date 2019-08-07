@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 public class OccInspectedSpaceElement 
         extends OccSpaceElement 
-        implements Serializable{
+        implements Serializable, Comparable<OccInspectedSpaceElement>{
     
     private int inspectedSpaceElementID;
     
@@ -56,7 +56,7 @@ public class OccInspectedSpaceElement
     private int failureIntensityClassID;
     
     
-    private InspectableStatus status;
+    private OccInspectableStatus status;
    
     
     /**
@@ -329,15 +329,26 @@ public class OccInspectedSpaceElement
     /**
      * @return the status
      */
-    public InspectableStatus getStatus() {
+    public OccInspectableStatus getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(InspectableStatus status) {
+    public void setStatus(OccInspectableStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public int compareTo(OccInspectedSpaceElement o) {
+        if(inspectedSpaceElementID > o.getInspectedSpaceElementID()){
+            return 1;
+        } else if(inspectedSpaceElementID == o.getInspectedSpaceElementID()){
+            return 0;
+        } else {
+            return -1;
+        }
     }
 
    

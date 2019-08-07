@@ -41,7 +41,7 @@ public class Directive extends EntityUtils {
     
     /**
      * Remember, for Directive and Proposal stuff, the hidden property
-     * only lives in JavaLand as it's determined programatically based
+     * only lives in JavaLand and not DB as it's determined programatically based
      * on current User viewing and the Date/Time
      */
     private boolean hidden;

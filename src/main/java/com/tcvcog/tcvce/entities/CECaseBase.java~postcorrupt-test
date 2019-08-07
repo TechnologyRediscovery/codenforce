@@ -5,17 +5,23 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Objects;
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 
 /**
  *
  * @author sylvia
  */
-public class CaseBase extends EntityUtils implements Serializable, Cloneable {
+public class CECaseBase 
+        extends EntityUtils 
+        implements Serializable, 
+                    Openable,
+                    Cloneable{
     
     protected int caseID;
     protected int publicControlCode;
@@ -61,13 +67,21 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
      * @throws CloneNotSupportedException
      */
     @Override
-    public CaseBase clone() throws CloneNotSupportedException{
+    public CECaseBase clone() throws CloneNotSupportedException{
         super.clone();
         return null;
         
         
     }
 
+    
+      @Override
+    public boolean isOpen() {
+        return this.casePhase.isCaseOpen();
+    }
+
+  
+    
     public long getCaseAge() {
         return getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
@@ -337,7 +351,7 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CaseBase other = (CaseBase) obj;
+        final CECaseBase other = (CECaseBase) obj;
         if (this.caseID != other.caseID) {
             return false;
         }
@@ -401,5 +415,7 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
     public void setSource(BOBSource source) {
         this.source = source;
     }
+
+  
 
 }

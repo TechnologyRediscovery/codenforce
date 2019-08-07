@@ -46,7 +46,7 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
     private User lastInspectedBy;
     private LocalDateTime lastInspectedTS;
     
-    private InspectableStatus status;
+    private OccInspectableStatus status;
     
     
     public OccInspectedSpace(OccSpace spc){
@@ -218,14 +218,14 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
     /**
      * @return the status
      */
-    public InspectableStatus getStatus() {
+    public OccInspectableStatus getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(InspectableStatus status) {
+    public void setStatus(OccInspectableStatus status) {
         this.status = status;
     }
 

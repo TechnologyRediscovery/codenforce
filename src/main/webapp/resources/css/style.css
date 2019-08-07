@@ -620,10 +620,6 @@ div.printer-friendly-report .ui-widget-content{
 .mainContainer{
 }
 
-.mainContainerDashboard{
-
-    display:block;
-}
 
 
 .primaryContentContainer{
@@ -967,6 +963,33 @@ img.headerImg{
     font-weight: bold;
 }
 
+.mainContainerDashboard{
+
+    display:block;
+}
+
+
+
+.ui-panel, div.ui-state-hover {
+                margin: 10px;
+                
+            }
+             
+.ui-dashboard-column {
+    width:33%;
+   
+}
+
+.ui-widget-content{
+    /*background-color: gray;*/
+}
+
+
+.ui-widget, .ui-widget .ui-widget {
+    font-size: 90% !important;
+}
+
+
 
 /*************** END DASHBOARD ****************************/
 
@@ -1206,34 +1229,65 @@ gridTd-bignum{
 /* ****************** CLOSE BUTTON STYLES ********************/
 
 
-/* -------------------- DASHBOARDS--------------------------------- */
 
+/* -------------------- INSPECTION----------------------- */
 
-
-.ui-panel, div.ui-state-hover {
-                margin: 10px;
-                width:200px;
-            }
-             
-.ui-dashboard-column {
-    width:33%;
-   
+h2.insp-proposal-prophead{
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
-.ui-widget-content{
-    /*background-color: gray;*/
+h2.insp-proposal-choicehead{
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
 
-.ui-widget, .ui-widget .ui-widget {
-    font-size: 90% !important;
+i.inspection-pass{
+    color: forestgreen;
 }
 
-/* ****************** CLOSE DASHBOARDS********************/
+i.inspection-fail{
+    color: #B36A00;
+}
+
+i.inspection-notinspected{
+    color: #1a237e;
+}
+
+.insp-inspace-header{
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #163F8A;
+    margin-bottom: 15px;
+}
+.insp-inelement-header{
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.inspection-notinspected{
+    color: #1a237e;
+    font-weight: bold;
+    
+}
+
+.inspection-pass{
+    color: forestgreen;
+    font-weight: bold;
+}
+
+.inspectio-fail{
+    color:#B36A00;
+    font-weight: bold;
+}
 
 
 
 
+/* ****************** CLOSE INSPECTION********************/
 
 /* -------------------- MISC --------------------------------- */
 

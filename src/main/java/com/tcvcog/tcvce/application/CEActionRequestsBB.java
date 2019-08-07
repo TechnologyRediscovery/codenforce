@@ -132,9 +132,11 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                                                 getSessionBean().getSessionMuni(), 
                                                 null);
             List<CEActionRequest> singleReqList = new ArrayList<>();
-            selectedRequest.setInsertPageBreakBefore(false);
-            singleReqList.add(selectedRequest);
-            query.addToResults(singleReqList);
+            if(selectedRequest != null){
+                selectedRequest.setInsertPageBreakBefore(false);
+                singleReqList.add(selectedRequest);
+                query.addToResults(singleReqList);
+            }
             query.setExecutionTimestamp(LocalDateTime.now());
             rpt.setBOBQuery(query);
             rpt.setGenerationTimestamp(LocalDateTime.now());

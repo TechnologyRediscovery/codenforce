@@ -22,6 +22,8 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Proposable;
 import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.entities.ProposalCECase;
+import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -57,7 +59,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
-    public OccPeriod configureProposals(OccPeriod oPeriod, UserWithAccessData u){
+    public OccPeriod configureProposals(OccPeriod oPeriod, UserWithAccessData u) throws EventException, AuthorizationException{
         Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
         while(iter.hasNext()){
             Proposal p = iter.next();
@@ -74,6 +76,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     
     private Proposal configureProposal( Proposal proposal, 
                                         UserWithAccessData u){
+        
+        // start by  setting the most restrictive rights and then relax them as authorization
+        // status allows
         proposal.setHidden(true);
         proposal.setReadOnlyCurrentUser(true);
 
@@ -126,7 +131,27 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     
     
     
-    public Proposal processProposalEvaluation(Proposal proposal, Proposable chosen, CECase cse, UserWithAccessData u) throws EventException, AuthorizationException{
+    public CECase processProposalEvaluation(    Proposal proposal, 
+                                                Proposable chosen, 
+                                                CECase cse, 
+                                                UserWithAccessData u) 
+                                                throws EventException, AuthorizationException{
+        // first make sure that the given Proposable is in the Proposal
+        if(!proposal.getDirective().getChoiceList().contains(chosen)){
+            throw new EventException("The identified chosen Proposable is not contained inside the given Proposal");
+        }
+        // check authorization
+        configureChoice(chosen, u);
+        if(!chosen.isCanChoose()){
+            throw new AuthorizationException("You do not have permission to select this Choice");
+        }
+        return cse;
+    }
+    
+    public OccPeriod processProposalEvaluation( Proposal proposal, 
+                                                Proposable chosen, 
+                                                OccPeriod oPeriod, 
+                                                UserWithAccessData u) throws EventException, AuthorizationException{
         // first make sure that the given Proposable is in the Proposal
         if(!proposal.getDirective().getChoiceList().contains(chosen)){
             throw new EventException("The identified chosen Proposable is not contained inside the given Proposal");
@@ -138,17 +163,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         
-        
-        
-        
-        return proposal;
-        
-    }
-    
-    public Proposal processProposalEvaluation(Proposal proposal, Proposable chosen, OccPeriod oPeriod, User u){
-        
-        
-        return proposal;
+        return oPeriod;
         
     }
     
