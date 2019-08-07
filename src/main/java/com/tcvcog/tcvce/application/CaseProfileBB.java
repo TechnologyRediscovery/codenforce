@@ -1044,12 +1044,6 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         }
     }    
     
-    
-    
-    
-    
-    
-
     /**
      * @param currentCase the currentCase to set
      */

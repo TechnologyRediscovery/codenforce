@@ -5,6 +5,9 @@
  */
 package com.tcvcog.tcvce.entities.reports;
 
+import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
@@ -17,86 +20,100 @@ import java.util.List;
  */
 public class ReportConfigOccPermit 
         extends Report 
-        implements Serializable, QueryBacked{
+        implements Serializable{
     
-    /**
-     * This report config needs to work for printing single requests
-     * and multiple ones. Turn this switch on when reporting only the active CEAR
-     */
-    private boolean printFullCEARQueue;
-    private boolean includePhotos;
-    private boolean insertPageBreakBeforeEachPhotoSet;
-    private boolean insertPageBreakBeforeEachIndivPhoto;
-    private QueryCEAR queryCEAR;
-
-    @Override
-    public QueryCEAR getBOBQuery() {
-        return queryCEAR;
-
-    }
-
-    @Override
-    public void setBOBQuery(Query q) {
-        queryCEAR = (QueryCEAR) q;
-    }
+    private OccPermit permit;
+    private OccPeriod period;
+    private PropertyUnitWithProp propUnitWithProp;
     
+    private boolean includeAdditionalText;
+    private boolean includeListingOfTenantPersons;
+    private boolean includeListingOfOwnerPersons;
 
     /**
-     * @return the printFullCEARQueue
+     * @return the permit
      */
-    public boolean isPrintFullCEARQueue() {
-        return printFullCEARQueue;
+    public OccPermit getPermit() {
+        return permit;
     }
 
     /**
-     * @return the includePhotos
+     * @param permit the permit to set
      */
-    public boolean isIncludePhotos() {
-        return includePhotos;
+    public void setPermit(OccPermit permit) {
+        this.permit = permit;
     }
 
     /**
-     * @param printFullCEARQueue the printFullCEARQueue to set
+     * @return the includeAdditionalText
      */
-    public void setPrintFullCEARQueue(boolean printFullCEARQueue) {
-        this.printFullCEARQueue = printFullCEARQueue;
+    public boolean isIncludeAdditionalText() {
+        return includeAdditionalText;
     }
 
     /**
-     * @param includePhotos the includePhotos to set
+     * @param includeAdditionalText the includeAdditionalText to set
      */
-    public void setIncludePhotos(boolean includePhotos) {
-        this.includePhotos = includePhotos;
+    public void setIncludeAdditionalText(boolean includeAdditionalText) {
+        this.includeAdditionalText = includeAdditionalText;
     }
 
     /**
-     * @return the insertPageBreakBeforeEachPhotoSet
+     * @return the period
      */
-    public boolean isInsertPageBreakBeforeEachPhotoSet() {
-        return insertPageBreakBeforeEachPhotoSet;
+    public OccPeriod getPeriod() {
+        return period;
     }
 
     /**
-     * @return the insertPageBreakBeforeEachIndivPhoto
+     * @param period the period to set
      */
-    public boolean isInsertPageBreakBeforeEachIndivPhoto() {
-        return insertPageBreakBeforeEachIndivPhoto;
+    public void setPeriod(OccPeriod period) {
+        this.period = period;
     }
 
     /**
-     * @param insertPageBreakBeforeEachPhotoSet the insertPageBreakBeforeEachPhotoSet to set
+     * @return the propUnitWithProp
      */
-    public void setInsertPageBreakBeforeEachPhotoSet(boolean insertPageBreakBeforeEachPhotoSet) {
-        this.insertPageBreakBeforeEachPhotoSet = insertPageBreakBeforeEachPhotoSet;
+    public PropertyUnitWithProp getPropUnitWithProp() {
+        return propUnitWithProp;
     }
 
     /**
-     * @param insertPageBreakBeforeEachIndivPhoto the insertPageBreakBeforeEachIndivPhoto to set
+     * @param propUnitWithProp the propUnitWithProp to set
      */
-    public void setInsertPageBreakBeforeEachIndivPhoto(boolean insertPageBreakBeforeEachIndivPhoto) {
-        this.insertPageBreakBeforeEachIndivPhoto = insertPageBreakBeforeEachIndivPhoto;
+    public void setPropUnitWithProp(PropertyUnitWithProp propUnitWithProp) {
+        this.propUnitWithProp = propUnitWithProp;
     }
 
+    /**
+     * @return the includeListingOfTenantPersons
+     */
+    public boolean isIncludeListingOfTenantPersons() {
+        return includeListingOfTenantPersons;
+    }
+
+    /**
+     * @return the includeListingOfOwnerPersons
+     */
+    public boolean isIncludeListingOfOwnerPersons() {
+        return includeListingOfOwnerPersons;
+    }
+
+    /**
+     * @param includeListingOfTenantPersons the includeListingOfTenantPersons to set
+     */
+    public void setIncludeListingOfTenantPersons(boolean includeListingOfTenantPersons) {
+        this.includeListingOfTenantPersons = includeListingOfTenantPersons;
+    }
+
+    /**
+     * @param includeListingOfOwnerPersons the includeListingOfOwnerPersons to set
+     */
+    public void setIncludeListingOfOwnerPersons(boolean includeListingOfOwnerPersons) {
+        this.includeListingOfOwnerPersons = includeListingOfOwnerPersons;
+    }
+  
    
     
 }

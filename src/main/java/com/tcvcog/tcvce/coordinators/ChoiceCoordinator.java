@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -136,6 +137,8 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
                                                 CECase cse, 
                                                 UserWithAccessData u) 
                                                 throws EventException, AuthorizationException{
+        
+
         // first make sure that the given Proposable is in the Proposal
         if(!proposal.getDirective().getChoiceList().contains(chosen)){
             throw new EventException("The identified chosen Proposable is not contained inside the given Proposal");
@@ -145,6 +148,10 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         if(!chosen.isCanChoose()){
             throw new AuthorizationException("You do not have permission to select this Choice");
         }
+        
+        
+        
+        
         return cse;
     }
     
@@ -152,6 +159,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
                                                 Proposable chosen, 
                                                 OccPeriod oPeriod, 
                                                 UserWithAccessData u) throws EventException, AuthorizationException{
+                                            
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        
         // first make sure that the given Proposable is in the Proposal
         if(!proposal.getDirective().getChoiceList().contains(chosen)){
             throw new EventException("The identified chosen Proposable is not contained inside the given Proposal");
@@ -161,6 +171,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         if(!chosen.isCanChoose()){
             throw new AuthorizationException("You do not have permission to select this Choice");
         }
+        
         
         
         return oPeriod;
