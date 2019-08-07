@@ -47,7 +47,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
    
     private ReportConfigCEEventList reportCEEvent;
     
-    private ReportConfigOccInspection reportInspection;
+    private ReportConfigOccInspection reportConfigOccInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
     
     private HorizontalBarChartModel caseCountByPhase;
@@ -74,22 +74,28 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         caseList = getSessionBean().getSessionCECaseList();
         DataCoordinator dc = getDataCoordinator();
         
-        try {
-            cPhaseMap = dc.getCaseCountsByPhase(caseList);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+        if(caseList != null && !caseList.isEmpty()){
+            
+            try {
+                cPhaseMap = dc.getCaseCountsByPhase(caseList);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+            generateModelCaseCountByPhase();
+            generateModelCaseCountsByStage();
         }
         
         reportCECase = getSessionBean().getReportConfigCECase();
         reportCECaseList = getSessionBean().getReportConfigCECaseList();
+        reportConfigOccPermit = getSessionBean().getReportConfigOccPermit();
+        reportConfigOccInspection = getSessionBean().getReportConfigInspection();
+        
         if(reportCECase != null){
             currentReport = reportCECase;
         } else {
             currentReport = reportCECaseList;
         }
         
-        generateModelCaseCountByPhase();
-        generateModelCaseCountsByStage();
         
     }
     
@@ -310,17 +316,17 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the reportInspection
+     * @return the reportConfigOccInspection
      */
-    public ReportConfigOccInspection getReportInspection() {
-        return reportInspection;
+    public ReportConfigOccInspection getReportConfigOccInspection() {
+        return reportConfigOccInspection;
     }
 
     /**
-     * @param reportInspection the reportInspection to set
+     * @param reportConfigOccInspection the reportConfigOccInspection to set
      */
-    public void setReportInspection(ReportConfigOccInspection reportInspection) {
-        this.reportInspection = reportInspection;
+    public void setReportConfigOccInspection(ReportConfigOccInspection reportConfigOccInspection) {
+        this.reportConfigOccInspection = reportConfigOccInspection;
     }
 
     /**

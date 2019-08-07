@@ -47,6 +47,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -238,10 +239,18 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                                                                     OccPeriod period,
                                                                     PropertyUnit propUnit,
                                                                     User u){
+        PropertyIntegrator pi = getPropertyIntegrator();
         ReportConfigOccPermit rpt = new ReportConfigOccPermit();
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occpermit_default_title"));
         
         rpt.setPermit(permit);
+        rpt.setPeriod(period);
+        try {
+            rpt.setPropUnitWithProp(pi.getPropertyUnitWithProp(propUnit.getUnitID()));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        rpt.setCreator(u);
         
         return rpt;
     }

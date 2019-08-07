@@ -14,7 +14,10 @@
             <ui:define name="print-content">
                 <h:form id="occpermit-form">
                     <div class="occpermit-borderbox">
-                        
+
+                        <div class="occpermit-muniheader">
+                            <h:outputText value="Municipality of #{reportingBB.reportConfigOccPermit.propUnitWithProp.property.muni.muniName}"/>
+                        </div>
                         <div class="occpermit-title">
                             <h:outputText value="#{reportingBB.reportConfigOccPermit.period.type.permitTitle}"/>
                         </div>
@@ -28,36 +31,96 @@
                                      footerClass="gridFooter"
                                      columnClasses="gridTd-permit, gridTd-permit">
                             <h:panelGroup>
+
+                                <h:outputText   value="Property:" 
+                                                class="occpermit-criticaldata-label"/>
+
+                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.address} " 
+                                                class="occpermit-criticaldata-value"/>
+                                <p:spacer height="0px" />
+                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.address_city} " 
+                                                class="occpermit-criticaldata-value"/>
+                                <h:outputText   value=", "
+                                                class="occpermit-criticaldata-value"/>
+                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.address_state} " 
+                                                class="occpermit-criticaldata-value"/>
+                                    <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.address_zip} " 
+                                                    class="occpermit-criticaldata-value"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <h:outputText   value="County parcel ID: " 
+                                                class="occpermit-criticaldata-label"/>
+                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.parID} " 
+                                                class="occpermit-criticaldata-value"/>
+
+                                <h:outputText   value="Occuapncy unit:" 
+                                                class="occpermit-criticaldata-label"/>
+
+                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.unitNumber} " 
+                                                class="occpermit-criticaldata-value"/>
+
+                                <h:outputText   value="(Unit ID: " 
+                                                class="occpermit-criticaldata-value"/>
+                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.unitID} " 
+                                                class="occpermit-criticaldata-value"/>
+                                <h:outputText   value=")" 
+                                                class="occpermit-criticaldata-value"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <h:outputText   value="Validity start date:" 
+                                                class="occpermit-criticaldata-label"/>
+
+                                <h:outputText   value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.period.startDate)}" 
+                                                class="occpermit-criticaldata-label"/>
+
+                                <f:subview id="occpermit-validuntil-subview"
+                                           rendered="#{!empty reportingBB.reportConfigOccPermit.period.endDate}">
+                                    <h:outputText   value="Validity end date: " 
+                                                    class="occpermit-criticaldata-label"/>
+                                    <h:outputText   value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.period.endDate)}" 
+                                                    class="occpermit-criticaldata-value"/>
+                                </f:subview>
+
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <h:outputText value="Permit ID" 
+                                              class="occpermit-criticaldata-label"/>
+                                <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.permitID}"/>
+                                <h:outputText value="Date issued: " 
+                                              class="occpermit-criticaldata-label"/>
+                                <h:outputText value="#{occInspectionBB.getPrettyDate(reportingBB.reportConfigOccPermit.permit.dateIssued)}"/>
+
+
+                                <f:subview id="occpermit-issuedto-subview"
+                                           rendered="#{!empty reportingBB.reportConfigOccPermit.permit.issuedTo}">
+                                    <h:outputText value="Issued to: " 
+                                                  class="occpermit-criticaldata-label"/>
+                                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedTo.firstName}"/>
+                                    <h:outputText value=" "/>
+                                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedTo.lastName}"/>
+                                    <h:outputText value="("/>
+                                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedTo.personType.label}"/>
+                                    <h:outputText value=", codeNforce ID:"/>
+                                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedTo.personID}"/>
+                                    <h:outputText value=")"/>
+                                </f:subview>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <h:outputText value="Issuer" 
+                                              class="occpermit-criticaldata-label"/>
+                                <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedBy.person.firstName}"/>
+                                <h:outputText value=""/>
+                                <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedBy.person.lastName}"/>
+
+                                <p:spacer height="0px" />
                                 
-                            <h:outputText value="Permit ID" />
-                            <h:outputText value="#{permit.permitID}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                            <h:outputText value="Date issued" />
-                            <h:outputText value="#{occInspectionBB.getPrettyDate(permit.dateIssued)}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <h:outputText value="Issued to: " />
-                                <h:outputText value="#{permit.issuedTo.firstName}"/>
-                                <h:outputText value=" "/>
-                                <h:outputText value="#{permit.issuedTo.LastName}"/>
-                                <h:outputText value="("/>
-                                <h:outputText value="#{permit.issuedTo.personType.label}"/>
-                                <h:outputText value=", ID:"/>
-                                <h:outputText value="#{permit.issuedTo.personID}"/>
+                                <h:outputText value=" (codeNforce userID:"/>
+                                <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedBy.userID}"/>
                                 <h:outputText value=")"/>
                             </h:panelGroup>
-                            <h:panelGroup>
-                            <h:outputText value="Issuer" />
-                            <h:outputText value="#{permit.issuedBy.person.firstName}"/>
-                            <h:outputText value=""/>
-                            <h:outputText value="#{permit.issuedBy.person.LastName}"/>
-                            <h:outputText value="<br />" escape="false"/>
-                            <h:outputText value=" (codeNforce user ID:"/>
-                            <h:outputText value="#{permit.issuedBy.userID}"/>
-                            <h:outputText value=")"/>
-                            </h:panelGroup>
-                                
+
                         </h:panelGrid>
                     </div>
                 </h:form>
