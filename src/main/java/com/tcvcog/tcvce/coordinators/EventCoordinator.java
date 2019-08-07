@@ -41,6 +41,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -283,15 +284,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         Event e = new Event();
         // check to make sure the case isn't closed before allowing event into the switched blocks
-        if(c.getCasePhase() == CasePhase.Closed && 
-                (
-                    ec.getEventType() == EventType.Action
-                    || 
-                    ec.getEventType() == EventType.Origination
-                    ||
-                    ec.getEventType() == EventType.Compliance
-                )
-        ){
+        if(op.getStatus() == OccPeriodStatusEnum.AUTHORIZED){
             throw new CaseLifecyleException("This event cannot be attached to an authorized occ period");
         }
         // the moment of event instantiaion!!!!

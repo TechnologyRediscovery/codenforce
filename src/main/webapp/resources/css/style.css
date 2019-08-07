@@ -1319,20 +1319,49 @@ i.inspection-notinspected{
     font-style: italic;
 }
 
-.occpermit-criticaldatalabel{
+.occpermit-criticaldata-label{
+    display: block;
+    clear: right;
+    font-weight: bold;
+    font-size: 1.2em;
     
 }
 
-.occpermit-minordatalabel{
+.occpermit-criticaldata-value{
+    font-size: 1.2em;
+}
+
+.occpermit-minordata-label{
+    font-size: 1em;
     
 }
 
-.occpermit-admindatalabel{
+.occpermit-minordata-value{
+    font-size: 1em;
+    
+}
+
+.occpermit-admindata-label{
+    font-size: .8em;
+    font-weight: bold;
+    color: darkgrey;
+}
+
+.occpermit-admindata-value{
+    font-size: .8em;
     
 }
 
 .occpermit-additionalnotes{
     
+}
+
+.occpermit-muniheader{
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 /* ****************** CLOSE INSPECTION AND OCC PERMIT********************/

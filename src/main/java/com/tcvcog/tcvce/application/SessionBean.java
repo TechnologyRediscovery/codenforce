@@ -52,6 +52,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
@@ -143,6 +145,9 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
     private ReportConfigCEEventList reportConfigCEEventList;
+    
+    private ReportConfigOccInspection reportConfigInspection;
+    private ReportConfigOccPermit reportConfigOccPermit;
     
     /* *** Public Person Search/Edit Session Shelves *** */
     private Person activeAnonPerson;
@@ -867,6 +872,34 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
      */
     public void setOccPermitAppActivePersonType(PersonType occPermitAppActivePersonType) {
         this.occPermitAppActivePersonType = occPermitAppActivePersonType;
+    }
+
+    /**
+     * @return the reportConfigOccPermit
+     */
+    public ReportConfigOccPermit getReportConfigOccPermit() {
+        return reportConfigOccPermit;
+    }
+
+    /**
+     * @param reportConfigOccPermit the reportConfigOccPermit to set
+     */
+    public void setReportConfigOccPermit(ReportConfigOccPermit reportConfigOccPermit) {
+        this.reportConfigOccPermit = reportConfigOccPermit;
+    }
+
+    /**
+     * @return the reportConfigInspection
+     */
+    public ReportConfigOccInspection getReportConfigInspection() {
+        return reportConfigInspection;
+    }
+
+    /**
+     * @param reportConfigInspection the reportConfigInspection to set
+     */
+    public void setReportConfigInspection(ReportConfigOccInspection reportConfigInspection) {
+        this.reportConfigInspection = reportConfigInspection;
     }
     
     

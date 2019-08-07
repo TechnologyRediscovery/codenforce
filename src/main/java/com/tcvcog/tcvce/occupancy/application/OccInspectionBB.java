@@ -19,6 +19,7 @@ import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.Proposal;
@@ -115,6 +116,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private EventType selectedEventType;
     private List<EventCategory> eventCategoryList;
     private EventCategory selectedEventCategory;
+    private Person selectedPerson;
     
     /**
      * Creates a new instance of InspectionsBB
@@ -330,21 +332,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
+
     public String generateOccPermit(OccPermit permit){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentOccPermit = permit;
+        reportConfigOccPermit = oc.getOccPermitReportConfigDefault( currentOccPermit, 
+                                                                    currentOccPeriod, 
+                                                                    currentPropertyUnit, 
+                                                                    getSessionBean().getSessionUser());
+        getSessionBean().setReportConfigOccPermit(reportConfigOccPermit);
         
         return "occPermit";
     }
     
     
-    public void initializeOccPermitReport(OccPermit op){
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        currentOccPermit = op;
-        reportConfigOccPermit = oc.getOccPermitReportConfigDefault( currentOccPermit, 
-                                                                    currentOccPeriod, 
-                                                                    currentPropertyUnit, 
-                                                                    getSessionBean().getSessionUser());
-    }
-
     /**
      * All Code Enforcement case events are funneled through this method which
      * has to carry out a number of checks based on the type of event being
@@ -362,53 +363,39 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         // category is already set from initialization sequence
         selectedEvent.setOccPeriodID(currentOccPeriod.getPeriodID());
         selectedEvent.setOwner(getSessionBean().getSessionUser());
-        try {
+//        try {
         
             // main entry point for handing the new event off to the CaseCoordinator
             // only the compliance events need to pass in another object--the violation
             // otherwise just the case and the event go to the coordinator
-            if (selectedEvent.getCategory().getEventType() == EventType.Compliance) {
-                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, selectedViolation));
-            } else {
-                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, null));
-            }
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully logged event with an ID " + selectedEvent.getEventID(), ""));
+//            if (selectedEvent.getCategory().getEventType() == EventType.Compliance) {
+//                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, selectedViolation));
+//            } else {
+//                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, null));
+//            }
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                            "Successfully logged event with an ID " + selectedEvent.getEventID(), ""));
 
-            // now update the triggering event with the newly inserted event's ID
-            // (We saved the triggering event when the take action button was clicked, before the event
-            // add dialog was displayed and event-specific data is entered by the user
-            if (triggeringEventForProposal != null) {
-//                triggeringEventForProposal.getEventProposalImplementation().setResponseEvent(selectedEvent);
-//                triggeringEventForProposal.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
-                ec.logResponseToActionRequest(triggeringEventForProposal);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Updated triggering event ID + "
-                                + triggeringEventForProposal.getEventID()
-                                + " with response info!", ""));
-                // reset our holding var since we're done processing the event
-                triggeringEventForProposal = null;
-            }
+            
 
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        } catch (CaseLifecyleException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        }
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            ex.getMessage(),
+//                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+//        } catch (CaseLifecyleException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            ex.getMessage(),
+//                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+//        }
 
         // nullify the session's case so that the reload of currentCase
         // no the cecaseProfile.xhtml will trigger a new DB read
-        refreshCurrentCase();
+//        refreshCurrentCase();
     }
      
     /**
@@ -865,6 +852,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setCurrentOccPermit(OccPermit currentOccPermit) {
         this.currentOccPermit = currentOccPermit;
+    }
+
+    /**
+     * @return the selectedPerson
+     */
+    public Person getSelectedPerson() {
+        return selectedPerson;
+    }
+
+    /**
+     * @param selectedPerson the selectedPerson to set
+     */
+    public void setSelectedPerson(Person selectedPerson) {
+        this.selectedPerson = selectedPerson;
     }
     
     
