@@ -51,6 +51,9 @@ public class OccPeriodType {
     private boolean requirepersontypeentrycheck;
     
     private int defaultValidityPeriodDays;
+    
+    private String permitTitle;
+    private String permitTitleSub;
 
     private List<Fee> feeList;
     /**
@@ -375,6 +378,34 @@ public class OccPeriodType {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the permitTitle
+     */
+    public String getPermitTitle() {
+        return permitTitle;
+    }
+
+    /**
+     * @return the permitTitleSub
+     */
+    public String getPermitTitleSub() {
+        return permitTitleSub;
+    }
+
+    /**
+     * @param permitTitle the permitTitle to set
+     */
+    public void setPermitTitle(String permitTitle) {
+        this.permitTitle = permitTitle;
+    }
+
+    /**
+     * @param permitTitleSub the permitTitleSub to set
+     */
+    public void setPermitTitleSub(String permitTitleSub) {
+        this.permitTitleSub = permitTitleSub;
     }
     
 }

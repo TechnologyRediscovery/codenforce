@@ -1,4 +1,9 @@
+-- SEALED AS OF 5-JUL-2019 BY SYLVIA
 
+-- RUN THIS ALONE
+ALTER TYPE eventtype ADD VALUE IF NOT EXISTS 'Occupancy' AFTER 'Citation';
+
+-- THEN CONTINUE
 ALTER TABLE PERSON DROP COLUMN IF EXISTS bobsource_sourceid;
 
 ALTER TABLE login ADD COLUMN userrole TEXT;
@@ -26,15 +31,14 @@ ALTER TABLE choiceproposal DROP COLUMN hidden;
 ALTER TABLE munilogin ADD COLUMN defaultcecase_caseid INTEGER CONSTRAINT munilogin_defcaseid_fk REFERENCES cecase (caseid);
 
 
-ALTER TYPE eventype ADD VALUE IF NOT EXISTS Occupancy AFTER Citation;
+
 
 ALTER TABLE occperiod DROP COLUMN overrideperiodtypeconfig;
 ALTER TABLE occperiod ADD COLUMN overrideperiodtypeconfig BOOLEAN DEFAULT FALSE;
 
 ALTER TABLE public.occperiod DROP CONSTRAINT occperiod_periodtype_typeid_fk;
+
 ALTER TABLE public.occperiod ADD CONSTRAINT occperiod_periodtypid_fk FOREIGN KEY (type_typeid) REFERENCES occperiodtype (typeid);
-
-
 
 ALTER TABLE public.occinspection
    ALTER COLUMN passedinspection_userid DROP NOT NULL;

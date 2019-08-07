@@ -578,6 +578,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     }
 
+    /**
+     * TODO: Finish me!
+     * @param opt
+     * @throws IntegrationException 
+     */
     public void updateOccPeriodType(OccPeriodType opt) throws IntegrationException {
         String query = "UPDATE public.occpermittype\n"
                 + "   SET typename=?, typedescription=?\n"
@@ -633,7 +638,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "       requiredpersontypes, commercial, requirepersontypeentrycheck, \n"
                 + "       defaultpermitvalidityperioddays, occchecklist_checklistlistid, \n"
                 + "       asynchronousinspectionvalidityperiod, defaultinspectionvalidityperiod, \n"
-                + "       eventruleset_setid\n"
+                + "       eventruleset_setid, permittitle, permittitlesub\n"
                 + "  FROM public.occperiodtype WHERE typeid=?;";
 
         Connection con = getPostgresCon();
@@ -715,12 +720,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "            permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n"
                 + "            rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n"
                 + "            requiredpersontypes, commercial, requirepersontypeentrycheck, \n"
-                + "            defaultvalidityperioddays)\n"
+                + "            defaultvalidityperioddays, permittitle, permittitlesub)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, \n"
-                + "            ?);";
+                + "            ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -748,6 +753,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setBoolean(15, periodType.isRequirepersontypeentrycheck());
 
             stmt.setInt(16, periodType.getDefaultValidityPeriodDays());
+            stmt.setString(17, periodType.getPermitTitle());
+            stmt.setString(18, periodType.getPermitTitleSub());
 
             stmt.execute();
         } catch (SQLException ex) {
@@ -1027,6 +1034,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setCommercial(rs.getBoolean("commercial"));
             opt.setRequirepersontypeentrycheck(rs.getBoolean("requirepersontypeentrycheck"));
             opt.setDefaultValidityPeriodDays(rs.getInt("defaultpermitvalidityperioddays"));
+            
+            opt.setPermitTitle(rs.getString("permittitle"));
+            opt.setPermitTitleSub(rs.getString("permittitlesub"));
 
             // wire up when nathan is done
             // opt.setFeeList(fee);

@@ -18,6 +18,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,7 +46,9 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private Report currentReport;
    
     private ReportConfigCEEventList reportCEEvent;
+    
     private ReportConfigOccInspection reportInspection;
+    private ReportConfigOccPermit reportConfigOccPermit;
     
     private HorizontalBarChartModel caseCountByPhase;
     private HorizontalBarChartModel caseCountByStage;
@@ -318,6 +321,20 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      */
     public void setReportInspection(ReportConfigOccInspection reportInspection) {
         this.reportInspection = reportInspection;
+    }
+
+    /**
+     * @return the reportConfigOccPermit
+     */
+    public ReportConfigOccPermit getReportConfigOccPermit() {
+        return reportConfigOccPermit;
+    }
+
+    /**
+     * @param reportConfigOccPermit the reportConfigOccPermit to set
+     */
+    public void setReportConfigOccPermit(ReportConfigOccPermit reportConfigOccPermit) {
+        this.reportConfigOccPermit = reportConfigOccPermit;
     }
 
    

@@ -1061,10 +1061,6 @@
         </navigation-case>
     </navigation-rule>
 
-    
-   
-
-
     <navigation-rule>
         <from-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</from-view-id>
         <navigation-case>
@@ -1118,12 +1114,25 @@
     <!--  OCCUPANCY  -->
     
     <navigation-rule>
-        
         <navigation-case>
             <from-view-id>/restricted/*</from-view-id>
             <from-outcome>inspection</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/inspection.xhtml</to-view-id>
             <redirect />
+        </navigation-case>
+    </navigation-rule>
+    
+    
+    <navigation-rule>
+        <navigation-case>
+            <from-view-id>/restricted/cogstaff/occ/inspection.xhtml</from-view-id>
+            <from-outcome>inspectionReport</from-outcome>
+            <to-view-id>/restricted/reports/reportInspection.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-view-id>/restricted/cogstaff/occ/inspection.xhtml</from-view-id>
+            <from-outcome>occPermit</from-outcome>
+            <to-view-id>/restricted/reports/reportOccPermit.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
     

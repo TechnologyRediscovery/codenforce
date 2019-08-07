@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
@@ -17,6 +18,8 @@ import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -33,6 +36,9 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
     private List<OccEvent> eventList;
+    private boolean showHiddenEvents;
+    private boolean showInactiveEvents;
+    
     private List<Proposal> proposalList;
     private List<EventRuleOccPeriod> eventRuleOccPeriodList;
     
@@ -66,6 +72,35 @@ public class OccPeriod extends EntityUtils implements Serializable{
     
     private String notes;
 
+    public List<OccEvent> getVisibleEventList(){
+        List<OccEvent> visEventList = new ArrayList<>();
+        for (OccEvent ev : eventList) {
+            if (!ev.isActive() && !isShowInactiveEvents()) {
+                continue;
+            }
+            if (ev.isHidden() && !isShowHiddenEvents()) {
+                continue;
+            }
+            visEventList.add(ev);
+        } // close for   
+        return visEventList;
+        
+    }
+    
+      public List<OccEvent> getActiveEventList() {
+        List<OccEvent> actEvList = new ArrayList<>();
+            Iterator<OccEvent> iter = eventList.iterator();
+                while(iter.hasNext()){
+                    OccEvent ev = iter.next();
+                    if(ev.isActive()){
+                        actEvList.add(ev);
+                    }
+                }
+        return actEvList;
+    }
+
+    
+    
     /**
      * @return the periodID
      */
@@ -501,6 +536,34 @@ public class OccPeriod extends EntityUtils implements Serializable{
      */
     public void setStatus(OccPeriodStatusEnum status) {
         this.status = status;
+    }
+
+    /**
+     * @return the showHiddenEvents
+     */
+    public boolean isShowHiddenEvents() {
+        return showHiddenEvents;
+    }
+
+    /**
+     * @return the showInactiveEvents
+     */
+    public boolean isShowInactiveEvents() {
+        return showInactiveEvents;
+    }
+
+    /**
+     * @param showHiddenEvents the showHiddenEvents to set
+     */
+    public void setShowHiddenEvents(boolean showHiddenEvents) {
+        this.showHiddenEvents = showHiddenEvents;
+    }
+
+    /**
+     * @param showInactiveEvents the showInactiveEvents to set
+     */
+    public void setShowInactiveEvents(boolean showInactiveEvents) {
+        this.showInactiveEvents = showInactiveEvents;
     }
      
     

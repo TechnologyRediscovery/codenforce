@@ -39,6 +39,8 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserWithAccessData;
+import com.tcvcog.tcvce.entities.occupancy.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsEventCECase;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -186,6 +188,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Utility method for setting view confirmation authorization 
      * at the event level by user
+     * @deprecated following separation of Choice objects and their selections from events
      * @param ev
      * @param u the User viewing the list of CEEvents
      * @param muniList
@@ -266,6 +269,42 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Core coordinator method called by all other classes who want to 
+     * create their own event. Restricts the event type based on current
+     * case phase (closed cases cannot have action, origination, or compliance events.
+     * Includes the instantiation of Event objects
+     * 
+     * @param op
+     * @param ec the type of event to attach to the case
+     * @return an initialized event with basic properties set
+     * @throws CaseLifecyleException thrown if the case is in an improper state for proposed event
+     */
+    public OccEvent getInitializedEvent(OccPeriod op, EventCategory ec) throws CaseLifecyleException{
+        
+        Event e = new Event();
+        // check to make sure the case isn't closed before allowing event into the switched blocks
+        if(c.getCasePhase() == CasePhase.Closed && 
+                (
+                    ec.getEventType() == EventType.Action
+                    || 
+                    ec.getEventType() == EventType.Origination
+                    ||
+                    ec.getEventType() == EventType.Compliance
+                )
+        ){
+            throw new CaseLifecyleException("This event cannot be attached to an authorized occ period");
+        }
+        // the moment of event instantiaion!!!!
+        e.setCategory(ec);
+        e.setDateOfRecord(LocalDateTime.now());
+        e.setActive(true);
+        e.setHidden(false);
+        OccEvent event = new OccEvent(e);
+        event.setOccPeriodID(op.getPeriodID());
+        return event;
+    }
+    
+    /**
      * Skeleton event factory
      * For use by the public messaging system which attaches events to code enforcement
      * cases without having access to the entire CECase object--only the caseid
@@ -275,6 +314,19 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public CECaseEvent getInitializedEvent(int caseID){
         CECaseEvent event = new CECaseEvent();
         event.setCaseID(caseID);
+        return event;
+        
+    }
+    /**
+     * Skeleton event factory
+     * For use by the public messaging system which attaches events to code enforcement
+     * cases without having access to the entire CECase object--only the caseid
+     * @param periodID
+     * @return an instantiated CECaseEvent object ready to be configured
+     */
+    public OccEvent getInitializedOccPeriodEvent(int periodID){
+        OccEvent event = new OccEvent(new Event());
+        event.setOccPeriodID(periodID);
         return event;
         
     }

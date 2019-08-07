@@ -6,33 +6,41 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecyleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Choice;
+import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -78,7 +86,10 @@ import javax.faces.event.ActionEvent;
 public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 
     private OccInspection currentInspection;
+    
     private OccPeriod currentOccPeriod;
+    private List<OccEvent> filteredEventList;
+    
     private PropertyUnitWithProp currentPropertyUnit;
     private Property currentProperty;
     
@@ -93,7 +104,17 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private String formNoteText;
     private List<OccLocationDescriptor> locationList;
     
+    // reports
+    private ReportConfigOccInspection reportConfigOccInspec;
+    private OccPermit currentOccPermit;
+    private ReportConfigOccPermit reportConfigOccPermit;
     
+    // events 
+    private OccEvent selectedEvent;
+    private List<EventType> availableEventTypeList; 
+    private EventType selectedEventType;
+    private List<EventCategory> eventCategoryList;
+    private EventCategory selectedEventCategory;
     
     /**
      * Creates a new instance of InspectionsBB
@@ -105,6 +126,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyIntegrator pi = getPropertyIntegrator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         
         browseSpaceList = new ArrayList<>();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -124,6 +146,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             Logger.getLogger(OccInspectionBB.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        availableEventTypeList = oc.getPermittedEventTypesForCECase(currentOccPeriod, getSessionBean().getSessionUser());
+        
+        
+
+        
     }
     
     public void browseSpaceType(){
@@ -152,6 +180,26 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             ex.getMessage(), ""));
         }
     }    
+    
+    public void updateEventCategoryList(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        EventIntegrator ei = getEventIntegrator();
+        try {
+            eventCategoryList = ei.getEventCategoryList(selectedEventType);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Unable to load event category choices, sorry!", ""));
+            
+        }
+    }
+    
+    public void initializeEvent(EventCategory eventCat){
+        
+        
+        
+    }
     
     
     private void reloadCurrentInspection(){
@@ -193,6 +241,175 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
+    
+     public void hideEvent(OccEvent event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(true);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! event ID: " + event.getEventID() + " is now hidden", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not hide event, sorry; this is a system erro", ""));
+        }
+    }
+    
+    public void unHideEvent(CECaseEvent event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(false);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! Unhid event ID: " + event.getEventID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           "Could not unhide event, sorry; this is a system erro", ""));
+        }
+    }
+  /**
+     * Called when the user selects their own EventCategory to add to the case
+     * and is a pass-through method to the initializeEvent method
+     *
+     * @param ev
+     */
+    public void initiateUserChosenEventCreation(ActionEvent ev) {
+        initiateNewEvent();
+    }
+
+    public void initiateNewEvent() {
+
+        if (getSelectedEventCategory() != null) {
+
+            System.out.println("OccInspectionBB.initiateNewEvent | category: " + getSelectedEventCategory().getEventCategoryTitle());
+            EventCoordinator ec = getEventCoordinator();
+            try {
+                selectedEvent = ec.getInitializedEvent(currentOccPeriod, getSelectedEventCategory());
+                selectedEvent.setDateOfRecord(LocalDateTime.now());
+                selectedEvent.setDiscloseToMunicipality(true);
+                selectedEvent.setDiscloseToPublic(false);
+            } catch (CaseLifecyleException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            }
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select an event category to create a new event.", ""));
+        }
+    }
+    
+    public void initializeOccInspectionReport(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        reportConfigOccInspec = oc.getOccInspectionReportConfigDefault( currentInspection, 
+                                                                        currentOccPeriod, 
+                                                                        getSessionBean().getSessionUser());
+        
+        
+    }
+    
+    public String generateOccInspectionReport(){
+        
+        
+        
+        return "inspectionReport";
+    }
+    
+    public void initializeOccPermit(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessionUser());
+        
+        
+        
+    }
+    
+    public String generateOccPermit(OccPermit permit){
+        
+        return "occPermit";
+    }
+    
+    
+    public void initializeOccPermitReport(OccPermit op){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentOccPermit = op;
+        reportConfigOccPermit = oc.getOccPermitReportConfigDefault( currentOccPermit, 
+                                                                    currentOccPeriod, 
+                                                                    currentPropertyUnit, 
+                                                                    getSessionBean().getSessionUser());
+    }
+
+    /**
+     * All Code Enforcement case events are funneled through this method which
+     * has to carry out a number of checks based on the type of event being
+     * created. The event is then passed to the attachNewEventToCECase on the
+     * CaseCoordinator who will do some more checking about the event before
+     * writing it to the DB
+     *
+     * @param ev unused
+     * @throws ViolationException
+     */
+    public void attachEventToOccPeriod(ActionEvent ev) throws ViolationException {
+        EventCoordinator ec = getEventCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+
+        // category is already set from initialization sequence
+        selectedEvent.setOccPeriodID(currentOccPeriod.getPeriodID());
+        selectedEvent.setOwner(getSessionBean().getSessionUser());
+        try {
+        
+            // main entry point for handing the new event off to the CaseCoordinator
+            // only the compliance events need to pass in another object--the violation
+            // otherwise just the case and the event go to the coordinator
+            if (selectedEvent.getCategory().getEventType() == EventType.Compliance) {
+                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, selectedViolation));
+            } else {
+                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, null));
+            }
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully logged event with an ID " + selectedEvent.getEventID(), ""));
+
+            // now update the triggering event with the newly inserted event's ID
+            // (We saved the triggering event when the take action button was clicked, before the event
+            // add dialog was displayed and event-specific data is entered by the user
+            if (triggeringEventForProposal != null) {
+//                triggeringEventForProposal.getEventProposalImplementation().setResponseEvent(selectedEvent);
+//                triggeringEventForProposal.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
+                ec.logResponseToActionRequest(triggeringEventForProposal);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Updated triggering event ID + "
+                                + triggeringEventForProposal.getEventID()
+                                + " with response info!", ""));
+                // reset our holding var since we're done processing the event
+                triggeringEventForProposal = null;
+            }
+
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        }
+
+        // nullify the session's case so that the reload of currentCase
+        // no the cecaseProfile.xhtml will trigger a new DB read
+        refreshCurrentCase();
+    }
      
     /**
      * Called when the user clicks a command button inside the row of the
@@ -522,6 +739,132 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setCurrentProperty(Property currentProperty) {
         this.currentProperty = currentProperty;
+    }
+
+    /**
+     * @return the filteredEventList
+     */
+    public List<OccEvent> getFilteredEventList() {
+        return filteredEventList;
+    }
+
+    /**
+     * @param filteredEventList the filteredEventList to set
+     */
+    public void setFilteredEventList(List<OccEvent> filteredEventList) {
+        this.filteredEventList = filteredEventList;
+    }
+
+    /**
+     * @return the selectedEventType
+     */
+    public EventType getSelectedEventType() {
+        return selectedEventType;
+    }
+
+    /**
+     * @param selectedEventType the selectedEventType to set
+     */
+    public void setSelectedEventType(EventType selectedEventType) {
+        this.selectedEventType = selectedEventType;
+    }
+
+    /**
+     * @return the availableEventTypeList
+     */
+    public List<EventType> getAvailableEventTypeList() {
+        return availableEventTypeList;
+    }
+
+    /**
+     * @param availableEventTypeList the availableEventTypeList to set
+     */
+    public void setAvailableEventTypeList(List<EventType> availableEventTypeList) {
+        this.availableEventTypeList = availableEventTypeList;
+    }
+
+    /**
+     * @return the eventCategoryList
+     */
+    public List<EventCategory> getEventCategoryList() {
+        return eventCategoryList;
+    }
+
+    /**
+     * @param eventCategoryList the eventCategoryList to set
+     */
+    public void setEventCategoryList(List<EventCategory> eventCategoryList) {
+        this.eventCategoryList = eventCategoryList;
+    }
+
+    /**
+     * @return the selectedEvent
+     */
+    public OccEvent getSelectedEvent() {
+        return selectedEvent;
+    }
+
+    /**
+     * @param selectedEvent the selectedEvent to set
+     */
+    public void setSelectedEvent(OccEvent selectedEvent) {
+        this.selectedEvent = selectedEvent;
+    }
+
+    /**
+     * @return the selectedEventCategory
+     */
+    public EventCategory getSelectedEventCategory() {
+        return selectedEventCategory;
+    }
+
+    /**
+     * @param selectedEventCategory the selectedEventCategory to set
+     */
+    public void setSelectedEventCategory(EventCategory selectedEventCategory) {
+        this.selectedEventCategory = selectedEventCategory;
+    }
+
+    /**
+     * @return the reportConfigOccInspec
+     */
+    public ReportConfigOccInspection getReportConfigOccInspec() {
+        return reportConfigOccInspec;
+    }
+
+    /**
+     * @return the reportConfigOccPermit
+     */
+    public ReportConfigOccPermit getReportConfigOccPermit() {
+        return reportConfigOccPermit;
+    }
+
+    /**
+     * @param reportConfigOccInspec the reportConfigOccInspec to set
+     */
+    public void setReportConfigOccInspec(ReportConfigOccInspection reportConfigOccInspec) {
+        this.reportConfigOccInspec = reportConfigOccInspec;
+    }
+
+    /**
+     * @param reportConfigOccPermit the reportConfigOccPermit to set
+     */
+    public void setReportConfigOccPermit(ReportConfigOccPermit reportConfigOccPermit) {
+        this.reportConfigOccPermit = reportConfigOccPermit;
+    }
+
+    /**
+     * @return the currentOccPermit
+     */
+    public OccPermit getCurrentOccPermit() {
+        return currentOccPermit;
+    }
+
+    /**
+     * @param currentOccPermit the currentOccPermit to set
+     */
+    public void setCurrentOccPermit(OccPermit currentOccPermit) {
+        this.currentOccPermit = currentOccPermit;
     }
     
     
