@@ -17,6 +17,7 @@ import com.tcvcog.tcvce.entities.reports.Report;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,10 +42,10 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private ReportConfigCECase reportCECase;
     private ReportConfigCECaseList reportCECaseList;
     
-    
     private Report currentReport;
    
     private ReportConfigCEEventList reportCEEvent;
+    private ReportConfigOccInspection reportInspection;
     
     private HorizontalBarChartModel caseCountByPhase;
     private HorizontalBarChartModel caseCountByStage;
@@ -303,6 +304,20 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      */
     public void setViolationDonut(DonutChartModel violationDonut) {
         this.violationDonut = violationDonut;
+    }
+
+    /**
+     * @return the reportInspection
+     */
+    public ReportConfigOccInspection getReportInspection() {
+        return reportInspection;
+    }
+
+    /**
+     * @param reportInspection the reportInspection to set
+     */
+    public void setReportInspection(ReportConfigOccInspection reportInspection) {
+        this.reportInspection = reportInspection;
     }
 
    

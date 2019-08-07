@@ -19,20 +19,20 @@ import java.io.Serializable;
 public class EventCECaseCasePropBundle 
         implements Serializable, Comparable<EventCECaseCasePropBundle> {
     
-    private CaseBase eventCase;
+    private CECaseBase eventCase;
     private CECaseEvent event;
 
     /**
      * @return the eventCase
      */
-    public CaseBase getEventCaseBare() {
+    public CECaseBase getEventCaseBare() {
         return eventCase;
     }
 
     /**
      * @param eventCase the eventCase to set
      */
-    public void setEventCaseBare(CaseBase eventCase) {
+    public void setEventCaseBare(CECaseBase eventCase) {
         this.eventCase = eventCase;
     }
 

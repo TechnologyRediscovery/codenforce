@@ -32,7 +32,9 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.servlet.http.HttpSession;
 
 /**
  * A hodgepodge class of backing bean code for improvement suggestion stuff
@@ -71,6 +73,36 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         }
         return "missionControl";
     }
+    
+     
+    public String logout(){
+        FacesContext context = getFacesContext();
+        HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
+        
+        if (session != null) {
+
+//            session.removeAttribute("dBConnection");
+//            session.removeAttribute("codeCoordinator");
+//            session.removeAttribute("codeIntegrator");
+//            session.removeAttribute("municipalitygrator");
+//            session.removeAttribute("personIntegrator");
+//            session.removeAttribute("propertyIntegrator");
+//            session.removeAttribute("cEActionRequestIntegrator");
+//            session.removeAttribute("userIntegrator");
+            session.invalidate();
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Logout Successful", ""));
+            System.out.println("MissionControlBB.logout | Session invalidated");
+
+        } else {
+            FacesContext facesContext = getFacesContext();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "ERROR: Unable to invalidate session.", "Your system administrator has been notified."));
+        }
+        return "logoutSequenceComplete";
+    }
+
     
     public void logErrorPageLoad(){
 //        try {

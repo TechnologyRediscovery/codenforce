@@ -35,7 +35,7 @@ public class Citation extends EntityUtils implements Serializable {
     
     private List<CECaseEvent> eventList;
     
-    private CaseBase ceCaseNoLists;
+    private CECaseBase ceCaseNoLists;
     private User userOwner;
     
     private LocalDateTime dateOfRecord;
@@ -261,14 +261,14 @@ public class Citation extends EntityUtils implements Serializable {
     /**
      * @return the ceCaseNoLists
      */
-    public CaseBase getCeCaseNoLists() {
+    public CECaseBase getCeCaseNoLists() {
         return ceCaseNoLists;
     }
 
     /**
      * @param ceCaseNoLists the ceCaseNoLists to set
      */
-    public void setCeCaseNoLists(CaseBase ceCaseNoLists) {
+    public void setCeCaseNoLists(CECaseBase ceCaseNoLists) {
         this.ceCaseNoLists = ceCaseNoLists;
     }
 

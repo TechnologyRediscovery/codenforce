@@ -30,6 +30,8 @@ import com.tcvcog.tcvce.entities.ChoiceEventRule;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.Proposable;
+import com.tcvcog.tcvce.entities.ProposalCECase;
+import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -281,6 +283,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         EventIntegrator ei = getEventIntegrator();
         
         prop.setProposalID(rs.getInt("proposalid"));
+        
         prop.setDirective(getDirective(rs.getInt("directive_directiveid")));
         if(rs.getInt("generatingevent_cecaseeventid") != 0){
             prop.setGeneratingEvent(ei.getEventCECase(rs.getInt("generatingevent_cecaseeventid")));
@@ -295,7 +298,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             prop.setResponseEvent(ei.getOccEvent(rs.getInt("responseevent_occeventid")));
         }
                
-        prop.setInitiator(ui.getUser(rs.getInt("initiator")));
+        prop.setInitiator(ui.getUser(rs.getInt("initiator_userid")));
+        
         prop.setResponderIntended(ui.getUser(rs.getInt("responderintended_userid")));
         if(rs.getTimestamp("activateson") != null){
             prop.setActivatesOn(rs.getTimestamp("activateson").toLocalDateTime());
@@ -304,7 +308,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             prop.setExpiresOn(rs.getTimestamp("expireson").toLocalDateTime());
         }
         
-        prop.setResponderActual(ui.getUser(rs.getInt("responder_userid")));
+        prop.setResponderActual(ui.getUser(rs.getInt("responderactual_userid")));
         prop.setProposalRejected(rs.getBoolean("rejectproposal"));
         if(rs.getTimestamp("responsetimestamp") != null){
             prop.setResponseTimestamp(rs.getTimestamp("responsetimestamp").toLocalDateTime());
@@ -314,21 +318,30 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         prop.setNotes(rs.getString("notes"));
         prop.setOrder(rs.getInt("relativeorder"));
         
-        prop.setCecaseID(rs.getInt("cecase_caseid"));
-        prop.setOccperiodID(rs.getInt("occperiod_periodid"));
+        if(rs.getInt("cecase_caseid") != 0){
+            ProposalCECase propCECase = new ProposalCECase(prop);
+            propCECase.setCeCaseID(rs.getInt("cecase_caseid"));
+            return propCECase;
+        }
         
+        if(rs.getInt("occperiod_periodid") != 0){
+            ProposalOccPeriod propPeriod = new ProposalOccPeriod(prop);
+            propPeriod.setOccperiodID(rs.getInt("occperiod_periodid"));
+            return propPeriod;
+        }
         return prop;
+        
     }
     
     public void updateProposal(Proposal prop) throws IntegrationException{
           String query =    "UPDATE public.choiceproposal\n" +
-                            "   SET directive_directiveid=?, generatingevent_cecaseeventid=?, \n" +
-                            "       initiator_userid=?, responderintended_userid=?, activateson=?, \n" +
-                            "       expireson=?, responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" +
-                            "       responseevent_cecaseeventid=?, active=?, notes=?, relativeorder=?, \n" +
-                            "       generatingevent_occeventid=?, responseevent_occeventid=?, \n" +
-                            "       occperiod_periodid=?, cecase_caseid=?\n" +
-                            " WHERE proposalid=?;";
+                            "   SET directive_directiveid=?, generatingevent_cecaseeventid=?, \n" +   // 1-2
+                            "       initiator_userid=?, responderintended_userid=?, activateson=?, \n" + // 3-5
+                            "       expireson=?, responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" + // 6-9
+                            "       responseevent_cecaseeventid=?, active=?, notes=?, relativeorder=?, \n" + // 10-13
+                            "       generatingevent_occeventid=?, responseevent_occeventid=?, \n" + // 14-15
+                            "       occperiod_periodid=?, cecase_caseid=?\n" + // 16-17
+                            " WHERE proposalid=?;"; // 18
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -349,13 +362,16 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setNull(2, java.sql.Types.NULL);
                 }
             }
+            if(prop.getInitiator().getUserID() != 0){
+                stmt.setInt(3, prop.getInitiator().getUserID());
+            }
             
-            stmt.setInt(3, prop.getInitiator().getUserID());
             if(prop.getResponderIntended() != null){
                 stmt.setInt(4, prop.getResponderIntended().getUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
+            
             if(prop.getActivatesOn() != null){
                 stmt.setTimestamp(5, java.sql.Timestamp.valueOf(prop.getActivatesOn()));
             } else {
@@ -367,18 +383,22 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
+            
             if(prop.getResponderActual() != null){
                 stmt.setInt(7, prop.getResponderActual().getUserID());
             } else {
                 stmt.setNull(7, java.sql.Types.NULL);
             }
+            
             stmt.setBoolean(8, prop.isProposalRejected());
             if(prop.getResponseTimestamp() != null){
                 stmt.setTimestamp(9, java.sql.Timestamp.valueOf(prop.getResponseTimestamp()));
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
             }
+            
             ev = prop.getResponseEvent();
+            
             if(ev != null){
                 if(ev instanceof CECaseEvent){
                     stmt.setInt(10, prop.getResponseEvent().getEventID());
@@ -397,9 +417,14 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             
 //            stmt.setBoolean(14, prop.isHidden());
             
-            stmt.setInt(16, prop.getOccperiodID());
-            stmt.setInt(17, prop.getCecaseID());
-            
+            if(prop instanceof ProposalCECase){
+                ProposalCECase pcec = (ProposalCECase) prop;
+                stmt.setInt(17, pcec.getCeCaseID());
+            } else {
+                ProposalOccPeriod pop = (ProposalOccPeriod) prop;
+                stmt.setInt(16, pop.getOccperiodID());
+                
+            }
             
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -469,13 +494,14 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
 
         Directive dir = new Directive();
         
+        dir.setDirectiveID(rs.getInt("directiveid"));
         dir.setTitle(rs.getString("title"));
         dir.setDescription(rs.getString("overalldescription"));
         dir.setCreator(ui.getUser(rs.getInt("creator_userid")));
         dir.setDirectPropToDefaultMuniCEO(rs.getBoolean("directtodefaultmuniceo"));
         
-        dir.setDirectPropToDefaultMuniStaffer(rs.getBoolean("directproposaltodefaultmunistaffer"));
-        dir.setDirectPropToDeveloper(rs.getBoolean("directproposaltodeveloper"));
+        dir.setDirectPropToDefaultMuniStaffer(rs.getBoolean("directtodefaultmunistaffer"));
+        dir.setDirectPropToDeveloper(rs.getBoolean("directtodeveloper"));
         dir.setExecuteChoiceIfLoneWolf(rs.getBoolean("executechoiceiflonewolf"));
         
         dir.setApplyToClosedBOBs(rs.getBoolean("applytoclosedentities"));
@@ -571,11 +597,11 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
 
     public void insertProposal(Proposal prop) throws IntegrationException{
                         String query = "INSERT INTO public.choiceproposal(\n" +
-                "            proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" +
-                "            initiator_userid, responderintended_userid, activateson, expireson, \n" +
-                "            responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" +
-                "            active, notes, relativeorder, generatingevent_occeventid, \n" +
-                "            responseevent_occeventid, occperiod_periodid, cecase_caseid)\n" +
+                "            proposalid, directive_directiveid, generatingevent_cecaseeventid, \n" + //1-2
+                "            initiator_userid, responderintended_userid, activateson, expireson, \n" +//3-6
+                "            responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" + //7-10
+                "            active, notes, relativeorder, generatingevent_occeventid, \n" + //11-14
+                "            responseevent_occeventid, occperiod_periodid, cecase_caseid)\n" + //15-17
                 "    VALUES (DEFAULT, ?, ?, \n" +
                 "            ?, ?, ?, ?, \n" +
                 "            ?, ?, ?, ?, \n" +
@@ -649,9 +675,14 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(12, prop.getNotes());
             stmt.setInt(13, prop.getOrder());
             
-//            stmt.setBoolean(14, prop.isHidden());
-            stmt.setInt(16, prop.getOccperiodID());
-            stmt.setInt(17, prop.getCecaseID());
+             if(prop instanceof ProposalCECase){
+                ProposalCECase pcec = (ProposalCECase) prop;
+                stmt.setInt(17, pcec.getCeCaseID());
+            } else {
+                ProposalOccPeriod pop = (ProposalOccPeriod) prop;
+                stmt.setInt(16, pop.getOccperiodID());
+                
+            }
             
             stmt.execute();
 

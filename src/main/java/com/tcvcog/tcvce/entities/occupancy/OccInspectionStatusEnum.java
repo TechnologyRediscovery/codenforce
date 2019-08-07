@@ -23,17 +23,17 @@ import com.tcvcog.tcvce.entities.*;
  *
  * @author Eric C. Darsow
  */
-public enum InspectionStatusEnum {
+public enum OccInspectionStatusEnum {
 
-    NOTINSPECTED("Not yet inspected", 0, "inspectionStatusIcon_notinspected"),
-    PASS("Passed inspection", 1, "inspectionStatusIcon_pass"),
-    FAIL("Failed inspection", 2, "inspectionStatusIcon_fail");
+    NOTINSPECTED("Not inspected", 0, "inspectionStatusIcon_notinspected"),
+    PASS("Passed", 1, "inspectionStatusIcon_pass"),
+    FAIL("Failed", 2, "inspectionStatusIcon_fail");
     
     private final String label;
     private final int phaseOrder;
     private final String iconPropertyLookup;
     
-    private InspectionStatusEnum(String label, int ord, String iconLkup){
+    private OccInspectionStatusEnum(String label, int ord, String iconLkup){
         this.label = label;
         this.phaseOrder = ord;
         this.iconPropertyLookup = iconLkup;

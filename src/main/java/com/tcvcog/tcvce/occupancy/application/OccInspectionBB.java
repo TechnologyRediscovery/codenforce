@@ -6,12 +6,19 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
+import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.entities.ProposalCECase;
+import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
@@ -127,6 +134,24 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
+     public void makeChoice(Choice choice, Proposal p){
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        try {
+            if(p instanceof ProposalOccPeriod){
+                currentOccPeriod = cc.processProposalEvaluation(    p, 
+                                                                    choice, 
+                                                                    currentOccPeriod, 
+                                                                    getSessionBean().getSessionUser());
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
+            }
+            
+        } catch (EventException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            ex.getMessage(), ""));
+        }
+    }    
     
     
     private void reloadCurrentInspection(){
@@ -214,10 +239,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
      }
      
+     
+     
      public void removeComlianceWithElement(OccInspectedSpaceElement inSpcEl){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.removeComplianceWithInspectedElement(    inSpcEl,
+            oc.inspectWithoutCompliance(inSpcEl,
                                                         getSessionBean().getSessionUser(),
                                                         currentInspection);
             reloadCurrentInspection();
@@ -231,6 +258,46 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 ex.getMessage() + inSpcEl.getInspectedSpaceElementID(), ""));
         }
      }
+     
+     public void inspectElementWithoutCompliance(OccInspectedSpaceElement inSpcEl){
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.inspectWithoutCompliance(inSpcEl,
+                                        getSessionBean().getSessionUser(),
+                                        currentInspection);
+            reloadCurrentInspection();
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Compliance removed for Space Element: " + inSpcEl.getInspectedSpaceElementID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                ex.getMessage() + inSpcEl.getInspectedSpaceElementID(), ""));
+        }
+     }
+     
+     
+     
+     public void clearInspectionOfElement(OccInspectedSpaceElement inSpcEl){
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.clearInspectionOfElement(    inSpcEl,
+                                            getSessionBean().getSessionUser(),
+                                            currentInspection);
+            reloadCurrentInspection();
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Inspection cleared for Space Element: " + inSpcEl.getInspectedSpaceElementID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                ex.getMessage() + inSpcEl.getInspectedSpaceElementID(), ""));
+        }
+     }
+     
+     
      
      public void editLocation(OccInspectedSpace inSpace){
          

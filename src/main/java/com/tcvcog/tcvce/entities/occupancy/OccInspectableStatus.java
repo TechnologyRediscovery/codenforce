@@ -22,10 +22,10 @@ import com.tcvcog.tcvce.entities.Status;
  *
  * @author sylvia
  */
-public class InspectableStatus extends Status{
-    private final InspectionStatusEnum statusEnum;
+public class OccInspectableStatus extends Status{
+    private final OccInspectionStatusEnum statusEnum;
 
-    public InspectableStatus(InspectionStatusEnum enumVal){
+    public OccInspectableStatus(OccInspectionStatusEnum enumVal){
         statusEnum = enumVal;
     }
     
@@ -33,7 +33,7 @@ public class InspectableStatus extends Status{
     /**
      * @return the statusEnum
      */
-    public InspectionStatusEnum getStatusEnum() {
+    public OccInspectionStatusEnum getStatusEnum() {
         return statusEnum;
     }
 

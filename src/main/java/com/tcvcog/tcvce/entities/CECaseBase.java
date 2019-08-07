@@ -15,7 +15,9 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class CaseBase extends EntityUtils implements Serializable, Cloneable {
+public class CECaseBase 
+        extends EntityUtils 
+        implements Serializable, Cloneable {
     
     protected int caseID;
     protected int publicControlCode;
@@ -61,7 +63,7 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
      * @throws CloneNotSupportedException
      */
     @Override
-    public CaseBase clone() throws CloneNotSupportedException{
+    public CECaseBase clone() throws CloneNotSupportedException{
         super.clone();
         return null;
         
@@ -337,7 +339,7 @@ public class CaseBase extends EntityUtils implements Serializable, Cloneable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CaseBase other = (CaseBase) obj;
+        final CECaseBase other = (CECaseBase) obj;
         if (this.caseID != other.caseID) {
             return false;
         }

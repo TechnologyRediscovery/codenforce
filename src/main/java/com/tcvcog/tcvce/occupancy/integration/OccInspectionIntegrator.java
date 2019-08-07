@@ -1006,9 +1006,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                     stmt.setNull(3, java.sql.Types.NULL);
                 }
                 if(inspElement.getComplianceGrantedBy() != null){
-                    stmt.setInt(4, inspElement.getLastInspectedBy().getUserID());
+                    stmt.setInt(4, inspElement.getComplianceGrantedBy().getUserID());
                 } else {
-                    stmt.setNull(5, java.sql.Types.NULL);
+                    stmt.setNull(4, java.sql.Types.NULL);
                 }
                 
                 if(inspElement.getComplianceGrantedTS() != null){
@@ -1020,7 +1020,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 // TODO: failure severity classes
                 stmt.setNull(6, java.sql.Types.NULL);
                 
-                stmt.setInt(7, inspElement.getElementID());
+                stmt.setInt(7, inspElement.getInspectedSpaceElementID());
                 
                 
                 stmt.executeUpdate();

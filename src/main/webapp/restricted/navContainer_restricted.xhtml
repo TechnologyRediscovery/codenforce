@@ -125,10 +125,10 @@
                                 </p:submenu>
 
                                 <f:facet name="options">
-                                    <p:commandButton 
-                                                     action="#{missionControlBB.logout}" 
-                                                     value="Logout: #{sessionBean.sessionUser.person.firstName}"
-                                                     ajax="false"/>
+                                    <p:commandButton    id="navcontres-button-logout"
+                                                        action="#{systemServicesBB.logout}" 
+                                                        value="Logout: #{sessionBean.sessionUser.person.firstName}"
+                                                        ajax="false"/>
                                 </f:facet>
                             </p:menubar>
                             </h:form>

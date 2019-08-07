@@ -1597,4 +1597,10 @@
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <description>Handles client-side actions related to choice display and selection</description>
+        <managed-bean-name>choiceBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ChoiceBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

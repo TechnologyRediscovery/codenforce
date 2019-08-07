@@ -1,4 +1,3 @@
--- STATUS: Unreleased
 -- STATUS: Prototype db: WIP
 -- STATUS: Beta db: null
 
