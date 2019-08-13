@@ -22,11 +22,16 @@
                         </h:messages>
 
                         <p:commandButton value="Got To Fee Manage" action="#{occPermitApplicationBB.goToFeeManage()}"/>
-                        
+
+                        <p:commandButton value="Got To Payment Manage" action="#{occPermitApplicationBB.goToPayments()}"/>
+
+                        <p:commandButton value="Got To Fee Manage" action="#{occPermitApplicationBB.goToPaymentTypes()}"/>
+
+
                         <h1>Public Data Access Portal</h1>
 
                         <h:form id="checkRequestStatusForm">
-                           
+
                             <h:outputLabel for="controlCode" >
                                 <h:outputText value="Enter your 6-digit public access control code (PACC)" styleClass="uiLabel" />
                             </h:outputLabel>
@@ -47,10 +52,10 @@
                             <p:dataList id="bundleDL" emptyMessage="Please enter a valid control code to retrieve data" 
                                         value="#{publicInfoBB.publicInfoBundleList}" 
                                         var="pib" type="definition">
-                                
+
                                 <div class="publicInfoBundleContainer">
-                                    
-                                
+
+
                                     <h:outputText escape="false" value="#{pib}"/>
 
                                     <p:spacer height="5px"/>
@@ -66,36 +71,36 @@
                                                      ajax="false" rendered="#{pib.showDetailsPageButton}"/>
 
                                 </div>
-                                
-                                
+
+
                             </p:dataList>
 
                         </h:form>
-                        
-                        
-                        
-                                <p:confirmDialog message="Type your message to the code enforcement staff in the box below." 
-                                                      severity="alert" widgetVar="messageDialog">
 
-                                    <h:form id="messageForm">
-                                        
-                                        
-                                        <h:outputText value="You are attaching a note to bundle with a type: #{publicInfoBB.selectedBundle.typeName}"/>
-                                        
-                                        <p:spacer height="15px"/>
-                                        <p:inputTextarea id="message-ita" style="width: 300px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
-                                        <p:spacer height="15px"/>
-                                        <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage}"
-                                                         value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
-                                                         update="paccSearchMessages
-                                                                messageForm:message-ita"/>
-                                        <p>Please note that all messages submitted through this portal become part of the permanent case record
-                                        and may be included in documents prepare for town councils and magistrates. </p>
-                                    </h:form>
-                                </p:confirmDialog>
-                                
-                        
-                        
+
+
+                        <p:confirmDialog message="Type your message to the code enforcement staff in the box below." 
+                                         severity="alert" widgetVar="messageDialog">
+
+                            <h:form id="messageForm">
+
+
+                                <h:outputText value="You are attaching a note to bundle with a type: #{publicInfoBB.selectedBundle.typeName}"/>
+
+                                <p:spacer height="15px"/>
+                                <p:inputTextarea id="message-ita" style="width: 300px; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                <p:spacer height="15px"/>
+                                <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage}"
+                                                 value="Submit" icon="fa fa-link" oncomplete="PF('messageDialog').hide()" 
+                                                 update="paccSearchMessages
+                                                 messageForm:message-ita"/>
+                                <p>Please note that all messages submitted through this portal become part of the permanent case record
+                                    and may be included in documents prepare for town councils and magistrates. </p>
+                            </h:form>
+                        </p:confirmDialog>
+
+
+
                     </div>
                 </f:view>
 

@@ -89,19 +89,19 @@
                                              value="Nuke Selected Type Forever" tabindex="3"/>
 
                             <p:spacer height="15"/>
-                            
+
                             <p:commandButton    id="newFeeDialogButton"
                                                 actionListener="#{feeManagementBB.initializeNewFee}"
-                                                    oncomplete="PF('feeAddDialogVar').show()"
-                                                    ajax="true"
-                                                    update="poccInsFeeAddForm"
-                                                    value="Create new Fee"
-                                                    icon="fa fa-plus"
-                                                    />
+                                                oncomplete="PF('feeAddDialogVar').show()"
+                                                ajax="true"
+                                                update="poccInsFeeAddForm"
+                                                value="Create new Fee"
+                                                icon="fa fa-plus"
+                                                />
                             <ui:remove>
                                                     <!--rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                     ajax="true" actionListener="#{personsBB.initiatePersonCreation}"
-                                                    -->
+                                -->
                             </ui:remove>
                         </h:form>    
 
@@ -182,13 +182,13 @@
                                     </h:panelGroup>
 
                                     <ui:remove>
-                                    <h:outputLabel value="Notes:" for="newOccInsFeeNotes"/>
-                                    <h:panelGroup>
-                                        <p:inputText id="newOccInsFeeNotes" value="#{feeManagementBB.formFeeNotes}" 
-                                                     style="width: 250px;" tabindex="8" required="false" styleClass="inputText"/>
-                                        <h:message for="newOccInsFeeNotes" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
+                                        <h:outputLabel value="Notes:" for="newOccInsFeeNotes"/>
+                                        <h:panelGroup>
+                                            <p:inputText id="newOccInsFeeNotes" value="#{feeManagementBB.formFeeNotes}" 
+                                                         style="width: 250px;" tabindex="8" required="false" styleClass="inputText"/>
+                                            <h:message for="newOccInsFeeNotes" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
                                     </ui:remove>
                                     <h:outputLabel value="Expiry Date:" for="newOccInsFeeExpDate"/>
                                     <h:panelGroup>
@@ -226,12 +226,12 @@
                                                  value="Commit Updates" tabindex="10"
                                                  rendered="#{feeManagementBB.editing}"/>
                                 <p:commandButton    id="cancel-cb"
-                                                ajax="true"  tabindex="27"
-                                                value="Cancel" 
-                                                icon="fa fa-stop" 
-                                                immediate="true"
-                                                onclick="PF('feeAddDialogVar').hide()"
-                                                />
+                                                    ajax="true"  tabindex="27"
+                                                    value="Cancel" 
+                                                    icon="fa fa-stop" 
+                                                    immediate="true"
+                                                    onclick="PF('feeAddDialogVar').hide()"
+                                                    />
                             </h:form>
                         </p:dialog>
                     </f:view>

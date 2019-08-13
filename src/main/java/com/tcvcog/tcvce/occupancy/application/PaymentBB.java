@@ -48,6 +48,8 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private PaymentType formPaymentType;
     private PaymentType newSelectedPaymentType;
     private PaymentType newPaymentType;
+    
+    private boolean editing;
 
     public PaymentBB() {
     }
@@ -101,6 +103,8 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Payment record updated!", ""));
+            editing = false;
+            formPayment = new Payment();
         } catch (IntegrationException ex){
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -123,11 +127,19 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             formPayment.setPaymentDateDeposited(selectedPayment.getPaymentDateDeposited());
             formPayment.setPaymentDateReceived(selectedPayment.getPaymentDateReceived());
             formPayment.setNotes(selectedPayment.getNotes());
+            editing = true;
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Please select a payment record to update", ""));
         }
+    }
+    
+    public void initializeNewPayment(ActionEvent e){
+        
+        editing = false;
+        formPayment = new Payment();
+        
     }
     
     public String addPayment(){
@@ -347,7 +359,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         if(getSelectedPaymentType() != null){
             formPaymentType.setPaymentTypeId(selectedPaymentType.getPaymentTypeId());
             formPaymentType.setPaymentTypeTitle(selectedPaymentType.getPaymentTypeTitle());
-            
+            editing = true;
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -366,6 +378,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Payment type updated!", ""));
+            editing = false;
         } catch (IntegrationException ex){
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -524,6 +537,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      */
     public void setPaymentTypeTitleList(ArrayList<PaymentType> paymentTypeTitleList) {
         this.paymentTypeTitleList = paymentTypeTitleList;
+    }
+
+    public boolean isEditing() {
+        return editing;
+    }
+
+    public void setEditing(boolean editing) {
+        this.editing = editing;
     }
     
 }
