@@ -826,7 +826,7 @@
 
                             <h2 id="add-event">Add new event</h2>
 
-                            <h:form id="formEventAddAjax">
+                            <h:form id="insp-events-form-addevent">
 
                                 <h:panelGrid columns="3" border="0" 
                                              cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
@@ -853,6 +853,23 @@
                                             <h:outputText value="Step 2: Choose category"/>
                                         </h:outputLabel>
 
+                                        
+                                        <p:dataScroller id="insp-events-datascroller-chooseeventcategory"
+                                                        value="#{occInspectionBB.eventCategoryList}"
+                                                        var="eventCat"
+                                                        rowIndexVar="#{eventCat.categoryID}">
+                                            
+                                            <p:commandButton id="insp-events-button-selecteventcat"
+                                                             ajax="true"
+                                                             value="new #{eventCat.eventCategoryTitle} event"
+                                                             actionListener="#{occInspectionBB.initializeEvent(eventCat)}"
+                                                             icon="fa fa-plus" 
+                                                             oncomplete=""
+                                                             update="insp-form-addeditevent"
+                                                             
+                                                             />
+                                            
+                                        </p:dataScroller>
                                         <p:selectOneListbox style="width: 300px;" id="categoryList" value="#{caseProfileBB.selectedEventCategory}" tabindex="10">
                                             <p:ajax update="selectedEventCategoryDescription
                                                     selectedEventCategoryDescription 
@@ -2217,7 +2234,6 @@
                                     <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
                                     <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{caseProfileBB.reportCECase.includeViolationPhotos}" />
 
-                                    <p:spacer height="5px"/>
                                 </h:panelGroup>
                             </h:panelGrid>
 

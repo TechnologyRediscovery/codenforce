@@ -1230,7 +1230,7 @@ gridTd-bignum{
 
 
 
-/* -------------------- INSPECTION----------------------- */
+/* -------------------- INSPECTION AND OCC PERMIT----------------------- */
 
 h2.insp-proposal-prophead{
     font-weight: bold;
@@ -1285,9 +1285,86 @@ i.inspection-notinspected{
 }
 
 
+.occpermit-borderbox{
+    display: block;
+    width: 800px;
+    border: #00637F double medium;
+}
+
+.occpermit-datagrid{
+    
+    
+}
+
+.gridTd-permit {
+    border: none;
+    vertical-align: top;
+    padding: 10px;
+}
 
 
-/* ****************** CLOSE INSPECTION********************/
+.occpermit-title{
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.occpermit-titlesub{
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 1.1em;
+    font-style: italic;
+}
+
+.occpermit-criticaldata-label{
+    display: block;
+    clear: right;
+    font-weight: bold;
+    font-size: 1.2em;
+    
+}
+
+.occpermit-criticaldata-value{
+    font-size: 1.2em;
+}
+
+.occpermit-minordata-label{
+    font-size: 1em;
+    
+}
+
+.occpermit-minordata-value{
+    font-size: 1em;
+    
+}
+
+.occpermit-admindata-label{
+    font-size: .8em;
+    font-weight: bold;
+    color: darkgrey;
+}
+
+.occpermit-admindata-value{
+    font-size: .8em;
+    
+}
+
+.occpermit-additionalnotes{
+    
+}
+
+.occpermit-muniheader{
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* ****************** CLOSE INSPECTION AND OCC PERMIT********************/
 
 /* -------------------- MISC --------------------------------- */
 

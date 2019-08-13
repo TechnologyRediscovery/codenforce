@@ -18,6 +18,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,7 +46,9 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     private Report currentReport;
    
     private ReportConfigCEEventList reportCEEvent;
-    private ReportConfigOccInspection reportInspection;
+    
+    private ReportConfigOccInspection reportConfigOccInspection;
+    private ReportConfigOccPermit reportConfigOccPermit;
     
     private HorizontalBarChartModel caseCountByPhase;
     private HorizontalBarChartModel caseCountByStage;
@@ -71,22 +74,28 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         caseList = getSessionBean().getSessionCECaseList();
         DataCoordinator dc = getDataCoordinator();
         
-        try {
-            cPhaseMap = dc.getCaseCountsByPhase(caseList);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
+        if(caseList != null && !caseList.isEmpty()){
+            
+            try {
+                cPhaseMap = dc.getCaseCountsByPhase(caseList);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+            generateModelCaseCountByPhase();
+            generateModelCaseCountsByStage();
         }
         
         reportCECase = getSessionBean().getReportConfigCECase();
         reportCECaseList = getSessionBean().getReportConfigCECaseList();
+        reportConfigOccPermit = getSessionBean().getReportConfigOccPermit();
+        reportConfigOccInspection = getSessionBean().getReportConfigInspection();
+        
         if(reportCECase != null){
             currentReport = reportCECase;
         } else {
             currentReport = reportCECaseList;
         }
         
-        generateModelCaseCountByPhase();
-        generateModelCaseCountsByStage();
         
     }
     
@@ -307,17 +316,31 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the reportInspection
+     * @return the reportConfigOccInspection
      */
-    public ReportConfigOccInspection getReportInspection() {
-        return reportInspection;
+    public ReportConfigOccInspection getReportConfigOccInspection() {
+        return reportConfigOccInspection;
     }
 
     /**
-     * @param reportInspection the reportInspection to set
+     * @param reportConfigOccInspection the reportConfigOccInspection to set
      */
-    public void setReportInspection(ReportConfigOccInspection reportInspection) {
-        this.reportInspection = reportInspection;
+    public void setReportConfigOccInspection(ReportConfigOccInspection reportConfigOccInspection) {
+        this.reportConfigOccInspection = reportConfigOccInspection;
+    }
+
+    /**
+     * @return the reportConfigOccPermit
+     */
+    public ReportConfigOccPermit getReportConfigOccPermit() {
+        return reportConfigOccPermit;
+    }
+
+    /**
+     * @param reportConfigOccPermit the reportConfigOccPermit to set
+     */
+    public void setReportConfigOccPermit(ReportConfigOccPermit reportConfigOccPermit) {
+        this.reportConfigOccPermit = reportConfigOccPermit;
     }
 
    

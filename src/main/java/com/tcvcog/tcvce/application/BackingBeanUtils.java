@@ -491,6 +491,19 @@ public class BackingBeanUtils implements Serializable{
             return "";
         }
     }
+    
+    
+    public String getPrettyDateNoTime(LocalDateTime d){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy");
+        if(d != null){
+            String formattedDateTime = d.format(formatter); 
+            return formattedDateTime;
+        } else {
+            return "";
+        }
+    }
+    
+    
 
     /**
      * @return the codeViolationIntegrator

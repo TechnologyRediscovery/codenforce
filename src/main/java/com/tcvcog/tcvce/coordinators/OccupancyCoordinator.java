@@ -20,7 +20,9 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityComplete;
@@ -28,6 +30,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
@@ -39,8 +42,12 @@ import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -62,6 +69,9 @@ import javax.sound.midi.SysexMessage;
  */
 public class OccupancyCoordinator extends BackingBeanUtils implements Serializable {
 
+    private final int MINIMUM_RANK_INSPECTOREVENTS = 5;
+    private final int MINIMUM_RANK_STAFFEVENTS = 3;
+    
     /**
      * Creates a new instance of OccupancyCoordinator
      */
@@ -172,13 +182,86 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         return inSpaceEle;
     }
+        
+    public List<EventType> getPermittedEventTypesForCECase(OccPeriod op, User u){
+        List<EventType> typeList = new ArrayList<>();
+        int rnk = u.getRoleType().getRank();
+        
+        if(rnk >= MINIMUM_RANK_INSPECTOREVENTS){
+            typeList.add(EventType.Action);
+            typeList.add(EventType.Timeline);
+        }
+        
+        if(rnk >= MINIMUM_RANK_STAFFEVENTS){
+            typeList.add(EventType.Communication);
+            typeList.add(EventType.Meeting);
+            typeList.add(EventType.Custom);
+            typeList.add(EventType.Occupancy);
+        }
+        return typeList;
+    }
+    
 
-
+    public ReportConfigOccInspection getOccInspectionReportConfigDefault(   OccInspection insp, 
+                                                                            OccPeriod period,
+                                                                            User usr){
+        ReportConfigOccInspection rpt = new ReportConfigOccInspection();
+        rpt.setReportPeriod(period);
+        
+        rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
+        rpt.setCreator(usr);
+        rpt.setMuni(getSessionBean().getSessionMuni());
+        
+        rpt.setIncludeOccPeriodInfoHeader(true);
+        rpt.setIncludeElements_notInspected(false);
+        rpt.setIncludeElements_pass(false);
+        rpt.setIncludeElements_fail(true);
+        
+        rpt.setIncludePhotos_pass(false);
+        rpt.setIncludePhotos_fail(true);
+        
+        rpt.setSeparateElementsBySpace(true);
+        rpt.setIncludeFullOrdText(false);
+        rpt.setIncludeElementNotes(true);
+        
+        rpt.setIncludeElementLastInspectedInfo(false);
+        rpt.setIncludeElementComplianceInfo(false);
+        
+        rpt.setIncludeFullInpsectedSpaceList(true);
+        rpt.setIncludeNextStepText(false);
+        rpt.setIncludeSignature(false);
+        
+        return rpt;
+    }
     
     
+    public ReportConfigOccPermit getOccPermitReportConfigDefault(   OccPermit permit,
+                                                                    OccPeriod period,
+                                                                    PropertyUnit propUnit,
+                                                                    User u){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        ReportConfigOccPermit rpt = new ReportConfigOccPermit();
+        rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occpermit_default_title"));
+        
+        rpt.setPermit(permit);
+        rpt.setPeriod(period);
+        try {
+            rpt.setPropUnitWithProp(pi.getPropertyUnitWithProp(propUnit.getUnitID()));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        rpt.setCreator(u);
+        
+        return rpt;
+    }
     
-    
-    
+    public OccPermit getOccPermitSkeleton(User usr){
+        OccPermit permit = new OccPermit();
+        permit.setDateIssued(LocalDateTime.now());
+        permit.setIssuedBy(usr);
+        return permit;
+        
+    }
     
     public OccInspection getOccInspectionSkeleton(){
         return new OccInspection();

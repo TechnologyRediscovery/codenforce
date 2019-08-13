@@ -578,6 +578,32 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
     }
+    
+    public void updateEvent(OccEvent event) throws IntegrationException{
+         String query = "UPDATE public.ceevent\n"
+                + "   SET activeevent=false, hidden=true WHERE eventid = ?;";
+
+        // TO DO: finish clearing view confirmation
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, event.getEventID());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive event", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           
+        } // close finally
+    }
 
     public void updateEvent(CECaseEvent event) throws IntegrationException {
         StringBuilder sb = new StringBuilder();
