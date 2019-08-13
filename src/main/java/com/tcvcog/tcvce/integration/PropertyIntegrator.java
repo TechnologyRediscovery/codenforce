@@ -34,6 +34,8 @@ import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -1128,16 +1130,18 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param pu
      * @return a PropertyUnit containing a list of OccPeriods, and more in the future
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.EventException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
-    public PropertyUnitWithLists getPropertyUnitWithLists(PropertyUnit pu) throws IntegrationException{
+    public PropertyUnitWithLists getPropertyUnitWithList(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException{
         return getPropertyUnitWithLists(pu.getUnitID());
     }
     
-    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID) throws IntegrationException{
+    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID) throws IntegrationException, EventException, AuthorizationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
 
         PropertyUnitWithLists puwl = new PropertyUnitWithLists(getPropertyUnitByPropertyUnitID(unitID));
-        puwl.setPeriodList(oi.getOccPeriodList(unitID));
+        puwl.setPeriodList(oi.getOccPeriodList(unitID, getSessionBean().getSessionUser()));
         return puwl;
     }
     

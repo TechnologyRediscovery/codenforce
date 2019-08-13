@@ -89,6 +89,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private OccInspection currentInspection;
     
     private OccPeriod currentOccPeriod;
+    private ProposalOccPeriod currentProposal;
     private List<OccEvent> filteredEventList;
     
     private PropertyUnitWithProp currentPropertyUnit;
@@ -143,10 +144,10 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             }
         }
         try {
-            currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID());
+            currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID(), getSessionBean().getSessionUser());
             currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-        } catch (IntegrationException ex) {
-            Logger.getLogger(OccInspectionBB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IntegrationException | EventException| AuthorizationException ex) {
+            System.out.println(ex);
         }
         
         availableEventTypeList = oc.getPermittedEventTypesForCECase(currentOccPeriod, getSessionBean().getSessionUser());
@@ -200,6 +201,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void initializeEvent(EventCategory eventCat){
         
         
+        
+    }
+    
+    public void viewProposalMetadata(ProposalOccPeriod p){
+        currentProposal = p;
         
     }
     
@@ -318,7 +324,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     public String generateOccInspectionReport(){
-        
+        getSessionBean().setReportConfigInspection(reportConfigOccInspec);
         
         
         return "inspectionReport";
@@ -866,6 +872,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedPerson(Person selectedPerson) {
         this.selectedPerson = selectedPerson;
+    }
+
+    /**
+     * @return the currentProposal
+     */
+    public ProposalOccPeriod getCurrentProposal() {
+        return currentProposal;
+    }
+
+    /**
+     * @param currentProposal the currentProposal to set
+     */
+    public void setCurrentProposal(ProposalOccPeriod currentProposal) {
+        this.currentProposal = currentProposal;
     }
     
     

@@ -18,6 +18,8 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -78,7 +80,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccupancyCoordinator() {
     }
     
-    public OccPeriod configureOccPeriod(OccPeriod period){
+    public OccPeriod configureOccPeriod(OccPeriod period, User u) throws EventException, AuthorizationException{
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        period = cc.configureProposals(period, u);
         
         return period;
         

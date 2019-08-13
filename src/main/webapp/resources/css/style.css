@@ -1226,18 +1226,33 @@ gridTd-bignum{
     margin:5px;
 }
 
+.right-floater{
+    display: block;
+    float: right;
+    clear: none;
+}
+
 /* ****************** CLOSE BUTTON STYLES ********************/
 
 
 
 /* -------------------- INSPECTION AND OCC PERMIT----------------------- */
 
-h2.insp-proposal-prophead{
+.occperiod-proposal-choice-button{
+    margin-top: 5px;
+}
+
+.occperiod-proposal-prophead{
     font-weight: bold;
     font-size: 1.2em;
 }
 
-h2.insp-proposal-choicehead{
+.occperiod-proposal-description{
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+.occperiod--proposal-choicehead{
     font-weight: bold;
     font-size: 1.2em;
 }
@@ -1255,13 +1270,13 @@ i.inspection-notinspected{
     color: #1a237e;
 }
 
-.insp-inspace-header{
+.occperiod-inspace-header{
     font-size: 1.4em;
     font-weight: bold;
     color: #163F8A;
     margin-bottom: 15px;
 }
-.insp-inelement-header{
+.occperiod-inelement-header{
     font-size: 1.2em;
     font-weight: bold;
     margin-top: 5px;
@@ -1362,6 +1377,23 @@ i.inspection-notinspected{
     text-align: center;
     font-size: 1.5em;
     font-weight: bold;
+}
+
+/*class given to <h:outputText ... components which are nested in an <hx of some kind*/
+.occperiod-periodlabel{
+    font-weight: bold;
+    color: darkgrey;
+    font-size: 1.1em;
+}
+
+.occperiod-periodvalue{
+    
+    
+}
+
+.occperiod-address{
+    font-weight: bold;
+    font-size: 1.3em;
 }
 
 /* ****************** CLOSE INSPECTION AND OCC PERMIT********************/
