@@ -44,7 +44,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     public ChoiceCoordinator() {
     }
     
-    public CECase configureProposals(CECase cse, UserWithAccessData u) throws EventException, AuthorizationException{
+    public CECase configureProposals(CECase cse, User u) throws EventException, AuthorizationException{
         Iterator<Proposal> iter = cse.getProposalList().iterator();
         while(iter.hasNext()){
             Proposal p = iter.next();
@@ -60,7 +60,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         return cse;
     }
     
-    public OccPeriod configureProposals(OccPeriod oPeriod, UserWithAccessData u) throws EventException, AuthorizationException{
+    public OccPeriod configureProposals(OccPeriod oPeriod, User u) throws EventException, AuthorizationException{
         Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
         while(iter.hasNext()){
             Proposal p = iter.next();
@@ -76,7 +76,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     private Proposal configureProposal( Proposal proposal, 
-                                        UserWithAccessData u){
+                                        User u){
         
         // start by  setting the most restrictive rights and then relax them as authorization
         // status allows
@@ -89,9 +89,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         if(!proposal.getActivatesOn().isBefore(LocalDateTime.now()) && !proposal.getExpiresOn().isAfter((LocalDateTime.now()))){
-            if(u.getAccessRecord().getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
+            if(u.getRoleType().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
                 proposal.setHidden(false);
-                if(u.getAccessRecord().getRole().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){
+                if(u.getRoleType().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){
                     proposal.setReadOnlyCurrentUser(false);
                 }
                 // this will only execute if we are unhidden
@@ -103,7 +103,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
-    public Proposal configureChoiceList(Proposal proposal, UserWithAccessData u){
+    public Proposal configureChoiceList(Proposal proposal, User u){
         Iterator<Proposable> iter = proposal.getDirective().getChoiceList().iterator();
         while(iter.hasNext()){
             Proposable p = iter.next();
@@ -112,7 +112,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         return proposal;
     }
     
-    private Proposable configureChoice(Proposable choice, UserWithAccessData u){
+    private Proposable configureChoice(Proposable choice, User u){
         choice.setHidden(true);
         choice.setCanChoose(false);
         
@@ -121,9 +121,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
             return choice;
         }
         
-         if(u.getAccessRecord().getRole().getRank() >= choice.getMinimumRequiredUserRankToView()){
+         if(u.getRoleType().getRank() >= choice.getMinimumRequiredUserRankToView()){
                 choice.setHidden(false);
-                if(u.getAccessRecord().getRole().getRank() >= choice.getMinimumRequiredUserRankToChoose()){
+                if(u.getRoleType().getRank() >= choice.getMinimumRequiredUserRankToChoose()){
                     choice.setCanChoose(true);
                 }
             }
@@ -135,7 +135,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     public CECase processProposalEvaluation(    Proposal proposal, 
                                                 Proposable chosen, 
                                                 CECase cse, 
-                                                UserWithAccessData u) 
+                                                User u) 
                                                 throws EventException, AuthorizationException{
         
 
@@ -158,7 +158,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     public OccPeriod processProposalEvaluation( Proposal proposal, 
                                                 Proposable chosen, 
                                                 OccPeriod oPeriod, 
-                                                UserWithAccessData u) throws EventException, AuthorizationException{
+                                                User u) throws EventException, AuthorizationException{
                                             
         OccupancyIntegrator oi = getOccupancyIntegrator();
         
