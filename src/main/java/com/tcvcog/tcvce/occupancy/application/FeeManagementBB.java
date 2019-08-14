@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.occupancy.application;
 
-
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -24,8 +23,11 @@ import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import javafx.util.converter.LocalDateTimeStringConverter;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
 import javax.faces.event.ActionEvent;
@@ -34,74 +36,63 @@ import javax.faces.event.ActionEvent;
  *
  * @author Adam Gutonski
  */
-
 @ViewScoped
 public class FeeManagementBB extends BackingBeanUtils implements Serializable {
-    
+
     private ArrayList<Fee> existingFeeTypeList;
     private Fee selectedFeeType;
-    private int formFeeID;
     private Municipality formMuni;
-    private String formFeeName;
-    private double formFeeAmount;
-    private java.util.Date formFeeEffDate;
-    private java.util.Date formFeeExpDate;
-    private String formFeeNotes;
-    
-    //create data fields for user editing/updating of occ. inspection fees
-    private Fee newFormSelectedFee;
-    private int newFormFeeID;
-    private String newFormFeeName;
-    private double newFormFeeAmount;
-    private java.util.Date newFormFeeEffDate;
-    private java.util.Date newFormFeeExpDate;
-    private String newFormFeeNotes;
+    private Fee formFee;
+
     private boolean editing;
-    
 
     /**
      * Creates a new instance of NewJSFManagedBean
      */
     public FeeManagementBB() {
     }
+
+    @PostConstruct
+    public void initBean(){
+        formFee = new Fee();
+        formFee.setEffectiveDate(LocalDateTime.now());
+        formFee.setExpiryDate(LocalDateTime.now());
+        
+    }
     
-    public void editFeeType(ActionEvent e){
-        if(getSelectedFeeType() != null){
+    public void editFeeType(ActionEvent e) {
+        if (getSelectedFeeType() != null) {
             editing = true;
-            formFeeID = selectedFeeType.getOccupancyInspectionFeeID();
-            formMuni = selectedFeeType.getMuni();
-            formFeeName = selectedFeeType.getFeeName();
-            formFeeAmount = selectedFeeType.getFeeAmount();
-            //formOccupancyInspectionFeeNotes = selectedFeeType.getOccupancyInspectionFeeNotes();
+            formFee.setOccupancyInspectionFeeID(selectedFeeType.getOccupancyInspectionFeeID());
+            formFee.setMuni(selectedFeeType.getMuni());
+            formFee.setFeeName(selectedFeeType.getFeeName());
+            formFee.setFeeAmount(selectedFeeType.getFeeAmount());
+            formFee.setNotes(selectedFeeType.getNotes());
             /*
             Have to figure out what to do w/ setting dates...
             setFormOccupancyInspectionFeeEffDate(formFeeEffDate.toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime());
-            */
+             */
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Please select an occupancy inspection fee to update", ""));
+                            "Please select an occupancy inspection fee to update", ""));
         }
     }
-    
-    public void commitFeeUpdates(ActionEvent e){
+
+    public void commitFeeUpdates(ActionEvent e) {
         OccupancyIntegrator oifi = getOccupancyIntegrator();
         PaymentIntegrator pi = getPaymentIntegrator();
         Fee oif = selectedFeeType;
-        
-        oif.setMuni(formMuni);
-        oif.setFeeName(formFeeName);
-        oif.setFeeAmount(formFeeAmount);
-        oif.setEffectiveDate(formFeeEffDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        oif.setExpiryDate(formFeeExpDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
+
+        oif.setMuni(formFee.getMuni());
+        oif.setFeeName(formFee.getFeeName());
+        oif.setFeeAmount(formFee.getFeeAmount());
+        oif.setEffectiveDate(formFee.getEffectiveDate());
+        oif.setExpiryDate(formFee.getExpiryDate());
+        oif.setNotes(formFee.getNotes());
         try {
-            //oif.setOccupancyInspectionFeeNotes(formFeeNotes);
             pi.updateOccupancyInspectionFee(oif);
             editing = false;
         } catch (IntegrationException ex) {
@@ -110,64 +101,23 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Occupancy Inspection Fee updated!", ""));
     }
-    
-    public void initializeNewFee(ActionEvent e){
-        
-            editing = false;
-            formFeeID = 0;
-            formMuni = new Municipality();
-            formFeeName = "";
-            formFeeAmount = 0.0;
-            formFeeNotes = "";
-            /*
-            Have to figure out what to do w/ setting dates...
-            setFormOccupancyInspectionFeeEffDate(formFeeEffDate.toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime());
-            */
-        
+
+    public void initializeNewFee(ActionEvent e) {
+
+        editing = false;
+        formFee = new Fee();
     }
-    
-    public void addNewFeeType(ActionEvent e){
+
+    public String saveNewFeeType() {
         PaymentIntegrator pi = getPaymentIntegrator();
         Fee oif = new Fee();
-        
-        oif.setOccupancyInspectionFeeID(newFormFeeID);
-        oif.setMuni(formMuni);
-        oif.setFeeName(newFormFeeName);
-        oif.setFeeAmount(newFormFeeAmount);
-        oif.setEffectiveDate(newFormFeeEffDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        oif.setExpiryDate(newFormFeeExpDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        oif.setNotes(newFormFeeNotes);
-        
-        try {
-            pi.insertOccupancyInspectionFee(oif);
-        } catch (IntegrationException ex) {
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Occupancy Inspection Fee updated!", ""));
-    
-    }
-    
-    public String saveNewFeeType(){
-        PaymentIntegrator pi = getPaymentIntegrator();
-        Fee oif = new Fee();
-        oif.setOccupancyInspectionFeeID(formFeeID);
+        oif.setOccupancyInspectionFeeID(formFee.getOccupancyInspectionFeeID());
         oif.setMuni(getFormMuni());
-        oif.setFeeName(formFeeName);
-        oif.setFeeAmount(formFeeAmount);
-        oif.setEffectiveDate(formFeeEffDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        oif.setExpiryDate(formFeeExpDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime());
-        oif.setNotes(formFeeNotes);
+        oif.setFeeName(formFee.getFeeName());
+        oif.setFeeAmount(formFee.getFeeAmount());
+        oif.setEffectiveDate(formFee.getEffectiveDate());
+        oif.setExpiryDate(formFee.getExpiryDate());
+        oif.setNotes(formFee.getNotes());
         try {
             pi.insertOccupancyInspectionFee(oif);
         } catch (IntegrationException ex) {
@@ -175,28 +125,27 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Successfully added occupancy inspection fee to database!", ""));
-        
+
         return "occupancyInspectionFeeManage";
-        
-        
+
     }
-    
-    public void deleteSelectedFee(ActionEvent e){
+
+    public void deleteSelectedFee(ActionEvent e) {
         PaymentIntegrator pi = getPaymentIntegrator();
-        
-        if(getSelectedFeeType() != null){
+
+        if (getSelectedFeeType() != null) {
             try {
                 pi.deleteOccupancyInspectionFee(getSelectedFeeType());
             } catch (IntegrationException ex) {
             }
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Occupancy inspection fee deleted forever!", ""));
-            
+
         } else {
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Please select an occupancy inspection fee from the table to delete", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select an occupancy inspection fee from the table to delete", ""));
         }
     }
 
@@ -210,11 +159,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        if(existingFeeTypeList != null){
-        return existingFeeTypeList;
-        }else{
-         existingFeeTypeList = new ArrayList();
-         return existingFeeTypeList;
+        if (existingFeeTypeList != null) {
+            return existingFeeTypeList;
+        } else {
+            existingFeeTypeList = new ArrayList();
+            return existingFeeTypeList;
         }
     }
 
@@ -243,14 +192,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @return the formFeeID
      */
     public int getFormFeeID() {
-        return formFeeID;
+        return formFee.getOccupancyInspectionFeeID();
     }
 
     /**
      * @param formFeeID the formFeeID to set
      */
     public void setFormFeeID(int formFeeID) {
-        this.formFeeID = formFeeID;
+        this.formFee.setOccupancyInspectionFeeID(formFeeID);
     }
 
     /**
@@ -271,168 +220,78 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @return the formFeeName
      */
     public String getFormFeeName() {
-        return formFeeName;
+        return formFee.getFeeName();
     }
 
     /**
      * @param formFeeName the formFeeName to set
      */
     public void setFormFeeName(String formFeeName) {
-        this.formFeeName = formFeeName;
+        this.formFee.setFeeName(formFeeName);
     }
 
     /**
      * @return the formFeeAmount
      */
     public double getFormFeeAmount() {
-        return formFeeAmount;
+        return formFee.getFeeAmount();
     }
 
     /**
      * @param formFeeAmount the formFeeAmount to set
      */
     public void setFormFeeAmount(double formFeeAmount) {
-        this.formFeeAmount = formFeeAmount;
+        this.formFee.setFeeAmount(formFeeAmount);
     }
 
     /**
      * @return the formFeeEffDate
      */
     public java.util.Date getFormFeeEffDate() {
-        return formFeeEffDate;
+        return java.util.Date.from(formFee.getEffectiveDate()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
     }
 
     /**
      * @param formFeeEffDate the formFeeEffDate to set
      */
     public void setFormFeeEffDate(java.util.Date formFeeEffDate) {
-        this.formFeeEffDate = formFeeEffDate;
+        this.formFee.setEffectiveDate(
+                LocalDateTime.ofInstant(formFeeEffDate.toInstant(),
+                        ZoneId.systemDefault()));
     }
 
     /**
      * @return the formFeeExpDate
      */
     public java.util.Date getFormFeeExpDate() {
-        return formFeeExpDate;
+        return java.util.Date.from(formFee.getExpiryDate()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
     }
 
     /**
      * @param formFeeExpDate the formFeeExpDate to set
      */
     public void setFormFeeExpDate(java.util.Date formFeeExpDate) {
-        this.formFeeExpDate = formFeeExpDate;
+        this.formFee.setExpiryDate(
+                LocalDateTime.ofInstant(formFeeExpDate.toInstant(),
+                        ZoneId.systemDefault()));
     }
 
     /**
      * @return the formFeeNotes
      */
     public String getFormFeeNotes() {
-        return formFeeNotes;
+        return formFee.getNotes();
     }
 
     /**
      * @param formFeeNotes the formFeeNotes to set
      */
     public void setFormFeeNotes(String formFeeNotes) {
-        this.formFeeNotes = formFeeNotes;
-    }
-
-    /**
-     * @return the newFormSelectedFee
-     */
-    public Fee getNewFormSelectedFee() {
-        return newFormSelectedFee;
-    }
-
-    /**
-     * @param newFormSelectedFee the newFormSelectedFee to set
-     */
-    public void setNewFormSelectedFee(Fee newFormSelectedFee) {
-        this.newFormSelectedFee = newFormSelectedFee;
-    }
-
-    /**
-     * @return the newFormFeeID
-     */
-    public int getNewFormFeeID() {
-        return newFormFeeID;
-    }
-
-    /**
-     * @param newFormFeeID the newFormFeeID to set
-     */
-    public void setNewFormFeeID(int newFormFeeID) {
-        this.newFormFeeID = newFormFeeID;
-    }
-
-    /**
-     * @return the newFormFeeName
-     */
-    public String getNewFormFeeName() {
-        return newFormFeeName;
-    }
-
-    /**
-     * @param newFormFeeName the newFormFeeName to set
-     */
-    public void setNewFormFeeName(String newFormFeeName) {
-        this.newFormFeeName = newFormFeeName;
-    }
-
-    /**
-     * @return the newFormFeeAmount
-     */
-    public double getNewFormFeeAmount() {
-        return newFormFeeAmount;
-    }
-
-    /**
-     * @param newFormFeeAmount the newFormFeeAmount to set
-     */
-    public void setNewFormFeeAmount(double newFormFeeAmount) {
-        this.newFormFeeAmount = newFormFeeAmount;
-    }
-
-    /**
-     * @return the newFormFeeEffDate
-     */
-    public java.util.Date getNewFormFeeEffDate() {
-        return newFormFeeEffDate;
-    }
-
-    /**
-     * @param newFormFeeEffDate the newFormFeeEffDate to set
-     */
-    public void setNewFormFeeEffDate(java.util.Date newFormFeeEffDate) {
-        this.newFormFeeEffDate = newFormFeeEffDate;
-    }
-
-    /**
-     * @return the newFormFeeExpDate
-     */
-    public java.util.Date getNewFormFeeExpDate() {
-        return newFormFeeExpDate;
-    }
-
-    /**
-     * @param newFormFeeExpDate the newFormFeeExpDate to set
-     */
-    public void setNewFormFeeExpDate(java.util.Date newFormFeeExpDate) {
-        this.newFormFeeExpDate = newFormFeeExpDate;
-    }
-
-    /**
-     * @return the newFormFeeNotes
-     */
-    public String getNewFormFeeNotes() {
-        return newFormFeeNotes;
-    }
-
-    /**
-     * @param newFormFeeNotes the newFormFeeNotes to set
-     */
-    public void setNewFormFeeNotes(String newFormFeeNotes) {
-        this.newFormFeeNotes = newFormFeeNotes;
+        this.formFee.setNotes(formFeeNotes);
     }
 
     public boolean isEditing() {
@@ -442,5 +301,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public void setEditing(boolean editing) {
         this.editing = editing;
     }
-    
+
+    public Fee getFormFee() {
+        return formFee;
+    }
+
+    public void setFormFee(Fee formFee) {
+        this.formFee = formFee;
+    }
+
 }

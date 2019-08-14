@@ -1279,23 +1279,5 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public void setOptAndReqPersons(List<PersonType> optAndReqPersons) {
         this.optAndReqPersons = optAndReqPersons;
     }
-
-    public String goToFeeManage() {
-        
-        return "feeManage";
-        
-    }
-    
-    public String goToPayments() {
-        
-        return "payments";
-        
-    }
-    
-    public String goToPaymentTypes() {
-        
-        return "paymentTypeManage";
-        
-    }
     
 }
