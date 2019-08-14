@@ -1246,35 +1246,19 @@
             <to-view-id>/restricted/cogstaff/occ/checklsit.xhtml</to-view-id>
         </navigation-case>
         
-       <!-- <navigation-case>
+       <navigation-case>
             <from-outcome>payments</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/paymentManage.xhtml</to-view-id>
-        </navigation-case>-->
-        
-        <navigation-case>
-            <from-outcome>payments</from-outcome>
-            <to-view-id>/public/paymentManage.xhtml</to-view-id>
         </navigation-case>
-        <!--
+
         <navigation-case>
             <from-outcome>paymentTypeManage</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/paymentTypeManage.xhtml</to-view-id>
-        </navigation-case>-->
-        
-        <navigation-case>
-            <from-outcome>paymentTypeManage</from-outcome>
-            <to-view-id>/public/paymentTypeManage.xhtml</to-view-id>
         </navigation-case>
-<!--
+
         <navigation-case>
             <from-outcome>feeManage</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/feeManage.xhtml</to-view-id>
-        </navigation-case>
--->        
-        
-        <navigation-case>
-            <from-outcome>feeManage</from-outcome>
-            <to-view-id>/public/feeManage.xhtml</to-view-id>
         </navigation-case>
         
         <navigation-case>

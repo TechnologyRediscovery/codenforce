@@ -387,6 +387,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    public void initializeNewType(ActionEvent e){
+        editing = false;
+        formPaymentType = new PaymentType();
+    }
+    
     public String addPaymentType(){
         PaymentType pt = new PaymentType();
         PaymentIntegrator pti = new PaymentIntegrator();
