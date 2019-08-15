@@ -25,14 +25,17 @@ import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
@@ -40,6 +43,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,6 +52,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 /**
@@ -86,25 +91,40 @@ import javax.faces.event.ActionEvent;
  */
 public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 
-    private OccInspection currentInspection;
+   
     
+    public static final String ADD_WITH_COMPLIANCE = "comp";
+    public static final String ADD_AS_UNINSPECTED = "insp";
+
+    private OccInspection currentInspection;
     private OccPeriod currentOccPeriod;
     private ProposalOccPeriod currentProposal;
-    private List<OccEvent> filteredEventList;
-    
     private PropertyUnitWithProp currentPropertyUnit;
     private Property currentProperty;
     
     private OccInspectedSpace currentInSpc;
     private OccInspectedSpaceElement currentInSpcEl;
     
+    private OccLocationDescriptor currentLocation;
+    private OccLocationDescriptor selectedLocation;
+    private List<OccLocationDescriptor> workingLocationList;
+    
+    private List<OccPeriodType> occPeriodTypeList;
+    private List<OccEvent> filteredEventList;
+    
     private OccSpaceTypeInspectionDirective selectedOccSpaceType;
-    private List<OccSpace> browseSpaceList;
+    private OccSpace selectedOccSpace;
+    
+    private List<OccSpace> spacesInTypeList;
+    private List<OccSpaceElement> elementsInSpaceList;
+    
+    private boolean markNewlyAddedSpacesWithCompliance;
+    private boolean promptForSpaceLocationUponAdd;
+    
     private List<User> inspectorPossibilityList;
     private User selectedInspector;
     
     private String formNoteText;
-    private List<OccLocationDescriptor> locationList;
     
     // reports
     private ReportConfigOccInspection reportConfigOccInspec;
@@ -130,43 +150,123 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyIntegrator pi = getPropertyIntegrator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        
-        browseSpaceList = new ArrayList<>();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        if(currentInspection == null){
-            if(getSessionBean().getSessionOccInspection() != null){
-                currentInspection = getSessionBean().getSessionOccInspection();
-                try {
-                    currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                }
-            }
-        }
+        
+        spacesInTypeList = new ArrayList<>();
         try {
-            currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID(), getSessionBean().getSessionUser());
-            currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+            if(currentInspection == null){
+                if(getSessionBean().getSessionOccInspection() != null){
+                    currentInspection = getSessionBean().getSessionOccInspection();
+                    try {
+                        currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
+                    } catch (IntegrationException ex) {
+                        System.out.println(ex);
+                    }
+                currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID(), getSessionBean().getSessionUser());
+                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+                } else {
+                    currentOccPeriod = oi.getOccPeriod(getSessionBean().getSessionOccPeriod().getPeriodID(), getSessionBean().getSessionUser());
+                    currentInspection = oii.getOccInspection(currentOccPeriod.getInspectionList().get(0).getInspectionID());
+                    currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+                } 
+            }
         } catch (IntegrationException | EventException| AuthorizationException ex) {
             System.out.println(ex);
         }
         
         availableEventTypeList = oc.getPermittedEventTypesForCECase(currentOccPeriod, getSessionBean().getSessionUser());
+        occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
         
-        
-
-        
-    }
-    
-    public void browseSpaceType(){
-        if(selectedOccSpaceType != null){
-            browseSpaceList = selectedOccSpaceType.getSpaceList();
-            System.out.println("OccInspectionBB.browseSpaceType");
+        if(workingLocationList == null){
+            workingLocationList = new ArrayList<>();
+            try {
+                workingLocationList.add(oii.getLocationDescriptor(
+                        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("locationdescriptor_implyfromspacename"))));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+            
         }
         
     }
     
+    public void loadSpacesInType(){
+        if(selectedOccSpaceType != null){
+            spacesInTypeList = selectedOccSpaceType.getSpaceList();
+            System.out.println("OccInspectionBB.loadSpacesInType");
+        }
+    }
+    
+    public void loadElementsInSpace(){
+        if(selectedOccSpace != null){
+            elementsInSpaceList = selectedOccSpace.getSpaceElementList();
+            System.out.println("OccInspectionBB.loadElementsInSpace");
+        }
+        
+    }
+    
+    public void addAllRequiredSpaceTypes(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+          
+        for(OccSpaceTypeInspectionDirective stid: currentInspection.getChecklistTemplate().getOccSpaceTypeTemplateList()){
+            for(OccSpace spc: stid.getSpaceList()){
+                if(spc.isRequired()){
+                    try {
+                        oc.inspectionAction_commenceSpaceInspection(    currentInspection,
+                                getSessionBean().getSessionUser(),
+                                spc,
+                                null);
+                    } catch (IntegrationException ex) {
+                        System.out.println(ex);
+                        
+                    }
+                }
+            }
+        }
+        reloadCurrentInspection();
+    }
+    
+    public void initiateOccLocationDescriptorDialog(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentLocation = oc.getOccLocationDescriptorSkeleton();
+    }
+    
+    public void addNewLocationDescriptor(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        int freshLocID = 0;
+        try {
+            oc.addNewLocationDescriptor(currentLocation);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Created new location descriptor of ID " + freshLocID, ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                ex.getMessage(), ""));
+        }
+    }
+    
+    public void initiateOccLocationUpdate(OccLocationDescriptor old){
+        currentLocation = old;
+        
+    }
+    
+    
+    public void activateOccInspection(OccInspection ins){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        if(getSessionBean().getSessionUser().getKeyCard().isHasEnfOfficialPermissions()){
+            currentInspection = ins;
+            try {
+                oc.updateOccInspection(ins, selectedInspector);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "Property inspection ID " + ins.getInspectionID(), ""));
+            }
+        }
+    }
+    
      public void makeChoice(Choice choice, Proposal p){
         ChoiceCoordinator cc = getChoiceCoordinator();
+         System.out.println("OccInspectionBB.makeChoice");
         try {
             if(p instanceof ProposalOccPeriod){
                 currentOccPeriod = cc.processProposalEvaluation(    p, 
@@ -226,6 +326,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     public void addSpaceToChecklist(OccSpace space) {
+        FacesContext fc = getFacesContext();
+        String paramVal = fc.getExternalContext().getRequestParameterMap().get("occperiod-elementstatusonadd");
+        System.out.println("OccInspectionBB.addSpaceToChecklist | param val: " + paramVal);
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -594,18 +697,18 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the browseSpaceList
+     * @return the spacesInTypeList
      */
-    public List<OccSpace> getBrowseSpaceList() {
+    public List<OccSpace> getSpacesInTypeList() {
         
-        return browseSpaceList;
+        return spacesInTypeList;
     }
 
     /**
-     * @param browseSpaceList the browseSpaceList to set
+     * @param spacesInTypeList the spacesInTypeList to set
      */
-    public void setBrowseSpaceList(List<OccSpace> browseSpaceList) {
-        this.browseSpaceList = browseSpaceList;
+    public void setSpacesInTypeList(List<OccSpace> spacesInTypeList) {
+        this.spacesInTypeList = spacesInTypeList;
     }
 
     /**
@@ -622,19 +725,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.formNoteText = formNoteText;
     }
 
-    /**
-     * @return the locationList
-     */
-    public List<OccLocationDescriptor> getLocationList() {
-        return locationList;
-    }
-
-    /**
-     * @param locationList the locationList to set
-     */
-    public void setLocationList(List<OccLocationDescriptor> locationList) {
-        this.locationList = locationList;
-    }
+    
 
     /**
      * @return the currentInSpcEl
@@ -887,7 +978,118 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void setCurrentProposal(ProposalOccPeriod currentProposal) {
         this.currentProposal = currentProposal;
     }
+
+    /**
+     * @return the occPeriodTypeList
+     */
+    public List<OccPeriodType> getOccPeriodTypeList() {
+        return occPeriodTypeList;
+    }
+
+    /**
+     * @param occPeriodTypeList the occPeriodTypeList to set
+     */
+    public void setOccPeriodTypeList(List<OccPeriodType> occPeriodTypeList) {
+        this.occPeriodTypeList = occPeriodTypeList;
+    }
+
+    /**
+     * @return the markNewlyAddedSpacesWithCompliance
+     */
+    public boolean isMarkNewlyAddedSpacesWithCompliance() {
+        return markNewlyAddedSpacesWithCompliance;
+    }
+
+    /**
+     * @return the promptForSpaceLocationUponAdd
+     */
+    public boolean isPromptForSpaceLocationUponAdd() {
+        return promptForSpaceLocationUponAdd;
+    }
+
+    /**
+     * @param markNewlyAddedSpacesWithCompliance the markNewlyAddedSpacesWithCompliance to set
+     */
+    public void setMarkNewlyAddedSpacesWithCompliance(boolean markNewlyAddedSpacesWithCompliance) {
+        this.markNewlyAddedSpacesWithCompliance = markNewlyAddedSpacesWithCompliance;
+    }
+
+    /**
+     * @param promptForSpaceLocationUponAdd the promptForSpaceLocationUponAdd to set
+     */
+    public void setPromptForSpaceLocationUponAdd(boolean promptForSpaceLocationUponAdd) {
+        this.promptForSpaceLocationUponAdd = promptForSpaceLocationUponAdd;
+    }
+
+    /**
+     * @return the selectedOccSpace
+     */
+    public OccSpace getSelectedOccSpace() {
+        return selectedOccSpace;
+    }
+
+    /**
+     * @param selectedOccSpace the selectedOccSpace to set
+     */
+    public void setSelectedOccSpace(OccSpace selectedOccSpace) {
+        this.selectedOccSpace = selectedOccSpace;
+    }
+
+    /**
+     * @return the elementsInSpaceList
+     */
+    public List<OccSpaceElement> getElementsInSpaceList() {
+        return elementsInSpaceList;
+    }
+
+    /**
+     * @param elementsInSpaceList the elementsInSpaceList to set
+     */
+    public void setElementsInSpaceList(List<OccSpaceElement> elementsInSpaceList) {
+        this.elementsInSpaceList = elementsInSpaceList;
+    }
+
+    /**
+     * @return the currentLocation
+     */
+    public OccLocationDescriptor getCurrentLocation() {
+        return currentLocation;
+    }
+
+    /**
+     * @param currentLocation the currentLocation to set
+     */
+    public void setCurrentLocation(OccLocationDescriptor currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    /**
+     * @return the selectedLocation
+     */
+    public OccLocationDescriptor getSelectedLocation() {
+        return selectedLocation;
+    }
+
+    /**
+     * @param selectedLocation the selectedLocation to set
+     */
+    public void setSelectedLocation(OccLocationDescriptor selectedLocation) {
+        this.selectedLocation = selectedLocation;
+    }
     
     
-    
+    /**
+     * @return the workingLocationList
+     */
+    public List<OccLocationDescriptor> getWorkingLocationList() {
+        return workingLocationList;
+    }
+
+    /**
+     * @param workingLocationList the workingLocationList to set
+     */
+    public void setWorkingLocationList(List<OccLocationDescriptor> workingLocationList) {
+        this.workingLocationList = workingLocationList;
+    }
+     
 }

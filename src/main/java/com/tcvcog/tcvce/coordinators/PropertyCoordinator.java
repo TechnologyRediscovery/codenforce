@@ -18,7 +18,9 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CECase;
@@ -28,6 +30,7 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChange;
 import com.tcvcog.tcvce.entities.PropertyUnitWithLists;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
@@ -93,14 +96,15 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     /**
      * Returns PropertyWithLists with all units, including default unit.
      * @param prop
+     * @param u
      * @return PropertyWithLists object
      * @throws CaseLifecyleException 
      */
-    public PropertyWithLists getPropertyUnits(Property prop) throws CaseLifecyleException{
+    public PropertyWithLists getPropertyUnits(Property prop, User u) throws CaseLifecyleException, EventException, AuthorizationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyWithLists propWithLists = null;
         try{
-            propWithLists = pi.getPropertyWithLists(prop.getPropertyID());
+            propWithLists = pi.getPropertyWithLists(prop.getPropertyID(), u);
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }     

@@ -322,10 +322,21 @@
 
                                         <h4>Occupancy periods</h4>
 
-                                        <p:commandButton       id="button-addoccunit"
-                                                               ajax="true" 
-                                                               actionListener="#{propertyProfileBB.beginConstructingNewOccPeriod(unit)}"
-                                                               oncomplete="PF('dialog-widvar-occperiod-addupdate').show()"
+                                          <p:selectOneMenu
+                                                  id="som-occperiodtype" tabindex="1"
+                                                  value="#{propertyProfileBB.selectedOccPeriodType}">
+                                                      <f:converter converterId="occPeriodTypeConverter"/>
+                                                      <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
+                                                      <f:selectItems id="si-typelist" 
+                                                                     value="#{propertyProfileBB.occPeriodTypeList}" 
+                                                                     var ="opt" 
+                                                                     itemValue="#{opt}" 
+                                                                     itemLabel="#{opt.title}" />
+                                                </p:selectOneMenu>
+                                        
+                                        <p:commandButton       id="properties-occperiods-button-addnewperiod"
+                                                               ajax="false" 
+                                                               action="#{propertyProfileBB.beginConstructingNewOccPeriod(unit)}"
                                                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                                value="Add new occupancy period"  
                                                                icon="fa fa-plus"
@@ -371,40 +382,13 @@
                                                 <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : propertyProfileBB.getPrettyDate(period.authorizedTS)}" />
                                             </div>
                                                 <p:commandButton       id="button-occperiodtable-editperiod"
-                                                                       ajax="true" 
-                                                                       actionListener="#{propertyProfileBB.manageOccPeriod(period)}"
-                                                                       oncomplete="PF('dialog-widvar-occperiod-addupdate').show()"
+                                                                       ajax="false" 
+                                                                       action="#{propertyProfileBB.manageOccPeriod(period)}"
                                                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                       value="edit period"  
+                                                                       value="manage occupancy period"  
                                                                        icon="fa fa-edit"
                                                                        update="form-occperiod-addupdate"/>
-                                                <p:dataScroller
-                                                    id="scroller-inspectionlist"
-                                                    widgetVar="var-scroller-inspectionlist"
-                                                    var="inspection"
-                                                    value="#{period.inspectionList}"
-                                                    rowIndexVar="#{inspection.inspectionID}">
-                                                    
-                                                    <div class="datum">
-                                                        <h:outputText styleClass="ui-label-inline" value="Inspection ID: " />
-                                                        <h:outputText styleClass="data-text" value="#{inspection.inspectionID}" />
-                                                    </div>
-                                                    <div class="datum">
-                                                        <h:outputText styleClass="ui-label-inline" value="Inspector: " />
-                                                        <h:outputText styleClass="data-text" value="#{inspection.inspector.person.firstName} #{inspection.inspector.person.lastName}" />
-                                                    </div>
-                                                    
-                                                    <p:commandButton       id="button-inspectionscroller-manageinspection"
-                                                                           ajax="false" 
-                                                                           action="#{propertyProfileBB.manageInspection(inspection)}"
-                                                                           rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                           value="manage inspection"  
-                                                                           icon="fa fa-list-alt"
-                                                                           />
-                                                
-                                                
-                                                </p:dataScroller>
-                                                
+                                               
                                         </p:dataScroller>
                                     </div>
                                 </p:dataScroller>
@@ -884,213 +868,7 @@
                         </h:form>
                     </p:dialog>
 
-                    <p:dialog    id="dialog-occperiod-addupdate"
-                                 height="650" width="900"
-                                 header="Occupancy Period"
-                                 widgetVar="dialog-widvar-occperiod-addupdate"
-                                 closable="true" >
-                        
-                         <h:panelGrid columns="1" columnClasses="gridTd">
-                             <h:panelGroup id="pg-occperiod-add-h2" rendered="#{propertyProfileBB.currOccPeriod.periodID != 0}">
-                                    <h2>
-                                        <h:outputText value="Create new occupancy period for unit no. #{propertyProfileBB.currPropUnit.unitNumber}"  /> 
-                                    </h2>
-                                </h:panelGroup>
-                                <h:panelGroup id="pg-occperiod-update-h2" rendered="#{propertyProfileBB.currOccPeriod.periodID == 0}">
-                                    <h2>
-                                        <h:outputText value="Update occupancy period id #{propertyProfileBB.currOccPeriod.periodID}"  /> 
-                                    </h2>
-                                </h:panelGroup>
-                            </h:panelGrid>
-                        
-                        <h:form id="form-occperiod-addupdate">
-                            <h:messages id="messages-occperiod-addupdate"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-
-                            <h:panelGrid    columns="2" rendered="true"
-                                            columnClasses="gridTd-solid-back, gridTd-solid-back"
-                                            footerClass="no-border">
-
-                                <h:panelGroup>
-                                    <div class="datum">
-                                    <h:outputLabel styleClass="ui-label-inline" for="som-occperiodtype" value="Period type:"/>
-                                    <p:spacer height="5px"/>
-                                      <p:selectOneMenu
-                                        id="som-occperiodtype" tabindex="1"
-                                        value="#{propertyProfileBB.currOccPeriod.type}">
-                                            <f:converter converterId="occPeriodTypeConverter"/>
-                                            <f:selectItems id="si-typelist" 
-                                                           value="#{propertyProfileBB.occPeriodTypeList}" 
-                                                           var ="opt" 
-                                                           itemValue="#{opt}" 
-                                                           itemLabel="#{opt.title}" />
-                                    </p:selectOneMenu>
-                                        <h:outputText styleClass="ui-label-inline" value="Certified date: " />
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currOccPeriod.periodTypeCertifiedTS)}" />
-
-                                        <p:spacer height="0px" />
-                                        
-                                        <h:outputText styleClass="ui-label-inline" value="Certified by: " />
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.periodTypeCertifiedBy.person.firstName} 
-                                                      #{propertyProfileBB.currOccPeriod.periodTypeCertifiedBy.person.lastName}" />
-                                    </div>
-                                    
-                                </h:panelGroup>
-                                
-                                <h:panelGroup>
-                                    <div class="datum">
-                                        <h:outputText styleClass="ui-label-inline" value="Occ Period creator: "/>
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.createdBy.person.firstName} 
-                                                      #{propertyProfileBB.currOccPeriod.createdBy.person.lastName}"/>
-                                        
-                                        <p:spacer height="0px" />
-                                        
-                                        <h:outputText styleClass="ui-label-inline" value="Creation date: " />
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currOccPeriod.createdTS)}" />
-                                        
-                                        <p:spacer height="0px" />
-                                        
-                                        <h:outputText styleClass="ui-label-inline" value="Object source: "/>
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.source.title}"/>
-                                    </div>
-                                </h:panelGroup>  
-                                
-                                <h:panelGroup>
-                                    <div class="datum">
-                                        <h3>Start date:</h3>
-                                        <p:calendar value="#{propertyProfileBB.currOccPeriod.startDateUtilDate}" 
-                                                    mode="popup"  id="cal-occperiod-startdate"
-                                                    showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                    navigator="true" tabindex="2" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                                    showButtonPanel="true" showTodayButton="true" disabled="#{!(empty propertyProfileBB.currOccPeriod.startDateCertifiedTS)}"
-                                                    required="#{propertyProfileBB.currOccPeriod.type.startdaterequired}"/>
-                                        <h:message for="cal-occperiod-startdate" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                        
-                            <ui:remove>
-
-                                        <h:outputText styleClass="ui-label-inline" value="Certified date: " />
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currOccPeriod.startDateCertifiedTS)}" />
-                            </ui:remove>
-
-                                        <p:spacer height="0px" />
-                                        
-                                        <h:outputText styleClass="ui-label-inline" value="Certified by: " />
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.startDateCertifiedBy.person.firstName} 
-                                                      #{propertyProfileBB.currOccPeriod.startDateCertifiedBy.person.lastName}" />
-                                    </div>
-                                    
-                                    
-                                    
-                                </h:panelGroup>
-                                
-                                <h:panelGroup>
-                                    <div class="datum">
-                                        <h3>End date:</h3>
-                                        <p:calendar value="#{propertyProfileBB.currOccPeriod.endDateUtilDate}" 
-                                                    mode="popup"  id="cal-occperiod-enddate"
-                                                    showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                    navigator="true" tabindex="2" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                                    showButtonPanel="true" showTodayButton="true" disabled="#{!(empty propertyProfileBB.currOccPeriod.endDateCertifiedTS)}"
-                                                    required="#{propertyProfileBB.currOccPeriod.type.enddaterequired}"/>
-                                        <h:message for="cal-occperiod-enddate" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                        <ui:remove>
-                                            
-                                        <h:outputText styleClass="ui-label-inline" value="Certified date: " />
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currOccPeriod.endDateCertifiedTS)}" />
-                        </ui:remove>
-
-                                        <p:spacer height="0px" />
-                                        
-                                        <h:outputText styleClass="ui-label-inline" value="Certified by: " />
-                                        <h:outputText styleClass="data-text" value="#{propertyProfileBB.currOccPeriod.endDateCertifiedBy.person.firstName} 
-                                                      #{propertyProfileBB.currOccPeriod.endDateCertifiedBy.person.lastName}" />
-                                        <p:commandButton id="button-occperiodaddupdate-certenddate"
-                                                         actionListener="#{propertyProfileBB.certifyDataFieldOccPeriod}"
-                                                         ajax="true"
-                                                         value="Certify and lock start date"
-                                                         icon="fa fa-lock"
-                                                         disabled="#{(empty propertyProfileBB.currOccPeriod.endDateCertifiedTS)}"
-                                                         styleClass="button-size-small buttonOwnLine" 
-                                                         >
-                                            <f:param name="certify-fieldid" value="enddate" /> 
-                                        </p:commandButton>
-                                    
-                                    
-                                    </div>
-                                    
-                                </h:panelGroup>
-                                
-                                <h:panelGroup>
-                                        <h:outputText styleClass="ui-label" value="Permits: " />
-                                        <p:dataScroller value="#{propertyProfileBB.currOccPeriod.permitList}"
-                                                        var="permit" rowIndexVar="#{permit.periodID}">
-                                            
-                                            <h:outputText styleClass="ui-label-inline" value="Permit ID: " />
-                                            <h:outputText styleClass="data-text" value="#{permit.permitID}" />
-                                            
-                                            <p:spacer height="0px" />
-                                            <h:outputText styleClass="ui-label-inline" value="Creation date: " />
-                                            <h:outputText styleClass="data-text" value="#{propertyProfileBB.getPrettyDate(permit.dateIssued)}" />
-                                            
-                                            <p:spacer height="0px" />
-                                            
-                                            <h:outputText styleClass="ui-label-inline" value="Issued by: " />
-                                            <h:outputText styleClass="data-text" value="#{permit.issuedBy.person.firstName} #{permit.issuedBy.person.lastName}" />
-                                            
-                                            <p:commandButton    id="button-occperiodaddupdate-printpermit"
-                                                                value="print" />
-                                            <p:spacer height="3px" />
-                                        </p:dataScroller>
-                                        <p:commandButton    id="button-occperiodaddupdate-newpermit"
-                                                            value="new permit" />
-                                    
-                                </h:panelGroup>
-                                
-                                
-                                <h:panelGroup>
-                                        <h:outputText styleClass="ui-label" value="Connected persons: " />
-                                        <p:dataScroller value="#{propertyProfileBB.currOccPeriod.personList}"
-                                                        var="pers" rowIndexVar="#{pers.personID}">
-                                            <h:outputText value="#{pers.firstName} #{pers.lastName} (#{pers.personType.label})" />
-                                            <p:commandButton    id="button-occperiodaddupdate-viewperson"
-                                                                value="view" />
-                                            <p:commandButton    id="button-occperiodaddupdate-removeperson"
-                                                                value="remove" />
-                                            <p:spacer height="3px" />
-                                        </p:dataScroller>
-                                    
-                                </h:panelGroup>
-                                
-
-                            </h:panelGrid>
-
-                            <p:spacer height="5px" />
-
-                            <p:spacer height="5px"/>
-
-                            <p:commandButton ajax="true" 
-                                             value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('dialog-widvar-occperiod-addupdate').hide()"
-                                             tabindex="4"/>
-
-
-                            <p:commandButton ajax="true"
-                                             value="Commit new occupancy period" 
-                                             actionListener="#{propertyProfileBB.commitNewOccPeriod}"
-                                             oncomplete="PF('dialog-widvar-occperiod-addupdate').hide()"
-                                             icon="fa fa-thumbs-o-up"
-                                             update="
-                                                    form-propunits:datascroller-propunits
-                                                    form-propertyobject-messages:messages-properties-object"
-                                             tabindex="3"/>
-                        </h:form>
-                    </p:dialog>
+                 
                 </f:view>
             </ui:define>
         </ui:composition>

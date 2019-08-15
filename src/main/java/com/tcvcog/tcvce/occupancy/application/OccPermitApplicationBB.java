@@ -8,7 +8,9 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -779,11 +781,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         Person changedby = getSessionBean().getSessionOccPermitApplication().getApplicantPerson();
         
         try {
-            existingProp = pri.getPropertyWithLists(prop.getPropertyID());
+            existingProp = pri.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser());
                     
         } catch (IntegrationException ex) {
             System.out.println(ex);
         } catch (CaseLifecyleException ex) {
+            System.out.println(ex);
+        } catch (EventException ex) {
+            System.out.println(ex);
+        } catch (AuthorizationException ex) {
             System.out.println(ex);
         }
         

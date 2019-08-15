@@ -88,7 +88,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
             return proposal;
         }
         
-        if(!proposal.getActivatesOn().isBefore(LocalDateTime.now()) && !proposal.getExpiresOn().isAfter((LocalDateTime.now()))){
+        if(proposal.getActivatesOn().isBefore(LocalDateTime.now()) && proposal.getExpiresOn().isAfter((LocalDateTime.now()))){
             if(u.getRoleType().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToView()){
                 proposal.setHidden(false);
                 if(u.getRoleType().getRank() >= proposal.getDirective().getMinimumRequiredUserRankToEvaluate()){

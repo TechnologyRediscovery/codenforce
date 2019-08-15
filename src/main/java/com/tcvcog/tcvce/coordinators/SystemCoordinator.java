@@ -23,6 +23,8 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.CaseStage;
+import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -65,6 +67,12 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable{
             muniCodeNameMap = m;
         }
         return muniCodeNameMap;
+    }
+    
+    public User getPublicAccessUser(){
+        User u = new User();
+        u.setRoleType(RoleType.Public);
+        return u;
     }
     
     

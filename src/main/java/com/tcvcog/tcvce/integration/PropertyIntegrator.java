@@ -869,7 +869,17 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     } // close getProperty()
 
-    public PropertyWithLists getPropertyWithLists(int propertyID) throws IntegrationException, CaseLifecyleException {
+    /**
+     * 
+     * @param propertyID
+     * @param u
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecyleException
+     * @throws EventException
+     * @throws AuthorizationException 
+     */
+    public PropertyWithLists getPropertyWithLists(int propertyID, User u) throws IntegrationException, CaseLifecyleException, EventException, AuthorizationException {
             PropertyCoordinator pc = getPropertyCoordinator();
             CaseIntegrator ci = getCaseIntegrator();
             PersonIntegrator pi = getPersonIntegrator();
@@ -877,7 +887,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             PropertyWithLists p = new PropertyWithLists(getProperty(propertyID));
    
             p.setCeCaseList(ci.getCECasesByProp(p));
-            p.setUnitWithListsList(getPropertyUnitWithListsList(p.getUnitList()));
+            p.setUnitWithListsList(getPropertyUnitWithListsList(p.getUnitList(), u));
             p.setPersonList(pi.getPersonList(p));
         return pc.configurePropertyWithLists(p);
     }
@@ -1114,12 +1124,20 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return unitList;
     }
 
-    public List<PropertyUnitWithLists> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList) throws IntegrationException{
+    /**
+     * 
+     * @param propUnitList
+     * @return
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws EventException 
+     */
+    public List<PropertyUnitWithLists> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList, User u) throws IntegrationException, EventException, EventException, AuthorizationException{
         List<PropertyUnitWithLists> puwll = new ArrayList<>();
         Iterator<PropertyUnit> iter = propUnitList.iterator();
         while(iter.hasNext()){
             PropertyUnit pu = iter.next();
-            puwll.add(getPropertyUnitWithLists(pu.getUnitID()));
+            puwll.add(getPropertyUnitWithLists(pu.getUnitID(), u));
         }
         return puwll;
     }
@@ -1128,20 +1146,20 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * Adaptor method for calling getPropertyUnitWithLists(int unitID) given a PropertyUnit object
      * 
      * @param pu
+     * @param u
      * @return a PropertyUnit containing a list of OccPeriods, and more in the future
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.EventException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
-    public PropertyUnitWithLists getPropertyUnitWithList(PropertyUnit pu) throws IntegrationException, EventException, AuthorizationException{
-        return getPropertyUnitWithLists(pu.getUnitID());
+    public PropertyUnitWithLists getPropertyUnitWithList(PropertyUnit pu, User u) throws IntegrationException, EventException, AuthorizationException{
+        return getPropertyUnitWithLists(pu.getUnitID(), u);
     }
     
-    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID) throws IntegrationException, EventException, AuthorizationException{
+    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID, User u) throws IntegrationException, EventException, AuthorizationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
-
         PropertyUnitWithLists puwl = new PropertyUnitWithLists(getPropertyUnitByPropertyUnitID(unitID));
-        puwl.setPeriodList(oi.getOccPeriodList(unitID, getSessionBean().getSessionUser()));
+        puwl.setPeriodList(oi.getOccPeriodList(unitID, u));
         return puwl;
     }
     

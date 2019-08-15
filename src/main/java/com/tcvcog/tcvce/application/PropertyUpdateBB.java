@@ -18,7 +18,9 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyWithLists;
@@ -49,8 +51,8 @@ public class PropertyUpdateBB extends BackingBeanUtils implements Serializable {
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            currProp = pi.getPropertyWithLists(getSessionBean().getSessionPropertyList().get(0).getPropertyID());
-        } catch (IntegrationException | CaseLifecyleException ex) {
+            currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
+        } catch (IntegrationException | CaseLifecyleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
     }

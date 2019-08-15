@@ -45,6 +45,7 @@ public class OccInspection {
     
     private User passedInspectionCertifiedBy;
     private LocalDateTime passedInspectionTS;
+    
     private LocalDateTime effectiveDateOfRecord;
     protected java.util.Date effectiveDateOfRecordUtilDate;
     
