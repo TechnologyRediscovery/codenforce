@@ -1156,6 +1156,17 @@ gridTd-bignum{
 
 /*---------------------BUTTONS & CONTROLS---------------------------*/
 
+.ui-state-hover{
+    
+    
+}
+
+.hover-none:hover{
+    
+    margin: auto;
+    background-color: green;
+    
+}
 
 /* this styling is for use w/ command button on codeSourceManage.xhtml */
 .manButton{
@@ -1281,6 +1292,10 @@ i.inspection-notinspected{
     font-weight: bold;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+.button-moreinfo{
+    margin-left: 8px;
 }
 
 .inspection-notinspected{

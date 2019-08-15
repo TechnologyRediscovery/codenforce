@@ -83,7 +83,7 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
     /**
      * @return the spaceList
      */
-    public List getSpaceList() {
+    public List<OccSpace> getSpaceList() {
         return spaceList;
     }
 

@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
@@ -700,7 +701,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * minimum required rank accessible via queryinstance.getUserRankAccessMinimum()
      * @throws IntegrationException fatal error in the integration code
      */
-    public QueryOccPeriod runQuery(QueryOccPeriod query) throws AuthorizationException, IntegrationException{
+    public QueryOccPeriod runQuery(QueryOccPeriod query, User u) throws AuthorizationException, IntegrationException, EventException{
         query.clearResultList();
         OccupancyIntegrator oi = getOccupancyIntegrator();
 //        if(query.getUser().getRoleType().getRank() > query.getQueryName().getUserRankMinimum() ){
@@ -712,7 +713,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         if(query.getQueryName().logQueryRun()){
             logRun(query);
         }
-        return oi.runQueryOccPeriod(query);
+        return oi.runQueryOccPeriod(query, u);
     }
     
     

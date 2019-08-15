@@ -47,6 +47,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -89,12 +91,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
     
     public OccInspection configureOccInspection(OccInspection inspection){
-        for(OccInspectedSpace inSpace: inspection.getInspectedSpaceList()){
-            configureOccInspectedSpace(inSpace);
+        if(inspection != null){
+            for(OccInspectedSpace inSpace: inspection.getInspectedSpaceList()){
+                configureOccInspectedSpace(inSpace);
+            }
         }
-        
-        
-        
         return inspection;
     }
     
@@ -267,6 +268,18 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
+    public OccLocationDescriptor getOccLocationDescriptorSkeleton(){
+        return new OccLocationDescriptor();
+    }
+    
+    public int addNewLocationDescriptor(OccLocationDescriptor old) throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        int freshLocID = 0;
+            freshLocID  = oii.insertLocationDescriptor(old);
+        
+        return freshLocID;
+    }
+    
     public OccInspection getOccInspectionSkeleton(){
         return new OccInspection();
     }
@@ -419,10 +432,18 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return inspection;
     }
     
+   
+    
     public OccPermitApplication getNewOccPermitApplication(){
         OccPermitApplication occpermitapp = new OccPermitApplication();        
         occpermitapp.setSubmissionDate(LocalDateTime.now());        
         return occpermitapp;       
+    }
+    
+    public void updateOccInspection(OccInspection is, User u) throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        oii.updateOccInspection(is);
+        
     }
     
     /**
