@@ -469,11 +469,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         pr.setRequirementSatisfied(isRequirementSatisfied);
     }
     
-    public void removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi){
+    public void removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        
-        
-        
+        oii.deleteInspectedSpace(spc);
     }
     
     public void recordComplianceWithInspectedElement(   OccInspectedSpaceElement oise, 

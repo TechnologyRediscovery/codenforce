@@ -1074,16 +1074,42 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     }
     
     public void deleteInspectedSpace(OccInspectedSpace is) throws IntegrationException{
-        String query = "DELETE FROM occinspectedspace WHERE inspectedspaceelementid=?;";
+        String sqlDeleteInsSpaceElement = "DELETE FROM occinspectedspaceelement WHERE inspectedspace_inspectedspaceid=?;";
+        String sqlDeleteInsSpace = "DELETE FROM occinspectedspace WHERE inspectedspaceid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
-            stmt = con.prepareStatement(query);
+            // first remove inspected space elements
+            stmt = con.prepareStatement(sqlDeleteInsSpaceElement);
+            stmt.setInt(1, is.getSpaceID());
+            stmt.execute();
+            
+            // then remove the inspected space
+            stmt = con.prepareStatement(sqlDeleteInsSpace);
             stmt.setInt(1, is.getSpaceID());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot delete inspected space!", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public void deleteInspectedSpaceElement(OccInspectedSpaceElement ele) throws IntegrationException{
+        String sqlDeleteInsSpaceElement = "DELETE FROM occinspectedspaceelement WHERE inspectedspaceelementid =?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            // first remove inspected space elements
+            stmt = con.prepareStatement(sqlDeleteInsSpaceElement);
+            stmt.setInt(1, ele.getInspectedSpaceElementID());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete inspected element!", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
