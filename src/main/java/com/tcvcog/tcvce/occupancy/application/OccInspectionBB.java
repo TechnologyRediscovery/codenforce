@@ -218,7 +218,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                                 null);
                     } catch (IntegrationException ex) {
                         System.out.println(ex);
-                        
                     }
                 }
             }
@@ -329,8 +328,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         FacesContext fc = getFacesContext();
         String paramVal = fc.getExternalContext().getRequestParameterMap().get("occperiod-elementstatusonadd");
         System.out.println("OccInspectionBB.addSpaceToChecklist | param val: " + paramVal);
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.inspectionAction_commenceSpaceInspection(currentInspection,
@@ -530,7 +527,17 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      
      public void removeSpaceFromChecklist(OccInspectedSpace spc){
          OccupancyCoordinator oc = getOccupancyCoordinator();
-         oc.removeSpaceFromChecklist(spc, getSessionBean().getSessionUser(), currentInspection);
+        try {
+            oc.removeSpaceFromChecklist(spc, getSessionBean().getSessionUser(), currentInspection);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Successfully removed InspectedSpace ID: " + spc.getInspectedSpaceID() , ""));
+        } catch (IntegrationException ex) {
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                ex.getMessage(), ""));
+            
+        }
          reloadCurrentInspection();
      }
      
@@ -620,13 +627,22 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      
      
      
-     
-     
-     
-     
      public void addNoteToInspectedElement(OccInspectedSpaceElement spcEl){
-         
-         
+         OccInspectionIntegrator oii = getOccInspectionIntegrator();
+         StringBuilder sb = new StringBuilder(spcEl.getNotes());
+         sb.append(formNoteText);
+         spcEl.setNotes(sb.toString());
+        try {
+            oii.updateInspectedSpaceElement(spcEl);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Success! Note added", ""));
+        } catch (IntegrationException ex) {
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                ex.getMessage(), ""));
+        }
+         reloadCurrentInspection();
      }
      
     
