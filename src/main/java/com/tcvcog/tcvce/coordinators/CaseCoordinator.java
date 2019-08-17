@@ -21,12 +21,15 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.PermissionsException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
@@ -477,6 +480,33 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable{
         } // close switch
         return insertedEventID;
     } // close method
+    
+     public void evaluateProposal(   Proposal proposal, 
+                                    Proposable chosen, 
+                                    CECase ceCase, 
+                                    User u) throws EventException, AuthorizationException, CaseLifecycleException, IntegrationException, ViolationException{
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        EventIntegrator ei = getEventIntegrator();
+        OccEvent propEvent = null;
+        int insertedEventID = 0;
+        if(cc.determineProposalEvaluatability(proposal, chosen, u)){
+            // since we can evaluate this proposal with the chosen Proposable, configure members
+            proposal.setResponderActual(u);
+            proposal.setResponseTimestamp(LocalDateTime.now());
+            proposal.setChosenChoice(chosen);
+            
+            // ask the EventCoord for a nicely formed Event, which we cast to OccEvent
+            CECaseEvent csEv = new CECaseEvent(ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u));
+            // insert the event and grab the new ID
+            insertedEventID = attachNewEventToCECase(ceCase, csEv, null);
+            // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
+            proposal.setResponseEvent(ei.getOccEvent(insertedEventID));
+            cc.recordProposalEvaluation(proposal);
+        } else {
+            throw new CaseLifecycleException("Unable to evaluate proposal due to business rule violation");
+        }
+    }
     
     
     protected void processCaseOnEventRulePass(CECase cse, EventRuleAbstract rule) 

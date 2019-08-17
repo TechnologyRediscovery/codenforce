@@ -53,11 +53,11 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         while(iter.hasNext()){
             Proposal p = iter.next();
             configureProposal(p, u);
-            if(p.getDirective().getChoiceList().size() == 1
-                    &&
-                p.getDirective().isExecuteChoiceIfLoneWolf()){
-                    processProposalEvaluation(p, p.getDirective().getChoiceList().get(0), cse, u);
-            }
+//            if(p.getDirective().getChoiceList().size() == 1
+//                    &&
+//                p.getDirective().isExecuteChoiceIfLoneWolf()){
+//                    processProposalEvaluation(p, p.getDirective().getChoiceList().get(0), cse, u);
+//            }
         }
         
         
@@ -69,11 +69,11 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         while(iter.hasNext()){
             Proposal p = iter.next();
             configureProposal(p, u);
-            if(p.getDirective().getChoiceList().size() == 1
-                    &&
-                p.getDirective().isExecuteChoiceIfLoneWolf()){
-                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
-            }
+//            if(p.getDirective().getChoiceList().size() == 1
+//                    &&
+//                p.getDirective().isExecuteChoiceIfLoneWolf()){
+//                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
+//            }
         }
         
         return oPeriod;

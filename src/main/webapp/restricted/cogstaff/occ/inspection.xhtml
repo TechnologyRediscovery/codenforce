@@ -176,7 +176,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="proposal-propbuttoncontainer">
                                                         <p:commandButton    id="proposal-button-showdescription"
                                                                             styleClass="noFill button-size-small button-moreinfo"
-                                                                            icon="fa fa-info-circle-o"/>
+                                                                            icon="fa fa-info"/>
                                                         
                                                             <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
                                                                         for="proposal-button-showdescription"
@@ -187,68 +187,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         modal="false">
                                                             <h:outputText       styleClass="proposal-description"
                                                                                 value="#{proposal.directive.description}" />
+                                                            
+                                                            
                                                         </p:overlayPanel>
                                                         
                                                         <p:commandButton    id="proposal-button-propmetadata"
                                                                             ajax="true"
                                                                             styleClass="noFill button-size-small"
-                                                                            actionListener="#{occInspectionBB.propoals_viewPropMetadata(proposal)}"
-                                                                            oncomplete="PF('dialog-proposalmetadata-var').show()"
+                                                                            actionListener="#{occInspectionBB.proposals_makeChoice(choice, p)}"
+                                                                            oncomplete="PF('occperiod-rejectproposal-dialog-var').hide()"
                                                                             icon="fa fa-gears"
-                                                                            update="dialog-proposalmetadata-form"/>
+                                                                            update="occperiod-dialog-proposalmetadata-form"/>
                                                         
                                                         <p:commandButton    id="proposal-button-rejectionreason"
                                                                             styleClass="noFill button-size-small"
-                                                                            icon="fa fa-info-circle-o"/>
+                                                                            rendered="#{!proposal.directive.requiredEvaluationForBOBClose 
+                                                                                        or sessionBean.sessionUser.keyCard.hasSysAdminPermissions }"
+                                                                            icon="fa fa-close"/>
                                                         
-                                                            <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
-                                                                        for="proposal-button-showdescription"
-                                                                        hideEffect="fade" 
-                                                                        dynamic="true" 
-                                                                        showCloseIcon="true"
-                                                                        style="width:300px" 
-                                                                        modal="false">
-                                                            <h:outputText       styleClass="proposal-description"
-                                                                                value="#{proposal.directive.description}" />
-                                                        </p:overlayPanel>
-                                                        
-                                                        <p:commandButton    id="proposal-button-reject"
-                                                                            ajax="true"
-                                                                            styleClass="noFill button-size-small"
-                                                                            actionListener="#{occInspectionBB.rejectProposal(proposal)}"
-                                                                            rendered="#{!proposal.directive.requiredEvaluationForBOBClose}"
-                                                                            oncomplete="PF('dialog-proposalmetadata-var').show()"
-                                                                            icon="fa fa-trash-o"
-                                                                            update="occperiod-form-proposals"/>
+                                                           
                                                     </div>
                                                     <div class="proposal-prophead">
                                                         <h:outputText value="#{proposal.directive.title}" />
                                                     </div>
                                                     
-                                                     <h:panelGrid   id="violation-ord-fulltext-pg" 
-                                                                    columns="1" 
-                                                                    columnClasses="gridTD" 
-                                                                    rendered="true">
-                                                         
-                                                         <h:panelGroup>
-                                                            <h:outputText styleClass="ui-label-inline" 
-                                                                          value="For: "  />
-                                                            <h:outputText styleClass="data-text" 
-                                                                          value="#{occInspectionBB.currentProposal.responderIntended.person.firstName}" />
-                                                            <h:outputText styleClass="data-text" 
-                                                                          value=" " />
-                                                            <h:outputText styleClass="data-text" 
-                                                                          value="#{occInspectionBB.currentProposal.responderIntended.person.lastName}" />
-                                                         </h:panelGroup>
-                                                                                            
-                                                         
-                                                         <h:panelGroup>
-                                                            <h:outputText   styleClass="ui-label-inline" 
-                                                                            value="Expires on: "  />
-                                                            <h:outputText   styleClass="data-text" 
-                                                                            value="#{occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentProposal.expiresOn)}" />
-                                                         </h:panelGroup>
-                                                     </h:panelGrid>
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <div class="proposal-infotable-box">
+                                                        <h:panelGrid   id="occperiod-proposals-panelgrid-propinfo" 
+                                                                       columns="1" 
+                                                                       columnClasses="gridTD" 
+                                                                       rendered="true">
+                                                            <h:panelGroup>
+                                                               <h:outputText styleClass="ui-label-inline" 
+                                                                             value="Intended for: "  />
+                                                               <h:outputText styleClass="data-text" 
+                                                                             value="#{occInspectionBB.currentProposal.responderIntended.person.firstName}" />
+                                                               <h:outputText styleClass="data-text" 
+                                                                             value=" " />
+                                                               <h:outputText styleClass="data-text" 
+                                                                             value="#{occInspectionBB.currentProposal.responderIntended.person.lastName}" />
+                                                            </h:panelGroup>
+
+
+                                                            <h:panelGroup>
+                                                               <h:outputText   styleClass="ui-label-inline" 
+                                                                               value="Expires on: "  />
+                                                               <h:outputText   styleClass="data-text" 
+                                                                               value="#{occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentProposal.expiresOn)}" />
+                                                            </h:panelGroup>
+                                                        </h:panelGrid>
+                                                    </div>
                                                 </div>
 
                                                 <p:dataScroller id="proposals-choicescroller"
@@ -448,7 +437,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                    actionListener="#{occInspectionBB.addSpaceToChecklist(occInspectionBB.selectedOccSpace)}"
                                                                                    rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                                    disabled="#{empty occInspectionBB.selectedOccSpace}"
-                                                                                   value="add w/ compliance"  
+                                                                                   value="mark added items with compliance"  
                                                                                    icon="fa fa-check"
                                                                                    update=" form-inspecteditems
                                                                                             occperiod-inspecteditems-form-messages">
@@ -464,8 +453,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                    actionListener="#{occInspectionBB.addSpaceToChecklist(occInspectionBB.selectedOccSpace)}"
                                                                                    rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                                    disabled="#{empty occInspectionBB.selectedOccSpace}"
-                                                                                   value="add as uninspected"  
-                                                                                   icon="fa fa-check"
+                                                                                   value="add items as uninspected"  
+                                                                                   icon="fa fa-circle-o"
                                                                                    update=" form-inspecteditems
                                                                                    occperiod-inspecteditems-form-messages">
                                                                 <f:param name="occperiod-elementstatusonadd" value="uninsp"/>
@@ -668,9 +657,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     value="#{caseProfileBB.selectedEventCategory}" 
                                                                     tabindex="10">
                                                     
-                                                    <p:ajax update="selectedEventCategoryDescription
-                                                            selectedEventCategoryDescription 
-                                                            selectedEventCateogryNotifiesCaseMonitors
+                                                    <p:ajax update="
                                                             event-add-dialog-show-cb"                                                           
                                                             immediate="true"/>
                                                     <f:converter converterId="eventCategoryConverter"/>
@@ -1034,145 +1021,145 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="5px" />
 
                                                         <h:outputText styleClass="ui-label-inline" value="Notes: " />
-                                                        
+
                                                         <h:outputText  styleClass="data-text" value="#{inelement.notes}" escape="false"/>
-                                                        
+
                                                         <p:spacer height="5px" />
 
-                                                            <p:commandButton   id="occperiod-checklist-scroller-inEle-button-notes"
+                                                        <p:commandButton   id="occperiod-checklist-scroller-inEle-button-notes"
+                                                                           rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                           value="add note"  
+                                                                           icon="fa fa-sticky-note-o"/>
+
+
+                                                            <p:commandButton   id="occperiod-checklist-scroller-inEle-button-blobs"
+                                                                               ajax="true" 
+                                                                               disabled="true"
+                                                                               actionListener="#{occInspectionBB.addNoteToInspectedElement(inelement)}"
                                                                                rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               value="add note"  
-                                                                               icon="fa fa-sticky-note-o"/>
+                                                                               value="images"  
+                                                                               icon="fa fa-photo"
+                                                                               update="occperiod-dialog-blobs-form"/>
 
-                                                        <p:overlayPanel     id="occperiod-checklist-overlay-notes"
-                                                                            for="occperiod-checklist-scroller-inEle-button-notes"
-                                                                            style="height: 450px; width: 250px;"
-                                                                            dismissable="true"
-                                                                            >
-                                                            
-                                                                <h:outputText styleClass="ui-label" value="Note text: "/>
-                                                                <p:editor   id="occperiod-checklist-overlay-notes-editor"  
-                                                                            value="#{occInspectionBB.formNoteText}" 
-                                                                            controls="bold italic underline strikethrough font size style color 
-                                                                            bullets numbering center undo redo rule link removeformat outdent 
-                                                                            indent link unlink copy cut paste rule alignleft center alignright"
-                                                                            width="400" required="true"
-                                                                            height="200"/>
-                                                                <h:message for="occperiod-checklist-overlay-notes-editor" showDetail="false" showSummary="true" 
-                                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </h:panelGroup>
+                                                        <h:panelGroup>
 
-                                                                <p:spacer height="5px" />
+                                                            <f:subview id="occperiod-checklist-inelescroller-subview-compliance"
+                                                                       rendered="#{empty inelement.complianceGrantedTS}">
 
-                                                                <p:commandButton   id="occperiod-checklist-overlay-notes-addnote"
+                                                                <p:commandButton   id="occperiod-checklist-inelescroller-button-compliance"
                                                                                    ajax="true" 
-                                                                                   actionListener="#{occInspectionBB.addNoteToInspectedElement(inelement)}"
+                                                                                   actionListener="#{occInspectionBB.recordComplianceWithElement(inelement)}"
                                                                                    rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                                   value="save note"  
-                                                                                   icon="fa fa-edit"
+                                                                                   disabled="#{!(empty inelement.complianceGrantedTS)}"
+                                                                                   value="grant compliance"  
+                                                                                   icon="fa fa-check-square-o"
+                                                                                   update="form-inspecteditems
+                                                                                   occperiod-inspecteditems-form-messages
+                                                                                   "/>
+                                                            </f:subview>
+
+                                                            <p:spacer height="5px" />
+                                                            <f:subview id="occperiod-checklist-subview-reinspect"
+                                                                       rendered="#{empty inelement.complianceGrantedTS}">
+
+
+                                                                <p:commandButton   id="occperiod-checklist-scroller-inEle-button-reinspectionwithoutcompliance"
+                                                                                   ajax="true" 
+                                                                                   actionListener="#{occInspectionBB.inspectElementWithoutCompliance(inelement)}"
+                                                                                   rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                   disabled="#{!(empty inelement.complianceGrantedTS or empty inelement.complianceGrantedTS)}"
+                                                                                   value="inspect; do NOT grant compliance"  
+                                                                                   icon="fa fa-eye"
                                                                                    update="form-inspecteditems
                                                                                    occperiod-inspecteditems-form-messages
                                                                                    "/>
 
+                                                            </f:subview>
+
+                                                            <p:spacer height="5px" />
+                                                            <f:subview id="occperiod-checklist-subview-withdrawcompliance"
+                                                                       rendered="#{!(empty inelement.complianceGrantedTS)}">
+
+                                                                <p:commandButton   id="occperiod-checklist-scroller-inEle-button-removecompliance"
+                                                                                   ajax="true" 
+                                                                                   actionListener="#{occInspectionBB.removeComlianceWithElement(inelement)}"
+                                                                                   rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                   disabled="#{(empty inelement.complianceGrantedTS)}"
+                                                                                   value="withdraw compliance"  
+                                                                                   icon="fa fa-minus-square-o"
+                                                                                   update="form-inspecteditems
+                                                                                   occperiod-inspecteditems-form-messages
+                                                                                   "/>
+
+
+                                                            </f:subview>
+                                                            <p:spacer height="5px" />
+                                                            <f:subview id="occperiod-checklist-subview-clearinspection"
+                                                                       rendered="#{!(empty inelement.lastInspectedTS)}">
+
+
+                                                                <p:commandButton   id="occperiod-checklist-scroller-inEle-button-clearinspection"
+                                                                                   ajax="true" 
+                                                                                   actionListener="#{occInspectionBB.clearInspectionOfElement(inelement)}"
+                                                                                   rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                   disabled="#{!(!(empty inelement.lastInspectedTS) or !(empty inelement.complianceGrantedTS))}"
+                                                                                   value="clear inspection"  
+                                                                                   icon="fa fa-eraser"
+                                                                                   update="form-inspecteditems
+                                                                                   occperiod-inspecteditems-form-messages
+                                                                                   "/>
+
+                                                            </f:subview>
+
+                                                            <p:spacer height="5px" />
+
+                                                            <p:fieldset legend="Inspection tips" 
+                                                                        toggleable="true" 
+                                                                        toggleSpeed="500"
+                                                                        collapsed="true">
+
+                                                                <h:outputText value="Code guide inspection tips:" escape="false" />
+                                                                <h:outputText value="#{inelement.guideEntry.inspectionGuidelines}" escape="false" />
+                                                            </p:fieldset>
+                                                        </h:panelGroup>
+                                                </h:panelGrid>
+                                                
+                                                 <p:overlayPanel     id="occperiod-checklist-overlay-notes"
+                                                                            for="occperiod-checklist-scroller-inEle-button-notes"
+                                                                            style="height: 450px; width: 250px;"
+                                                                            dismissable="true"
+                                                                            >
+
+                                                            <h:outputText styleClass="ui-label" value="Note text: "/>
+                                                            <p:editor   id="occperiod-checklist-overlay-notes-editor"  
+                                                                        value="#{occInspectionBB.formNoteText}" 
+                                                                        controls="bold italic underline strikethrough font size style color 
+                                                                        bullets numbering center undo redo rule link removeformat outdent 
+                                                                        indent link unlink copy cut paste rule alignleft center alignright"
+                                                                        width="400" required="true"
+                                                                        height="200"/>
+                                                            <h:message for="occperiod-checklist-overlay-notes-editor" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                            <p:spacer height="5px" />
+
+                                                            <p:commandButton   id="occperiod-checklist-overlay-notes-addnote"
+                                                                               ajax="true" 
+                                                                               actionListener="#{occInspectionBB.addNoteToInspectedElement(inelement)}"
+                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                               value="save note"  
+                                                                               icon="fa fa-edit"
+                                                                               update="form-inspecteditems
+                                                                               occperiod-inspecteditems-form-messages
+                                                                               "/>
+
                                                         </p:overlayPanel>
 
-                                                        <p:commandButton   id="occperiod-checklist-scroller-inEle-button-blobs"
-                                                                           ajax="true" 
-                                                                           disabled="true"
-                                                                           actionListener="#{occInspectionBB.addNoteToInspectedElement(inelement)}"
-                                                                           rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                           value="images"  
-                                                                           icon="fa fa-photo"
-                                                                           update="occperiod-dialog-blobs-form"/>
 
-                                                    </h:panelGroup>
-                                                    <h:panelGroup>
-
-                                                        <f:subview id="occperiod-checklist-inelescroller-subview-compliance"
-                                                                   rendered="#{empty inelement.complianceGrantedTS}">
-
-                                                            <p:commandButton   id="occperiod-checklist-inelescroller-button-compliance"
-                                                                               ajax="true" 
-                                                                               actionListener="#{occInspectionBB.recordComplianceWithElement(inelement)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               disabled="#{!(empty inelement.complianceGrantedTS)}"
-                                                                               value="grant compliance"  
-                                                                               icon="fa fa-check-square-o"
-                                                                               update="form-inspecteditems
-                                                                               occperiod-inspecteditems-form-messages
-                                                                               "/>
-                                                        </f:subview>
-
-                                                        <p:spacer height="5px" />
-                                                        <f:subview id="occperiod-checklist-subview-reinspect"
-                                                                   rendered="#{empty inelement.complianceGrantedTS}">
-
-
-                                                            <p:commandButton   id="occperiod-checklist-scroller-inEle-button-reinspectionwithoutcompliance"
-                                                                               ajax="true" 
-                                                                               actionListener="#{occInspectionBB.inspectElementWithoutCompliance(inelement)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               disabled="#{!(empty inelement.complianceGrantedTS or empty inelement.complianceGrantedTS)}"
-                                                                               value="inspect; do NOT grant compliance"  
-                                                                               icon="fa fa-eye"
-                                                                               update="form-inspecteditems
-                                                                               occperiod-inspecteditems-form-messages
-                                                                               "/>
-
-                                                        </f:subview>
-
-                                                        <p:spacer height="5px" />
-                                                        <f:subview id="occperiod-checklist-subview-withdrawcompliance"
-                                                                   rendered="#{!(empty inelement.complianceGrantedTS)}">
-
-                                                            <p:commandButton   id="occperiod-checklist-scroller-inEle-button-removecompliance"
-                                                                               ajax="true" 
-                                                                               actionListener="#{occInspectionBB.removeComlianceWithElement(inelement)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               disabled="#{(empty inelement.complianceGrantedTS)}"
-                                                                               value="withdraw compliance"  
-                                                                               icon="fa fa-minus-square-o"
-                                                                               update="form-inspecteditems
-                                                                               occperiod-inspecteditems-form-messages
-                                                                               "/>
-
-
-                                                        </f:subview>
-                                                        <p:spacer height="5px" />
-                                                        <f:subview id="occperiod-checklist-subview-clearinspection"
-                                                                   rendered="#{!(empty inelement.lastInspectedTS)}">
-
-
-                                                            <p:commandButton   id="occperiod-checklist-scroller-inEle-button-clearinspection"
-                                                                               ajax="true" 
-                                                                               actionListener="#{occInspectionBB.clearInspectionOfElement(inelement)}"
-                                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                               disabled="#{!(!(empty inelement.lastInspectedTS) or !(empty inelement.complianceGrantedTS))}"
-                                                                               value="clear inspection"  
-                                                                               icon="fa fa-eraser"
-                                                                               update="form-inspecteditems
-                                                                               occperiod-inspecteditems-form-messages
-                                                                               "/>
-
-                                                        </f:subview>
-
-                                                        <p:spacer height="5px" />
-
-                                                        <p:fieldset legend="Inspection tips" 
-                                                                    toggleable="true" 
-                                                                    toggleSpeed="500"
-                                                                    collapsed="true">
-
-
-                                                            <h:outputText value="Code guide inspection tips:" escape="false" />
-                                                            <h:outputText value="#{inelement.guideEntry.inspectionGuidelines}" escape="false" />
-
-                                                        </p:fieldset>
-                                                    </h:panelGroup>
-
-
-
-                                                </h:panelGrid>
                                                 <hr />  
+
+
                                             </p:dataScroller>
                                         </p:dataScroller>
                                     </h:form>
@@ -1722,6 +1709,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 value="Generate permit" icon="fa fa-plus"
                                                 disabled="false"
                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"/>
+                        </h:form>
+                    </p:dialog>
+                    
+                    
+                    <p:dialog   id="occperiod-rejectproposal-dialog"
+                                height="650" width="900"
+                                widgetVar="occperiod-rejectproposal-dialog-var"
+                                closable="true" 
+                                rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                >
+
+                        <h:form id="occperiod-rejectproposal-form">
+
+                            <h:messages id="occperiod-rejectproposal-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                           
+
+                                    <h:outputText styleClass="ui-label" value="reason for rejecting proposal" />
+
+                                    <p:inputText    id="proposal-rejectreason-it" 
+                                                    value="#{occInspectionBB.formProposalRejectionReason}" 
+                                                    required="true"/>
+
+
+
+                                    <p:commandButton    id="proposal-button-reject"
+                                                        ajax="true"
+                                                        styleClass="noFill button-size-small"
+                                                        actionListener="#{occInspectionBB.rejectProposal(proposal)}"
+                                                        rendered="#{!proposal.directive.requiredEvaluationForBOBClose}"
+                                                        oncomplete="PF('occperiod-rejectproposal-dialog-var').hide()"
+                                                        icon="fa fa-hand-stop-o"
+                                                        update="occperiod-form-proposals"/>
                         </h:form>
                     </p:dialog>
                     
