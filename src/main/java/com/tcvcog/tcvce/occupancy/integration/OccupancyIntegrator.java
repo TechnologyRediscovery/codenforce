@@ -766,9 +766,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            
         }
-
     }
 
     public int insertOccPeriod(OccPeriod period) throws IntegrationException {

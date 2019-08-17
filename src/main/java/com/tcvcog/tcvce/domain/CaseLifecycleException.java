@@ -21,22 +21,22 @@ package com.tcvcog.tcvce.domain;
  *
  * @author Eric C. Darsow
  */
-public class CaseLifecyleException extends BaseException {
+public class CaseLifecycleException extends BaseException {
     
-    public CaseLifecyleException(){
+    public CaseLifecycleException(){
         super();
         
     }
     
-    public CaseLifecyleException(String message){
+    public CaseLifecycleException(String message){
         super(message);
     }
     
-    public CaseLifecyleException(Exception e){
+    public CaseLifecycleException(Exception e){
         super(e);
     }
     
-    public CaseLifecyleException(String message, Exception e){
+    public CaseLifecycleException(String message, Exception e){
         super(message, e);
         
     }

@@ -1247,26 +1247,50 @@ gridTd-bignum{
 
 
 
-/* -------------------- INSPECTION AND OCC PERMIT----------------------- */
 
-.occperiod-proposal-choice-button{
+/* -------------------- PROPOSALS AND CHOICES ----------------------- */
+
+.proposal-choice-button{
     margin-top: 5px;
+    
 }
 
-.occperiod-proposal-prophead{
+.proposal-prophead{
     font-weight: bold;
     font-size: 1.2em;
+    display: block;
+    float: left;
 }
 
-.occperiod-proposal-description{
+.proposal-description{
     font-style: italic;
     font-size: 0.9em;
 }
 
-.occperiod--proposal-choicehead{
+.proposal-choicehead{
     font-weight: bold;
     font-size: 1.2em;
 }
+
+.proposal-metadata-container{
+    display: block;
+    width: 100%;
+}
+
+.proposal-propbuttoncontainer{
+    display: block;
+    float: right;
+}
+
+/* ****************** PROPOSALS AND CHOICES ********************/
+
+
+
+
+/* -------------------- INSPECTION AND OCC PERMIT----------------------- */
+
+
+
 
 
 i.inspection-pass{
@@ -1294,9 +1318,6 @@ i.inspection-notinspected{
     margin-bottom: 5px;
 }
 
-.button-moreinfo{
-    margin-left: 8px;
-}
 
 .inspection-notinspected{
     color: #1a237e;

@@ -4,7 +4,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -102,7 +102,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         
         try {
             this.currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
-        } catch (IntegrationException | CaseLifecyleException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
         }
         propList = getSessionBean().getSessionPropertyList();
@@ -269,7 +269,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             currProp = pi.getPropertyWithLists(currProp.getPropertyID(), getSessionBean().getSessionUser());
-        } catch (IntegrationException | CaseLifecyleException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -375,7 +375,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Managing property at " + prop.getAddress() , ""));
-        } catch (IntegrationException | CaseLifecyleException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -392,7 +392,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             if(currProp == null){
                 currProp = pi.getPropertyWithLists(getSessionBean().getSessionProperty().getPropertyID(), getSessionBean().getSessionUser());
             }
-        } catch (IntegrationException | CaseLifecyleException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,

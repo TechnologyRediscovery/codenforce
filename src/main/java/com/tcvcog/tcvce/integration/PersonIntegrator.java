@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
@@ -570,6 +571,40 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
+    public void connectPersonsToEvent(OccEvent ev, List<Person> personList) throws IntegrationException {
+        ListIterator li = personList.listIterator();
+        while (li.hasNext()) {
+            connectPersonToEvent(ev, (Person) li.next());
+        }
+    }
+
+    public void connectPersonToEvent(OccEvent ev, Person p) throws IntegrationException {
+
+        String query =  "INSERT INTO public.occeventperson(\n" +
+                        "            occevent_eventid, person_personid)\n" +
+                        "    VALUES (?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, ev.getOccPeriodID());
+            stmt.setInt(2, p.getPersonID());
+
+            System.out.println("PersonIntegrator.connectPersonToEvent | sql: " + stmt.toString());
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to insert person and connect to property", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
     public void connectPersonToMunicipalities(List<Municipality> munuiList, Person p) throws IntegrationException {
 
         Iterator<Municipality> iter = munuiList.iterator();
@@ -661,7 +696,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             list.add(getPerson(personId));
         }
         return list;
-    } // close getPersonList()
+    } // close getPersonsByEvent()
 
     /**
      * Updates a given record for a person in the database. Will throw an error
@@ -789,7 +824,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    public List<Person> getPersonList(Event ev) throws IntegrationException {
+    public List<Person> getPersonsByEvent(Event ev) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;

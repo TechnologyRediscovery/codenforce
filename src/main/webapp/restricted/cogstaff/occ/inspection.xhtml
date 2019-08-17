@@ -104,7 +104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:commandButton    id="occperiod-periodmetadata-subview-typelock-unlocked-button-changetype"
                                                                     ajax="true" 
                                                                     styleClass="noFill"
-                                                                    actionListener="#{occInspectionBB.makeChoice(choice, proposal)}"
+                                                                    actionListener="#{occInspectionBB.proposals_makeChoice(choice, proposal)}"
                                                                     disabled="#{!choice.canChoose}"
                                                                     value="change period type"
                                                                     icon="fa fa-edit"
@@ -165,58 +165,102 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <h:form id="occperiod-form-proposals">
 
-                                        <p:dataScroller id="occperiod-proposals-proposalscroller"
+                                        <p:dataScroller id="proposals-proposalscroller"
                                                         var="proposal"
-                                                        widgetVar="occperiod-proposals-proposalscroller-var"
+                                                        widgetVar="proposals-proposalscroller-var"
                                                         value="#{occInspectionBB.currentOccPeriod.proposalList}"
                                                         rowIndexVar="#{proposal.proposalID}">
 
                                             <div class="outlinedBox">
-                                                <div class="occperiod-proposal-prophead">
-                                                    <h:outputText value="#{proposal.directive.title}" />
-                                                    
-                                                    <p:commandButton    id="occperiod-proposal-button-showdescription"
-                                                                        styleClass="noFill button-size-small button-moreinfo"
-                                                                        icon="fa fa-info-circle"/>
-                                                    <p:overlayPanel id="occperiod-proposal-overlaypanel-proposaldescription"
-                                                                    for="occperiod-proposal-button-showdescription"
-                                                                    hideEffect="fade" 
-                                                                    dynamic="true" 
-                                                                    showCloseIcon="true"
-                                                                    style="width:300px" 
-                                                                    modal="false">
-                                                                        
-                                                        <h:outputText       styleClass="occperiod-proposal-description"
-                                                                            value="#{proposal.directive.description}" />
+                                                <div class="proposal-metadata-container">
+                                                    <div class="proposal-propbuttoncontainer">
+                                                        <p:commandButton    id="proposal-button-showdescription"
+                                                                            styleClass="noFill button-size-small button-moreinfo"
+                                                                            icon="fa fa-info-circle-o"/>
                                                         
+                                                            <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
+                                                                        for="proposal-button-showdescription"
+                                                                        hideEffect="fade" 
+                                                                        dynamic="true" 
+                                                                        showCloseIcon="true"
+                                                                        style="width:300px" 
+                                                                        modal="false">
+                                                            <h:outputText       styleClass="proposal-description"
+                                                                                value="#{proposal.directive.description}" />
+                                                        </p:overlayPanel>
                                                         
-                                                    </p:overlayPanel>
+                                                        <p:commandButton    id="proposal-button-propmetadata"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            actionListener="#{occInspectionBB.propoals_viewPropMetadata(proposal)}"
+                                                                            oncomplete="PF('dialog-proposalmetadata-var').show()"
+                                                                            icon="fa fa-gears"
+                                                                            update="dialog-proposalmetadata-form"/>
+                                                        
+                                                        <p:commandButton    id="proposal-button-rejectionreason"
+                                                                            styleClass="noFill button-size-small"
+                                                                            icon="fa fa-info-circle-o"/>
+                                                        
+                                                            <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
+                                                                        for="proposal-button-showdescription"
+                                                                        hideEffect="fade" 
+                                                                        dynamic="true" 
+                                                                        showCloseIcon="true"
+                                                                        style="width:300px" 
+                                                                        modal="false">
+                                                            <h:outputText       styleClass="proposal-description"
+                                                                                value="#{proposal.directive.description}" />
+                                                        </p:overlayPanel>
+                                                        
+                                                        <p:commandButton    id="proposal-button-reject"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            actionListener="#{occInspectionBB.rejectProposal(proposal)}"
+                                                                            rendered="#{!proposal.directive.requiredEvaluationForBOBClose}"
+                                                                            oncomplete="PF('dialog-proposalmetadata-var').show()"
+                                                                            icon="fa fa-trash-o"
+                                                                            update="occperiod-form-proposals"/>
+                                                    </div>
+                                                    <div class="proposal-prophead">
+                                                        <h:outputText value="#{proposal.directive.title}" />
+                                                    </div>
                                                     
-                                                    
-                                                    
+                                                     <h:panelGrid   id="violation-ord-fulltext-pg" 
+                                                                    columns="1" 
+                                                                    columnClasses="gridTD" 
+                                                                    rendered="true">
+                                                         
+                                                         <h:panelGroup>
+                                                            <h:outputText styleClass="ui-label-inline" 
+                                                                          value="For: "  />
+                                                            <h:outputText styleClass="data-text" 
+                                                                          value="#{occInspectionBB.currentProposal.responderIntended.person.firstName}" />
+                                                            <h:outputText styleClass="data-text" 
+                                                                          value=" " />
+                                                            <h:outputText styleClass="data-text" 
+                                                                          value="#{occInspectionBB.currentProposal.responderIntended.person.lastName}" />
+                                                         </h:panelGroup>
+                                                                                            
+                                                         
+                                                         <h:panelGroup>
+                                                            <h:outputText   styleClass="ui-label-inline" 
+                                                                            value="Expires on: "  />
+                                                            <h:outputText   styleClass="data-text" 
+                                                                            value="#{occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentProposal.expiresOn)}" />
+                                                         </h:panelGroup>
+                                                     </h:panelGrid>
                                                 </div>
 
-                                                <div class="occperiod-proposal-description-container">
-                                                    <p:commandButton    id="occperiod-proposal-button-propmetadata"
-                                                                        ajax="true"
-                                                                        styleClass="noFill right-floater button-size-small"
-                                                                        value="proposal details"
-                                                                        actionListener="#{occInspectionBB.viewProposalMetadata(proposal)}"
-                                                                        oncomplete="PF('occperiod-dialog-proposalmetadata-var').show()"
-                                                                        icon="fa fa-gears"
-                                                                        update="occperiod-dialog-proposalmetadata-form"/>
-                                                </div>
-
-                                                <p:dataScroller id="occperiod-proposals-choicescroller"
+                                                <p:dataScroller id="proposals-choicescroller"
                                                                 var="choice"
-                                                                widgetVar="occperiod-proposals-choicescroller-var"
+                                                                widgetVar="proposals-choicescroller-var"
                                                                 value="#{proposal.directive.choiceList}"
                                                                 rowIndexVar="#{choice.choiceID}">
 
-                                                    <p:commandButton    id="occperiod-proposal-choice-button-choose"
+                                                    <p:commandButton    id="proposal-choice-button-choose"
                                                                         ajax="true" 
-                                                                        styleClass="occperiod-proposal-choice-button"
-                                                                        actionListener="#{occInspectionBB.makeChoice(choice, proposal)}"
+                                                                        styleClass="proposal-choice-button"
+                                                                        actionListener="#{occInspectionBB.proposals_makeChoice(choice, proposal)}"
                                                                         disabled="#{!choice.canChoose}"
                                                                         value="#{choice.title}"
                                                                         icon="#{choice.icon.fontAwesome}"
@@ -441,9 +485,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </ui:remove>
 
                                                             
-                                                     
-                                                     
-                                                     
                                                  </h:panelGroup>
                                              </h:panelGrid>
                                               
@@ -580,17 +621,81 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                   <h:messages id="occperiod-messages-messages-rightcolheader" globalOnly="true" showDetail="true" showSummary="true"
                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                   </h:messages>
-                              </h:form>
+                                </h:form>
+                                
+                                
                                 <p:panel    id="occperiod-panel-events"
                                             toggleable="true"  
                                             collapsed="false"
                                             header="Occupancy period events">
-                                    
-
 
                                     <h:form id="occperiod-form-events">
                                         
-                                        
+                                        <h2>Add new event</h2>
+
+                                        <h:panelGrid columns="3" border="0" 
+                                                     cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
+                                                     footerClass="gridFooter" style="vertical-align: top;">
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="ui-label" for="newEventTypeMenu">
+                                                    <h:outputText value="Step 1: Choose type"/>
+                                                </h:outputLabel>
+                                                <p:selectOneMenu id="newEventTypeMenu" 
+                                                                    required="true" 
+                                                                    value="#{occInspectionBB.selectedEventCategory}" 
+                                                                    tabindex="10">
+                                                    <f:converter converterId="eventCategoryConverter" />
+                                                    <p:ajax update="categoryList
+                                                            event-add-dialog-show-cb" 
+                                                            immediate="true"/> 
+                                                    <f:selectItems value="#{occInspectionBB.eventCategoryList}" 
+                                                                   var="et" 
+                                                                   itemLabel="#{et.label}" />
+                                                </p:selectOneMenu>
+                                                <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+                                            
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="ui-label" for="categoryList">
+                                                    <h:outputText value="Step 2: Choose category"/>
+                                                </h:outputLabel>
+
+                                              
+                                                <p:selectOneListbox style="width: 300px;" 
+                                                                    id="categoryList" 
+                                                                    value="#{caseProfileBB.selectedEventCategory}" 
+                                                                    tabindex="10">
+                                                    
+                                                    <p:ajax update="selectedEventCategoryDescription
+                                                            selectedEventCategoryDescription 
+                                                            selectedEventCateogryNotifiesCaseMonitors
+                                                            event-add-dialog-show-cb"                                                           
+                                                            immediate="true"/>
+                                                    <f:converter converterId="eventCategoryConverter"/>
+                                                    <f:selectItems  id="catItemsList" value="#{caseProfileBB.eventCategoryList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                                </p:selectOneListbox>
+
+                                                <h:message for="categoryList" showDetail="false" showSummary="true"  
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:commandButton    id="event-add-dialog-show-cb"
+                                                                    ajax="true"
+                                                                    process="@form"
+                                                                    actionListener="#{occInspectionBB.events_initializeEvent}" 
+                                                                    oncomplete="PF('occperiod-events-dialog-addeditevent-var').show()"
+                                                                    disabled="#{empty occInspectionBB.selectedEventCategory}"
+                                                                    rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                    value="Create new event"  
+                                                                    icon="fa fa-plus"
+                                                                    update="occperiod-events-dialog-form"/>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+
 
                                         <p:dataTable
                                             id="occperiod-events-datatable"
@@ -687,7 +792,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                  />
 
                                             </p:column>
-
                                             <p:column width="4%" exportable="false">
                                                 <f:facet name="header">
                                                     <h:outputText value="Edit" />
@@ -699,18 +803,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                  update="addNewEventForm
                                                                  event-messages-form"
                                                                  />
-
                                             </p:column>
-
                                             <p:rowExpansion>
-
                                                 <div class="outlinedBox">
-                                                    <h2><h:outputText value="#{e.category.eventType.label}:#{e.category.eventCategoryTitle}"/>
-                                                        ; Event ID: <h:outputText value="#{e.eventID}"/> 
+                                                    <h2>
+                                                        <h:outputText value="#{e.category.eventType.label}:#{e.category.eventCategoryTitle}"/>
+                                                        <h:outputText value="; Event ID: "/> 
+                                                        <h:outputText value="#{e.eventID}"/> 
                                                     </h2>
                                                     <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                                  columnClasses="gridTd, gridTd, gridTd, gridTd">
-
                                                         <h:panelGroup>
                                                             <h:outputText styleClass="bold" value="Description" />
                                                             <div class="rowExpansion">
@@ -759,34 +861,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </p:rowExpansion>
 
                                         </p:dataTable>
+
                                         <p:spacer height="5px" />
 
-                                        <p:inputSwitch id="events-showhidden-sbcb" 
-                                                       style="margin-right: 5px;"
-                                                       value="#{occInspectionBB.currentOccPeriod.showHiddenEvents}" 
-                                                       offLabel="view hidden events"
-                                                       onLabel="conceal hidden events">
+                                        <h:outputText styleClass="ui-label-inline" value="show hidden events: " />
+
+                                        <p:selectBooleanCheckbox id="events-showhidden-sbcb" 
+                                                                 style="margin-right: 5px;"
+                                                                 value="#{occInspectionBB.currentOccPeriod.showHiddenEvents}" >
                                             <p:ajax update="occperiod-events-datatable" />
 
-                                        </p:inputSwitch>
+                                        </p:selectBooleanCheckbox>
 
+                                        <h:outputText styleClass="ui-label-inline" value="show inactive events: " />
 
-
-                                        <p:inputSwitch id="events-inactive-sbcb" 
-                                                       value="#{occInspectionBB.currentOccPeriod.showInactiveEvents}"
-                                                       offLabel="view inactive events"
-                                                       onLabel="conceal inactive events">
+                                        <p:selectBooleanCheckbox id="events-inactive-sbcb" 
+                                                                 value="#{occInspectionBB.currentOccPeriod.showInactiveEvents}">
                                             <p:ajax update="occperiod-events-datatable" />
-                                        </p:inputSwitch>
-
-
-
+                                        </p:selectBooleanCheckbox>
                                     </h:form>
-
                                 </p:panel>
-
-
-
+                                
                                 <p:panel    id="occperiod-panel-inspitems"
                                             toggleable="true"  
                                             collapsed="false"
@@ -799,24 +894,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      </h:form>
                                     
                                     <h:form id="occperiod-inspecteditems-form-options">
+                                        <h2>Checklist actions</h2>
+                                        
                                           <p:commandButton   id="occperiod-inspectedspace-button-filterfailed"
                                                                ajax="true" 
-                                                               actionListener="#{occInspectionBB.filterinspectedelements()}"
-                                                               rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                               onclick="PF('occperiod-location-dialog-var').show()"
-                                                               value="edit location"  
+                                                               actionListener="#{occInspectionBB.initializeOccInspectionReport}"
+                                                               rendered="#{sessionBean.sessionUser.keyCard.hasMuniReaderPermissions}"
+                                                               onclick="PF('occperiod-configurereport-occinspection-var').show()"
+                                                               value="generate inspection to-do list"
                                                                disabled="false"
-                                                               icon="fa fa-map-pin"
-                                                               update="
-                                                               occperiod-location-form
-                                                               "/>
-                                        
-                                        
+                                                               icon="fa fa-print"
+                                                               update="occperiod-location-form"/>
                                     </h:form>
-                                    
 
                                     <h:form id="form-inspecteditems">
-
                                         <p:dataScroller
                                             id="scroller-inspectionlist"
                                             widgetVar="var-scroller-inspectionlist"
@@ -842,11 +933,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                    value="activate this inspection"  
                                                                    icon="fa fa-bolt"
                                                                    />
-
                                         </p:dataScroller>
-
-
-
 
                                         <p:dataScroller
                                             id="scroller-inspectedspacelist"
@@ -1314,7 +1401,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                  rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}">
 
 
-                        <h:form id="addNewEventForm">
+                        <h:form id="occperiod-events-dialog-form">
 
                             <h1>
                                 Add/edit occupancy period event
@@ -1323,21 +1410,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:outputLabel for="add-event-ec-ot">
                                 <h:outputText styleClass="bold" value="Event:"/>
                             </p:outputLabel>
-                            <h:outputText id="add-event-ec-ot" value="#{occInspectionBB.selectedEvent.category.eventCategoryTitle} (ID:#{occInspectionBB.selectedEvent.eventID})"/>
+                            <h:outputText id="add-event-ec-ot" value="#{occInspectionBB.currentEvent.category.eventCategoryTitle}"/>
+                            <h:outputText id="add-event-ec-ot2" value=" (cat ID:#{occInspectionBB.currentEvent.eventID})"/>
 
                             <p:spacer height="5px"/>
 
                             <p:outputLabel for="add-event-et-ot">
                                 <h:outputText styleClass="bold" value="Event type:"/>
                             </p:outputLabel>
-                            <h:outputText id="add-event-et-ot" value="#{occInspectionBB.selectedEvent.category.eventType.label}"/>
+                            <h:outputText id="add-event-et-ot" value="#{occInspectionBB.currentEvent.category.eventType.label}"/>
 
                             <p:spacer height="5px"/>
 
                             <p:outputLabel for="add-event-cd-ot">
                                 <h:outputText styleClass="bold" value="Cateogry description:"/>
                             </p:outputLabel>
-                            <h:outputText id="add-event-cd-ot" value="#{occInspectionBB.selectedEvent.category.eventCategoryDesc}"/>
+                            <h:outputText id="add-event-cd-ot" value="#{occInspectionBB.currentEvent.category.eventCategoryDesc}"/>
 
 
 
@@ -1352,7 +1440,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:outputLabel for="eventDesc">
                                             <h:outputText value="Short Description:"/>
                                         </p:outputLabel>
-                                        <p:inputText id="eventDesc" value="#{occInspectionBB.selectedEvent.description}" 
+                                        <p:inputText id="eventDesc" value="#{occInspectionBB.currentEvent.description}" 
                                                      style="width: 600px;" tabindex="3" required="true" styleClass="inputText"/>
                                         <h:message for="eventDesc" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1365,7 +1453,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText value="Active Event?"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="activeEvent" value="#{occInspectionBB.selectedEvent.active}" />
+                                    <p:selectBooleanCheckbox tabindex="18" id="activeEvent" value="#{occInspectionBB.currentEvent.active}" />
 
                                 </h:panelGroup>
 
@@ -1374,7 +1462,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText value="Date of Record"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:calendar value="#{occInspectionBB.selectedEvent.dateOfRecordUtilDate}" 
+                                    <p:calendar value="#{occInspectionBB.currentEvent.dateOfRecordUtilDate}" 
                                                 mode="popup"  id="eventDateCal"
                                                 showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                 navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -1389,7 +1477,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText value="Disclose to Municipalities"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToMuniIS" value="#{occInspectionBB.selectedEvent.discloseToMunicipality}" />
+                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToMuniIS" value="#{occInspectionBB.currentEvent.discloseToMunicipality}" />
                                 </h:panelGroup>
 
                                 <h:panelGroup>
@@ -1397,7 +1485,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText value="Disclose to Public"/>
                                     </h:outputLabel>
                                     <p:spacer height="5px"/>
-                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToPublic" value="#{occInspectionBB.selectedEvent.discloseToPublic}" />
+                                    <p:selectBooleanCheckbox tabindex="18" id="discloseToPublic" value="#{occInspectionBB.currentEvent.discloseToPublic}" />
                                 </h:panelGroup>
 
 
@@ -1407,7 +1495,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText value="Event Notes:"/>
                                     </h:outputLabel>
                                     <h:panelGroup>
-                                        <p:editor id="eventNotes" value="#{occInspectionBB.selectedEvent.notes}" 
+                                        <p:editor id="eventNotes" value="#{occInspectionBB.currentEvent.notes}" 
                                                   controls="bold italic underline strikethrough font size style color 
                                                   bullets numbering center undo redo rule link removeformat outdent 
                                                   indent link unlink copy cut paste rule alignleft center alignright"
@@ -1420,7 +1508,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                             </h:panelGrid>
 
-                            <h2>Connect persons to event (coming soon!)</h2>
+                            <h2>Connect persons to event</h2>
 
                             <h:form id="add-person-to-event-form">
 
@@ -1436,49 +1524,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
 
-                                <p:commandButton    ajax="true" actionListener="#{occInspectionBB.queueSelectedPerson}"
+                                <p:commandButton    ajax="true" actionListener="#{occInspectionBB.events_queuePerson}"
                                                     value="Add selected person to event" disabled="true"
                                                     update="persons-to-add-ds"/>
                                 <p:spacer height="5px"/>
 
                                 <p:dataScroller     id="persons-to-add-ds"
-                                                    value="#{occInspectionBB.selectedEvent.personList}"
+                                                    value="#{occInspectionBB.currentEvent.personList}"
                                                     var="pers">
                                     <h:outputText value="#{pers.firstName} #{pers.lastName} (id:#{pers.personID})"/>
-                                    <p:commandButton    ajax="true" icon="fa fa-stop"
-                                                        process="persons-to-add-ds" immediate="true"
-                                                        actionListener="#{occInspectionBB.deQueuePersonFromEvent(pers)}"
+                                    <p:commandButton    ajax="true" 
+                                                        icon="fa fa-trash"
+                                                        immediate="true"
+                                                        actionListener="#{occInspectionBB.events_deQueuePersonFromEvent(pers)}"
                                                         update="persons-to-add-ds"/>
                                 </p:dataScroller>
 
-                                <h2>Submit form</h2>
+                                <p:spacer height="5px"/>
 
                                 <p:commandButton ajax="true" 
                                                  value="Cancel" icon="fa fa-stop" 
                                                  onclick="PF('occperiod-events-dialog-addeditevent-var').hide()"/>
 
-                                <p:commandButton ajax="true" actionListener="#{occInspectionBB.attachEventToOccPeriod}"
+                                <p:commandButton ajax="true" actionListener="#{occInspectionBB.events_attachNewEvent}"
                                                  value="Create new event" icon="fa fa-plus"
                                                  oncomplete="PF('occperiod-events-dialog-addeditevent-var').hide()"
-                                                 disabled="#{!(occInspectionBB.selectedEvent.eventID == 0)}"
+                                                 disabled="#{!(occInspectionBB.currentEvent.eventID == 0)}"
                                                  rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                 update="
-                                                 "/>
+                                                 update="occperiod-form-events
+                                                 occperiod-messages-form-rightcolheader"/>
 
-                                <p:commandButton ajax="true" actionListener="#{occInspectionBB.commitEventEdits}"
+                                <p:commandButton ajax="true" actionListener="#{occInspectionBB.events_commitEventEdits}"
                                                  value="Edit event" icon="fa fa-edit"
-                                                 disabled="#{occInspectionBB.selectedEvent.eventID == 0}"
+                                                 disabled="#{occInspectionBB.currentEvent.eventID != 0}"
                                                  rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                  oncomplete="PF('occperiod-events-dialog-addeditevent-var').hide()"
-                                                 update="
-
-                                                 "/>
+                                                 update="occperiod-form-events
+                                                 occperiod-messages-form-rightcolheader"/>
 
                                 <p:commandButton ajax="true" actionListener="#{occInspectionBB.deleteSelectedEvent}"
                                                  value="Nuke event" icon="fa fa-bomb"
                                                  oncomplete="PF('occperiod-events-dialog-addeditevent-var').hide()"
                                                  rendered="#{sessionBeasessionUserer.keyCard.hasSysAdminPermissions}"
-                                                 update="
+                                                 update="occperiod-form-events
+                                                 occperiod-messages-form-rightcolheader
                                                  "/>
                             </h:form>
 
@@ -1492,17 +1581,96 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 closable="true" 
                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                 >
-
                         <h:form id="occperiod-configurereport-occinspection-form">
-
                             <h:messages id="occperiod-configurereport-occinspection-messages"
                                         globalOnly="true" showDetail="true" showSummary="true" 
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
 
-
                             <h:panelGrid columns="2"
                                          columnClasses="gridTd, gridTd">
+                                
+                                <f:facet name="header">
+                                    <h:outputLabel for="occperiod-report-occinspection-it-title" value="Report title"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <p:inputText id="occperiod-report-occinspection-it-title" style="width: 300px;" value="#{caseProfileBB.reportCECase.title}"/>
+                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include case name" for="report-case-profile-casename-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{caseProfileBB.reportCECase.includeCaseName}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                    <p:spacer height="5px"/>
+                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{caseProfileBB.reportCECase.notes}"/>
+                                    <p:spacer height="5px"/>
+                                </f:facet>
+
+                                <h:panelGroup>
+                                    <h3>Case event history report options</h3>
+
+                                    <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{caseProfileBB.reportCECase.includeHiddenEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{caseProfileBB.reportCECase.includeInactiveEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{caseProfileBB.reportCECase.includeEventNotes}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{caseProfileBB.reportCECase.includeRequestedActionFields}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{caseProfileBB.reportCECase.includeMunicipalityDiclosedEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{caseProfileBB.reportCECase.includeOfficerOnlyEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{caseProfileBB.reportCECase.includeEventMetadata}" />
+
+                                </h:panelGroup>
+                                <h:panelGroup>
+
+                                    <h3>Other options</h3>
+
+                                    <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{caseProfileBB.reportCECase.includeNoticeFullText}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{caseProfileBB.reportCECase.includeAllNotices}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{caseProfileBB.reportCECase.includeFullOrdinanceText}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{caseProfileBB.reportCECase.includeViolationPhotos}" />
+
+                                </h:panelGroup>
 
                             </h:panelGrid>
 
@@ -1516,7 +1684,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 action="#{occInspectionBB.generateOccInspectionReport}"
                                                 value="Create new event" icon="fa fa-plus"
                                                 oncomplete="PF('occperiod-events-dialog-addeditevent-var').hide()"
-                                                disabled="#{!(occInspectionBB.selectedEvent.eventID == 0)}"
+                                                disabled="#{!(occInspectionBB.currentEvent.eventID == 0)}"
                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                 update="
                                                 "/>

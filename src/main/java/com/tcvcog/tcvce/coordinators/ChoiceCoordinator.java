@@ -18,8 +18,11 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Openable;
 import com.tcvcog.tcvce.entities.Proposable;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalCECase;
@@ -27,6 +30,7 @@ import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.integration.ChoiceIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -68,7 +72,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
             if(p.getDirective().getChoiceList().size() == 1
                     &&
                 p.getDirective().isExecuteChoiceIfLoneWolf()){
-                    processProposalEvaluation(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
+                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
             }
         }
         
@@ -130,55 +134,64 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
         return choice;
     }
     
-    
-    
-    public CECase processProposalEvaluation(    Proposal proposal, 
-                                                Proposable chosen, 
-                                                CECase cse, 
-                                                User u) 
-                                                throws EventException, AuthorizationException{
+    public boolean determineProposalEvaluatability( Proposal proposal,
+                                                    Proposable chosen, 
+                                                    User u){
         
-
-        // first make sure that the given Proposable is in the Proposal
+        // our proposal must contain our desired choice
         if(!proposal.getDirective().getChoiceList().contains(chosen)){
-            throw new EventException("The identified chosen Proposable is not contained inside the given Proposal");
+            return false;
         }
-        // check authorization
-        configureChoice(chosen, u);
+        // we must be allowed to choose the choice
         if(!chosen.isCanChoose()){
-            throw new AuthorizationException("You do not have permission to select this Choice");
+            return false;
         }
-        
-        
-        
-        
-        return cse;
+        if(!proposal.isActive()){
+            return false;
+        }
+        if(!(proposal.getActivatesOn().isBefore(LocalDateTime.now()) 
+                && proposal.getExpiresOn().isAfter((LocalDateTime.now())))){
+            return false;
+        }
+        return true;
     }
     
-    public OccPeriod processProposalEvaluation( Proposal proposal, 
-                                                Proposable chosen, 
-                                                OccPeriod oPeriod, 
-                                                User u) throws EventException, AuthorizationException{
-                                            
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-        
-        // first make sure that the given Proposable is in the Proposal
-        if(!proposal.getDirective().getChoiceList().contains(chosen)){
-            throw new EventException("The identified chosen Proposable is not contained inside the given Proposal");
-        }
-        // check authorization
-        configureChoice(chosen, u);
-        if(!chosen.isCanChoose()){
-            throw new AuthorizationException("You do not have permission to select this Choice");
-        }
-        
-        
-        
-        return oPeriod;
-        
+    public void recordProposalEvaluation(Proposal p) throws IntegrationException{
+        ChoiceIntegrator ci = getChoiceIntegrator();
+        ci.recordProposalEvaluation(p);
     }
     
     
+  
     
-    
+    /**
+     * Processes requests to reject a proposal by checking user rank, required status, 
+     * and the CECase's or OccPeriod's open/closed status
+     * @param p to be rejected
+     * @param bob this interface allows you to ask the object if it's open or closed. For Occbeta, this is only
+     * OccPeriod and CECase objects
+     * @param u the current session user
+     * @throws IntegrationException
+     * @throws AuthorizationException
+     * @throws CaseLifecycleException if the directive is required for bob close and if it is open.
+     * This method does not allow evaluation of a required proposal after BOB is closed. 
+     * If this occurs, there's a bug somewhere in the entitylifecycle that anybody could have closed this bob
+     */
+    public void rejectProposal(Proposal p, Openable bob, User u) throws IntegrationException, AuthorizationException, CaseLifecycleException{
+        ChoiceIntegrator ci = getChoiceIntegrator();
+        if(u.getRoleType().getRank() >= p.getDirective().getMinimumRequiredUserRankToEvaluate()){
+            if(!p.getDirective().isRequiredEvaluationForBOBClose() && bob.isOpen()){
+                // configure our proposal for rejection
+                p.setProposalRejected(true);
+                p.setResponderActual(u);
+                p.setResponseTimestamp(LocalDateTime.now());
+                // send the updates to the integrator
+                ci.updateProposal(p);
+            } else {
+                throw new CaseLifecycleException("Evaluating this proposal is required. This setting can be overriden by an administrator.");
+            }
+        } else {
+            throw new AuthorizationException("You do not have sufficient privileges to reject this propsoal");
+        }
+    }
 }

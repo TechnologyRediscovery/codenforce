@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -45,7 +45,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     private final String DEFAULTUNITNUMBER = "-1";
     private final boolean DEFAULTRENTAL = false;
     
-    public PropertyWithLists configurePropertyWithLists(PropertyWithLists propWL) throws IntegrationException, CaseLifecyleException{
+    public PropertyWithLists configurePropertyWithLists(PropertyWithLists propWL) throws IntegrationException, CaseLifecycleException{
         
         PropertyIntegrator pi = getPropertyIntegrator();
         
@@ -98,9 +98,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param prop
      * @param u
      * @return PropertyWithLists object
-     * @throws CaseLifecyleException 
+     * @throws CaseLifecycleException 
      */
-    public PropertyWithLists getPropertyUnits(Property prop, User u) throws CaseLifecyleException, EventException, AuthorizationException{
+    public PropertyWithLists getPropertyUnits(Property prop, User u) throws CaseLifecycleException, EventException, AuthorizationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyWithLists propWithLists = null;
         try{

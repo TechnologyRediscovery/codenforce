@@ -21,12 +21,16 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import com.tcvcog.tcvce.entities.Openable;
 
 /**
  *
  * @author sylvia
  */
-public class OccPeriod extends EntityUtils implements Serializable{
+public class OccPeriod 
+        extends EntityUtils 
+        implements  Serializable,
+                    Openable{
     
     private int periodID;
     private int propertyUnitID;
@@ -71,6 +75,11 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private boolean overrideTypeConfig;
     
     private String notes;
+    
+     @Override
+    public boolean isOpen() {
+        return status.isOpenPeriod();
+    }
 
     public List<OccEvent> getVisibleEventList(){
         List<OccEvent> visEventList = new ArrayList<>();
@@ -98,8 +107,6 @@ public class OccPeriod extends EntityUtils implements Serializable{
                 }
         return actEvList;
     }
-
-    
     
     /**
      * @return the periodID
@@ -565,6 +572,8 @@ public class OccPeriod extends EntityUtils implements Serializable{
     public void setShowInactiveEvents(boolean showInactiveEvents) {
         this.showInactiveEvents = showInactiveEvents;
     }
+
+   
      
     
 }

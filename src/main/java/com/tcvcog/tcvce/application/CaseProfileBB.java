@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;    
 import com.tcvcog.tcvce.domain.PermissionsException;
@@ -147,7 +147,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         if(!selectedCECaseQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery(selectedCECaseQuery);
-            } catch (IntegrationException | CaseLifecyleException ex) {
+            } catch (IntegrationException | CaseLifecycleExceptionex) {
                 System.out.println(ex);
             }
         }
@@ -205,7 +205,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         try {
             cc.updateCoreCECaseData(currentCase);
             cc.refreshCase(currentCase);
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -305,7 +305,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             System.out.println(ex);
         }
     }
@@ -341,7 +341,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             reportCECase = cc.transformCECaseForReport(reportCECase);
         } catch (IntegrationException ex) {
             System.out.println(ex);
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             System.out.println(ex);
         }
 
@@ -431,7 +431,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                 selectedEvent.setDateOfRecord(LocalDateTime.now());
                 selectedEvent.setDiscloseToMunicipality(true);
                 selectedEvent.setDiscloseToPublic(false);
-            } catch (CaseLifecyleException ex) {
+            } catch (CaseLifecycleException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -508,7 +508,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(),
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -665,7 +665,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to write case phase changes to DB",
                             "This error must be corrected by a system administrator, sorry"));
-        } catch (CaseLifecyleException | ViolationException ex) {
+        } catch (CaseLifecycleException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -692,7 +692,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             if (localCase.getCaseID() == c.getCaseID()) {
                 try {
                     caseList.set(idx, ci.getCECase(c.getCaseID()));
-                } catch (IntegrationException | CaseLifecyleException ex) {
+                } catch (IntegrationException | CaseLifecycleExceptionex) {
                     System.out.println(ex);
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
                 }
@@ -720,7 +720,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println("CaseProfileBB.refreshCurrentCase | integration ex" + ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             System.out.println("CaseProfileBB.refreshCurrentCase | lifecycle ex" + ex);
         }
 
@@ -881,7 +881,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         
         try {
             caseCoord.novLockAndQueue(currentCase, nov, getSessionBean().getSessionUser());
-        } catch (CaseLifecyleException | IntegrationException ex) {
+        } catch (CaseLifecycleException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         } catch (EventException ex) {
@@ -912,7 +912,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID() + " has been nuked forever", ""));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -933,7 +933,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Marked notice as sent and added event to case",
                             ""));
-        } catch (CaseLifecyleException | IntegrationException ex) {
+        } catch (CaseLifecycleException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,ex.getMessage(),""));
         }catch (EventException ex) {
@@ -955,7 +955,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID()
                             + " has been marked as returned on today's date", ""));
-        } catch (IntegrationException | CaseLifecyleException ex) {
+        } catch (IntegrationException | CaseLifecycleExceptionex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
@@ -982,7 +982,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         selectedViolation = cv;
     }
 
-    public void updateViolationsCodeBookLink(ActionEvent ae) throws CaseLifecyleException {
+    public void updateViolationsCodeBookLink(ActionEvent ae) throws CaseLifecycleException {
         CaseIntegrator casei = getCaseIntegrator();
         try {
             ViolationIntegrator cvi = getCodeViolationIntegrator();
@@ -1128,7 +1128,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Error connecting to DB. This must be corrected by a system administrator", ""));
 
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1152,7 +1152,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             nextPhase = cc.getNextCasePhase(currentCase);
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
