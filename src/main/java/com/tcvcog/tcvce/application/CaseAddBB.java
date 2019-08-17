@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -83,7 +83,7 @@ public class CaseAddBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "Integration Module error: Unable to add case to current property.", 
                             "Best try again or note the error and complain to Eric."));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "A code enf action request was found in queue to be attached to this case. "

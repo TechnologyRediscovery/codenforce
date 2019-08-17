@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseEvent;
@@ -726,6 +726,73 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return insertedEventID;
 
     } // close method
+    
+    public int insertEvent(OccEvent event) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        int insertedEventID = 0;
+
+        String query = "INSERT INTO public.occevent(\n" +
+                        "            eventid, category_catid, occperiod_periodid, dateofrecord, eventtimestamp, \n" +
+                        "            eventdescription, owner_userid, disclosetomunicipality, disclosetopublic, \n" +
+                        "            activeevent, hidden, notes)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, now(), \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, event.getCategory().getCategoryID());
+            stmt.setInt(2, event.getOccPeriodID());
+            if (event.getDateOfRecord() != null) {
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(event.getDateOfRecord()));
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+
+            // note that the timestamp is set by a call to postgres's now()
+            stmt.setString(4, event.getDescription());
+            stmt.setInt(5, event.getOwner().getUserID());
+            stmt.setBoolean(6, event.isDiscloseToMunicipality());
+
+            stmt.setBoolean(7, event.isDiscloseToPublic());
+            stmt.setBoolean(8, event.isActive());
+            
+            stmt.setBoolean(9, event.isHidden());
+            stmt.setString(10, event.getNotes());
+            
+            stmt.execute();
+
+            String retrievalQuery = "SELECT currval('occevent_eventid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                insertedEventID = rs.getInt(1);
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert Event into system", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+        if(event.getPersonList() != null){
+            List<Person> persList = event.getPersonList();
+            if (persList.size() > 0 && event.getEventID() != 0) {
+                pi.connectPersonsToEvent(event, persList);
+            }
+        }
+        
+        return insertedEventID;
+
+    } // close method
 
     public void inactivateEvent(int eventIdToInactivate) throws IntegrationException {
         String query = "UPDATE public.ceevent\n"
@@ -752,32 +819,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
            
         } // close finally
 
-    }
-    
-    public void updateEvent(OccEvent event) throws IntegrationException{
-         String query = "UPDATE public.ceevent\n"
-                + "   SET activeevent=false, hidden=true WHERE eventid = ?;";
-
-        // TO DO: finish clearing view confirmation
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, event.getEventID());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive event", ex);
-
-        } finally {
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-           
-        } // close finally
     }
 
     public void updateEvent(CECaseEvent event) throws IntegrationException {
@@ -824,24 +865,80 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
+    
 
-    public void deleteEvent(CECaseEvent event) throws IntegrationException {
-        String query = "DELETE FROM public.ceevent WHERE eventid = ?;";
+    public void updateEvent(OccEvent event) throws IntegrationException {
+       String sql = "UPDATE public.occevent\n" +
+                    "   SET category_catid=?, dateofrecord=?, \n" +
+                    "       eventtimestamp=?, eventdescription=?, owner_userid=?, disclosetomunicipality=?, \n" +
+                    "       disclosetopublic=?, activeevent=?, hidden=?, notes=?\n" +
+                    " WHERE eventid=?;";
+
+        // TO DO: finish clearing view confirmation
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
 
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, event.getCaseID());
+            stmt = con.prepareStatement(sql);
+            stmt.setInt(1, event.getCategory().getCategoryID());
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(event.getDateOfRecord()));
 
+            // timestamp is updated with a call to postgres's now()
+            stmt.setString(3, event.getDescription());
+            stmt.setInt(4, event.getOwner().getUserID());
+            stmt.setBoolean(5, event.isDiscloseToMunicipality());
+
+            stmt.setBoolean(6, event.isDiscloseToPublic());
+            stmt.setBoolean(7, event.isActive());
+            stmt.setBoolean(8, event.isHidden());
+            stmt.setString(9, event.getNotes());
+            
+            stmt.setInt(10, event.getEventID());
+            
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
+            throw new IntegrationException("Cannot update occ event", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+   
+    public void deleteEvent(CECaseEvent event) throws IntegrationException {
+        String query = "DELETE FROM public.ceevent WHERE eventid = ?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, event.getEventID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
             throw new IntegrationException("Cannot delete event--probalby because one or"
                     + "more other entries reference this event. ", ex);
-
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+   
+    public void deleteEvent(OccEvent event) throws IntegrationException {
+        String query = "DELETE FROM public.occeventg WHERE eventid = ?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, event.getEventID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete event--probalby because one or"
+                    + "more other entries reference this event. ", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -895,7 +992,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     
     
-    public EventCECaseCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException, CaseLifecyleException{
+    public EventCECaseCasePropBundle getEventCasePropBundle(int eventid) throws IntegrationException, CaseLifecycleException{
         EventCECaseCasePropBundle evCPBundle = null;
         CaseIntegrator ci = getCaseIntegrator();
 
@@ -948,7 +1045,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<CECaseEvent> queryCaseDependentEvents(SearchParamsEventCECase params) throws IntegrationException, CaseLifecyleException{
+    public List<CECaseEvent> queryCaseDependentEvents(SearchParamsEventCECase params) throws IntegrationException, CaseLifecycleException{
         List<EventCECaseCasePropBundle> wrappedEventList = getEventsCECase(params);
         List<CECaseEvent> depList = new ArrayList<>();
         for(EventCECaseCasePropBundle ec: wrappedEventList){
@@ -959,7 +1056,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
   
     public QueryEventCECase runQueryEventCECase(QueryEventCECase q) 
-            throws IntegrationException, CaseLifecyleException{
+            throws IntegrationException, CaseLifecycleException{
         List<SearchParamsEventCECase> pList = q.getParmsList();
         
         for(SearchParamsEventCECase sp: pList){
@@ -971,7 +1068,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     public List<EventCECaseCasePropBundle> getEventsCECase(SearchParamsEventCECase params) 
-            throws IntegrationException, CaseLifecyleException {
+            throws IntegrationException, CaseLifecycleException {
         List<EventCECaseCasePropBundle> eventList = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement stmt = null;

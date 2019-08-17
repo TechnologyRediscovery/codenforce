@@ -9,7 +9,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
@@ -345,7 +345,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Successfully connected action request ID " + selectedRequest.getRequestID()
                     + " to code enforcement case ID " + selectedCaseForAttachment.getCaseID(), ""));
-        } catch (CaseLifecyleException | IntegrationException ex) {
+        } catch (CaseLifecycleException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Unable to connect request to case.",
@@ -808,7 +808,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
             } catch (IntegrationException ex) {
                 System.out.println(ex);
-            } catch (CaseLifecyleException ex) {
+            } catch (CaseLifecycleException ex) {
                 System.out.println(ex);
             }
         }

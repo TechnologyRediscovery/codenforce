@@ -13,6 +13,10 @@
         <title>Code Enforcement event report</title>
     </h:head>
     <h:body>
+        <f:view>
+        <ui:composition template="./../report_template.xhtml">
+            
+        
         <ui:insert name="report-header">
             <f:view id="report-header">
                 <div class="flexing-box-topbar">
@@ -36,7 +40,6 @@
                 </div>
             </f:view>
         </ui:insert>
-        <f:view>
             <div class="flexing-box-pagecontent">
                 <ui:insert name="print-content">
                     <div class="report-header-info">
@@ -279,6 +282,7 @@
                         </div>
                     </p:dataScroller>
                 </ui:insert>
+                </ui:composition>
             </div>
         </f:view>
     </h:body>

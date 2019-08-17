@@ -56,7 +56,6 @@ public class Event
     
     protected long daysUntilDue;
     
-    
     /**
      * @return the eventID
      */

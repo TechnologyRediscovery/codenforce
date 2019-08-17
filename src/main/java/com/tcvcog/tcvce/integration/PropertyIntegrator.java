@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyStatus;
@@ -875,11 +875,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param u
      * @return
      * @throws IntegrationException
-     * @throws CaseLifecyleException
+     * @throws CaseLifecycleException
      * @throws EventException
      * @throws AuthorizationException 
      */
-    public PropertyWithLists getPropertyWithLists(int propertyID, User u) throws IntegrationException, CaseLifecyleException, EventException, AuthorizationException {
+    public PropertyWithLists getPropertyWithLists(int propertyID, User u) throws IntegrationException, CaseLifecycleException, EventException, AuthorizationException {
             PropertyCoordinator pc = getPropertyCoordinator();
             CaseIntegrator ci = getCaseIntegrator();
             PersonIntegrator pi = getPersonIntegrator();

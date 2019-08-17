@@ -11,7 +11,7 @@ import com.tcvcog.tcvce.coordinators.ChoiceCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -90,8 +90,6 @@ import javax.faces.event.ActionEvent;
  * @author mced ghost
  */
 public class OccInspectionBB extends BackingBeanUtils implements Serializable {
-
-   
     
     public static final String ADD_WITH_COMPLIANCE = "comp";
     public static final String ADD_AS_UNINSPECTED = "insp";
@@ -132,11 +130,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private ReportConfigOccPermit reportConfigOccPermit;
     
     // events 
-    private OccEvent selectedEvent;
+    private OccEvent currentEvent;
     private List<EventType> availableEventTypeList; 
     private EventType selectedEventType;
     private List<EventCategory> eventCategoryList;
     private EventCategory selectedEventCategory;
+    private List<Person> personCandidateList;
     private Person selectedPerson;
     
     /**
@@ -174,7 +173,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
         }
         
-        availableEventTypeList = oc.getPermittedEventTypesForCECase(currentOccPeriod, getSessionBean().getSessionUser());
+        availableEventTypeList = oc.getPermittedEventTypes(currentOccPeriod, getSessionBean().getSessionUser());
         occPeriodTypeList = getSessionBean().getSessionMuni().getProfile().getOccPeriodTypeList();
         
         if(workingLocationList == null){
@@ -185,9 +184,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
-            
         }
         
+        if(personCandidateList == null){
+            personCandidateList = new ArrayList<>();
+            personCandidateList.addAll(getSessionBean().getSessionPersonList());
+        }
     }
     
     public void loadSpacesInType(){
@@ -202,7 +204,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             elementsInSpaceList = selectedOccSpace.getSpaceElementList();
             System.out.println("OccInspectionBB.loadElementsInSpace");
         }
-        
     }
     
     public void addAllRequiredSpaceTypes(ActionEvent ev){
@@ -245,9 +246,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     public void initiateOccLocationUpdate(OccLocationDescriptor old){
         currentLocation = old;
-        
     }
-    
     
     public void activateOccInspection(OccInspection ins){
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -263,25 +262,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-     public void makeChoice(Choice choice, Proposal p){
-        ChoiceCoordinator cc = getChoiceCoordinator();
-         System.out.println("OccInspectionBB.makeChoice");
-        try {
-            if(p instanceof ProposalOccPeriod){
-                currentOccPeriod = cc.processProposalEvaluation(    p, 
-                                                                    choice, 
-                                                                    currentOccPeriod, 
-                                                                    getSessionBean().getSessionUser());
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
-            }
-            
-        } catch (EventException | AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-            ex.getMessage(), ""));
-        }
-    }    
+   
     
     public void updateEventCategoryList(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -293,20 +274,58 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Unable to load event category choices, sorry!", ""));
-            
         }
     }
     
-    public void initializeEvent(EventCategory eventCat){
-        
-        
-        
+    public void events_queuePerson(ActionEvent ev){
+        if(currentEvent != null){
+            currentEvent.getPersonList().add(selectedPerson);
+        }
     }
     
-    public void viewProposalMetadata(ProposalOccPeriod p){
-        currentProposal = p;
-        
+    public void events_deQueuePersonFromEvent(Person p){
+        currentEvent.getPersonList().remove(p);
     }
+    
+    public void propoals_viewPropMetadata(ProposalOccPeriod p){
+        currentProposal = p;
+    }
+    
+    public void proposal_reject(Proposal p){
+        ChoiceCoordinator choiceCoord = getChoiceCoordinator();
+        try {
+            choiceCoord.rejectProposal(p, currentOccPeriod, getSessionBean().getSessionUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            "Proposal id " + p.getProposalID() + " has been rejected!", ""));
+        } catch (IntegrationException | AuthorizationException | CaseLifecycleException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            ex.getMessage(), ""));
+        }
+    }
+    
+    
+    public void proposals_makeChoice(Choice choice, Proposal p){
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+         System.out.println("OccInspectionBB.makeChoice");
+        try {
+            if(p instanceof ProposalOccPeriod){
+                oc.evaluateProposal(     p, 
+                                        choice, 
+                                        currentOccPeriod, 
+                                        getSessionBean().getSessionUser());
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
+            }
+            
+        } catch (EventException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+            ex.getMessage(), ""));
+        }
+        reloadCurrentOccPeriod();
+    }    
+    
     
     
     private void reloadCurrentInspection(){
@@ -319,9 +338,23 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Unable to reload inspection", ""));
+        }
+    }
+    
+    private void reloadCurrentOccPeriod(){
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        try {
+            oi.getOccPeriod(currentOccPeriod.getPeriodID(), getSessionBean().getSessionUser());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
+        } catch (IntegrationException | EventException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Unable to reload occ period", ""));
             
         }
-        
     }
     
     public void addSpaceToChecklist(OccSpace space) {
@@ -346,7 +379,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Unable to add space to checklist", ""));
         }
-        
     }
     
     
@@ -381,52 +413,70 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                            "Could not unhide event, sorry; this is a system erro", ""));
         }
     }
+    
   /**
      * Called when the user selects their own EventCategory to add to the case
      * and is a pass-through method to the initializeEvent method
      *
      * @param ev
      */
-    public void initiateUserChosenEventCreation(ActionEvent ev) {
-        initiateNewEvent();
+    public void events_initializeEvent(ActionEvent ev) {
+        events_initiateNewEvent();
     }
 
-    public void initiateNewEvent() {
+    /**
+     * Initialization of event process
+     */
+    public void events_initiateNewEvent() {
 
         if (getSelectedEventCategory() != null) {
 
             System.out.println("OccInspectionBB.initiateNewEvent | category: " + getSelectedEventCategory().getEventCategoryTitle());
             EventCoordinator ec = getEventCoordinator();
             try {
-                selectedEvent = ec.getInitializedEvent(currentOccPeriod, getSelectedEventCategory());
-                selectedEvent.setDateOfRecord(LocalDateTime.now());
-                selectedEvent.setDiscloseToMunicipality(true);
-                selectedEvent.setDiscloseToPublic(false);
-            } catch (CaseLifecyleException ex) {
+                currentEvent = ec.getInitializedEvent(currentOccPeriod, getSelectedEventCategory());
+                currentEvent.setDateOfRecord(LocalDateTime.now());
+                currentEvent.setDiscloseToMunicipality(true);
+                currentEvent.setDiscloseToPublic(false);
+            } catch (CaseLifecycleException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
             }
         } else {
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select an event category to create a new event.", ""));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Please select an event category to create a new event.", ""));
         }
     }
     
-    public void initializeOccInspectionReport(){
+    public void events_commitEventEdits(ActionEvent ev){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.editEvent(currentEvent, getSessionBean().getSessionUser());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Successfully updated event!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                ex.getMessage(), ""));
+        }
+    }
+    
+    public void rejectProposal(){
+        
+    }
+    
+    public void initializeOccInspectionReport(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         reportConfigOccInspec = oc.getOccInspectionReportConfigDefault( currentInspection, 
                                                                         currentOccPeriod, 
                                                                         getSessionBean().getSessionUser());
-        
-        
     }
     
     public String generateOccInspectionReport(){
         getSessionBean().setReportConfigInspection(reportConfigOccInspec);
-        
-        
         return "inspectionReport";
     }
     
@@ -462,26 +512,26 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      * @param ev unused
      * @throws ViolationException
      */
-    public void attachEventToOccPeriod(ActionEvent ev) throws ViolationException {
+    public void events_attachNewEvent(ActionEvent ev) throws ViolationException {
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
 
         // category is already set from initialization sequence
-        selectedEvent.setOccPeriodID(currentOccPeriod.getPeriodID());
-        selectedEvent.setOwner(getSessionBean().getSessionUser());
+        currentEvent.setOccPeriodID(currentOccPeriod.getPeriodID());
+        currentEvent.setOwner(getSessionBean().getSessionUser());
 //        try {
         
             // main entry point for handing the new event off to the CaseCoordinator
             // only the compliance events need to pass in another object--the violation
             // otherwise just the case and the event go to the coordinator
-//            if (selectedEvent.getCategory().getEventType() == EventType.Compliance) {
-//                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, selectedViolation));
+//            if (currentEvent.getCategory().getEventType() == EventType.Compliance) {
+//                currentEvent.setEventID(cc.attachNewEventToCECase(currentCase, currentEvent, selectedViolation));
 //            } else {
-//                selectedEvent.setEventID(cc.attachNewEventToCECase(currentCase, selectedEvent, null));
+//                currentEvent.setEventID(cc.attachNewEventToCECase(currentCase, currentEvent, null));
 //            }
 //            getFacesContext().addMessage(null,
 //                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                            "Successfully logged event with an ID " + selectedEvent.getEventID(), ""));
+//                            "Successfully logged event with an ID " + currentEvent.getEventID(), ""));
 
             
 
@@ -491,7 +541,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 //                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
 //                            ex.getMessage(),
 //                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-//        } catch (CaseLifecyleException ex) {
+//        } catch (CaseLifecycleException ex) {
 //            System.out.println(ex);
 //            getFacesContext().addMessage(null,
 //                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -528,7 +578,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void removeSpaceFromChecklist(OccInspectedSpace spc){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.removeSpaceFromChecklist(spc, getSessionBean().getSessionUser(), currentInspection);
+            oc.inspectionAction_removeSpaceFromChecklist(spc, getSessionBean().getSessionUser(), currentInspection);
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Successfully removed InspectedSpace ID: " + spc.getInspectedSpaceID() , ""));
@@ -544,7 +594,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void recordComplianceWithElement(OccInspectedSpaceElement inSpcEl){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.recordComplianceWithInspectedElement(    inSpcEl,
+            oc.inspectionAction_recordComplianceWithInspectedElement(    inSpcEl,
                                                         getSessionBean().getSessionUser(),
                                                         currentInspection);
             reloadCurrentInspection();
@@ -564,7 +614,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void removeComlianceWithElement(OccInspectedSpaceElement inSpcEl){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.inspectWithoutCompliance(inSpcEl,
+            oc.inspectionAction_inspectWithoutCompliance(inSpcEl,
                                                         getSessionBean().getSessionUser(),
                                                         currentInspection);
             reloadCurrentInspection();
@@ -582,7 +632,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void inspectElementWithoutCompliance(OccInspectedSpaceElement inSpcEl){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.inspectWithoutCompliance(inSpcEl,
+            oc.inspectionAction_inspectWithoutCompliance(inSpcEl,
                                         getSessionBean().getSessionUser(),
                                         currentInspection);
             reloadCurrentInspection();
@@ -898,17 +948,17 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the selectedEvent
+     * @return the currentEvent
      */
-    public OccEvent getSelectedEvent() {
-        return selectedEvent;
+    public OccEvent getCurrentEvent() {
+        return currentEvent;
     }
 
     /**
-     * @param selectedEvent the selectedEvent to set
+     * @param currentEvent the currentEvent to set
      */
-    public void setSelectedEvent(OccEvent selectedEvent) {
-        this.selectedEvent = selectedEvent;
+    public void setCurrentEvent(OccEvent currentEvent) {
+        this.currentEvent = currentEvent;
     }
 
     /**
@@ -1106,6 +1156,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setWorkingLocationList(List<OccLocationDescriptor> workingLocationList) {
         this.workingLocationList = workingLocationList;
+    }
+
+    /**
+     * @return the personCandidateList
+     */
+    public List<Person> getPersonCandidateList() {
+        return personCandidateList;
+    }
+
+    /**
+     * @param personCandidateList the personCandidateList to set
+     */
+    public void setPersonCandidateList(List<Person> personCandidateList) {
+        this.personCandidateList = personCandidateList;
     }
      
 }

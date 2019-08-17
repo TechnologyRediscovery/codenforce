@@ -210,7 +210,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         personList = null;
         getSessionBean().setSessionPersonList(null);
         // this will trigger database lookup logic inside
-        // getPersonList() when we tell the search result table to clear itself
+        // getPersonsByEvent() when we tell the search result table to clear itself
     }
     
     
@@ -222,7 +222,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         personList = null;
         getSessionBean().setSessionPersonList(null);
         // this will trigger database lookup logic inside
-        // getPersonList() when we tell the search result table to clear itself
+        // getPersonsByEvent() when we tell the search result table to clear itself
     }
     
     

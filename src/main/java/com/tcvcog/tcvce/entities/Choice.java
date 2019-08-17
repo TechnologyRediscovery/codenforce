@@ -35,6 +35,7 @@ public abstract class Choice implements Proposable, Serializable, Comparable<Cho
     protected int minimumRequiredUserRankToView;
     protected int relativeOrder;
     protected String title;
+    
 
     @Override
     public int getChoiceID() {
@@ -223,7 +224,7 @@ public abstract class Choice implements Proposable, Serializable, Comparable<Cho
             return 0;
         }
     }
-    
+
     
     
 }

@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -139,7 +139,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             try {
                 personCandidateList = pi.getPropertyWithLists(
                         currentRequest.getRequestProperty().getPropertyID(), usr).getPersonList();
-            } catch (IntegrationException | CaseLifecyleException | EventException | AuthorizationException ex) {
+            } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
                 System.out.println(ex);
             }
         } else if (usr != null && req != null ) {

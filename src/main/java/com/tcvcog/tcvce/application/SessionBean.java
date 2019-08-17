@@ -17,7 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.Report;
@@ -181,7 +181,7 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void refreshActiveCase() throws IntegrationException, CaseLifecyleException{
+    public void refreshActiveCase() throws IntegrationException, CaseLifecycleException{
         CaseIntegrator ci = getCaseIntegrator();
         if(sessionCECase != null){
             CECase c = ci.getCECase(sessionCECase.getCaseID());

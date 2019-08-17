@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ChangeOrderAction;
@@ -115,7 +115,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
             ui.logObjectView(getSessionBean().getSessionUser(), prop);
             getSessionBean().getSessionPropertyList().add(prop);
 
-        } catch (IntegrationException | CaseLifecyleException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

@@ -439,6 +439,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     
   
     
+    
   
     public Directive getDirective(int directiveID) throws IntegrationException{
 
@@ -586,6 +587,52 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to insert directive", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void recordProposalEvaluation(Proposal p) throws IntegrationException{
+        StringBuilder sb = new StringBuilder("UPDATE public.choiceproposal ");
+        sb.append("   SET responderactual_userid=?, responsetimestamp=now(), \n");
+        sb.append("       notes=?, chosen_choiceid=?\n");
+                        
+        if(p instanceof ProposalCECase){
+            sb.append("       cecase_caseid=?, responseevent_cecaseeventid=?, \n");
+        } else if (p instanceof ProposalOccPeriod){
+            sb.append("       occperiod_periodid=?, responseevent_occeventid=?, \n");
+        } else {
+            throw new IntegrationException("Cannot record given proposal due to incorrect Proposal object type");
+        }
+            sb.append(" WHERE proposalid=?;");
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, p.getResponderActual().getPersonID());
+            stmt.setString(2, p.getNotes());
+            stmt.setInt(3, p.getChosenChoice().getChoiceID());
+            if(p instanceof ProposalCECase){
+                ProposalCECase pcec = new ProposalCECase(p);
+                stmt.setInt(4, pcec.getCeCaseID());
+            } else if (p instanceof ProposalOccPeriod){
+                ProposalOccPeriod pop = new ProposalOccPeriod(p);
+                stmt.setInt(4, pop.getOccperiodID());
+            } 
+            
+            stmt.setInt(5, p.getResponseEvent().getEventID());
+            stmt.setInt(6, p.getProposalID());
+            
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to record proposal evaluation", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -300,7 +300,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return queryList;
      }
      
-     public QueryCECase runQuery(QueryCECase query) throws IntegrationException, CaseLifecyleException{
+     public QueryCECase runQuery(QueryCECase query) throws IntegrationException, CaseLifecycleException{
          query.clearResultList();
          CaseIntegrator ci = getCaseIntegrator();
          if(query.getQueryName().logQueryRun()){
@@ -457,7 +457,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
      }
      
-     public QueryEventCECase runQuery(QueryEventCECase query) throws IntegrationException, CaseLifecyleException{
+     public QueryEventCECase runQuery(QueryEventCECase query) throws IntegrationException, CaseLifecycleException{
          EventIntegrator ei = getEventIntegrator();
          query.clearResultList();
          
