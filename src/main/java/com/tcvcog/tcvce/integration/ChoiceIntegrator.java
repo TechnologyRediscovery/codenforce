@@ -601,9 +601,9 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("       notes=?, chosen_choiceid=?\n");
                         
         if(p instanceof ProposalCECase){
-            sb.append("       cecase_caseid=?, responseevent_cecaseeventid=?, \n");
+            sb.append(" cecase_caseid=?, responseevent_cecaseeventid=?, \n");
         } else if (p instanceof ProposalOccPeriod){
-            sb.append("       occperiod_periodid=?, responseevent_occeventid=?, \n");
+            sb.append(" occperiod_periodid=?, responseevent_occeventid=?, \n");
         } else {
             throw new IntegrationException("Cannot record given proposal due to incorrect Proposal object type");
         }

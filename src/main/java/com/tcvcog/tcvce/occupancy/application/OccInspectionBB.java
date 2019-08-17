@@ -123,6 +123,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private User selectedInspector;
     
     private String formNoteText;
+    private String formProposalRejectionReason;
     
     // reports
     private ReportConfigOccInspection reportConfigOccInspec;
@@ -186,7 +187,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             }
         }
         
-        if(personCandidateList == null){
+        if(personCandidateList != null){
             personCandidateList = new ArrayList<>();
             personCandidateList.addAll(getSessionBean().getSessionPersonList());
         }
@@ -287,13 +288,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         currentEvent.getPersonList().remove(p);
     }
     
-    public void propoals_viewPropMetadata(ProposalOccPeriod p){
+    public void proposals_viewPropMetadata(ProposalOccPeriod p){
+        System.out.println("OccInspectionBB.proposals_viewPropMetadata");
         currentProposal = p;
     }
     
     public void proposal_reject(Proposal p){
         ChoiceCoordinator choiceCoord = getChoiceCoordinator();
         try {
+            StringBuilder sb = new StringBuilder();
+            sb.append(p.getNotes());
+            sb.append("*** Proposal Rejection Reason ***");
+            sb.append(formNoteText);
+            p.setNotes(sb.toString());
+            
             choiceCoord.rejectProposal(p, currentOccPeriod, getSessionBean().getSessionUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             "Proposal id " + p.getProposalID() + " has been rejected!", ""));
@@ -305,12 +313,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     
     public void proposals_makeChoice(Choice choice, Proposal p){
-        ChoiceCoordinator cc = getChoiceCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
          System.out.println("OccInspectionBB.makeChoice");
         try {
             if(p instanceof ProposalOccPeriod){
-                oc.evaluateProposal(     p, 
+                oc.evaluateProposal(    p, 
                                         choice, 
                                         currentOccPeriod, 
                                         getSessionBean().getSessionUser());
@@ -318,7 +325,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
             }
             
-        } catch (EventException | AuthorizationException ex) {
+        } catch (EventException | AuthorizationException | CaseLifecycleException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
@@ -1170,6 +1177,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setPersonCandidateList(List<Person> personCandidateList) {
         this.personCandidateList = personCandidateList;
+    }
+
+    /**
+     * @return the formProposalRejectionReason
+     */
+    public String getFormProposalRejectionReason() {
+        return formProposalRejectionReason;
+    }
+
+    /**
+     * @param formProposalRejectionReason the formProposalRejectionReason to set
+     */
+    public void setFormProposalRejectionReason(String formProposalRejectionReason) {
+        this.formProposalRejectionReason = formProposalRejectionReason;
     }
      
 }

@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventType;
@@ -526,13 +527,25 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public void evaluateProposal(   Proposal proposal, 
                                     Proposable chosen, 
                                     OccPeriod occPeriod, 
-                                    User u) throws EventException, AuthorizationException, CaseLifecycleException{
-        
+                                    User u) throws EventException, AuthorizationException, CaseLifecycleException, IntegrationException{
         ChoiceCoordinator cc = getChoiceCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        EventIntegrator ei = getEventIntegrator();
+        OccEvent propEvent = null;
+        int insertedEventID = 0;
         if(cc.determineProposalEvaluatability(proposal, chosen, u)){
+            // since we can evaluate this proposal with the chosen Proposable, configure members
             proposal.setResponderActual(u);
             proposal.setResponseTimestamp(LocalDateTime.now());
+            proposal.setChosenChoice(chosen);
             
+            // ask the EventCoord for a nicely formed Event, which we cast to OccEvent
+            propEvent = new OccEvent(ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u));
+            // insert the event and grab the new ID
+            insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
+            // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
+            proposal.setResponseEvent(ei.getOccEvent(insertedEventID));
+            cc.recordProposalEvaluation(proposal);
         } else {
             throw new CaseLifecycleException("Unable to evaluate proposal due to business rule violation");
         }

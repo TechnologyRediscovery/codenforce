@@ -147,7 +147,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         if(!selectedCECaseQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery(selectedCECaseQuery);
-            } catch (IntegrationException | CaseLifecycleExceptionex) {
+            } catch (IntegrationException | CaseLifecycleException ex) {
                 System.out.println(ex);
             }
         }
@@ -462,18 +462,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
         selectedEvent.setOwner(getSessionBean().getSessionUser());
         try {
         
-            // Removed for proposal overhaul
-            
-//            if (selectedEvent.isRequestsAction()) {
-//                selectedEvent.setActionRequestedBy(getSessionBean().getFacesUser());
-//            }
-
-//            if(triggeringEventForProposal != null && selectedEvent.getEventProposalImplementation() != null){
-//                selectedEvent.getEventProposalImplementation().setGeneratingEventID(triggeringEventForProposal.getEventID());
-//                
-//            }
-            // writing null in here is fine if the event wasn't triggered
-
+         
             // main entry point for handing the new event off to the CaseCoordinator
             // only the compliance events need to pass in another object--the violation
             // otherwise just the case and the event go to the coordinator
@@ -492,7 +481,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             if (triggeringEventForProposal != null) {
 //                triggeringEventForProposal.getEventProposalImplementation().setResponseEvent(selectedEvent);
 //                triggeringEventForProposal.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
-                ec.logResponseToActionRequest(triggeringEventForProposal);
+//                ec.logResponseToActionRequest(triggeringEventForProposal);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Updated triggering event ID + "
@@ -567,25 +556,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void commitActionRequestRejection(ActionEvent ev) {
-        EventCoordinator ec = getEventCoordinator();
-//        selectedEvent.getEventProposalImplementation().setResponderActual(getSessionBean().getFacesUser());
-//        selectedEvent.getEventProposalImplementation().setProposalRejected(true);
-        
-        // rejected Proposals by definition did not result in a new Event
-//        selectedEvent.getEventProposalImplementation().setResponseEvent(null);
-        try {
-            ec.logResponseToActionRequest(selectedEvent);
-//            currentCase.getEventProposalList().remove(rejectedEventListIndex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Action request successfully rejected for event ID " + selectedEvent.getEventID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Could not insert the action request rejection event.",
-                    "This is a non-user system-level error that must be fixed by your Sys Admin, sorry!"));
-        }
-    }
+  
 
     public void queueSelectedPerson(ActionEvent ev) {
         if (selectedPerson != null) {
@@ -692,7 +663,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
             if (localCase.getCaseID() == c.getCaseID()) {
                 try {
                     caseList.set(idx, ci.getCECase(c.getCaseID()));
-                } catch (IntegrationException | CaseLifecycleExceptionex) {
+                } catch (IntegrationException | CaseLifecycleException ex) {
                     System.out.println(ex);
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
                 }
@@ -955,7 +926,7 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID()
                             + " has been marked as returned on today's date", ""));
-        } catch (IntegrationException | CaseLifecycleExceptionex) {
+        } catch (IntegrationException | CaseLifecycleException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
@@ -1007,41 +978,22 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     }
 
 
-    public void clearActionResponse(ActionEvent ev) {
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ec.clearActionResponse(selectedEvent);
-//            refreshCurrentEventList();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Action response: cleared for event ID " + selectedEvent.getEventID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not clear action response, sorry.", ""));
-        }
-        refreshCurrentCase();
-    }
-    
+  
     
     public void makeChoice(Choice choice, Proposal p){
-        ChoiceCoordinator cc = getChoiceCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         try {
             if(p instanceof ProposalCECase){
-                currentCase = cc.processProposalEvaluation( p, 
-                                                            choice, 
-                                                            currentCase, 
-                                                            getSessionBean().getSessionUser());
+                cc.evaluateProposal(p, choice, currentCase, getSessionBean().getSessionUser());
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "You just chose choice ID " + choice.getChoiceID() + " proposed in proposal ID " + p.getProposalID(), ""));
             }
             
-        } catch (EventException | AuthorizationException ex) {
+        } catch (EventException | AuthorizationException | CaseLifecycleException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
             ex.getMessage(), ""));
-        }
+        } 
     }    
     
     /**

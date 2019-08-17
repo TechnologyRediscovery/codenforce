@@ -80,7 +80,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery((QueryEventCECase) selectedBOBQuery);
-            } catch (IntegrationException| CaseLifecycleExceptionex) {
+            } catch (IntegrationException| CaseLifecycleException ex) {
                 System.out.println(ex);
             }
             
@@ -234,7 +234,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
        if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 selectedBOBQuery = sc.runQuery((QueryEventCECase) selectedBOBQuery);
-            } catch (IntegrationException| CaseLifecycleExceptionex) {
+            } catch (IntegrationException| CaseLifecycleException ex) {
                 System.out.println(ex);
             }
             

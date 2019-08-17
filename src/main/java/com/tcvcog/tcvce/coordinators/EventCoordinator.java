@@ -28,6 +28,8 @@ import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CECaseEvent;
+import com.tcvcog.tcvce.entities.Choice;
+import com.tcvcog.tcvce.entities.ChoiceEventCat;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
@@ -36,6 +38,8 @@ import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Proposable;
+import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserWithAccessData;
@@ -226,6 +230,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         } catch (IntegrationException ex) {
             Logger.getLogger(EventCoordinator.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public Event getInitializedEvent(EventCategory ec){
+        Event ev = new Event();
+        ev.setCategory(ec);
+        return ev;
     }
     
     
@@ -540,6 +550,56 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventIntegrator ei = getEventIntegrator();
         ei.clearResponseToActionRequest(ev);
     }
+    
+    /**
+     * A BOB-agnostic event generator given a Proposal object and the Choice that was
+     * selected by the user. 
+     * @param p
+     * @param ch
+     * @param u
+     * @return a configured but not integrated Event superclass. The caller will need to cast it to
+     * the appropriate subclass and insert it
+     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public Event generateEventDocumentingProposalEvaluation(Proposal p, Proposable ch, User u) throws CaseLifecycleException, IntegrationException{
+        Event ev = null;
+        if(ch instanceof ChoiceEventCat){
+            EventCategory ec = getInitiatlizedEventCategory(((ChoiceEventCat) ch).getEventCategory().getCategoryID());
+            ev = getInitializedEvent(ec);
+            
+            ev.setActive(true);
+            ev.setHidden(false);
+            ev.setDateOfRecord(LocalDateTime.now());
+            ev.setDiscloseToMunicipality(true);
+            ev.setDiscloseToPublic(false);
+            ev.setOwner(u);
+            ev.setTimestamp(LocalDateTime.now());
+            
+            StringBuilder descBldr = new StringBuilder();
+            descBldr.append("User ");
+            descBldr.append(u.getPerson().getFirstName());
+            descBldr.append(" ");
+            descBldr.append(u.getPerson().getLastName());
+            descBldr.append(" evaluated the proposal titled: '");
+            descBldr.append(p.getDirective().getTitle());
+            descBldr.append("' on ");
+            descBldr.append(getPrettyDateNoTime(p.getResponseTimestamp()));
+            descBldr.append(" and selected choice titled:  '");
+            descBldr.append(ch.getTitle());
+            descBldr.append("'.");
+            
+            ev.setDescription(descBldr.toString());
+            
+        } else {
+            throw new CaseLifecycleException("Generating events for Choice "
+                    + "objects that are not Event triggers is not yet supported. "
+                    + "Thank you in advance for your patience.");
+        }
+        return ev;
+    }
+    
+   
     
     
     public void generateAndInsertManualCasePhaseOverrideEvent(CECase currentCase, CasePhase pastPhase) 
