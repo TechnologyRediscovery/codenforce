@@ -110,6 +110,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private List<OccPeriodType> occPeriodTypeList;
     private List<OccEvent> filteredEventList;
     
+    private List<OccInspectedSpace> visibleInspectedSpaceList;
+    
     private OccSpaceTypeInspectionDirective selectedOccSpaceType;
     private OccSpace selectedOccSpace;
     
@@ -153,15 +155,24 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         
         spacesInTypeList = new ArrayList<>();
+        visibleInspectedSpaceList = new ArrayList<>();
+        
         try {
+            if(currentOccPeriod != null){
+                currentInspection = currentOccPeriod.determineGoverningOccInspection();
+                
+            }
+                
+                
             if(currentInspection == null){
                 if(getSessionBean().getSessionOccInspection() != null){
                     currentInspection = getSessionBean().getSessionOccInspection();
-                    try {
-                        currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
-                    } catch (IntegrationException ex) {
-                        System.out.println(ex);
-                    }
+                    // we don't really need to reload inspection from integrator
+//                    try {
+//                        currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
+//                    } catch (IntegrationException ex) {
+//                        System.out.println(ex);
+//                    }
                 currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID(), getSessionBean().getSessionUser());
                 currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
                 } else {
@@ -207,14 +218,24 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    /**
+     * Placeholder method for the action listener on the client side button
+     * @param ev 
+     */
+    public void viewStaticChecklistTemplate(ActionEvent ev){
+        // dialog will appear clientside on complete
+    }
+    
     public void addAllRequiredSpaceTypes(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        System.out.println("OccinspectionBB.addAllrequiredSpaceTypes");
           
         for(OccSpaceTypeInspectionDirective stid: currentInspection.getChecklistTemplate().getOccSpaceTypeTemplateList()){
             for(OccSpace spc: stid.getSpaceList()){
                 if(spc.isRequired()){
                     try {
-                        oc.inspectionAction_commenceSpaceInspection(    currentInspection,
+                        oc.inspectionAction_commenceSpaceInspection(    
+                                currentInspection,
                                 getSessionBean().getSessionUser(),
                                 spc,
                                 null);
@@ -263,8 +284,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
     
-   
-    
     public void updateEventCategoryList(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         EventIntegrator ei = getEventIntegrator();
@@ -298,7 +317,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append(p.getNotes());
-            sb.append("*** Proposal Rejection Reason ***");
+            sb.append("\n*** Proposal Rejection Reason ***");
             sb.append(formNoteText);
             p.setNotes(sb.toString());
             
@@ -310,7 +329,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             ex.getMessage(), ""));
         }
     }
-    
     
     public void proposals_makeChoice(Choice choice, Proposal p){
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -332,8 +350,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
         reloadCurrentOccPeriod();
     }    
-    
-    
     
     private void reloadCurrentInspection(){
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -385,6 +401,40 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Unable to add space to checklist", ""));
+        }
+    }
+    
+    public void filterChecklist_failedItems(ActionEvent ev){
+        for(OccInspectedSpace ois: currentInspection.getInspectedSpaceList()){
+            for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
+                if(oise.getComplianceGrantedTS() == null 
+                        && oise.getLastInspectedTS() != null){
+                    oise.setVisibleInChecklist(true);
+                } else {
+                    oise.setVisibleInChecklist(false);
+                }
+            }
+        }
+    }
+    
+    public void filterChecklist_uninspectedItems(ActionEvent ev){
+        for(OccInspectedSpace ois: currentInspection.getInspectedSpaceList()){
+            for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
+                if(oise.getComplianceGrantedTS() == null 
+                        && oise.getLastInspectedTS() == null){
+                    oise.setVisibleInChecklist(true);
+                } else {
+                    oise.setVisibleInChecklist(false);
+                }
+            }
+        }
+    }
+    
+    public void filterChecklist_allItems(ActionEvent ev){
+        for(OccInspectedSpace ois: currentInspection.getInspectedSpaceList()){
+            for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
+                oise.setVisibleInChecklist(true);
+            }
         }
     }
     
@@ -477,9 +527,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     public void initializeOccInspectionReport(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        reportConfigOccInspec = oc.getOccInspectionReportConfigDefault( currentInspection, 
-                                                                        currentOccPeriod, 
-                                                                        getSessionBean().getSessionUser());
+        reportConfigOccInspec = 
+                oc.getOccInspectionReportConfigDefault( 
+                        currentInspection, 
+                        currentOccPeriod, 
+                        getSessionBean().getSessionUser());
     }
     
     public String generateOccInspectionReport(){
@@ -490,11 +542,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void initializeOccPermit(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessionUser());
-        
-        
-        
     }
-    
 
     public String generateOccPermit(OccPermit permit){
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -571,9 +619,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
-    
-    
-    
      /**
       * Edits the currentInspection 
       * @param e 
@@ -616,8 +661,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
      }
      
-     
-     
      public void removeComlianceWithElement(OccInspectedSpaceElement inSpcEl){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
@@ -654,10 +697,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
      }
      
-     
-     
      public void clearInspectionOfElement(OccInspectedSpaceElement inSpcEl){
-         OccupancyCoordinator oc = getOccupancyCoordinator();
+        System.out.println("OccInspectionBB.clearInspection");
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.clearInspectionOfElement(    inSpcEl,
                                             getSessionBean().getSessionUser(),
@@ -674,15 +716,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
      }
      
-     
-     
      public void editLocation(OccInspectedSpace inSpace){
          
-         
-         
      }
-     
-     
      
      public void addNoteToInspectedElement(OccInspectedSpaceElement spcEl){
          OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -733,11 +769,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                     "This must be corrected by the System Administrator"));
         }
     }
-    
-   
-
-
-  
 
     /**
      * @return the currentInspection
@@ -745,8 +776,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public OccInspection getCurrentInspection() {
         return currentInspection;
     }
-
-  
 
     /**
      * @param currentInspection the currentInspection to set
@@ -1192,5 +1221,21 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public void setFormProposalRejectionReason(String formProposalRejectionReason) {
         this.formProposalRejectionReason = formProposalRejectionReason;
     }
+
+    /**
+     * @return the visibleInspectedSpaceList
+     */
+    public List<OccInspectedSpace> getVisibleInspectedSpaceList() {
+        return visibleInspectedSpaceList;
+    }
+
+    /**
+     * @param visibleInspectedSpaceList the visibleInspectedSpaceList to set
+     */
+    public void setVisibleInspectedSpaceList(List<OccInspectedSpace> visibleInspectedSpaceList) {
+        this.visibleInspectedSpaceList = visibleInspectedSpaceList;
+    }
+
+    
      
 }

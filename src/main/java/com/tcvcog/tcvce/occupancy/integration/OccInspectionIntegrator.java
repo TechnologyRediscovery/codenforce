@@ -1339,7 +1339,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                         "       enablepacc, notes, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n" +
                         "       thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n" +
                         "       numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n" +
-                        "       effectivedate\n" +
+                        "       effectivedate, active, creationts \n" +
                         "  FROM public.occinspection WHERE inspectionid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1407,6 +1407,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         ins.setChecklistTemplate(getChecklistTemplate(rs.getInt("occchecklist_checklistlistid")));
         ins.setInspectedSpaceList(getInspectedSpaceList(ins.getInspectionID()));
         
+        ins.setActive(rs.getBoolean("active"));
+        
+        if(rs.getTimestamp("creationts") != null){
+            ins.setCreationTS(rs.getTimestamp("creationts").toLocalDateTime());
+        }
         
         return ins;
     }
@@ -1417,7 +1422,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                         "       enablepacc=?, notes=?, thirdpartyinspector_personid=?, thirdpartyinspectorapprovalts=?, \n" +
                         "       thirdpartyinspectorapprovalby=?, passedinspection_userid=?, maxoccupantsallowed=?, \n" +
                         "       numbedrooms=?, numbathrooms=?, passedinspectionts=?, occchecklist_checklistlistid=?, \n" +
-                        "       effectivedate=?\n" +
+                        "       effectivedate=?, active=?\n" +
                         " WHERE inspectionid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1471,6 +1476,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 stmt.setNull(14, java.sql.Types.NULL);
             }
             
+            stmt.setBoolean(15, occInsp.isActive());
+            
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -1506,12 +1513,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                         "            enablepacc, notes, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n" +
                         "            thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n" +
                         "            numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n" +
-                        "            effectivedate)\n" +
+                        "            effectivedate, active, creationts)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
-                        "            ?);";
+                        "            ?, ?, ?);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1566,6 +1573,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 stmt.setNull(14, java.sql.Types.NULL);
             }
             
+            stmt.setBoolean(15, occInsp.isActive());
+            
+            
+            if(occInsp.getEffectiveDateOfRecord() != null){
+                stmt.setTimestamp(16, java.sql.Timestamp.valueOf(occInsp.getCreationTS()));
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
             
             stmt.execute();
             String retrievalQuery = "SELECT currval('occupancyinspectionid_seq');";

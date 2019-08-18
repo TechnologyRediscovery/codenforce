@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import com.tcvcog.tcvce.entities.Openable;
+import java.util.Collections;
 
 /**
  *
@@ -106,6 +107,24 @@ public class OccPeriod
                     }
                 }
         return actEvList;
+    }
+      
+    public OccInspection determineGoverningOccInspection(){
+        OccInspection selIns = null;
+        Collections.sort(inspectionList);
+        // logic for determining the currentOccInspection
+        if(inspectionList != null){
+            if(inspectionList.size() == 1){
+                return inspectionList.get(0);
+            } else {
+                for(OccInspection ins: inspectionList){
+                    if(ins.isActive()){
+                        selIns = ins;
+                    }
+                }
+            }
+        }
+        return selIns;
     }
     
     /**

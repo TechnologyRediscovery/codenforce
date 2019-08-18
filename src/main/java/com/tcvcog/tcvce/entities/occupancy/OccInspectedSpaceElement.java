@@ -50,14 +50,11 @@ public class OccInspectedSpaceElement
     private String notes;
     
     private List<Blob> blobList;
-    
     private OccLocationDescriptor location;
-    
     private int failureIntensityClassID;
-    
-    
     private OccInspectableStatus status;
    
+    private boolean visibleInChecklist;
     
     /**
      * For advanced checklist object management in the UI
@@ -72,6 +69,7 @@ public class OccInspectedSpaceElement
      */
     public OccInspectedSpaceElement(CodeElement ele) {
         super(ele);
+        visibleInChecklist = true;
     }
     
     /**
@@ -349,6 +347,20 @@ public class OccInspectedSpaceElement
         } else {
             return -1;
         }
+    }
+
+    /**
+     * @return the visibleInChecklist
+     */
+    public boolean isVisibleInChecklist() {
+        return visibleInChecklist;
+    }
+
+    /**
+     * @param visibleInChecklist the visibleInChecklist to set
+     */
+    public void setVisibleInChecklist(boolean visibleInChecklist) {
+        this.visibleInChecklist = visibleInChecklist;
     }
 
    

@@ -368,6 +368,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return inspec;
     }
     
+   
+    
     
     /**
      * Called by the backing bean when the user selects a space to start inspecting.

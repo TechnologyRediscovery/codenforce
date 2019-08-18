@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
@@ -29,11 +30,13 @@ import java.util.Objects;
  *
  * @author Adam Gutonski and Sylvia
  */
-public class OccInspection {
+public class OccInspection extends EntityUtils implements Comparable<OccInspection> {
     
     private int inspectionID;
     private User inspector;
     private int occPeriodID;
+    
+    private boolean active;
     
     // This template object provides us the raw lists of uninspected
     // space types, from which we extract a list of Spaces and their CodeElements
@@ -48,6 +51,8 @@ public class OccInspection {
     
     private LocalDateTime effectiveDateOfRecord;
     protected java.util.Date effectiveDateOfRecordUtilDate;
+    
+    private LocalDateTime creationTS;
     
     private int maxOccupantsAllowed;
     private int numBedrooms;
@@ -419,6 +424,64 @@ public class OccInspection {
         if(effectiveDateOfRecordUtilDate != null){
             effectiveDateOfRecord = effectiveDateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    
+    /**
+     * Utility method for determining which date to use for comparison.
+     * Note that inspections that haven't been approved probably won't have an
+     * effective date of record so we should just use the creation timestamp
+     * @param ins
+     * @return the selected date for comparison
+     */
+    private LocalDateTime getDateForComparison(OccInspection ins){
+        if(ins.getEffectiveDateOfRecord() == null){
+            return ins.getCreationTS();
+        } else {
+            return ins.getEffectiveDateOfRecord();
+        }
+    }
+    
+
+    @Override
+    public int compareTo(OccInspection ins) {
+        int compRes = getDateForComparison(this).compareTo(getDateForComparison(ins));
+
+//        if(getDateForComparison(this).isBefore(getDateForComparison(ins))){
+//            return 1;
+//        } else if (getDateForComparison(this).isAfter(getDateForComparison(ins))){
+//            return -1;
+//        } else {
+//            return 0;
+//        }
+        return compRes;
+    }
+
+    /**
+     * @return the creationTS
+     */
+    public LocalDateTime getCreationTS() {
+        return creationTS;
+    }
+
+    /**
+     * @param creationTS the creationTS to set
+     */
+    public void setCreationTS(LocalDateTime creationTS) {
+        this.creationTS = creationTS;
     }
 
     
