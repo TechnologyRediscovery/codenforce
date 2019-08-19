@@ -590,7 +590,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     public int attachNewEventToOccPeriod(OccPeriod period, Event ev, User u) throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
+        
         OccEvent oe = new OccEvent(ev);
+        oe.setOccPeriodID(period.getPeriodID());
         int insertedEventID = ei.insertEvent(oe);
         return insertedEventID;
         

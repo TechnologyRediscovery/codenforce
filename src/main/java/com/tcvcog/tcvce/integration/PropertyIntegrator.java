@@ -36,6 +36,7 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -49,6 +50,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -1132,12 +1135,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws EventException
      * @throws EventException 
      */
-    public List<PropertyUnitWithLists> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList, User u) throws IntegrationException, EventException, EventException, AuthorizationException{
+    public List<PropertyUnitWithLists> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList, User u) throws IntegrationException, EventException, EventException, AuthorizationException, CaseLifecycleException{
         List<PropertyUnitWithLists> puwll = new ArrayList<>();
         Iterator<PropertyUnit> iter = propUnitList.iterator();
         while(iter.hasNext()){
-            PropertyUnit pu = iter.next();
-            puwll.add(getPropertyUnitWithLists(pu.getUnitID(), u));
+            try {
+                PropertyUnit pu = iter.next();
+                puwll.add(getPropertyUnitWithLists(pu.getUnitID(), u));
+            } catch (ViolationException ex) {
+                System.out.println(ex);
+            }
         }
         return puwll;
     }
@@ -1152,11 +1159,17 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws com.tcvcog.tcvce.domain.EventException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
-    public PropertyUnitWithLists getPropertyUnitWithList(PropertyUnit pu, User u) throws IntegrationException, EventException, AuthorizationException{
-        return getPropertyUnitWithLists(pu.getUnitID(), u);
+    public PropertyUnitWithLists getPropertyUnitWithList(PropertyUnit pu, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException{
+        PropertyUnitWithLists puwl = null;
+        try {
+            puwl = getPropertyUnitWithLists(pu.getUnitID(), u);
+        } catch (ViolationException ex) {
+            System.out.println(ex);
+        }
+        return puwl;
     }
     
-    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID, User u) throws IntegrationException, EventException, AuthorizationException{
+    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyUnitWithLists puwl = new PropertyUnitWithLists(getPropertyUnitByPropertyUnitID(unitID));
         puwl.setPeriodList(oi.getOccPeriodList(unitID, u));
