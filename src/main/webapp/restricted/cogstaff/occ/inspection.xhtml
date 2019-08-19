@@ -262,7 +262,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:dataScroller id="proposals-proposalscroller"
                                                         var="proposal"
                                                         widgetVar="proposals-proposalscroller-var"
-                                                        value="#{occInspectionBB.currentOccPeriod.proposalList}"
+                                                        value="#{occInspectionBB.currentOccPeriod.proposalListVisible}"
                                                         rowIndexVar="#{proposal.proposalID}">
                                             <div class="outlinedBox">
                                                 <div class="proposal-metadata-container">
@@ -280,17 +280,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         modal="false">
                                                             <h:outputText       styleClass="proposal-description"
                                                                                 value="#{proposal.directive.description}" />
-                                                            
-                                                            
                                                         </p:overlayPanel>
                                                         
                                                         <p:commandButton    id="proposal-button-propmetadata"
                                                                             ajax="true"
                                                                             styleClass="noFill button-size-small"
-                                                                            actionListener="#{occInspectionBB.proposals_makeChoice(choice, p)}"
+                                                                            actionListener="#{occInspectionBB.proposals_initiateViewPropMetadata(proposal)}"
                                                                             oncomplete="PF('occperiod-dialog-proposalmetadata-var').show()"
                                                                             icon="fa fa-gears"
-                                                                            update="occperiod-form-events
+                                                                            update="occperiod-dialog-proposalmetadata-form
+                                                                            occperiod-form-events
                                                                             occperiod-form-proposals"/>
                                                         
                                                         <p:commandButton    id="proposal-button-rejectionreason"
@@ -298,7 +297,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             oncomplete="PF('occperiod-rejectproposal-dialog-var').show()"
                                                                             rendered="#{!proposal.directive.requiredEvaluationForBOBClose 
                                                                                         or sessionBean.sessionUser.keyCard.hasSysAdminPermissions }"
-                                                                            icon="fa fa-close"/>
+                                                                            icon="fa fa-trash"/>
                                                     </div>
                                                     <div class="proposal-prophead">
                                                         <h:outputText value="#{proposal.directive.title}" />
@@ -306,7 +305,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     
                                                     <p:spacer height="5px" />
                                                     
-                                                    <div class="proposal-infotable-box">
                                                         <h:panelGrid   id="occperiod-proposals-panelgrid-propinfo" 
                                                                        columns="1" 
                                                                        columnClasses="gridTD" 
@@ -322,15 +320,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                              value="#{occInspectionBB.currentProposal.responderIntended.person.lastName}" />
                                                             </h:panelGroup>
 
-
-                                                            <h:panelGroup>
-                                                               <h:outputText   styleClass="ui-label-inline" 
-                                                                               value="Expires on: "  />
-                                                               <h:outputText   styleClass="data-text" 
-                                                                               value="#{occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentProposal.expiresOn)}" />
-                                                            </h:panelGroup>
+                                                           
                                                         </h:panelGrid>
-                                                    </div>
                                                 </div>
 
                                                 <p:dataScroller id="proposals-choicescroller"
@@ -352,6 +343,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </p:dataScroller>
                                             </div>
                                         </p:dataScroller>
+                                        
+                                        <p:spacer height="5px" />
+                                        
+                                        <h:outputText styleClass="ui-label-inline font-smaller" value="show hidden proposals? " />
+                                        <p:selectBooleanCheckbox id="proposals-boolcheckbox-showhiddenprops" value="#{occInspectionBB.currentOccPeriod.showHiddenProposals}" >
+                                            <p:ajax update="proposals-proposalscroller" />
+                                        </p:selectBooleanCheckbox>
+                                        
+                                        <h:outputText styleClass="ui-label-inline font-smaller" value="show inactive proposals? " />
+                                        <p:selectBooleanCheckbox id="proposals-boolcheckbox-showinactiveprops" value="#{occInspectionBB.currentOccPeriod.showInactiveProposals}" >
+                                            <p:ajax update="proposals-proposalscroller" />
+                                        </p:selectBooleanCheckbox>
+                                        
                                     </h:form>
                                 </p:panel>
                                     
@@ -713,7 +717,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <i class="material-icons"><h:outputText value="#{e.category.icon.materialIcon}"/></i>
                                             </p:column>
 
-                                            <p:column width="9%" sortBy="#{e.dateOfRecord}">
+                                            <p:column width="12%" sortBy="#{e.dateOfRecord}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Date" />
                                                 </f:facet>
@@ -729,7 +733,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <h:outputText value="#{e.eventID}"/>
                                             </p:column>
                                             <ui:remove>
-                                                <p:column width="8%" sortBy="#{e.category.eventType.label}"
+                                                <p:column width="20%" sortBy="#{e.category.eventType.label}"
                                                           filterBy="#{e.category.eventType.label}">
                                                     <f:facet name="header">
                                                         <h:outputText value="Type" />
@@ -738,7 +742,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </p:column>
                                             </ui:remove>
 
-                                            <p:column width="12%" sortBy="#{e.category.eventCategoryTitle}"
+                                            <p:column width="15%" sortBy="#{e.category.eventCategoryTitle}"
                                                       filterBy="#{e.category.eventCategoryTitle}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Category" />
@@ -755,28 +759,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </f:facet>
                                                 <h:outputText value="#{e.owner.person.lastName}"/>
                                             </p:column>
-                                            <p:column width="20%" style="word-wrap: normal;">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Description" />
-                                                </f:facet>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{e.description}"/>
-                                                </div>
-                                            </p:column>
+                                           
 
-                                            <p:column width="6%" exportable="false">
+                                            <p:column width="10%" exportable="false">
                                                 <f:facet name="header">
                                                     <h:outputText value="Hide" />
                                                 </f:facet>
-                                                <p:commandButton icon="fa fa-moon-o"
-                                                                 ajax="true"
-                                                                 disabled="#{e.hidden}"
-                                                                 rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                 actionListener="#{occInspectionBB.hideEvent(e)}" 
-                                                                 update="occperiod-events-datatable
-                                                                 occperiod-messages-messages-rightcolheader"
-                                                                 />
-                                                <p:commandButton icon="fa fa-star"
+                                                <p:commandButton    id="occperiod-events-button-hideevent"
+                                                                    icon="fa fa-moon-o"
+                                                                    ajax="true"
+                                                                    disabled="#{e.hidden}"
+                                                                    rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    actionListener="#{occInspectionBB.hideEvent(e)}" 
+                                                                    update="occperiod-events-datatable
+                                                                    occperiod-messages-messages-rightcolheader"
+                                                                    />
+                                                <p:commandButton id="occperiod-events-button-showevent"
+                                                                    icon="fa fa-star"
                                                                  ajax="true"
                                                                  disabled="#{!e.hidden}"
                                                                  actionListener="#{occInspectionBB.unHideEvent(e)}" 
@@ -793,7 +792,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:commandButton icon="fa fa-edit"
                                                                  ajax="true"
                                                                  actionListener="#{occInspectionBB.initiateEventEdit(e)}" 
-                                                                 oncomplete="PF('add-event-dialog-var').show()"
+                                                                 oncomplete="PF('occperiod-events-dialog-addeditevent-var').show()"
                                                                  update="occperiod-events-dialog-form"
                                                                  />
                                             </p:column>

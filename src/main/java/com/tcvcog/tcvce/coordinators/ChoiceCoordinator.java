@@ -158,11 +158,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     
     public void recordProposalEvaluation(Proposal p) throws IntegrationException{
         ChoiceIntegrator ci = getChoiceIntegrator();
+        p.setHidden(true);
         ci.recordProposalEvaluation(p);
     }
-    
-    
-  
     
     /**
      * Processes requests to reject a proposal by checking user rank, required status, 
@@ -185,6 +183,7 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
                 p.setProposalRejected(true);
                 p.setResponderActual(u);
                 p.setResponseTimestamp(LocalDateTime.now());
+                p.setHidden(true);
                 // send the updates to the integrator
                 ci.updateProposal(p);
             } else {

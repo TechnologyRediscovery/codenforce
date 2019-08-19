@@ -468,8 +468,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
-   
-    
     public OccPermitApplication getNewOccPermitApplication(){
         OccPermitApplication occpermitapp = new OccPermitApplication();        
         occpermitapp.setSubmissionDate(LocalDateTime.now());        
@@ -528,8 +526,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oise.setLastInspectedBy(u);
         
         oii.updateInspectedSpaceElement(oise);
-        
-        
     }
     
     
@@ -544,8 +540,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oise.setLastInspectedBy(null);
         
         oii.updateInspectedSpaceElement(oise);
-        
-        
     }
     
     public void inspectionAction_inspectWithoutCompliance(   OccInspectedSpaceElement oise, 
@@ -561,7 +555,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oii.updateInspectedSpaceElement(oise);
     }
     
-    public void evaluateProposal(   Proposal proposal, 
+     public void evaluateProposal(   Proposal proposal, 
                                     Proposable chosen, 
                                     OccPeriod occPeriod, 
                                     User u) throws EventException, AuthorizationException, CaseLifecycleException, IntegrationException{
@@ -595,7 +589,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oe.setOccPeriodID(period.getPeriodID());
         int insertedEventID = ei.insertEvent(oe);
         return insertedEventID;
-        
     }
     
     public void editOccEvent(OccEvent ev) throws IntegrationException{

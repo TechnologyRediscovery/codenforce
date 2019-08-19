@@ -322,7 +322,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         currentEvent.getPersonList().remove(p);
     }
     
-    public void proposals_viewPropMetadata(ProposalOccPeriod p){
+    public void proposals_initiateViewPropMetadata(ProposalOccPeriod p){
         System.out.println("OccInspectionBB.proposals_viewPropMetadata");
         currentProposal = p;
     }
