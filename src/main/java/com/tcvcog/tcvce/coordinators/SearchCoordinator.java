@@ -11,6 +11,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -47,6 +48,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -702,6 +705,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException fatal error in the integration code
      */
     public QueryOccPeriod runQuery(QueryOccPeriod query, User u) throws AuthorizationException, IntegrationException, EventException{
+        QueryOccPeriod qop = null;
         query.clearResultList();
         OccupancyIntegrator oi = getOccupancyIntegrator();
 //        if(query.getUser().getRoleType().getRank() > query.getQueryName().getUserRankMinimum() ){
@@ -713,7 +717,13 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         if(query.getQueryName().logQueryRun()){
             logRun(query);
         }
-        return oi.runQueryOccPeriod(query, u);
+        try {
+            qop = oi.runQueryOccPeriod(query, u);
+        } catch (CaseLifecycleException | ViolationException ex) {
+            System.out.println(ex);
+        }
+        
+        return qop;
     }
     
     

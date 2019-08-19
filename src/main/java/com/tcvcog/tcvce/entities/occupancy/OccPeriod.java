@@ -86,17 +86,19 @@ public class OccPeriod
 
     public List<OccEvent> getVisibleEventList(){
         List<OccEvent> visEventList = new ArrayList<>();
-        for (OccEvent ev : eventList) {
-            if (!ev.isActive() && !isShowInactiveEvents()) {
-                continue;
-            }
-            if (ev.isHidden() && !isShowHiddenEvents()) {
-                continue;
-            }
-            visEventList.add(ev);
-        } // close for   
+        if(eventList != null){
+            for (OccEvent ev : eventList) {
+                if (!ev.isActive() && !isShowInactiveEvents()) {
+                    continue;
+                }
+                if (ev.isHidden() && !isShowHiddenEvents()) {
+                    continue;
+                }
+                System.out.println("OccPeriod.getVisibleEvent | adding event ID " + ev.getEventID());
+                visEventList.add(ev);
+            } // close for   
+        }
         return visEventList;
-        
     }
     
       public List<OccEvent> getActiveEventList() {

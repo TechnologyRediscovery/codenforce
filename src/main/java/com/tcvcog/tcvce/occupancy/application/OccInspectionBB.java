@@ -193,7 +193,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
 //                } 
 //            }
             propertyUnitCandidateList = pi.getPropertyUnitList(getSessionBean().getSessionProperty());
-        } catch (IntegrationException | EventException| AuthorizationException ex) {
+        } catch (IntegrationException | EventException| AuthorizationException |CaseLifecycleException | ViolationException ex) {
             System.out.println(ex);
         }
         
@@ -386,7 +386,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
-        } catch (IntegrationException | EventException | AuthorizationException ex) {
+        } catch (IntegrationException | EventException | AuthorizationException | CaseLifecycleException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -498,6 +498,10 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Please select an event category to create a new event.", ""));
         }
+    }
+    
+    public void initiateEventEdit(OccEvent ev){
+        
     }
     
     public void events_commitEventEdits(ActionEvent ev){
@@ -787,9 +791,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_ERROR,
                ex.getMessage(), ""));
-            
         }
-         
      }
      
      public void updatePeriodPropUnit(){

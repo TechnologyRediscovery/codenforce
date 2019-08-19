@@ -167,11 +167,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                             disabled="#{!occInspectionBB.currentOccPeriod.readyForPeriodAuthorization}"
                                                                             value="authorize occupancy period"
-                                                                            icon="fa fa-edit"
-                                                                            title="update period type"/>
+                                                                            icon="fa fa-shield"
+                                                                            title="finalize all occupancy period settings which then allows permitting"/>
                                                     </f:subview>
                                                 </f:subview>
-                                                
                                                 
                                             </h:panelGroup>
                                             
@@ -181,8 +180,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <h:outputText value="#{empty occInspectionBB.currentOccPeriod.endDate ? 'no start date' : occInspectionBB.getPrettyDateNoTime(occInspectionBB.currentOccPeriod.startDate)}" />
                                             </h:panelGroup>
                                             
-                                            
-
                                             <h:panelGroup>
                                                 <f:subview id="occperiod-periodmetadata-subview-startdate-container">
                                                     <h:outputText value="Test of nesting subviews" 
@@ -251,14 +248,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 </f:subview>
                                             </h:panelGroup>
-
-
                                         </h:panelGrid>
-
-                                    </p:panel>
-
-                                       
-                                </h:form>
+                                    </h:form>
+                                </p:panel>
 
                                 <p:panel id="occperiod-panel-proposals"
                                          toggleable="true"
@@ -267,13 +259,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                          header="Tasks and notices">
 
                                     <h:form id="occperiod-form-proposals">
-
                                         <p:dataScroller id="proposals-proposalscroller"
                                                         var="proposal"
                                                         widgetVar="proposals-proposalscroller-var"
                                                         value="#{occInspectionBB.currentOccPeriod.proposalList}"
                                                         rowIndexVar="#{proposal.proposalID}">
-
                                             <div class="outlinedBox">
                                                 <div class="proposal-metadata-container">
                                                     <div class="proposal-propbuttoncontainer">
@@ -300,7 +290,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             actionListener="#{occInspectionBB.proposals_makeChoice(choice, p)}"
                                                                             oncomplete="PF('occperiod-dialog-proposalmetadata-var').show()"
                                                                             icon="fa fa-gears"
-                                                                            update="occperiod-dialog-proposalmetadata-form"/>
+                                                                            update="occperiod-form-events
+                                                                            occperiod-form-proposals"/>
                                                         
                                                         <p:commandButton    id="proposal-button-rejectionreason"
                                                                             styleClass="noFill button-size-small"
@@ -308,8 +299,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             rendered="#{!proposal.directive.requiredEvaluationForBOBClose 
                                                                                         or sessionBean.sessionUser.keyCard.hasSysAdminPermissions }"
                                                                             icon="fa fa-close"/>
-                                                        
-                                                           
                                                     </div>
                                                     <div class="proposal-prophead">
                                                         <h:outputText value="#{proposal.directive.title}" />
@@ -365,8 +354,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </p:dataScroller>
                                     </h:form>
                                 </p:panel>
-
-
+                                    
                                 <p:panel id="occperiod-permits"
                                          toggleable="true"
                                          collapsed="false"
@@ -635,7 +623,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <p:panel    id="occperiod-panel-events"
                                             widgetVar="occperiod-panel-events-var"
                                             toggleable="true"  
-                                            collapsed="true"
+                                            collapsed="false"
                                             header="Events">
                                     <h:form id="occperiod-form-events">
                                         
@@ -784,17 +772,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                  ajax="true"
                                                                  disabled="#{e.hidden}"
                                                                  rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                 actionListener="#{caseProfileBB.hideEvent(e)}" 
-                                                                 update="caseEventTable
-                                                                 event-messages-form"
+                                                                 actionListener="#{occInspectionBB.hideEvent(e)}" 
+                                                                 update="occperiod-events-datatable
+                                                                 occperiod-messages-messages-rightcolheader"
                                                                  />
                                                 <p:commandButton icon="fa fa-star"
                                                                  ajax="true"
                                                                  disabled="#{!e.hidden}"
-                                                                 actionListener="#{caseProfileBB.unHideEvent(e)}" 
+                                                                 actionListener="#{occInspectionBB.unHideEvent(e)}" 
                                                                  rendered="#{sessionUserBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                 update="caseEventTable
-                                                                 event-messages-form"
+                                                                 update="occperiod-events-datatable
+                                                                 occperiod-messages-messages-rightcolheader"
                                                                  />
 
                                             </p:column>
@@ -804,10 +792,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </f:facet>
                                                 <p:commandButton icon="fa fa-edit"
                                                                  ajax="true"
-                                                                 actionListener="#{caseProfileBB.editEvent(e)}" 
+                                                                 actionListener="#{occInspectionBB.initiateEventEdit(e)}" 
                                                                  oncomplete="PF('add-event-dialog-var').show()"
-                                                                 update="addNewEventForm
-                                                                 event-messages-form"
+                                                                 update="occperiod-events-dialog-form"
                                                                  />
                                             </p:column>
                                             <p:rowExpansion>
@@ -1031,6 +1018,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText styleClass="data-text" value="#{inspace.name}" />
                                                 </div>
                                             </div>
+                                            
+                                            <p:spacer height="5px" />
+                                            
                                             <p:dataScroller
                                                 id="scroller-inspectedspacelist-elementlist"
                                                 widgetVar="var-scroller-inspectedspacelist-elementlist"
@@ -1897,7 +1887,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         rendered="#{!proposal.directive.requiredEvaluationForBOBClose}"
                                                         oncomplete="PF('occperiod-rejectproposal-dialog-var').hide()"
                                                         icon="fa fa-hand-stop-o"
-                                                        update="occperiod-form-proposals"/>
+                                                        update="occperiod-form-proposals
+                                                        occperiod-form-events"/>
                         </h:form>
                     </p:dialog>
                     

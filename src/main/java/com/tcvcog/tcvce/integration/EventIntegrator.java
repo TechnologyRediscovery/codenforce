@@ -133,7 +133,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     public CECaseEvent getEventCECase(int eventID) throws IntegrationException {
         CECaseEvent ev = null;
 
-        String query = "SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n" +
+        String query = "SELECT eventid, category_catid, cecase_caseid, dateofrecord, \n" +
                 "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
                 "       disclosetopublic, activeevent, hidden, ceevent.notes, property_propertyid,  municipality_municode " +
                 "       FROM public.ceevent INNER JOIN public.cecase ON (cecase_caseid = caseid)\n" +
@@ -171,12 +171,14 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     public OccEvent getOccEvent(int eventID) throws IntegrationException{
         OccEvent occEv = null;
 
-        String query =  "SELECT eventid, category_catid, occperiod_periodid, dateofrecord, eventtimestamp, \n" +
-                        "       eventdescription, owner_userid, disclosetomunicipality, disclosetopublic, \n" +
-                        "       activeevent, hidden, notes\n" +
-                        "  FROM public.occevent INNER JOIN public.propertyunit ON (propertyunit_unitid = unitid)\n" +
-                        "                       INNER JOIN public.property on (property_propertyid = propertyid) " +
-                        "       WHERE eventid = ?;";
+        String query =  "SELECT eventid, category_catid, occperiod_periodid, dateofrecord, eventtimestamp,  \n" +
+                        "                               eventdescription, owner_userid, disclosetomunicipality, disclosetopublic,  \n" +
+                        "                               activeevent, hidden, occevent.notes, property_propertyid, propertyunit_unitid, municipality_municode \n" +
+                        "	FROM public.occevent \n" +
+                        "	INNER JOIN public.occperiod ON (occperiod_periodid = periodid)\n" +
+                        "	INNER JOIN public.propertyunit ON (propertyunit_unitid = unitid) \n" +
+                        "	INNER JOIN public.property on (property_propertyid = propertyid)  \n" +
+                        "	WHERE eventid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -191,7 +193,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 occEv = new OccEvent(generateEventFromRS(rs));
                 occEv.setOccPeriodID(rs.getInt("occperiod_periodid"));
             }
-            
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -204,10 +205,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         
         return occEv;    
-        
-        
-        
-        
     }
     
     public List<OccEvent> getOccEvents(int occPeriodID) throws IntegrationException{
@@ -225,9 +222,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                evList.add(getOccEvent(occPeriodID));
+                evList.add(getOccEvent(rs.getInt("eventid")));
             }
-            
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -485,7 +481,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         int insertedEventID = 0;
 
         String query = "INSERT INTO public.ceevent(\n"
-                + "            eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n"
+                + "            eventid, category_catid, cecase_caseid, dateofrecord, \n"
                 + "            eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n"
                 + "            disclosetopublic, activeevent, \n"
                 + "            hidden, notes)\n"
@@ -614,9 +610,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 pi.connectPersonsToEvent(event, persList);
             }
         }
-        
         return insertedEventID;
-
     } // close method
 
     public void inactivateEvent(int eventIdToInactivate) throws IntegrationException {
@@ -791,7 +785,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ev.setMuniName(ssc.getMuniCodeNameMap().get(rs.getInt("municipality_municode")));
 
         ev.setEventID(rs.getInt("eventid"));
-        ev.setCategory(getEventCategory(rs.getInt("ceeventCategory_catID")));
+        ev.setCategory(getEventCategory(rs.getInt("category_catid")));
 //        ev.setCaseID(rs.getInt("cecase_caseid"));
         
         if (rs.getTimestamp("dateofrecord") != null) {
