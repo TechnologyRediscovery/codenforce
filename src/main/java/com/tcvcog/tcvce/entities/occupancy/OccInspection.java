@@ -16,37 +16,48 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
  * @author Adam Gutonski and Sylvia
  */
-public class OccInspection {
+public class OccInspection extends EntityUtils implements Comparable<OccInspection> {
     
     private int inspectionID;
     private User inspector;
     private int occPeriodID;
+    
+    private boolean active;
     
     // This template object provides us the raw lists of uninspected
     // space types, from which we extract a list of Spaces and their CodeElements
     private OccChecklistTemplate checklistTemplate;
     private List<OccInspectedSpace> inspectedSpaceList;
     
+    private List<OccInspectedSpace> visibleInspectedSpaceList;
+    
     private int pacc;
     private boolean enablePacc;
     
+    private boolean readyForPassedCertification;
     private User passedInspectionCertifiedBy;
     private LocalDateTime passedInspectionTS;
+    
     private LocalDateTime effectiveDateOfRecord;
     protected java.util.Date effectiveDateOfRecordUtilDate;
+    
+    private LocalDateTime creationTS;
     
     private int maxOccupantsAllowed;
     private int numBedrooms;
@@ -60,12 +71,51 @@ public class OccInspection {
     
     public OccInspection(){
         inspectedSpaceList = new ArrayList<>();
+        visibleInspectedSpaceList = new ArrayList<>();
     }
     
     public void addSpaceToInspectedSpaces(OccInspectedSpace spc){
         inspectedSpaceList.add(spc);
-        
     }
+    
+    public void configureVisibleElementSpaceList(OccInspectionViewOptions viewOption){
+        List<OccInspectedSpaceElement> visibleEleList = null;
+        
+        for(Iterator<OccInspectedSpace> it = inspectedSpaceList.iterator(); it.hasNext(); ){
+            OccInspectedSpace ois = it.next(); 
+            ois.getVisibleInspectedElementList().clear();
+            visibleEleList = new ArrayList<>();
+
+            for(Iterator<OccInspectedSpaceElement> itEle = ois.getInspectedElementList().iterator(); itEle.hasNext(); ){
+                OccInspectedSpaceElement oise = itEle.next();
+                switch(viewOption){
+                    case ALL_ITEMS:
+                        visibleEleList.add(oise);
+                        break;
+                    case FAILED_ITEMS_ONLY:
+                        // look for failed items
+                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
+                            visibleEleList.add(oise);
+                        } 
+                        break;
+                    case UNISPECTED_ITEMS_ONLY:
+                        // look for failed items
+                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
+                            visibleEleList.add(oise);
+                        } 
+                        break;
+                    default:
+                        visibleEleList.add(oise);
+                        
+                }
+            }
+            // close for over inspectedSpaceelements
+            if(!visibleEleList.isEmpty()){
+                ois.getVisibleInspectedElementList().addAll(visibleEleList);
+            }
+        } // close for over inspectedspaces
+    }
+    
     
     
     /**
@@ -418,6 +468,92 @@ public class OccInspection {
         if(effectiveDateOfRecordUtilDate != null){
             effectiveDateOfRecord = effectiveDateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    
+    /**
+     * Utility method for determining which date to use for comparison.
+     * Note that inspections that haven't been approved probably won't have an
+     * effective date of record so we should just use the creation timestamp
+     * @param ins
+     * @return the selected date for comparison
+     */
+    private LocalDateTime getDateForComparison(OccInspection ins){
+        if(ins.getEffectiveDateOfRecord() == null){
+            return ins.getCreationTS();
+        } else {
+            return ins.getEffectiveDateOfRecord();
+        }
+    }
+    
+
+    @Override
+    public int compareTo(OccInspection ins) {
+        int compRes = getDateForComparison(this).compareTo(getDateForComparison(ins));
+
+//        if(getDateForComparison(this).isBefore(getDateForComparison(ins))){
+//            return 1;
+//        } else if (getDateForComparison(this).isAfter(getDateForComparison(ins))){
+//            return -1;
+//        } else {
+//            return 0;
+//        }
+        return compRes;
+    }
+
+    /**
+     * @return the creationTS
+     */
+    public LocalDateTime getCreationTS() {
+        return creationTS;
+    }
+
+    /**
+     * @param creationTS the creationTS to set
+     */
+    public void setCreationTS(LocalDateTime creationTS) {
+        this.creationTS = creationTS;
+    }
+
+    /**
+     * @return the visibleInspectedSpaceList
+     */
+    public List<OccInspectedSpace> getVisibleInspectedSpaceList() {
+        return visibleInspectedSpaceList;
+    }
+
+    /**
+     * @param visibleInspectedSpaceList the visibleInspectedSpaceList to set
+     */
+    public void setVisibleInspectedSpaceList(List<OccInspectedSpace> visibleInspectedSpaceList) {
+        this.visibleInspectedSpaceList = visibleInspectedSpaceList;
+    }
+
+    /**
+     * @return the readyForPassedCertification
+     */
+    public boolean isReadyForPassedCertification() {
+        return readyForPassedCertification;
+    }
+
+    /**
+     * @param readyForPassedCertification the readyForPassedCertification to set
+     */
+    public void setReadyForPassedCertification(boolean readyForPassedCertification) {
+        this.readyForPassedCertification = readyForPassedCertification;
     }
 
     

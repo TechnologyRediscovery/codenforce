@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -44,6 +45,75 @@ public class PropertyUnit {
     
     protected int conditionIntensityClassID;
     protected LocalDateTime lastUpdatedTS;
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 43 * hash + this.unitID;
+        hash = 43 * hash + this.propertyID;
+        hash = 43 * hash + Objects.hashCode(this.unitNumber);
+        hash = 43 * hash + Objects.hashCode(this.notes);
+        hash = 43 * hash + Objects.hashCode(this.otherKnownAddress);
+        hash = 43 * hash + Objects.hashCode(this.rentalIntentDateStart);
+        hash = 43 * hash + Objects.hashCode(this.rentalIntentDateStop);
+        hash = 43 * hash + Objects.hashCode(this.rentalIntentLastUpdatedBy);
+        hash = 43 * hash + Objects.hashCode(this.rentalNotes);
+        hash = 43 * hash + (this.active ? 1 : 0);
+        hash = 43 * hash + this.conditionIntensityClassID;
+        hash = 43 * hash + Objects.hashCode(this.lastUpdatedTS);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PropertyUnit other = (PropertyUnit) obj;
+        if (this.unitID != other.unitID) {
+            return false;
+        }
+        if (this.propertyID != other.propertyID) {
+            return false;
+        }
+        if (this.active != other.active) {
+            return false;
+        }
+        if (this.conditionIntensityClassID != other.conditionIntensityClassID) {
+            return false;
+        }
+        if (!Objects.equals(this.unitNumber, other.unitNumber)) {
+            return false;
+        }
+        if (!Objects.equals(this.notes, other.notes)) {
+            return false;
+        }
+        if (!Objects.equals(this.otherKnownAddress, other.otherKnownAddress)) {
+            return false;
+        }
+        if (!Objects.equals(this.rentalNotes, other.rentalNotes)) {
+            return false;
+        }
+        if (!Objects.equals(this.rentalIntentDateStart, other.rentalIntentDateStart)) {
+            return false;
+        }
+        if (!Objects.equals(this.rentalIntentDateStop, other.rentalIntentDateStop)) {
+            return false;
+        }
+        if (!Objects.equals(this.rentalIntentLastUpdatedBy, other.rentalIntentLastUpdatedBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastUpdatedTS, other.lastUpdatedTS)) {
+            return false;
+        }
+        return true;
+    }
     
 
     /**

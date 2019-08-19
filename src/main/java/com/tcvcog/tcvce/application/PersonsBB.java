@@ -78,7 +78,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         searchParams = pc.getDefaultSearchParamsPersons(getSessionBean().getSessionMuni());
         // the selected person should be initiated using logic in getSelectedPerson
-        selectedPerson = getSessionBean().getSessionPersonList().get(0);
+        selectedPerson = getSessionBean().getSessionPerson();
         try {
             muniNameIDMap = mi.getMunicipalityStringIDMap();
         } catch (IntegrationException ex) {
@@ -210,7 +210,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         personList = null;
         getSessionBean().setSessionPersonList(null);
         // this will trigger database lookup logic inside
-        // getPersonList() when we tell the search result table to clear itself
+        // getPersonsByEvent() when we tell the search result table to clear itself
     }
     
     
@@ -222,7 +222,7 @@ public class PersonsBB extends BackingBeanUtils implements Serializable{
         personList = null;
         getSessionBean().setSessionPersonList(null);
         // this will trigger database lookup logic inside
-        // getPersonList() when we tell the search result table to clear itself
+        // getPersonsByEvent() when we tell the search result table to clear itself
     }
     
     

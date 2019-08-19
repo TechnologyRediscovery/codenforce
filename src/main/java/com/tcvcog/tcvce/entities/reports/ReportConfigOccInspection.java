@@ -20,7 +20,7 @@ public class ReportConfigOccInspection
         extends Report 
         implements Serializable{
     
-    private OccPeriod reportPeriod;
+    private OccPeriod occPeriod;
     
     private boolean includeOccPeriodInfoHeader;
     
@@ -43,10 +43,10 @@ public class ReportConfigOccInspection
     private boolean includeSignature;
 
     /**
-     * @return the reportPeriod
+     * @return the occPeriod
      */
-    public OccPeriod getReportPeriod() {
-        return reportPeriod;
+    public OccPeriod getOccPeriod() {
+        return occPeriod;
     }
 
     /**
@@ -148,10 +148,10 @@ public class ReportConfigOccInspection
     }
 
     /**
-     * @param reportPeriod the reportPeriod to set
+     * @param occPeriod the occPeriod to set
      */
-    public void setReportPeriod(OccPeriod reportPeriod) {
-        this.reportPeriod = reportPeriod;
+    public void setOccPeriod(OccPeriod occPeriod) {
+        this.occPeriod = occPeriod;
     }
 
     /**

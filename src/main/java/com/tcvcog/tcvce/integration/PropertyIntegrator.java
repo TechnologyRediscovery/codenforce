@@ -18,7 +18,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyStatus;
@@ -34,6 +34,9 @@ import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -47,6 +50,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -867,7 +872,17 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     } // close getProperty()
 
-    public PropertyWithLists getPropertyWithLists(int propertyID) throws IntegrationException, CaseLifecyleException {
+    /**
+     * 
+     * @param propertyID
+     * @param u
+     * @return
+     * @throws IntegrationException
+     * @throws CaseLifecycleException
+     * @throws EventException
+     * @throws AuthorizationException 
+     */
+    public PropertyWithLists getPropertyWithLists(int propertyID, User u) throws IntegrationException, CaseLifecycleException, EventException, AuthorizationException {
             PropertyCoordinator pc = getPropertyCoordinator();
             CaseIntegrator ci = getCaseIntegrator();
             PersonIntegrator pi = getPersonIntegrator();
@@ -875,7 +890,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             PropertyWithLists p = new PropertyWithLists(getProperty(propertyID));
    
             p.setCeCaseList(ci.getCECasesByProp(p));
-            p.setUnitWithListsList(getPropertyUnitWithListsList(p.getUnitList()));
+            p.setUnitWithListsList(getPropertyUnitWithListsList(p.getUnitList(), u));
             p.setPersonList(pi.getPersonList(p));
         return pc.configurePropertyWithLists(p);
     }
@@ -1112,12 +1127,24 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return unitList;
     }
 
-    public List<PropertyUnitWithLists> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList) throws IntegrationException{
+    /**
+     * 
+     * @param propUnitList
+     * @return
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws EventException 
+     */
+    public List<PropertyUnitWithLists> getPropertyUnitWithListsList(List<PropertyUnit> propUnitList, User u) throws IntegrationException, EventException, EventException, AuthorizationException, CaseLifecycleException{
         List<PropertyUnitWithLists> puwll = new ArrayList<>();
         Iterator<PropertyUnit> iter = propUnitList.iterator();
         while(iter.hasNext()){
-            PropertyUnit pu = iter.next();
-            puwll.add(getPropertyUnitWithLists(pu.getUnitID()));
+            try {
+                PropertyUnit pu = iter.next();
+                puwll.add(getPropertyUnitWithLists(pu.getUnitID(), u));
+            } catch (ViolationException ex) {
+                System.out.println(ex);
+            }
         }
         return puwll;
     }
@@ -1126,18 +1153,26 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * Adaptor method for calling getPropertyUnitWithLists(int unitID) given a PropertyUnit object
      * 
      * @param pu
+     * @param u
      * @return a PropertyUnit containing a list of OccPeriods, and more in the future
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.EventException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
-    public PropertyUnitWithLists getPropertyUnitWithLists(PropertyUnit pu) throws IntegrationException{
-        return getPropertyUnitWithLists(pu.getUnitID());
+    public PropertyUnitWithLists getPropertyUnitWithList(PropertyUnit pu, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException{
+        PropertyUnitWithLists puwl = null;
+        try {
+            puwl = getPropertyUnitWithLists(pu.getUnitID(), u);
+        } catch (ViolationException ex) {
+            System.out.println(ex);
+        }
+        return puwl;
     }
     
-    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID) throws IntegrationException{
+    public PropertyUnitWithLists getPropertyUnitWithLists(int unitID, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
-
         PropertyUnitWithLists puwl = new PropertyUnitWithLists(getPropertyUnitByPropertyUnitID(unitID));
-        puwl.setPeriodList(oi.getOccPeriodList(unitID));
+        puwl.setPeriodList(oi.getOccPeriodList(unitID, u));
         return puwl;
     }
     

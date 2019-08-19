@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2019 Technology Rediscovery LLC
+ * Copyright (C) 2017 Turtle Creek Valley
+Council of Governments, PA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,29 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.entities.occupancy;
-
-import com.tcvcog.tcvce.entities.Status;
+package com.tcvcog.tcvce.domain;
 
 /**
  *
- * @author sylvia
+ * @author Eric C. Darsow
  */
-public class OccInspectableStatus extends Status{
+public class CaseLifecycleException extends BaseException {
     
-    private final OccInspectionStatusEnum statusEnum;
-
-    public OccInspectableStatus(OccInspectionStatusEnum enumVal){
-        statusEnum = enumVal;
+    public CaseLifecycleException(){
+        super();
+        
     }
     
-    
-    /**
-     * @return the statusEnum
-     */
-    public OccInspectionStatusEnum getStatusEnum() {
-        return statusEnum;
+    public CaseLifecycleException(String message){
+        super(message);
     }
-
+    
+    public CaseLifecycleException(Exception e){
+        super(e);
+    }
+    
+    public CaseLifecycleException(String message, Exception e){
+        super(message, e);
+        
+    }
     
 }

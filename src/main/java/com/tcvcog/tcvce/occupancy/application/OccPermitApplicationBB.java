@@ -8,7 +8,9 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -168,7 +170,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     } // end postConstruct
     
     
-    public String beginInternalOccApp(PropertyUnit pu) throws IntegrationException, CaseLifecyleException{
+    public String beginInternalOccApp(PropertyUnit pu) throws IntegrationException, CaseLifecycleException{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         
@@ -248,13 +250,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //        if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
 //            try {
 //                propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-//            } catch (CaseLifecyleException ex) {
+//            } catch (CaseLifecycleException ex) {
 //                System.out.println(ex);
 //            }
 //        } else {
 //            try {
 //                propWithLists = pc.getPropertyUnits(selectedProperty);
-//            } catch (CaseLifecyleException ex) {
+//            } catch (CaseLifecycleException ex) {
 //                System.out.println(ex);
 //            }
 //        }
@@ -322,13 +324,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 //            if (getSessionBean().getOccPermitApplication().isMultiUnit() == true) {
 //                try {
 //                    propWithLists = pc.getPropertyUnitsWithoutDefault(selectedProperty);
-//                } catch (CaseLifecyleException ex) {
+//                } catch (CaseLifecycleException ex) {
 //                    System.out.println(ex);
 //                }
 //            } else {
 //                try {
 //                    propWithLists = pc.getPropertyUnits(selectedProperty);
-//                } catch (CaseLifecyleException ex) {
+//                } catch (CaseLifecycleException ex) {
 //                    System.out.println(ex);
 //                }
 //            }
@@ -779,11 +781,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         Person changedby = getSessionBean().getSessionOccPermitApplication().getApplicantPerson();
         
         try {
-            existingProp = pri.getPropertyWithLists(prop.getPropertyID());
+            existingProp = pri.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser());
                     
         } catch (IntegrationException ex) {
             System.out.println(ex);
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
+            System.out.println(ex);
+        } catch (EventException ex) {
+            System.out.println(ex);
+        } catch (AuthorizationException ex) {
             System.out.println(ex);
         }
         

@@ -18,12 +18,17 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CasePhase;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -71,11 +76,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     
-    public List<OccPeriod> getOccPeriodList(PropertyUnit pu) throws IntegrationException {
-        return getOccPeriodList(pu.getUnitID());
+    public List<OccPeriod> getOccPeriodList(PropertyUnit pu, User u) throws IntegrationException, AuthorizationException, EventException, CaseLifecycleException, ViolationException {
+        return getOccPeriodList(pu.getUnitID(), u);
     }
     
-    public List<OccPeriod> getOccPeriodList(int unitID) throws IntegrationException {
+    public List<OccPeriod> getOccPeriodList(int unitID, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
         List<OccPeriod> opList = new ArrayList<>();
         String query = "SELECT periodid FROM public.occperiod WHERE propertyunit_unitid=?;";
 
@@ -88,7 +93,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(1, unitID);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                opList.add(getOccPeriod(rs.getInt("periodid")));
+                opList.add(getOccPeriod(rs.getInt("periodid"), u));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -101,18 +106,18 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return opList;
     }
 
-    public QueryOccPeriod runQueryOccPeriod(QueryOccPeriod query) throws IntegrationException {
+    public QueryOccPeriod runQueryOccPeriod(QueryOccPeriod query, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
         List<SearchParamsOccPeriod> pList = query.getParmsList();
         
         for(SearchParamsOccPeriod sp: pList){
-            query.addToResults(searchForOccPeriods(sp));
+            query.addToResults(searchForOccPeriods(sp, u));
         }
         query.setExecutionTimestamp(LocalDateTime.now());
         query.setExecutedByIntegrator(true);
         return query;
     }
 
-    public List<OccPeriod> searchForOccPeriods(SearchParamsOccPeriod params) throws IntegrationException {
+    public List<OccPeriod> searchForOccPeriods(SearchParamsOccPeriod params, User u) throws IntegrationException, EventException, AuthorizationException, CaseLifecycleException, ViolationException {
         List<OccPeriod> periodList = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -287,7 +292,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                periodList.add(getOccPeriod(rs.getInt("periodid")));
+                periodList.add(getOccPeriod(rs.getInt("periodid"), u));
                 counter++;
             }
 
@@ -371,7 +376,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
     }
 
-    public OccPeriod getOccPeriod(int periodid) throws IntegrationException {
+    public OccPeriod getOccPeriod(int periodid, User u) throws IntegrationException, 
+                                                                EventException, 
+                                                                AuthorizationException, 
+                                                                CaseLifecycleException, 
+                                                                ViolationException {
         OccPeriod op = null;
         OccupancyCoordinator oc = getOccupancyCoordinator();
         String query = "SELECT periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n"
@@ -400,7 +409,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return oc.configureOccPeriod(op);
+        return oc.configureOccPeriod(op, u);
     }
 
     private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException {
@@ -763,9 +772,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            
         }
-
     }
 
     public int insertOccPeriod(OccPeriod period) throws IntegrationException {

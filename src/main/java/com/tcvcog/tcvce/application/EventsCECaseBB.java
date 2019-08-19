@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseBase;
@@ -80,7 +80,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
         if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 sc.runQuery((QueryEventCECase) selectedBOBQuery);
-            } catch (IntegrationException|CaseLifecyleException ex) {
+            } catch (IntegrationException| CaseLifecycleException ex) {
                 System.out.println(ex);
             }
             
@@ -125,7 +125,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Case lifecycle exception.", ""));
@@ -151,7 +151,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not query the database, sorry.", ""));
-        } catch (CaseLifecyleException ex) {
+        } catch (CaseLifecycleException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Case lifecycle exception.", ""));
@@ -234,7 +234,7 @@ public class EventsCECaseBB extends BackingBeanUtils implements Serializable {
        if(!selectedBOBQuery.isExecutedByIntegrator()){
             try {
                 selectedBOBQuery = sc.runQuery((QueryEventCECase) selectedBOBQuery);
-            } catch (IntegrationException|CaseLifecyleException ex) {
+            } catch (IntegrationException| CaseLifecycleException ex) {
                 System.out.println(ex);
             }
             

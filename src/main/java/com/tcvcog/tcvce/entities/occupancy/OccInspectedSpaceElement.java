@@ -50,12 +50,8 @@ public class OccInspectedSpaceElement
     private String notes;
     
     private List<Blob> blobList;
-    
     private OccLocationDescriptor location;
-    
     private int failureIntensityClassID;
-    
-    
     private OccInspectableStatus status;
    
     
@@ -351,7 +347,6 @@ public class OccInspectedSpaceElement
         }
     }
 
-   
     
     
 }

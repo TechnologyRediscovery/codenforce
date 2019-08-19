@@ -21,17 +21,24 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import com.tcvcog.tcvce.entities.Openable;
+import java.util.Collections;
 
 /**
  *
  * @author sylvia
  */
-public class OccPeriod extends EntityUtils implements Serializable{
+public class OccPeriod 
+        extends EntityUtils 
+        implements  Serializable,
+                    Openable{
     
     private int periodID;
     private int propertyUnitID;
     private OccPeriodType type;
     private OccPeriodStatusEnum status;
+    
+    private boolean readyForPeriodAuthorization;
     
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
@@ -40,6 +47,11 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private boolean showInactiveEvents;
     
     private List<Proposal> proposalList;
+    
+    private boolean showHiddenProposals;
+    private boolean showInactiveProposals;
+    private List<Proposal> proposalListVisible;
+    
     private List<EventRuleOccPeriod> eventRuleOccPeriodList;
     
     private List<OccInspection> inspectionList;
@@ -71,20 +83,54 @@ public class OccPeriod extends EntityUtils implements Serializable{
     private boolean overrideTypeConfig;
     
     private String notes;
+    
+    public OccPeriod(){
+        proposalListVisible = new ArrayList<>();
+    }
+    
+    
+     @Override
+    public boolean isOpen() {
+        return status.isOpenPeriod();
+    }
 
     public List<OccEvent> getVisibleEventList(){
         List<OccEvent> visEventList = new ArrayList<>();
-        for (OccEvent ev : eventList) {
-            if (!ev.isActive() && !isShowInactiveEvents()) {
-                continue;
-            }
-            if (ev.isHidden() && !isShowHiddenEvents()) {
-                continue;
-            }
-            visEventList.add(ev);
-        } // close for   
+        if(eventList != null){
+            for (OccEvent ev : eventList) {
+                if (!ev.isActive() && !isShowInactiveEvents()) {
+                    continue;
+                }
+                if (ev.isHidden() && !isShowHiddenEvents()) {
+                    continue;
+                }
+                System.out.println("OccPeriod.getVisibleEvent | adding event ID " + ev.getEventID());
+                visEventList.add(ev);
+            } // close for   
+        }
         return visEventList;
-        
+    }
+    
+     /**
+     * @return the proposalListVisible
+     */
+    public List<Proposal> getProposalListVisible() {
+        proposalListVisible.clear();
+        if(proposalList != null && !proposalList.isEmpty()){
+            for(Proposal p: proposalList){
+                if(p.isActive() && !p.isHidden()){
+                    proposalListVisible.add(p);
+                } else if(p.isActive() 
+                        && p.isHidden() 
+                        && showHiddenProposals 
+                        && !p.getDirective().isRefuseToBeHidden()){
+                    proposalListVisible.add(p);
+                } else if(!p.isActive() && showInactiveProposals){
+                    proposalListVisible.add(p);
+                }
+            }
+        }
+        return proposalListVisible;
     }
     
       public List<OccEvent> getActiveEventList() {
@@ -98,8 +144,24 @@ public class OccPeriod extends EntityUtils implements Serializable{
                 }
         return actEvList;
     }
-
-    
+      
+    public OccInspection determineGoverningOccInspection(){
+        OccInspection selIns = null;
+        Collections.sort(inspectionList);
+        // logic for determining the currentOccInspection
+        if(inspectionList != null){
+            if(inspectionList.size() == 1){
+                return inspectionList.get(0);
+            } else {
+                for(OccInspection ins: inspectionList){
+                    if(ins.isActive()){
+                        selIns = ins;
+                    }
+                }
+            }
+        }
+        return selIns;
+    }
     
     /**
      * @return the periodID
@@ -565,6 +627,61 @@ public class OccPeriod extends EntityUtils implements Serializable{
     public void setShowInactiveEvents(boolean showInactiveEvents) {
         this.showInactiveEvents = showInactiveEvents;
     }
+
+    /**
+     * @return the readyForPeriodAuthorization
+     */
+    public boolean isReadyForPeriodAuthorization() {
+        return readyForPeriodAuthorization;
+    }
+
+    /**
+     * @param readyForPeriodAuthorization the readyForPeriodAuthorization to set
+     */
+    public void setReadyForPeriodAuthorization(boolean readyForPeriodAuthorization) {
+        this.readyForPeriodAuthorization = readyForPeriodAuthorization;
+    }
+
+   
+
+    /**
+     * @param proposalListVisible the proposalListVisible to set
+     */
+    public void setProposalListVisible(List<Proposal> proposalListVisible) {
+        this.proposalListVisible = proposalListVisible;
+    }
+
+   
+
+    /**
+     * @return the showInactiveProposals
+     */
+    public boolean isShowInactiveProposals() {
+        return showInactiveProposals;
+    }
+
+    /**
+     * @param showInactiveProposals the showInactiveProposals to set
+     */
+    public void setShowInactiveProposals(boolean showInactiveProposals) {
+        this.showInactiveProposals = showInactiveProposals;
+    }
+
+    /**
+     * @return the showHiddenProposals
+     */
+    public boolean isShowHiddenProposals() {
+        return showHiddenProposals;
+    }
+
+    /**
+     * @param showHiddenProposals the showHiddenProposals to set
+     */
+    public void setShowHiddenProposals(boolean showHiddenProposals) {
+        this.showHiddenProposals = showHiddenProposals;
+    }
+
+   
      
     
 }

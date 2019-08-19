@@ -18,10 +18,16 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Event;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -30,8 +36,11 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.Proposable;
+import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserWithAccessData;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
@@ -41,12 +50,16 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
+import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
@@ -78,19 +91,29 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccupancyCoordinator() {
     }
     
-    public OccPeriod configureOccPeriod(OccPeriod period){
-        
+    public OccPeriod configureOccPeriod(OccPeriod period, User u) throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException{
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        period = cc.configureProposals(period, u);
+        if(period.determineGoverningOccInspection().isReadyForPassedCertification() 
+                && ec.evaluateEventRules(period)){
+            period.setReadyForPeriodAuthorization(true);
+        }
         return period;
         
     }
     
     public OccInspection configureOccInspection(OccInspection inspection){
-        for(OccInspectedSpace inSpace: inspection.getInspectedSpaceList()){
-            configureOccInspectedSpace(inSpace);
+        boolean allSpacesPassed = true;
+        if(inspection != null){
+            for(OccInspectedSpace inSpace: inspection.getInspectedSpaceList()){
+                if(configureOccInspectedSpace(inSpace).getStatus().getStatusEnum() == OccInspectionStatusEnum.FAIL
+                        || configureOccInspectedSpace(inSpace).getStatus().getStatusEnum() == OccInspectionStatusEnum.NOTINSPECTED){
+                    allSpacesPassed = false;
+                }
+            }
+            inspection.setReadyForPassedCertification(allSpacesPassed);
         }
-        
-        
-        
         return inspection;
     }
     
@@ -139,8 +162,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         
         Collections.sort(inSpace.getInspectedElementList());
-        
-        
         return inSpace;
         
     }
@@ -183,7 +204,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return inSpaceEle;
     }
         
-    public List<EventType> getPermittedEventTypesForCECase(OccPeriod op, User u){
+    public List<EventType> getPermittedEventTypes(OccPeriod op, User u){
         List<EventType> typeList = new ArrayList<>();
         int rnk = u.getRoleType().getRank();
         
@@ -201,12 +222,33 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return typeList;
     }
     
+    public void updateOccPeriodPropUnit(OccPeriod period, PropertyUnit pu) throws IntegrationException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        period.setPropertyUnitID(pu.getUnitID());
+        oi.updateOccPeriod(period);
+    }
+    
+    public void authorizeOccPeriod(OccPeriod period, UserWithAccessData u) throws AuthorizationException, CaseLifecycleException, IntegrationException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        if(u.getKeyCard().isHasEnfOfficialPermissions()){
+            if(period.isReadyForPeriodAuthorization()){
+                period.setAuthorizedBy(u);
+                period.setAuthorizedTS(LocalDateTime.now());
+                oi.updateOccPeriod(period);
+            } else {
+                throw new CaseLifecycleException("Occ period not ready for authorization");
+            }
+        } else{
+            throw new AuthorizationException("Users must have enforcement official permissions to authorize an occupancy period");
+        }
+    }
+    
 
     public ReportConfigOccInspection getOccInspectionReportConfigDefault(   OccInspection insp, 
                                                                             OccPeriod period,
                                                                             User usr){
         ReportConfigOccInspection rpt = new ReportConfigOccInspection();
-        rpt.setReportPeriod(period);
+        rpt.setOccPeriod(period);
         
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
         rpt.setCreator(usr);
@@ -230,7 +272,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         rpt.setIncludeFullInpsectedSpaceList(true);
         rpt.setIncludeNextStepText(false);
         rpt.setIncludeSignature(false);
-        
         return rpt;
     }
     
@@ -261,6 +302,18 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         permit.setIssuedBy(usr);
         return permit;
         
+    }
+    
+    public OccLocationDescriptor getOccLocationDescriptorSkeleton(){
+        return new OccLocationDescriptor();
+    }
+    
+    public int addNewLocationDescriptor(OccLocationDescriptor old) throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        int freshLocID = 0;
+            freshLocID  = oii.insertLocationDescriptor(old);
+        
+        return freshLocID;
     }
     
     public OccInspection getOccInspectionSkeleton(){
@@ -312,7 +365,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws InspectionException
      * @throws IntegrationException 
      */
-    public OccInspection commenceOccupancyInspection(   OccInspection in,
+    public OccInspection inspectionAction_commenceOccupancyInspection(   OccInspection in,
                                                         OccPeriod period,
                                                         OccChecklistTemplate templ, 
                                                         User user,
@@ -345,6 +398,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return inspec;
     }
     
+   
+    
     
     /**
      * Called by the backing bean when the user selects a space to start inspecting.
@@ -367,8 +422,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccInspectedSpace inspSpace = new OccInspectedSpace(spc);
         // then configure the OccInspectedSpace for first insertion
         inspSpace.setLocation(loc);
-        inspSpace.setLastInspectedBy(u);
-        inspSpace.setLastInspectedTS(LocalDateTime.now());
+        inspSpace.setAddedToChecklistBy(u);
+        inspSpace.setAddedToChecklistTS(LocalDateTime.now());
         // We are inspecting all the code elements associated with this space in the checklist template
         ListIterator<OccSpaceElement> elementIterator = spc.getSpaceElementList().listIterator();
         OccInspectedSpaceElement inspEle; // Holds our new objects as we add them to the list
@@ -408,11 +463,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }    
     
     
-    public OccInspection inspectionAction_updateSpaceElementData(OccInspection inspection) throws IntegrationException{
+    public void inspectionAction_updateSpaceElementData(OccInspection inspection) throws IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        oii.updateOccInspection(inspection);
-        oii.getOccInspection(inspection.getInspectionID());
-        return inspection;
+        
     }
     
     public OccPermitApplication getNewOccPermitApplication(){
@@ -420,6 +473,19 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         occpermitapp.setSubmissionDate(LocalDateTime.now());        
         return occpermitapp;       
     }
+    
+    public void updateOccInspection(OccInspection is, User u) throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        oii.updateOccInspection(is);
+        
+    }
+    
+    public void activateOccInspection(OccInspection is, User u) throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        oii.activateOccInspection(is);
+        
+    }
+    
     
     /**
      * Sets boolean requirementSatisfied on an OccPermitApplication based on the application reason,
@@ -444,14 +510,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         pr.setRequirementSatisfied(isRequirementSatisfied);
     }
     
-    public void removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi){
+    public void inspectionAction_removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        
-        
-        
+        oii.deleteInspectedSpace(spc);
     }
     
-    public void recordComplianceWithInspectedElement(   OccInspectedSpaceElement oise, 
+    public void inspectionAction_recordComplianceWithInspectedElement(   OccInspectedSpaceElement oise, 
                                                         User u, 
                                                         OccInspection oi) throws IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -462,8 +526,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oise.setLastInspectedBy(u);
         
         oii.updateInspectedSpaceElement(oise);
-        
-        
     }
     
     
@@ -478,11 +540,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oise.setLastInspectedBy(null);
         
         oii.updateInspectedSpaceElement(oise);
-        
-        
     }
     
-    public void inspectWithoutCompliance(   OccInspectedSpaceElement oise, 
+    public void inspectionAction_inspectWithoutCompliance(   OccInspectedSpaceElement oise, 
                                             User u, 
                                             OccInspection oi) throws IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -493,10 +553,48 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oise.setLastInspectedBy(u);
         
         oii.updateInspectedSpaceElement(oise);
-        
-        
     }
     
+     public void evaluateProposal(   Proposal proposal, 
+                                    Proposable chosen, 
+                                    OccPeriod occPeriod, 
+                                    User u) throws EventException, AuthorizationException, CaseLifecycleException, IntegrationException{
+        ChoiceCoordinator cc = getChoiceCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        EventIntegrator ei = getEventIntegrator();
+        OccEvent propEvent = null;
+        int insertedEventID = 0;
+        if(cc.determineProposalEvaluatability(proposal, chosen, u)){
+            // since we can evaluate this proposal with the chosen Proposable, configure members
+            proposal.setResponderActual(u);
+            proposal.setResponseTimestamp(LocalDateTime.now());
+            proposal.setChosenChoice(chosen);
+            
+            // ask the EventCoord for a nicely formed Event, which we cast to OccEvent
+            propEvent = new OccEvent(ec.generateEventDocumentingProposalEvaluation(proposal, chosen, u));
+            // insert the event and grab the new ID
+            insertedEventID = attachNewEventToOccPeriod(occPeriod, propEvent, u);
+            // go get our new event by ID and inject it into our proposal before writing its evaluation to DB
+            proposal.setResponseEvent(ei.getOccEvent(insertedEventID));
+            cc.recordProposalEvaluation(proposal);
+        } else {
+            throw new CaseLifecycleException("Unable to evaluate proposal due to business rule violation");
+        }
+    }
     
+    public int attachNewEventToOccPeriod(OccPeriod period, Event ev, User u) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        
+        OccEvent oe = new OccEvent(ev);
+        oe.setOccPeriodID(period.getPeriodID());
+        int insertedEventID = ei.insertEvent(oe);
+        return insertedEventID;
+    }
     
-}
+    public void editOccEvent(OccEvent ev) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.updateEvent(ev);
+    }
+} // close class
+
+

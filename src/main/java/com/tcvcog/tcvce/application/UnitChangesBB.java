@@ -17,7 +17,9 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ChangeOrderAction;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -33,6 +35,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -105,14 +109,17 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
         PropertyIntegrator pi = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         try {
-            selectedProperty = pi.getPropertyWithLists(prop.getPropertyID());
+            selectedProperty = pi.getPropertyWithLists(prop.getPropertyID(), getSessionBean().getSessionUser());
             existingUnitList = pi.getPropertyUnitList(selectedProperty);
             proposedUnitList = pi.getPropertyUnitChangeList(selectedProperty);
             ui.logObjectView(getSessionBean().getSessionUser(), prop);
             getSessionBean().getSessionPropertyList().add(prop);
 
-        } catch (IntegrationException | CaseLifecyleException ex) {
+        } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
             System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
         }
     }
 

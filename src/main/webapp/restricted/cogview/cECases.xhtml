@@ -2126,14 +2126,7 @@
                                           and attached to event ID #{caseProfileBB.selectedEvent.eventID}"/>
                             <p:spacer height="15px"/>
 
-                            <p:commandButton ajax="true" actionListener="#{caseProfileBB.commitActionRequestRejection}"
-                                             value="Submit" icon="fa fa-thumbs-down" oncomplete="PF('reject-requested-action-diaglog-var').hide()"
-                                             rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
-                                             update="event-dt-form:caseEventTable
-                                             case-profile-messages-form:case-profile-messages-global    
-                                             events-datascroller-form
-                                             "/>
-
+                          
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('reject-requested-action-diaglog-var').hide()"/>

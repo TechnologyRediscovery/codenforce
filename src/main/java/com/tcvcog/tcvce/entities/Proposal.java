@@ -41,6 +41,8 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
     protected boolean proposalRejected;
     
     protected int order;
+    
+    protected Proposable chosenChoice;
 
     /**
      * @param responderIntended the responderIntended to set
@@ -356,6 +358,20 @@ public class Proposal extends EntityUtils implements Serializable, Comparable<Pr
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the chosenChoice
+     */
+    public Proposable getChosenChoice() {
+        return chosenChoice;
+    }
+
+    /**
+     * @param chosenChoice the chosenChoice to set
+     */
+    public void setChosenChoice(Proposable chosenChoice) {
+        this.chosenChoice = chosenChoice;
     }
 
     

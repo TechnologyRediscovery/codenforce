@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2019 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,30 +14,14 @@ Council of Governments, PA
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.domain;
+package com.tcvcog.tcvce.entities.occupancy;
 
 /**
  *
- * @author Eric C. Darsow
+ * @author sylvia
  */
-public class CaseLifecyleException extends BaseException {
-    
-    public CaseLifecyleException(){
-        super();
-        
-    }
-    
-    public CaseLifecyleException(String message){
-        super(message);
-    }
-    
-    public CaseLifecyleException(Exception e){
-        super(e);
-    }
-    
-    public CaseLifecyleException(String message, Exception e){
-        super(message, e);
-        
-    }
-    
+public enum OccInspectionViewOptions {
+    FAILED_ITEMS_ONLY,
+    UNISPECTED_ITEMS_ONLY,
+    ALL_ITEMS;
 }

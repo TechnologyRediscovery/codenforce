@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

@@ -22,7 +22,9 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.CaseLifecyleException;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.CaseLifecycleException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
@@ -120,6 +122,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CEActionRequest req = getSessionBean().getCeactionRequestForSubmission();
         PropertyIntegrator pi = getPropertyIntegrator();
         User usr = getSessionBean().getSessionUser();
+        
         currentRequest = req;
         
         // set date of record to current date
@@ -136,8 +139,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             currentRequest.getRequestProperty() != null){
             try {
                 personCandidateList = pi.getPropertyWithLists(
-                        currentRequest.getRequestProperty().getPropertyID()).getPersonList();
-            } catch (IntegrationException | CaseLifecyleException ex) {
+                        currentRequest.getRequestProperty().getPropertyID(), usr).getPersonList();
+            } catch (IntegrationException | CaseLifecycleException | EventException | AuthorizationException ex) {
                 System.out.println(ex);
             }
         } else if (usr != null && req != null ) {

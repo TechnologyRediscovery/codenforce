@@ -14,29 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.entities.occupancy;
-
-import com.tcvcog.tcvce.entities.Status;
+package com.tcvcog.tcvce.entities;
 
 /**
  *
  * @author sylvia
  */
-public class OccInspectableStatus extends Status{
+public interface Openable {
     
-    private final OccInspectionStatusEnum statusEnum;
-
-    public OccInspectableStatus(OccInspectionStatusEnum enumVal){
-        statusEnum = enumVal;
-    }
-    
-    
-    /**
-     * @return the statusEnum
-     */
-    public OccInspectionStatusEnum getStatusEnum() {
-        return statusEnum;
-    }
-
+    public abstract boolean isOpen();
     
 }
