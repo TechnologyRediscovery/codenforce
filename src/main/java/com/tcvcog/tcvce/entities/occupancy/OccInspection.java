@@ -23,8 +23,10 @@ import com.tcvcog.tcvce.entities.User;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -42,6 +44,8 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     // space types, from which we extract a list of Spaces and their CodeElements
     private OccChecklistTemplate checklistTemplate;
     private List<OccInspectedSpace> inspectedSpaceList;
+    
+    private List<OccInspectedSpace> visibleInspectedSpaceList;
     
     private int pacc;
     private boolean enablePacc;
@@ -66,12 +70,51 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     
     public OccInspection(){
         inspectedSpaceList = new ArrayList<>();
+        visibleInspectedSpaceList = new ArrayList<>();
     }
     
     public void addSpaceToInspectedSpaces(OccInspectedSpace spc){
         inspectedSpaceList.add(spc);
-        
     }
+    
+    public void configureVisibleElementSpaceList(OccInspectionViewOptions viewOption){
+        List<OccInspectedSpaceElement> visibleEleList = null;
+        
+        for(Iterator<OccInspectedSpace> it = inspectedSpaceList.iterator(); it.hasNext(); ){
+            OccInspectedSpace ois = it.next(); 
+            ois.getVisibleInspectedElementList().clear();
+            visibleEleList = new ArrayList<>();
+
+            for(Iterator<OccInspectedSpaceElement> itEle = ois.getInspectedElementList().iterator(); itEle.hasNext(); ){
+                OccInspectedSpaceElement oise = itEle.next();
+                switch(viewOption){
+                    case ALL_ITEMS:
+                        visibleEleList.add(oise);
+                        break;
+                    case FAILED_ITEMS_ONLY:
+                        // look for failed items
+                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
+                            visibleEleList.add(oise);
+                        } 
+                        break;
+                    case UNISPECTED_ITEMS_ONLY:
+                        // look for failed items
+                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
+                            visibleEleList.add(oise);
+                        } 
+                        break;
+                    default:
+                        visibleEleList.add(oise);
+                        
+                }
+            }
+            // close for over inspectedSpaceelements
+            if(!visibleEleList.isEmpty()){
+                ois.getVisibleInspectedElementList().addAll(visibleEleList);
+            }
+        } // close for over inspectedspaces
+    }
+    
     
     
     /**
@@ -482,6 +525,20 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
      */
     public void setCreationTS(LocalDateTime creationTS) {
         this.creationTS = creationTS;
+    }
+
+    /**
+     * @return the visibleInspectedSpaceList
+     */
+    public List<OccInspectedSpace> getVisibleInspectedSpaceList() {
+        return visibleInspectedSpaceList;
+    }
+
+    /**
+     * @param visibleInspectedSpaceList the visibleInspectedSpaceList to set
+     */
+    public void setVisibleInspectedSpaceList(List<OccInspectedSpace> visibleInspectedSpaceList) {
+        this.visibleInspectedSpaceList = visibleInspectedSpaceList;
     }
 
     

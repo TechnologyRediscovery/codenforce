@@ -16,27 +16,12 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import com.tcvcog.tcvce.entities.Status;
-
 /**
  *
  * @author sylvia
  */
-public class OccInspectableStatus extends Status{
-    
-    private final OccInspectionStatusEnum statusEnum;
-
-    public OccInspectableStatus(OccInspectionStatusEnum enumVal){
-        statusEnum = enumVal;
-    }
-    
-    
-    /**
-     * @return the statusEnum
-     */
-    public OccInspectionStatusEnum getStatusEnum() {
-        return statusEnum;
-    }
-
-    
+public enum OccInspectionViewOptions {
+    FAILED_ITEMS_ONLY,
+    UNISPECTED_ITEMS_ONLY,
+    ALL_ITEMS;
 }
