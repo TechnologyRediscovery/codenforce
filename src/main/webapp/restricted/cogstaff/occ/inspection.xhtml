@@ -862,7 +862,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                value="filter: show all items"
                                                                disabled="false"
                                                                icon="fa fa-list-alt"
+                                                               style="margin-right: 5px"
                                                                update="form-inspecteditems"/>
+                                          
+                                          <h:outputText class="ui-label-inline" value="include empty spaces?" />
+                                          <p:selectBooleanCheckbox id="occperiod-checklist-boolcb-includeemptyspaces"
+                                                                   value="#{occInspectionBB.includeSpacesWithNoElements}"/>
+                                          
                                     </h:form>
                                     
                                     <p:separator />
@@ -911,7 +917,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 id="scroller-inspectedspacelist-elementlist"
                                                 widgetVar="var-scroller-inspectedspacelist-elementlist"
                                                 var="inelement"
-                                                value="#{inspace.inspectedElementList}"
+                                                value="#{inspace.visibleInspectedElementList}"
                                                 rowIndexVar="#{inelement.inspectedSpaceElementID}">
                                                
                                                     <div class="occperiod-inelement-header">

@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
@@ -47,7 +48,9 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -111,6 +114,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private List<OccEvent> filteredEventList;
     
     private List<OccInspectedSpace> visibleInspectedSpaceList;
+    private boolean includeSpacesWithNoElements;
     
     private OccSpaceTypeInspectionDirective selectedOccSpaceType;
     private OccSpace selectedOccSpace;
@@ -154,33 +158,35 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         
+        // set our blank lists used only by elements on this page
         spacesInTypeList = new ArrayList<>();
         visibleInspectedSpaceList = new ArrayList<>();
         
         try {
-            if(currentOccPeriod != null){
+            if(getSessionBean().getSessionOccPeriod() != null){
+                currentOccPeriod = oi.getOccPeriod(getSessionBean().getSessionOccPeriod().getPeriodID(), getSessionBean().getSessionUser());
                 currentInspection = currentOccPeriod.determineGoverningOccInspection();
-                
+                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+                // all inspected spaces are visible by default
+                currentInspection.configureVisibleElementSpaceList(OccInspectionViewOptions.ALL_ITEMS);
             }
-                
-                
-            if(currentInspection == null){
-                if(getSessionBean().getSessionOccInspection() != null){
-                    currentInspection = getSessionBean().getSessionOccInspection();
+        
+//            if(currentInspection == null){
+//                if(getSessionBean().getSessionOccInspection() != null){
+//                    currentInspection = getSessionBean().getSessionOccInspection();
                     // we don't really need to reload inspection from integrator
 //                    try {
 //                        currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
 //                    } catch (IntegrationException ex) {
 //                        System.out.println(ex);
 //                    }
-                currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID(), getSessionBean().getSessionUser());
-                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-                } else {
-                    currentOccPeriod = oi.getOccPeriod(getSessionBean().getSessionOccPeriod().getPeriodID(), getSessionBean().getSessionUser());
-                    currentInspection = oii.getOccInspection(currentOccPeriod.getInspectionList().get(0).getInspectionID());
-                    currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-                } 
-            }
+//                currentOccPeriod = oi.getOccPeriod(currentInspection.getOccPeriodID(), getSessionBean().getSessionUser());
+//                } else {
+//                    currentOccPeriod = oi.getOccPeriod(getSessionBean().getSessionOccPeriod().getPeriodID(), getSessionBean().getSessionUser());
+//                    currentInspection = oii.getOccInspection(currentOccPeriod.getInspectionList().get(0).getInspectionID());
+//                    currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+//                } 
+//            }
         } catch (IntegrationException | EventException| AuthorizationException ex) {
             System.out.println(ex);
         }
@@ -405,37 +411,15 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     public void filterChecklist_failedItems(ActionEvent ev){
-        for(OccInspectedSpace ois: currentInspection.getInspectedSpaceList()){
-            for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
-                if(oise.getComplianceGrantedTS() == null 
-                        && oise.getLastInspectedTS() != null){
-                    oise.setVisibleInChecklist(true);
-                } else {
-                    oise.setVisibleInChecklist(false);
-                }
-            }
-        }
+        currentInspection.configureVisibleElementSpaceList(OccInspectionViewOptions.FAILED_ITEMS_ONLY);
     }
     
     public void filterChecklist_uninspectedItems(ActionEvent ev){
-        for(OccInspectedSpace ois: currentInspection.getInspectedSpaceList()){
-            for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
-                if(oise.getComplianceGrantedTS() == null 
-                        && oise.getLastInspectedTS() == null){
-                    oise.setVisibleInChecklist(true);
-                } else {
-                    oise.setVisibleInChecklist(false);
-                }
-            }
-        }
+        currentInspection.configureVisibleElementSpaceList(OccInspectionViewOptions.UNISPECTED_ITEMS_ONLY);
     }
     
     public void filterChecklist_allItems(ActionEvent ev){
-        for(OccInspectedSpace ois: currentInspection.getInspectedSpaceList()){
-            for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
-                oise.setVisibleInChecklist(true);
-            }
-        }
+        currentInspection.configureVisibleElementSpaceList(OccInspectionViewOptions.ALL_ITEMS);
     }
     
     
@@ -1236,6 +1220,47 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.visibleInspectedSpaceList = visibleInspectedSpaceList;
     }
 
+    /**
+     * @return the includeSpacesWithNoElements
+     */
+    public boolean isIncludeSpacesWithNoElements() {
+        return includeSpacesWithNoElements;
+    }
+
+    /**
+     * @param includeSpacesWithNoElements the includeSpacesWithNoElements to set
+     */
+    public void setIncludeSpacesWithNoElements(boolean includeSpacesWithNoElements) {
+        this.includeSpacesWithNoElements = includeSpacesWithNoElements;
+    }
+
     
      
 }
+
+//
+//OccInspectedSpace visibleSpace = null;
+//        List<OccInspectedSpaceElement> visibleEleList = new ArrayList<>();
+//        for(Iterator<OccInspectedSpace> it = currentInspection.getInspectedSpaceList().iterator(); it.hasNext(); ){
+//            OccInspectedSpace ois = it.next();
+//        
+//            for(Iterator<OccInspectedSpaceElement> itEle = ois.getInspectedElementList().iterator(); itEle.hasNext(); ){
+//                OccInspectedSpaceElement oise = itEle.next();
+//                if(oise.getComplianceGrantedTS() == null 
+//                        && oise.getLastInspectedTS() == null){
+//                    // we found a failed item, so add it to our visible list
+//                    visibleEleList.add(oise);
+//                } 
+//            } // close for over inspectedSpaceelements
+//            
+//            visibleSpace = (OccInspectedSpace) ois.clone();
+//            if(visibleSpace != null){
+//                visibleSpace.setInspectedElementList(visibleEleList);
+//                // only add our cloned InspectedSpace to the visible list if there
+//                // are some selected elements or the user wants to see empty spaces
+//                if((visibleEleList.isEmpty() && includeSpacesWithNoElements) 
+//                        || !visibleEleList.isEmpty() ){
+//                    visibleInspectedSpaceList.add(visibleSpace);
+//                } 
+//            }
+//        } // close for over inspectedspaces

@@ -17,9 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -27,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Subclass of Space: stores inspection-specific data about each space element
@@ -36,10 +36,12 @@ import java.util.Objects;
  * 
  * @author Eric C. Darsow, Technology Rediscovery LLC 
  */
-public class OccInspectedSpace extends OccSpace implements Serializable{
+public class OccInspectedSpace extends OccSpace implements Serializable, Cloneable{
+
     
     private int inspectedSpaceID;
     private List<OccInspectedSpaceElement> inspectedElementList;
+    private List<OccInspectedSpaceElement> visibleInspectedElementList;
     private OccLocationDescriptor location;
     private OccSpaceType type;
     
@@ -55,6 +57,22 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
         this.name = spc.getName();
         this.required = spc.isRequired();
         
+        visibleInspectedElementList = new ArrayList<>();
+    }
+    
+    /**
+     *
+     * @return
+     */
+    @Override
+    public Object clone() {
+        
+        try { 
+            OccInspectedSpace ois = (OccInspectedSpace) super.clone();
+            return ois;
+        } catch (CloneNotSupportedException ex) {
+            return null;
+        }
     }
     
     public List<CodeElement> getInspectedCodeElementsWithoutShell(){
@@ -227,6 +245,20 @@ public class OccInspectedSpace extends OccSpace implements Serializable{
      */
     public void setStatus(OccInspectableStatus status) {
         this.status = status;
+    }
+
+    /**
+     * @return the visibleInspectedElementList
+     */
+    public List<OccInspectedSpaceElement> getVisibleInspectedElementList() {
+        return visibleInspectedElementList;
+    }
+
+    /**
+     * @param visibleInspectedElementList the visibleInspectedElementList to set
+     */
+    public void setVisibleInspectedElementList(List<OccInspectedSpaceElement> visibleInspectedElementList) {
+        this.visibleInspectedElementList = visibleInspectedElementList;
     }
 
    
