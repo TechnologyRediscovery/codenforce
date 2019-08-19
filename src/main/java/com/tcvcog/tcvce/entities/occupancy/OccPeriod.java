@@ -47,6 +47,11 @@ public class OccPeriod
     private boolean showInactiveEvents;
     
     private List<Proposal> proposalList;
+    
+    private boolean showHiddenProposals;
+    private boolean showInactiveProposals;
+    private List<Proposal> proposalListVisible;
+    
     private List<EventRuleOccPeriod> eventRuleOccPeriodList;
     
     private List<OccInspection> inspectionList;
@@ -79,6 +84,11 @@ public class OccPeriod
     
     private String notes;
     
+    public OccPeriod(){
+        proposalListVisible = new ArrayList<>();
+    }
+    
+    
      @Override
     public boolean isOpen() {
         return status.isOpenPeriod();
@@ -99,6 +109,28 @@ public class OccPeriod
             } // close for   
         }
         return visEventList;
+    }
+    
+     /**
+     * @return the proposalListVisible
+     */
+    public List<Proposal> getProposalListVisible() {
+        proposalListVisible.clear();
+        if(proposalList != null && !proposalList.isEmpty()){
+            for(Proposal p: proposalList){
+                if(p.isActive() && !p.isHidden()){
+                    proposalListVisible.add(p);
+                } else if(p.isActive() 
+                        && p.isHidden() 
+                        && showHiddenProposals 
+                        && !p.getDirective().isRefuseToBeHidden()){
+                    proposalListVisible.add(p);
+                } else if(!p.isActive() && showInactiveProposals){
+                    proposalListVisible.add(p);
+                }
+            }
+        }
+        return proposalListVisible;
     }
     
       public List<OccEvent> getActiveEventList() {
@@ -608,6 +640,45 @@ public class OccPeriod
      */
     public void setReadyForPeriodAuthorization(boolean readyForPeriodAuthorization) {
         this.readyForPeriodAuthorization = readyForPeriodAuthorization;
+    }
+
+   
+
+    /**
+     * @param proposalListVisible the proposalListVisible to set
+     */
+    public void setProposalListVisible(List<Proposal> proposalListVisible) {
+        this.proposalListVisible = proposalListVisible;
+    }
+
+   
+
+    /**
+     * @return the showInactiveProposals
+     */
+    public boolean isShowInactiveProposals() {
+        return showInactiveProposals;
+    }
+
+    /**
+     * @param showInactiveProposals the showInactiveProposals to set
+     */
+    public void setShowInactiveProposals(boolean showInactiveProposals) {
+        this.showInactiveProposals = showInactiveProposals;
+    }
+
+    /**
+     * @return the showHiddenProposals
+     */
+    public boolean isShowHiddenProposals() {
+        return showHiddenProposals;
+    }
+
+    /**
+     * @param showHiddenProposals the showHiddenProposals to set
+     */
+    public void setShowHiddenProposals(boolean showHiddenProposals) {
+        this.showHiddenProposals = showHiddenProposals;
     }
 
    

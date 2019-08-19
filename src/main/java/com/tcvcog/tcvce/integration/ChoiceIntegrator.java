@@ -61,7 +61,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     public Choice getChoice(int choiceID) throws IntegrationException{
-        
        Choice c = null;
   
         StringBuilder sb = new StringBuilder();
@@ -72,7 +71,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-
         try {
 
             stmt = con.prepareStatement(sb.toString());
@@ -127,9 +125,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         return choiceList;
     }
     
-  
-    
-    
     private Choice generateChoice(ResultSet rs) throws SQLException, IntegrationException{
         EventIntegrator ei = getEventIntegrator();
         SystemIntegrator si = getSystemIntegrator();
@@ -177,7 +172,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                     "       initiator_userid, responderintended_userid, activateson, expireson, \n" +
                     "       responderactual_userid, rejectproposal, responsetimestamp, responseevent_cecaseeventid, \n" +
                     "       active, notes, relativeorder, generatingevent_occeventid, \n" +
-                    "       responseevent_occeventid, occperiod_periodid, cecase_caseid\n" +
+                    "       responseevent_occeventid, occperiod_periodid, cecase_caseid, hidden \n" +
                     "  FROM public.choiceproposal WHERE proposalid=?;");
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -315,6 +310,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         }
         
         prop.setActive(rs.getBoolean("active"));
+        prop.setHidden(rs.getBoolean("hidden"));
         prop.setNotes(rs.getString("notes"));
         prop.setOrder(rs.getInt("relativeorder"));
         
@@ -340,8 +336,8 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
                             "       expireson=?, responderactual_userid=?, rejectproposal=?, responsetimestamp=?, \n" + // 6-9
                             "       responseevent_cecaseeventid=?, active=?, notes=?, relativeorder=?, \n" + // 10-13
                             "       generatingevent_occeventid=?, responseevent_occeventid=?, \n" + // 14-15
-                            "       occperiod_periodid=?, cecase_caseid=?\n" + // 16-17
-                            " WHERE proposalid=?;"; // 18
+                            "       occperiod_periodid=?, cecase_caseid=?, hidden=?\n" + // 16-18
+                            " WHERE proposalid=?;"; // 19
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -414,7 +410,6 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(11, prop.isActive());
             stmt.setString(12, prop.getNotes());
             stmt.setInt(13, prop.getOrder());
-            
 //            stmt.setBoolean(14, prop.isHidden());
             
             if(prop instanceof ProposalCECase){
@@ -423,8 +418,10 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 ProposalOccPeriod pop = (ProposalOccPeriod) prop;
                 stmt.setInt(16, pop.getOccperiodID());
-                
             }
+            
+            stmt.setBoolean(18, prop.isHidden());
+            stmt.setInt(19, prop.getProposalID());
             
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -598,7 +595,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
     public void recordProposalEvaluation(Proposal p) throws IntegrationException{
         StringBuilder sb = new StringBuilder("UPDATE public.choiceproposal ");
         sb.append("   SET responderactual_userid=?, responsetimestamp=now(), \n");
-        sb.append("       notes=?, chosen_choiceid=?\n");
+        sb.append("       notes=?, chosen_choiceid=?, \n");
                         
         if(p instanceof ProposalCECase){
             sb.append(" cecase_caseid=?, responseevent_cecaseeventid=?, \n");
@@ -607,6 +604,7 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
         } else {
             throw new IntegrationException("Cannot record given proposal due to incorrect Proposal object type");
         }
+            sb.append(" hidden=? ");
             sb.append(" WHERE proposalid=?;");
 
         Connection con = getPostgresCon();
@@ -618,15 +616,16 @@ public class ChoiceIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(2, p.getNotes());
             stmt.setInt(3, p.getChosenChoice().getChoiceID());
             if(p instanceof ProposalCECase){
-                ProposalCECase pcec = new ProposalCECase(p);
+                ProposalCECase pcec = (ProposalCECase) p;
                 stmt.setInt(4, pcec.getCeCaseID());
             } else if (p instanceof ProposalOccPeriod){
-                ProposalOccPeriod pop = new ProposalOccPeriod(p);
+                ProposalOccPeriod pop = (ProposalOccPeriod) p;
                 stmt.setInt(4, pop.getOccperiodID());
             } 
             
             stmt.setInt(5, p.getResponseEvent().getEventID());
-            stmt.setInt(6, p.getProposalID());
+            stmt.setBoolean(6, p.isHidden());
+            stmt.setInt(7, p.getProposalID());
             
             stmt.executeUpdate();
 
