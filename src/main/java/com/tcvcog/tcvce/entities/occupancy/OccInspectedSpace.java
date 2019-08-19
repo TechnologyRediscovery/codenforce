@@ -45,8 +45,8 @@ public class OccInspectedSpace extends OccSpace implements Serializable, Cloneab
     private OccLocationDescriptor location;
     private OccSpaceType type;
     
-    private User lastInspectedBy;
-    private LocalDateTime lastInspectedTS;
+    private User addedToChecklistBy;
+    private LocalDateTime addedToChecklistTS;
     
     private OccInspectableStatus status;
     
@@ -149,31 +149,31 @@ public class OccInspectedSpace extends OccSpace implements Serializable, Cloneab
     }
 
     /**
-     * @return the lastInspectedBy
+     * @return the addedToChecklistBy
      */
-    public User getLastInspectedBy() {
-        return lastInspectedBy;
+    public User getAddedToChecklistBy() {
+        return addedToChecklistBy;
     }
 
     /**
-     * @return the lastInspectedTS
+     * @return the addedToChecklistTS
      */
-    public LocalDateTime getLastInspectedTS() {
-        return lastInspectedTS;
+    public LocalDateTime getAddedToChecklistTS() {
+        return addedToChecklistTS;
     }
 
     /**
-     * @param lastInspectedBy the lastInspectedBy to set
+     * @param addedToChecklistBy the addedToChecklistBy to set
      */
-    public void setLastInspectedBy(User lastInspectedBy) {
-        this.lastInspectedBy = lastInspectedBy;
+    public void setAddedToChecklistBy(User addedToChecklistBy) {
+        this.addedToChecklistBy = addedToChecklistBy;
     }
 
     /**
-     * @param lastInspectedTS the lastInspectedTS to set
+     * @param addedToChecklistTS the addedToChecklistTS to set
      */
-    public void setLastInspectedTS(LocalDateTime lastInspectedTS) {
-        this.lastInspectedTS = lastInspectedTS;
+    public void setAddedToChecklistTS(LocalDateTime addedToChecklistTS) {
+        this.addedToChecklistTS = addedToChecklistTS;
     }
 
     @Override
@@ -182,8 +182,8 @@ public class OccInspectedSpace extends OccSpace implements Serializable, Cloneab
         hash = 53 * hash + Objects.hashCode(this.inspectedElementList);
         hash = 53 * hash + Objects.hashCode(this.location);
         hash = 53 * hash + Objects.hashCode(this.type);
-        hash = 53 * hash + Objects.hashCode(this.lastInspectedBy);
-        hash = 53 * hash + Objects.hashCode(this.lastInspectedTS);
+        hash = 53 * hash + Objects.hashCode(this.addedToChecklistBy);
+        hash = 53 * hash + Objects.hashCode(this.addedToChecklistTS);
         return hash;
     }
 
@@ -208,10 +208,10 @@ public class OccInspectedSpace extends OccSpace implements Serializable, Cloneab
         if (!Objects.equals(this.type, other.type)) {
             return false;
         }
-        if (!Objects.equals(this.lastInspectedBy, other.lastInspectedBy)) {
+        if (!Objects.equals(this.addedToChecklistBy, other.addedToChecklistBy)) {
             return false;
         }
-        if (!Objects.equals(this.lastInspectedTS, other.lastInspectedTS)) {
+        if (!Objects.equals(this.addedToChecklistTS, other.addedToChecklistTS)) {
             return false;
         }
         return true;

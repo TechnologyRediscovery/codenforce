@@ -38,6 +38,8 @@ public class OccPeriod
     private OccPeriodType type;
     private OccPeriodStatusEnum status;
     
+    private boolean readyForPeriodAuthorization;
+    
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
     private List<OccEvent> eventList;
@@ -590,6 +592,20 @@ public class OccPeriod
      */
     public void setShowInactiveEvents(boolean showInactiveEvents) {
         this.showInactiveEvents = showInactiveEvents;
+    }
+
+    /**
+     * @return the readyForPeriodAuthorization
+     */
+    public boolean isReadyForPeriodAuthorization() {
+        return readyForPeriodAuthorization;
+    }
+
+    /**
+     * @param readyForPeriodAuthorization the readyForPeriodAuthorization to set
+     */
+    public void setReadyForPeriodAuthorization(boolean readyForPeriodAuthorization) {
+        this.readyForPeriodAuthorization = readyForPeriodAuthorization;
     }
 
    

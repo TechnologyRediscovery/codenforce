@@ -50,6 +50,7 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     private int pacc;
     private boolean enablePacc;
     
+    private boolean readyForPassedCertification;
     private User passedInspectionCertifiedBy;
     private LocalDateTime passedInspectionTS;
     
@@ -539,6 +540,20 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
      */
     public void setVisibleInspectedSpaceList(List<OccInspectedSpace> visibleInspectedSpaceList) {
         this.visibleInspectedSpaceList = visibleInspectedSpaceList;
+    }
+
+    /**
+     * @return the readyForPassedCertification
+     */
+    public boolean isReadyForPassedCertification() {
+        return readyForPassedCertification;
+    }
+
+    /**
+     * @param readyForPassedCertification the readyForPassedCertification to set
+     */
+    public void setReadyForPassedCertification(boolean readyForPassedCertification) {
+        this.readyForPassedCertification = readyForPassedCertification;
     }
 
     

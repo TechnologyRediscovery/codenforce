@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.EventCECaseCasePropBundle;
 import com.tcvcog.tcvce.entities.Directive;
 import com.tcvcog.tcvce.entities.Event;
+import com.tcvcog.tcvce.entities.EventRuleOccPeriod;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -708,7 +709,57 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             
          } // close switch
     } // close method
+    
+    
+    public boolean evaluateEventRules(OccPeriod period) throws IntegrationException, CaseLifecycleException, ViolationException{
+        boolean allRulesPassed = true;
+        List<EventRuleOccPeriod> ruleList = period.getEventRuleOccPeriodList();
+        List<Event> evList = new ArrayList<>();
+        // transfer our subclass OccEvents into a List<Event> that our rule checker wants
+        for(Event e: period.getActiveEventList()){
+            evList.add(e);
+        }
+        
+        for(EventRuleAbstract era: ruleList){
+            if(!evalulateEventRule(evList, era)){
+                allRulesPassed = false;
+            }
+        }
+        return allRulesPassed;
+    }
 
+    
+    public boolean evalulateEventRule(List<Event> eventList, EventRuleAbstract rule) throws IntegrationException, CaseLifecycleException, ViolationException {
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(eventList == null || rule == null){
+            throw new CaseLifecycleException("EventCoordinator.evaluateEventRule | Null event list or rule");
+        }
+        
+        if (rule.getRequiredEventType() != null){
+            if(!ruleSubcheck_requiredEventType(eventList, rule)){
+                return false;
+            }
+        } 
+        if (rule.getForbiddenEventType() != null){
+            if(!ruleSubcheck_forbiddenEventType(eventList, rule)){
+                return false;
+            }
+        } 
+        if (rule.getRequiredEventCategory() != null){
+            if(!ruleSubcheck_requiredEventCategory(eventList, rule)){
+                return false;
+            }
+        } 
+        if (rule.getForbiddenEventCategory() != null){
+            if(!ruleSubcheck_forbiddenEventCategory(eventList, rule)){
+                return false;
+            }
+        } 
+        return true;
+    }
+    
+    
     private boolean evalulateEventRule(CECase cse, CECaseEvent event) throws IntegrationException, CaseLifecycleException, ViolationException {
         EventRuleAbstract rule = new EventRuleAbstract();
         boolean rulePasses = false;
@@ -781,35 +832,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return subcheckPasses;
     }
 
-    public boolean evalulateEventRule(List<Event> eventList, EventRuleAbstract rule) throws IntegrationException, CaseLifecycleException, ViolationException {
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        if(eventList == null || rule == null){
-            throw new CaseLifecycleException("EventCoordinator.evaluateEventRule | Null event list or rule");
-        }
-        
-        if (rule.getRequiredEventType() != null){
-            if(!ruleSubcheck_requiredEventType(eventList, rule)){
-                return false;
-            }
-        } 
-        if (rule.getForbiddenEventType() != null){
-            if(!ruleSubcheck_forbiddenEventType(eventList, rule)){
-                return false;
-            }
-        } 
-        if (rule.getRequiredEventCategory() != null){
-            if(!ruleSubcheck_requiredEventCategory(eventList, rule)){
-                return false;
-            }
-        } 
-        if (rule.getForbiddenEventCategory() != null){
-            if(!ruleSubcheck_forbiddenEventCategory(eventList, rule)){
-                return false;
-            }
-        } 
-        return true;
-    }
     
     private boolean ruleSubcheck_requiredEventCategory(List<Event> eventList, EventRuleAbstract rule) {
         
