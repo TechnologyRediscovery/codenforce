@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public class Directive extends EntityUtils {
     private String description;
     
     private List<Proposable> choiceList;
+    private List<Proposable> choiceListVisible;
     
     private User creator;
     
@@ -54,6 +56,19 @@ public class Directive extends EntityUtils {
     private boolean forceHidePrecedingProps;
     private boolean forceHideTrailingProps;
     private boolean refuseToBeHidden;
+    
+    public Directive(){
+        
+    }
+    
+    
+      /**
+     * @param choiceListVisible the choiceListVisible to set
+     */
+    public void setChoiceListVisible(List<Proposable> choiceListVisible) {
+       
+    }
+    
     
     
 
@@ -423,7 +438,24 @@ public class Directive extends EntityUtils {
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
     }
-    
-    
+
+    /**
+     * @return the choiceListVisible
+     */
+    public List<Proposable> getChoiceListVisible() {
+        List<Proposable> prvl = new ArrayList<>();
+        if(choiceList != null){
+             for(Proposable pr: choiceList ){
+                 if(pr.isActive() && !pr.isHidden()){
+                     prvl.add(pr);
+                 }
+             }
+        }
+        
+        choiceListVisible = prvl;
+        return choiceListVisible;
+    }
+
+  
     
 }

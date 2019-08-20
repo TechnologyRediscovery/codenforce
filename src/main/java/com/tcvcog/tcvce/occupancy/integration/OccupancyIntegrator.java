@@ -612,7 +612,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             
         }
     }
 
@@ -1028,6 +1027,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setDescription(rs.getString("description"));
             opt.setUserassignable(rs.getBoolean("userassignable"));
             opt.setPermittable(rs.getBoolean("permittable"));
+            
+            opt.setChecklistID(rs.getInt("occchecklist_checklistlistid"));
 
             opt.setStartdaterequired(rs.getBoolean("startdaterequired"));
             opt.setEnddaterequired(rs.getBoolean("enddaterequired"));

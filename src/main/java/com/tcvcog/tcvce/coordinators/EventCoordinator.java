@@ -87,9 +87,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-   
-    
-    
     public SearchParamsEventCECase getSearchParamsCEEventsRequiringAction(User user, Municipality m){
         SearchCoordinator sc = getSearchCoordinator();
         return sc.getSearchParamsEventsRequiringAction(user,m);
@@ -119,8 +116,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public List<EventCECaseCasePropBundle> configureEventBundleList(    List<EventCECaseCasePropBundle> evList, 
-                                                                         User user, 
-                                                                         List<Municipality> userAuthMuniList) throws IntegrationException{
+                                                                        User user, 
+                                                                        List<Municipality> userAuthMuniList) throws IntegrationException{
         Iterator<EventCECaseCasePropBundle> iter = evList.iterator();
         while(iter.hasNext()){
             configureEvent(iter.next().getEvent(), user, userAuthMuniList);
@@ -139,8 +136,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         config.setSortInRevChrono(true);
         return config;
     }
-    
-    
     
     /**
      * Called by the EventIntegrator and other getEventCECase methods to set member variables based on business
