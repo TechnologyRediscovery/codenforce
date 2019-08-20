@@ -374,6 +374,19 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         }
 
     }
+    
+    /**
+     * Extracts the ID of the given OccPerioda and uses this to grab all relevant
+     * payments from the db associated with this Occperiod
+     * 
+     * @param period
+     * @return 
+     */
+    public List<Payment> getPaymentList(OccPeriod period){
+        
+        
+       return new ArrayList<>(); 
+    }
 
     public ArrayList<Payment> getPaymentList() throws IntegrationException {
         String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
