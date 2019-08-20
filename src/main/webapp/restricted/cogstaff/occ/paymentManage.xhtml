@@ -10,163 +10,176 @@
         <title>Add Payment</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../../navContainer_public.xhtml">
-            <!--template="../../navContainer_restricted.xhtml"-->
+        <ui:composition template="../../navContainer_restricted.xhtml">
             <ui:define name="content">
                 <div class="mainContainer">
-                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                    <h:messages id="messages" globalOnly="true" showDetail="true" showSummary="true"
+                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                     </h:messages>
-                            
+
                     <h1>Payment Record Configuration Tool (dev)</h1>
                     <p>View, create, and manage payment records</p>
                     <f:view>
                         <h:form id="paymentDisplay">
                             <h2>Recorded payments</h2>
                             <p:dataTable
-                                    id="occInsFees"
-                                    var="p"
-                                    selectionMode="single"
-                                    selection="#{paymentBB.selectedPayment}"
-                                    rowKey="#{p.paymentID}"
-                                    value="#{paymentBB.paymentList}"
-                                    tableStyleClass="primeDataTable"
-                                    tabindex="1"
-                                    resizableColumns="true">
-                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+                                id="occInsFees"
+                                var="p"
+                                selectionMode="single"
+                                selection="#{paymentBB.selectedPayment}"
+                                rowKey="#{p.paymentID}"
+                                value="#{paymentBB.paymentList}"
+                                tableStyleClass="primeDataTable"
+                                tabindex="1"
+                                resizableColumns="true">
+                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
-                                    <p:column width="10%">
-                                        <f:facet name="header">
-                                            <h:outputText value="ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentID}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Occ Inspection ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.occupancyInspectionID}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Payment Type" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentType.paymentTypeTitle}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Date Received" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentDateReceived}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Date Deposited" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentDateDeposited}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Amount" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentAmount}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Payer ID" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentPayer.personID}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Reference Num" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.paymentReferenceNum}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Check No" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.checkNum}"/>
-                                    </p:column>
-                                    
-                                    <p:column width="25%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Cleared" />
-                                        </f:facet>
-                                        <h:outputText value="#{p.cleared}"/>
-                                    </p:column>
-                                    
-                                </p:dataTable>
+                                <p:column width="10%">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.paymentID}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Occ Inspection ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.occupancyInspectionID}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Payment Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.paymentType.paymentTypeTitle}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Date Received" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.paymentDateReceived}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Date Deposited" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.paymentDateDeposited}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Amount" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.paymentAmount}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Payer ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.paymentPayer.personID}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Reference Num" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.paymentReferenceNum}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Check No" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.checkNum}"/>
+                                </p:column>
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Cleared" />
+                                    </f:facet>
+                                    <h:outputText value="#{p.cleared}"/>
+                                </p:column>
+
+                            </p:dataTable>
                             <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" 
-                                             actionListener="#{paymentBB.editPayment}"
-                                             value="Update Selected Payment Record" tabindex="2"/>
+                            <p:commandButton 
+                                actionListener="#{paymentBB.editPayment}"
+                                oncomplete="PF('paymentAddDialogVar').show()"
+                                ajax="true"
+                                update="paymentAddForm messages"
+                                value="Update Selected Payment Record" tabindex="2"/>
                             <p:commandButton ajax="false" 
                                              actionListener="#{paymentBB.deleteSelectedPayment}"
-                                            value="Nuke Selected Record Forever" tabindex="3"/>
-                            
-                         </h:form>    
-                             
-                             
-                            <!--<p:fieldset legend="Update occupancy inspection "
-                                toggleable="true" collapsed="false" tabindex="4">
-                                    <h:form id="updateCategoryForm">
-                                        <p:spacer height="10px"/>
-                                        <p:outputLabel for="occInsFeeName">
-                                           <h:outputText value="Name:"/>
-                                        </p:outputLabel>
-                                        <p:inputText id="occInsFeeName" value="{occupancyInspectionFeeBB.formOccupancyInspectionFeeName}" 
-                                                 style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
-                                        <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
-                                              warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                             value="Nuke Selected Record Forever" tabindex="3"/>
+                            <p:commandButton    id="newFeeDialogButton"
+                                                actionListener="#{paymentBB.initializeNewPayment}"
+                                                oncomplete="PF('paymentAddDialogVar').show()"
+                                                ajax="true"
+                                                update="paymentAddForm"
+                                                value="Create new Payment Record"
+                                                icon="fa fa-plus"
+                                                />
 
-                                        <p:spacer height="20px"/>
-                                        
-                                       
-                                    </h:form>  
-                                </p:fieldset>-->
-                            
-                           
-                        <h:form id="poccInsFeeAddForm">
-                            <h2>Add New Payment Record</h2>
-                            <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
-                            <h:panelGrid columns="4" border="0" 
-                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
-                                         footerClass="gridFooter">
+                        </h:form>    
 
-                                <h:outputLabel value="Occ Inspection ID:" for="occInsID"/>
-                                <h:panelGroup>
-                                    <p:inputText id="occInsID" value="#{paymentBB.formPaymentOccupancyInspectionID}" 
-                                                 style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
-                                    <h:message for="occInsID" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <p:outputLabel for="paymentTypeMenu">
-                                    <h:outputText value="Payment Type:"/>
-                                </p:outputLabel>
-                                <h:panelGroup>
-                                    <p:selectOneMenu id="paymentTypeMenu" tabindex="5" required="false" converter="paymentTypeConverter" value="#{paymentBB.formPaymentPaymentType}">
-                                        <f:selectItems id="paymentTypeList" value="#{paymentBB.paymentTypeList}" var="pt" itemValue="#{pt}" itemLabel="#{pt.paymentTypeTitle}"/>
-                                    </p:selectOneMenu>
+
+                        <!--<p:fieldset legend="Update occupancy inspection "
+                            toggleable="true" collapsed="false" tabindex="4">
+                                <h:form id="updateCategoryForm">
+                                    <p:spacer height="10px"/>
+                                    <p:outputLabel for="occInsFeeName">
+                                       <h:outputText value="Name:"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="occInsFeeName" value="{feeManagementBB.formOccupancyInspectionFeeName}" 
+                                             style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                    <h:message for="occInsFeeName" showDetail="false" showSummary="true" 
+                                          warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    <p:spacer height="20px"/>
                                     
-                                    <!--<h:message for="muniSelectMenu" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />-->
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Date Received:" for="newPaymentDateReceived"/>
-                                <h:panelGroup>
-                                    <p:calendar 
-                                        value="#{paymentBB.formPaymentDateReceived}" 
+                                   
+                                </h:form>  
+                            </p:fieldset>-->
+
+                        <p:dialog id="paymentAddDialog"
+                                  height="450" width="1000"
+                                  widgetVar="paymentAddDialogVar"
+                                  closable="true">   
+                            <h:form id="paymentAddForm">
+                                <h2>Add New Payment Record</h2>
+                                <p>The more fields you can populate, the better. (Data integrity hangs in the balance.)</p>
+                                <h:panelGrid columns="4" border="0" 
+                                             cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                             footerClass="gridFooter">
+
+                                    <h:outputLabel value="Occ Inspection ID:" for="occInsID"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="occInsID" value="#{paymentBB.formPaymentOccupancyInspectionID}" 
+                                                     style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
+                                        <h:message for="occInsID" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <p:outputLabel for="paymentTypeMenu">
+                                        <h:outputText value="Payment Type:"/>
+                                    </p:outputLabel>
+                                    <h:panelGroup>
+                                        <p:selectOneMenu id="paymentTypeMenu" tabindex="5" required="false" converter="paymentTypeConverter" value="#{paymentBB.formPaymentPaymentType}">
+                                            <f:selectItems id="paymentTypeList" value="#{paymentBB.paymentTypeList}" var="pt" itemValue="#{pt}" itemLabel="#{pt.paymentTypeTitle}"/>
+                                        </p:selectOneMenu>
+
+                                        <!--<h:message for="muniSelectMenu" showDetail="false" showSummary="true" 
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />-->
+                                    </h:panelGroup>
+
+                                    <h:outputLabel value="Date Received:" for="newPaymentDateReceived"/>
+                                    <h:panelGroup>
+                                        <p:calendar 
+                                            value="#{paymentBB.formPaymentDateReceived}" 
                                             styleClass="occInsFeeDateCal"
                                             mode="popup" tabindex="7"
                                             id="newPaymentDateReceived"
@@ -176,17 +189,17 @@
                                             showButtonPanel="true"
                                             showTodayButton="false"
                                             required="true"/>
-                                            
 
-                                    <h:message for="newPaymentDateReceived" showDetail="true" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                        
-                                </h:panelGroup> 
-                                
-                                <h:outputLabel value="Date Deposited" for="newPaymentDateDeposited"/>
-                                <h:panelGroup>
-                                    <p:calendar 
-                                        value="#{paymentBB.formPaymentDateDeposited}" 
+
+                                        <h:message for="newPaymentDateReceived" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup> 
+
+                                    <h:outputLabel value="Date Deposited" for="newPaymentDateDeposited"/>
+                                    <h:panelGroup>
+                                        <p:calendar 
+                                            value="#{paymentBB.formPaymentDateDeposited}" 
                                             styleClass="occInsFeeDateCal"
                                             mode="popup" tabindex="8"
                                             id="newPaymentDateDeposited"
@@ -196,73 +209,81 @@
                                             showButtonPanel="true"
                                             showTodayButton="false"
                                             required="true"/>
-                                            
 
-                                    <h:message for="newPaymentDateDeposited" showDetail="true" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                        
-                                </h:panelGroup> 
-                                
-                                <h:outputLabel value="Amount:" for="newPaymentAmount"/>
-                                <h:panelGroup>
-                                    <p:inputText id="newPaymentAmount" value="#{paymentBB.formPaymentAmount}" 
-                                           style="width: 250px;" tabindex="9" required="true" styleClass="inputText"/>
-                                    <h:message for="newPaymentAmount" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Payer ID:" for="newPaymentPayer"/>
-                                <h:panelGroup>
-                                    <p:inputText id="newPaymentPayer" value="#{paymentBB.formPaymentPayer}" 
-                                           style="width: 250px;" tabindex="10" required="true" styleClass="inputText"/>
-                                    <h:message for="newPaymentPayer" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Reference No:" for="newPaymentRefNo"/>
-                                <h:panelGroup>
-                                    <p:inputText id="newPaymentRefNo" value="#{paymentBB.formPaymentReferenceNum}" 
-                                           style="width: 250px;" tabindex="11" required="true" styleClass="inputText"/>
-                                    <h:message for="newPaymentRefNo" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Check No:" for="newPaymentCheckNo"/>
-                                <h:panelGroup>
-                                    <p:inputText id="newPaymentCheckNo" value="#{paymentBB.formPaymentCheckNum}" 
-                                           style="width: 250px;" tabindex="12" required="false" styleClass="inputText"/>
-                                    <h:message for="newPaymentCheckNo" showDetail="false" showSummary="true" 
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                
-                                <h:outputLabel value="Cleared"/>
+
+                                        <h:message for="newPaymentDateDeposited" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </h:panelGroup> 
+
+                                    <h:outputLabel value="Amount:" for="newPaymentAmount"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="newPaymentAmount" value="#{paymentBB.formPaymentAmount}" 
+                                                     style="width: 250px;" tabindex="9" required="true" styleClass="inputText"/>
+                                        <h:message for="newPaymentAmount" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:outputLabel value="Payer ID:" for="newPaymentPayer"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="newPaymentPayer" value="#{paymentBB.formPaymentPayer}" 
+                                                     style="width: 250px;" tabindex="10" required="true" styleClass="inputText"/>
+                                        <h:message for="newPaymentPayer" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:outputLabel value="Reference No:" for="newPaymentRefNo"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="newPaymentRefNo" value="#{paymentBB.formPaymentReferenceNum}" 
+                                                     style="width: 250px;" tabindex="11" required="true" styleClass="inputText"/>
+                                        <h:message for="newPaymentRefNo" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:outputLabel value="Check No:" for="newPaymentCheckNo"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="newPaymentCheckNo" value="#{paymentBB.formPaymentCheckNum}" 
+                                                     style="width: 250px;" tabindex="12" required="false" styleClass="inputText"/>
+                                        <h:message for="newPaymentCheckNo" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
+
+                                    <h:outputLabel value="Cleared"/>
                                     <h:panelGroup>    
                                         <p:inputSwitch id="newPaymentCleared" value="#{paymentBB.formPaymentCleared}" 
-                                                   tabindex="13" onLabel="Yes" offLabel="No"/>
+                                                       tabindex="13" onLabel="Yes" offLabel="No"/>
                                         <h:message for="newPaymentCleared" showDetail="true" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
-                                
-                                <f:facet name="footer">
-                                    <h:outputLabel for="paymentNotesEditor" value="Payment Notes:"/>
-                                    <p:editor id="paymentNotesEditor" value="#{paymentBB.formPaymentNotes}" 
-                                                    controls="bold italic underline strikethrough font size style color 
-                                                    bullets numbering center undo redo rule link removeformat outdent 
-                                                    indent link unlink copy cut paste rule alignleft center alignright"
-                                                    width="1000"
-                                                    height="200"/>
-                                            <h:message for="paymentNotesEditor" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </f:facet>   
-                                
-                                <p:spacer height="15"/>
-                                
-                            </h:panelGrid>
-                            <p:spacer height="10px"/>
-                            <p:commandButton ajax="false" value="Add Payment" action="#{paymentBB.addPayment}" />
-                            <p:commandButton ajax="false" actionListener="#{paymentBB.commitPaymentUpdates}"
-                                                  value="Commit Updates" tabindex="14"/>
-                        </h:form>
+
+                                    <f:facet name="footer">
+                                        <h:outputLabel for="paymentNotesEditor" value="Payment Notes:"/>
+                                        <p:editor id="paymentNotesEditor" value="#{paymentBB.formPaymentNotes}" 
+                                                  controls="bold italic underline strikethrough font size style color 
+                                                  bullets numbering center undo redo rule link removeformat outdent 
+                                                  indent link unlink copy cut paste rule alignleft center alignright"
+                                                  width="700"
+                                                  height="200"/>
+                                        <h:message for="paymentNotesEditor" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </f:facet>   
+
+                                    <p:spacer height="15"/>
+
+                                </h:panelGrid>
+                                <p:spacer height="10px"/>
+                                <p:commandButton ajax="false" rendered="#{!paymentBB.editing}" value="Add Payment" action="#{paymentBB.addPayment}" />
+                                <p:commandButton ajax="false" rendered="#{paymentBB.editing}" actionListener="#{paymentBB.commitPaymentUpdates}"
+                                                 value="Commit Updates" tabindex="14"/>
+                                <p:commandButton    id="cancel-cb"
+                                                    ajax="true"  tabindex="27"
+                                                    value="Cancel" 
+                                                    icon="fa fa-stop" 
+                                                    immediate="true"
+                                                    onclick="PF('feeAddDialogVar').hide()"
+                                                    />
+                            </h:form>
+                        </p:dialog>
                     </f:view>
                 </div>
             </ui:define>

@@ -908,7 +908,9 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     }
 
     public ArrayList<Fee> getOccupancyInspectionFeeList() throws IntegrationException {
-        String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" + "       notes\n" + "  FROM public.occinspectionfee";
+        String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, \n" 
+                + "       notes\n" 
+                + "  FROM public.moneyfee";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -919,7 +921,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             rs = stmt.executeQuery();
             System.out.println("OccupancyInspectionFeeIntegrator.getOccupancyInspectionFeeList | SQL: " + stmt.toString());
             while (rs.next()) {
-//                occupancyInspectionFeeList.add(generateOccupancyInspectionFee(rs));
+                occupancyInspectionFeeList.add(generateOccupancyInspectionFee(rs));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -987,6 +989,11 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             newOif.setOccupancyInspectionFeeID(rs.getInt("feeid"));
             newOif.setMuni(mi.getMuni(rs.getInt("muni_municode")));
+            newOif.setFeeName(rs.getString("feename"));
+            newOif.setFeeAmount(rs.getDouble("feeamount"));
+            newOif.setEffectiveDate(rs.getTimestamp("effectivedate").toLocalDateTime());
+            newOif.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
+            newOif.setNotes(rs.getString("notes"));
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generation OccInspectionFee from result set", ex);
