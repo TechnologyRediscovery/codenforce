@@ -35,6 +35,11 @@ public class OccPeriodType {
     private String description;
     private boolean userassignable;
     
+    /**
+     * Used to build a checklist template for the occperiod
+     */
+    private int checklistID;
+    
     private boolean permittable;
     private boolean startdaterequired;
     private boolean enddaterequired;
@@ -406,6 +411,20 @@ public class OccPeriodType {
      */
     public void setPermitTitleSub(String permitTitleSub) {
         this.permitTitleSub = permitTitleSub;
+    }
+
+    /**
+     * @return the checklistID
+     */
+    public int getChecklistID() {
+        return checklistID;
+    }
+
+    /**
+     * @param checklistID the checklistID to set
+     */
+    public void setChecklistID(int checklistID) {
+        this.checklistID = checklistID;
     }
     
 }

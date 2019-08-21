@@ -78,7 +78,7 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
         inspectedSpaceList.add(spc);
     }
     
-    public void configureVisibleElementSpaceList(OccInspectionViewOptions viewOption){
+    public void configureVisibleSpaceElementList(OccInspectionViewOptions viewOption){
         List<OccInspectedSpaceElement> visibleEleList = null;
         
         for(Iterator<OccInspectedSpace> it = inspectedSpaceList.iterator(); it.hasNext(); ){
@@ -106,7 +106,6 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
                         break;
                     default:
                         visibleEleList.add(oise);
-                        
                 }
             }
             // close for over inspectedSpaceelements
@@ -115,8 +114,6 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
             }
         } // close for over inspectedspaces
     }
-    
-    
     
     /**
      * @return the inspectionID

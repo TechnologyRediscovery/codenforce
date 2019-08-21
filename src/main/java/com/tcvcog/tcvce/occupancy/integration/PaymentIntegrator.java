@@ -10,8 +10,8 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
+ *git 
+* You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tcvcog.tcvce.occupancy.integration;
@@ -373,6 +373,19 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             }
         }
 
+    }
+    
+    /**
+     * Extracts the ID of the given OccPerioda and uses this to grab all relevant
+     * payments from the db associated with this Occperiod
+     * 
+     * @param period
+     * @return 
+     */
+    public List<Payment> getPaymentList(OccPeriod period){
+        
+        
+       return new ArrayList<>(); 
     }
 
     public ArrayList<Payment> getPaymentList() throws IntegrationException {

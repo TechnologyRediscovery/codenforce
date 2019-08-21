@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeSource;
+import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.List;
  * 
  * @author Eric Darsow
  */
-public class OccChecklistTemplate {
+public class OccChecklistTemplate extends EntityUtils {
     
     // note we have a lexicon switch here: in the DB, this object is 
     // derived from an inspectionchecklist row. In Javaland, we make

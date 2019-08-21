@@ -49,33 +49,34 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public CECase configureProposals(CECase cse, User u) throws EventException, AuthorizationException{
-        Iterator<Proposal> iter = cse.getProposalList().iterator();
-        while(iter.hasNext()){
-            Proposal p = iter.next();
-            configureProposal(p, u);
-//            if(p.getDirective().getChoiceList().size() == 1
-//                    &&
-//                p.getDirective().isExecuteChoiceIfLoneWolf()){
-//                    processProposalEvaluation(p, p.getDirective().getChoiceList().get(0), cse, u);
-//            }
+        if(cse.getProposalList() != null){
+            Iterator<Proposal> iter = cse.getProposalList().iterator();
+            while(iter.hasNext()){
+                Proposal p = iter.next();
+                configureProposal(p, u);
+    //            if(p.getDirective().getChoiceList().size() == 1
+    //                    &&
+    //                p.getDirective().isExecuteChoiceIfLoneWolf()){
+    //                    processProposalEvaluation(p, p.getDirective().getChoiceList().get(0), cse, u);
+    //            }
+            }
         }
-        
-        
         return cse;
     }
     
     public OccPeriod configureProposals(OccPeriod oPeriod, User u) throws EventException, AuthorizationException{
-        Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
-        while(iter.hasNext()){
-            Proposal p = iter.next();
-            configureProposal(p, u);
-//            if(p.getDirective().getChoiceList().size() == 1
-//                    &&
-//                p.getDirective().isExecuteChoiceIfLoneWolf()){
-//                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
-//            }
+        if(oPeriod.getProposalList() != null){
+            Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
+            while(iter.hasNext()){
+                Proposal p = iter.next();
+                configureProposal(p, u);
+    //            if(p.getDirective().getChoiceList().size() == 1
+    //                    &&
+    //                p.getDirective().isExecuteChoiceIfLoneWolf()){
+    //                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
+    //            }
+            }
         }
-        
         return oPeriod;
     }
     
@@ -102,21 +103,22 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
                 configureChoiceList(proposal, u);
             }
         }
-        
         return proposal;
     }
     
-    
     public Proposal configureChoiceList(Proposal proposal, User u){
-        Iterator<Proposable> iter = proposal.getDirective().getChoiceList().iterator();
-        while(iter.hasNext()){
-            Proposable p = iter.next();
-            configureChoice(p, u);
+        if(proposal.getDirective().getChoiceList() != null){
+            Iterator<Proposable> iter = proposal.getDirective().getChoiceList().iterator();
+            while(iter.hasNext()){
+                Proposable p = iter.next();
+                configureChoice(p, u);
+            }
         }
         return proposal;
     }
     
     private Proposable configureChoice(Proposable choice, User u){
+        
         choice.setHidden(true);
         choice.setCanChoose(false);
         
@@ -137,6 +139,9 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     public boolean determineProposalEvaluatability( Proposal proposal,
                                                     Proposable chosen, 
                                                     User u){
+        if(proposal == null || chosen == null || u== null){
+            return false;
+        }
         
         // our proposal must contain our desired choice
         if(!proposal.getDirective().getChoiceList().contains(chosen)){

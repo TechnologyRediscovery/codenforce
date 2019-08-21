@@ -1307,6 +1307,9 @@ gridTd-bignum{
     
 }
 
+.ui-datascroller-item{
+    clear:both;
+}
 
 .occinsspace-metadata-container{
     display: block;
@@ -1346,6 +1349,7 @@ i.inspection-notinspected{
     font-weight: bold;
     margin-top: 5px;
     margin-bottom: 5px;
+    clear:both;
 }
 
 

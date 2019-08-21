@@ -35,8 +35,6 @@ public class OccEvent extends Event implements Serializable {
         this.hidden = ev.isHidden();
         this.notes = ev.getNotes();
         this.personList = ev.getPersonList();
-        
-        
     }
 
     /**

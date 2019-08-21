@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import com.tcvcog.tcvce.entities.Openable;
+import com.tcvcog.tcvce.entities.Payment;
 import java.util.Collections;
 
 /**
@@ -57,6 +58,8 @@ public class OccPeriod
     private List<OccInspection> inspectionList;
     private List<OccPermit> permitList;
     private List<Integer> blobIDList;
+    
+    private List<Payment> paymentList;
     
     private User manager;
      
@@ -681,7 +684,20 @@ public class OccPeriod
         this.showHiddenProposals = showHiddenProposals;
     }
 
+    /**
+     * @return the paymentList
+     */
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    /**
+     * @param paymentList the paymentList to set
+     */
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+
    
-     
     
 }

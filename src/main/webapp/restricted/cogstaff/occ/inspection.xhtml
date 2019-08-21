@@ -257,6 +257,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                          widgetVar="occperiod-panel-proposals-var"
                                          collapsed="false"
                                          header="Tasks and notices">
+                                    
+                                    
+                                    <h:form id="occperiod-panel-proposals-messages-form">
+                                        <h:messages id="occperiod-panel-proposals-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
 
                                     <h:form id="occperiod-form-proposals">
                                         <p:dataScroller id="proposals-proposalscroller"
@@ -272,12 +279,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             icon="fa fa-info"/>
                                                         
                                                             <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
-                                                                        for="proposal-button-showdescription"
-                                                                        hideEffect="fade" 
-                                                                        dynamic="true" 
-                                                                        showCloseIcon="true"
-                                                                        style="width:300px" 
-                                                                        modal="false">
+                                                                            for="proposal-button-showdescription"
+                                                                            hideEffect="fade" 
+                                                                            dynamic="true" 
+                                                                            showCloseIcon="true"
+                                                                            style="width:300px" 
+                                                                            modal="false">
+                                                                
                                                             <h:outputText       styleClass="proposal-description"
                                                                                 value="#{proposal.directive.description}" />
                                                         </p:overlayPanel>
@@ -307,6 +315,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     
                                                         <h:panelGrid   id="occperiod-proposals-panelgrid-propinfo" 
                                                                        columns="1" 
+                                                                       style="clear:both;"
                                                                        columnClasses="gridTD" 
                                                                        rendered="true">
                                                             <h:panelGroup>
@@ -327,7 +336,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:dataScroller id="proposals-choicescroller"
                                                                 var="choice"
                                                                 widgetVar="proposals-choicescroller-var"
-                                                                value="#{proposal.directive.choiceList}"
+                                                                value="#{proposal.directive.choiceListVisible}"
                                                                 rowIndexVar="#{choice.choiceID}">
 
                                                     <p:commandButton    id="proposal-choice-button-choose"
@@ -338,7 +347,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         value="#{choice.title}"
                                                                         icon="#{choice.icon.fontAwesome}"
                                                                         title="#{choice.description}"
-                                                                        update="@this"/>
+                                                                        update="occperiod-form-proposals
+                                                                        occperiod-panel-proposals-messages-form
+                                                                        occperiod-form-events:occperiod-events-datatable"/>
                                                     <p:spacer height="5px" />
                                                 </p:dataScroller>
                                             </div>
@@ -608,13 +619,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             rendered="true"
                                                             icon="fa fa-align-left"
                                                             update="occperiod-configurereport-occpermit-form"/>
-                                        
-                                            
-
                                         </h:form>
                                 </p:panel>
                             </div>
-
+                            
+                               <p:panel id="occperiod-payments"
+                                         toggleable="true"
+                                         collapsed="false"
+                                         header="Payments"
+                                         rendered="t">
+                                   
+                                    <h:form id="occperiod-payments-form-messages">
+                                        <h:messages id="occperiod-payments-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
+                                
+                                   <h:form id="occperiod-payments-form">
+                                       
+                                       <ui:remove>
+                                           TODO in payments:
+                                           
+                                           1) In this panel, create a data table populated with all payments attached to this occupancy period
+                                           
+                                           2) Include in each row a button that launches the user to a payment details management page
+                                            where they can see all database fields, and edit the applicable ones.
+                                       </ui:remove>
+                                   </h:form>
+                               </p:panel>
                             <div id="inspection-inspectedelementscol" class="object-column">
 
                                 <h:form id="occperiod-messages-form-rightcolheader">
@@ -622,8 +654,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                   </h:messages>
                                 </h:form>
-                                
-                                
                                 <p:panel    id="occperiod-panel-events"
                                             widgetVar="occperiod-panel-events-var"
                                             toggleable="true"  
@@ -632,7 +662,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h:form id="occperiod-form-events">
                                         
                                         <h2>Add new event</h2>
-
                                         <h:panelGrid columns="3" border="0" 
                                                      cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
                                                      footerClass="gridFooter" style="vertical-align: top;">
@@ -1024,6 +1053,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 id="scroller-inspectedspacelist-elementlist"
                                                 widgetVar="var-scroller-inspectedspacelist-elementlist"
                                                 var="inelement"
+                                                
                                                 value="#{inspace.visibleInspectedElementList}"
                                                 rowIndexVar="#{inelement.inspectedSpaceElementID}">
                                                
@@ -1887,7 +1917,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         oncomplete="PF('occperiod-rejectproposal-dialog-var').hide()"
                                                         icon="fa fa-hand-stop-o"
                                                         update="occperiod-form-proposals
-                                                        occperiod-form-events"/>
+                                                        occperiod-form-events
+                                                        occperiod-panel-proposals-messages-form"/>
                         </h:form>
                     </p:dialog>
                     

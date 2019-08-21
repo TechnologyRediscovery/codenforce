@@ -158,7 +158,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         PreparedStatement stmt = null;
 
         try {
-
             stmt = con.prepareStatement(query);
             stmt.setString(1, space.getName());
             stmt.setInt(2, space.getOccSpaceTypeID());
@@ -243,7 +242,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         space.setDescription(rs.getString("description"));
         space = populateSpaceWithCodeElements(space);
         return space;
-        
     }
     
     /**
@@ -286,8 +284,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return spc;
     }
     
-    
-    
     /**
      * Connects a OccSpace with Code Elements. 
      * @param spc the space to which the elements should be connected
@@ -314,9 +310,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 stmt.setInt(2, ce.getElementID());
                 stmt.execute();
             }
-            
-         
-            
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -399,10 +392,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
-    
-    
-  
-    
+
     /**
      * Deletes both the linked spaceelements and the space entry itself
      * @param s
@@ -544,23 +534,19 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             System.out.println("OccInspectionIntegrator.getInspectedSpace | called with spaceid=0");
             return inspectedSpace;
         }
-        
         String querySpace = "SELECT inspectedspaceid, occspace_spaceid, occinspection_inspectionid, \n" +
                             "       occlocationdescription_descid, addedtochecklistby_userid, addedtochecklistts \n" +
                             "  FROM public.occinspectedspace WHERE inspectedspaceid=?;";
-        
         String queryElements = 
             "SELECT occinspectedspaceelement.inspectedspaceelementid\n" +
             "     FROM occinspectedspaceelement INNER JOIN occinspectedspace ON (occinspectedspaceelement.inspectedspace_inspectedspaceid = occinspectedspace.inspectedspaceid)\n" +
             "     WHERE occinspectedspace.inspectedspaceid=?;";
-        
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         List<OccInspectedSpaceElement> inspectedEleList = new ArrayList<>();
 
         try {
-            
             stmt = con.prepareStatement(querySpace);
             stmt.setInt(1, inspectedspaceID);
             rs = stmt.executeQuery();
@@ -570,19 +556,16 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             while(rs.next()){
                 inspectedSpace = generateOccInspectedSpace(rs);
             }
-
             stmt = con.prepareStatement(queryElements);
             if(inspectedSpace != null){
                 stmt.setInt(1, inspectedSpace.getInspectedSpaceID());
+                rs = stmt.executeQuery();
+                while(rs.next()){
+                    inspectedEleList.add(getInspectedSpaceElement(rs.getInt("inspectedspaceelementid")));
+                } 
             } else {
                 System.out.println("OccInspectionIntegrator.getInspectedSpace | Failure: inspected space is null");
             }
-            rs = stmt.executeQuery();
-
-            while(rs.next()){
-                inspectedEleList.add(getInspectedSpaceElement(rs.getInt("inspectedspaceelementid")));
-            }
-
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to generate an inspected space, sorry!", ex);
@@ -592,7 +575,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-    
         if(inspectedSpace != null){
             // finally, combine our two objects by injecting the Element list into the InspectedSpace
             inspectedSpace.setInspectedElementList(inspectedEleList);
