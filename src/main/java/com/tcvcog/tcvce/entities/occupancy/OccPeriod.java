@@ -60,7 +60,6 @@ public class OccPeriod
     private List<Integer> blobIDList;
     
     private List<Payment> paymentList;
-    private List<Payment> paymentListVisible;
     
     private User manager;
      
@@ -699,21 +698,6 @@ public class OccPeriod
         this.paymentList = paymentList;
     }
 
-    /**
-     * @return the paymentListVisible
-     */
-    public List<Payment> getPaymentListVisible() {
-        return paymentListVisible;
-    }
-
-    /**
-     * @param paymentListVisible the paymentListVisible to set
-     */
-    public void setPaymentListVisible(List<Payment> paymentListVisible) {
-        this.paymentListVisible = paymentListVisible;
-    }
-
    
-     
     
 }

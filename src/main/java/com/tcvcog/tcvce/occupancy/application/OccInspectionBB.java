@@ -173,7 +173,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 currentInspection = currentOccPeriod.determineGoverningOccInspection();
                 currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
                 // all inspected spaces are visible by default
-                currentInspection.configureVisibleElementSpaceList(OccInspectionViewOptions.ALL_ITEMS);
+                currentInspection.configureVisibleSpaceElementList(OccInspectionViewOptions.ALL_ITEMS);
             }
         
 //            if(currentInspection == null){
@@ -420,15 +420,15 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     public void filterChecklist_failedItems(ActionEvent ev){
-        currentInspection.configureVisibleElementSpaceList(OccInspectionViewOptions.FAILED_ITEMS_ONLY);
+        currentInspection.configureVisibleSpaceElementList(OccInspectionViewOptions.FAILED_ITEMS_ONLY);
     }
     
     public void filterChecklist_uninspectedItems(ActionEvent ev){
-        currentInspection.configureVisibleElementSpaceList(OccInspectionViewOptions.UNISPECTED_ITEMS_ONLY);
+        currentInspection.configureVisibleSpaceElementList(OccInspectionViewOptions.UNISPECTED_ITEMS_ONLY);
     }
     
     public void filterChecklist_allItems(ActionEvent ev){
-        currentInspection.configureVisibleElementSpaceList(OccInspectionViewOptions.ALL_ITEMS);
+        currentInspection.configureVisibleSpaceElementList(OccInspectionViewOptions.ALL_ITEMS);
     }
     
     
