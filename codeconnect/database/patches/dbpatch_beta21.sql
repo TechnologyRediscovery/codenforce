@@ -1,4 +1,6 @@
 
+-- SEALED as of 19AUG19
+
 ALTER TABLE occperiodtype ADD COLUMN permittitle TEXT;
 ALTER TABLE occperiodtype ADD COLUMN permittitlesub TEXT;
 
@@ -11,4 +13,4 @@ ALTER TABLE occinspectedspace RENAME COLUMN lastinspectedby_userid TO addedtoche
 ALTER TABLE occinspectedspace RENAME COLUMN lastinspectedts TO addedtochecklistts;
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (21, 'database/patches/dbpatch_beta20.sql', '07-23-2019', 'ecd', 'occ beta final over');
+    VALUES (21, 'database/patches/dbpatch_beta21.sql', '07-23-2019', 'ecd', 'occ beta final over');

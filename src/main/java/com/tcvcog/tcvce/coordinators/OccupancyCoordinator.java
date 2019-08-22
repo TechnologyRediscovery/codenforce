@@ -51,6 +51,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
@@ -95,10 +96,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         ChoiceCoordinator cc = getChoiceCoordinator();
         EventCoordinator ec = getEventCoordinator();
         period = cc.configureProposals(period, u);
-        if(period.determineGoverningOccInspection().isReadyForPassedCertification() 
-                && ec.evaluateEventRules(period)){
-            period.setReadyForPeriodAuthorization(true);
-        }
+//        if(period.determineGoverningOccInspection().isReadyForPassedCertification() 
+//                && ec.evaluateEventRules(period)){
+//            period.setReadyForPeriodAuthorization(true);
+//        }
         return period;
         
     }
@@ -246,7 +247,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     public ReportConfigOccInspection getOccInspectionReportConfigDefault(   OccInspection insp, 
                                                                             OccPeriod period,
-                                                                            User usr){
+                                                                            User usr) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+
         ReportConfigOccInspection rpt = new ReportConfigOccInspection();
         rpt.setOccPeriod(period);
         
@@ -254,24 +257,24 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         rpt.setCreator(usr);
         rpt.setMuni(getSessionBean().getSessionMuni());
         
+        rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));
+        
         rpt.setIncludeOccPeriodInfoHeader(true);
-        rpt.setIncludeElements_notInspected(false);
-        rpt.setIncludeElements_pass(false);
-        rpt.setIncludeElements_fail(true);
         
         rpt.setIncludePhotos_pass(false);
         rpt.setIncludePhotos_fail(true);
         
-        rpt.setSeparateElementsBySpace(true);
         rpt.setIncludeFullOrdText(false);
         rpt.setIncludeElementNotes(true);
         
         rpt.setIncludeElementLastInspectedInfo(false);
         rpt.setIncludeElementComplianceInfo(false);
         
-        rpt.setIncludeFullInpsectedSpaceList(true);
-        rpt.setIncludeNextStepText(false);
+        rpt.setIncludeRemedyInfo(false);
         rpt.setIncludeSignature(false);
+        
+        rpt.setViewSetting(OccInspectionViewOptions.FAILED_ITEMS_ONLY);
         return rpt;
     }
     

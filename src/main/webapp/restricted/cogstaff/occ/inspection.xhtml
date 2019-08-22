@@ -310,9 +310,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="proposal-prophead">
                                                         <h:outputText value="#{proposal.directive.title}" />
                                                     </div>
-                                                    
                                                     <p:spacer height="5px" />
-                                                    
                                                         <h:panelGrid   id="occperiod-proposals-panelgrid-propinfo" 
                                                                        columns="1" 
                                                                        style="clear:both;"
@@ -328,8 +326,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                <h:outputText styleClass="data-text" 
                                                                              value="#{occInspectionBB.currentProposal.responderIntended.person.lastName}" />
                                                             </h:panelGroup>
-
-                                                           
                                                         </h:panelGrid>
                                                 </div>
 
@@ -381,7 +377,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             value="Configure new permit"  
                                                             ajax="true" 
                                                             process="@form"
-                                                            actionListener="#{occInspectionBB.initializeOccPermit}" 
+                                                            actionListener="#{occInspectionBB.reports_initializeOccPermitReport}" 
                                                             oncomplete="PF('occperiod-configurereport-occpermit-var').show()"
                                                             disabled="#{empty occInspectionBB.currentOccPeriod.authorizedTS}"
                                                             rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
@@ -483,9 +479,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         
                                         <p:spacer height="5px" />
                                         
-                                      
-                                        
-                                        
                                         <p:commandButton    id="occperiod-template-button-addallrequiredspacetypes"
                                                             ajax="true" 
                                                             actionListener="#{occInspectionBB.addAllRequiredSpaceTypes}"
@@ -550,8 +543,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                             occperiod-inspecteditems-form-messages">
                                                                 <f:param name="occperiod-elementstatusonadd" value="#{comp}"/>
                                                             </p:commandButton>
-                                                     
-                                                     
                                                             
                                                             <p:spacer height="5px" />
                                                             
@@ -903,8 +894,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </h:form>
                                 </p:panel>
                                 
-                                
-                                
                                 <p:panel    id="occperiod-panel-inspitems"
                                             toggleable="true"  
                                             collapsed="false"
@@ -941,9 +930,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           update="form-dialog-inspectionmetadata
                                                                     occperiod-form-periodmetadata"/>
                                         
-                                        
-                                        
                                         <h:outputText styleClass="ui-label-inline font-smaller" value="Inspector: " />
+                                        
                                         <h:outputText  styleClass="data-text" value="#{occInspectionBB.currentInspection.inspector.person.firstName} 
                                                        #{occInspectionBB.currentInspection.inspector.person.lastName}
                                                        (ID:#{occInspectionBB.currentInspection.inspector.userID})" />
@@ -976,7 +964,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                value="filter: only failed items"
                                                                disabled="false"
                                                                icon="fa fa-close"
-                                                               update="form-inspecteditems"/>
+                                                               update="form-inspecteditems
+                                                               occperiod-checklisttemplate-form-settings"/>
                                           
                                           <p:commandButton   id="occperiod-checklist-button-showonlyuninspectedelements"
                                                                ajax="true" 
@@ -984,7 +973,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                value="filter: only uninspected items"
                                                                disabled="false"
                                                                icon="fa fa-circle-o"
-                                                               update="form-inspecteditems"/>
+                                                               update="form-inspecteditems
+                                                               occperiod-checklisttemplate-form-settings"/>
                                           
                                           <p:commandButton   id="occperiod-checklist-button-showall"
                                                                ajax="true" 
@@ -993,22 +983,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                disabled="false"
                                                                icon="fa fa-list-alt"
                                                                style="margin-right: 5px"
-                                                               update="form-inspecteditems"/>
+                                                               update="form-inspecteditems
+                                                               occperiod-checklisttemplate-form-settings"/>
                                           
                                           <h:outputText class="ui-label-inline" value="include empty spaces?" />
                                           <p:selectBooleanCheckbox id="occperiod-checklist-boolcb-includeemptyspaces"
-                                                                   value="#{occInspectionBB.includeSpacesWithNoElements}"/>
-                                          
+                                                                   value="#{occInspectionBB.currentInspection.includeEmtpySpaces}">
+                                              <p:ajax update="form-inspecteditems"/>
+                                          </p:selectBooleanCheckbox>
                                     </h:form>
                                     
                                     <p:separator />
+                                    
 
                                     <h:form id="form-inspecteditems">
+                                        <div>
+                                            <h:outputText id="occperiod-checklist-spacesize-ot"
+                                                value="Checklist size: #{occInspectionBB.currentInspection.inspectedSpaceList.size()} spaces visible of #{occInspectionBB.currentInspection.inspectedSpaceList.size()} total" />
+                                        </div>
                                         <p:dataScroller
                                             id="scroller-inspectedspacelist"
                                             widgetVar="var-scroller-inspectedspacelist"
                                             var="inspace"
-                                            value="#{occInspectionBB.currentInspection.inspectedSpaceList}"
+                                            value="#{occInspectionBB.currentInspection.inspectedSpaceListVisible}"
                                             rowIndexVar="#{inspace.spaceID}">
                                             
                                             <div class="occinsspace-metadata-container">
@@ -1045,6 +1042,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="occperiod-inspace-header">
                                                     <h:outputText styleClass="data-text" value="#{inspace.name}" />
                                                 </div>
+                                                <div class="occperiod-inspace-info">
+                                                     <f:subview id="occperiod-inspace-info-location-subview"
+                                                               rendered="#{inspace.location.locationID != -1}">
+                                                        <h:outputText value="Location: " /> 
+                                                        <h:outputText value="#{inspace.location.locationDescription}" /> 
+                                                        <h:outputText value=" | " /> 
+                                                    </f:subview>
+                                                    <h:outputText value="Showing " /> 
+                                                    <h:outputText value="#{inspace.inspectedElementListVisible.size()}" /> 
+                                                    <h:outputText value=" / " /> 
+                                                    <h:outputText value="#{inspace.inspectedElementList.size()} total items" />
+                                                                  
+                                                </div>                                                
                                             </div>
                                             
                                             <p:spacer height="5px" />
@@ -1054,15 +1064,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 widgetVar="var-scroller-inspectedspacelist-elementlist"
                                                 var="inelement"
                                                 
-                                                value="#{inspace.visibleInspectedElementList}"
+                                                value="#{inspace.inspectedElementListVisible}"
                                                 rowIndexVar="#{inelement.inspectedSpaceElementID}">
                                                
                                                     <div class="occperiod-inelement-header">
-
-                                                        <h:outputText  styleClass="data-text" value="#{inelement.ordSecTitle}; " />
                                                         <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecTitle}" />
-                                                        <h:outputText  styleClass="data-text" value=" &#167;" />
+                                                        <h:outputText  styleClass="data-text" value=" (&#167;" />
                                                         <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecNum}" />
+                                                        <h:outputText  styleClass="data-text" value=", " />
+                                                        <h:outputText  styleClass="data-text" value="#{inelement.ordSecTitle}; " />
+                                                        <h:outputText  styleClass="data-text" value=")" />
                                                     </div>
 
                                                     <h:panelGrid    id="occperiod-inspectedspace-panelgrid-inspelement" 
@@ -1144,7 +1155,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                        icon="fa fa-check-square-o"
                                                                                        update="form-inspecteditems
                                                                                        occperiod-inspecteditems-form-messages
-                                                                                       "/>
+                                                                                       occperiod-checklisttemplate-form-settings"/>
                                                                 </f:subview>
 
                                                                 <p:spacer height="5px" />
@@ -1161,7 +1172,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                        icon="fa fa-eye"
                                                                                        update="form-inspecteditems
                                                                                        occperiod-inspecteditems-form-messages
-                                                                                       "/>
+                                                                                       occperiod-checklisttemplate-form-settings"/>
 
                                                                 </f:subview>
 
@@ -1178,6 +1189,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                        icon="fa fa-minus-square-o"
                                                                                        update="form-inspecteditems
                                                                                        occperiod-inspecteditems-form-messages
+                                                                                       occperiod-checklisttemplate-form-settings
                                                                                        "/>
 
 
@@ -1740,96 +1752,153 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 widgetVar="occperiod-configurereport-occinspection-var"
                                 closable="true" 
                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
+                                
                                 >
                         <h:form id="occperiod-configurereport-occinspection-form">
                             <h:messages id="occperiod-configurereport-occinspection-messages"
                                         globalOnly="true" showDetail="true" showSummary="true" 
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
+                            
+                            <h2>Configure inspection report</h2>
 
                             <h:panelGrid columns="2"
                                          columnClasses="gridTd, gridTd">
                                 
                                 <f:facet name="header">
-                                    <h:outputLabel for="occperiod-report-occinspection-it-title" value="Report title"/>
+                                    <div class="occperiod-configurereport-occinspection-headerinfocontainer">
+                                        
+                                        <h:outputLabel for="occperiod-report-occinspection-it-title" value="Report title"/>
 
-                                    <p:spacer height="5px"/>
+                                        <p:spacer height="5px"/>
 
-                                    <p:inputText id="occperiod-report-occinspection-it-title" style="width: 300px;" value="#{caseProfileBB.reportCECase.title}"/>
-                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+                                        <p:inputText id="occperiod-report-occinspection-it-title" 
+                                                     style="width: 300px;" 
+                                                     value="#{occInspectionBB.reportConfigOccInspec.title}"/>
+                                        <h:outputText styleClass="italic" 
+                                                      value="note: your name and the current date and time will be automatically inserted" />
 
-                                    <p:spacer height="5px"/>
 
-                                    <h:outputLabel class="bold" value="Include case name" for="report-case-profile-casename-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{caseProfileBB.reportCECase.includeCaseName}" />
 
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
-                                    <p:spacer height="5px"/>
-                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{caseProfileBB.reportCECase.notes}"/>
-                                    <p:spacer height="5px"/>
+                                        <h:outputLabel for="report-case-profile-notes-ita" value="Notes: "/>
+                                        <p:spacer height="5px"/>
+                                        <p:inputText id="report-case-profile-notes-ita" 
+                                                     style="width: 300px; height: 100px;" 
+                                                     value="#{occInspectionBB.reportConfigOccInspec.notes}"/>
+                                        <p:spacer height="5px"/>
+                                    </div>
                                 </f:facet>
 
                                 <h:panelGroup>
-                                    <h3>Case event history report options</h3>
+                                    <h3>Inspection checklist view options</h3>
 
-                                    <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{caseProfileBB.reportCECase.includeHiddenEvents}" />
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include full occupancy period information? " 
+                                                   for="report-insp-incperiodinfo-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-incperiodinfo-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includeOccPeriodInfoHeader}" />
+                                    
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Checklist items to include: " 
+                                                   for="report-insp-filter-som" />
+                                     <p:selectOneMenu
+                                            id="report-insp-filter-som"
+                                            value="#{occInspectionBB.reportConfigOccInspec.viewSetting}">
 
-                                    <p:spacer height="5px"/>
+                                            <f:selectItem itemLabel="Select a list view option..." itemDisabled="true" noSelectionOption="true"/>
+                                            <f:selectItems id="si-typelist" 
+                                                           value="#{occInspectionBB.itemFilterOptions}" 
+                                                           var ="option" 
+                                                           itemValue="#{option}" 
+                                                           itemLabel="#{option.label}" />
+                                    </p:selectOneMenu>
+                                    
+                                    
+                                    <p:spacer height="5px" />
 
-                                    <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{caseProfileBB.reportCECase.includeInactiveEvents}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{caseProfileBB.reportCECase.includeEventNotes}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{caseProfileBB.reportCECase.includeRequestedActionFields}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{caseProfileBB.reportCECase.includeMunicipalityDiclosedEvents}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{caseProfileBB.reportCECase.includeOfficerOnlyEvents}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{caseProfileBB.reportCECase.includeEventMetadata}" />
-
+                                    
+                                    
                                 </h:panelGroup>
+                                
                                 <h:panelGroup>
 
-                                    <h3>Other options</h3>
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include photos of failed elements? " 
+                                                   for="report-insp-incphotofailed-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-incphotofailed-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includePhotos_fail}" 
+                                                             disabled="true"/>
+                                    
+                                    <p:spacer height="5px" />
 
-                                    <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{caseProfileBB.reportCECase.includeNoticeFullText}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{caseProfileBB.reportCECase.includeAllNotices}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{caseProfileBB.reportCECase.includeFullOrdinanceText}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{caseProfileBB.reportCECase.includeViolationPhotos}" />
-
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include photos of passed elements? " 
+                                                   for="report-insp-incphotopassed-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-incphotopassed-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includePhotos_pass}" 
+                                                             disabled="true"/>
+                                    
+                                </h:panelGroup>
+                                
+                                <h:panelGroup>
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include full ordinance text? " 
+                                                   for="report-insp-incordtext-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-incordtext-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includeFullOrdText}" 
+                                                             disabled="false"/>
+                                    
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include notes on checklist items? " 
+                                                   for="report-insp-incnotes-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-incnotes-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includeElementNotes}" 
+                                                             disabled="false"/>
+                                    
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include last inspected info? " 
+                                                   for="report-insp-inclastinspecinfo-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-inclastinspecinfo-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includeElementLastInspectedInfo}" 
+                                                             disabled="false"/>
+                                    
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include compliance info? " 
+                                                   for="report-insp-inccompinfo-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-inccompinfo-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includeElementComplianceInfo}" 
+                                                             disabled="false"/>
+                                    
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include failed item remedy suggestions? " 
+                                                   for="report-insp-incremedy-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-incremedy-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includeRemedyInfo}" 
+                                                             disabled="true"/>
+                                    
+                                    <p:spacer height="5px" />
+                                    
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    
+                                    <h:outputLabel class="ui-label-inline" 
+                                                   value="Include officer signature? " 
+                                                   for="report-insp-incsig-cb" />
+                                    <p:selectBooleanCheckbox id="report-insp-incsig-cb" 
+                                                             value="#{occInspectionBB.reportConfigOccInspec.includeSignature}" 
+                                                             disabled="true"/>
+                                    
+                                    
                                 </h:panelGroup>
 
                             </h:panelGrid>
@@ -1837,17 +1906,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:commandButton   id="occperiod-configurereport-occinspection-button-cancel"
                                                ajax="true" 
                                                value="Cancel" icon="fa fa-stop" 
-                                               onclick="PF('occperiod-events-dialog-addeditevent-var').hide()"/>
+                                               onclick="PF('occperiod-configurereport-occinspection-var').hide()"/>
 
                             <p:commandButton    id="occperiod-configurereport-occinspection-button-generate"
                                                 ajax="false" 
-                                                action="#{occInspectionBB.generateOccInspectionReport}"
-                                                value="Create new event" icon="fa fa-plus"
-                                                oncomplete="PF('occperiod-events-dialog-addeditevent-var').hide()"
-                                                disabled="#{!(occInspectionBB.currentEvent.eventID == 0)}"
-                                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                update="
-                                                "/>
+                                                action="#{occInspectionBB.reports_generateOccInspectionReport}"
+                                                value="Generate report" icon="fa fa-list-ul"
+                                                />
                         </h:form>
 
                     </p:dialog>
@@ -1878,7 +1943,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                             <p:commandButton    id="occperiod-configurereport-occpermit-button-generate"
                                                 ajax="false" 
-                                                action="#{occInspectionBB.generateOccPermit(currentOccPermit)}"
+                                                action="#{occInspectionBB.reports_generateOccPermit(currentOccPermit)}"
                                                 value="Generate permit" icon="fa fa-plus"
                                                 disabled="false"
                                                 rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"/>

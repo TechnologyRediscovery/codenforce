@@ -21,7 +21,17 @@ package com.tcvcog.tcvce.entities.occupancy;
  * @author sylvia
  */
 public enum OccInspectionViewOptions {
-    FAILED_ITEMS_ONLY,
-    UNISPECTED_ITEMS_ONLY,
-    ALL_ITEMS;
+    FAILED_ITEMS_ONLY("Failed items only"),
+    UNISPECTED_ITEMS_ONLY("Uninspected items only"),
+    ALL_ITEMS("All items");
+    
+     private final String label;
+     
+     private OccInspectionViewOptions(String l){
+         this.label = l;
+     }
+     
+     public String getLabel(){
+         return label;
+     }
 }
