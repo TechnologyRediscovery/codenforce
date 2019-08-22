@@ -43,9 +43,11 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     // This template object provides us the raw lists of uninspected
     // space types, from which we extract a list of Spaces and their CodeElements
     private OccChecklistTemplate checklistTemplate;
-    private List<OccInspectedSpace> inspectedSpaceList;
     
-    private List<OccInspectedSpace> visibleInspectedSpaceList;
+    private List<OccInspectedSpace> inspectedSpaceList;
+    private List<OccInspectedSpace> inspectedSpaceListVisible;
+    private OccInspectionViewOptions viewSetting;
+    private boolean includeEmtpySpaces;
     
     private int pacc;
     private boolean enablePacc;
@@ -71,46 +73,23 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     
     public OccInspection(){
         inspectedSpaceList = new ArrayList<>();
-        visibleInspectedSpaceList = new ArrayList<>();
+        inspectedSpaceListVisible = new ArrayList<>();
+        viewSetting = OccInspectionViewOptions.ALL_ITEMS;
     }
     
     public void addSpaceToInspectedSpaces(OccInspectedSpace spc){
         inspectedSpaceList.add(spc);
     }
     
-    public void configureVisibleSpaceElementList(OccInspectionViewOptions viewOption){
-        List<OccInspectedSpaceElement> visibleEleList = null;
-        
+    public void configureVisibleSpaceElementList(){
+        inspectedSpaceListVisible.clear();
         for(Iterator<OccInspectedSpace> it = inspectedSpaceList.iterator(); it.hasNext(); ){
             OccInspectedSpace ois = it.next(); 
-            ois.getVisibleInspectedElementList().clear();
-            visibleEleList = new ArrayList<>();
-
-            for(Iterator<OccInspectedSpaceElement> itEle = ois.getInspectedElementList().iterator(); itEle.hasNext(); ){
-                OccInspectedSpaceElement oise = itEle.next();
-                switch(viewOption){
-                    case ALL_ITEMS:
-                        visibleEleList.add(oise);
-                        break;
-                    case FAILED_ITEMS_ONLY:
-                        // look for failed items
-                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
-                            visibleEleList.add(oise);
-                        } 
-                        break;
-                    case UNISPECTED_ITEMS_ONLY:
-                        // look for failed items
-                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
-                            visibleEleList.add(oise);
-                        } 
-                        break;
-                    default:
-                        visibleEleList.add(oise);
-                }
-            }
-            // close for over inspectedSpaceelements
-            if(!visibleEleList.isEmpty()){
-                ois.getVisibleInspectedElementList().addAll(visibleEleList);
+            ois.setViewSetting(viewSetting);
+            ois.configureVisibleElementList();
+            if(!ois.getInspectedElementListVisible().isEmpty()
+                    || (ois.getInspectedElementListVisible().isEmpty() && includeEmtpySpaces)){
+                inspectedSpaceListVisible.add(ois);
             }
         } // close for over inspectedspaces
     }
@@ -143,8 +122,6 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
-  
 
     /**
      * @return the inspector
@@ -526,17 +503,19 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
     }
 
     /**
-     * @return the visibleInspectedSpaceList
+     * @return the inspectedSpaceListVisible
      */
-    public List<OccInspectedSpace> getVisibleInspectedSpaceList() {
-        return visibleInspectedSpaceList;
+    public List<OccInspectedSpace> getInspectedSpaceListVisible() {
+        configureVisibleSpaceElementList();
+
+        return inspectedSpaceListVisible;
     }
 
     /**
-     * @param visibleInspectedSpaceList the visibleInspectedSpaceList to set
+     * @param inspectedSpaceListVisible the inspectedSpaceListVisible to set
      */
-    public void setVisibleInspectedSpaceList(List<OccInspectedSpace> visibleInspectedSpaceList) {
-        this.visibleInspectedSpaceList = visibleInspectedSpaceList;
+    public void setInspectedSpaceListVisible(List<OccInspectedSpace> inspectedSpaceListVisible) {
+        this.inspectedSpaceListVisible = inspectedSpaceListVisible;
     }
 
     /**
@@ -551,6 +530,35 @@ public class OccInspection extends EntityUtils implements Comparable<OccInspecti
      */
     public void setReadyForPassedCertification(boolean readyForPassedCertification) {
         this.readyForPassedCertification = readyForPassedCertification;
+    }
+
+    /**
+     * @return the viewSetting
+     */
+    public OccInspectionViewOptions getViewSetting() {
+        return viewSetting;
+    }
+
+    /**
+     * @param viewSetting the viewSetting to set
+     */
+    public void setViewSetting(OccInspectionViewOptions viewSetting) {
+        
+        this.viewSetting = viewSetting;
+    }
+
+    /**
+     * @return the includeEmtpySpaces
+     */
+    public boolean isIncludeEmtpySpaces() {
+        return includeEmtpySpaces;
+    }
+
+    /**
+     * @param includeEmtpySpaces the includeEmtpySpaces to set
+     */
+    public void setIncludeEmtpySpaces(boolean includeEmtpySpaces) {
+        this.includeEmtpySpaces = includeEmtpySpaces;
     }
 
     

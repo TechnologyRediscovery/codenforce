@@ -1307,6 +1307,12 @@ gridTd-bignum{
     
 }
 
+.occperiod-inspace-info{
+    display: block;
+    clear: both;
+    
+}
+
 .ui-datascroller-item{
     clear:both;
 }
@@ -1465,6 +1471,12 @@ i.inspection-notinspected{
     font-weight: bold;
     font-size: 1.3em;
 }
+
+.occinspection-reportheader{
+    
+}
+
+
 
 /* ****************** CLOSE INSPECTION AND OCC PERMIT********************/
 

@@ -5,12 +5,10 @@
  */
 package com.tcvcog.tcvce.entities.reports;
 
+import com.tcvcog.tcvce.entities.Icon;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.search.Query;
-import com.tcvcog.tcvce.entities.search.QueryBacked;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  *
@@ -22,24 +20,22 @@ public class ReportConfigOccInspection
     
     private OccPeriod occPeriod;
     
+    private Icon defaultItemIcon;
+        
     private boolean includeOccPeriodInfoHeader;
     
-    private boolean includeElements_notInspected;
-    private boolean includeElements_pass;
-    private boolean includeElements_fail;
+    private OccInspectionViewOptions viewSetting;
     
     private boolean includePhotos_pass;
     private boolean includePhotos_fail;
     
-    private boolean separateElementsBySpace;
     private boolean includeFullOrdText;
     private boolean includeElementNotes;
     
     private boolean includeElementLastInspectedInfo;
     private boolean includeElementComplianceInfo;
    
-    private boolean includeFullInpsectedSpaceList;
-    private boolean includeNextStepText;
+    private boolean includeRemedyInfo;
     private boolean includeSignature;
 
     /**
@@ -56,26 +52,7 @@ public class ReportConfigOccInspection
         return includeOccPeriodInfoHeader;
     }
 
-    /**
-     * @return the includeElements_notInspected
-     */
-    public boolean isIncludeElements_notInspected() {
-        return includeElements_notInspected;
-    }
-
-    /**
-     * @return the includeElements_pass
-     */
-    public boolean isIncludeElements_pass() {
-        return includeElements_pass;
-    }
-
-    /**
-     * @return the includeElements_fail
-     */
-    public boolean isIncludeElements_fail() {
-        return includeElements_fail;
-    }
+   
 
     /**
      * @return the includePhotos_pass
@@ -91,12 +68,6 @@ public class ReportConfigOccInspection
         return includePhotos_fail;
     }
 
-    /**
-     * @return the separateElementsBySpace
-     */
-    public boolean isSeparateElementsBySpace() {
-        return separateElementsBySpace;
-    }
 
     /**
      * @return the includeFullOrdText
@@ -126,18 +97,12 @@ public class ReportConfigOccInspection
         return includeElementComplianceInfo;
     }
 
-    /**
-     * @return the includeFullInpsectedSpaceList
-     */
-    public boolean isIncludeFullInpsectedSpaceList() {
-        return includeFullInpsectedSpaceList;
-    }
 
     /**
-     * @return the includeNextStepText
+     * @return the includeRemedyInfo
      */
-    public boolean isIncludeNextStepText() {
-        return includeNextStepText;
+    public boolean isIncludeRemedyInfo() {
+        return includeRemedyInfo;
     }
 
     /**
@@ -162,27 +127,6 @@ public class ReportConfigOccInspection
     }
 
     /**
-     * @param includeElements_notInspected the includeElements_notInspected to set
-     */
-    public void setIncludeElements_notInspected(boolean includeElements_notInspected) {
-        this.includeElements_notInspected = includeElements_notInspected;
-    }
-
-    /**
-     * @param includeElements_pass the includeElements_pass to set
-     */
-    public void setIncludeElements_pass(boolean includeElements_pass) {
-        this.includeElements_pass = includeElements_pass;
-    }
-
-    /**
-     * @param includeElements_fail the includeElements_fail to set
-     */
-    public void setIncludeElements_fail(boolean includeElements_fail) {
-        this.includeElements_fail = includeElements_fail;
-    }
-
-    /**
      * @param includePhotos_pass the includePhotos_pass to set
      */
     public void setIncludePhotos_pass(boolean includePhotos_pass) {
@@ -194,13 +138,6 @@ public class ReportConfigOccInspection
      */
     public void setIncludePhotos_fail(boolean includePhotos_fail) {
         this.includePhotos_fail = includePhotos_fail;
-    }
-
-    /**
-     * @param separateElementsBySpace the separateElementsBySpace to set
-     */
-    public void setSeparateElementsBySpace(boolean separateElementsBySpace) {
-        this.separateElementsBySpace = separateElementsBySpace;
     }
 
     /**
@@ -231,18 +168,12 @@ public class ReportConfigOccInspection
         this.includeElementComplianceInfo = includeElementComplianceInfo;
     }
 
-    /**
-     * @param includeFullInpsectedSpaceList the includeFullInpsectedSpaceList to set
-     */
-    public void setIncludeFullInpsectedSpaceList(boolean includeFullInpsectedSpaceList) {
-        this.includeFullInpsectedSpaceList = includeFullInpsectedSpaceList;
-    }
 
     /**
-     * @param includeNextStepText the includeNextStepText to set
+     * @param includeRemedyInfo the includeRemedyInfo to set
      */
-    public void setIncludeNextStepText(boolean includeNextStepText) {
-        this.includeNextStepText = includeNextStepText;
+    public void setIncludeRemedyInfo(boolean includeRemedyInfo) {
+        this.includeRemedyInfo = includeRemedyInfo;
     }
 
     /**
@@ -250,5 +181,33 @@ public class ReportConfigOccInspection
      */
     public void setIncludeSignature(boolean includeSignature) {
         this.includeSignature = includeSignature;
+    }
+
+    /**
+     * @return the viewSetting
+     */
+    public OccInspectionViewOptions getViewSetting() {
+        return viewSetting;
+    }
+
+    /**
+     * @param viewSetting the viewSetting to set
+     */
+    public void setViewSetting(OccInspectionViewOptions viewSetting) {
+        this.viewSetting = viewSetting;
+    }
+
+    /**
+     * @return the defaultItemIcon
+     */
+    public Icon getDefaultItemIcon() {
+        return defaultItemIcon;
+    }
+
+    /**
+     * @param defaultItemIcon the defaultItemIcon to set
+     */
+    public void setDefaultItemIcon(Icon defaultItemIcon) {
+        this.defaultItemIcon = defaultItemIcon;
     }
 }

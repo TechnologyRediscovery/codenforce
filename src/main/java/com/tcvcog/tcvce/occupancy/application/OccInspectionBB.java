@@ -138,6 +138,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     
     // reports
     private ReportConfigOccInspection reportConfigOccInspec;
+    private OccInspectionViewOptions[] itemFilterOptions;
+    
     private OccPermit currentOccPermit;
     private ReportConfigOccPermit reportConfigOccPermit;
     
@@ -173,7 +175,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 currentInspection = currentOccPeriod.determineGoverningOccInspection();
                 currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
                 // all inspected spaces are visible by default
-                currentInspection.configureVisibleSpaceElementList(OccInspectionViewOptions.ALL_ITEMS);
+                currentInspection.setViewSetting(OccInspectionViewOptions.ALL_ITEMS);
             }
         
 //            if(currentInspection == null){
@@ -213,6 +215,18 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         if(personCandidateList != null){
             personCandidateList = new ArrayList<>();
             personCandidateList.addAll(getSessionBean().getSessionPersonList());
+        }
+        
+        itemFilterOptions = OccInspectionViewOptions.values();
+        
+        try {
+            reportConfigOccInspec =
+                    oc.getOccInspectionReportConfigDefault(
+                            currentInspection,
+                            currentOccPeriod,
+                            getSessionBean().getSessionUser());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
         }
     }
     
@@ -408,6 +422,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             
         System.out.println("OccInspectionBB.addSpaceToChecklist | space name: " + space.getName());
         reloadCurrentInspection();
+        selectedOccSpace = null;
+        selectedOccSpaceType = null;
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Space added to checklist!", ""));
@@ -420,15 +436,16 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     public void filterChecklist_failedItems(ActionEvent ev){
-        currentInspection.configureVisibleSpaceElementList(OccInspectionViewOptions.FAILED_ITEMS_ONLY);
+        currentInspection.setViewSetting(OccInspectionViewOptions.FAILED_ITEMS_ONLY);
+//        currentInspection.configureVisibleSpaceElementList();
     }
     
     public void filterChecklist_uninspectedItems(ActionEvent ev){
-        currentInspection.configureVisibleSpaceElementList(OccInspectionViewOptions.UNISPECTED_ITEMS_ONLY);
+        currentInspection.setViewSetting(OccInspectionViewOptions.UNISPECTED_ITEMS_ONLY);
     }
     
     public void filterChecklist_allItems(ActionEvent ev){
-        currentInspection.configureVisibleSpaceElementList(OccInspectionViewOptions.ALL_ITEMS);
+        currentInspection.setViewSetting(OccInspectionViewOptions.ALL_ITEMS);
     }
     
     
@@ -523,25 +540,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     public void initializeOccInspectionReport(ActionEvent ev){
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        reportConfigOccInspec = 
-                oc.getOccInspectionReportConfigDefault( 
-                        currentInspection, 
-                        currentOccPeriod, 
-                        getSessionBean().getSessionUser());
+       
     }
     
-    public String generateOccInspectionReport(){
+    public String reports_generateOccInspectionReport(){
         getSessionBean().setReportConfigInspection(reportConfigOccInspec);
         return "inspectionReport";
     }
     
-    public void initializeOccPermit(){
+    public void reports_initializeOccPermitReport(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessionUser());
     }
 
-    public String generateOccPermit(OccPermit permit){
+    public String reports_generateOccPermit(OccPermit permit){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         currentOccPermit = permit;
         reportConfigOccPermit = oc.getOccPermitReportConfigDefault( currentOccPermit, 
@@ -616,10 +628,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
-    
-    
-    
-    
      /**
       * Edits the currentInspection 
       * @param e 
@@ -631,9 +639,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-                 
-         
-         
     }
      
      public void checklistAction_removeSpaceFromChecklist(OccInspectedSpace spc){
@@ -647,7 +652,6 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 ex.getMessage(), ""));
-            
         }
          reloadCurrentInspection();
      }
@@ -1366,6 +1370,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedOccPeriodType(OccPeriodType selectedOccPeriodType) {
         this.selectedOccPeriodType = selectedOccPeriodType;
+    }
+
+    /**
+     * @return the itemFilterOptions
+     */
+    public OccInspectionViewOptions[] getItemFilterOptions() {
+        return itemFilterOptions;
+    }
+
+    /**
+     * @param itemFilterOptions the itemFilterOptions to set
+     */
+    public void setItemFilterOptions(OccInspectionViewOptions[] itemFilterOptions) {
+        this.itemFilterOptions = itemFilterOptions;
     }
 
     
