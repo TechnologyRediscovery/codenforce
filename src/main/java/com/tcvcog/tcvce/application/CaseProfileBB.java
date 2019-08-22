@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.PermissionsException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.Query;
@@ -125,6 +126,9 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     private ReportConfigCECase reportCECase;
     private ReportConfigCECaseList reportCECaseList;
 
+    private List<OccInspection> inspectionList;
+    private OccInspection selectedInspection;
+    
     /**
      * Creates a new instance of CaseManageBB
      */
@@ -1713,5 +1717,23 @@ public class CaseProfileBB extends BackingBeanUtils implements Serializable {
     public void setViolationDonut(DonutChartModel violationDonut) {
         this.violationDonut = violationDonut;
     }
+
+    public List<OccInspection> getInspectionList() {
+        return inspectionList;
+    }
+
+    public void setInspectionList(List<OccInspection> inspectionList) {
+        this.inspectionList = inspectionList;
+    }
+
+    public OccInspection getSelectedInspection() {
+        return selectedInspection;
+    }
+
+    public void setSelectedInspection(OccInspection selectedInspection) {
+        this.selectedInspection = selectedInspection;
+    }
+    
+    
 
 }
