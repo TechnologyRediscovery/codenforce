@@ -21,7 +21,8 @@
                         
                         <p:selectOneMenu id="userList" value="#{userAuthMuniManageBB.selectedUser}">
                             <p:ajax listener="#{userAuthMuniManageBB.onSelectedUserChange()}" 
-                                    update="unauthorizedMuniList authMuniTable selectedMunisTable" />
+                                    update="unauthorizedMuniList 
+                                    authMuniTable selectedMunisTable" />
                             <f:selectItem itemLabel="Select a user" noSelectionOption="true" />
                             <f:selectItems value="#{userAuthMuniManageBB.userList}"  var="u" itemValue="#{u}" 
                                            itemLabel="#{u.username}"/>
