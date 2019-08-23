@@ -47,6 +47,8 @@ public class UserAuthMuniManageBB extends BackingBeanUtils implements Serializab
         
     }
     
+    
+    
    
     
     public void setMuniList(List<Municipality> muniList) {        
