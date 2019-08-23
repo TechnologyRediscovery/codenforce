@@ -30,9 +30,6 @@ ALTER TABLE choiceproposal DROP COLUMN hidden;
 
 ALTER TABLE munilogin ADD COLUMN defaultcecase_caseid INTEGER CONSTRAINT munilogin_defcaseid_fk REFERENCES cecase (caseid);
 
-
-
-
 ALTER TABLE occperiod DROP COLUMN overrideperiodtypeconfig;
 ALTER TABLE occperiod ADD COLUMN overrideperiodtypeconfig BOOLEAN DEFAULT FALSE;
 

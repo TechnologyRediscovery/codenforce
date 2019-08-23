@@ -93,22 +93,26 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                 // the current user is allowed access to this muni, so now determine RoleType
                 // based on assigned start and stop dates for various roles as specified in the
                 // current UserAccessRecord
-                if(userWAccess.getAccessRecord().getSupportstartdate().isBefore(LocalDateTime.now())
-                        &&
-                    userWAccess.getAccessRecord().getSupportstopdate().isAfter(LocalDateTime.now())){
+                if(userWAccess.getAccessRecord().getSupportstartdate() != null
+                        && userWAccess.getAccessRecord().getSupportstopdate() != null
+                        && userWAccess.getAccessRecord().getSupportstartdate().isBefore(LocalDateTime.now())
+                        && userWAccess.getAccessRecord().getSupportstopdate().isAfter(LocalDateTime.now())){
                     userWAccess.setRoleType(RoleType.Developer);
-                } else if(userWAccess.getAccessRecord().getSysadminstartdate().isBefore(LocalDateTime.now())
-                        &&
-                    userWAccess.getAccessRecord().getSysadminstopdate().isAfter(LocalDateTime.now())){
+                } else if(userWAccess.getAccessRecord().getSysadminstartdate() != null
+                        && userWAccess.getAccessRecord().getSysadminstopdate() != null
+                        && userWAccess.getAccessRecord().getSysadminstartdate().isBefore(LocalDateTime.now())
+                        && userWAccess.getAccessRecord().getSysadminstopdate().isAfter(LocalDateTime.now())){
                     userWAccess.setRoleType(RoleType.SysAdmin);
                     
-                } else if(userWAccess.getAccessRecord().getCodeofficerstartdate().isBefore(LocalDateTime.now())
-                        &&
-                    userWAccess.getAccessRecord().getCodeofficerstopdate().isAfter(LocalDateTime.now())){
+                } else if(userWAccess.getAccessRecord().getCodeofficerstartdate() != null
+                        && userWAccess.getAccessRecord().getCodeofficerstopdate() != null
+                        && userWAccess.getAccessRecord().getCodeofficerstartdate().isBefore(LocalDateTime.now())
+                        &&userWAccess.getAccessRecord().getCodeofficerstopdate().isAfter(LocalDateTime.now())){
                     userWAccess.setRoleType(RoleType.EnforcementOfficial);
-                } else if(userWAccess.getAccessRecord().getStaffstartdate().isBefore(LocalDateTime.now())
-                        &&
-                    userWAccess.getAccessRecord().getStaffstopdate().isAfter(LocalDateTime.now())){
+                } else if(userWAccess.getAccessRecord().getStaffstartdate() != null
+                        && userWAccess.getAccessRecord().getStaffstopdate() != null
+                        && userWAccess.getAccessRecord().getStaffstartdate().isBefore(LocalDateTime.now())
+                        && userWAccess.getAccessRecord().getStaffstopdate().isAfter(LocalDateTime.now())){
                     userWAccess.setRoleType(RoleType.MuniStaff);
                 } else {
                     userWAccess.setRoleType(RoleType.MuniReader);

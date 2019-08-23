@@ -53,6 +53,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
@@ -85,6 +86,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     private final int MINIMUM_RANK_INSPECTOREVENTS = 5;
     private final int MINIMUM_RANK_STAFFEVENTS = 3;
+    private final int DEFAULT_OCC_PERIOD_START_DATE_OFFSET = 30;
     
     /**
      * Creates a new instance of OccupancyCoordinator
@@ -324,35 +326,50 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return new OccInspection();
     }
     
-    public OccPeriod initializeNewOccPeriod(Property p, PropertyUnit pu, User u, MunicipalityComplete muni) throws IntegrationException{
+    public OccPeriod initializeNewOccPeriod(Property p, 
+                                            PropertyUnit pu, 
+                                            OccPeriodType perType,
+                                            User u, 
+                                            MunicipalityComplete muni) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
-        OccPeriod op = new OccPeriod();
+        OccPeriod period = new OccPeriod();
         
-        op.setPropertyUnitID(pu.getUnitID());
-        op.setType(muni.getProfile().getOccPeriodTypeList().get(0));
-        op.setManager(u);
-        op.setCreatedBy(u);
-        op.setCreatedTS(LocalDateTime.now());
+        period.setPropertyUnitID(pu.getUnitID());
+        period.setType(perType);
         
-        op.setStartDate(LocalDateTime.now());
-        op.setStartDateCertifiedBy(u);
-        op.setStartDateCertifiedTS(LocalDateTime.now());
+        period.setManager(u);
+        period.setCreatedBy(u);
+        period.setCreatedTS(LocalDateTime.now());
         
-        op.setEndDate(op.getStartDate().plusDays(op.getType().getDefaultValidityPeriodDays()));
-        op.setEndDateCertifiedBy(u);
-        op.setEndDateCertifiedTS(LocalDateTime.now());
+        period.setStartDate(LocalDateTime.now().plusDays(DEFAULT_OCC_PERIOD_START_DATE_OFFSET));
+        period.setStartDateCertifiedBy(null);
+        period.setStartDateCertifiedTS(null);
         
-        op.setSource(si.getBOBSource(Integer.parseInt(
+        if(period.getStartDate() != null){
+            period.setEndDate(period.getStartDate().plusDays(period.getType().getDefaultValidityPeriodDays()));
+        }
+        period.setEndDateCertifiedBy(null);
+        period.setEndDateCertifiedTS(null);
+        
+        period.setSource(si.getBOBSource(Integer.parseInt(
                 getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("occPeriodNewInternalBOBSourceID"))));
         
-        return op;
+        System.out.println("OccupancyCoordinator.intitializeNewOccPeriod | period: " + period);
+        return period;
     }
     
-    public int insertNewOccPeriod(OccPeriod op, User u) throws IntegrationException{
+    public int insertNewOccPeriod(OccPeriod op, User u) throws IntegrationException, InspectionException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        return oi.insertOccPeriod(op);
+        int freshOccPeriodID = oi.insertOccPeriod(op);
+        System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
+        try {
+            inspectionAction_commenceOccupancyInspection(null, oi.getOccPeriod(freshOccPeriodID, u),  u);
+        } catch (EventException | AuthorizationException | CaseLifecycleException | ViolationException ex) {
+            System.out.println(ex);
+        }
         
+        return freshOccPeriodID;
     }
     
     /**
@@ -369,11 +386,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws InspectionException
      * @throws IntegrationException 
      */
-    public OccInspection inspectionAction_commenceOccupancyInspection(   OccInspection in,
-                                                        OccPeriod period,
-                                                        OccChecklistTemplate templ, 
-                                                        User user,
-                                                        Municipality muni) throws InspectionException, IntegrationException{
+    public OccInspection inspectionAction_commenceOccupancyInspection(  OccInspection in,
+                                                                        OccPeriod period,
+                                                                        User user) throws InspectionException, IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccInspection inspec = null;
         
@@ -387,7 +402,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 inspec = new OccInspection();
             }
             inspec.setOccPeriodID(period.getPeriodID());
-            inspec.setChecklistTemplate(templ);
+            inspec.setChecklistTemplate(oii.getChecklistTemplate(period.getType().getChecklistID()));
             inspec.setInspector(user);
             inspec.setPacc(generateControlCodeFromTime());
 //            if(muni.isEnablePublicOccInspectionTODOs()){
@@ -395,7 +410,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //            } else {
 //                inspec.setEnablePacc(false);
 //            }
-            inspec = oii.insertOccInspection(in);
+            inspec = oii.insertOccInspection(inspec);
         } else {
             throw new InspectionException("Occ period either inactive or uninspectable");
         }

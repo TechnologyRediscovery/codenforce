@@ -642,14 +642,14 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     public OccPeriodType getOccPeriodType(int typeid) throws IntegrationException {
         OccPeriodType tpe = null;
-        String query = "SELECT typeid, muni_municode, title, authorizeduses, description, userassignable, \n"
-                + "       permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n"
-                + "       rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n"
-                + "       requiredpersontypes, commercial, requirepersontypeentrycheck, \n"
-                + "       defaultpermitvalidityperioddays, occchecklist_checklistlistid, \n"
-                + "       asynchronousinspectionvalidityperiod, defaultinspectionvalidityperiod, \n"
-                + "       eventruleset_setid, permittitle, permittitlesub\n"
-                + "  FROM public.occperiodtype WHERE typeid=?;";
+        String query = "SELECT typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
+                        "       permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n" +
+                        "       rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
+                        "       requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
+                        "       defaultpermitvalidityperioddays, occchecklist_checklistlistid, \n" +
+                        "       asynchronousinspectionvalidityperiod, defaultinspectionvalidityperiod, \n" +
+                        "       eventruleset_setid, inspectable, permittitle, permittitlesub\n" +
+                        "  FROM public.occperiodtype WHERE typeid=?;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -798,7 +798,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt = con.prepareStatement(query);
 
             // PARAMS LINE 1
-            stmt.setInt(1, period.getSource().getSourceid());
+            stmt.setInt(1, 10);
             stmt.setInt(2, period.getPropertyUnitID());
             // timestamp set to now()
             stmt.setInt(3, period.getType().getTypeid());
@@ -1020,21 +1020,23 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setAuthorizeduses(rs.getString("authorizeduses"));
             opt.setDescription(rs.getString("description"));
             opt.setUserassignable(rs.getBoolean("userassignable"));
-            opt.setPermittable(rs.getBoolean("permittable"));
             
-            opt.setChecklistID(rs.getInt("occchecklist_checklistlistid"));
-
+            opt.setPermittable(rs.getBoolean("permittable"));
             opt.setStartdaterequired(rs.getBoolean("startdaterequired"));
             opt.setEnddaterequired(rs.getBoolean("enddaterequired"));
             opt.setPassedInspectionRequired(rs.getBoolean("passedinspectionrequired"));
+            
             opt.setRentalcompatible(rs.getBoolean("rentalcompatible"));
             opt.setActive(rs.getBoolean("active"));
             opt.setAllowthirdpartyinspection(rs.getBoolean("allowthirdpartyinspection"));
             opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
+            
+            opt.setInspectable(rs.getBoolean("inspectable"));
 
-            opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
-            opt.setCommercial(rs.getBoolean("commercial"));
             opt.setRequirepersontypeentrycheck(rs.getBoolean("requirepersontypeentrycheck"));
+            opt.setCommercial(rs.getBoolean("commercial"));
+            opt.setChecklistID(rs.getInt("occchecklist_checklistlistid"));
+            opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
             opt.setDefaultValidityPeriodDays(rs.getInt("defaultpermitvalidityperioddays"));
             
             opt.setPermitTitle(rs.getString("permittitle"));
