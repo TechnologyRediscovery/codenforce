@@ -40,8 +40,11 @@ public class OccInspectedSpace extends OccSpace implements Serializable, Cloneab
 
     
     private int inspectedSpaceID;
+    
     private List<OccInspectedSpaceElement> inspectedElementList;
-    private List<OccInspectedSpaceElement> visibleInspectedElementList;
+    private List<OccInspectedSpaceElement> inspectedElementListVisible;
+    private OccInspectionViewOptions viewSetting;
+    
     private OccLocationDescriptor location;
     private OccSpaceType type;
     
@@ -57,7 +60,34 @@ public class OccInspectedSpace extends OccSpace implements Serializable, Cloneab
         this.name = spc.getName();
         this.required = spc.isRequired();
         
-        visibleInspectedElementList = new ArrayList<>();
+        inspectedElementListVisible = new ArrayList<>();
+        viewSetting = OccInspectionViewOptions.ALL_ITEMS;
+    }
+    
+    public void configureVisibleElementList(){
+        inspectedElementListVisible.clear();
+        for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){
+            OccInspectedSpaceElement oise = itEle.next();
+            switch(viewSetting){
+                case ALL_ITEMS:
+                    inspectedElementListVisible.add(oise);
+                    break;
+                case FAILED_ITEMS_ONLY:
+                    // look for failed items
+                    if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
+                        inspectedElementListVisible.add(oise);
+                    } 
+                    break;
+                case UNISPECTED_ITEMS_ONLY:
+                    // look for failed items
+                    if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
+                        inspectedElementListVisible.add(oise);
+                    } 
+                    break;
+                default:
+                    inspectedElementListVisible.add(oise);
+            }
+        }
     }
     
     /**
@@ -248,17 +278,33 @@ public class OccInspectedSpace extends OccSpace implements Serializable, Cloneab
     }
 
     /**
-     * @return the visibleInspectedElementList
+     * @return the inspectedElementListVisible
      */
-    public List<OccInspectedSpaceElement> getVisibleInspectedElementList() {
-        return visibleInspectedElementList;
+    public List<OccInspectedSpaceElement> getInspectedElementListVisible() {
+        configureVisibleElementList();
+        return inspectedElementListVisible;
     }
 
     /**
-     * @param visibleInspectedElementList the visibleInspectedElementList to set
+     * @param inspectedElementListVisible the inspectedElementListVisible to set
      */
-    public void setVisibleInspectedElementList(List<OccInspectedSpaceElement> visibleInspectedElementList) {
-        this.visibleInspectedElementList = visibleInspectedElementList;
+    public void setInspectedElementListVisible(List<OccInspectedSpaceElement> inspectedElementListVisible) {
+        this.inspectedElementListVisible = inspectedElementListVisible;
+    }
+
+    /**
+     * @return the viewSetting
+     */
+    public OccInspectionViewOptions getViewSetting() {
+        
+        return viewSetting;
+    }
+
+    /**
+     * @param viewSetting the viewSetting to set
+     */
+    public void setViewSetting(OccInspectionViewOptions viewSetting) {
+        this.viewSetting = viewSetting;
     }
 
    

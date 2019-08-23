@@ -77,8 +77,4 @@ public class EventRuleOccPeriod extends EventRuleImplementation{
     public void setPassedRuleEvent(OccEvent passedRuleEvent) {
         this.passedRuleEvent = passedRuleEvent;
     }
-    
-    
-    
-    
 }

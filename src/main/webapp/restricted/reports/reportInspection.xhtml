@@ -10,38 +10,175 @@
         <title>Occupancy Inspection Report</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../report_template.xhtml">
-            <ui:insert name="report-header">
-            <f:view id="report-header">
-                <div class="flexing-box-topbar">
-                    <div class="logoBox">
-                        <div class="logo-image-wrapper">
-                            <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
-                        </div>
-                        <div class="logo-title-wrapper">
-                            <div class="report-title">
-                                <h:outputText id="report-title-ot"  value="#{eventCECaseReportBB.reportConfig.title}"/> 
+        <ui:composition template="./../report_template_occinsp.xhtml">
+            <ui:define name="report-header">
+                <f:view id="report-header">
+                    <div class="flexing-box-topbar">
+                        <div class="logoBox">
+                            <div class="logo-image-wrapper">
+                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
                             </div>
-                            <div class="report-title-sub">
-                                <h:outputText id="report-subtitle-ot"  value="#{eventCECaseReportBB.reportConfig.muni.muniName}, #{eventCECaseReportBB.reportConfig.muni.address_state}"/> 
-                                <h:outputText value=" | " />
-                                <h:outputText id="creator-ot" value="Created by: #{eventCECaseReportBB.reportConfig.creator.person.firstName} #{eventCECaseReportBB.reportConfig.creator.person.lastName}" />
-                                <h:outputText value=" | " />
-                                <h:outputText id="creator-ot" value="Date: #{eventCECaseReportBB.reportConfig.generationTimestampPretty}" />
+                            <div class="logo-title-wrapper">
+                                <div class="report-title">
+                                    <h:outputText id="report-title-ot"  value="#{reportingBB.reportConfigOccInspection.title}"/> 
+                                </div>
+                                <div class="report-title-sub">
+                                    <h:outputText id="report-subtitle-ot"  value="#{reportingBB.reportConfigOccInspection.muni.muniName}, #{eventCECaseReportBB.reportConfig.muni.address_state}"/> 
+                                    <h:outputText value=" | " />
+                                    <h:outputText id="creator-ot" value="Created by: #{reportingBB.reportConfigOccInspection.creator.person.firstName}" />
+                                    <h:outputText value=" " />
+                                    <h:outputText value="#{reportingBB.reportConfigOccInspection.creator.person.lastName}" />
+                                    <h:outputText value=" | " />
+                                    <h:outputText id="report-ts-ot" value="#{reportingBB.reportConfigOccInspection.generationTimestampPretty}" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </f:view>
-        </ui:insert>
-            <ui:insert name="print-content">
+                </f:view>
+            </ui:define>
+            <ui:define name="print-content">
+                
                 <f:view id="report-inspection-view">
-                    <h:form id="case-details-form">
+                    <h:form id="report-inspection-form">
 
+                        <h2>Occupancy inspection report</h2>
+                            <div class="occperiod-address-container">
 
+                                <h:outputText styleClass="occperiod-address" 
+                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address}" />
+                                <h:outputText styleClass="occperiod-address" 
+                                              value=", " />
+                                <h:outputText styleClass="occperiod-address" 
+                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address_city}" />
+                                <h:outputText styleClass="occperiod-address" 
+                                              value=" " />
+                                <h:outputText styleClass="occperiod-address" 
+                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address_state}" />
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText styleClass="ui-label-inline" value="Occupancy period for unit no. "  />
+
+                                <h:outputText value="(single dwelling unit)"  
+                                              rendered="#{reportingBB.reportConfigOccInspection.propUnitWithProp == '-1'}"
+                                              styleClass="data-text italic" />
+
+                                <h:outputText value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.unitNumber}"  
+                                              rendered="#{reportingBB.reportConfigOccInspection.propUnitWithProp.unitNumber != '-1'}"
+                                              styleClass="data-text"/>
+                            </div>
+                        
+                        <h2>To-Do list before reinspection</h2>
+
+                        <p:dataScroller
+                            id="scroller-inspectedspacelist"
+                            widgetVar="var-scroller-inspectedspacelist"
+                            var="inspace"
+                            value="#{reportingBB.reportConfigOccInspection.occPeriod.determineGoverningOccInspection().inspectedSpaceListVisible}"
+                            rowIndexVar="#{inspace.spaceID}">
+
+                            <div class="occinsspace-metadata-container">
+
+                                <div class="occperiod-inspace-header">
+                                    <h:outputText styleClass="data-text" value="#{inspace.name}" />
+                                </div>
+                                <div class="occperiod-inspace-info">
+
+                                    <f:subview id="occperiod-inspace-info-location-subview"
+                                               rendered="#{inspace.location.locationID != -1}">
+                                        <h:outputText value="Location: " /> 
+                                        <h:outputText value="#{inspace.location.locationDescription}" /> 
+                                        <h:outputText value=" | " /> 
+                                    </f:subview>
+                                    <h:outputText value="Showing " /> 
+                                    <h:outputText value="#{inspace.inspectedElementListVisible.size()}" /> 
+                                    <h:outputText value=" / " /> 
+                                    <h:outputText value="#{inspace.inspectedElementList.size()} total items" />
+                                </div>                                                
+                            </div>
+
+                            <p:spacer height="5px" />
+                            <p:dataScroller
+                                id="scroller-inspectedspacelist-elementlist"
+                                widgetVar="var-scroller-inspectedspacelist-elementlist"
+                                var="inelement"
+
+                                value="#{inspace.inspectedElementListVisible}"
+                                rowIndexVar="#{inelement.inspectedSpaceElementID}">
+
+                                <div class="occperiod-inelement-header">
+
+                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecTitle}" />
+                                    <h:outputText  styleClass="data-text" value=" (&#167;" />
+                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecNum}" />
+                                    <h:outputText  styleClass="data-text" value=", " />
+                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSecTitle} " />
+                                    <h:outputText  styleClass="data-text" value=")" />
+                                </div>
+
+                                <h:panelGrid    id="occperiod-inspectedspace-panelgrid-inspelement" 
+                                                columns="3" 
+                                                cellpadding="10" footerClass="gridFooter"
+                                                columnClasses="gridTd, gridTd, gridTd" 
+                                                rendered="true">
+                                    <h:panelGroup rendered="false">
+                                        <div class="status-display-container">
+                                            <div class="status-display-icon-container">
+                                                <i class="material-icons status-display-icon-i #{reportingBB.reportConfigOccInspection.defaultItemIcon.styleClass}">
+                                                    <h:outputText id="status-display-icon-ot" value="#{reportingBB.reportConfigOccInspection.defaultItemIcon.materialIcon}"/>
+                                                </i>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>      
+
+                                    <h:panelGroup>
+                                        <f:subview      id="occperiod-inspectedspace-subview-compliancedata"
+                                                        rendered="#{(!(empty inelement.complianceGrantedTS)) and reportingBB.reportConfigOccInspection.includeElementComplianceInfo}">
+
+                                            <h:outputText value="Compliance granted by: " 
+                                                          styleClass="ui-label-inline #{inelement.status.icon.styleClass}" />
+
+                                            <h:outputText  value="#{inelement.complianceGrantedBy.person.firstName} #{inelement.complianceGrantedBy.person.lastName}" 
+                                                           styleClass="data-text #{inelement.status.icon.styleClass}" />
+
+                                            <h:outputText styleClass="ui-label-inline #{inelement.status.icon.styleClass}" value=" on " />
+                                            <h:outputText  styleClass="data-text #{inelement.status.icon.styleClass}" value="#{occInspectionBB.getPrettyDate(inelement.complianceGrantedTS)}" />
+                                            <p:spacer height="5px" />
+
+                                        </f:subview>
+                                        <f:subview      id="occperiod-inspectedspace-subview-lastinspecteddata"
+                                                        rendered="#{(!(empty inelement.lastInspectedTS)) and reportingBB.reportConfigOccInspection.includeElementLastInspectedInfo}">
+
+                                            <h:outputText styleClass="ui-label-inline" value="Last inspected by: " />
+                                            <h:outputText  styleClass="data-text" value="#{inelement.lastInspectedBy.person.firstName} #{inelement.lastInspectedBy.person.lastName}" />
+                                            <h:outputText styleClass="ui-label-inline" value=" on " />
+                                            <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(inelement.lastInspectedTS)}" />
+                                        </f:subview>
+
+                                        <p:spacer height="5px" />
+
+                                        <f:subview      id="occperiod-inspectedspace-subview-notes"
+                                                        rendered="#{(!(empty inelement.notes)) and reportingBB.reportConfigOccInspection.includeElementNotes}">
+                                            <h:outputText styleClass="ui-label-inline" value="Notes: " />
+                                            <h:outputText  styleClass="data-text" value="#{inelement.notes}" escape="false"/>
+                                        </f:subview>
+
+                                        <p:spacer height="5px" />
+
+                                        <f:subview      id="occperiod-inspectedspace-subview-ordtext"
+                                                        rendered="#{reportingBB.reportConfigOccInspection.includeFullOrdText}">
+                                            <h:outputText styleClass="ui-label-inline" value="Ordinance text: " />
+                                            <h:outputText styleClass="italic" value="#{inelement.ordTechnicalText}" escape="false"/>
+                                        </f:subview>
+                                        <p:spacer height="5px" />
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                                <hr />  
+                            </p:dataScroller>
+                        </p:dataScroller>
                     </h:form>
                 </f:view>
-            </ui:insert>
+            </ui:define>
         </ui:composition>
     </h:body>
 </html>

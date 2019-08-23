@@ -49,9 +49,10 @@ public class OccPeriodType {
     private boolean rentalcompatible;
     private boolean active;
     private boolean allowthirdpartyinspection;
-    private List<PersonType> optionalpersontypeList;
     
+    private List<PersonType> optionalpersontypeList;
     private List<PersonType> requiredPersontypeList;
+    
     private boolean commercial;
     private boolean requirepersontypeentrycheck;
     

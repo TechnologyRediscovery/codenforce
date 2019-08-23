@@ -1302,8 +1302,15 @@ gridTd-bignum{
 
 .field-lock-status-icon-container{
     display: inline-block;
+    margin-right: 20px;
     height: 10px;
     width: 10px;
+    
+}
+
+.occperiod-inspace-info{
+    display: block;
+    clear: both;
     
 }
 
@@ -1465,6 +1472,12 @@ i.inspection-notinspected{
     font-weight: bold;
     font-size: 1.3em;
 }
+
+.occinspection-reportheader{
+    
+}
+
+
 
 /* ****************** CLOSE INSPECTION AND OCC PERMIT********************/
 

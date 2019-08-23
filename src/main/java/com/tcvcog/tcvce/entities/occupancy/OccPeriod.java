@@ -43,12 +43,12 @@ public class OccPeriod
     
     private List<OccPermitApplication> applicationList;
     private List<PersonOccPeriod> personList;
+    
     private List<OccEvent> eventList;
     private boolean showHiddenEvents;
     private boolean showInactiveEvents;
     
     private List<Proposal> proposalList;
-    
     private boolean showHiddenProposals;
     private boolean showInactiveProposals;
     private List<Proposal> proposalListVisible;
@@ -148,6 +148,11 @@ public class OccPeriod
         return actEvList;
     }
       
+    /**
+     * TODO: finish more intelligent guts for this process come the time of
+     * multiple inspections
+     * @return 
+     */
     public OccInspection determineGoverningOccInspection(){
         OccInspection selIns = null;
         Collections.sort(inspectionList);
