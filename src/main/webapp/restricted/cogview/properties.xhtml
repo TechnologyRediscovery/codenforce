@@ -280,7 +280,8 @@
                                                  disabled="#{!(sessionBean.sessionUser.keyCard.hasCOGStaffPermissions)}"/>
                             </h:form>
 
-                            <h:form id="form-propunits">
+                            <h:form id="form-propunits-editunits">
+                                
 
                                 <h2>Property units and occupancy periods</h2>
 
@@ -293,6 +294,9 @@
                                                        value="Edit unit list"  
                                                        icon="fa fa-edit"
                                                        update="form-unitedit"/>
+                            </h:form>
+                            
+                            <h:form id="form-propunits" >
 
                                 <p:spacer height="5px" />
 
@@ -322,25 +326,17 @@
 
                                         <h4>Occupancy periods</h4>
 
-                                          <p:selectOneMenu
-                                              id="som-occperiodtype" tabindex="1" required="false"
-                                                  value="#{propertyProfileBB.selectedOccPeriodType}">
-                                                      <f:converter converterId="occPeriodTypeConverter"/>
-                                                      <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
-                                                      <f:selectItems id="si-typelist" 
-                                                                     value="#{propertyProfileBB.occPeriodTypeList}" 
-                                                                     var ="opt" 
-                                                                     itemValue="#{opt}" 
-                                                                     itemLabel="#{opt.title}" />
-                                                </p:selectOneMenu>
+                                      
                                         
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
-                                                               ajax="false" 
-                                                               action="#{propertyProfileBB.addNewOccPeriod(unit)}"
+                                                               ajax="true" 
+                                                               actionListener="#{propertyProfileBB.initiateNewOccPeriodCreation(unit)}"
                                                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
-                                                               value="Add new occupancy period"  
-                                                               icon="fa fa-plus"
-                                                               update="form-occperiod-addupdate"/>
+                                                               disabled="#{!propertyProfileBB.currProp.active}"
+                                                               oncomplete="PF('dialog-addoccperiod-var').show()"
+                                                               value="Add new occupancy period" 
+                                                               update="dialog-addoccperiod-form"
+                                                               icon="fa fa-plus"/>
 
                                         <p:spacer height="5px" />
 
@@ -696,6 +692,54 @@
                         </div>
                     </div>
 
+                    <p:dialog    id="dialog-addoccperiod"
+                                 height="400" width="600"
+                                 widgetVar="dialog-addoccperiod-var"
+                                 closable="true" >
+                        
+                        <h2>Create new occupancy period</h2>
+
+                        <h:form id="dialog-addoccperiod-form">
+                            <h:messages id="messages-properties-editunit"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                            
+                            
+                            <h:outputLabel styleClass="ui-label" for="som-occperiodtype" value="Occupancy type" />
+                            
+                                <p:selectOneMenu
+                                    id="som-occperiodtype" tabindex="1" required="true"
+                                        value="#{propertyProfileBB.selectedOccPeriodType}">
+                                            <f:converter converterId="occPeriodTypeConverter"/>
+                                            <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
+                                            <f:selectItems id="si-typelist" 
+                                                           value="#{propertyProfileBB.occPeriodTypeList}" 
+                                                           var ="opt" 
+                                                           itemValue="#{opt}" 
+                                                           itemLabel="#{opt.title}" />
+                                </p:selectOneMenu>
+                             <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('dialog-addoccperiod-var').hide()"
+                                             tabindex="4"/>
+
+
+                            <p:commandButton ajax="true"
+                                             action="#{propertyProfileBB.addNewOccPeriod}"
+                                             icon="fa fa-thumbs-o-up"
+                                             value="Create new period" 
+                                             tabindex="3"/>
+                            
+                                
+                            
+                            
+                        </h:form>
+                    </p:dialog>
+                            
+                            
+                            
+                            
                     <p:dialog    id="dialog-unitedit"
                                  height="650" width="900"
                                  widgetVar="dialog-widvar-unitedit"

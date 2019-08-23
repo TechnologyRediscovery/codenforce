@@ -6,6 +6,7 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
@@ -301,25 +302,27 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public String addNewOccPeriod(PropertyUnit pu){
+    public void initiateNewOccPeriodCreation(PropertyUnit pu){
+        selectedOccPeriodType = null;
         currPropUnit = pu;
+    }
+    
+    public String addNewOccPeriod(){
+        
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        System.out.println("PropertyProfileBB.beginConstructingNewOccPeriod | received propunit " + pu.getUnitID());
         try {
             if(selectedOccPeriodType != null){
+                System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + selectedOccPeriodType.getTypeid());
                 currOccPeriod = oc.initializeNewOccPeriod(  currProp, 
-                                                            pu, 
+                                                            currPropUnit, 
+                                                            selectedOccPeriodType,
                                                             getSessionBean().getSessionUser(), 
                                                             getSessionBean().getSessionMuni());
                 currOccPeriod.setType(selectedOccPeriodType);
-//                getSessionBean().setSessionOccPeriod(currOccPeriod);
                 int newID = 0;
+                System.out.println("PropertyProfileBB.initateNewOccPeriod | currOccPeriod: " + currOccPeriod.getPeriodID());
                 newID = oc.insertNewOccPeriod(currOccPeriod, getSessionBean().getSessionUser());
-//                refreshCurrPropWithLists();
-//                getFacesContext().addMessage(null,
-//                                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                                            "Success! New occ period ID: " + newID, ""));
                 getSessionBean().setSessionOccPeriod(oi.getOccPeriod(newID, getSessionBean().getSessionUser()));
             } else {
                 getFacesContext().addMessage(null,
@@ -332,7 +335,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                         "Could not commit new occ period: " , ""));
-        } 
+            return "";
+        } catch (InspectionException ex) { 
+            System.out.println(ex);
+            return "";
+        }
         return "inspection";
     }
     
@@ -357,13 +364,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
     
     
-    public void commitNewOccPeriod(ActionEvent ev){
-    }
-    
-    public String manageInspection(OccInspection inspec){
-        getSessionBean().setSessionOccInspection(inspec);
-        return "inspection";
-    }
+   
     
     public String viewPersonProfile(Person p){
         getSessionBean().getSessionPersonList().add(0,p);

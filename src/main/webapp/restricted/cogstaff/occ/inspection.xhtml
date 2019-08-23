@@ -1038,7 +1038,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h:form id="occperiod-checklist-form-settings">
                                         
                                         <h2>
-                                            <h:outputText styleClass="data-text" value="Occupancy inspection (ID: #{occInspectionBB.currentInspection.inspectionID})"  />
+                                            <h:outputText styleClass="data-text" 
+                                                          rendered="#{empty occInspectionBB.currentInspection}"
+                                                          value="...start a new inspection"  />
+                                            
+                                            <h:outputText styleClass="data-text" 
+                                                          rendered="#{!(empty occInspectionBB.currentInspection)}"
+                                                          value="Occupancy inspection (ID: #{occInspectionBB.currentInspection.inspectionID})"  />
                                         </h2>
                                         
                                          <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
