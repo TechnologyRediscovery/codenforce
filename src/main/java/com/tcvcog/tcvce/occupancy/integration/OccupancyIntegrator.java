@@ -419,6 +419,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         UserIntegrator ui = getUserIntegrator();
         EventIntegrator ei = getEventIntegrator();
         ChoiceIntegrator choiceInt = getChoiceIntegrator();
+        PaymentIntegrator payInt = getPaymentIntegrator();
 
         OccPeriod op = new OccPeriod();
 
@@ -476,7 +477,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         op.setInspectionList(inspecInt.getOccInspectionList(op));
         op.setEventRuleOccPeriodList(ei.getEventRuleOccPeriodList(op));
         
-        // call getPayments(op) here when ready
+        op.setPaymentList(payInt.getPaymentList(op));
         
         op.setPermitList(getOccPermitList(op));
         op.setBlobIDList(getBlobList(op));
