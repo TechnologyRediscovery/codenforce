@@ -703,7 +703,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     public void updateEvent(CECaseEvent event) throws IntegrationException {
         StringBuilder sb = new StringBuilder();
         sb.append("UPDATE public.ceevent ");
-        sb.append("   SET ceeventcategory_catid=?, cecase_caseid=?, dateofrecord=?, ");
+        sb.append("   SET category_catid=?, cecase_caseid=?, dateofrecord=?, ");
         sb.append("       eventdescription=?, owner_userid=?, disclosetomunicipality=?, ");
         sb.append("       disclosetopublic=?, activeevent=?, ");
         sb.append("       hidden=?, notes=? ");
@@ -956,7 +956,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ceevent.eventid ");
-        sb.append("FROM ceevent INNER JOIN eventcategory ON (ceeventcategory_catid = categoryid) ");
+        sb.append("FROM ceevent INNER JOIN eventcategory ON (category_catid = categoryid) ");
         sb.append("INNER JOIN cecase ON (cecase_caseid = caseid) ");
         sb.append("INNER JOIN property ON (property_propertyid = propertyid) ");
         sb.append("WHERE ");
@@ -1113,11 +1113,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         ArrayList<EventCECaseCasePropBundle> eventList = new ArrayList<>();
 
-        String query = "SELECT ceevent.eventid, ceevent.ceeventcategory_catid, ceevent.dateofrecord, \n"
+        String query = "SELECT ceevent.eventid, ceevent.category_catid, ceevent.dateofrecord, \n"
                 + "       ceevent.eventtimestamp, ceevent.eventdescription, ceevent.owner_userid, ceevent.disclosetomunicipality, \n"
                 + "       ceevent.disclosetopublic, ceevent.activeevent, ceevent.requestsAction, ceevent.hidden, \n"
                 + "       ceevent.notes, ceevent.viewconfirmedby, ceevent.viewconfirmedat, cecase.caseid, eventcategory.categoryid\n"
-                + " FROM ceevent 	INNER JOIN eventcategory ON (ceeventcategory_catid = categoryid)\n"
+                + " FROM ceevent 	INNER JOIN eventcategory ON (category_catid = categoryid)\n"
                 + "		INNER JOIN cecase ON (cecase_caseid = caseid)\n"
                 + " WHERE categorytype = CAST ('Timeline' AS ceeventtype)\n"
                 + "		AND dateofrecord >= ? AND dateofrecord <= ? \n"
