@@ -382,10 +382,51 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      * @param period
      * @return 
      */
-    public List<Payment> getPaymentList(OccPeriod period){
+    public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException{
         
-        
-       return new ArrayList<>(); 
+            String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
+                + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes\n"
+                + "  FROM public.moneypayment, moneyoccperiodfeepayment"
+                    + "WHERE occperiodassignedfee_id = ? AND moneypayment_paymentid = paymentid";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, period.getPeriodID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                paymentList.add(generatePayment(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList; 
     }
 
     public ArrayList<Payment> getPaymentList() throws IntegrationException {
@@ -432,7 +473,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         }
         return paymentList;
     }
-
+   
     public void insertPayment(Payment payment) throws IntegrationException {
         String query = "INSERT INTO public.moneypayment(\n"
                 + "            paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
