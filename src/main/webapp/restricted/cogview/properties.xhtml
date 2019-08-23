@@ -323,7 +323,7 @@
                                         <h4>Occupancy periods</h4>
 
                                           <p:selectOneMenu
-                                                  id="som-occperiodtype" tabindex="1"
+                                              id="som-occperiodtype" tabindex="1" required="false"
                                                   value="#{propertyProfileBB.selectedOccPeriodType}">
                                                       <f:converter converterId="occPeriodTypeConverter"/>
                                                       <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
@@ -336,7 +336,7 @@
                                         
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="false" 
-                                                               action="#{propertyProfileBB.beginConstructingNewOccPeriod(unit)}"
+                                                               action="#{propertyProfileBB.addNewOccPeriod(unit)}"
                                                                rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                                value="Add new occupancy period"  
                                                                icon="fa fa-plus"
@@ -386,8 +386,7 @@
                                                                        action="#{propertyProfileBB.manageOccPeriod(period)}"
                                                                        rendered="#{sessionBean.sessionUser.keyCard.hasMuniStaffPermissions}"
                                                                        value="manage occupancy period"  
-                                                                       icon="fa fa-edit"
-                                                                       update="form-occperiod-addupdate"/>
+                                                                       icon="fa fa-edit"/>
                                                
                                         </p:dataScroller>
                                     </div>

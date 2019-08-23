@@ -175,7 +175,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                 currentInspection = currentOccPeriod.determineGoverningOccInspection();
                 currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
                 // all inspected spaces are visible by default
-                currentInspection.setViewSetting(OccInspectionViewOptions.ALL_ITEMS);
+                if(currentInspection != null){
+                    currentInspection.setViewSetting(OccInspectionViewOptions.ALL_ITEMS);
+                }
             }
         
 //            if(currentInspection == null){
@@ -398,7 +400,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         try {
             oi.getOccPeriod(currentOccPeriod.getPeriodID(), getSessionBean().getSessionUser());
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
         } catch (IntegrationException | EventException | AuthorizationException | CaseLifecycleException | ViolationException ex) {
             System.out.println(ex);
@@ -539,11 +541,46 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
-    public void initializeOccInspectionReport(ActionEvent ev){
-       
+    public void initiateNoteOnInspection(ActionEvent ev){
+        formNoteText = null;
+    }
+    
+    public void attachNoteToInspection(ActionEvent ev){
+                 OccInspectionIntegrator oii = getOccInspectionIntegrator();
+         if(currentInspection != null){
+            StringBuilder sb = new StringBuilder();
+            if(currentInspection.getNotes() !=null){
+                sb.append(currentInspection.getNotes());
+                sb.append("<br />****************<br />");
+            }
+            sb.append(formNoteText);
+            currentInspection.setNotes(sb.toString());
+           try {
+               oii.updateOccInspection(currentInspection);
+                getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                   "Success! Note added", ""));
+           } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                   ex.getMessage(), ""));
+           }
+            reloadCurrentInspection();
+         }
+        
+    }
+    
+    /**
+     * Utility method called when the user begins inspection report process.
+     * The report object is put in place on the bean during init()
+     * @param ev 
+     */
+    public void reports_initializeOccInspectionReport(ActionEvent ev){
+       // go ahead!
     }
     
     public String reports_generateOccInspectionReport(){
+        reportConfigOccInspec.setPropUnitWithProp(currentPropertyUnit);
         getSessionBean().setReportConfigInspection(reportConfigOccInspec);
         return "inspectionReport";
     }
@@ -729,23 +766,34 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
      }
      
+     public void checklistAction_initiateNoteOnInspectedElement(OccInspectedSpaceElement spcEl){
+         formNoteText = null;
+         currentInSpcEl = spcEl;
+         
+     }
      
-     public void checklistAction_addNoteToInspectedElement(OccInspectedSpaceElement spcEl){
+     public void checklistAction_addNoteToInspectedElement(){
          OccInspectionIntegrator oii = getOccInspectionIntegrator();
-         StringBuilder sb = new StringBuilder(spcEl.getNotes());
-         sb.append(formNoteText);
-         spcEl.setNotes(sb.toString());
-        try {
-            oii.updateInspectedSpaceElement(spcEl);
-             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Success! Note added", ""));
-        } catch (IntegrationException ex) {
-             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
-        }
-         reloadCurrentInspection();
+         if(currentInSpcEl != null){
+            StringBuilder sb = new StringBuilder();
+            if(currentInSpcEl.getNotes() !=null){
+                sb.append(currentInSpcEl.getNotes());
+                sb.append("****************<br />");
+            }
+            sb.append(formNoteText);
+            currentInSpcEl.setNotes(sb.toString());
+           try {
+               oii.updateInspectedSpaceElement(currentInSpcEl);
+                getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                   "Success! Note added", ""));
+           } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                   ex.getMessage(), ""));
+           }
+            reloadCurrentInspection();
+         }
      }
      
      public void checklistAction_recordComplianceForAllElements(ActionEvent ev){
@@ -778,9 +826,73 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         // do nothing!
      }
      
-     public void updateOccPeriodType(ActionEvent ev){
+
+     
+     public void certifyOccPeriodField(ActionEvent ev){
+         
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+         FacesContext context = getFacesContext();
+         String field = context.getExternalContext().getRequestParameterMap().get("fieldtocertify");
+         String certifymode = context.getExternalContext().getRequestParameterMap().get("certifymode");
+         
+         System.out.println("OccInspectionBB.certifuyOccPeriodField | field: " + field + " | mode: " + certifymode);
+         
+         User u = getSessionBean().getSessionUser();
+         LocalDateTime now = LocalDateTime.now();
+         
+         switch(field){
+            case "authorization":
+                currentOccPeriod.setAuthorizedBy(u);
+                currentOccPeriod.setAuthorizedTS(now);
+                if(certifymode.equals("withdraw")){
+                    currentOccPeriod.setAuthorizedBy(null);
+                    currentOccPeriod.setAuthorizedTS(null);
+                }
+                break;
+            case "occperiodtype":
+                currentOccPeriod.setPeriodTypeCertifiedBy(u);
+                currentOccPeriod.setPeriodTypeCertifiedTS(now);
+                if(certifymode.equals("withdraw")){
+                    currentOccPeriod.setPeriodTypeCertifiedBy(null);
+                    currentOccPeriod.setPeriodTypeCertifiedTS(null);
+                }
+                break;
+            case "startdate":
+                currentOccPeriod.setStartDateCertifiedBy(u);
+                currentOccPeriod.setStartDateCertifiedTS(now);
+                if(certifymode.equals("withdraw")){
+                    currentOccPeriod.setStartDateCertifiedBy(null);
+                    currentOccPeriod.setStartDateCertifiedTS(null);
+                }
+                break;
+            case "enddate":
+                currentOccPeriod.setEndDateCertifiedBy(u);
+                currentOccPeriod.setEndDateCertifiedTS(now);
+                if(certifymode.equals("withdraw")){
+                    currentOccPeriod.setEndDateCertifiedBy(null);
+                    currentOccPeriod.setEndDateCertifiedTS(null);
+                }
+                break;
+            default:
+                getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Error! Unable to certify field", ""));
+         }
+         
+        try {
+            oc.updateOccPeriod(currentOccPeriod, u);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Successfully udpated field status!", ""));
+        } catch (IntegrationException ex) {
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                ex.getMessage(), ""));
+        }
+        reloadCurrentOccPeriod();
          
      }
+     
      
      public void authorizeOccPeriod(ActionEvent ev){
          OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -818,6 +930,28 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void editLocation(OccInspectedSpace inSpace){
          
      }
+     
+     /**
+      * utility pass through method to be called when loading Occperiod advanced settings
+      * @param ev 
+      */
+     public void updateOccPeriodInitialize(ActionEvent ev){
+         
+     }
+     
+     public void updateOccPeriodCommit(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.updateOccPeriod(currentOccPeriod, getSessionBean().getSessionUser());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Update successful on OccPeriod ID: " + currentOccPeriod.getPeriodID(), ""));
+        } catch (IntegrationException ex) {
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                ex.getMessage(), ""));
+        }
+     }
     
      /**
       * We can only delete one that was JUST made - OK if this doesn't get implemented
@@ -833,7 +967,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      * Happens in a dialog in inspections.xhtml
      * @param e 
      */
-    public void commitOccupancyInspectionUpdates(ActionEvent e){
+    public void updateOccInspectionCommitChanges(ActionEvent e){
         OccupancyIntegrator oii = getOccupancyIntegrator();
         OccInspectionIntegrator ci = getOccInspectionIntegrator();
         

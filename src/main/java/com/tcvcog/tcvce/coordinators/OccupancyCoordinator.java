@@ -251,6 +251,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         SystemIntegrator si = getSystemIntegrator();
 
         ReportConfigOccInspection rpt = new ReportConfigOccInspection();
+        rpt.setGenerationTimestamp(LocalDateTime.now());
         rpt.setOccPeriod(period);
         
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
@@ -475,6 +476,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccPermitApplication occpermitapp = new OccPermitApplication();        
         occpermitapp.setSubmissionDate(LocalDateTime.now());        
         return occpermitapp;       
+    }
+    
+    public void updateOccPeriod(OccPeriod period, User u) throws IntegrationException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        
+        // TODO needs to check for status of period, if the period is auhtorized, only
+        // some udpates will be allowed
+        
+        oi.updateOccPeriod(period);
+        
     }
     
     public void updateOccInspection(OccInspection is, User u) throws IntegrationException{

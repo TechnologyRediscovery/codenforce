@@ -65,16 +65,18 @@ public class ChoiceCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public OccPeriod configureProposals(OccPeriod oPeriod, User u) throws EventException, AuthorizationException{
-        if(oPeriod.getProposalList() != null){
-            Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
-            while(iter.hasNext()){
-                Proposal p = iter.next();
-                configureProposal(p, u);
-    //            if(p.getDirective().getChoiceList().size() == 1
-    //                    &&
-    //                p.getDirective().isExecuteChoiceIfLoneWolf()){
-    //                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
-    //            }
+        if(oPeriod != null){
+            if(oPeriod.getProposalList() != null){
+                Iterator<Proposal> iter = oPeriod.getProposalList().iterator();
+                while(iter.hasNext()){
+                    Proposal p = iter.next();
+                    configureProposal(p, u);
+        //            if(p.getDirective().getChoiceList().size() == 1
+        //                    &&
+        //                p.getDirective().isExecuteChoiceIfLoneWolf()){
+        //                    evaluateProposal(p, p.getDirective().getChoiceList().get(0), oPeriod, u);
+        //            }
+                }
             }
         }
         return oPeriod;

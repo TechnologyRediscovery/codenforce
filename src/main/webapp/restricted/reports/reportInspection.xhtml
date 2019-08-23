@@ -38,11 +38,37 @@
             </ui:define>
             <ui:define name="print-content">
                 
-            
                 <f:view id="report-inspection-view">
                     <h:form id="report-inspection-form">
 
-                        <h2>Inspection Fix-It List</h2>
+                        <h2>Occupancy inspection report</h2>
+                            <div class="occperiod-address-container">
+
+                                <h:outputText styleClass="occperiod-address" 
+                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address}" />
+                                <h:outputText styleClass="occperiod-address" 
+                                              value=", " />
+                                <h:outputText styleClass="occperiod-address" 
+                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address_city}" />
+                                <h:outputText styleClass="occperiod-address" 
+                                              value=" " />
+                                <h:outputText styleClass="occperiod-address" 
+                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address_state}" />
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText styleClass="ui-label-inline" value="Occupancy period for unit no. "  />
+
+                                <h:outputText value="(single dwelling unit)"  
+                                              rendered="#{reportingBB.reportConfigOccInspection.propUnitWithProp == '-1'}"
+                                              styleClass="data-text italic" />
+
+                                <h:outputText value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.unitNumber}"  
+                                              rendered="#{reportingBB.reportConfigOccInspection.propUnitWithProp.unitNumber != '-1'}"
+                                              styleClass="data-text"/>
+                            </div>
+                        
+                        <h2>To-Do list before reinspection</h2>
 
                         <p:dataScroller
                             id="scroller-inspectedspacelist"
@@ -86,17 +112,16 @@
                                     <h:outputText  styleClass="data-text" value=" (&#167;" />
                                     <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecNum}" />
                                     <h:outputText  styleClass="data-text" value=", " />
-                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSecTitle}; " />
+                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSecTitle} " />
                                     <h:outputText  styleClass="data-text" value=")" />
                                 </div>
 
                                 <h:panelGrid    id="occperiod-inspectedspace-panelgrid-inspelement" 
                                                 columns="3" 
                                                 cellpadding="10" footerClass="gridFooter"
-                                                columnClasses="gridTD, gridTD, gridTD" 
+                                                columnClasses="gridTd, gridTd, gridTd" 
                                                 rendered="true">
-                                    <h:panelGroup>
-
+                                    <h:panelGroup rendered="false">
                                         <div class="status-display-container">
                                             <div class="status-display-icon-container">
                                                 <i class="material-icons status-display-icon-i #{reportingBB.reportConfigOccInspection.defaultItemIcon.styleClass}">
@@ -104,12 +129,9 @@
                                                 </i>
                                             </div>
                                         </div>
-                                        <p:spacer height="5px" />
-
                                     </h:panelGroup>      
 
                                     <h:panelGroup>
-
                                         <f:subview      id="occperiod-inspectedspace-subview-compliancedata"
                                                         rendered="#{(!(empty inelement.complianceGrantedTS)) and reportingBB.reportConfigOccInspection.includeElementComplianceInfo}">
 

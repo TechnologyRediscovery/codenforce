@@ -900,7 +900,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     public void updateOccPeriod(OccPeriod period) throws IntegrationException {
         String query = "UPDATE public.occperiod\n"
-                + "   SET source_sourceid=?, propertyunit_unitid=?, createdts=?, \n"
+                + "   SET source_sourceid=?, propertyunit_unitid=?,\n"
                 + "       type_typeid=?, typecertifiedby_userid=?, typecertifiedts=?, startdate=?, \n"
                 + "       startdatecertifiedby_userid=?, startdatecertifiedts=?, enddate=?, \n"
                 + "       enddatecertifiedby_userid=?, enddatecterifiedts=?, manager_userid=?, \n"
@@ -910,7 +910,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         ResultSet rs = null;
         Connection con = null;
         PreparedStatement stmt = null;
-        int newPeriodId = 0;
 
         try {
             con = getPostgresCon();
@@ -993,22 +992,15 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             } else {
                 stmt.setNull(17, java.sql.Types.NULL);
             }
+            
+            stmt.setInt(18, period.getPeriodID());
 
-            stmt.execute();
+            stmt.executeUpdate();
 
-            String lastIDNumSQL = "SELECT currval('occperiodid_seq'::regclass)";
-
-            stmt = con.prepareStatement(lastIDNumSQL);
-
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                newPeriodId = rs.getInt("currval");
-            }
+           
 
         } catch (SQLException ex) {
-            throw new IntegrationException("OccupancyIntegrator.insertOccPermitApplication"
-                    + "| IntegrationError: unable to insert occupancy permit application ", ex);
+            throw new IntegrationException("Integration error: Unable to update occ period. This is a fatal error that should be reported.", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

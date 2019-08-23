@@ -7,6 +7,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -300,20 +301,38 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public String beginConstructingNewOccPeriod(PropertyUnit pu){
+    public String addNewOccPeriod(PropertyUnit pu){
         currPropUnit = pu;
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
         System.out.println("PropertyProfileBB.beginConstructingNewOccPeriod | received propunit " + pu.getUnitID());
         try {
-            currOccPeriod = oc.initializeNewOccPeriod(  currProp, 
-                                                        pu, 
-                                                        getSessionBean().getSessionUser(), 
-                                                        getSessionBean().getSessionMuni());
-            currOccPeriod.setType(selectedOccPeriodType);
-            getSessionBean().setSessionOccPeriod(currOccPeriod);
-        } catch (IntegrationException ex) {
+            if(selectedOccPeriodType != null){
+                currOccPeriod = oc.initializeNewOccPeriod(  currProp, 
+                                                            pu, 
+                                                            getSessionBean().getSessionUser(), 
+                                                            getSessionBean().getSessionMuni());
+                currOccPeriod.setType(selectedOccPeriodType);
+//                getSessionBean().setSessionOccPeriod(currOccPeriod);
+                int newID = 0;
+                newID = oc.insertNewOccPeriod(currOccPeriod, getSessionBean().getSessionUser());
+//                refreshCurrPropWithLists();
+//                getFacesContext().addMessage(null,
+//                                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                                            "Success! New occ period ID: " + newID, ""));
+                getSessionBean().setSessionOccPeriod(oi.getOccPeriod(newID, getSessionBean().getSessionUser()));
+            } else {
+                getFacesContext().addMessage(null,
+                                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                            "Please select a period type" , ""));
+                return "";
+            }
+        } catch (EventException | AuthorizationException | CaseLifecycleException | ViolationException | IntegrationException ex) {
             System.out.println(ex);
-        }
+            getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                        "Could not commit new occ period: " , ""));
+        } 
         return "inspection";
     }
     
@@ -339,20 +358,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     
     
     public void commitNewOccPeriod(ActionEvent ev){
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        try {
-            int newID = 0;
-            newID = oc.insertNewOccPeriod(currOccPeriod, getSessionBean().getSessionUser());
-            refreshCurrPropWithLists();
-            getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Success! New occ period ID: " + newID, ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "Could not commit new occ period: " , ""));
-        }
     }
     
     public String manageInspection(OccInspection inspec){

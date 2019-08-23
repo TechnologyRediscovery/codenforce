@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities.reports;
 
 import com.tcvcog.tcvce.entities.Icon;
+import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ public class ReportConfigOccInspection
         implements Serializable{
     
     private OccPeriod occPeriod;
+    private PropertyUnitWithProp propUnitWithProp;
     
     private Icon defaultItemIcon;
         
@@ -209,5 +211,19 @@ public class ReportConfigOccInspection
      */
     public void setDefaultItemIcon(Icon defaultItemIcon) {
         this.defaultItemIcon = defaultItemIcon;
+    }
+
+    /**
+     * @return the propUnitWithProp
+     */
+    public PropertyUnitWithProp getPropUnitWithProp() {
+        return propUnitWithProp;
+    }
+
+    /**
+     * @param propUnitWithProp the propUnitWithProp to set
+     */
+    public void setPropUnitWithProp(PropertyUnitWithProp propUnitWithProp) {
+        this.propUnitWithProp = propUnitWithProp;
     }
 }

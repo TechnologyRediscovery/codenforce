@@ -1460,6 +1460,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
             stmt.setBoolean(15, occInsp.isActive());
             
+            stmt.setInt(16, occInsp.getInspectionID());
+            
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
