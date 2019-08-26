@@ -21,7 +21,7 @@
                     <p>View, create, and manage payment records</p>
                     <f:view>
                         <h:form id="paymentDisplay">
-                            <h2>Recorded payments</h2>
+                            <h2>Recorded payments <p:outputLabel rendered="#{paymentBB.editingOccPeriod()}" value="for OccPeriod ##{paymentBB.currentOccPeriod.periodID} (#{paymentBB.occPeriodAddress})"/></h2>
                             <p:dataTable
                                 id="occInsFees"
                                 var="p"
@@ -59,35 +59,35 @@
                                     <f:facet name="header">
                                         <h:outputText value="Date Received" />
                                     </f:facet>
-                                    <h:outputText value="#{p.paymentDateReceived}"/>
+                                    <h:outputText value="#{p.dateReceived}"/>
                                 </p:column>
 
                                 <p:column width="25%">
                                     <f:facet name="header">
                                         <h:outputText value="Date Deposited" />
                                     </f:facet>
-                                    <h:outputText value="#{p.paymentDateDeposited}"/>
+                                    <h:outputText value="#{p.dateDeposited}"/>
                                 </p:column>
 
                                 <p:column width="25%">
                                     <f:facet name="header">
                                         <h:outputText value="Amount" />
                                     </f:facet>
-                                    <h:outputText value="#{p.paymentAmount}"/>
+                                    <h:outputText value="#{p.amount}"/>
                                 </p:column>
 
                                 <p:column width="25%">
                                     <f:facet name="header">
                                         <h:outputText value="Payer ID" />
                                     </f:facet>
-                                    <h:outputText value="#{p.paymentPayer.personID}"/>
+                                    <h:outputText value="#{p.payer.personID}"/>
                                 </p:column>
 
                                 <p:column width="25%">
                                     <f:facet name="header">
                                         <h:outputText value="Reference Num" />
                                     </f:facet>
-                                    <h:outputText value="#{p.paymentReferenceNum}"/>
+                                    <h:outputText value="#{p.referenceNum}"/>
                                 </p:column>
 
                                 <p:column width="25%">
@@ -123,7 +123,8 @@
                                                 value="Create new Payment Record"
                                                 icon="fa fa-plus"
                                                 />
-
+                            <p:commandButton rendered="#{paymentBB.redirTo != null}" action="#{paymentBB.finishAndRedir()}"
+                                                 value="Finish editing payment list and return"/>
                         </h:form>    
 
 
@@ -159,9 +160,12 @@
                                     <h:outputLabel value="Occ Inspection ID:" for="occInsID"/>
                                     <h:panelGroup>
                                         <p:inputText id="occInsID" value="#{paymentBB.formPaymentOccupancyInspectionID}" 
-                                                     style="width: 250px;" tabindex="4" required="false" styleClass="inputText" maxlength="100"/>
+                                                     style="width: 250px;" tabindex="4" required="false" 
+                                                     styleClass="inputText" maxlength="100"/>
                                         <h:message for="occInsID" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                   warnClass="msgWarn" infoClass="msgInfo" 
+                                                   fatalClass="msgFatal" errorClass="msgError" 
+                                                   />
                                     </h:panelGroup>
 
                                     <p:outputLabel for="paymentTypeMenu">

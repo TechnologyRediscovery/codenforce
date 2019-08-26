@@ -19,6 +19,7 @@ import com.tcvcog.tcvce.entities.CECaseEvent;
 import com.tcvcog.tcvce.entities.Choice;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -26,7 +27,6 @@ import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
@@ -49,18 +49,14 @@ import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 /**
- * Primary backing bean for the inspections.xhtml page which is the central
+ * Primary backing bean for the inspection.xhtml page which is the central
  management point for all occupancy inspection related tasks including:\
  * 
  Reviewing, editing (generally processing) occupancy applications
@@ -151,6 +147,13 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private EventCategory selectedEventCategory;
     private List<Person> personCandidateList;
     private Person selectedPerson;
+    
+    // payments
+    private List<Payment> existingPaymentList;
+    private List<Payment> workingPaymentList;
+    private List<Payment> filteredPaymentList;
+    private Payment selectedPayment;
+    
     
     /**
      * Creates a new instance of InspectionsBB
@@ -927,6 +930,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      }
      
      
+     public String editOccPeriodPayments(){
+         getSessionBean().setSessionOccPeriod(currentOccPeriod);
+         getSessionBean().setPaymentRedirTo("inspection");
+         
+         return "payments";
+     }
+     
+     public String editOnePayment(Payment thisPayment){
+         getSessionBean().setSessionPayment(thisPayment);
+         getSessionBean().setPaymentRedirTo("inspection");
+         
+         return "payments";
+     }
+     
      public void editLocation(OccInspectedSpace inSpace){
          
      }
@@ -1520,8 +1537,38 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.itemFilterOptions = itemFilterOptions;
     }
 
+    public List<Payment> getExistingPaymentList() {
+        return existingPaymentList;
+    }
+
+    public void setExistingPaymentList(List<Payment> existingPaymentList) {
+        this.existingPaymentList = existingPaymentList;
+    }
+
+    public List<Payment> getWorkingPaymentList() {
+        return workingPaymentList;
+    }
+
+    public void setWorkingPaymentList(List<Payment> workingPaymentList) {
+        this.workingPaymentList = workingPaymentList;
+    }
+
+    public List<Payment> getFilteredPaymentList() {
+        return filteredPaymentList;
+    }
+
+    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
+        this.filteredPaymentList = filteredPaymentList;
+    }
     
-     
+    public Payment getSelectedPayment() {
+        return selectedPayment;
+    }
+
+    public void setSelectedPayment(Payment selectedPayment) {
+        this.selectedPayment = selectedPayment;
+    }
+
 }
 
 //
