@@ -27,24 +27,26 @@ public class Payment {
     private int paymentID;
     private int occupancyInspectionID;
     private PaymentType paymentType;
-    private LocalDateTime paymentDateDeposited;
-    private LocalDateTime paymentDateReceived;
-    private double paymentAmount;
-    private Person paymentPayer;
-    private String paymentReferenceNum;
+    private LocalDateTime dateDeposited;
+    private LocalDateTime dateReceived;
+    private double amount;
+    private Person payer;
+    private String referenceNum;
     private int checkNum;
     private boolean cleared;
     private String notes;
+    private User recordedBy;
+    private LocalDateTime entryTimestamp;
 
    public Payment() {
        
        notes = " ";
        
-       paymentPayer = new Person();
+       payer = new Person();
        
-       paymentDateReceived = LocalDateTime.now();
+       dateReceived = LocalDateTime.now();
        
-       paymentDateDeposited = LocalDateTime.now();
+       dateDeposited = LocalDateTime.now();
        
        paymentType = new PaymentType();
        
@@ -67,59 +69,59 @@ public class Payment {
     }
 
     /**
-     * @return the paymentDateDeposited
+     * @return the dateDeposited
      */
-    public LocalDateTime getPaymentDateDeposited() {
-        return paymentDateDeposited;
+    public LocalDateTime getDateDeposited() {
+        return dateDeposited;
     }
 
     /**
-     * @param paymentDateDeposited the paymentDateDeposited to set
+     * @param dateDeposited the dateDeposited to set
      */
-    public void setPaymentDateDeposited(LocalDateTime paymentDateDeposited) {
-        this.paymentDateDeposited = paymentDateDeposited;
+    public void setDateDeposited(LocalDateTime dateDeposited) {
+        this.dateDeposited = dateDeposited;
     }
 
     /**
-     * @return the paymentDateReceived
+     * @return the dateReceived
      */
-    public LocalDateTime getPaymentDateReceived() {
-        return paymentDateReceived;
+    public LocalDateTime getDateReceived() {
+        return dateReceived;
     }
 
     /**
-     * @param paymentDateReceived the paymentDateReceived to set
+     * @param dateReceived the dateReceived to set
      */
-    public void setPaymentDateReceived(LocalDateTime paymentDateReceived) {
-        this.paymentDateReceived = paymentDateReceived;
+    public void setDateReceived(LocalDateTime dateReceived) {
+        this.dateReceived = dateReceived;
     }
 
     /**
-     * @return the paymentAmount
+     * @return the amount
      */
-    public double getPaymentAmount() {
-        return paymentAmount;
+    public double getAmount() {
+        return amount;
     }
 
     /**
-     * @param paymentAmount the paymentAmount to set
+     * @param amount the amount to set
      */
-    public void setPaymentAmount(double paymentAmount) {
-        this.paymentAmount = paymentAmount;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
     /**
-     * @return the paymentReferenceNum
+     * @return the referenceNum
      */
-    public String getPaymentReferenceNum() {
-        return paymentReferenceNum;
+    public String getReferenceNum() {
+        return referenceNum;
     }
 
     /**
-     * @param paymentReferenceNum the paymentReferenceNum to set
+     * @param referenceNum the referenceNum to set
      */
-    public void setPaymentReferenceNum(String paymentReferenceNum) {
-        this.paymentReferenceNum = paymentReferenceNum;
+    public void setReferenceNum(String referenceNum) {
+        this.referenceNum = referenceNum;
     }
 
     /**
@@ -167,28 +169,16 @@ public class Payment {
     /**
      * @return the paymentPayerID
      */
-    public Person getPaymentPayer() {
-        return paymentPayer;
+    public Person getPayer() {
+        return payer;
     }
 
     /**
      * @param paymentPayerID the paymentPayerID to set
      */
-    public void setPaymentPayer(Person paymentPayer) {
-        this.paymentPayer = paymentPayer;
+    public void setPayer(Person payer) {
+        this.payer = payer;
     }
-
-    /**
-     * unused methods (for now...)
-    
-    public int getPaymentPaymentTypeID() {
-        return getPaymentType();
-    }
-    
-    public void setPaymentPaymentTypeID(int paymentPaymentTypeID) {
-        this.setPaymentType(paymentPaymentTypeID);
-    }
-    */
 
     /**
      * @return the paymentType
@@ -217,6 +207,21 @@ public class Payment {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    
+
+    public User getRecordedBy() {
+        return recordedBy;
+    }
+
+    public void setRecordedBy(User recordedBy) {
+        this.recordedBy = recordedBy;
+    }
+
+    public LocalDateTime getEntryTimestamp() {
+        return entryTimestamp;
+    }
+
+    public void setEntryTimestamp(LocalDateTime entryTimestamp) {
+        this.entryTimestamp = entryTimestamp;
+    }
     
 }

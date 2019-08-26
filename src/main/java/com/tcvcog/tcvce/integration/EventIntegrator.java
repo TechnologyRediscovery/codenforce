@@ -147,7 +147,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        String query = "SELECT eventid, ceeventcategory_catid, cecase_caseid, dateofrecord, \n" +
+        String query = "SELECT eventid, category_catid, cecase_caseid, dateofrecord, \n" +
                 "       eventtimestamp, eventdescription, owner_userid, disclosetomunicipality, \n" +
                 "       disclosetopublic, activeevent, hidden, ceevent.notes, property_propertyid,  municipality_municode " +
                 "       FROM public.ceevent INNER JOIN public.cecase ON (cecase_caseid = caseid)\n" +
@@ -845,7 +845,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ev.setMuniName(ssc.getMuniCodeNameMap().get(rs.getInt("municipality_municode")));
 
         ev.setEventID(rs.getInt("eventid"));
-        ev.setCategory(getEventCategory(rs.getInt("ceeventcategory_catid")));
+        ev.setCategory(getEventCategory(rs.getInt("category_catid")));
 //        ev.setCaseID(rs.getInt("cecase_caseid"));
         
         if (rs.getTimestamp("dateofrecord") != null) {

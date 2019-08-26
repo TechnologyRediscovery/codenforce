@@ -155,6 +155,10 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     private Person activeAnonPerson;
     private OccPermitApplicationReason occPermitApplicationReason;
 
+    /* *** Payment Management Shelves *** */
+    private Payment sessionPayment;
+    private String paymentRedirTo;
+    
     /* *** Blob Upload Session Shelves *** */
     //linking
 
@@ -889,6 +893,21 @@ public class SessionBean extends BackingBeanUtils implements Serializable{
     public void setReportConfigInspection(ReportConfigOccInspection reportConfigInspection) {
         this.reportConfigInspection = reportConfigInspection;
     }
-    
+
+    public Payment getSessionPayment() {
+        return sessionPayment;
+    }
+
+    public void setSessionPayment(Payment sessionPayment) {
+        this.sessionPayment = sessionPayment;
+    }
+
+    public String getPaymentRedirTo() {
+        return paymentRedirTo;
+    }
+
+    public void setPaymentRedirTo(String paymentRedirTo) {
+        this.paymentRedirTo = paymentRedirTo;
+    }
     
 }
