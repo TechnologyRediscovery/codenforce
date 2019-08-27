@@ -36,7 +36,9 @@ import java.util.logging.Logger;
  * 
  * @author Eric C. Darsow, Technology Rediscovery LLC 
  */
-public class OccInspectedSpace extends OccSpace implements Serializable, Cloneable{
+public class OccInspectedSpace 
+        extends OccSpace 
+        implements Serializable, Cloneable, Comparable<OccInspectedSpace>{
 
     
     private int inspectedSpaceID;
@@ -305,6 +307,11 @@ public class OccInspectedSpace extends OccSpace implements Serializable, Cloneab
      */
     public void setViewSetting(OccInspectionViewOptions viewSetting) {
         this.viewSetting = viewSetting;
+    }
+
+    @Override
+    public int compareTo(OccInspectedSpace o) {
+        return this.addedToChecklistTS.compareTo(o.addedToChecklistTS);
     }
 
    
