@@ -13,6 +13,7 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.CaseLifecycleException;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseEvent;
@@ -31,6 +32,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -111,6 +113,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private OccLocationDescriptor selectedLocation;
     private List<OccLocationDescriptor> workingLocationList;
     
+    private List<OccChecklistTemplate> inspectionTemplateCandidateList;
+    private OccChecklistTemplate selectedInspectionTemplate;
+    
     private List<OccPeriodType> occPeriodTypeList;
     private List<OccEvent> filteredEventList;
     
@@ -123,10 +128,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private List<OccSpace> spacesInTypeList;
     private List<OccSpaceElement> elementsInSpaceList;
     
+    private OccInspectionStatusEnum selectedInspectedElementAddValue;
+    private OccInspectionStatusEnum[] inspectedElementAddValueCandidateList;
     private boolean markNewlyAddedSpacesWithCompliance;
     private boolean promptForSpaceLocationUponAdd;
     
-    private List<User> inspectorPossibilityList;
+    private List<User> inspectorCandidateList;
     private User selectedInspector;
     
     private String formNoteText;
@@ -172,7 +179,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         try {
             if(getSessionBean().getSessionOccPeriod() != null){
                 currentOccPeriod = oi.getOccPeriod(getSessionBean().getSessionOccPeriod().getPeriodID(), getSessionBean().getSessionUser());
-                currentInspection = currentOccPeriod.determineGoverningOccInspection();
+                currentInspection = currentOccPeriod.getGoverningInspection();
                 currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
                 // all inspected spaces are visible by default
                 if(currentInspection != null){
@@ -220,8 +227,11 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
         
         itemFilterOptions = OccInspectionViewOptions.values();
+        inspectedElementAddValueCandidateList = OccInspectionStatusEnum.values();
+        
         
         try {
+            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessionMuni());
             reportConfigOccInspec =
                     oc.getOccInspectionReportConfigDefault(
                             currentInspection,
@@ -254,7 +264,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         // dialog will appear clientside on complete
     }
     
-    public void addAllRequiredSpaceTypes(ActionEvent ev){
+    public void checklistAction_addAllRequiredSpaceTypes(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         System.out.println("OccinspectionBB.addAllrequiredSpaceTypes");
           
@@ -266,6 +276,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                                 currentInspection,
                                 getSessionBean().getSessionUser(),
                                 spc,
+                                selectedInspectedElementAddValue,
                                 null);
                     } catch (IntegrationException ex) {
                         System.out.println(ex);
@@ -298,13 +309,18 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         currentLocation = old;
     }
     
+    public void initializeSpaceAdd(ActionEvent ev){
+        
+    }
+    
     public void activateOccInspection(OccInspection ins){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         if(getSessionBean().getSessionUser().getKeyCard().isHasEnfOfficialPermissions()){
             try {
                 
-                oc.activateOccInspection(ins, selectedInspector);
+                oc.activateOccInspection(ins);
                 currentInspection = ins;
+                reloadCurrentInspection();
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Inspection ID " + ins.getInspectionID() + " is now your active inspection", ""));
             } catch (IntegrationException ex) {
@@ -385,7 +401,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private void reloadCurrentInspection(){
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         try {
-            currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
+            if(currentInspection != null){
+                currentInspection = oii.getOccInspection(currentInspection.getInspectionID());
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Reloaded inspection ID " + currentInspection.getInspectionID(), ""));
+            }
         } catch (IntegrationException ex) {
             System.out.println(ex);
             System.out.println(ex);
@@ -407,11 +428,25 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 "Unable to reload occ period", ""));
-            
         }
     }
     
-    public void addSpaceToChecklist(OccSpace space) {
+    public void markInspectionAsGoverning(OccInspection insp){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.activateOccInspection(insp);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Success! Activated inspection ID: " + insp.getInspectionID(), ""));
+        } catch (IntegrationException ex) {
+            
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                ex.getMessage(), ""));
+        }
+    }
+    
+    public void checklistAction_addSpaceToChecklist(OccSpace space) {
         FacesContext fc = getFacesContext();
         String paramVal = fc.getExternalContext().getRequestParameterMap().get("occperiod-elementstatusonadd");
         System.out.println("OccInspectionBB.addSpaceToChecklist | param val: " + paramVal);
@@ -420,6 +455,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             oc.inspectionAction_commenceSpaceInspection(currentInspection,
                             getSessionBean().getSessionUser(),
                             space,
+                            selectedInspectedElementAddValue,
                             null);
             
         System.out.println("OccInspectionBB.addSpaceToChecklist | space name: " + space.getName());
@@ -541,6 +577,30 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         
     }
     
+    public void implementNewInspectionChecklist(ActionEvent ev){
+        if(selectedInspectionTemplate != null){
+            OccupancyCoordinator oc = getOccupancyCoordinator();
+            try {
+                oc.inspectionAction_commenceOccupancyInspection(null, selectedInspectionTemplate, currentOccPeriod, getSessionBean().getSessionUser());
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Success! Created new inspection.", ""));
+            } catch (InspectionException | IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+            }
+            reloadCurrentOccPeriod();
+            reloadCurrentInspection();
+        } else {
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Please select an inspection template!", ""));
+            
+        }
+    }
+    
     public void initiateNoteOnInspection(ActionEvent ev){
         formNoteText = null;
     }
@@ -580,6 +640,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
     
     public String reports_generateOccInspectionReport(){
+        reloadCurrentInspection();
+        currentOccPeriod.setGoverningInspection(currentInspection);
+        reportConfigOccInspec.setOccPeriod(currentOccPeriod);
         reportConfigOccInspec.setPropUnitWithProp(currentPropertyUnit);
         getSessionBean().setReportConfigInspection(reportConfigOccInspec);
         return "inspectionReport";
@@ -1072,17 +1135,17 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @return the inspectorPossibilityList
+     * @return the inspectorCandidateList
      */
-    public List<User> getInspectorPossibilityList() {
-        return inspectorPossibilityList;
+    public List<User> getInspectorCandidateList() {
+        return inspectorCandidateList;
     }
 
     /**
-     * @param inspectorPossibilityList the inspectorPossibilityList to set
+     * @param inspectorCandidateList the inspectorCandidateList to set
      */
-    public void setInspectorPossibilityList(List<User> inspectorPossibilityList) {
-        this.inspectorPossibilityList = inspectorPossibilityList;
+    public void setInspectorCandidateList(List<User> inspectorCandidateList) {
+        this.inspectorCandidateList = inspectorCandidateList;
     }
 
     /**
@@ -1518,6 +1581,62 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      */
     public void setItemFilterOptions(OccInspectionViewOptions[] itemFilterOptions) {
         this.itemFilterOptions = itemFilterOptions;
+    }
+
+    /**
+     * @return the inspectionTemplateCandidateList
+     */
+    public List<OccChecklistTemplate> getInspectionTemplateCandidateList() {
+        return inspectionTemplateCandidateList;
+    }
+
+    /**
+     * @param inspectionTemplateCandidateList the inspectionTemplateCandidateList to set
+     */
+    public void setInspectionTemplateCandidateList(List<OccChecklistTemplate> inspectionTemplateCandidateList) {
+        this.inspectionTemplateCandidateList = inspectionTemplateCandidateList;
+    }
+
+    /**
+     * @return the selectedInspectionTemplate
+     */
+    public OccChecklistTemplate getSelectedInspectionTemplate() {
+        return selectedInspectionTemplate;
+    }
+
+    /**
+     * @param selectedInspectionTemplate the selectedInspectionTemplate to set
+     */
+    public void setSelectedInspectionTemplate(OccChecklistTemplate selectedInspectionTemplate) {
+        this.selectedInspectionTemplate = selectedInspectionTemplate;
+    }
+
+    /**
+     * @return the selectedInspectedElementAddValue
+     */
+    public OccInspectionStatusEnum getSelectedInspectedElementAddValue() {
+        return selectedInspectedElementAddValue;
+    }
+
+    /**
+     * @param selectedInspectedElementAddValue the selectedInspectedElementAddValue to set
+     */
+    public void setSelectedInspectedElementAddValue(OccInspectionStatusEnum selectedInspectedElementAddValue) {
+        this.selectedInspectedElementAddValue = selectedInspectedElementAddValue;
+    }
+
+    /**
+     * @return the inspectedElementAddValueCandidateList
+     */
+    public OccInspectionStatusEnum[] getInspectedElementAddValueCandidateList() {
+        return inspectedElementAddValueCandidateList;
+    }
+
+    /**
+     * @param inspectedElementAddValueCandidateList the inspectedElementAddValueCandidateList to set
+     */
+    public void setInspectedElementAddValueCandidateList(OccInspectionStatusEnum[] inspectedElementAddValueCandidateList) {
+        this.inspectedElementAddValueCandidateList = inspectedElementAddValueCandidateList;
     }
 
     

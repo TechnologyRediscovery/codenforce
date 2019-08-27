@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -429,6 +430,37 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }    
+    
+    
+    public List<OccChecklistTemplate> getChecklistTemplateList(Municipality m) throws IntegrationException{
+        String checklistTableSELECT = "SELECT checklistid FROM public.occchecklist;";
+        Connection con = getPostgresCon();
+        List<OccChecklistTemplate> tempList = new ArrayList<>();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            
+            stmt = con.prepareStatement(checklistTableSELECT);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                tempList.add(getChecklistTemplate(rs.getInt("checklistid")));
+                
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build a checklist blueprint from database", ex);
+
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return tempList;
+        
+    }
     
     
     public OccChecklistTemplate getChecklistTemplate(int checklistID) throws IntegrationException{
@@ -872,7 +904,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                                 "            inspectedspace_inspectedspaceid, overriderequiredflagnotinspected_userid, \n" +
                                 "            spaceelement_elementid, required, failureseverity_intensityclassid)\n" +
                                 "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                                "            now(), ?, ?, \n" +
+                                "            ?, ?, ?, \n" +
                                 "            ?, ?, \n" +
                                 "            ?, ?, ?);";
         
@@ -904,38 +936,41 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                         .getString("locationdescriptor_implyfromspacename"))).getLocationID();
             }
             stmt.setInt(2, locID);
-            if(inspElement.getLastInspectedBy() != null){
+            if(inspElement.getLastInspectedBy() != null
+                    && inspElement.getLastInspectedTS() != null){
                 stmt.setInt(3, inspElement.getLastInspectedBy().getUserID());
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(inspElement.getLastInspectedTS()));
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
+                stmt.setNull(4, java.sql.Types.NULL);
+                
             }
 
 
             if(inspElement.getComplianceGrantedBy() != null 
-                    &&
-                inspElement.getComplianceGrantedTS() != null){
-                stmt.setInt(4, inspElement.getComplianceGrantedBy().getUserID());
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(inspElement.getComplianceGrantedTS()));
+                    && inspElement.getComplianceGrantedTS() != null){
+                stmt.setInt(5, inspElement.getComplianceGrantedBy().getUserID());
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(inspElement.getComplianceGrantedTS()));
             } else {
-                stmt.setNull(4, java.sql.Types.NULL);
                 stmt.setNull(5, java.sql.Types.NULL);
+                stmt.setNull(6, java.sql.Types.NULL);
             }
 
-            stmt.setInt(6, inSpace.getInspectedSpaceID());
+            stmt.setInt(7, inSpace.getInspectedSpaceID());
 
             if(inspElement.getOverrideRequiredFlag_thisElementNotInspectedBy() != null){
-                stmt.setInt(7, inspElement.getOverrideRequiredFlag_thisElementNotInspectedBy().getUserID());
+                stmt.setInt(8, inspElement.getOverrideRequiredFlag_thisElementNotInspectedBy().getUserID());
             } else {
-                stmt.setNull(7, java.sql.Types.NULL);
+                stmt.setNull(8, java.sql.Types.NULL);
             }
             
-            stmt.setInt(8, inspElement.getSpaceElementID());
+            stmt.setInt(9, inspElement.getSpaceElementID());
 
-            stmt.setBoolean(9, inspElement.isRequired());
+            stmt.setBoolean(10, inspElement.isRequired());
 
             // TODO: Finish severity intensity!
 //                stmt.setInt(10, 0);
-            stmt.setNull(10, java.sql.Types.NULL);
+            stmt.setNull(11, java.sql.Types.NULL);
             stmt.execute();
             System.out.println("OccInspectectionIntegrator.insertInspectedSpaceElements | inspectedElement inserted!");
             
