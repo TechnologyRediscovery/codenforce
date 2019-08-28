@@ -55,6 +55,7 @@ public class OccPeriod
     
     private List<EventRuleOccPeriod> eventRuleOccPeriodList;
     
+    private OccInspection governingInspection;
     private List<OccInspection> inspectionList;
     private List<OccPermit> permitList;
     private List<Integer> blobIDList;
@@ -148,28 +149,7 @@ public class OccPeriod
         return actEvList;
     }
       
-    /**
-     * TODO: finish more intelligent guts for this process come the time of
-     * multiple inspections
-     * @return 
-     */
-    public OccInspection determineGoverningOccInspection(){
-        OccInspection selIns = null;
-        Collections.sort(inspectionList);
-        // logic for determining the currentOccInspection
-        if(inspectionList != null){
-            if(inspectionList.size() == 1){
-                return inspectionList.get(0);
-            } else {
-                for(OccInspection ins: inspectionList){
-                    if(ins.isActive()){
-                        selIns = ins;
-                    }
-                }
-            }
-        }
-        return selIns;
-    }
+   
     
     /**
      * @return the periodID
@@ -701,6 +681,20 @@ public class OccPeriod
      */
     public void setPaymentList(List<Payment> paymentList) {
         this.paymentList = paymentList;
+    }
+
+    /**
+     * @return the governingInspection
+     */
+    public OccInspection getGoverningInspection() {
+        return governingInspection;
+    }
+
+    /**
+     * @param governingInspection the governingInspection to set
+     */
+    public void setGoverningInspection(OccInspection governingInspection) {
+        this.governingInspection = governingInspection;
     }
 
    

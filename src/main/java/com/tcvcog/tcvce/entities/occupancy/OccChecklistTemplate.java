@@ -20,8 +20,8 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a set of space types and their associated code elements
@@ -143,6 +143,55 @@ public class OccChecklistTemplate extends EntityUtils {
      */
     public void setGoverningCodeSource(CodeSource governingCodeSource) {
         this.governingCodeSource = governingCodeSource;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + this.inspectionChecklistID;
+        hash = 79 * hash + Objects.hashCode(this.muni);
+        hash = 79 * hash + Objects.hashCode(this.title);
+        hash = 79 * hash + Objects.hashCode(this.description);
+        hash = 79 * hash + (this.active ? 1 : 0);
+        hash = 79 * hash + Objects.hashCode(this.governingCodeSource);
+        hash = 79 * hash + Objects.hashCode(this.occSpaceTypeTemplateList);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OccChecklistTemplate other = (OccChecklistTemplate) obj;
+        if (this.inspectionChecklistID != other.inspectionChecklistID) {
+            return false;
+        }
+        if (this.active != other.active) {
+            return false;
+        }
+        if (!Objects.equals(this.title, other.title)) {
+            return false;
+        }
+        if (!Objects.equals(this.description, other.description)) {
+            return false;
+        }
+        if (!Objects.equals(this.muni, other.muni)) {
+            return false;
+        }
+        if (!Objects.equals(this.governingCodeSource, other.governingCodeSource)) {
+            return false;
+        }
+        if (!Objects.equals(this.occSpaceTypeTemplateList, other.occSpaceTypeTemplateList)) {
+            return false;
+        }
+        return true;
     }
 
   

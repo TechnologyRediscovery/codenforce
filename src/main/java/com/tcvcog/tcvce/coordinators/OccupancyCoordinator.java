@@ -97,7 +97,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccPeriod configureOccPeriod(OccPeriod period, User u) throws EventException, AuthorizationException, IntegrationException, CaseLifecycleException, ViolationException{
         ChoiceCoordinator cc = getChoiceCoordinator();
         EventCoordinator ec = getEventCoordinator();
+        period.setGoverningInspection(designateGoverningInspection(period));
         period = cc.configureProposals(period, u);
+        // Removed during occbeta overhaul
 //        if(period.determineGoverningOccInspection().isReadyForPassedCertification() 
 //                && ec.evaluateEventRules(period)){
 //            period.setReadyForPeriodAuthorization(true);
@@ -116,6 +118,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 }
             }
             inspection.setReadyForPassedCertification(allSpacesPassed);
+            if(!inspection.getInspectedSpaceList().isEmpty()){
+                Collections.sort(inspection.getInspectedSpaceList());
+                Collections.reverse(inspection.getInspectedSpaceList());
+            }
         }
         return inspection;
     }
@@ -326,6 +332,44 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return new OccInspection();
     }
     
+    /**
+     * Updates DB to mark the passed in OccInspection the governing one in the 
+     * given OccPeriod
+     * @param period
+     * @param insp to be made governing
+     * @return the governing Inspection
+     * @throws com.tcvcog.tcvce.domain.CaseLifecycleException 
+     */
+    public OccInspection designateGoverningInspection(OccPeriod period) throws CaseLifecycleException{
+        List<OccInspection> inspectionList = period.getInspectionList();
+        OccInspection selIns = null;
+        // logic for determining the currentOccInspection
+        if(inspectionList != null){
+            if(inspectionList.size() == 1){
+                selIns = inspectionList.get(0);
+            } else {
+                Collections.sort(inspectionList);
+                for(OccInspection ins: inspectionList){
+                    if(ins.isActive()){
+                        selIns = ins;
+                    }
+                }
+            }
+        }
+        try {
+            if(period.getGoverningInspection() != null){
+                if (selIns.getInspectionID() != period.getGoverningInspection().getInspectionID()) {
+                    activateOccInspection(selIns);
+                }
+            }
+        } catch (IntegrationException ex) {
+            throw new CaseLifecycleException("Cannot designate governing inspection");
+        }
+        return selIns;
+    }
+    
+    
+    
     public OccPeriod initializeNewOccPeriod(Property p, 
                                             PropertyUnit pu, 
                                             OccPeriodType perType,
@@ -364,7 +408,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         int freshOccPeriodID = oi.insertOccPeriod(op);
         System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
         try {
-            inspectionAction_commenceOccupancyInspection(null, oi.getOccPeriod(freshOccPeriodID, u),  u);
+            inspectionAction_commenceOccupancyInspection(null, null, oi.getOccPeriod(freshOccPeriodID, u),  u);
         } catch (EventException | AuthorizationException | CaseLifecycleException | ViolationException ex) {
             System.out.println(ex);
         }
@@ -378,6 +422,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * sets member variables on there and then passes it into this method.
      * 
      * @param in A skeleton of an OccInspection without an ID number
+     * @param tem
      * @param period the OccPeriod to which the OccInspection should be linked
      * @param templ The template from which the Inspection will draw its SpaceTypes
      * @param user The current user who will become the Inspector
@@ -387,6 +432,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws IntegrationException 
      */
     public OccInspection inspectionAction_commenceOccupancyInspection(  OccInspection in,
+                                                                        OccChecklistTemplate tem,
                                                                         OccPeriod period,
                                                                         User user) throws InspectionException, IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -402,7 +448,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 inspec = new OccInspection();
             }
             inspec.setOccPeriodID(period.getPeriodID());
-            inspec.setChecklistTemplate(oii.getChecklistTemplate(period.getType().getChecklistID()));
+            if(tem == null){
+                inspec.setChecklistTemplate(oii.getChecklistTemplate(period.getType().getChecklistID()));                
+            } else {
+                inspec.setChecklistTemplate(tem);
+            }
             inspec.setInspector(user);
             inspec.setPacc(generateControlCodeFromTime());
 //            if(muni.isEnablePublicOccInspectionTODOs()){
@@ -426,6 +476,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @param inspection The current inspection
      * @param u The current user--not necessarily the official Inspector of the OccInspection
      * @param spc The OccSpace pulled from the OccInspectionTemplate list
+     * @param initialStatus
      * @param loc A populated location descriptor for this Space. Can be an existing location or an new one
      * @return Containing a List of InspectedCodeElement objects ready to be evaluated
      * @throws IntegrationException 
@@ -433,6 +484,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccInspection inspectionAction_commenceSpaceInspection(  OccInspection inspection, 
                                                                     User u, 
                                                                     OccSpace spc, 
+                                                                    OccInspectionStatusEnum initialStatus,
                                                                     OccLocationDescriptor loc) 
                                                                 throws IntegrationException{
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
@@ -453,7 +505,29 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             OccSpaceElement ele = elementIterator.next();
             // Create an OccInspectedElement by by passing in a CodeElement using the special constructor
             inspEle = new OccInspectedSpaceElement(ele, ele.getSpaceElementID());
-            inspEle.setLastInspectedBy(u);
+            if(initialStatus == null){
+                initialStatus = OccInspectionStatusEnum.NOTINSPECTED;
+            }
+            switch(initialStatus){
+                case FAIL:
+                    inspEle.setLastInspectedBy(u);
+                    inspEle.setLastInspectedTS(LocalDateTime.now());
+                    break;
+                case NOTINSPECTED:
+                    inspEle.setLastInspectedBy(null);
+                    inspEle.setLastInspectedTS(null);
+                    break;
+                case PASS:
+                    inspEle.setLastInspectedBy(u);
+                    inspEle.setLastInspectedTS(LocalDateTime.now());
+                    inspEle.setComplianceGrantedBy(u);
+                    inspEle.setComplianceGrantedTS(LocalDateTime.now());
+                    break;
+                default:
+                    inspEle.setLastInspectedBy(null);
+                    inspEle.setLastInspectedTS(null);
+                    
+            }
             inElementList.add(inspEle);
             // each element in this space gets a reference to the same OccLocationDescriptor object
             if(loc == null){
@@ -475,8 +549,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         // now use our convenience method to record Inspection of the space's individual elements
         inspecInt.recordInspectionOfSpaceElements(inspSpace, inspection);
         
+        // check sequence by retrieving new inspected space and displaying info
         inspSpace = inspecInt.getInspectedSpace(inspSpace.getSpaceID());
-        System.out.println("OccucpancyCoordinator.inpectionAction_commenceSpaceInspection | retrievedInspectedSpaceid="+inspSpace);
+        System.out.println("OccucpancyCoordinator.inpectionAction_commenceSpaceInspection | retrievedInspectedSpaceid= "+inspSpace);
         
         return inspection;
     }    
@@ -509,7 +584,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
-    public void activateOccInspection(OccInspection is, User u) throws IntegrationException{
+    public void activateOccInspection(OccInspection is) throws IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         oii.activateOccInspection(is);
         
