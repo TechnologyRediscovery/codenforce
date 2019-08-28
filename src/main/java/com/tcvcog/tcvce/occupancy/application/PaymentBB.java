@@ -214,6 +214,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         payment.setCheckNum(formPayment.getCheckNum());
         payment.setCleared(formPayment.isCleared());
         payment.setNotes(formPayment.getNotes());
+        payment.setRecordedBy(getSessionBean().getSessionUser());
 
         if (payment.getPayer() == null) {
             getFacesContext().addMessage(null,
@@ -234,6 +235,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         try {
             paymentIntegrator.insertPayment(payment);
             if (editingOccPeriod()) {
+                payment = paymentIntegrator.getMostRecentPayment();
                 paymentIntegrator.insertPaymentPeriodJoin(payment, currentOccPeriod);
             }
             getFacesContext().addMessage(null,

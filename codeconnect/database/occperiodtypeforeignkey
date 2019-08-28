@@ -1,0 +1,5 @@
+﻿ALTER TABLE occperiod
+ADD COLUMN occperiodtype_typeid int;
+
+ALTER TABLE occperiod
+ADD CONSTRAINT occperiodtype_typeid_fk FOREIGN KEY (occperiodtype_typeid) REFERENCES occperiodtype (typeid);

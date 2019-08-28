@@ -385,7 +385,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
     public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException {
 
         String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
-                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes\n"
+                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
+                + "recordedby_userid, entrytimestamp\n"
                 + "FROM public.moneypayment, moneyoccperiodfeepayment\n"
                 + "WHERE occperiodassignedfee_id = ? AND payment_paymentid = paymentid;";
         Connection con = getPostgresCon();
@@ -431,7 +432,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public ArrayList<Payment> getPaymentList() throws IntegrationException {
         String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
-                + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes\n"
+                + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
+                + "recordedby_userid, entrytimestamp\n"
                 + "  FROM public.moneypayment;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -474,12 +476,60 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
+    public Payment getMostRecentPayment() throws IntegrationException {
+        String query = "SELECT paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived,\n"
+                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
+                + "recordedby_userid, entrytimestamp\n"
+                + "FROM moneypayment\n"
+                + "WHERE paymentid = (SELECT MAX(paymentid) from moneypayment);";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        Payment skeleton = new Payment();
+
+        try {
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            System.out.println("PaymentIntegrator.getMostRecentPayment | SQL: " + stmt.toString());
+            while (rs.next()) {
+                skeleton = generatePayment(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get most recent payment", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return skeleton;
+    }
+
     public void insertPayment(Payment payment) throws IntegrationException {
         String query = "INSERT INTO public.moneypayment(\n"
-                + "            paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
-                + "            datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes)\n"
+                + " paymentid, occinspec_inspectionid, paymenttype_typeid, datereceived, \n"
+                + " datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes, \n"
+                + " recordedby_userid, entrytimestamp)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, ?, DEFAULT, ?);";
+                + "            ?, ?, ?, ?, ?, DEFAULT, ?, ?, NOW());";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
@@ -503,6 +553,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setString(7, payment.getReferenceNum());
             stmt.setInt(8, payment.getCheckNum());
             stmt.setString(9, payment.getNotes());
+            stmt.setInt(10, payment.getRecordedBy().getUserID());
             System.out.println("PaymentIntegrator.paymentIntegrator | sql: " + stmt.toString());
             stmt.execute();
         } catch (SQLException ex) {
@@ -528,7 +579,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-   public void insertPaymentPeriodJoin(Payment payment, OccPeriod occPeriod) throws IntegrationException {
+    public void insertPaymentPeriodJoin(Payment payment, OccPeriod occPeriod) throws IntegrationException {
         String query = "INSERT INTO public.moneyoccperiodfeepayment(\n"
                 + "    payment_paymentid, occperiodassignedfee_id)\n"
                 + "    VALUES (?, ?);";
@@ -564,7 +615,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
 
     }
-    
+
     public void deletePayment(Payment payment) throws IntegrationException {
         String query = "DELETE FROM public.moneypayment\n"
                 + " WHERE paymentid=?;";
@@ -605,7 +656,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         PersonIntegrator pi = getPersonIntegrator();
 
         UserIntegrator ui = getUserIntegrator();
-        
+
         try {
             newPayment.setPaymentID(rs.getInt("paymentid"));
             newPayment.setOccupancyInspectionID(rs.getInt("occinspec_inspectionid"));
