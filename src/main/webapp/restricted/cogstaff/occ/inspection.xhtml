@@ -709,12 +709,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     value="#{occInspectionBB.elementsInSpaceList}"
                                                     rowIndexVar="#{codeElement.elementID}">
 
-
-                                            </h:panelGroup>
-                                            <h:panelGroup>
-
                                                 </p:dataScroller>
                                             <p:spacer height="5px" />
+
                                         <p:commandButton    id="occperiod-permits-button-newpermit"
                                                             value="view static template"
                                                             ajax="true"
@@ -2872,6 +2869,77 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                          columnClasses="gridTd, gridTd">
 
                             </h:panelGrid>
+                        </h:form>
+
+                    </p:dialog>
+
+                    <p:dialog   id="occperiod-inspectionconfig-dialog"
+                                height="650" width="900"
+                                widgetVar="occperiod-inspectionconfig-dialog-var"
+                                closable="true"
+                                rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                >
+
+                        <h:form id="occperiod-inspectionconfig-form">
+
+                            <h:messages id="occperiod-inspectionconfig-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+
+
+                            <p:dataTable
+                                id="occperiod-inspectionconfig-inspectionlist"
+                                widgetVar="occperiod-inspectionconfig-inspectionlist-var"
+                                var="inspection"
+                                value="#{occInspectionBB.currentOccPeriod.inspectionList}"
+                                rowIndexVar="#{inspection.inspectionID}">
+
+                                <p:column width="5%">
+                                    <f:facet name="header">
+                                        <h:outputText styleClass="ui-label-inline" value="ID" />
+                                    </f:facet>
+                                    <h:outputText styleClass="data-text" value="#{inspection.inspectionID}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText styleClass="ui-label-inline" value="Date created" />
+                                    </f:facet>
+                                    <h:outputText styleClass="data-text" value="#{occInspectionBB.getPrettyDateNoTime(inspection.creationTS)}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText styleClass="ui-label-inline" value="Status" />
+                                    </f:facet>
+                                    <h:outputText styleClass="data-text" value="#{empty inspection.passedInspectionTS ? 'incomplete' : occInspectionBB.getPrettyDateNoTime(inspection.passedInspectionTS)}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText styleClass="ui-label-inline" value="Inspector" />
+                                    </f:facet>
+                                    <h:outputText styleClass="data-text" value="#{inspection.inspector.person.firstName} #{inspection.inspector.person.lastName}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText styleClass="ui-label-inline" value="Active?" />
+                                    </f:facet>
+                                    <h:outputText styleClass="data-text" value="#{inspection.active}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText styleClass="ui-label-inline" value="Activate" />
+                                    </f:facet>
+                                    <p:commandButton   id="occperiod-inspectionconfig-button-activateinspection"
+                                                       ajax="true"
+                                                       actionListener="#{occInspectionBB.activateOccInspection(inspection)}"
+                                                       rendered="#{sessionBean.sessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                       icon="fa fa-bolt"
+                                                       />
+                                </p:column>
+                            </p:dataTable>
+
                         </h:form>
 
                     </p:dialog>
