@@ -28,13 +28,13 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
 
     private List<Payment> paymentList;
     private int moneyFeeAssigned;
-    private int assignedBy;
+    private User assignedBy;
     private int waivedBy;
     private LocalDateTime lastModified;
     private double reducedBy;
     private User reducedByUser;
     private String notes;
-    private int feeID;
+    private Fee fee;
 
     public List<Payment> getPaymentList() {
         return paymentList;
@@ -52,11 +52,11 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
         this.moneyFeeAssigned = moneyFeeAssigned;
     }
 
-    public int getAssignedBy() {
+    public User getAssignedBy() {
         return assignedBy;
     }
 
-    public void setAssignedBy(int assignedBy) {
+    public void setAssignedBy(User assignedBy) {
         this.assignedBy = assignedBy;
     }
 
@@ -100,12 +100,12 @@ public class FeeAssigned  extends EntityUtils implements Serializable {
         this.notes = notes;
     }
 
-    public int getFeeID() {
-        return feeID;
+    public Fee getFee() {
+        return fee;
     }
 
-    public void setFeeID(int feeID) {
-        this.feeID = feeID;
+    public void setFee(Fee fee) {
+        this.fee = fee;
     }
         
 }

@@ -25,8 +25,6 @@ import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
@@ -141,6 +139,53 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+    public Fee getFee(int feeID) throws IntegrationException{
+        Fee skeleton = new Fee();
+        
+        String query = "SELECT feeid, muni_municode, feename, feeamount, effectivedate, expirydate, notes\n"
+                + "FROM moneyfee\n"
+                + "WHERE feeid = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, feeID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                skeleton = generateFee(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.getFee | Unable to retrieve fee of ID" + feeID, ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+        
+        return skeleton;
+    }
+    
     public List<Fee> getFeeList(OccPeriodType type) throws IntegrationException {
 
         List<Fee> feeList = new ArrayList<>();
@@ -245,13 +290,13 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
-            fee.setAssignedBy(rs.getInt("assignedby_userid"));
+            fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
             fee.setWaivedBy(rs.getInt("waivedby_userid"));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
             fee.setReducedBy(rs.getDouble("reducedby"));
             fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
             fee.setNotes(rs.getString("notes"));
-            fee.setFeeID(rs.getInt("fee_feeid"));
+            fee.setFee(getFee(rs.getInt("fee_feeid")));
 
             fee.setOccPeriodID(rs.getInt("occperiod_periodid"));
             fee.setOccPeriodTypeID(rs.getInt("occperiodtype_typeid"));
@@ -273,13 +318,13 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
-            fee.setAssignedBy(rs.getInt("assignedby_userid"));
+            fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
             fee.setWaivedBy(rs.getInt("waivedby_userid"));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
             fee.setReducedBy(rs.getDouble("reducedby"));
             fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
             fee.setNotes(rs.getString("notes"));
-            fee.setFeeID(rs.getInt("fee_feeid"));
+            fee.setFee(getFee(rs.getInt("fee_feeid")));
 
             fee.setCeCaseAssignedFeeID(rs.getInt("cecaseassignedfeeid"));
             fee.setCaseID(rs.getInt("cecase_caseid"));
@@ -302,8 +347,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             fee.setOccupancyInspectionFeeID(rs.getInt("feeid"));
             fee.setMuni(mi.getMuni(rs.getInt("muni_municode")));
-            fee.setFeeName(rs.getString("feename"));
-            fee.setFeeAmount(rs.getDouble("feeamount"));
+            fee.setName(rs.getString("feename"));
+            fee.setAmount(rs.getDouble("feeamount"));
             fee.setEffectiveDate(rs.getTimestamp("effectivedate").toLocalDateTime());
             fee.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
             fee.setNotes(rs.getString("notes"));
@@ -1138,8 +1183,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             newOif.setOccupancyInspectionFeeID(rs.getInt("feeid"));
             newOif.setMuni(mi.getMuni(rs.getInt("muni_municode")));
-            newOif.setFeeName(rs.getString("feename"));
-            newOif.setFeeAmount(rs.getDouble("feeamount"));
+            newOif.setName(rs.getString("feename"));
+            newOif.setAmount(rs.getDouble("feeamount"));
             newOif.setEffectiveDate(rs.getTimestamp("effectivedate").toLocalDateTime());
             newOif.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
             newOif.setNotes(rs.getString("notes"));

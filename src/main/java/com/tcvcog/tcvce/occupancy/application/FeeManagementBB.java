@@ -65,8 +65,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             editing = true;
             formFee.setOccupancyInspectionFeeID(selectedFeeType.getOccupancyInspectionFeeID());
             formFee.setMuni(selectedFeeType.getMuni());
-            formFee.setFeeName(selectedFeeType.getFeeName());
-            formFee.setFeeAmount(selectedFeeType.getFeeAmount());
+            formFee.setName(selectedFeeType.getName());
+            formFee.setAmount(selectedFeeType.getAmount());
             formFee.setNotes(selectedFeeType.getNotes());
             /*
             Have to figure out what to do w/ setting dates...
@@ -87,8 +87,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         Fee oif = selectedFeeType;
 
         oif.setMuni(formFee.getMuni());
-        oif.setFeeName(formFee.getFeeName());
-        oif.setFeeAmount(formFee.getFeeAmount());
+        oif.setName(formFee.getName());
+        oif.setAmount(formFee.getAmount());
         oif.setEffectiveDate(formFee.getEffectiveDate());
         oif.setExpiryDate(formFee.getExpiryDate());
         oif.setNotes(formFee.getNotes());
@@ -113,8 +113,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         Fee oif = new Fee();
         oif.setOccupancyInspectionFeeID(formFee.getOccupancyInspectionFeeID());
         oif.setMuni(getFormMuni());
-        oif.setFeeName(formFee.getFeeName());
-        oif.setFeeAmount(formFee.getFeeAmount());
+        oif.setName(formFee.getName());
+        oif.setAmount(formFee.getAmount());
         oif.setEffectiveDate(formFee.getEffectiveDate());
         oif.setExpiryDate(formFee.getExpiryDate());
         oif.setNotes(formFee.getNotes());
@@ -220,28 +220,28 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @return the formFeeName
      */
     public String getFormFeeName() {
-        return formFee.getFeeName();
+        return formFee.getName();
     }
 
     /**
      * @param formFeeName the formFeeName to set
      */
     public void setFormFeeName(String formFeeName) {
-        this.formFee.setFeeName(formFeeName);
+        this.formFee.setName(formFeeName);
     }
 
     /**
      * @return the formFeeAmount
      */
     public double getFormFeeAmount() {
-        return formFee.getFeeAmount();
+        return formFee.getAmount();
     }
 
     /**
      * @param formFeeAmount the formFeeAmount to set
      */
     public void setFormFeeAmount(double formFeeAmount) {
-        this.formFee.setFeeAmount(formFeeAmount);
+        this.formFee.setAmount(formFeeAmount);
     }
 
     /**
